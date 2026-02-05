@@ -1,449 +1,269 @@
-Return-Path: <kvm+bounces-70372-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70373-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mEGUNxYQhWms7wMAu9opvQ
-	(envelope-from <kvm+bounces-70372-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 22:48:06 +0100
+	id yAbVOAkRhWms7wMAu9opvQ
+	(envelope-from <kvm+bounces-70373-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 22:52:09 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AB84F7DF6
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 22:48:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40E07F7E96
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 22:52:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2BC753092544
-	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 21:44:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 75F4F3007A67
+	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 21:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0089F33A6F1;
-	Thu,  5 Feb 2026 21:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2DD33469D;
+	Thu,  5 Feb 2026 21:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2CXF8Ou8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zo6B4CDz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2826B339B3C
-	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 21:43:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00FCD29BDA2
+	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 21:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770327830; cv=none; b=nYgiE04jt4N1veLSak4kqOmT8WDEQKW+Kzs4KM8fPhImjFKngtVzbVaF5Qbvbona7g3hTmP5WVCkp1j9vcmCfJStwY4akQ2lgZunGV+c08WQoJzzYSK7b5Wv6FmZakWmUcq19GRnIKM6gcF1M3WDn91JbAL+NOiNBBMINIhC1Bs=
+	t=1770328323; cv=none; b=skYhKR9Evb98RW3cpzsYyIhjj5rMNqSUoLkcEeS+qtJdNKQmg6JPMZBgLEHRZfInmwIfEH663RYDC5/77c6k2zYkEcBzpcDyIg0LTD0miVDH7mm204egcKYhHmlHukLkrpm0GHb0RTzbud91k3T988G9Mv07p2As6Ehpp11k9cE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770327830; c=relaxed/simple;
-	bh=JZ5ruax6Fqre5VIwRYbUJVDDyy/C2tkKudh0Pd6yX/M=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BgdBJz77TiOZIe0GF0u7xv3HtLvan4oFzDGXejovUVzimVSYjb3hkjXxXPNTRfNJIGMAv1Ijm1qwwDCziMV1+UTSgyz/8hrFwQiwCE/sCbW70B7vAYzHLhgFEUbPOI5+5XSn1XSVtwg0pCyKdGo7SLm8k1YkyCNJFEzyXf0/aXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2CXF8Ou8; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1770328323; c=relaxed/simple;
+	bh=F3aKZ/fCnbB9EJmonJjgo8SU4XqpJqBtz1yAs+j9ReM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HQy07cWOzcRvwqIkxTlwcBQZo5M2mqMoMAs37bQnMFUlu1jblKiuYEWT/CG7l8pdGgZKoPhvbKRSNlV/FfqwaX7FymfA3GfueXJF7JtDvXxRxvXvwlpMtMDvU+VRAuPKbb8XQ7KGv8WXz6iXyWQZDOzdlSwBxK8IgG90B30JOuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zo6B4CDz; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a946c0e441so10099755ad.1
-        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 13:43:50 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2a7bceb6cd0so9996275ad.1
+        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 13:52:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770327829; x=1770932629; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1yRMb4qc+aRpKM0YfgdxkNe0DvJ7aTkEuu9+gYbrEts=;
-        b=2CXF8Ou81t60wqGx1B4aiqHvpCDSZJPGD4UK0Vv1Lp1U64bZPb7pONh+KURj9HBich
-         jAAdrY0MpXemYjgwUW5vJgVZdXKUaOSObVR/tGefyhuZmt71LK3YiAMRnF/FmsJAivuk
-         sb5DW7FTyY+XwKWgNzVmJxhSmTxPyuxO24E7QkOErCwY0DsAZ47Cd8ely5CxQpvw/9Hv
-         tocZYNj/zsL7PUiXa4LjFS8NG0CLgLNRw8SuFXyDdQgpMCUGg7h/jvh56Xtg/Fi3cCRw
-         zErIPnRZFunXl6QozOmFznrR9FqLseyFaJsnMjVVJbM++YCqdNhP4Mb9QFlcL9wQDyUI
-         T4fg==
+        d=google.com; s=20230601; t=1770328322; x=1770933122; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=kGsy+6Drt04/pl8yx93tFPhkkWQllmpTFtK5bY5HHKI=;
+        b=zo6B4CDzOGlGXmOvjRL/lMANxUl4N3LMS16xfUwXnMDXBRpMnGEinBZG1yN/mavVSw
+         MTOWp8oegko5eCOezR1SJM1kCtufF6NHEIOFYVHg+GepYMQOiCONJ3ifcuu+bI8eAJob
+         6Epvs0Wu1jhWY6wHu07KTyaT60sIr5iyHZ52B5Glvll1bS3PJ6OroCThuWBY5guYqPLo
+         f/MeNo80xp+wwRexTgW6BRwFeowC2JyzoCJl+c8i9NVJBmm/NwWN7T0s5Voj/iChYd3e
+         2m0mzBvEDC4SAf7/KVnyi1TaV2q/msHAIjFZFpM/xFW31TTaOImHR/Y0ilU1Fh+eeJXU
+         QHOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770327829; x=1770932629;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1yRMb4qc+aRpKM0YfgdxkNe0DvJ7aTkEuu9+gYbrEts=;
-        b=SxZQCT5LH/9DfF649d5gdWDZ044e9m6fJ1ighTvz9B1SkXB60yPsOQeMYCzLFSOn6N
-         AAfDZtWauFVN5i2q/hsOK68ht3yTwg+HWecLVbKrE9/ho5fnAHE7VUiBYFU3FzbRyBkV
-         8YbX2lsdUFfd87V4bSh3+PXOfDsm7D3hvZ/JojkGp7diVGVo2pMtrtZuesXMGT4fNDfp
-         ZBQde65hqyCGwlcVrOYBsBcwbVsUWyylfoFA/uC2CxFGsJ2ljqrRm7vJl/g6BBBADzQH
-         MNs7785ivmI+0QE9WsnHbf9QYmhJtwyR5lrg3Xu0JqctW/w7lMUXIQ6aY8RbB+eOWVJ4
-         6xNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXNSU3k6QLUBJQ3Q1RUyKdOa/SjLxirFkEraVLJZTMY2qyneNoVBkYVv87/FSdExs07FT8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywv2WOr5i6hkj7RnWTkveB1WJXgLv3r6XGz9XrAcAhxsxu+Pj2q
-	/BHpwmfIaXlO0h9ezLnc7WZijywCAlepvGYsgoBaK08DbUA7wg89winF3PRiIn9Jk1Ju+V3L5cA
-	jpj+PDkcJPb5znw==
-X-Received: from pjbqd12.prod.google.com ([2002:a17:90b:3ccc:b0:352:b687:3b20])
- (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:4f45:b0:343:7714:4cab with SMTP id 98e67ed59e1d1-354b3e2f162mr294708a91.22.1770327829498;
- Thu, 05 Feb 2026 13:43:49 -0800 (PST)
-Date: Thu,  5 Feb 2026 13:43:08 -0800
-In-Reply-To: <20260205214326.1029278-1-jmattson@google.com>
+        d=1e100.net; s=20230601; t=1770328322; x=1770933122;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kGsy+6Drt04/pl8yx93tFPhkkWQllmpTFtK5bY5HHKI=;
+        b=UnodV2dw4ijHok9mswy/l8U0wxNcBx1zFvp4om1tMxNbiTMBmNNGjUjW8NUBPwzgy9
+         u7EYwLyX4A85kZBUcVU2N8UoSpDBUmsOKuUdALfmUlMftM6PeSETfeBpUkusOO+jPRbO
+         rILPtSqCBTGsbOZGA9CW/OuX4muOSJSM6miQlx8CRUPFO0arFiKt01ieQsTKSEEtvDpG
+         0psdZXv2p/L9+Cjnr/SVZ9YEF4CMuK9lLta3nUhbVY4V4ORMnIs8wn69xD1zLDMKC7m4
+         4koPrk7Svo0UmRUcHsJkx/r1k1p9pIxkY9AeDB7qw1lGvTNPq9anb8uVQdAwjC49H7Xi
+         s7Vg==
+X-Forwarded-Encrypted: i=1; AJvYcCUhZeMZUrE/9UdUaSrvRu4tdHPI7liJTsNIPOBAB0lhNFZBVIhFf55VbDDDC4AcRjq0/4o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytqbRSuM9PszXBF+TBF+8q9cUYa3hXPQ0SeJtvpBleAo8jrxA2
+	poS9UXEEtgw3zX1FyP2ZIYZ5P9Ag4OC7cTpZWFItwfDqpJA+Vr/XZ8jGO+fFDUfmmg==
+X-Gm-Gg: AZuq6aLij3oTS2+qpQaSX+zh7NZckRWs67bpdOtt3UGxGYFrlwBLYFWaJVIPX1tAq3H
+	pwhSad3ZKBo0MBgQhqqztwiw/kp1NIFi8yEhHzUDq/QfnEp3+G5yIidv72w5pAzE7gg13od+cCc
+	CtKgjlhwidasEm4VjsHOZ3/QZZMBnQjDqlL0VN9BmtXDCy5j5byuBkyOtzyL2ztfnl98TXmEsFB
+	AoabkaaEpp+38ryDi8XNaHDpS9Sabzj+R7ShrC+11w+7Cjj+nvKrzLpGBRMDl4SfsjgsleW68uD
+	stuEFw2a8aZKgsqn2NjY2ELdIGq3xtrQFa4Q0LeACtjkFeyXG7E214oSVE2WuPUMORfqlTeYYre
+	qAl44/9SYx/4R1jnDhEkL4JlZty4XKeT9+s0HDO6GxjAHnyU0LEggx/SEX4JhXIimNG7RBumoqQ
+	uMtAA2GtcMYHJd4AvNnPYX2fyPDaXLmKCOEaSfSMiaOOAWLwwoiA==
+X-Received: by 2002:a17:902:c94b:b0:2a1:deb:c460 with SMTP id d9443c01a7336-2a9516d3e0cmr5394585ad.33.1770328321980;
+        Thu, 05 Feb 2026 13:52:01 -0800 (PST)
+Received: from google.com (79.217.168.34.bc.googleusercontent.com. [34.168.217.79])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a9521b9f5esm3197445ad.51.2026.02.05.13.52.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Feb 2026 13:52:01 -0800 (PST)
+Date: Thu, 5 Feb 2026 21:51:56 +0000
+From: David Matlack <dmatlack@google.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Alex Williamson <alex@shazbot.org>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
+	David Woodhouse <dwmw2@infradead.org>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH v2 6/6] vfio: selftests: Add tests to validate SR-IOV UAPI
+Message-ID: <aYUQ_HkDJU9kjsUl@google.com>
+References: <20251210181417.3677674-1-rananta@google.com>
+ <20251210181417.3677674-7-rananta@google.com>
+ <aUSNoBzvybi24SUD@google.com>
+ <CAJHc60zAB8pyc7=ca=eOf+SEEvnZ3JxVEnZoOtgj+mX1GQiALw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260205214326.1029278-1-jmattson@google.com>
-X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260205214326.1029278-9-jmattson@google.com>
-Subject: [PATCH v3 8/8] KVM: selftests: nSVM: Add svm_nested_pat test
-From: Jim Mattson <jmattson@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJHc60zAB8pyc7=ca=eOf+SEEvnZ3JxVEnZoOtgj+mX1GQiALw@mail.gmail.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70372-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-70373-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8AB84F7DF6
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 40E07F7E96
 X-Rspamd-Action: no action
 
-Verify that when nested NPT is enabled, L1 and L2 have independent PATs,
-and changes to the PAT by either guest are not visible to the other.
+On 2026-01-06 11:47 AM, Raghavendra Rao Ananta wrote:
+> On Thu, Dec 18, 2025 at 3:26 PM David Matlack <dmatlack@google.com> wrote:
+> >
+> > On 2025-12-10 06:14 PM, Raghavendra Rao Ananta wrote:
+> > > Add a selfttest, vfio_pci_sriov_uapi_test.c, to validate the
+> > > SR-IOV UAPI, including the following cases, iterating over
+> > > all the IOMMU modes currently supported:
+> > >  - Setting correct/incorrect/NULL tokens during device init.
+> > >  - Close the PF device immediately after setting the token.
+> > >  - Change/override the PF's token after device init.
+> > >
+> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> >
+> > I hit the following kernel NULL pointer dereference after running the
+> > new test a few times (nice!).
+> >
+> > Repro:
+> >
+> >   $ tools/testing/selftests/vfio/scripts/setup.sh 0000:16:00.1
+> >   $ tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test 0000:16:00.1
+> >   $ tools/testing/selftests/vfio/scripts/cleanup.sh
+> >   ... repeat ...
+> >
+> > The panic:
+> >
+> > [  553.245784][T27601] vfio-pci 0000:1a:00.0: probe with driver vfio-pci failed with error -22
+> > [  553.256622][T27601] vfio-pci 0000:1a:00.0: probe with driver vfio-pci failed with error -22
+> > [  574.857650][T27935] BUG: kernel NULL pointer dereference, address: 0000000000000008
+> > [  574.865322][T27935] #PF: supervisor read access in kernel mode
+> > [  574.871175][T27935] #PF: error_code(0x0000) - not-present page
+> > [  574.877021][T27935] PGD 4116e63067 P4D 40fb0a3067 PUD 409597f067 PMD 0
+> > [  574.883654][T27935] Oops: Oops: 0000 [#1] SMP NOPTI
+> > [  574.888551][T27935] CPU: 100 UID: 0 PID: 27935 Comm: vfio_pci_sriov_ Tainted: G S      W           6.18.0-smp-DEV #1 NONE
+> > [  574.899600][T27935] Tainted: [S]=CPU_OUT_OF_SPEC, [W]=WARN
+> > [  574.905104][T27935] Hardware name: Google Izumi-EMR/izumi, BIOS 0.20250801.2-0 08/25/2025
+> > [  574.913289][T27935] RIP: 0010:rb_insert_color+0x44/0x110
+> > [  574.918623][T27935] Code: cc cc 48 89 cf 48 83 cf 01 48 89 3a 48 89 38 48 8b 01 48 89 cf 48 83 e0 fc 48 89 01 74 d7 48 8b 08 f6 c1 01 0f 85 c1 00 00 00 <48> 8b 51 08 48 39 c2 74 0c 48 85 d2 74 4f f6 02 01 74 c5 eb 48 48
+> > [  574.938080][T27935] RSP: 0018:ff85113dcdd6bb08 EFLAGS: 00010046
+> > [  574.944013][T27935] RAX: ff3f257594a99e80 RBX: ff3f25758af490c0 RCX: 0000000000000000
+> > [  574.951857][T27935] RDX: 0000000000001a00 RSI: ff3f25360038eb70 RDI: ff3f2536658bbee0
+> > [  574.959702][T27935] RBP: ff3f25360038ea00 R08: 0000000000000002 R09: ff85113dcdd6badc
+> > [  574.967544][T27935] R10: ff3f257590ab8000 R11: ffffffffa78210a0 R12: ff3f2536658bbea0
+> > [  574.975387][T27935] R13: 0000000000000286 R14: ff3f25758af49000 R15: ff3f25360038eb78
+> > [  574.983230][T27935] FS:  00000000223403c0(0000) GS:ff3f25b4d4d83000(0000) knlGS:0000000000000000
+> > [  574.992032][T27935] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [  574.998488][T27935] CR2: 0000000000000008 CR3: 00000040fa254005 CR4: 0000000000f71ef0
+> > [  575.006332][T27935] PKRU: 55555554
+> > [  575.009753][T27935] Call Trace:
+> > [  575.012919][T27935]  <TASK>
+> > [  575.015730][T27935]  intel_iommu_probe_device+0x4c9/0x7b0
+> > [  575.021153][T27935]  __iommu_probe_device+0x101/0x4c0
+> > [  575.026231][T27935]  iommu_bus_notifier+0x37/0x100
+> > [  575.031046][T27935]  blocking_notifier_call_chain+0x53/0xd0
+> > [  575.036634][T27935]  bus_notify+0x99/0xc0
+> > [  575.040666][T27935]  device_add+0x252/0x470
+> > [  575.044872][T27935]  pci_device_add+0x414/0x5c0
+> > [  575.049429][T27935]  pci_iov_add_virtfn+0x2f2/0x3e0
+> > [  575.054326][T27935]  sriov_add_vfs+0x33/0x70
+> > [  575.058613][T27935]  sriov_enable+0x2fc/0x490
+> > [  575.062992][T27935]  vfio_pci_core_sriov_configure+0x16c/0x210
+> > [  575.068843][T27935]  sriov_numvfs_store+0xc4/0x190
+> > [  575.073652][T27935]  kernfs_fop_write_iter+0xfe/0x180
+> > [  575.078724][T27935]  vfs_write+0x2d0/0x430
+> > [  575.082846][T27935]  ksys_write+0x7f/0x100
+> > [  575.086965][T27935]  do_syscall_64+0x6f/0x940
+> > [  575.091339][T27935]  ? arch_exit_to_user_mode_prepare+0x9/0xb0
+> > [  575.097193][T27935]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/x86/svm_nested_pat_test.c   | 298 ++++++++++++++++++
- 2 files changed, 299 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/svm_nested_pat_test.c
+I think this is a use-after-free.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 58eee0474db6..dddaaa6ac157 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -110,6 +110,7 @@ TEST_GEN_PROGS_x86 += x86/state_test
- TEST_GEN_PROGS_x86 += x86/vmx_preemption_timer_test
- TEST_GEN_PROGS_x86 += x86/svm_vmcall_test
- TEST_GEN_PROGS_x86 += x86/svm_int_ctl_test
-+TEST_GEN_PROGS_x86 += x86/svm_nested_pat_test
- TEST_GEN_PROGS_x86 += x86/svm_nested_shutdown_test
- TEST_GEN_PROGS_x86 += x86/svm_nested_soft_inject_test
- TEST_GEN_PROGS_x86 += x86/tsc_scaling_sync
-diff --git a/tools/testing/selftests/kvm/x86/svm_nested_pat_test.c b/tools/testing/selftests/kvm/x86/svm_nested_pat_test.c
-new file mode 100644
-index 000000000000..08c1428969b0
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/svm_nested_pat_test.c
-@@ -0,0 +1,298 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * KVM nested SVM PAT test
-+ *
-+ * Copyright (C) 2026, Google LLC.
-+ *
-+ * Test that KVM correctly virtualizes the PAT MSR and VMCB g_pat field
-+ * for nested SVM guests:
-+ *
-+ * o With nested NPT disabled:
-+ *     - L1 and L2 share the same PAT
-+ *     - The vmcb12.g_pat is ignored
-+ * o With nested NPT enabled:
-+ *     - Invalid g_pat in vmcb12 should cause VMEXIT_INVALID
-+ *     - L2 should see vmcb12.g_pat via RDMSR, not L1's PAT
-+ *     - L2's writes to PAT should be saved to vmcb12 on exit
-+ *     - L1's PAT should be restored after #VMEXIT from L2
-+ *     - State save/restore should preserve both L1's and L2's PAT values
-+ */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "svm_util.h"
-+
-+#define L2_GUEST_STACK_SIZE 256
-+
-+#define PAT_DEFAULT		0x0007040600070406ULL
-+#define L1_PAT_VALUE		0x0007040600070404ULL  /* Change PA0 to WT */
-+#define L2_VMCB12_PAT		0x0606060606060606ULL  /* All WB */
-+#define L2_PAT_MODIFIED		0x0606060606060604ULL  /* Change PA0 to WT */
-+#define INVALID_PAT_VALUE	0x0808080808080808ULL  /* 8 is reserved */
-+
-+/*
-+ * Shared state between L1 and L2 for verification.
-+ */
-+struct pat_test_data {
-+	uint64_t l2_pat_read;
-+	uint64_t l2_pat_after_write;
-+	uint64_t l1_pat_after_vmexit;
-+	uint64_t vmcb12_gpat_after_exit;
-+	bool l2_done;
-+};
-+
-+static struct pat_test_data *pat_data;
-+
-+static void l2_guest_code(void)
-+{
-+	pat_data->l2_pat_read = rdmsr(MSR_IA32_CR_PAT);
-+	wrmsr(MSR_IA32_CR_PAT, L2_PAT_MODIFIED);
-+	pat_data->l2_pat_after_write = rdmsr(MSR_IA32_CR_PAT);
-+	pat_data->l2_done = true;
-+	vmmcall();
-+}
-+
-+static void l2_guest_code_saverestoretest(void)
-+{
-+	pat_data->l2_pat_read = rdmsr(MSR_IA32_CR_PAT);
-+
-+	GUEST_SYNC(1);
-+	GUEST_ASSERT_EQ(rdmsr(MSR_IA32_CR_PAT), pat_data->l2_pat_read);
-+
-+	wrmsr(MSR_IA32_CR_PAT, L2_PAT_MODIFIED);
-+	pat_data->l2_pat_after_write = rdmsr(MSR_IA32_CR_PAT);
-+
-+	GUEST_SYNC(2);
-+	GUEST_ASSERT_EQ(rdmsr(MSR_IA32_CR_PAT), L2_PAT_MODIFIED);
-+
-+	pat_data->l2_done = true;
-+	vmmcall();
-+}
-+
-+static void l2_guest_code_multi_vmentry(void)
-+{
-+	pat_data->l2_pat_read = rdmsr(MSR_IA32_CR_PAT);
-+	wrmsr(MSR_IA32_CR_PAT, L2_PAT_MODIFIED);
-+	pat_data->l2_pat_after_write = rdmsr(MSR_IA32_CR_PAT);
-+	vmmcall();
-+
-+	pat_data->l2_pat_read = rdmsr(MSR_IA32_CR_PAT);
-+	pat_data->l2_done = true;
-+	vmmcall();
-+}
-+
-+static struct vmcb *l1_common_setup(struct svm_test_data *svm,
-+				    struct pat_test_data *data,
-+				    void *l2_guest_code,
-+				    void *l2_guest_stack)
-+{
-+	struct vmcb *vmcb = svm->vmcb;
-+
-+	pat_data = data;
-+
-+	wrmsr(MSR_IA32_CR_PAT, L1_PAT_VALUE);
-+	GUEST_ASSERT_EQ(rdmsr(MSR_IA32_CR_PAT), L1_PAT_VALUE);
-+
-+	generic_svm_setup(svm, l2_guest_code, l2_guest_stack);
-+
-+	vmcb->save.g_pat = L2_VMCB12_PAT;
-+	vmcb->control.intercept &= ~(1ULL << INTERCEPT_MSR_PROT);
-+
-+	return vmcb;
-+}
-+
-+static void l1_assert_l2_state(struct pat_test_data *data, uint64_t expected_pat_read)
-+{
-+	GUEST_ASSERT(data->l2_done);
-+	GUEST_ASSERT_EQ(data->l2_pat_read, expected_pat_read);
-+	GUEST_ASSERT_EQ(data->l2_pat_after_write, L2_PAT_MODIFIED);
-+}
-+
-+static void l1_svm_code_npt_disabled(struct svm_test_data *svm,
-+				     struct pat_test_data *data)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb;
-+
-+	vmcb = l1_common_setup(svm, data, l2_guest_code,
-+			       &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-+	l1_assert_l2_state(data, L1_PAT_VALUE);
-+
-+	data->l1_pat_after_vmexit = rdmsr(MSR_IA32_CR_PAT);
-+	GUEST_ASSERT_EQ(data->l1_pat_after_vmexit, L2_PAT_MODIFIED);
-+
-+	GUEST_DONE();
-+}
-+
-+static void l1_svm_code_invalid_gpat(struct svm_test_data *svm,
-+				     struct pat_test_data *data)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb;
-+
-+	vmcb = l1_common_setup(svm, data, l2_guest_code,
-+			       &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	vmcb->save.g_pat = INVALID_PAT_VALUE;
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_ERR);
-+	GUEST_ASSERT(!data->l2_done);
-+
-+	GUEST_DONE();
-+}
-+
-+static void l1_svm_code_npt_enabled(struct svm_test_data *svm,
-+				    struct pat_test_data *data)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb;
-+
-+	vmcb = l1_common_setup(svm, data, l2_guest_code,
-+			       &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-+	l1_assert_l2_state(data, L2_VMCB12_PAT);
-+
-+	data->vmcb12_gpat_after_exit = vmcb->save.g_pat;
-+	GUEST_ASSERT_EQ(data->vmcb12_gpat_after_exit, L2_PAT_MODIFIED);
-+
-+	data->l1_pat_after_vmexit = rdmsr(MSR_IA32_CR_PAT);
-+	GUEST_ASSERT_EQ(data->l1_pat_after_vmexit, L1_PAT_VALUE);
-+
-+	GUEST_DONE();
-+}
-+
-+static void l1_svm_code_saverestore(struct svm_test_data *svm,
-+				    struct pat_test_data *data)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb;
-+
-+	vmcb = l1_common_setup(svm, data, l2_guest_code_saverestoretest,
-+			       &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-+	GUEST_ASSERT(data->l2_done);
-+
-+	GUEST_ASSERT_EQ(rdmsr(MSR_IA32_CR_PAT), L1_PAT_VALUE);
-+	GUEST_ASSERT_EQ(vmcb->save.g_pat, L2_PAT_MODIFIED);
-+
-+	GUEST_DONE();
-+}
-+
-+static void l1_svm_code_multi_vmentry(struct svm_test_data *svm,
-+				      struct pat_test_data *data)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb;
-+
-+	vmcb = l1_common_setup(svm, data, l2_guest_code_multi_vmentry,
-+			       &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-+
-+	GUEST_ASSERT_EQ(data->l2_pat_after_write, L2_PAT_MODIFIED);
-+	GUEST_ASSERT_EQ(vmcb->save.g_pat, L2_PAT_MODIFIED);
-+	GUEST_ASSERT_EQ(rdmsr(MSR_IA32_CR_PAT), L1_PAT_VALUE);
-+
-+	vmcb->save.rip += 3;  /* vmmcall */
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-+	GUEST_ASSERT(data->l2_done);
-+	GUEST_ASSERT_EQ(data->l2_pat_read, L2_PAT_MODIFIED);
-+	GUEST_ASSERT_EQ(rdmsr(MSR_IA32_CR_PAT), L1_PAT_VALUE);
-+
-+	GUEST_DONE();
-+}
-+
-+static void run_test(void *l1_code, const char *test_name, bool npt_enabled,
-+		     bool do_save_restore)
-+{
-+	struct pat_test_data *data_hva;
-+	vm_vaddr_t svm_gva, data_gva;
-+	struct kvm_x86_state *state;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	pr_info("Testing: %s\n", test_name);
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, l1_code);
-+	if (npt_enabled)
-+		vm_enable_npt(vm);
-+
-+	vcpu_alloc_svm(vm, &svm_gva);
-+
-+	data_gva = vm_vaddr_alloc_page(vm);
-+	data_hva = addr_gva2hva(vm, data_gva);
-+	memset(data_hva, 0, sizeof(*data_hva));
-+
-+	if (npt_enabled)
-+		tdp_identity_map_default_memslots(vm);
-+
-+	vcpu_args_set(vcpu, 2, svm_gva, data_gva);
-+
-+	for (;;) {
-+		vcpu_run(vcpu);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			if (do_save_restore) {
-+				pr_info("  Save/restore at sync point %ld\n",
-+					uc.args[1]);
-+				state = vcpu_save_state(vcpu);
-+				kvm_vm_release(vm);
-+				vcpu = vm_recreate_with_one_vcpu(vm);
-+				vcpu_load_state(vcpu, state);
-+				kvm_x86_state_cleanup(state);
-+			}
-+			break;
-+		case UCALL_DONE:
-+			pr_info("  PASSED\n");
-+			kvm_vm_free(vm);
-+			return;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_NPT));
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
-+
-+	run_test(l1_svm_code_npt_disabled, "nested NPT disabled", false, false);
-+
-+	run_test(l1_svm_code_invalid_gpat, "invalid g_pat", true, false);
-+
-+	run_test(l1_svm_code_npt_enabled, "nested NPT enabled", true, false);
-+
-+	run_test(l1_svm_code_saverestore, "save/restore", true, true);
-+
-+	run_test(l1_svm_code_multi_vmentry, "multiple entries", true, false);
-+
-+	return 0;
-+}
--- 
-2.53.0.rc2.204.g2597b5adb4-goog
+The VF used in this test matches quirk_intel_e2000_no_ats() which means
+that ATS gets disabled (pdev->ats_cap = 0) via quirk after the device is
+set up.
 
+ drivers/pci/quirks.c:
+
+ 5651 DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_INTEL, 0x1457, quirk_intel_e2000_no_ats);
+
+The issue is this quirk is applied after the Intel IOMMU driver is
+notified about the device.
+
+So during intel_iommu_probe_device(), the Intel IOMMU driver sees that
+ATS is enabled, and adds the device to the device rbtree:
+
+ drivers/iommu/intel/iommu.c:
+
+ 3765 static struct iommu_device *intel_iommu_probe_device(struct device *dev)
+ 3766 {
+ ...
+ 3826         if (pdev && pci_ats_supported(pdev)) {
+ 3827                 pci_prepare_ats(pdev, VTD_PAGE_SHIFT);
+ 3828                 ret = device_rbtree_insert(iommu, info);
+ 3829                 if (ret)
+ 3830                         goto free;
+ 3831         }
+ ...
+ 3858 }
+
+
+Then ATS is disabled via quirk:
+
+ drivers/pci/iov.c:
+
+ 346 int pci_iov_add_virtfn(struct pci_dev *dev, int id)
+ 347 {
+ ...
+ 383
+ 384         pci_device_add(virtfn, virtfn->bus);  <======= notifies Intel IOMMU
+ 385         rc = pci_iov_sysfs_link(dev, virtfn, id);
+ 386         if (rc)
+ 387                 goto failed1;
+ 388
+ 389         pci_bus_add_device(virtfn);  <==== Disables ATS via pci_fixup_final
+ 390
+ 391         return 0;
+ ...
+ 401 }
+
+Then later when the VF is destroyed (SR-IOV disabled on the PF), the
+Intel IOMMU sees that ATS is disabled and does not remove the device
+from its rbtree.
+
+ drivers/iommu/intel/iommu.c:
+
+ 3889 static void intel_iommu_release_device(struct device *dev)
+ 3890 {
+ ...
+ 3903         if (dev_is_pci(dev) && pci_ats_supported(to_pci_dev(dev)))
+ 3904                 device_rbtree_remove(info);
+ ...
+ 3913         kfree(info);   <======= info is still reachable from device rbtree
+ 3914 }
 
