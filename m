@@ -1,200 +1,234 @@
-Return-Path: <kvm+bounces-70317-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70318-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iEedFRB0hGn12wMAu9opvQ
-	(envelope-from <kvm+bounces-70317-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 11:42:24 +0100
+	id iHkQOSR5hGk23AMAu9opvQ
+	(envelope-from <kvm+bounces-70318-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 12:04:04 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 626C8F16DB
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 11:42:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 412B4F19EC
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 12:04:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D234E300690E
-	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 10:42:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 864283049709
+	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 10:58:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF583A9616;
-	Thu,  5 Feb 2026 10:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A4B3A9D9B;
+	Thu,  5 Feb 2026 10:58:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cosisSUp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jG0lM977"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BA63A962E;
-	Thu,  5 Feb 2026 10:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770288128; cv=none; b=k8wsFtD4izMBA+5MxQ7fFWXEJRiECi4niDRzgoruQJ0TERa2wnr8D1zACoLT9+7rW5zCcr/3DsOmX3DLb7iQRQfK4XE9goi72nrcUAX0RJFUB3wYfDZ7iw/rqw3dtrrPinQY26i6f2dGvEBE9ZondwpNKNn0D1l+p6VEk2R7DhA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770288128; c=relaxed/simple;
-	bh=NGjS2W/fPan80cD9RMH4Y/pXk5yggvLWzpNgN5tKX14=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bgplK/PaLo2ZKVQPKOguLtZdaq69PEGV5tRMnZQ9X+qyYEO/5Gy0Aw0+2xbDaXCEf+GgsotBND0muyGcuhpFsp24rT8WZ/cCkjI6GZxoaU3/Mm+xpYKk/5AZpWxpeu+v6KCZ0K6CV4h3ILVNqJt8vH5tCSyz/N2Q2UIOb8LDcZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cosisSUp; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770288128; x=1801824128;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NGjS2W/fPan80cD9RMH4Y/pXk5yggvLWzpNgN5tKX14=;
-  b=cosisSUpxyzypsPulOR8kwAbBPTFSkXJ0XBps8mUweAkFD/K3etg7GBY
-   qS7OJs0s2RywH6S1TtmU8aGw0Zulv4dvmJDtGOyI4w5YuRqZxnBMhZj4U
-   rIu6T7D1BPnaLMKqnleOYZO35/A/zHlClm9x7CFgH5P1foiLTcK7Yb1px
-   LQxkqVtQeC+ol+/F1oQ+fdV6l2BmaMMqXka5hk0eRn+cgRut0aPYkMIQ8
-   rmo8PZGFbrGrzpDWVe4rUbAChAu9SlyngUvZkMDTULEAs58PaBl5zW0mz
-   5jta/I66NeL2peSslWbR4Dio6xoX1Jld+XpVZXI/sKgdOWzpos8KXmO/0
-   Q==;
-X-CSE-ConnectionGUID: ZcOIaeApSreNQLKJRxzVSg==
-X-CSE-MsgGUID: 7ZfImLPPTJCuI5n2eqwwUA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11691"; a="82221831"
-X-IronPort-AV: E=Sophos;i="6.21,274,1763452800"; 
-   d="scan'208";a="82221831"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 02:42:07 -0800
-X-CSE-ConnectionGUID: ozeke08AS5Sc90Vx7mUNMw==
-X-CSE-MsgGUID: V3W2IP7WRoqI5oG+Ju4Iqw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,274,1763452800"; 
-   d="scan'208";a="248079118"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 05 Feb 2026 02:42:04 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vnwoD-00000000jjA-0ysQ;
-	Thu, 05 Feb 2026 10:42:01 +0000
-Date: Thu, 5 Feb 2026 18:41:09 +0800
-From: kernel test robot <lkp@intel.com>
-To: Nikunj A Dadhania <nikunj@amd.com>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, bp@alien8.de, thomas.lendacky@amd.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, tglx@kernel.org,
-	mingo@redhat.com, dave.hansen@linux.intel.com, hpa@zytor.com,
-	xin@zytor.com, seanjc@google.com, pbonzini@redhat.com,
-	x86@kernel.org, jon.grimm@amd.com, nikunj@amd.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] x86/fred: Fix early boot failures on SEV-ES/SNP guests
-Message-ID: <202602051859.vGTf24Nk-lkp@intel.com>
-References: <20260205051030.1225975-1-nikunj@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7543A9D83
+	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 10:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770289129; cv=pass; b=T683cx9pzrP1krci4EBcWEgRW1tJEbHRkB2OEvptruOeVB1Cp0ZLYpQUsHjhbWCPMyXhBOr+MZCiEJvaYjOeb/REFf7PsP8uQu7H4Vp3EPhvX1Mv1AJ7IiH1L9TSqef7zv2cbTd7sqt24uw4lckjVSFyyL1G0OeapA0Z9qGaIuA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770289129; c=relaxed/simple;
+	bh=eInnJKMahFR6g+uDKXbFT99Bh2LRk+v2OWPd769Xq2c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JhVqsgQiBxBfZTP6wHzZsL29alCGpzt0xsUev0bgA7123fD9GmKSaGiA+v392hqVNdgaBqfUEVsvRMswKQkzwTf29l0r9jc1fzeG7Oso+02dg1n8MRLU7Eqrp5KJdrOYVWHJ27lTtGg0Zg84Qp+Q55ErJgyXwJPASlSrgE3bfQY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jG0lM977; arc=pass smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-5014b5d8551so335391cf.0
+        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 02:58:48 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770289128; cv=none;
+        d=google.com; s=arc-20240605;
+        b=dEzyIVTL6W7rwqi/PxsjjRLySzP7VJj9q14JvyaQHABy1KeTjw04oDNQE5Z2CsduoM
+         C6XJQBk0n1ilsEBExQMsTwOJb4EGg9lcWCYzhAGTyZgzKtIDmbdKpR4T5mbbHJ6IbGf1
+         eEMEiJMmHWQVdENd5pJHfl+uxW1vMH3TsxLZe9UCSpn5aPtiYp2olRNhqGVIkTs7oylt
+         O94ZZFkEKyLdEI38hRT2rfvvx9lqCzM2sQBC8LcDSPFkT2g5eao0teRIhhCrwOYrcdKX
+         GlJqacyWpTa3uoOH16NeiE37XuDlbDzflk1P4oJr72bp/2u35k1J6S9amHwgXYBr9IgI
+         Dfjw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=mWdaGHBGoTQV6Nt/HUCcE0KGg84oEg+M9DxtvHa6/t4=;
+        fh=9TVMu45Pi0zBFKqMqBux14Bc9Ys3uazMEFzVURRsUaA=;
+        b=U0aCnT3zWVsfI0LQvlMB4odOIp18kxA9uoIva6jUeswLn9JeVkkHN2A9cXm4qrShtS
+         wXvyDt3z/TeoO5EsuoYIUPLN7x3PYvlzWDrpyqiwd0dxqxvULNE0aQR3EWawQ3MKgBNx
+         7LPY0c69DwEmDN2oDh6fotlWdMfrCD9MKyrX+MrONVQGmCi2c9qUiiTskz6P7JbHvg5E
+         gA546W0UFdpfqHSA6gz+pZqS+UqwG/3oqZMG7/8Io+PyQWijh7s+h3QHIex9iHMfBDgY
+         mzJBnBY7NVKw81ZYmCAdhxLiE8mGILEgojHuC0xCSA+WrU5xpG+2JKcML1DmgmYexE63
+         W7mA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770289128; x=1770893928; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=mWdaGHBGoTQV6Nt/HUCcE0KGg84oEg+M9DxtvHa6/t4=;
+        b=jG0lM977AgU4k4a3NUw2sqizKRC290Y1gHjmForcDH6xHiXGSGNlvcYv6eo8BrcX5W
+         JGylmlS5DVKZvrLnX0jfnv4q9ympM1pDuryMuu+DhJSdylXBUWWp61QJg07zrimaS72I
+         djPSqDrbMSaKZ2ZsJAPDqYQu14CPmc+gfJoXdzs47hiJfJ+gPVeIsM13zk3fsUPF4JwI
+         tPhXOI1MEakE0ASSoYyc+PwZOmBHOXV3VKR8+iYcqF9FLOYpblQ5FMJ3Qi+JbaUB5krO
+         m1sOuZee46r4fU29N0gkDUuq21fUI9brAXQtogw7GlNs36+1a6I6WZ+swHGciE8h3Tdp
+         przA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770289128; x=1770893928;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mWdaGHBGoTQV6Nt/HUCcE0KGg84oEg+M9DxtvHa6/t4=;
+        b=ozS3kOk9qQ4TlYJjgmxDiBkTMl+gvNqYnR7oJNgCaI7OX0qCp8yZiV+zJUJYvLldvn
+         R7cXNeNFuaPOY87bdgfveBS71k0xE7aHVSKTjsFyhbaDOOz1uj+zg4UwkqvaVRLQkPtD
+         CSwyWzn+zePtOk+i8uh8F4+J6xrBY3/BQNzGSBS35RJO1+1AW6avkFKNkDSootP7ZSRZ
+         fnFI6M6cW8I/W98EPmDoVdUGLo8XWQLQQW6Re4eIjOQQgftk7borQP7OhTSl5W4TpqzF
+         ZXsSfdIrN6K1Y6Cx+k2SnbCDGxHYrJLn//cZKx4Ya8wjROsIEyjR/Kt4gpl7McWtCNGP
+         Uvfw==
+X-Forwarded-Encrypted: i=1; AJvYcCV5JBQTivyIrTVWlWYtuLRSD2dvn1Ic3I4M0OesiZ8moQEyb8/Hb+qESn9VWn0LGUVT5YM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCaf0qWMAx6npawvPvCMaxUyq9/0IzjySnR2cBW9Bcczq+bHsM
+	64MoC+OkpRccyYP4ibDmJXRtCHvIgJ/CO87acUnvQTW/eq98RmFfA2PwwlYTRnF5daAtJtKkEnN
+	YuB4H/Zy25a3RxAmHRAbggihxzX0D4FShmZIj8bD1
+X-Gm-Gg: AZuq6aIPJXHG/yuAauyMFtcfHlnn4WS6qZpE3MT7uUyjApgQI43Cry6PUtVp2kCEqpN
+	hyfOMYqM+1826RX7kHMT4Usp2nQBHGSmDlvLZpcGYzEgwoJdGX+/KMqIpNCKBfhpUPoJWivs39B
+	cpRO1FMZeIdcXc08PHi+hmFTB9ugWqVO8U1X2Od6QBO8+RWLW5BFhbMtWrQxOGE7t3xLWhIh9/M
+	uqbEgoXyX4YOCkeYydQ7zrrHtEDLIvec5VkVMrd5PgNNtwuGFOcN/iak93M90Ke2g4NglmB
+X-Received: by 2002:a05:622a:1a9e:b0:4ed:a65c:88d0 with SMTP id
+ d75a77b69052e-5062b0a3b84mr6534461cf.6.1770289127426; Thu, 05 Feb 2026
+ 02:58:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260205051030.1225975-1-nikunj@amd.com>
+References: <20260116182606.61856-1-sascha.bischoff@arm.com>
+In-Reply-To: <20260116182606.61856-1-sascha.bischoff@arm.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 5 Feb 2026 10:58:11 +0000
+X-Gm-Features: AZwV_Qj2DbaENVW72ogYB2HV7TiFDfYeQJXErbOTc52O5rdL0EP2dF1kO889FaM
+Message-ID: <CA+EHjTxhekJXyc7PbcXNhcByVp5mYqi56B6RXUukJfgE-QzrMg@mail.gmail.com>
+Subject: Re: [PATCH kvmtool v2 00/17] arm64: Support GICv5-based guests
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "will@kernel.org" <will@kernel.org>, 
+	"julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>, nd <nd@arm.com>, 
+	"maz@kernel.org" <maz@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, Timothy Hayes <Timothy.Hayes@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70317-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70318-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,arm.com,vger.kernel.org,lists.linux.dev];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,kvm@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tabba@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,intel.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,01.org:url]
-X-Rspamd-Queue-Id: 626C8F16DB
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:url,arm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 412B4F19EC
 X-Rspamd-Action: no action
 
-Hi Nikunj,
+Hi Sascha,
 
-kernel test robot noticed the following build warnings:
+I would like to review and test this series. Do you have it in a
+branch somewhere, since it's not trivial to apply it to kvmtool master
+as this is based on the nv series.
 
-[auto build test WARNING on 3c2ca964f75460093a8aad6b314a6cd558e80e66]
+Cheers,
+/fuad
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Nikunj-A-Dadhania/x86-fred-Fix-early-boot-failures-on-SEV-ES-SNP-guests/20260205-131359
-base:   3c2ca964f75460093a8aad6b314a6cd558e80e66
-patch link:    https://lore.kernel.org/r/20260205051030.1225975-1-nikunj%40amd.com
-patch subject: [PATCH] x86/fred: Fix early boot failures on SEV-ES/SNP guests
-config: x86_64-kexec (https://download.01.org/0day-ci/archive/20260205/202602051859.vGTf24Nk-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260205/202602051859.vGTf24Nk-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602051859.vGTf24Nk-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   arch/x86/entry/entry_fred.c:213:11: error: call to undeclared function 'user_exc_vmm_communication'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     213 |                         return user_exc_vmm_communication(regs, error_code);
-         |                                ^
->> arch/x86/entry/entry_fred.c:213:4: warning: void function 'fred_hwexc' should not return a value [-Wreturn-mismatch]
-     213 |                         return user_exc_vmm_communication(regs, error_code);
-         |                         ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   arch/x86/entry/entry_fred.c:215:11: error: call to undeclared function 'kernel_exc_vmm_communication'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     215 |                         return kernel_exc_vmm_communication(regs, error_code);
-         |                                ^
-   arch/x86/entry/entry_fred.c:215:4: warning: void function 'fred_hwexc' should not return a value [-Wreturn-mismatch]
-     215 |                         return kernel_exc_vmm_communication(regs, error_code);
-         |                         ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   2 warnings and 2 errors generated.
-
-
-vim +/fred_hwexc +213 arch/x86/entry/entry_fred.c
-
-   180	
-   181	static noinstr void fred_hwexc(struct pt_regs *regs, unsigned long error_code)
-   182	{
-   183		/* Optimize for #PF. That's the only exception which matters performance wise */
-   184		if (likely(regs->fred_ss.vector == X86_TRAP_PF))
-   185			return exc_page_fault(regs, error_code);
-   186	
-   187		switch (regs->fred_ss.vector) {
-   188		case X86_TRAP_DE: return exc_divide_error(regs);
-   189		case X86_TRAP_DB: return fred_exc_debug(regs);
-   190		case X86_TRAP_BR: return exc_bounds(regs);
-   191		case X86_TRAP_UD: return exc_invalid_op(regs);
-   192		case X86_TRAP_NM: return exc_device_not_available(regs);
-   193		case X86_TRAP_DF: return exc_double_fault(regs, error_code);
-   194		case X86_TRAP_TS: return exc_invalid_tss(regs, error_code);
-   195		case X86_TRAP_NP: return exc_segment_not_present(regs, error_code);
-   196		case X86_TRAP_SS: return exc_stack_segment(regs, error_code);
-   197		case X86_TRAP_GP: return exc_general_protection(regs, error_code);
-   198		case X86_TRAP_MF: return exc_coprocessor_error(regs);
-   199		case X86_TRAP_AC: return exc_alignment_check(regs, error_code);
-   200		case X86_TRAP_XF: return exc_simd_coprocessor_error(regs);
-   201	
-   202	#ifdef CONFIG_X86_MCE
-   203		case X86_TRAP_MC: return fred_exc_machine_check(regs);
-   204	#endif
-   205	#ifdef CONFIG_INTEL_TDX_GUEST
-   206		case X86_TRAP_VE: return exc_virtualization_exception(regs);
-   207	#endif
-   208	#ifdef CONFIG_X86_CET
-   209		case X86_TRAP_CP: return exc_control_protection(regs, error_code);
-   210	#endif
-   211		case X86_TRAP_VC:
-   212			if (user_mode(regs))
- > 213				return user_exc_vmm_communication(regs, error_code);
-   214			else
-   215				return kernel_exc_vmm_communication(regs, error_code);
-   216		default: return fred_bad_type(regs, error_code);
-   217		}
-   218	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+On Fri, 16 Jan 2026 at 18:27, Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+>
+> This series adds support for GICv5-based guests. The GICv5
+> specification can be found at [1]. There are under-reiew Linux KVM
+> patches at [2] which add support for PPIs, only. Future patch series
+> will add support for the GICv5 IRS and ITS, as well as SPIs and
+> LPIs. Marc has very kindly agreed to host the full *WIP* set of GICv5
+> KVM patches which can be found at [3].
+>
+> v1 of this series can be found at [4].
+>
+> This series is based on the Nested Virtualisation series at [5]. The
+> previous version of this series was accidentally based on an older
+> version - apologies!
+>
+> As in v1, the GICv5 support for kvmtool has been staged such that the
+> initial changes just support PPIs (and go hand-in-hand with those
+> currently under review at [2]). As of "arm64: Update timer FDT for
+> GICv5" the support is sufficient to run small tests with the arch
+> timer or PMU.
+>
+> Changes in v2:
+> * Used gic__is_v5() in more places to avoid explicit checks for gicv5
+>   & gicv5-its configs.
+> * Fixed gic__is_v5() addition leaking across changes.
+> * Cleaned up FDT generation a little.
+> * Actually based the series on [5] (Sorry!).
+>
+> Thanks,
+> Sascha
+>
+> [1] https://developer.arm.com/documentation/aes0070/latest
+> [2] https://lore.kernel.org/all/20260109170400.1585048-1-sascha.bischoff@arm.com
+> [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/gicv5-full
+> [4] https://lore.kernel.org/all/20251219161240.1385034-1-sascha.bischoff@arm.com/
+> [5] https://lore.kernel.org/all/20250924134511.4109935-1-andre.przywara@arm.com/
+>
+> Sascha Bischoff (17):
+>   Sync kernel UAPI headers with v6.19-rc5 with WIP KVM GICv5 PPI support
+>   arm64: Add basic support for creating a VM with GICv5
+>   arm64: Simplify GICv5 type checks by adding gic__is_v5()
+>   arm64: Introduce GICv5 FDT IRQ types
+>   arm64: Generate GICv5 FDT node
+>   arm64: Update PMU IRQ and FDT code for GICv5
+>   arm64: Update timer FDT IRQsfor GICv5
+>   irq: Add interface to override default irq offset
+>   arm64: Add phandle for each CPU
+>   Sync kernel headers with v6.19-rc5 for GICv5 IRS and ITS support in
+>     KVM
+>   arm64: Add GICv5 IRS support
+>   arm64: Generate FDT node for GICv5's IRS
+>   arm64: Update generic FDT interrupt desc generator for GICv5
+>   arm64: Bump PCI FDT code for GICv5
+>   arm64: Introduce gicv5-its irqchip
+>   arm64: Add GICv5 ITS node to FDT
+>   arm64: Update PCI FDT generation for GICv5 ITS MSIs
+>
+>  arm64/fdt.c                  |  22 ++++-
+>  arm64/gic.c                  | 179 ++++++++++++++++++++++++++++++++---
+>  arm64/include/asm/kvm.h      |  12 ++-
+>  arm64/include/kvm/fdt-arch.h |   2 +
+>  arm64/include/kvm/gic.h      |   9 ++
+>  arm64/include/kvm/kvm-arch.h |  30 ++++++
+>  arm64/pci.c                  |  16 +++-
+>  arm64/pmu.c                  |  23 +++--
+>  arm64/timer.c                |  20 +++-
+>  include/kvm/irq.h            |   1 +
+>  include/linux/kvm.h          |  20 ++++
+>  include/linux/virtio_ids.h   |   1 +
+>  include/linux/virtio_net.h   |  36 ++++++-
+>  include/linux/virtio_pci.h   |   2 +-
+>  irq.c                        |  16 +++-
+>  powerpc/include/asm/kvm.h    |  13 ---
+>  riscv/include/asm/kvm.h      |  27 +++++-
+>  x86/include/asm/kvm.h        |  35 +++++++
+>  18 files changed, 416 insertions(+), 48 deletions(-)
+>
+> --
+> 2.34.1
+>
 
