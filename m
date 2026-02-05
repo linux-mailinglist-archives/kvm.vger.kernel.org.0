@@ -1,174 +1,222 @@
-Return-Path: <kvm+bounces-70380-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70381-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WCJxKGYkhWlV9AMAu9opvQ
-	(envelope-from <kvm+bounces-70380-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 00:14:46 +0100
+	id oEB3EbgkhWlV9AMAu9opvQ
+	(envelope-from <kvm+bounces-70381-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 00:16:08 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06E0BF849A
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 00:14:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6F8AF84B8
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 00:16:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 92C32301572D
-	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 23:14:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A613D3015466
+	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 23:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9331E33C19E;
-	Thu,  5 Feb 2026 23:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 958B133C1A6;
+	Thu,  5 Feb 2026 23:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fyn09gfv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WFxM0hwo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D5233B6CC
-	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 23:14:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97662C026C
+	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 23:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770333271; cv=none; b=FxXpE+9u4D/5mWUNO1+Z9mYyH1ojTgGfAbiPAsjZdcfO3vQL2TrE8Gw0h7hfM5Bzuy0B3Mze57QIwYg5Psw1iue3ZHt/P4Z/4NSshPmcNbBTjvsybD2rIPD/y8x4lNL3CaBNlNG0Hj0yS+qXYaiXrji9lmhsiLgtc4QlHTtWc3E=
+	t=1770333354; cv=none; b=fNnpEbrATTXftloLuz+heiVlG7ls3+rx18V36RTJ9siTBvfKCfeIgQ5uI9+fa7Mxo/OP85xVIEPfNuNPSytmcoZj4aRaGsT7JfiILm+Vsfejyq8SFh9U3wtw6NmaumG5dzDDuZcQYtDNdqZqOl9PRQvrif6eDKMzshN80Y3j+gA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770333271; c=relaxed/simple;
-	bh=MB9cFztH4tXwlZPY6Vm1wb8szVNgUXQWKPfhBfZqWcI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WD0qO+HBfeCrG/SQAS5oxpiffvKrN+gj5e9uPf2b4ZyjmN6yeky77jZvMvYA8mQzTjjfmR0BiWZnKW1sbWe1qM/Up04K9mhTO577AK9EfnTSZuikKgX3YBJ79xGPyvv0JHVgQCT1W4rWr0Q5fqYTU57mMXzANSmlnwAGLNRBxXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fyn09gfv; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1770333354; c=relaxed/simple;
+	bh=z38i7xJ8mEcWy9tZkax+kUeEbeGtqWOfE4+kMi9dRjs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=t0xpNK531oy7FyXjSIxcC/oHQRMoJo0LpXliiDTmClZx7BuzyK0f7pF6eG2Q0oiHl3Zg9HGgLiEgNAPvOdTquDFFPMU8gOCXl2RnLCUcb7Iz7mZbDu8OCDWrQxp5wPsLB/fcS8clBbXC99rF+ck5/clFD1i/wafAyo5GiP29dfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WFxM0hwo; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c337cde7e40so889428a12.1
-        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 15:14:31 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29f2381ea85so2269685ad.0
+        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 15:15:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770333271; x=1770938071; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cz1wGDR7P66u5Gzy7fs495/TW9uNtgSB7cp6FfFekc4=;
-        b=fyn09gfvA4kFfRrEHlYntmXM9C02og/A+dT8p+t7Zq1O0p8sO1x4hsTp48RCyIs1ES
-         tZcfIidmZAHX33rLGqss21YB7tvVvj8694FNFHAVoJxmZML8gDU4Mw3efwg0sCk0EYHs
-         k0W/z+ylDShsSMQ5SFWh5daD9x/9Mtv7J0mnSi6OGcMbBlD+4zTMAV88v1ncAAedqxwV
-         rVaNpu25OjHzvuHUnJtQAQa6qkqwhhvQUNQuB9Q2U8NLOJ+C3qhYfJ+Li/npZMnHB0b6
-         RnILw23IGvo2WksRNwOWDh91oCnY+MuY4Y/EeWAt60OJqrN6uzYgGJwz8T3KeZMQD3/5
-         tWWw==
+        d=google.com; s=20230601; t=1770333354; x=1770938154; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Pr9RaIefez2nBGuJOdeMmo4gmWbUowIaURWL9SUM80k=;
+        b=WFxM0hwoRq9mbj2QvzsGXoyieuDGBO8yN7TMYHrb90+yazFQf2bJYCJrHMuU+oXY2R
+         W46g706Vcc5c3ENls6lK3SlOo2MYQ0d4mUfY1GkvCFMisiWEMSjo1hRlLmr754hDAbzq
+         O1sZcZZ97KZYQ+ydutPYI9xJCbLVLeGdbB1Dvsli6jYSBXOzZSVAYlcwTJdlE3+Q/FnT
+         kvIBRBcBC7tcMqu7thrqRJ9T9PnuK+N1CLqeSaETYhfTNqi0V+zP1Qr6rZVjNp70dW/l
+         lkjmxSN9GvGmAICWYLQoj1RRS5u96s/+lE50A7ay2sEEcNV4uLATvm86sUhKk3ZtE994
+         ulJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770333271; x=1770938071;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cz1wGDR7P66u5Gzy7fs495/TW9uNtgSB7cp6FfFekc4=;
-        b=QMeMPa018AhnLSyVP3gNP6HNgP/Cc7Nx4YSB6jEO22F5em6Bz23VV0IcaUPeRS4ftN
-         7/HQS10BUXlXoHSRha4EZihiFQTuna7GUYH9biMsEb+k2JiwnEHe1jvf4gYwVX3pvSbv
-         PLwJDNkIjiulCJLg8jpCdc4mDEMWCmJASr9V0jP0LyXwWl5XiItWizORpZJQ6fOnT3Gy
-         8JGtAUuQbTezqFPfl/0aXeWleYMSrz/HnJtvhFjoXZ/OGcLvLFFLQujnmYQj7AsG71G0
-         cgZJJTYB1eruNnD4whXXRJaP1Ruc0YTAfcDd9UaKbEN8n9b8s1ieWTRoZBsQPXh/Cl6Y
-         F/pQ==
-X-Forwarded-Encrypted: i=1; AJvYcCViKIVNHLV+7b5hU59q2bbumcw0+fSRL46hj5BzSKNAwBPQERtOi2L8uivsYDQkWKmppn8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzms1pD7uclH8j4z60QhJ72AZV1ZrSlJPJZ9iJZjYHRvgyMC3NO
-	1r0e7XBlymFP48rKv4b6kEEjVAMXuZ1DT47k0+494Fy8AlX1gs4EvkuquT2/V1LAgziReLafH+R
-	LQeC1dQ==
-X-Received: from pgbcr9.prod.google.com ([2002:a05:6a02:4109:b0:c08:3dd8:1e39])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:d12f:b0:38b:d95e:69a9
- with SMTP id adf61e73a8af0-393acf898b1mr720567637.16.1770333270970; Thu, 05
- Feb 2026 15:14:30 -0800 (PST)
-Date: Thu, 5 Feb 2026 15:14:29 -0800
-In-Reply-To: <aYLqESiqkADxMGf9@yzhao56-desk.sh.intel.com>
+        d=1e100.net; s=20230601; t=1770333354; x=1770938154;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Pr9RaIefez2nBGuJOdeMmo4gmWbUowIaURWL9SUM80k=;
+        b=NQaenFdp6FE93gOeb1VFs4qAEYnXfYuTD6WO1f311vzyh0tAqb8xSgMsQe5IuPmsOI
+         DwfBHXnB86FaogZa/A0cJpSMmMEtnh+9kBTIonToy33wc/Td4/6aA/amMNf+O/YYYgHJ
+         jTJL9xQ0K6oP7u52IpB9Hfb9Ouh9EKaUoGxkEzzMFj/Rv00NDHKzz/2KjDZqcoXp49Vl
+         H5bJnvAWNuo29gKFFbwjy4Szj6oqwjuAgEG6Dmotg+oRlkp0mG7pwuSEYUTBY6Y2gY9p
+         g2MUE3pUj7BaAzDno95iOUGSr4X39BVuFbFWlGH+18amrgvthnDUrqjnyfRqyKNFTGpx
+         jR0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVgX8ki9rk14eJOTN4Dih3uUyae2RX9sfQeyNWJAL2C6vcvLA+eoORPiEdf0aTbV1M3vfw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxV1n1FuMXbUVq8qhw7zJ/AswTnS27SSu3elrfDDAyQ34CUOp3w
+	zafh46p9KtiIa4mAqd+bOR36LdwaKQ8CcG7Qmx999Hr0lea+QbKy1ICSOFUJqZEkMGt3wsk4h5h
+	NWsvxJhxrlBbULA==
+X-Received: from pjblp12.prod.google.com ([2002:a17:90b:4a8c:b0:352:c761:3cf])
+ (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:1246:b0:2a9:410:2413 with SMTP id d9443c01a7336-2a95192ab1dmr7613285ad.29.1770333354123;
+ Thu, 05 Feb 2026 15:15:54 -0800 (PST)
+Date: Thu,  5 Feb 2026 15:15:26 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260129011517.3545883-1-seanjc@google.com> <20260129011517.3545883-6-seanjc@google.com>
- <aYHLlTPeo2fzh02y@yzhao56-desk.sh.intel.com> <aYJU8Som706YkIEO@google.com> <aYLqESiqkADxMGf9@yzhao56-desk.sh.intel.com>
-Message-ID: <aYUkVRedz9ngwu_1@google.com>
-Subject: Re: [RFC PATCH v5 05/45] KVM: TDX: Drop kvm_x86_ops.link_external_spt(),
- use .set_external_spte() for all
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Kiryl Shutsemau <kas@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
-	linux-coco@lists.linux.dev, kvm@vger.kernel.org, 
-	Kai Huang <kai.huang@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Sagi Shahar <sagis@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
+Message-ID: <20260205231537.1278753-1-jmattson@google.com>
+Subject: [PATCH v2] Introduce KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC
+From: Jim Mattson <jmattson@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Josh Hilke <jrhilke@google.com>
+Cc: Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MID_CONTAINS_FROM(1.00)[];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70380-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70381-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 06E0BF849A
+X-Rspamd-Queue-Id: D6F8AF84B8
 X-Rspamd-Action: no action
 
-On Wed, Feb 04, 2026, Yan Zhao wrote:
-> On Tue, Feb 03, 2026 at 08:05:05PM +0000, Sean Christopherson wrote:
-> > On Tue, Feb 03, 2026, Yan Zhao wrote:
-> > > On Wed, Jan 28, 2026 at 05:14:37PM -0800, Sean Christopherson wrote:
-> > > >  static int __must_check set_external_spte_present(struct kvm *kvm, tdp_ptep_t sptep,
-> > > >  						 gfn_t gfn, u64 *old_spte,
-> > > >  						 u64 new_spte, int level)
-> > > >  {
-> > > > -	bool was_present = is_shadow_present_pte(*old_spte);
-> > > > -	bool is_present = is_shadow_present_pte(new_spte);
-> > > > -	bool is_leaf = is_present && is_last_spte(new_spte, level);
-> > > > -	int ret = 0;
-> > > > -
-> > > > -	KVM_BUG_ON(was_present, kvm);
-> > > > +	int ret;
-> > > >  
-> > > >  	lockdep_assert_held(&kvm->mmu_lock);
-> > > > +
-> > > > +	if (KVM_BUG_ON(is_shadow_present_pte(*old_spte), kvm))
-> > > > +		return -EIO;
-> > > Why not move this check of is_shadow_present_pte() to tdx_sept_set_private_spte()
-> > > as well? 
-> > 
-> > The series gets there eventually, but as of this commit, @old_spte isn't plumbed
-> > into tdx_sept_set_private_spte().
-> > 
-> > > Or also check !is_shadow_present_pte(new_spte) in TDP MMU?
-> > 
-> > Not sure I understand this suggestion.
-> Sorry. The accurate expression should be 
-> "what about moving !is_shadow_present_pte(new_spte) to TDP MMU as well?".
+Add KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC to allow L1 to set FREEZE_IN_SMM
+in vmcs12's GUEST_IA32_DEBUGCTL field, as permitted prior to
+commit 6b1dd26544d0 ("KVM: VMX: Preserve host's DEBUGCTLMSR_FREEZE_IN_SMM
+while running the guest").  The quirk is enabled by default for backwards
+compatibility; userspace can disable it via KVM_CAP_DISABLE_QUIRKS2 for
+consistency with the constraints on WRMSR(IA32_DEBUGCTL).
 
-It's already there, in __tdp_mmu_set_spte_atomic():
+Note that the quirk only bypasses the consistency check. The vmcs02 bit is
+still owned by the host, and PMCs are not frozen during virtualized SMM.
+In particular, if a host administrator decides that PMCs should not be
+frozen during physical SMM, then L1 has no say in the matter.
 
-		/*
-		 * KVM doesn't currently support zapping or splitting mirror
-		 * SPTEs while holding mmu_lock for read.
-		 */
-		if (KVM_BUG_ON(is_shadow_present_pte(iter->old_spte), kvm) ||
-		    KVM_BUG_ON(!is_shadow_present_pte(new_spte), kvm))
-			return -EBUSY;
+Fixes: 095686e6fcb4 ("KVM: nVMX: Check vmcs12->guest_ia32_debugctl on nested VM-Enter")
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ Documentation/virt/kvm/api.rst  | 10 ++++++++++
+ arch/x86/include/asm/kvm_host.h |  3 ++-
+ arch/x86/include/uapi/asm/kvm.h |  1 +
+ arch/x86/kvm/vmx/nested.c       | 23 +++++++++++++++++++----
+ 4 files changed, 32 insertions(+), 5 deletions(-)
 
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index d04b4bdd60c1..325e565ff99e 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -8482,6 +8482,16 @@ KVM_X86_QUIRK_IGNORE_GUEST_PAT      By default, on Intel platforms, KVM ignores
+                                     guest software, for example if it does not
+                                     expose a bochs graphics device (which is
+                                     known to have had a buggy driver).
++
++KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC
++				    By default, KVM relaxes the consistency
++				    check for GUEST_IA32_DEBUGCTL in vmcb12
++				    to allow FREEZE_IN_SMM to be set.  When
++				    this quirk is disabled, KVM requires
++				    this bit to be cleared.  Note that the
++				    vmcs02 bit is still completely
++				    controlled by the host, regardless of
++				    the quirk setting.
+ =================================== ============================================
+ 
+ 7.32 KVM_CAP_MAX_VCPU_ID
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index ff07c45e3c73..1669d4797f0b 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2485,7 +2485,8 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
+ 	 KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS |	\
+ 	 KVM_X86_QUIRK_SLOT_ZAP_ALL |		\
+ 	 KVM_X86_QUIRK_STUFF_FEATURE_MSRS |	\
+-	 KVM_X86_QUIRK_IGNORE_GUEST_PAT)
++	 KVM_X86_QUIRK_IGNORE_GUEST_PAT |	\
++	 KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC)
+ 
+ #define KVM_X86_CONDITIONAL_QUIRKS		\
+ 	(KVM_X86_QUIRK_CD_NW_CLEARED |		\
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 846a63215ce1..76128958bbca 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -476,6 +476,7 @@ struct kvm_sync_regs {
+ #define KVM_X86_QUIRK_SLOT_ZAP_ALL		(1 << 7)
+ #define KVM_X86_QUIRK_STUFF_FEATURE_MSRS	(1 << 8)
+ #define KVM_X86_QUIRK_IGNORE_GUEST_PAT		(1 << 9)
++#define KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC	(1 << 10)
+ 
+ #define KVM_STATE_NESTED_FORMAT_VMX	0
+ #define KVM_STATE_NESTED_FORMAT_SVM	1
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 248635da6766..9bd29b9375fb 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3300,10 +3300,25 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+ 	if (CC(vmcs12->guest_cr4 & X86_CR4_CET && !(vmcs12->guest_cr0 & X86_CR0_WP)))
+ 		return -EINVAL;
+ 
+-	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) &&
+-	    (CC(!kvm_dr7_valid(vmcs12->guest_dr7)) ||
+-	     CC(!vmx_is_valid_debugctl(vcpu, vmcs12->guest_ia32_debugctl, false))))
+-		return -EINVAL;
++	if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) {
++		u64 debugctl = vmcs12->guest_ia32_debugctl;
++
++		/*
++		 * FREEZE_IN_SMM is not virtualized, but allow L1 to set it
++		 * in VMCB12's DEBUGCTL under a quirk for backwards
++		 * compatibility.  Note that the quirk only relaxes the
++		 * consistency check. The vmcb02 bit is still under the
++		 * control of the host. In particular, if a host
++		 * administrator decides to clear the bit, then L1 has no
++		 * say in the matter.
++		 */
++		if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC))
++			debugctl &= ~DEBUGCTLMSR_FREEZE_IN_SMM;
++
++		if (CC(!kvm_dr7_valid(vmcs12->guest_dr7)) ||
++		    CC(!vmx_is_valid_debugctl(vcpu, debugctl, false)))
++			return -EINVAL;
++	}
+ 
+ 	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PAT) &&
+ 	    CC(!kvm_pat_valid(vmcs12->guest_ia32_pat)))
 
-> > > And as Rick also mentioned, better to remove external in external_spt, e.g.
-> > > something like pt_page.
-> > 
-> > Yeah, maybe sept_spt?
-> Hmm, here sept_spt is of type struct page, while sp->spt and sp->external_spt
-> represents VA. Not sure if it will cause confusion.
+base-commit: e944fe2c09f405a2e2d147145c9b470084bc4c9a
+-- 
+2.53.0.rc2.204.g2597b5adb4-goog
 
-How about sept_pt?
 
