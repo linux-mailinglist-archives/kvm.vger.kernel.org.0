@@ -1,120 +1,114 @@
-Return-Path: <kvm+bounces-70291-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70292-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MATrF8kYhGk1ywMAu9opvQ
-	(envelope-from <kvm+bounces-70291-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 05:12:57 +0100
+	id 2H+HIMUahGmyywMAu9opvQ
+	(envelope-from <kvm+bounces-70292-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 05:21:25 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7F55EE772
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 05:12:56 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACE17EE80E
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 05:21:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 41891301B71B
-	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 04:12:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9142D3005158
+	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 04:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F272E8B97;
-	Thu,  5 Feb 2026 04:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79982E9733;
+	Thu,  5 Feb 2026 04:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VR935B40"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PCtKr3Bl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F1D286430
-	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 04:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4661DF258
+	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 04:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770264732; cv=pass; b=iWztX4EOa8nGr/2V7XtFhM0L9eOm2h7JF+KL8uWSkE0xigk4fsapkamq8cMDcMnz9GHLFdd0eQluz0Kr3vutXB8Wfu2TNC35FPaqO3QvPh7gp/0wF3aKJawLil+kglax38S90nNG/hL2HAS9WK7RveMbNunmSb0MN9DOSp3LDb4=
+	t=1770265279; cv=pass; b=Qv8fxjGKp4sNPyupnX+GIC7hkihfjFw2kQ6c1IvZIveZmam+9WguLuoR9CO6YUEF8sUiXkiuYSAY4z13j4PenZOVEXnlZ5jv9HJmhdQ5I6+O+1T6ZMSnyxlnc3mJBSElNBIjxnuMBuvvrvH7YoLmYIpiItk574y9EpnlQJiPag8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770264732; c=relaxed/simple;
-	bh=iHv3eVZ4uKQEnCsixa8y4B/vLhRYUmz/8FIeHb+C3QU=;
+	s=arc-20240116; t=1770265279; c=relaxed/simple;
+	bh=7yhThvn4bzIjdduhCJxS1FI1eCt8UDuoIfG/EznMXOw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cUmYTVE0SbDN6DKHN9KG2bfrMrEqln07uSiiBQLvZTcxD7OxaxmhZF2V7jItAPdjIdtBlSGgIqsg9zR1kLrVMxO7CWwLY9YE1Pb7wnwAhpTCcbq5kWun3cbdE8tdUrH42vJHsOrUYcovMDL1Ge2GIPA0BaiV6DF6yUN4pKvQDKg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VR935B40; arc=pass smtp.client-ip=209.85.208.47
+	 To:Cc:Content-Type; b=tD6CBQWzYgA46nQWW2KXUwdltaZM15ganRJIarCd15QDKwDEmRwqqg2hwzxMMHa+2ztO2XA+gd4UGD/aw1GnjBQFxDcdyfsSTUz1hHxziq1s0xWEaAqRFuDf1J2ImSYq/+JHvb8lk9cTwweCAZkromiY5efdO/6zxNbCo/87Ecc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PCtKr3Bl; arc=pass smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6581551aa88so3716a12.0
-        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 20:12:11 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770264730; cv=none;
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-652fe3bf65aso3696a12.1
+        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 20:21:18 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770265277; cv=none;
         d=google.com; s=arc-20240605;
-        b=jG2neZXSkRccR0Au57GyaGOZgKPCRx3WLEMrXJFC02UzHCFU+mgW31Ap7HX/ibGbEq
-         D4cr/x/RR1w4MXDDquA9bwZBtcjJovJzqbsbnbAb2ZOd1/ETEAUGR8qLLdtmSG3yTt0A
-         UQL/b2BgoiplTTxM5AF0XaRnLoIyAdRX38SOA8trT7VFbYRwz4h/xyIHEM3Js92Ajx7s
-         ZPZKiDBCmwaVPruXh5N60mwM9iFuUvLquZtmFLIQjNvL/V0a6AVxij1xayfQx6C/32ue
-         GJC00ZFdfQ0ozkfI7/5ja+mK/zq5qnm5BgQk5KU+JNye3Y87DJQCQnVuymmgdcBaQJ7H
-         YSEQ==
+        b=bLCZH7+T0hbb8uOj4JMNTuhlJ77z4vRlu5e7Z3u5Zq0+cdRA7DPEov7UNvFrIGJpkC
+         i9X7RewZng/mZjPlYjQyCUTasKqR6ZDXsDrINiUOM1ZBh9Ymp68etRHQ5D1ssJvT0wx6
+         OV1Jd4NVN6Lhx/7bGzv6xHschfof0sK8Nv07WeU8MZEMymQWcg6Uyt+ETm5RgbXOt3W0
+         D1/+YxV9TozMYSDetlD2996qwXW94VCDnQ0rBL3x2jb6PkO5eB6HmVdgun9t3tZyMBLe
+         o90g7Bc2IPXJY0KtgbDDUkWHLFtkK4en02MTmxp63YOU5Z/MevO7lqrtMG3JcyX2iV9u
+         muIw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=ICuQy7A+pz8n4uIx9cAJ+hnxhishMNCKfdmmi6Or3XQ=;
-        fh=ekYukuQwRS2FP1SNe4D/VCv4CYW45mU0QXXcxBTtMUo=;
-        b=C5s/jT+HR/asvPDLJUAcAcIeIMJMi6ly2lxXkuOY6tcuI/yI0Mnc6zIc/IsyKmsGn/
-         XShKtiKyt22PbLzcA+/AnDvugDmKSFlAkM9m8f38gwyDTOFPgo0wQBYEC8NWUJyQBCNn
-         Dxv+BzAb6H3161915YEHSvJqHaHSkkEbuwcjqMVMwCV6cA3Ptv8W8thrcuFvR+zsIxrp
-         rGw3lAee5bTyzkYyA9ufnVltTmbACnmQJXBqFCx1DDkXGicMKXgj71Fhk63UM0L44bh/
-         jFcGggYp5LOEc9z+tADFZqwkz13qzacimVxJr+WQ33O50H3fQ/IBs6TgvrD1WLVMklfp
-         9vEQ==;
+        bh=6m1freqtmLCwlZInU9XCUDzTqiVQQJw+wkmys497tIs=;
+        fh=zoCWLi9wZp74Fx46kqqESbmT2ZvlqJsAMyExJtqr2Y0=;
+        b=bHVMCISgTnk6HXC4tbI8iS+2jkuU4rVIkSejLvBKiMYW6om02c4AmouELWwLkY0Nnn
+         FlU/hJsKMY3/xnpF0Ty5Do9mEg8QR3q5ZdyH4Ty0Lf9MjDS628V+QidaIRVssSHi9HZB
+         kN3zsac4kGhqWxBIRg4s8evsj+UYls28SwowcAo5BBSHGLXP/duAPbgvrv6AWRzQYNsN
+         4pMwBDwOHYCQQUPa3BQ6aJJDReLVmXW1AtlAj+U1n/+hs+4ywtLzqBegwTHPb9nnrPac
+         s1UFGI56jCAdlv4fuX4DIxZgSHPu9D9ziqVq4tq5oqK+OZ4YlCMm6asp3/KwN7oRVaV7
+         LuTw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770264730; x=1770869530; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770265277; x=1770870077; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ICuQy7A+pz8n4uIx9cAJ+hnxhishMNCKfdmmi6Or3XQ=;
-        b=VR935B40t49/OEw8tjlQgRRex6rXoo9ezw1nnj4BbNEkaCLca27lWZwfOs6pwRd8Pb
-         evki0mBw9+1RoZdsoNCTITCCV0v/XRrtdl7ipL/guJGBjVu1w3tJ1Pjzws7ClgT6/wJQ
-         TmM/x8DjG4htW3DKcXjz04HMw8ZuNgIASrCeaXuTUbrMgqsonCxtUvBqItRH8kpQffyz
-         n+bSA6IIgSZ2TOJUzGAHNt0mME9iY0G6FkusW+dwli7R10vu4WO1/Cw4XSywy1d1Wx1D
-         JU92TOkQ5/0gEET8SUAdR/6HfYmN6qPH3iDtnWKZj7iuRQUeWhtVt48uL4wM6KckkQk/
-         HTVg==
+        bh=6m1freqtmLCwlZInU9XCUDzTqiVQQJw+wkmys497tIs=;
+        b=PCtKr3Blswnc/Qn73l0iihMLyHP943jtdbze+EVLDk1JrKUQt8sfCaDFqHZBBDeZw/
+         WoKKb5O4pADzSR9BNpihofIdINoCJHLkH9+RuUBCviHZZNWBa52L/tgNId5/m9LDxr9h
+         gZ7VC6CaIZrozlDgFXEGHvW9dlhI3hhQWH+PP/ldY9WJ63CQBKgr+gGmai4KZQUo9M8r
+         m8PZqdGRSrZ9lAUuOkCN3oh7LSCuMa0FlGP66mcGyLxzMKuuieBEfRdYzGCGm6iIoLvH
+         io5QeueqChb6nwIL+ewkwd22DNCca1trIkStz2j+AHOqO+6EXt3tNJBaZF+DQRSyXRi9
+         ovWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770264730; x=1770869530;
+        d=1e100.net; s=20230601; t=1770265277; x=1770870077;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ICuQy7A+pz8n4uIx9cAJ+hnxhishMNCKfdmmi6Or3XQ=;
-        b=seMgGVSrkrbOiUM2fcEYnva3EG9CD+tfJ4Ll4xC1WT7dN5Fncd1UoqMX09guOIrtBA
-         /ATknVDnIYQvsP5UQMaoM5GB7JM53mrA2kjKIFM9hfNk3MvNzwc26hsoPiEgitT5etk3
-         9Cqq6dtfPhIJgC5dATnpVyPu8/it/bBwRcWWsyqlJc1zfqzuDfwcgHBu8wO7RRRKxfxw
-         7VX+3f28lQ7oBP+uZYPuM5v0cEgq8soOBhTLwNgC91IfEg8BOrsCnBwTb1C6X7hV+Vzc
-         jyBQhWpiSLgsQ/7ELox4Qk/OTwTqi7FqIFHkPXIGOB7M09sfFbOfEtnzVT8n60hSv+NL
-         Zh1A==
-X-Forwarded-Encrypted: i=1; AJvYcCUMFaA5CTQho+0t5uEaUn6iypIVrpgq0vR0NtnGMOffFpQJlNlMtj4gadBEzRnIZ52gSCU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7XWQybUvhcEzL5/QSW58LFdqAvjndTjdVljZBCgWo7RMosAlx
-	XOhCN8IqdnDbr8CfvOHzSOyKkmNaa3w61VJhR3e1vJQqs9mJTgb5J5CKVtgeznKApLSPDykp+qf
-	LLelKG5uRABaEeFGcqWEvExk/38kxvUsvjf4x6wIy
-X-Gm-Gg: AZuq6aKYFnxZ0GPATZkLI0XosT2wcZZ3kL1/m9/Dw1Q4O6SPfBISShIeyTLl5JbIywE
-	VxT9XXncyDag3b98OoIJPwIXpzviukGtQxKuVMJS0hD9wTvVvhQkK/luewuyeEYRnUjLYOAgkBf
-	cnah6FM01K8YmN3t2XKQy9mk+2riILvijB97vtRu9W1N7ZQijPB5Bp2OE4RgnsIwvkjs+Ry8Snm
-	qrcmVPJYFOJE7fwJv9kDry+30XaT3ugdOqcGhguJLJUMstCzEXOcS6dpHtX02SGqO1jK2M=
-X-Received: by 2002:a50:fb99:0:b0:649:8aa1:e524 with SMTP id
- 4fb4d7f45d1cf-65965ebe482mr10226a12.11.1770264730115; Wed, 04 Feb 2026
- 20:12:10 -0800 (PST)
+        bh=6m1freqtmLCwlZInU9XCUDzTqiVQQJw+wkmys497tIs=;
+        b=YMiOa00IpgTpBHfmfNrh3WW5Xy1ggVUr2PD0rF6lDDui0y17mYds+2BALI1m7+GL/H
+         lVsOUzVQVMFWnup9zSvbniYQlnbBMO5L5pPb+11q8MABjnB4fi+zkkzcLHYdPFKDD1XI
+         v+BrW8uBWxOO7VigWsrVQgtl3AUdwuwI8Le9y7r3iHuMgVuI1L/BhEHukj45GyQhyoF5
+         bp1MWzywli60ILpQEtt6s/rBcGF+i3ugMWIUoGVOVhz+9xo/pNdnMU4XUXYNQDhh2D6I
+         0tGZJdXdOWtQqYuCqN+YlK1qw8jKRlhK25WToLdoCNlGhpoyYK6RmJ58pa/w9UwkIK+7
+         aVXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVxj31NZnZaFiWt3o/CszRBkf7W15rTWrWsdsqz7oaB4js7a3yRnL5tBOY9wDIeK5sHZ2E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOSJPJDuqGzBb8DB6SQg8XV04t65aHvKTqcLWEMbgd+GnV02Yu
+	SANicGLUwSZxniu9sGDSgJc3vM4kyLaE1Aww/hs6TZFfDDCKh7OGPEPHLVED5lfMM9stjGTUiO7
+	2iyWYvRvRDvcnXhcS5Ryiu3SmlmNu+twRluISQlll
+X-Gm-Gg: AZuq6aKWo4p8lm0TDqXryqT1tB8ElVhra2oB+Z+IsaWJgVoSrikYE98S6vT3zbD8uCO
+	vif37Ez2coesM9jpBaj/8Daw0is6d884we8TBfD3Yr50oCfAE4Z1tMAbiwyALjUthUZoeT0fG4/
+	Vn+ogVxfiFrLocTysoABmw+8lX5ulU+XKOob4PEIyyiqdgmQvXsAlUje0URntQTlG2boATFhor5
+	uw4EQGOsm+FQ+VZqPHmMeOsCrKkefwvyN3uiIDo6Qj6Uc4XCDW9YG1VgFA7Q8ATiB2mIxg=
+X-Received: by 2002:a05:6402:1ed2:b0:658:eee:f21a with SMTP id
+ 4fb4d7f45d1cf-659635d0118mr29540a12.10.1770265276979; Wed, 04 Feb 2026
+ 20:21:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260113225406.273373-1-jmattson@google.com> <aWbmXTJdZDO_tnvE@google.com>
- <CALMp9eTYakMk0Bogxa_GdGU5_h4PK-YOXcu-cSQ16m1QcusHxw@mail.gmail.com>
- <CALMp9eQx7EVim4iYGbAhoHrei2YmTra6oxtdmKaY7bw-M0PHbw@mail.gmail.com>
- <aYKoJ74MWboBuE_M@google.com> <CALMp9eSc=0zS+6Rk-c_0P-Q1Y8_9Xv58G5BYxieKpv_XaSj0wg@mail.gmail.com>
- <aYPvyMDipM9Z9Z7t@google.com>
-In-Reply-To: <aYPvyMDipM9Z9Z7t@google.com>
+References: <20260203190711.458413-1-seanjc@google.com> <20260203190711.458413-2-seanjc@google.com>
+In-Reply-To: <20260203190711.458413-2-seanjc@google.com>
 From: Jim Mattson <jmattson@google.com>
-Date: Wed, 4 Feb 2026 20:11:57 -0800
-X-Gm-Features: AZwV_Qhrwh_pA1gXlaRFSMVmwpj18Td64_tdGrDJiNzY-mtZF0eo8OUjw8uOEFA
-Message-ID: <CALMp9eR4trBDwgDnyEJmrHnStKnAMiRgehty=xu=NMnLVN2vtw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: VMX: Add quirk to allow L1 to set FREEZE_IN_SMM in vmcs12
+Date: Wed, 4 Feb 2026 20:21:04 -0800
+X-Gm-Features: AZwV_Qh7dtAdQTWWR_uTZ9ih-Fy5xiDTl4uF2BN41SYMZgZKmzbjZrLPg8Y-bYE
+Message-ID: <CALMp9eTkbZzgukskiU_Uo_aekXnnqBqjW5jAeS029VCB=f04gg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: SVM: Initialize AVIC VMCB fields if AVIC is
+ enabled with in-kernel APIC
 To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Naveen N Rao <naveen@kernel.org>, "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
@@ -122,15 +116,15 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70291-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70292-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
@@ -139,116 +133,40 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: B7F55EE772
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: ACE17EE80E
 X-Rspamd-Action: no action
 
-On Wed, Feb 4, 2026 at 5:18=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
+On Tue, Feb 3, 2026 at 11:07=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
-> On Wed, Feb 04, 2026, Jim Mattson wrote:
-> > On Tue, Feb 3, 2026 at 6:00=E2=80=AFPM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> > >
-> > > On Thu, Jan 22, 2026, Jim Mattson wrote:
-> > > > On Tue, Jan 13, 2026 at 7:47=E2=80=AFPM Jim Mattson <jmattson@googl=
-e.com> wrote:
-> > > > > On Tue, Jan 13, 2026 at 4:42=E2=80=AFPM Sean Christopherson <sean=
-jc@google.com> wrote:
-> > > > > >
-> > > > > > On Tue, Jan 13, 2026, Jim Mattson wrote:
-> > > > > > > Add KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM to allow L1 to set
-> > > > > > > IA32_DEBUGCTL.FREEZE_IN_SMM in vmcs12 when using nested VMX. =
- Prior to
-> > > > > > > commit 6b1dd26544d0 ("KVM: VMX: Preserve host's
-> > > > > > > DEBUGCTLMSR_FREEZE_IN_SMM while running the guest"), L1 could=
- set
-> > > > > > > FREEZE_IN_SMM in vmcs12 to freeze PMCs during physical SMM co=
-incident
-> > > > > > > with L2's execution.  The quirk is enabled by default for bac=
-kwards
-> > > > > > > compatibility; userspace can disable it via KVM_CAP_DISABLE_Q=
-UIRKS2 if
-> > > > > > > consistency with WRMSR(IA32_DEBUGCTL) is desired.
-> > > > > >
-> > > > > > It's probably worth calling out that KVM will still drop FREEZE=
-_IN_SMM in vmcs02
-> > > > > >
-> > > > > >         if (vmx->nested.nested_run_pending &&
-> > > > > >             (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CO=
-NTROLS)) {
-> > > > > >                 kvm_set_dr(vcpu, 7, vmcs12->guest_dr7);
-> > > > > >                 vmx_guest_debugctl_write(vcpu, vmcs12->guest_ia=
-32_debugctl &
-> > > > > >                                                vmx_get_supporte=
-d_debugctl(vcpu, false)); <=3D=3D=3D=3D
-> > > > > >         } else {
-> > > > > >                 kvm_set_dr(vcpu, 7, vcpu->arch.dr7);
-> > > > > >                 vmx_guest_debugctl_write(vcpu, vmx->nested.pre_=
-vmenter_debugctl);
-> > > > > >         }
-> > > > > >
-> > > > > > both from a correctness standpoint and so that users aren't mis=
-lead into thinking
-> > > > > > the quirk lets L1 control of FREEZE_IN_SMM while running L2.
-> > > > >
-> > > > > Yes, it's probably worth pointing out that the VM is now subject =
-to
-> > > > > the whims of the L0 administrators.
-> > > > >
-> > > > > While that makes some sense for the legacy vPMU, where KVM is jus=
+> Initialize all per-vCPU AVIC control fields in the VMCB if AVIC is enable=
+d
+> in KVM and the VM has an in-kernel local APIC, i.e. if it's _possible_ th=
+e
+> vCPU could activate AVIC at any point in its lifecycle.  Configuring the
+> VMCB if and only if AVIC is active "works" purely because of optimization=
+s
+> in kvm_create_lapic() to speculatively set apicv_active if AVIC is enable=
+d
+> *and* to defer updates until the first KVM_RUN.  In quotes because KVM
+> likely won't do the right thing if kvm_apicv_activated() is false, i.e. i=
+f
+> a vCPU is created while APICv is inhibited at the VM level for whatever
+> reason.  E.g. if the inhibit is *removed* before KVM_REQ_APICV_UPDATE is
+> handled in KVM_RUN, then __kvm_vcpu_update_apicv() will elide calls to
+> vendor code due to seeing "apicv_active =3D=3D activate".
+>
+> Cleaning up the initialization code will also allow fixing a bug where KV=
+M
+> incorrectly leaves CR8 interception enabled when AVIC is activated withou=
 t
-> > > > > another client of host perf, perhaps the decision should be revis=
-ited
-> > > > > in the case of the MPT vPMU, where KVM owns the PMU while the vCP=
-U is
-> > > > > in VMX non-root operation.
-> > >
-> > > Eh, running guests with FREEZE_IN_SMM=3D0 seems absolutely crazy from=
- a security
-> > > perspective.  If an admin wants to disable FREEZE_IN_SMM, they get to=
- keep the
-> > > pieces.  And KVM definitely isn't going to override the admin, e.g. t=
-o allow the
-> > > guest to profile host SMM.
-> >
-> > I'm not sure what you mean by "they get to keep the pieces." What is
-> > the security problem with allowing L1 to freeze *guest-owned* PMCs
-> > during SMM?
+> creating a mess with respect to whether AVIC is activated or not.
 >
-> To give L1 the option to freeze PMCs, KVM would also need to give L1 the =
-option
-> to *not* freeze PMCs.  At that point, the guest can use its PMCs to profi=
-le host
-> SMM code.  Maybe even leverage a PMI to attack a poorly written SMM handl=
-er.
-
-Perhaps I'm missing something. I was thinking, essentially, of a logical or=
-:
-
-vmcs02.debugctl.freeze_in_smm =3D vmcs12.debugctl.freeze_in_smm |
-vmcs01.debugctl.freeze_in_smm
-
-So, an L1 request to freeze counters in SMM would be granted, but an
-L1 request to *not* freeze counters could be overruled by the host.
-
-I'm not suggesting this in the context of the legacy vPMU, because
-some PMCs may be counting host-initiated perf events, and L1 should
-not have any say in what those PMCs count. However, with the mediated
-vPMU, L1 owns the entire PMU while L2 is running, so it seems
-reasonable to allow it to freeze the counters during physical SMM.
-
-> In other words, unless I'm missing something, the only reasonable option =
-is to
-> run the guest with FREEZE_IN_SMM=3D1, which means ignoring the guest's wi=
-shes.
-> Or I guess another way to look at it: you can have any color car you want=
-, as
-> long as it's black :-)
-
-I would be happy with FREEZE_IN_SMM=3D1. I'm not happy with the host
-dictating FREEZE_IN_SMM=3D0.
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
 
