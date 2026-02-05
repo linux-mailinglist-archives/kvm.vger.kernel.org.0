@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-70346-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70347-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wAmPKVTAhGnG4wMAu9opvQ
-	(envelope-from <kvm+bounces-70346-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 17:07:48 +0100
+	id WM44CjLBhGnG4wMAu9opvQ
+	(envelope-from <kvm+bounces-70347-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 17:11:30 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0786DF4F83
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 17:07:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 933C2F5061
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 17:11:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 076063082DB4
-	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 16:01:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 49934302DE09
+	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 16:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74152436356;
-	Thu,  5 Feb 2026 16:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01224436365;
+	Thu,  5 Feb 2026 16:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RttX/3Mk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nv2s5bbx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D6F42EED8;
-	Thu,  5 Feb 2026 16:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0921A42980C;
+	Thu,  5 Feb 2026 16:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770307271; cv=none; b=rzREF+YfjfBwTX7f7hx5t8HfFr2xlgBkIcgAGkJnkip4oPk9Y+iO6XKElDlawR+69hBqZPYXGhNpGUIKMkp2eGC1gpvoRV358M6+xqMuPqPsBHfYjBEj8KYJK6mGbW7+/YpyIUF4tiHsZPFrP4isGaiRBIgte6j1cHHdGdmyXBA=
+	t=1770307816; cv=none; b=qijqHMjCDLKkLHrOPvlobCfxSwMhlTLnIbovySCJKPnxXUqaCZoaq5JRCYNN/YogSzlO9sCaP8iOvJqNEDe5kF5y2Pqy9D7UFF9tY3SU0JSy17gO5/u1nuOGw+XpYcJ2LKPGfE7wCKhkjEPR2SdgXhnP7bzb26KVhPhgMQ+/nAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770307271; c=relaxed/simple;
-	bh=qz+3cehkgOjxXFCo62f/+p5mv+1H938wSgTdCYi+IUo=;
+	s=arc-20240116; t=1770307816; c=relaxed/simple;
+	bh=1Y9kTUxObA5PRGOhksza1ItRBMQVFFAeDQzn+OFKihU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GoGWJZOqljdrTjajrg9tj0VBnUy8GIb84jDFcvAzyicNoQki9Uj46qWWv34rAPczPxl4cWYCHmTVRXfnLdumGKXFVtye2kIBgJ+EJeXOrKrOsDcYFMeBEqkKi3fsSqbYRwxX9EWlQE6kCCa1e6+rgX7QLkt5aFQ9T8Ta+wuvUpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RttX/3Mk; arc=none smtp.client-ip=198.175.65.20
+	 In-Reply-To:Content-Type; b=bXDo5/gc92eAqN5DGA+RsV6g6q5367KDCMoTW4n+WJ5YFg7WzeF06UfXUwAdeBmpqc66AD1mY558MF+goVbwoZOy2cMchwyx30AtzV51wlw3ypBFW2i2AiToaCTZihP1daVap7UdCRdnI2OvfLgDvAmFfdcUDR4CwETT5/YpTzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nv2s5bbx; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770307272; x=1801843272;
+  t=1770307816; x=1801843816;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=qz+3cehkgOjxXFCo62f/+p5mv+1H938wSgTdCYi+IUo=;
-  b=RttX/3MkLu4EaYo5bdqZNYHX+o90/3xL+MhG0Dmvoepjpbf/6BfvfN78
-   7Wdevgsgeck4LS/G2/8jOeEVMJeIp4G65xQcUb82WMJ8150smDYyQTsE2
-   Ws1XrsjYAnDh66BTcr5P+u9fR+4+1sJtFh28KforE9Mbef8hk/ULXZuAr
-   c/IMRsoO7/UYSpSWxwRJOUxXEANiy00z6A8e4slOPsU7KL55mgohbRcF+
-   EUxjLTHCCutN+qm+S9dKr4Yxp+OUq405u17Z3hTKB2CpcPdcBKjrgng8/
-   NYbttZAp6tqLZyWvefM39Lr27h8DKIVpPIwB9Sftz9UZh9kOwvh/XMWH8
-   A==;
-X-CSE-ConnectionGUID: ioMT1Qb4SGGBwy/pEoq5Eg==
-X-CSE-MsgGUID: dobSm/GERZWj/1lkZTBu9g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11692"; a="71237618"
+  bh=1Y9kTUxObA5PRGOhksza1ItRBMQVFFAeDQzn+OFKihU=;
+  b=Nv2s5bbxDlveC0hulJDEWjWDxx5wgemlaXjUmIy7bbEHX9JWymaayKcl
+   R3ohva144/7svOeIGYpB32A/SUI/gENUGRfWpFcQSLEBrN9WRY3UW1cAE
+   o0ZIITDlwIBZagHGNlkxDWgxxpZpCOCzcujXizsP0ewofOmb/JgoQYBfr
+   YIilKjGLKzsLcVY0WzKLtEgRtC1zbM/ke4u4dt7L7jSszvB7SmDgoQsmH
+   J2aaQYIAidb6cxl3PcQ6krkcvdzuw0mwZympMQ4znV4OXp76JE+N6vkGJ
+   ocGiZNcMlVZdLyvo88GkpjnGQsG22Lk5It6lnuncUEwE9mrLHrw9k1g16
+   w==;
+X-CSE-ConnectionGUID: viRKRnImSliMZ/21pju8+w==
+X-CSE-MsgGUID: iLnZQi/PQpubM9KJRix73A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11692"; a="71549231"
 X-IronPort-AV: E=Sophos;i="6.21,274,1763452800"; 
-   d="scan'208";a="71237618"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 08:01:11 -0800
-X-CSE-ConnectionGUID: zz4C4dKFSVOzqXZnfJBhQw==
-X-CSE-MsgGUID: XbiRlqb8R1iFGtpWdnoz5Q==
+   d="scan'208";a="71549231"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 08:10:16 -0800
+X-CSE-ConnectionGUID: Vyls9xQeSZuLf00A9ztyOQ==
+X-CSE-MsgGUID: f49i3fagTOaNrMxJeaoKzw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,274,1763452800"; 
-   d="scan'208";a="248170547"
+   d="scan'208";a="210483918"
 Received: from tfalcon-desk.amr.corp.intel.com (HELO [10.125.111.86]) ([10.125.111.86])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 08:01:10 -0800
-Message-ID: <dabf57c8-88c9-4bc0-bed6-c4d451a4ec42@intel.com>
-Date: Thu, 5 Feb 2026 08:01:08 -0800
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2026 08:10:15 -0800
+Message-ID: <9c8c2d69-5434-4416-ba37-897ce00e2b11@intel.com>
+Date: Thu, 5 Feb 2026 08:10:14 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,24 +70,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v5 00/45] TDX: Dynamic PAMT + S-EPT Hugepage
-To: Sean Christopherson <seanjc@google.com>
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, Kiryl Shutsemau <kas@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
- linux-coco@lists.linux.dev, kvm@vger.kernel.org,
- Kai Huang <kai.huang@intel.com>, Rick Edgecombe
- <rick.p.edgecombe@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
- Vishal Annapurve <vannapurve@google.com>,
- Ackerley Tng <ackerleytng@google.com>, Sagi Shahar <sagis@google.com>,
- Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>
-References: <20260129011517.3545883-1-seanjc@google.com>
- <aXuVR0kq_K1TYwlR@char.us.oracle.com> <aYNaA7Td23xKHoHK@google.com>
- <e60e0929-f3b0-463d-8c82-dc9170e401eb@intel.com>
- <aYS85EsXu_xuQXSI@google.com>
+Subject: Re: [PATCH] x86/fred: Fix early boot failures on SEV-ES/SNP guests
+To: Nikunj A Dadhania <nikunj@amd.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, bp@alien8.de, thomas.lendacky@amd.com
+Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
+ hpa@zytor.com, xin@zytor.com, seanjc@google.com, pbonzini@redhat.com,
+ x86@kernel.org, jon.grimm@amd.com, stable@vger.kernel.org
+References: <20260205051030.1225975-1-nikunj@amd.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -133,21 +122,21 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <aYS85EsXu_xuQXSI@google.com>
+In-Reply-To: <20260205051030.1225975-1-nikunj@amd.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	TAGGED_FROM(0.00)[bounces-70346-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	TAGGED_FROM(0.00)[bounces-70347-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+];
@@ -156,19 +145,81 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0786DF4F83
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim]
+X-Rspamd-Queue-Id: 933C2F5061
 X-Rspamd-Action: no action
 
-On 2/5/26 07:53, Sean Christopherson wrote:
-> I'm a-ok starting with a topic branch.  If maintaining that branch becomes too
-> costly, then we can always revisit things.  And that would probably be good
-> motiviation to beat guest_memfd hugepage into shape 🙂
+On 2/4/26 21:10, Nikunj A Dadhania wrote:
+...
+> --- a/arch/x86/entry/entry_fred.c
+> +++ b/arch/x86/entry/entry_fred.c
+> @@ -208,6 +208,11 @@ static noinstr void fred_hwexc(struct pt_regs *regs, unsigned long error_code)
+>  #ifdef CONFIG_X86_CET
+>  	case X86_TRAP_CP: return exc_control_protection(regs, error_code);
+>  #endif
+> +	case X86_TRAP_VC:
+> +		if (user_mode(regs))
+> +			return user_exc_vmm_communication(regs, error_code);
+> +		else
+> +			return kernel_exc_vmm_communication(regs, error_code);
+>  	default: return fred_bad_type(regs, error_code);
+>  	}
 
-Sounds like a plan.
+Please look at the code in the ~20 lines above this hunk. It has a nice,
+consistent form of:
+
+	case X86_TRAP_FOO: return exc_foo_action(...);
+
+Could we keep that going, please?
+
+Second, these functions are defined in arch/x86/coco/sev/vc-handle.c.
+That looks suspiciously like CONFIG_AMD_MEM_ENCRYPT code and not
+something that will compile everywhere. Also note the other features in
+the switch() block. See all the #ifdefs on those?
+
+Have you compiled this?
+
+> diff --git a/arch/x86/kernel/fred.c b/arch/x86/kernel/fred.c
+> index e736b19e18de..8cf4da546a8e 100644
+> --- a/arch/x86/kernel/fred.c
+> +++ b/arch/x86/kernel/fred.c
+> @@ -27,9 +27,6 @@ EXPORT_PER_CPU_SYMBOL(fred_rsp0);
+>  
+>  void cpu_init_fred_exceptions(void)
+>  {
+> -	/* When FRED is enabled by default, remove this log message */
+> -	pr_info("Initialize FRED on CPU%d\n", smp_processor_id());
+> -
+>  	/*
+>  	 * If a kernel event is delivered before a CPU goes to user level for
+>  	 * the first time, its SS is NULL thus NULL is pushed into the SS field
+> @@ -70,6 +67,17 @@ void cpu_init_fred_exceptions(void)
+>  	/* Use int $0x80 for 32-bit system calls in FRED mode */
+>  	setup_clear_cpu_cap(X86_FEATURE_SYSFAST32);
+>  	setup_clear_cpu_cap(X86_FEATURE_SYSCALL32);
+> +
+> +	/*
+> +	 * For secondary processors, FRED bit in CR4 gets enabled in cr4_init()
+> +	 * and FRED MSRs are not configured till the end of this function. For
+> +	 * SEV-ES and SNP guests, any console write before the FRED MSRs are
+> +	 * setup will cause a #VC and cannot be handled. Move the pr_info to
+> +	 * the end of this function.
+> +	 *
+> +	 * When FRED is enabled by default, remove this log message
+> +	 */
+> +	pr_info("Initialized FRED on CPU%d\n", smp_processor_id());
+>  }
+
+This seems really gross. Now there's a window where printk() doesn't
+work. To fix it, we start moving printk()'s?
+
+Please, no.
+
+Shouldn't we flip the FRED CR4 bit _last_, once all the MSRs are set up?
+Why is it backwards in the first place? Why can't it be fixed?
 
