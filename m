@@ -1,234 +1,376 @@
-Return-Path: <kvm+bounces-70318-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70319-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iHkQOSR5hGk23AMAu9opvQ
-	(envelope-from <kvm+bounces-70318-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 12:04:04 +0100
+	id gFmFMhmChGl/3AMAu9opvQ
+	(envelope-from <kvm+bounces-70319-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 12:42:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 412B4F19EC
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 12:04:04 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C4B5F1FB8
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 12:42:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 864283049709
-	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 10:58:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C1C87300614C
+	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 11:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A4B3A9D9B;
-	Thu,  5 Feb 2026 10:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jG0lM977"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CAE3B5302;
+	Thu,  5 Feb 2026 11:42:11 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7543A9D83
-	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 10:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770289129; cv=pass; b=T683cx9pzrP1krci4EBcWEgRW1tJEbHRkB2OEvptruOeVB1Cp0ZLYpQUsHjhbWCPMyXhBOr+MZCiEJvaYjOeb/REFf7PsP8uQu7H4Vp3EPhvX1Mv1AJ7IiH1L9TSqef7zv2cbTd7sqt24uw4lckjVSFyyL1G0OeapA0Z9qGaIuA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770289129; c=relaxed/simple;
-	bh=eInnJKMahFR6g+uDKXbFT99Bh2LRk+v2OWPd769Xq2c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JhVqsgQiBxBfZTP6wHzZsL29alCGpzt0xsUev0bgA7123fD9GmKSaGiA+v392hqVNdgaBqfUEVsvRMswKQkzwTf29l0r9jc1fzeG7Oso+02dg1n8MRLU7Eqrp5KJdrOYVWHJ27lTtGg0Zg84Qp+Q55ErJgyXwJPASlSrgE3bfQY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jG0lM977; arc=pass smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-5014b5d8551so335391cf.0
-        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 02:58:48 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770289128; cv=none;
-        d=google.com; s=arc-20240605;
-        b=dEzyIVTL6W7rwqi/PxsjjRLySzP7VJj9q14JvyaQHABy1KeTjw04oDNQE5Z2CsduoM
-         C6XJQBk0n1ilsEBExQMsTwOJb4EGg9lcWCYzhAGTyZgzKtIDmbdKpR4T5mbbHJ6IbGf1
-         eEMEiJMmHWQVdENd5pJHfl+uxW1vMH3TsxLZe9UCSpn5aPtiYp2olRNhqGVIkTs7oylt
-         O94ZZFkEKyLdEI38hRT2rfvvx9lqCzM2sQBC8LcDSPFkT2g5eao0teRIhhCrwOYrcdKX
-         GlJqacyWpTa3uoOH16NeiE37XuDlbDzflk1P4oJr72bp/2u35k1J6S9amHwgXYBr9IgI
-         Dfjw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=mWdaGHBGoTQV6Nt/HUCcE0KGg84oEg+M9DxtvHa6/t4=;
-        fh=9TVMu45Pi0zBFKqMqBux14Bc9Ys3uazMEFzVURRsUaA=;
-        b=U0aCnT3zWVsfI0LQvlMB4odOIp18kxA9uoIva6jUeswLn9JeVkkHN2A9cXm4qrShtS
-         wXvyDt3z/TeoO5EsuoYIUPLN7x3PYvlzWDrpyqiwd0dxqxvULNE0aQR3EWawQ3MKgBNx
-         7LPY0c69DwEmDN2oDh6fotlWdMfrCD9MKyrX+MrONVQGmCi2c9qUiiTskz6P7JbHvg5E
-         gA546W0UFdpfqHSA6gz+pZqS+UqwG/3oqZMG7/8Io+PyQWijh7s+h3QHIex9iHMfBDgY
-         mzJBnBY7NVKw81ZYmCAdhxLiE8mGILEgojHuC0xCSA+WrU5xpG+2JKcML1DmgmYexE63
-         W7mA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770289128; x=1770893928; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mWdaGHBGoTQV6Nt/HUCcE0KGg84oEg+M9DxtvHa6/t4=;
-        b=jG0lM977AgU4k4a3NUw2sqizKRC290Y1gHjmForcDH6xHiXGSGNlvcYv6eo8BrcX5W
-         JGylmlS5DVKZvrLnX0jfnv4q9ympM1pDuryMuu+DhJSdylXBUWWp61QJg07zrimaS72I
-         djPSqDrbMSaKZ2ZsJAPDqYQu14CPmc+gfJoXdzs47hiJfJ+gPVeIsM13zk3fsUPF4JwI
-         tPhXOI1MEakE0ASSoYyc+PwZOmBHOXV3VKR8+iYcqF9FLOYpblQ5FMJ3Qi+JbaUB5krO
-         m1sOuZee46r4fU29N0gkDUuq21fUI9brAXQtogw7GlNs36+1a6I6WZ+swHGciE8h3Tdp
-         przA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770289128; x=1770893928;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mWdaGHBGoTQV6Nt/HUCcE0KGg84oEg+M9DxtvHa6/t4=;
-        b=ozS3kOk9qQ4TlYJjgmxDiBkTMl+gvNqYnR7oJNgCaI7OX0qCp8yZiV+zJUJYvLldvn
-         R7cXNeNFuaPOY87bdgfveBS71k0xE7aHVSKTjsFyhbaDOOz1uj+zg4UwkqvaVRLQkPtD
-         CSwyWzn+zePtOk+i8uh8F4+J6xrBY3/BQNzGSBS35RJO1+1AW6avkFKNkDSootP7ZSRZ
-         fnFI6M6cW8I/W98EPmDoVdUGLo8XWQLQQW6Re4eIjOQQgftk7borQP7OhTSl5W4TpqzF
-         ZXsSfdIrN6K1Y6Cx+k2SnbCDGxHYrJLn//cZKx4Ya8wjROsIEyjR/Kt4gpl7McWtCNGP
-         Uvfw==
-X-Forwarded-Encrypted: i=1; AJvYcCV5JBQTivyIrTVWlWYtuLRSD2dvn1Ic3I4M0OesiZ8moQEyb8/Hb+qESn9VWn0LGUVT5YM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCaf0qWMAx6npawvPvCMaxUyq9/0IzjySnR2cBW9Bcczq+bHsM
-	64MoC+OkpRccyYP4ibDmJXRtCHvIgJ/CO87acUnvQTW/eq98RmFfA2PwwlYTRnF5daAtJtKkEnN
-	YuB4H/Zy25a3RxAmHRAbggihxzX0D4FShmZIj8bD1
-X-Gm-Gg: AZuq6aIPJXHG/yuAauyMFtcfHlnn4WS6qZpE3MT7uUyjApgQI43Cry6PUtVp2kCEqpN
-	hyfOMYqM+1826RX7kHMT4Usp2nQBHGSmDlvLZpcGYzEgwoJdGX+/KMqIpNCKBfhpUPoJWivs39B
-	cpRO1FMZeIdcXc08PHi+hmFTB9ugWqVO8U1X2Od6QBO8+RWLW5BFhbMtWrQxOGE7t3xLWhIh9/M
-	uqbEgoXyX4YOCkeYydQ7zrrHtEDLIvec5VkVMrd5PgNNtwuGFOcN/iak93M90Ke2g4NglmB
-X-Received: by 2002:a05:622a:1a9e:b0:4ed:a65c:88d0 with SMTP id
- d75a77b69052e-5062b0a3b84mr6534461cf.6.1770289127426; Thu, 05 Feb 2026
- 02:58:47 -0800 (PST)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10733A7F5D;
+	Thu,  5 Feb 2026 11:42:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770291731; cv=none; b=sYRttrmW3IO7AmHj4eJrUdYKxzVR9q7ccQWZOrpo92AeZexTsSafc3ZhwUpJjadn2dNNdh5kMzyEOS9bTwYKroRloV/7mJmTFiEKbtvLgZhB7WYDFGoL1E3iCb7vgIxqvorLhyeE0KhcJvzu4v6Ruk2DTpiYzH2JEAPlGMu44XE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770291731; c=relaxed/simple;
+	bh=vHL+E3uxxnhFuaa6PISDD3la3/3ftmgbCRpBwX9kRBM=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=sV40391wcU7J9+Nimrjy0wNXMYmrAk4shCJJmx8EjHiSn326afJ6L8XJMiPgVaAnmkJsUmMYEcMaOl/hJUWtsAwOZ3e2+bgWXHPZViVqKyZfQ+zlLQuCQ7NmlhakI9GXEC+SqJiALOU+boc6fOkIgnRmgG5giilEMYJwWVUfYb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.239])
+	by gateway (Coremail) with SMTP id _____8BxnsMNgoRpvhoQAA--.52406S3;
+	Thu, 05 Feb 2026 19:42:06 +0800 (CST)
+Received: from [10.20.42.239] (unknown [10.20.42.239])
+	by front1 (Coremail) with SMTP id qMiowJBxLMIJgoRp1mdAAA--.52533S3;
+	Thu, 05 Feb 2026 19:42:03 +0800 (CST)
+Subject: Re: [PATCH v5 1/2] LongArch: KVM: Add DMSINTC device support
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: maobibo@loongson.cn, kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ kernel@xen0n.name, linux-kernel@vger.kernel.org
+References: <20251225091224.2893389-1-gaosong@loongson.cn>
+ <20251225091224.2893389-2-gaosong@loongson.cn>
+ <CAAhV-H5h2LioH6SZD8RUNewb4De3LWM9g2PJFUnTTkX+GG4cdw@mail.gmail.com>
+From: gaosong <gaosong@loongson.cn>
+Message-ID: <373e1c37-07f2-8a20-c305-03a88b573001@loongson.cn>
+Date: Thu, 5 Feb 2026 19:43:06 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260116182606.61856-1-sascha.bischoff@arm.com>
-In-Reply-To: <20260116182606.61856-1-sascha.bischoff@arm.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 5 Feb 2026 10:58:11 +0000
-X-Gm-Features: AZwV_Qj2DbaENVW72ogYB2HV7TiFDfYeQJXErbOTc52O5rdL0EP2dF1kO889FaM
-Message-ID: <CA+EHjTxhekJXyc7PbcXNhcByVp5mYqi56B6RXUukJfgE-QzrMg@mail.gmail.com>
-Subject: Re: [PATCH kvmtool v2 00/17] arm64: Support GICv5-based guests
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "will@kernel.org" <will@kernel.org>, 
-	"julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>, nd <nd@arm.com>, 
-	"maz@kernel.org" <maz@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, Timothy Hayes <Timothy.Hayes@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAAhV-H5h2LioH6SZD8RUNewb4De3LWM9g2PJFUnTTkX+GG4cdw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:qMiowJBxLMIJgoRp1mdAAA--.52533S3
+X-CM-SenderInfo: 5jdr20tqj6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Jr1xJF13AF1kXFyUKw1UXFc_yoWfJFyUpF
+	9rAFs8Gr48WryxCrn2gas8urnFvr4fKr129FyjgFW5ArnFvryrJry8Kr9ruF9xXa18Gr10
+	vFyS93WY9a1Ut3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	XVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
+	Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0
+	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
+	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
+	14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jjwZcUUUUU=
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-1.46 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70318-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,arm.com,vger.kernel.org,lists.linux.dev];
+	TAGGED_RCPT(0.00)[kvm];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.988];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	R_DKIM_NA(0.00)[];
+	DMARC_NA(0.00)[loongson.cn];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gaosong@loongson.cn,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tabba@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:url,arm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 412B4F19EC
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70319-lists,kvm=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6C4B5F1FB8
 X-Rspamd-Action: no action
 
-Hi Sascha,
+Hi,
 
-I would like to review and test this series. Do you have it in a
-branch somewhere, since it's not trivial to apply it to kvmtool master
-as this is based on the nv series.
+在 2026/1/15 下午3:43, Huacai Chen 写道:
+> Hi, Song,
+>
+> On Thu, Dec 25, 2025 at 5:37 PM Song Gao <gaosong@loongson.cn> wrote:
+>> Add device model for DMSINTC interrupt controller, implement basic
+>> create/destroy/set_attr interfaces, and register device model to kvm
+>> device table.
+>>
+>> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+>> Signed-off-by: Song Gao <gaosong@loongson.cn>
+>> ---
+>>   arch/loongarch/include/asm/kvm_dmsintc.h |  21 +++++
+>>   arch/loongarch/include/asm/kvm_host.h    |   3 +
+>>   arch/loongarch/include/uapi/asm/kvm.h    |   4 +
+>>   arch/loongarch/kvm/Makefile              |   1 +
+>>   arch/loongarch/kvm/intc/dmsintc.c        | 110 +++++++++++++++++++++++
+>>   arch/loongarch/kvm/main.c                |   6 ++
+>>   include/uapi/linux/kvm.h                 |   2 +
+>>   7 files changed, 147 insertions(+)
+>>   create mode 100644 arch/loongarch/include/asm/kvm_dmsintc.h
+>>   create mode 100644 arch/loongarch/kvm/intc/dmsintc.c
+>>
+>> diff --git a/arch/loongarch/include/asm/kvm_dmsintc.h b/arch/loongarch/include/asm/kvm_dmsintc.h
+>> new file mode 100644
+>> index 000000000000..1d4f66996f3c
+>> --- /dev/null
+>> +++ b/arch/loongarch/include/asm/kvm_dmsintc.h
+>> @@ -0,0 +1,21 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/*
+>> + * Copyright (C) 2025 Loongson Technology Corporation Limited
+>> + */
+>> +
+>> +#ifndef __ASM_KVM_DMSINTC_H
+>> +#define __ASM_KVM_DMSINTC_H
+>> +
+>> +
+>> +struct loongarch_dmsintc  {
+>> +       struct kvm *kvm;
+>> +       uint64_t msg_addr_base;
+>> +       uint64_t msg_addr_size;
+>> +};
+>> +
+>> +struct dmsintc_state {
+>> +       atomic64_t  vector_map[4];
+>> +};
+>> +
+>> +int kvm_loongarch_register_dmsintc_device(void);
+>> +#endif
+>> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+>> index e4fe5b8e8149..5e9e2af7312f 100644
+>> --- a/arch/loongarch/include/asm/kvm_host.h
+>> +++ b/arch/loongarch/include/asm/kvm_host.h
+>> @@ -22,6 +22,7 @@
+>>   #include <asm/kvm_ipi.h>
+>>   #include <asm/kvm_eiointc.h>
+>>   #include <asm/kvm_pch_pic.h>
+>> +#include <asm/kvm_dmsintc.h>
+>>   #include <asm/loongarch.h>
+>>
+>>   #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+>> @@ -134,6 +135,7 @@ struct kvm_arch {
+>>          struct loongarch_ipi *ipi;
+>>          struct loongarch_eiointc *eiointc;
+>>          struct loongarch_pch_pic *pch_pic;
+>> +       struct loongarch_dmsintc *dmsintc;
+>>   };
+>>
+>>   #define CSR_MAX_NUMS           0x800
+>> @@ -244,6 +246,7 @@ struct kvm_vcpu_arch {
+>>          struct kvm_mp_state mp_state;
+>>          /* ipi state */
+>>          struct ipi_state ipi_state;
+>> +       struct dmsintc_state dmsintc_state;
+>>          /* cpucfg */
+>>          u32 cpucfg[KVM_MAX_CPUCFG_REGS];
+>>
+>> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
+>> index de6c3f18e40a..0a370d018b08 100644
+>> --- a/arch/loongarch/include/uapi/asm/kvm.h
+>> +++ b/arch/loongarch/include/uapi/asm/kvm.h
+>> @@ -154,4 +154,8 @@ struct kvm_iocsr_entry {
+>>   #define KVM_DEV_LOONGARCH_PCH_PIC_GRP_CTRL             0x40000006
+>>   #define KVM_DEV_LOONGARCH_PCH_PIC_CTRL_INIT            0
+>>
+>> +#define KVM_DEV_LOONGARCH_DMSINTC_CTRL                 0x40000007
+>> +#define KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_BASE                0x0
+>> +#define KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_SIZE                0x1
+>> +
+>>   #endif /* __UAPI_ASM_LOONGARCH_KVM_H */
+>> diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
+>> index cb41d9265662..6e184e24443c 100644
+>> --- a/arch/loongarch/kvm/Makefile
+>> +++ b/arch/loongarch/kvm/Makefile
+>> @@ -19,6 +19,7 @@ kvm-y += vm.o
+>>   kvm-y += intc/ipi.o
+>>   kvm-y += intc/eiointc.o
+>>   kvm-y += intc/pch_pic.o
+>> +kvm-y += intc/dmsintc.o
+>>   kvm-y += irqfd.o
+>>
+>>   CFLAGS_exit.o  += $(call cc-disable-warning, override-init)
+>> diff --git a/arch/loongarch/kvm/intc/dmsintc.c b/arch/loongarch/kvm/intc/dmsintc.c
+>> new file mode 100644
+>> index 000000000000..3fdea81a08c8
+>> --- /dev/null
+>> +++ b/arch/loongarch/kvm/intc/dmsintc.c
+>> @@ -0,0 +1,110 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (C) 2025 Loongson Technology Corporation Limited
+>> + */
+>> +
+>> +#include <linux/kvm_host.h>
+>> +#include <asm/kvm_dmsintc.h>
+>> +#include <asm/kvm_vcpu.h>
+>> +
+>> +static int kvm_dmsintc_ctrl_access(struct kvm_device *dev,
+>> +                               struct kvm_device_attr *attr,
+>> +                               bool is_write)
+>> +{
+>> +       int addr = attr->attr;
+>> +       void __user *data;
+>> +       struct loongarch_dmsintc *s = dev->kvm->arch.dmsintc;
+>> +       u64 tmp;
+>> +
+>> +       data = (void __user *)attr->addr;
+>> +       switch (addr) {
+>> +       case KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_BASE:
+>> +               if (is_write) {
+>> +                       if (copy_from_user(&tmp, data, sizeof(s->msg_addr_base)))
+>> +                               return -EFAULT;
+>> +                       if (s->msg_addr_base) {
+>> +                               /* Duplicate setting are not allowed. */
+>> +                               return -EFAULT;
+>> +                       }
+>> +                       if ((tmp & (BIT(AVEC_CPU_SHIFT) - 1)) == 0)
+>> +                               s->msg_addr_base = tmp;
+>> +                       else
+>> +                               return  -EFAULT;
+>> +               }
+>> +               break;
+>> +       case KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_SIZE:
+>> +               if (is_write) {
+>> +                       if (copy_from_user(&tmp, data, sizeof(s->msg_addr_size)))
+>> +                               return -EFAULT;
+>> +                       if (s->msg_addr_size) {
+>> +                               /*Duplicate setting are not allowed. */
+>> +                               return -EFAULT;
+>> +                       }
+>> +                       s->msg_addr_size = tmp;
+>> +               }
+>> +               break;
+>> +       default:
+>> +               kvm_err("%s: unknown dmsintc register, addr = %d\n", __func__, addr);
+>> +               return -ENXIO;
+>> +       }
+>> +
+>> +       return 0;
+>> +}
+>> +
+>> +static int kvm_dmsintc_set_attr(struct kvm_device *dev,
+>> +                       struct kvm_device_attr *attr)
+>> +{
+>> +       switch (attr->group) {
+>> +       case KVM_DEV_LOONGARCH_DMSINTC_CTRL:
+>> +               return kvm_dmsintc_ctrl_access(dev, attr, true);
+>> +       default:
+>> +               kvm_err("%s: unknown group (%d)\n", __func__, attr->group);
+>> +               return -EINVAL;
+>> +       }
+>> +}
+>> +
+>> +static int kvm_dmsintc_create(struct kvm_device *dev, u32 type)
+>> +{
+>> +       struct kvm *kvm;
+>> +       struct loongarch_dmsintc *s;
+>> +
+>> +       if (!dev) {
+>> +               kvm_err("%s: kvm_device ptr is invalid!\n", __func__);
+>> +               return -EINVAL;
+>> +       }
+>> +
+>> +       kvm = dev->kvm;
+>> +       if (kvm->arch.dmsintc) {
+>> +               kvm_err("%s: LoongArch DMSINTC has already been created!\n", __func__);
+>> +               return -EINVAL;
+>> +       }
+>> +
+>> +       s = kzalloc(sizeof(struct loongarch_dmsintc), GFP_KERNEL);
+>> +       if (!s)
+>> +               return -ENOMEM;
+>> +
+>> +       s->kvm = kvm;
+>> +       kvm->arch.dmsintc = s;
+>> +       return 0;
+>> +}
+>> +
+>> +static void kvm_dmsintc_destroy(struct kvm_device *dev)
+>> +{
+>> +
+>> +       if (!dev || !dev->kvm || !dev->kvm->arch.dmsintc)
+>> +               return;
+>> +
+>> +       kfree(dev->kvm->arch.dmsintc);
+> No need to call kvm_io_bus_unregister_dev()? And it seems you need to
+> kfree(dev) if this series is correct:
+Yes , need  kfree(dev), I will correct it on v6.
 
-Cheers,
-/fuad
+but no need kvm_io_bus_unregister_dev()
+dmsintc did't use kvm_io_bus_register_dev().
 
-On Fri, 16 Jan 2026 at 18:27, Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+Thanks.
+Song Gao
+> https://lore.kernel.org/loongarch/99826cf9-356d-235b-9c7c-9d51d36e53c3@loongson.cn/T/#t
 >
-> This series adds support for GICv5-based guests. The GICv5
-> specification can be found at [1]. There are under-reiew Linux KVM
-> patches at [2] which add support for PPIs, only. Future patch series
-> will add support for the GICv5 IRS and ITS, as well as SPIs and
-> LPIs. Marc has very kindly agreed to host the full *WIP* set of GICv5
-> KVM patches which can be found at [3].
+> Huacai
 >
-> v1 of this series can be found at [4].
->
-> This series is based on the Nested Virtualisation series at [5]. The
-> previous version of this series was accidentally based on an older
-> version - apologies!
->
-> As in v1, the GICv5 support for kvmtool has been staged such that the
-> initial changes just support PPIs (and go hand-in-hand with those
-> currently under review at [2]). As of "arm64: Update timer FDT for
-> GICv5" the support is sufficient to run small tests with the arch
-> timer or PMU.
->
-> Changes in v2:
-> * Used gic__is_v5() in more places to avoid explicit checks for gicv5
->   & gicv5-its configs.
-> * Fixed gic__is_v5() addition leaking across changes.
-> * Cleaned up FDT generation a little.
-> * Actually based the series on [5] (Sorry!).
->
-> Thanks,
-> Sascha
->
-> [1] https://developer.arm.com/documentation/aes0070/latest
-> [2] https://lore.kernel.org/all/20260109170400.1585048-1-sascha.bischoff@arm.com
-> [3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/gicv5-full
-> [4] https://lore.kernel.org/all/20251219161240.1385034-1-sascha.bischoff@arm.com/
-> [5] https://lore.kernel.org/all/20250924134511.4109935-1-andre.przywara@arm.com/
->
-> Sascha Bischoff (17):
->   Sync kernel UAPI headers with v6.19-rc5 with WIP KVM GICv5 PPI support
->   arm64: Add basic support for creating a VM with GICv5
->   arm64: Simplify GICv5 type checks by adding gic__is_v5()
->   arm64: Introduce GICv5 FDT IRQ types
->   arm64: Generate GICv5 FDT node
->   arm64: Update PMU IRQ and FDT code for GICv5
->   arm64: Update timer FDT IRQsfor GICv5
->   irq: Add interface to override default irq offset
->   arm64: Add phandle for each CPU
->   Sync kernel headers with v6.19-rc5 for GICv5 IRS and ITS support in
->     KVM
->   arm64: Add GICv5 IRS support
->   arm64: Generate FDT node for GICv5's IRS
->   arm64: Update generic FDT interrupt desc generator for GICv5
->   arm64: Bump PCI FDT code for GICv5
->   arm64: Introduce gicv5-its irqchip
->   arm64: Add GICv5 ITS node to FDT
->   arm64: Update PCI FDT generation for GICv5 ITS MSIs
->
->  arm64/fdt.c                  |  22 ++++-
->  arm64/gic.c                  | 179 ++++++++++++++++++++++++++++++++---
->  arm64/include/asm/kvm.h      |  12 ++-
->  arm64/include/kvm/fdt-arch.h |   2 +
->  arm64/include/kvm/gic.h      |   9 ++
->  arm64/include/kvm/kvm-arch.h |  30 ++++++
->  arm64/pci.c                  |  16 +++-
->  arm64/pmu.c                  |  23 +++--
->  arm64/timer.c                |  20 +++-
->  include/kvm/irq.h            |   1 +
->  include/linux/kvm.h          |  20 ++++
->  include/linux/virtio_ids.h   |   1 +
->  include/linux/virtio_net.h   |  36 ++++++-
->  include/linux/virtio_pci.h   |   2 +-
->  irq.c                        |  16 +++-
->  powerpc/include/asm/kvm.h    |  13 ---
->  riscv/include/asm/kvm.h      |  27 +++++-
->  x86/include/asm/kvm.h        |  35 +++++++
->  18 files changed, 416 insertions(+), 48 deletions(-)
->
-> --
-> 2.34.1
->
+>> +}
+>> +
+>> +static struct kvm_device_ops kvm_dmsintc_dev_ops = {
+>> +       .name = "kvm-loongarch-dmsintc",
+>> +       .create = kvm_dmsintc_create,
+>> +       .destroy = kvm_dmsintc_destroy,
+>> +       .set_attr = kvm_dmsintc_set_attr,
+>> +};
+>> +
+>> +int kvm_loongarch_register_dmsintc_device(void)
+>> +{
+>> +       return kvm_register_device_ops(&kvm_dmsintc_dev_ops, KVM_DEV_TYPE_LOONGARCH_DMSINTC);
+>> +}
+>> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
+>> index 80ea63d465b8..f363a3b24903 100644
+>> --- a/arch/loongarch/kvm/main.c
+>> +++ b/arch/loongarch/kvm/main.c
+>> @@ -408,6 +408,12 @@ static int kvm_loongarch_env_init(void)
+>>
+>>          /* Register LoongArch PCH-PIC interrupt controller interface. */
+>>          ret = kvm_loongarch_register_pch_pic_device();
+>> +       if (ret)
+>> +               return ret;
+>> +
+>> +       /* Register LoongArch DMSINTC interrupt contrroller interface */
+>> +       if (cpu_has_msgint)
+>> +               ret = kvm_loongarch_register_dmsintc_device();
+>>
+>>          return ret;
+>>   }
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index dddb781b0507..7c56e7e36265 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -1209,6 +1209,8 @@ enum kvm_device_type {
+>>   #define KVM_DEV_TYPE_LOONGARCH_EIOINTC KVM_DEV_TYPE_LOONGARCH_EIOINTC
+>>          KVM_DEV_TYPE_LOONGARCH_PCHPIC,
+>>   #define KVM_DEV_TYPE_LOONGARCH_PCHPIC  KVM_DEV_TYPE_LOONGARCH_PCHPIC
+>> +       KVM_DEV_TYPE_LOONGARCH_DMSINTC,
+>> +#define KVM_DEV_TYPE_LOONGARCH_DMSINTC   KVM_DEV_TYPE_LOONGARCH_DMSINTC
+>>
+>>          KVM_DEV_TYPE_MAX,
+>>
+>> --
+>> 2.39.3
+>>
+>>
+
 
