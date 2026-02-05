@@ -1,200 +1,195 @@
-Return-Path: <kvm+bounces-70332-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70333-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MFoBC0ewhGk14QMAu9opvQ
-	(envelope-from <kvm+bounces-70332-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 15:59:19 +0100
+	id UCMkNjGxhGk54wMAu9opvQ
+	(envelope-from <kvm+bounces-70333-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 16:03:13 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 929BAF45A4
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 15:59:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78E23F460D
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 16:03:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 944A4302BE2F
-	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 14:58:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 75749303CA61
+	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 15:02:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD5F4218AC;
-	Thu,  5 Feb 2026 14:58:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F356421898;
+	Thu,  5 Feb 2026 15:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="i1JLIViS"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="R1OGaVme"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f68.google.com (mail-qv1-f68.google.com [209.85.219.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F6341C308
-	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 14:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345FA1D90DF;
+	Thu,  5 Feb 2026 15:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770303527; cv=none; b=YzIerPYFiplvWSHjVcdiBNWreUmjzgTkh7qUJtbCtrb7beiDepGteheHArq/bRiWUZ2y63sBkawXjQraSMgzYIPB1dZIkJnk6y606xOV3X7HELCxyec0knhbooJrKJR63XxP23jAv1HdClPGout0ZKIDtxoZtwrIXOi8Ra9kWD0=
+	t=1770303720; cv=none; b=UgI/xkXn7CMiOe9dGmCVoCeDKc/V6zLAh2cvPdqxf6wQqfETYHKHYpErAeyG8cp2YXh2gltuz9KM5XGbw5Bp51UdGAeHkRx9tGk9a3GxlsbEAzTRYDBtptFOnMNqT8vOIX04lPm+dbGKkVKZjQwBE6tjfJacu+ShkVmzgjjuZ44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770303527; c=relaxed/simple;
-	bh=r4B2Ie8qQ9e+bddAPy/IrxMyxgCLdGouLxcA6jhMbCY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L+LDZ8oN/DvGw1SvIw9bl6VLgy8C4rqIjT3crDV6ac9cQEnbgQZUYfR0t4iX/yuHTdkZXteIB3KHWVAI7xR+BUFqXkNlDyrqmF9SxPvWnptR+828+aA8JH8KGZENm9qOAHzhC3NVDq4GmRYFipoyH73nN0wtOxXd9Hua1nKMbZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=i1JLIViS; arc=none smtp.client-ip=209.85.219.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f68.google.com with SMTP id 6a1803df08f44-88a367a1dbbso17929606d6.0
-        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 06:58:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1770303526; x=1770908326; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6paZ1/dfF6ZJkTrV436UqQ3Veg/Kl0esrhdcHdeVKCQ=;
-        b=i1JLIViSZyg9JmiQN9fxVXsiYybSALi2vY+h68TUZ0OV/iIqVwWZRRhWt4H4dAcruC
-         1i+pwaEaMqa57MqN90cVZt0MfBHW8Tj1osq2pqqmDhjT0Z7tSaSEVUKtQetugOK1tAeE
-         3FBk14xY6abiw7keBtBmEImVaTb7z6Lz6UPMlPZ4nMWBFAyMHXF/zGrF2gi63Axb1mIW
-         CWxS8XdzmLR3dJRWiH5lPUnU+AoTeVpLYTfg4EhmcXTraVToOqdIuU991XYnC9TCb0FX
-         xQDtvL9jPqwYkvj11cK4xOgrbX8zFxsfixd+4pi5h24blIbPPavxhxs8yeCENJhoSjdL
-         XhZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770303526; x=1770908326;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6paZ1/dfF6ZJkTrV436UqQ3Veg/Kl0esrhdcHdeVKCQ=;
-        b=RaY7ev+7YY3c/N1mpxypLoJxJmiorLbpYdGA/TGZfEf/Ua++9MgTBRuY1nQtdupsI8
-         tC04S8+uP5j3cZd7/z5EBDh0EfCGnyLBDPh2t1mDdQw8uN7suw5OAKfy8/ku8XWWxOup
-         2kftGIc/HBT1t4hnyx+6BPjlctxIyWwc8EKd7VCPYaiRyhAyGtfodNei8tV27l7uEaZh
-         ajp6SL/+466DPixGaGtmVGj1LWLMdc5Qd7l89GZD8Hk893pcF5TPInlBLM9ElUFiiF9R
-         NZaZ3VZ8wlC2aPoYSS2KfydR8gFWUqUw13dqLyph+hQLzYtPZB0Bg3wtAT7mAWGsUpsN
-         54bA==
-X-Forwarded-Encrypted: i=1; AJvYcCV2V+nysS+N9sDLNvQlfLSTQQaSZvG50NLgE0qTTTtbJixEOpjZJAyxgJ76SIEflUMfVyE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/8XAJdkCIHtUtwJzhIg/XxnCB6z6qcQcyq3QufoYdPBu+c5re
-	bWl/12SfFip/soR2f1yYuw8ph3hy9yVDm3VENwfOtZoW8boxRR7Xbn99kipwfjn2FFQ=
-X-Gm-Gg: AZuq6aJh3yV1Qe6bdu7b79BYNDNDKcI9qA9xNmMLEq4m/fUdWD/6ffw2qKjewrmstiT
-	KgpkyjxHOK/wR/D8jlWJ36g7nKlvHT2i6+2dYDWb9re1aULNB1oCvVGJevwCCmzopQahFb58afW
-	eQDHiDpphAOdnO2bY2l55c64wl1RWXz8XWDWhsBBk++1eMZc6YoXA+84g77oIgGeJDCVrOsCzfC
-	+NTKUP90AkV2AsU7zhqm6vnciimGb1xUebN7KVVkIxTWVF5ggSd1uCDqYXlSaDWQgWU/xAppbTT
-	yt0tIh5p1ZsQSZ2Z4BEBdcyDgIo63f4E/5uUwuLC+f77OYM+VI3uE+WMSBWmxnK5dlncTY29enJ
-	1Kn3uVzVvmaKp/dH0eKQEvym5ovRpG0td2wKVZF0JaHMVxozMpwHPgTj+FzU88k/WHah3tjfUaw
-	7BGW3t6Cd3hMDRtgqV9ltWCi02eU1rdYBEZLPbB4UpoOw3JeBb0dT5h0F8IQActS+3AKo=
-X-Received: by 2002:ad4:5bc1:0:b0:894:6d0b:502 with SMTP id 6a1803df08f44-895221eff32mr95805386d6.59.1770303526139;
-        Thu, 05 Feb 2026 06:58:46 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89521bffb41sm43278866d6.4.2026.02.05.06.58.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Feb 2026 06:58:45 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vo0of-00000000zky-02N9;
-	Thu, 05 Feb 2026 10:58:45 -0400
-Date: Thu, 5 Feb 2026 10:58:44 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alex Williamson <alex@shazbot.org>
-Cc: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Leon Romanovsky <leon@kernel.org>, Simona Vetter <simona@ffwll.ch>,
-	Jani Nikula <jani.nikula@intel.com>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	David Airlie <airlied@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
-	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>,
-	Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
-	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
-	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-	iommu@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [PATCH v7 7/8] vfio: Permit VFIO to work with pinned importers
-Message-ID: <20260205145844.GM2328995@ziepe.ca>
-References: <20260131-dmabuf-revoke-v7-0-463d956bd527@nvidia.com>
- <20260131-dmabuf-revoke-v7-7-463d956bd527@nvidia.com>
- <fb9bf53a-7962-451a-bac2-c61eb52c7a0f@amd.com>
- <20260204095659.5a983af2@shazbot.org>
- <ac33ad1a-330c-4ab5-bb98-4a4dedccf0da@amd.com>
- <20260205121945.GC12824@unreal>
- <20260205142111.GK2328995@ziepe.ca>
- <f27ad57b-d935-4ffa-a65c-9f6b5d9a1f9a@amd.com>
- <1b7ee5ad-6dde-415a-8e06-93daddc9bcef@app.fastmail.com>
+	s=arc-20240116; t=1770303720; c=relaxed/simple;
+	bh=z7DlHGRAWqmVCDGHT8bYe/0iOwwIf+tGe2De5QVYgmk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ha7KM1OgvF61yWB5jHKysQpjF159iM+R6WF/YqtQsLEQ8E6ieNycmfi2IY/RC4Sqi/RrRf8WYhPLwkb2+cts+GI87vGz1Uh5FZrGOWSeF1BRhJz1njSLCLfpKfekF71St5hpHi4C+63hDYcpgMlXWv2Mm8Y5AhEMtpb5i+rxn5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=R1OGaVme; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <3026ad8d-92ad-4683-8c3e-733d4070d033@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770303707;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oeEv7fnd0NPkK8yO5EsGkSZ8yT0L8dwlwYeRPZ0uSkk=;
+	b=R1OGaVmeCDAWYZLObcFuiWzoPWWNt28v4igYWupPC//Zz1G0EDHuFGPWKTGAtHEUZLW2Fy
+	3v4fmgvc2ba3Usxdf4CZjRo+kqepU2FyfthjVzh8xwyIbi026D1Signk4cST/7CbkfmxUI
+	4G4+Ec/ufy2updDebH445fX0FG0OzlE=
+Date: Thu, 5 Feb 2026 23:01:11 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1b7ee5ad-6dde-415a-8e06-93daddc9bcef@app.fastmail.com>
+Subject: Re: [PATCH v4 0/3] targeted TLB sync IPIs for lockless page table
+Content-Language: en-US
+To: "David Hildenbrand (Arm)" <david@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>, dave.hansen@intel.com
+Cc: Liam.Howlett@oracle.com, akpm@linux-foundation.org,
+ aneesh.kumar@kernel.org, arnd@arndb.de, baohua@kernel.org,
+ baolin.wang@linux.alibaba.com, boris.ostrovsky@oracle.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, dev.jain@arm.com, hpa@zytor.com,
+ hughd@google.com, ioworker0@gmail.com, jannh@google.com, jgross@suse.com,
+ kvm@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ lorenzo.stoakes@oracle.com, mingo@redhat.com, npache@redhat.com,
+ npiggin@gmail.com, pbonzini@redhat.com, riel@surriel.com,
+ ryan.roberts@arm.com, seanjc@google.com, shy828301@gmail.com,
+ tglx@linutronix.de, virtualization@lists.linux.dev, will@kernel.org,
+ x86@kernel.org, ypodemsk@redhat.com, ziy@nvidia.com
+References: <20260202095414.GE2995752@noisy.programming.kicks-ass.net>
+ <20260202110329.74397-1-lance.yang@linux.dev>
+ <20260202125030.GB1395266@noisy.programming.kicks-ass.net>
+ <c6fda7c2-ad54-416a-a869-1499c97c7bd7@linux.dev>
+ <4700e7ba-8456-4a93-9e28-7e5a3ca2a1be@linux.dev>
+ <20260202133713.GF1395266@noisy.programming.kicks-ass.net>
+ <540adec9-c483-460a-a682-f2076cf015c2@linux.dev>
+ <20260202150957.GD1282955@noisy.programming.kicks-ass.net>
+ <d6944cd8-d3b7-4b16-ab52-a61e7dc2221c@linux.dev>
+ <06d48a52-e4ec-47cd-b3fb-0fccd4dc49f4@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Lance Yang <lance.yang@linux.dev>
+In-Reply-To: <06d48a52-e4ec-47cd-b3fb-0fccd4dc49f4@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	DMARC_NA(0.00)[ziepe.ca];
-	FREEMAIL_CC(0.00)[amd.com,kernel.org,ffwll.ch,intel.com,linaro.org,gmail.com,redhat.com,collabora.com,chromium.org,linux.intel.com,suse.de,8bytes.org,arm.com,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70332-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[oracle.com,linux-foundation.org,kernel.org,arndb.de,linux.alibaba.com,alien8.de,linux.intel.com,arm.com,zytor.com,google.com,gmail.com,suse.com,vger.kernel.org,kvack.org,redhat.com,surriel.com,linutronix.de,lists.linux.dev,nvidia.com];
+	TAGGED_FROM(0.00)[bounces-70333-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[35];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[37];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[lance.yang@linux.dev,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 929BAF45A4
+X-Rspamd-Queue-Id: 78E23F460D
 X-Rspamd-Action: no action
 
-On Thu, Feb 05, 2026 at 07:41:11AM -0700, Alex Williamson wrote:
-> >> From https://anongit.freedesktop.org/git/drm/drm-misc
-> >>  * branch                          drm-misc-next -> FETCH_HEAD
-> >> 
-> >> $ git show FETCH_HEAD
-> >> commit 779ec12c85c9e4547519e3903a371a3b26a289de
-> >> Author: Alexander Konyukhov <Alexander.Konyukhov@kaspersky.com>
-> >> Date:   Tue Feb 3 16:48:46 2026 +0300
-> >> 
-> >>     drm/komeda: fix integer overflow in AFBC framebuffer size check
-> >> 
-> >> $ git merge-base  FETCH_HEAD 61ceaf236115f20f4fdd7cf60f883ada1063349a
-> >> 24d479d26b25bce5faea3ddd9fa8f3a6c3129ea7
-> >> $ git describe --contains 24d479d26b25bce5faea3ddd9fa8f3a6c3129ea7
-> >> v6.19-rc6^0
-> >> 
-> >> $ git log --oneline 61ceaf236115f20f4fdd7cf60f883ada1063349a ^FETCH_HEAD
-> >> 61ceaf236115f2 vfio: Prevent from pinned DMABUF importers to attach to VFIO DMABUF
-> >> 
-> >> Just pull Alex's tree, the drm-misc-next tree already has v6.19-rc6,
-> >> so all they will see is one extra patch from Alex in your PR.
-> >> 
-> >> No need to backmerge, this is normal git stuff and there won't be
-> >> conflicts when they merge a later Linus tag.
-> >
-> > Correct, but that would merge the same patch through two different 
-> > trees. That is usually a pretty big no-go.
+
+
+On 2026/2/5 21:25, David Hildenbrand (Arm) wrote:
+> On 2/2/26 16:52, Lance Yang wrote:
+>>
+>>
+>> On 2026/2/2 23:09, Peter Zijlstra wrote:
+>>> On Mon, Feb 02, 2026 at 10:37:39PM +0800, Lance Yang wrote:
+>>>>
+>>>>
+>>>>
+>>>> PT_RECLAIM=y does have IPI for unshare/collapse — those paths call
+>>>> tlb_flush_unshared_tables() (for hugetlb unshare) and 
+>>>> collapse_huge_page()
+>>>> (in khugepaged collapse), which already send IPIs today (broadcast 
+>>>> to all
+>>>> CPUs via tlb_remove_table_sync_one()).
+>>>>
+>>>> What PT_RECLAIM=y doesn't need IPI for is table freeing (
+>>>> __tlb_remove_table_one() uses call_rcu() instead). But table 
+>>>> modification
+>>>> (unshare, collapse) still needs IPI to synchronize with lockless 
+>>>> walkers,
+>>>> regardless of PT_RECLAIM.
+>>>>
+>>>> So PT_RECLAIM=y is not broken; it already has IPI where needed. This 
+>>>> series
+>>>> just makes those IPIs targeted instead of broadcast. Does that clarify?
+>>>
+>>> Oh bah, reading is hard. I had missed they had more table_sync_one() 
+>>> calls,
+>>> rather than remove_table_one().
+>>>
+>>> So you *can* replace table_sync_one() with rcu_sync(), that will provide
+>>> the same guarantees. Its just a 'little' bit slower on the update side,
+>>> but does not incur the read side cost.
+>>
+>> Yep, we could replace the IPI with synchronize_rcu() on the sync side:
+>>
+>> - Currently: TLB flush → send IPI → wait for walkers to finish
+>> - With synchronize_rcu(): TLB flush → synchronize_rcu() -> waits for 
+>> grace period
+>>
+>> Lockless walkers (e.g. GUP-fast) use local_irq_disable(); 
+>> synchronize_rcu() also
+>> waits for regions with preemption/interrupts disabled, so it should 
+>> work, IIUC.
+>>
+>> And then, the trade-off would be:
+>> - Read side: zero cost (no per-CPU tracking)
+>> - Write side: wait for RCU grace period (potentially slower)
+>>
+>> For collapse/unshare, that write-side latency might be acceptable :)
+>>
+>> @David, what do you think?
 > 
-> Applying the patch through two different trees is a no-go, but
-> merging the same commit from a shared branch or tag is very common
-> and acceptable.  It's the same commit after all, there is no
-> conflict, no duplicate commit.  When the trees are merged, the
-> commit will exist once in the log.  Thanks,
+> Given that we just fixed the write-side latency from breaking Oracle's 
+> databases completely, we have to be a bit careful here :)
 
-+1
+Yep, agreed.
 
-This is how shared branches work. There is no issue here.
+> 
+> The thing is: on many x86 configs we don't need *any* TLB flushed or RCU 
+> syncs.
 
-Jason
+Right. Looks like that is low-hanging fruit. I'll send that out 
+separately :)
+
+> 
+> So "how much slower" are we talking about, especially on bigger/loaded 
+> systems?
+
+Unfortunately the numbers are pretry bad. On an x86-64 64-core system
+under high load, each synchronize_rcu() is about *22.9* ms on average ...
+
+So for now, neither approach looks good: tracking on the read side adss
+cost to GUP-fast, and syncing on the write side e.g. synchronize_rcu()
+is too slow on large systems.
 
