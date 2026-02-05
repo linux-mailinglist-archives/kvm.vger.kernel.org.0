@@ -1,193 +1,179 @@
-Return-Path: <kvm+bounces-70363-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70364-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cBXiC4cMhWmj7gMAu9opvQ
-	(envelope-from <kvm+bounces-70363-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 22:32:55 +0100
+	id kPWZIR8QhWms7wMAu9opvQ
+	(envelope-from <kvm+bounces-70364-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 22:48:15 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2DD5F7B3B
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 22:32:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED854F7E0C
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 22:48:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F9F8304600D
-	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 21:30:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 89DDD308B83D
+	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 21:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA56F3321B0;
-	Thu,  5 Feb 2026 21:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD5733291F;
+	Thu,  5 Feb 2026 21:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UWJa58im"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QiQpQ0Su"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6C232E6B8;
-	Thu,  5 Feb 2026 21:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D27332909
+	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 21:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770327026; cv=none; b=ZhlPQ9/dsCe/pNW8ckOy977uKeoxNM2jlAM+LRPXk61+tsyttJwq51l2acmhA4EzRGUwrm1RjPLrWc5NLxd62TYa1CDcPhW6WgKIlUYtp0u8tb8+TIQwFuba2NVqqSJKC29eebqAQQE5/HewnkS6XHOlrc7Dx5/bFaEBr1ybPd4=
+	t=1770327818; cv=none; b=n7nXqnhtszhJY73sxDN6u54acU8hPfL/ps374AMxbWTbH6ffcF9+JkH0Nu1zD44pFQnDHiSj+3LaUKVEXKlEXtxhluBm/pgPYPV5xQXBb2EuH595fsr4u95LdLKTLmRUpRbcKeXFBer/n0p0rF3fmOiWLZG78R56ef+CAVZhwxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770327026; c=relaxed/simple;
-	bh=Lx+GDw84ajKkD7Q7e2YiWEUXDPohIGrcgs1E8NQihRE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ijsDdFrGBh+HK8E5p0j1B8/NSnWsSP0bLOu1q/XWjJOXx6rYCozTPr8viLIi5JjFgYCKE6cJigrrTM0UK+vTvTd3D75yGQ/hjzP59uIN8wedrOqOWQkh+MRbLkBKsoTknVyxTlGRZFHRyuVvR55Qn2WUUNxC6fpJ8mZs+knMc/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UWJa58im; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CF3DC4CEF7;
-	Thu,  5 Feb 2026 21:30:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770327026;
-	bh=Lx+GDw84ajKkD7Q7e2YiWEUXDPohIGrcgs1E8NQihRE=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=UWJa58imC0523bdHUwOv4s43hDkqXGIQPMlrIIoBFoNK5Q4WIDQtxwtXe9LRgv7C3
-	 1QOhGsuqa7ynp1ftSHwRBc4UYKNQPQHilUoIRYBu6uIlD7s6MVOdVRrnDVQMKnA0lt
-	 e6+/I/RmUZ3ndJGVodsAmXmCGSnYIDW3QpvPkGhYuqgaC5hXHneSYbLeskpQPGHxZ2
-	 IwNCwiebzbU5H7TgTuurErSwRhUQVzMASWNT0ykO2LdV0Co4UK752mykmHWViMd30t
-	 Z7FcWNRAjEhgh2CYvI6dF9duOwmDfMiuXG3HQsi8YuTLX66jVqQuIVP3rADGoClRKg
-	 7odoQAFZkaeLQ==
-Message-ID: <2cb4503d-3a3f-4f6c-8038-7b3d1c74b3c2@kernel.org>
-Date: Thu, 5 Feb 2026 22:30:14 +0100
+	s=arc-20240116; t=1770327818; c=relaxed/simple;
+	bh=tCblJoq9g/HMbi+utPa6tWkGtYvQHIGZ3smM0wbHPKQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TbZLTLbkP7pGeEzLdTGpADuDrUl9Qrm7H9gUWmH8LWLY3FpPOqUqaCvWfGh/U1yVOQBo3a/9dzHz/GuhXX6w4qVj88v+6hcS58y9+3mcS/cjpruti45j8BjCHgOQZUnyIWW34xB+B5tUv37/2ag2FdOyfjy4AXDFBvCjWhT7mcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QiQpQ0Su; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c56848e6f53so819631a12.0
+        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 13:43:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770327818; x=1770932618; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=NTt3Yt6WZ7YQmoJsNOI79U3marZK5bHkKaL7b6P4x+M=;
+        b=QiQpQ0Su/+s8beQk6Qehefqcr245UbugC3o6dfQsP3oW072RdO07kI3f8gvezNN2S5
+         SxjzRsl9cvWL4vkUD7iz8gYn7Dm/ILqMzJKDr8vFGtbUen+qsd74Z3rwFKIJboFkBkve
+         0aM6h9caeoETQdOnMCSL/zyfrj5INbsWTGweeFshsUnDqcmUOwDR4RadMKUKqEhpxRi2
+         BhPVHYluKuxbFt/wn6wo/OWtBJ3UW+jbLem0jhE/uSHWF9D6YUD1gdi78P3fNSZ1dXk5
+         PlqN3DFcHuWZtLn5B+zgR56H6oBevqi2bANXOWPEAe5I7CoPsTrEGFj1ZR7OqyfMhZ9r
+         r0Xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770327818; x=1770932618;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NTt3Yt6WZ7YQmoJsNOI79U3marZK5bHkKaL7b6P4x+M=;
+        b=bcvJ3+01nI+bh0GIbU1d2FZhvgD5h6qjl9ZqcxeTtw0CMaZwM/B8jL5Npx9SZRYb6/
+         JilEzJttqj0xgQ3LcYIM44LTqQf7JLbnMPxq/URZ4r/93qphrVLH0k91XRf4oH15SISc
+         Occ2sdu1bNM3ELqQkciHwPLf5lJbAUc0CNUzx6VnHl3gRtyn6Q7FuizV3rrkWAS4yx7v
+         I4pMPgBBPrB2TFtboLrdtxpqO1M5GJEUxJpnGvuu/mOhXs4qMqorz/Ytp0MB8FsU+cHk
+         MjIfYDcysIlhKWD9SdFhQpKY2lvq1JTl1qrn+S8SeyH6HfY7khfw47qurCiT+TQb+c0f
+         K6Qg==
+X-Forwarded-Encrypted: i=1; AJvYcCViP1lgQBGh2oiz7wCv9JjQndcN4sLxrLn1AZnoNTa+awcWVGcTTrq8BaL16CvHIgvh4uU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxV7zRQ17oVUwrdBd13S7QzTDckba6seWwEcbXIg/jPZOVLMu/l
+	YkgVo/aKW9mlU5/+eB5eQjsCbyMn2WldDLr3p6aPKMnlNEEwSiqSnsl22P4l9uIxZLBBjbUAezP
+	PqVQTuAh/8XOvLA==
+X-Received: from pge15.prod.google.com ([2002:a05:6a02:2d0f:b0:c61:7e5d:a81])
+ (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a21:151b:b0:342:44f3:d1bc with SMTP id adf61e73a8af0-393aef76be4mr328688637.35.1770327817947;
+ Thu, 05 Feb 2026 13:43:37 -0800 (PST)
+Date: Thu,  5 Feb 2026 13:43:00 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/3] targeted TLB sync IPIs for lockless page table
-From: "David Hildenbrand (Arm)" <david@kernel.org>
-To: Matthew Wilcox <willy@infradead.org>, Lance Yang <lance.yang@linux.dev>
-Cc: Dave Hansen <dave.hansen@intel.com>, Peter Zijlstra
- <peterz@infradead.org>, Liam.Howlett@oracle.com, akpm@linux-foundation.org,
- aneesh.kumar@kernel.org, arnd@arndb.de, baohua@kernel.org,
- baolin.wang@linux.alibaba.com, boris.ostrovsky@oracle.com, bp@alien8.de,
- dave.hansen@linux.intel.com, dev.jain@arm.com, hpa@zytor.com,
- hughd@google.com, ioworker0@gmail.com, jannh@google.com, jgross@suse.com,
- kvm@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- lorenzo.stoakes@oracle.com, mingo@redhat.com, npache@redhat.com,
- npiggin@gmail.com, pbonzini@redhat.com, riel@surriel.com,
- ryan.roberts@arm.com, seanjc@google.com, shy828301@gmail.com,
- tglx@linutronix.de, virtualization@lists.linux.dev, will@kernel.org,
- x86@kernel.org, ypodemsk@redhat.com, ziy@nvidia.com
-References: <20260202133713.GF1395266@noisy.programming.kicks-ass.net>
- <540adec9-c483-460a-a682-f2076cf015c2@linux.dev>
- <20260202150957.GD1282955@noisy.programming.kicks-ass.net>
- <d6944cd8-d3b7-4b16-ab52-a61e7dc2221c@linux.dev>
- <06d48a52-e4ec-47cd-b3fb-0fccd4dc49f4@kernel.org>
- <3026ad8d-92ad-4683-8c3e-733d4070d033@linux.dev>
- <64f3a75a-30ff-4bee-833c-be5dba05f72b@intel.com>
- <c985a8ed-37ad-415e-b7b4-18a66b4da3fe@linux.dev>
- <647cbe2e-a034-4a75-9492-21ea1708eccc@intel.com>
- <99237729-f2b0-4a7a-8213-65a2f1c57744@linux.dev>
- <aYTJzft5cuqD9akC@casper.infradead.org>
- <6a364356-5fea-4a6c-b959-ba3b22ce9c88@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=david@kernel.org; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzS5EYXZpZCBIaWxk
- ZW5icmFuZCAoQ3VycmVudCkgPGRhdmlkQGtlcm5lbC5vcmc+wsGQBBMBCAA6AhsDBQkmWAik
- AgsJBBUKCQgCFgICHgUCF4AWIQQb2cqtc1xMOkYN/MpN3hD3AP+DWgUCaYJt/AIZAQAKCRBN
- 3hD3AP+DWriiD/9BLGEKG+N8L2AXhikJg6YmXom9ytRwPqDgpHpVg2xdhopoWdMRXjzOrIKD
- g4LSnFaKneQD0hZhoArEeamG5tyo32xoRsPwkbpIzL0OKSZ8G6mVbFGpjmyDLQCAxteXCLXz
- ZI0VbsuJKelYnKcXWOIndOrNRvE5eoOfTt2XfBnAapxMYY2IsV+qaUXlO63GgfIOg8RBaj7x
- 3NxkI3rV0SHhI4GU9K6jCvGghxeS1QX6L/XI9mfAYaIwGy5B68kF26piAVYv/QZDEVIpo3t7
- /fjSpxKT8plJH6rhhR0epy8dWRHk3qT5tk2P85twasdloWtkMZ7FsCJRKWscm1BLpsDn6EQ4
- jeMHECiY9kGKKi8dQpv3FRyo2QApZ49NNDbwcR0ZndK0XFo15iH708H5Qja/8TuXCwnPWAcJ
- DQoNIDFyaxe26Rx3ZwUkRALa3iPcVjE0//TrQ4KnFf+lMBSrS33xDDBfevW9+Dk6IISmDH1R
- HFq2jpkN+FX/PE8eVhV68B2DsAPZ5rUwyCKUXPTJ/irrCCmAAb5Jpv11S7hUSpqtM/6oVESC
- 3z/7CzrVtRODzLtNgV4r5EI+wAv/3PgJLlMwgJM90Fb3CB2IgbxhjvmB1WNdvXACVydx55V7
- LPPKodSTF29rlnQAf9HLgCphuuSrrPn5VQDaYZl4N/7zc2wcWM7BTQRVy5+RARAA59fefSDR
- 9nMGCb9LbMX+TFAoIQo/wgP5XPyzLYakO+94GrgfZjfhdaxPXMsl2+o8jhp/hlIzG56taNdt
- VZtPp3ih1AgbR8rHgXw1xwOpuAd5lE1qNd54ndHuADO9a9A0vPimIes78Hi1/yy+ZEEvRkHk
- /kDa6F3AtTc1m4rbbOk2fiKzzsE9YXweFjQvl9p+AMw6qd/iC4lUk9g0+FQXNdRs+o4o6Qvy
- iOQJfGQ4UcBuOy1IrkJrd8qq5jet1fcM2j4QvsW8CLDWZS1L7kZ5gT5EycMKxUWb8LuRjxzZ
- 3QY1aQH2kkzn6acigU3HLtgFyV1gBNV44ehjgvJpRY2cC8VhanTx0dZ9mj1YKIky5N+C0f21
- zvntBqcxV0+3p8MrxRRcgEtDZNav+xAoT3G0W4SahAaUTWXpsZoOecwtxi74CyneQNPTDjNg
- azHmvpdBVEfj7k3p4dmJp5i0U66Onmf6mMFpArvBRSMOKU9DlAzMi4IvhiNWjKVaIE2Se9BY
- FdKVAJaZq85P2y20ZBd08ILnKcj7XKZkLU5FkoA0udEBvQ0f9QLNyyy3DZMCQWcwRuj1m73D
- sq8DEFBdZ5eEkj1dCyx+t/ga6x2rHyc8Sl86oK1tvAkwBNsfKou3v+jP/l14a7DGBvrmlYjO
- 59o3t6inu6H7pt7OL6u6BQj7DoMAEQEAAcLBfAQYAQgAJgIbDBYhBBvZyq1zXEw6Rg38yk3e
- EPcA/4NaBQJonNqrBQkmWAihAAoJEE3eEPcA/4NaKtMQALAJ8PzprBEXbXcEXwDKQu+P/vts
- IfUb1UNMfMV76BicGa5NCZnJNQASDP/+bFg6O3gx5NbhHHPeaWz/VxlOmYHokHodOvtL0WCC
- 8A5PEP8tOk6029Z+J+xUcMrJClNVFpzVvOpb1lCbhjwAV465Hy+NUSbbUiRxdzNQtLtgZzOV
- Zw7jxUCs4UUZLQTCuBpFgb15bBxYZ/BL9MbzxPxvfUQIPbnzQMcqtpUs21CMK2PdfCh5c4gS
- sDci6D5/ZIBw94UQWmGpM/O1ilGXde2ZzzGYl64glmccD8e87OnEgKnH3FbnJnT4iJchtSvx
- yJNi1+t0+qDti4m88+/9IuPqCKb6Stl+s2dnLtJNrjXBGJtsQG/sRpqsJz5x1/2nPJSRMsx9
- 5YfqbdrJSOFXDzZ8/r82HgQEtUvlSXNaXCa95ez0UkOG7+bDm2b3s0XahBQeLVCH0mw3RAQg
- r7xDAYKIrAwfHHmMTnBQDPJwVqxJjVNr7yBic4yfzVWGCGNE4DnOW0vcIeoyhy9vnIa3w1uZ
- 3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
- CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
- qIws/H2t
-In-Reply-To: <6a364356-5fea-4a6c-b959-ba3b22ce9c88@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
+Message-ID: <20260205214326.1029278-1-jmattson@google.com>
+Subject: [PATCH v3 0/8] KVM: x86: nSVM: Improve PAT virtualization
+From: Jim Mattson <jmattson@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-70364-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70363-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,infradead.org,oracle.com,linux-foundation.org,kernel.org,arndb.de,linux.alibaba.com,alien8.de,linux.intel.com,arm.com,zytor.com,google.com,gmail.com,suse.com,vger.kernel.org,kvack.org,redhat.com,surriel.com,linutronix.de,lists.linux.dev,nvidia.com];
-	RCPT_COUNT_TWELVE(0.00)[38];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[kvm];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C2DD5F7B3B
+X-Rspamd-Queue-Id: ED854F7E0C
 X-Rspamd-Action: no action
 
-On 2/5/26 18:06, David Hildenbrand (Arm) wrote:
-> On 2/5/26 17:48, Matthew Wilcox wrote:
->> On Fri, Feb 06, 2026 at 12:30:56AM +0800, Lance Yang wrote:
->>>
->>> The issue is we're about to free the page table (e.g.
->>> pmdp_collapse_flush()).
->>>
->>> We have to ensure no walker is still doing a lockless page-table walk
->>> when the page directories are freed, otherwise we get use-after-free.
->>
->> But can't we RCU-free the page table?  Why do we need to wait for the
->> RCU readers to finish?
-> 
-> For unsharing hugetlb PMD tables the problem is not the freeing but the 
-> reuse of the PMD table for other purposes in the last remaining user. 
-> It's complicated.
-> 
-> For page table freeing, we only do it if we fail to allocate memory -- 
-> if we cannot use RCU IIRC.
-> 
-> khugepaged, no idea.
+Currently, KVM's implementation of nested SVM treats the PAT MSR the same
+way whether or not nested NPT is enabled: L1 and L2 share a single
+PAT. However, the APM specifies that when nested NPT is enabled, the host
+(L1) and the guest (L2) should have independent PATs: hPAT for L1 and gPAT
+for L2. This patch series implements the architectural specification in
+KVM.
 
-Now that I had dinner my memory comes back: for khugepaged, we have to 
-make sure there is no concurrent GUP-fast before collapsing and 
-(possibly) freeing the page table / re-depositing it.
+Use the existing PAT MSR (vcpu->arch.pat) for hPAT. Add a new field,
+svm->nested.gpat, for gPAT. With nested NPT enabled, redirect guest
+accesses to the IA32_PAT MSR to gPAT. All other accesses, including
+userspace accesses via KVM_{GET,SET}_MSRS, continue to reference hPAT.  The
+special handling of userspace accesses ensures save/restore forward
+compatibility (i.e. resuming a new checkpoint on an older kernel). When an
+old kernel restores a checkpoint from a new kernel, the gPAT will be lost,
+and L2 will simply use L1's PAT, which is the existing behavior of the old
+kernel anyway.
 
+v1: https://lore.kernel.org/kvm/20260113003016.3511895-1-jmattson@google.com/
+v2: https://lore.kernel.org/kvm/20260115232154.3021475-1-jmattson@google.com/
+
+v2 -> v3:
+
+* Extract VMCB_NPT clean bit fix as a separate patch [Yosry]
+* Squash v2 patches 2 and 3 (cache and validate g_pat) [Yosry]
+* Drop redundant npt_enabled check in g_pat validation since existing
+  nested_vmcb_check_controls() already rejects NP_ENABLE when !npt_enabled
+  [Yosry]
+* Fix svm_set_hpat() to propagate to vmcb02 only when !nested_npt_enabled,
+  not unconditionally when in guest mode [Jim]
+* Warn in svm_{get,set}_msr() if host_initiated and vcpu_wants_to_run when
+  accessing IA32_PAT [Sean]
+* Use dedicated svm->nested.gpat field instead of vmcb_save_area_cached
+* Use dedicated header field (kvm_svm_nested_state_hdr.gpat) for nested
+  state save/restore instead of overwriting vmcb01 save area
+* Replace restore_gpat_from_pat with legacy_gpat_semantics to correctly
+  handle KVM_GET_NESTED_STATE before the first KVM_RUN [Jim]
+* Remove nested_vmcb02_compute_g_pat() after removing all callers [Yosry]
+
+Jim Mattson (8):
+  KVM: x86: nSVM: Clear VMCB_NPT clean bit when updating g_pat in L2
+  KVM: x86: nSVM: Cache and validate vmcb12 g_pat
+  KVM: x86: nSVM: Set vmcb02.g_pat correctly for nested NPT
+  KVM: x86: nSVM: Redirect IA32_PAT accesses to either hPAT or gPAT
+  KVM: x86: nSVM: Save gPAT to vmcb12.g_pat on VMEXIT
+  KVM: x86: nSVM: Save/restore gPAT with KVM_{GET,SET}_NESTED_STATE
+  KVM: x86: nSVM: Handle restore of legacy nested state
+  KVM: selftests: nSVM: Add svm_nested_pat test
+
+ arch/x86/include/uapi/asm/kvm.h               |   5 +
+ arch/x86/kvm/svm/nested.c                     |  51 ++-
+ arch/x86/kvm/svm/svm.c                        |  37 ++-
+ arch/x86/kvm/svm/svm.h                        |  35 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/x86/svm_nested_pat_test.c   | 298 ++++++++++++++++++
+ 6 files changed, 406 insertions(+), 21 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/svm_nested_pat_test.c
+
+
+base-commit: e944fe2c09f405a2e2d147145c9b470084bc4c9a
 -- 
-Cheers,
+2.53.0.rc2.204.g2597b5adb4-goog
 
-David
 
