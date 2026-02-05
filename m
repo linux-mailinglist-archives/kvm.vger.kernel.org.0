@@ -1,224 +1,190 @@
-Return-Path: <kvm+bounces-70324-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70325-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qNsPCL2ahGmh3gMAu9opvQ
-	(envelope-from <kvm+bounces-70324-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 14:27:25 +0100
+	id GPQMBbynhGmI3wMAu9opvQ
+	(envelope-from <kvm+bounces-70325-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 15:22:52 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE500F33D9
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 14:27:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61704F3E7D
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 15:22:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 27C3C3036743
-	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 13:25:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 23E19303A6CB
+	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 14:21:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582A73D7D65;
-	Thu,  5 Feb 2026 13:25:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663ED3F0752;
+	Thu,  5 Feb 2026 14:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="syUPtY6w"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="dBYGQPPv"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f66.google.com (mail-qv1-f66.google.com [209.85.219.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3E93C1969;
-	Thu,  5 Feb 2026 13:25:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586F53D903C
+	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 14:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770297915; cv=none; b=d0kEYNvFgWW06j+sHa2sfAy7Yvhxrq8tq2ITy9VKFVHpdH3wffr2N0r/CUbfWq/3AC0lAkUszngp8eSr1GDFoS3p00jb2jJm9PIX6ok8zOy38Cm2GdcgF0+9UX5olBsbaTbCZ/SHFdLuY4U+SCm8WtXVNoxer5/jVHRgi8VJCRI=
+	t=1770301274; cv=none; b=Vc3eXP7elKfgPkDFTWj8uoVPAf+8QxQZ7cyyW+QAp5xGCYPf42qtJxg3qzmofVc3yQiLKXgflzc6NcaAnzH2kPMnibb4y7Ko7h1mR5Wh8zv30vnibEHVIk74t53A2NOjJq0MQIvdNvGi1/0t/1Fb8jFrXy4oSgDRJdp21A5YQzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770297915; c=relaxed/simple;
-	bh=ZNnRI00WuKNETmTvhJmd7z3KdSrnG1/LdsurzwSvMV8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kcRGNNABNSWqV9uhBdPMZje+g/vuvBH0KzDqA4aa10c1gQcLwS/yANNJBsKv/karWYHm/qil3koT5aRlVBRTpy46rXZRGE1bYQ0Nf8Uu59/FeWJwBm4oZJvhxzQqfJsvU2MsX/zZDeRqaST/OZ2EgIru7mttKfTD3Gh3FvebQcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=syUPtY6w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0607C4CEF7;
-	Thu,  5 Feb 2026 13:25:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770297915;
-	bh=ZNnRI00WuKNETmTvhJmd7z3KdSrnG1/LdsurzwSvMV8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=syUPtY6w30APzE75pzBQSESfdtrxIxyU+Wb4bl5STSoesRAQgZAS+B+O+5/jpmJ/U
-	 dwYjT+SAXdf+ZZni8ujBAnmCclEaVM5dBvrXYnIhbsKNPU3gtHi5r4sGtLP1weUGYy
-	 hzyqogeLtiOPBgN0XJ/SYMRW08nXrLGWMBCvKNhLMHwPDQKpEarWGo6DTaRt4zpimH
-	 crT8snBDtzAZtyRImNdKI6ysnP2zgsFZlir3ohopfVbsA1xQ2YaEQWoVE5ZzRzzz2A
-	 lSg5p4stvb3eFmwiaADNk+wNfUJ/QbF67gqJowQTAQ+JAgHWbYza83XTiqoRQKKqkH
-	 HNeqrs7dTvAhA==
-Message-ID: <06d48a52-e4ec-47cd-b3fb-0fccd4dc49f4@kernel.org>
-Date: Thu, 5 Feb 2026 14:25:04 +0100
+	s=arc-20240116; t=1770301274; c=relaxed/simple;
+	bh=2XDmVAyyw3kHSva2SZjpEPftSjaLFto+qTX6dWpgwkU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B+S9sbQNCMk4PN2s/KYhWZIAXnjxmg43l9quQczuryFNlRNo8tLldX3Zwuxcll5mbrFbrRW7razE8PlnI+K9Ip3vBIivZHiGfJie8oJOtUwnYfAwtfrs4MYE1CmVfjDQYA2emn1We3hRTBNUMh2bKPZn1aWGjts7Cg5NCMPhZNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=dBYGQPPv; arc=none smtp.client-ip=209.85.219.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f66.google.com with SMTP id 6a1803df08f44-89505dd3e24so13863626d6.1
+        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 06:21:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1770301273; x=1770906073; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MSUoQMJoCCNydU2DcwMWqdKRWnt0MqAVvIGN6ESmMGo=;
+        b=dBYGQPPvUly5VvEqhvl2u7nK0k0qRi4RMkSn5JaxEDU2nUWmV8/KnZlR4swFyjFACU
+         4LTMGns51pld42g426iHpFALujuMgFaW6Dmzu1qZzxekH0GxRDte3EoDkhGRtYD0dqwN
+         9aResQfBpcjtt7jkIB1l1DJS0yS+k9v17AT4s4+TB5BUpbvADfxAumefJFkmMFluAg/D
+         H2yovYYLsqxkNa9DeEp5HRmuiPqDFmfxnIC5He88AYqfjdb7tdBceXzby7SF7J35qG3B
+         xpD2/m2gMonD/zuUz99DDpkKhlpEEB8TU5O5FLSbNZ1MWKvdvaByduuDaOgoCLIMRJdH
+         nDSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770301273; x=1770906073;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MSUoQMJoCCNydU2DcwMWqdKRWnt0MqAVvIGN6ESmMGo=;
+        b=Nw23L1GcaxmcJWe05qSMe0vX3FKSRgOkeyJhiR1KNvgveo12JHYv4BlDXD1tD6x/WH
+         32ZUg9sFEXYB5pypaDeq/JdikWP8diB1kfiqG7Gqj0bX0aBhGpCEnV1qIXC41cQNZ5PF
+         ysBaeVJ4Ug3lX+/xHuI0nRB4B/mETL1MD6SIhWLzXQm3ZPPZEuxFo+1PT2/0d6vf9reC
+         btOnybLv+YIX7cpN/0jl7ENgOxAGPj6disNPj36ywM5FvpF68EZsnpScvGGQULz9DXRV
+         WoyFvfOfV+DoeJNEgSFfNyKoqRiTRFChBLI4AaoJRcZAZ7OIsvHve2ENFuz37/zESkB3
+         1P6w==
+X-Forwarded-Encrypted: i=1; AJvYcCWJvrlhqu96STZwG8k1zvCcizgqtyAZXw1Jv8fJqHgGjTP8HWyTVWkMftCFsuV1+aTCgpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFpKSuQQ7qTGaNCSky+d6XUB+4OgK0apTEmUGJ/loqwiQIPHkv
+	YDDIdzzN8l03Vc8svkrvU1w0g7+r0idgpAtI0trJGxfFfYrKStmw73BTZsGJZRFlKqI=
+X-Gm-Gg: AZuq6aLNY4D5qlsNrYz2xbanYoTOcCwoO7g0dNb+jGT3T7uEFoo9RmUu2GHFqfWF9Be
+	d7fRA+mrCKsoiVycT++EhloiEPiNNt7RfSZ3E10CT/btpyjLtCHPpVsoXt/RpOAm4NDdiKVwV/C
+	lIQue81VcX1RatlaUPVh6+qCps8Q0JrYGUfo6+xShrGmVpST02/7KiPmEto0y5/IHDzP5lPQKk1
+	sJjJD3ndKQAKsLZM6QBlK2GSex3w1p2PX5RPs5AHnD9fAJWm2cWWrS7CZyceWu9S95xWsRunMAt
+	U0jNr6nEXXyhaWTCL1dudeHgpeV1rD38FS6NViDxYGiWWo0FKtu15NfmiqqeuYMFf7HrrG0stNP
+	moUf1uDIbOokaT5PSsg6otkLKZ6RUV7vn4+yqy+Hj2KAzN+xJKykS6sK638WhOf3kbb3EvuWzqv
+	AC8z3hRWj43K3ScK4EoKI1t8SdzwJG5dLYb2AhbOlX/tRPT9Tt+zmULr1NCDqrd0GX7Zs=
+X-Received: by 2002:ad4:5cc6:0:b0:88f:ca72:6ae8 with SMTP id 6a1803df08f44-89522189787mr84672066d6.45.1770301272999;
+        Thu, 05 Feb 2026 06:21:12 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89521bff53esm42252276d6.8.2026.02.05.06.21.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Feb 2026 06:21:12 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vo0EJ-00000000kPY-3gpa;
+	Thu, 05 Feb 2026 10:21:11 -0400
+Date: Thu, 5 Feb 2026 10:21:11 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Alex Williamson <alex@shazbot.org>, Simona Vetter <simona@ffwll.ch>,
+	Jani Nikula <jani.nikula@intel.com>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	David Airlie <airlied@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+	Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+	Gurchetan Singh <gurchetansingh@chromium.org>,
+	Chia-I Wu <olvaffe@gmail.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org, virtualization@lists.linux.dev,
+	intel-xe@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [PATCH v7 7/8] vfio: Permit VFIO to work with pinned importers
+Message-ID: <20260205142111.GK2328995@ziepe.ca>
+References: <20260131-dmabuf-revoke-v7-0-463d956bd527@nvidia.com>
+ <20260131-dmabuf-revoke-v7-7-463d956bd527@nvidia.com>
+ <fb9bf53a-7962-451a-bac2-c61eb52c7a0f@amd.com>
+ <20260204095659.5a983af2@shazbot.org>
+ <ac33ad1a-330c-4ab5-bb98-4a4dedccf0da@amd.com>
+ <20260205121945.GC12824@unreal>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/3] targeted TLB sync IPIs for lockless page table
-To: Lance Yang <lance.yang@linux.dev>, Peter Zijlstra <peterz@infradead.org>
-Cc: Liam.Howlett@oracle.com, akpm@linux-foundation.org,
- aneesh.kumar@kernel.org, arnd@arndb.de, baohua@kernel.org,
- baolin.wang@linux.alibaba.com, boris.ostrovsky@oracle.com, bp@alien8.de,
- dave.hansen@intel.com, dave.hansen@linux.intel.com, dev.jain@arm.com,
- hpa@zytor.com, hughd@google.com, ioworker0@gmail.com, jannh@google.com,
- jgross@suse.com, kvm@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- lorenzo.stoakes@oracle.com, mingo@redhat.com, npache@redhat.com,
- npiggin@gmail.com, pbonzini@redhat.com, riel@surriel.com,
- ryan.roberts@arm.com, seanjc@google.com, shy828301@gmail.com,
- tglx@linutronix.de, virtualization@lists.linux.dev, will@kernel.org,
- x86@kernel.org, ypodemsk@redhat.com, ziy@nvidia.com
-References: <20260202095414.GE2995752@noisy.programming.kicks-ass.net>
- <20260202110329.74397-1-lance.yang@linux.dev>
- <20260202125030.GB1395266@noisy.programming.kicks-ass.net>
- <c6fda7c2-ad54-416a-a869-1499c97c7bd7@linux.dev>
- <4700e7ba-8456-4a93-9e28-7e5a3ca2a1be@linux.dev>
- <20260202133713.GF1395266@noisy.programming.kicks-ass.net>
- <540adec9-c483-460a-a682-f2076cf015c2@linux.dev>
- <20260202150957.GD1282955@noisy.programming.kicks-ass.net>
- <d6944cd8-d3b7-4b16-ab52-a61e7dc2221c@linux.dev>
-From: "David Hildenbrand (Arm)" <david@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=david@kernel.org; keydata=
- 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
- qIws/H2t
-In-Reply-To: <d6944cd8-d3b7-4b16-ab52-a61e7dc2221c@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260205121945.GC12824@unreal>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70324-lists,kvm=lfdr.de];
-	FREEMAIL_CC(0.00)[oracle.com,linux-foundation.org,kernel.org,arndb.de,linux.alibaba.com,alien8.de,intel.com,linux.intel.com,arm.com,zytor.com,google.com,gmail.com,suse.com,vger.kernel.org,kvack.org,redhat.com,surriel.com,linutronix.de,lists.linux.dev,nvidia.com];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[amd.com,shazbot.org,ffwll.ch,intel.com,linaro.org,gmail.com,redhat.com,collabora.com,chromium.org,linux.intel.com,kernel.org,suse.de,8bytes.org,arm.com,nvidia.com,vger.kernel.org,lists.freedesktop.org,lists.linaro.org,lists.linux.dev];
+	TAGGED_FROM(0.00)[bounces-70325-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[ziepe.ca];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[37];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
+	RCPT_COUNT_TWELVE(0.00)[35];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: BE500F33D9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,anongit.freedesktop.org:url,kaspersky.com:email,ziepe.ca:mid,ziepe.ca:dkim]
+X-Rspamd-Queue-Id: 61704F3E7D
 X-Rspamd-Action: no action
 
-On 2/2/26 16:52, Lance Yang wrote:
-> 
-> 
-> On 2026/2/2 23:09, Peter Zijlstra wrote:
->> On Mon, Feb 02, 2026 at 10:37:39PM +0800, Lance Yang wrote:
->>>
->>>
->>>
->>> PT_RECLAIM=y does have IPI for unshare/collapse — those paths call
->>> tlb_flush_unshared_tables() (for hugetlb unshare) and 
->>> collapse_huge_page()
->>> (in khugepaged collapse), which already send IPIs today (broadcast to 
->>> all
->>> CPUs via tlb_remove_table_sync_one()).
->>>
->>> What PT_RECLAIM=y doesn't need IPI for is table freeing (
->>> __tlb_remove_table_one() uses call_rcu() instead). But table 
->>> modification
->>> (unshare, collapse) still needs IPI to synchronize with lockless 
->>> walkers,
->>> regardless of PT_RECLAIM.
->>>
->>> So PT_RECLAIM=y is not broken; it already has IPI where needed. This 
->>> series
->>> just makes those IPIs targeted instead of broadcast. Does that clarify?
->>
->> Oh bah, reading is hard. I had missed they had more table_sync_one() 
->> calls,
->> rather than remove_table_one().
->>
->> So you *can* replace table_sync_one() with rcu_sync(), that will provide
->> the same guarantees. Its just a 'little' bit slower on the update side,
->> but does not incur the read side cost.
-> 
-> Yep, we could replace the IPI with synchronize_rcu() on the sync side:
-> 
-> - Currently: TLB flush → send IPI → wait for walkers to finish
-> - With synchronize_rcu(): TLB flush → synchronize_rcu() -> waits for 
-> grace period
-> 
-> Lockless walkers (e.g. GUP-fast) use local_irq_disable(); 
-> synchronize_rcu() also
-> waits for regions with preemption/interrupts disabled, so it should 
-> work, IIUC.
-> 
-> And then, the trade-off would be:
-> - Read side: zero cost (no per-CPU tracking)
-> - Write side: wait for RCU grace period (potentially slower)
-> 
-> For collapse/unshare, that write-side latency might be acceptable :)
-> 
-> @David, what do you think?
+On Thu, Feb 05, 2026 at 02:19:45PM +0200, Leon Romanovsky wrote:
+> You don't need any backmerge, SHA-1 version of vfio-v6.19-rc8 tag is the
+> same as in Linus's tree, so the flow is:
 
-Given that we just fixed the write-side latency from breaking Oracle's 
-databases completely, we have to be a bit careful here :)
+I'm confused what is the problem here?
 
-The thing is: on many x86 configs we don't need *any* TLB flushed or RCU 
-syncs.
+From https://anongit.freedesktop.org/git/drm/drm-misc
+ * branch                          drm-misc-next -> FETCH_HEAD
 
-So "how much slower" are we talking about, especially on bigger/loaded 
-systems?
+$ git show FETCH_HEAD
+commit 779ec12c85c9e4547519e3903a371a3b26a289de
+Author: Alexander Konyukhov <Alexander.Konyukhov@kaspersky.com>
+Date:   Tue Feb 3 16:48:46 2026 +0300
 
--- 
-Cheers,
+    drm/komeda: fix integer overflow in AFBC framebuffer size check
 
-David
+$ git merge-base  FETCH_HEAD 61ceaf236115f20f4fdd7cf60f883ada1063349a
+24d479d26b25bce5faea3ddd9fa8f3a6c3129ea7
+$ git describe --contains 24d479d26b25bce5faea3ddd9fa8f3a6c3129ea7
+v6.19-rc6^0
+
+$ git log --oneline 61ceaf236115f20f4fdd7cf60f883ada1063349a ^FETCH_HEAD
+61ceaf236115f2 vfio: Prevent from pinned DMABUF importers to attach to VFIO DMABUF
+
+Just pull Alex's tree, the drm-misc-next tree already has v6.19-rc6,
+so all they will see is one extra patch from Alex in your PR.
+
+No need to backmerge, this is normal git stuff and there won't be
+conflicts when they merge a later Linus tag.
+
+Jason
 
