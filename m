@@ -1,247 +1,207 @@
-Return-Path: <kvm+bounces-70281-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70282-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Mm1OVHvg2mtvwMAu9opvQ
-	(envelope-from <kvm+bounces-70281-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 02:16:01 +0100
+	id 6H5XN9nvg2mtvwMAu9opvQ
+	(envelope-from <kvm+bounces-70282-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 02:18:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26BFEED99F
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 02:16:01 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17C68ED9CF
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 02:18:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7827D301D4F5
-	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 01:15:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4DE483006833
+	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 01:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92FF228371;
-	Thu,  5 Feb 2026 01:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9382877D4;
+	Thu,  5 Feb 2026 01:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="jV0AcD2R"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s8gVOT6c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC482673B7
-	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 01:15:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DDBE18CC13
+	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 01:18:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770254143; cv=none; b=Pq0HOcWQTG0ChrSe8/9NLioaIC5nx7JvZLHkNwXyEOZ25g9akIqRjiDtOyxIJe+c7s1WH6oYfc2KR49kRhfCg5elUNGM4BaQusvLmbt5zJQ0Fbu50xBajLep+tFZlp4Qjyzaf55SHDAF8bfdfSPOOdyC9SsfLc6TFHaxVVRIJ+c=
+	t=1770254282; cv=none; b=uLCkDzes5IZ8h5JenmMLWQkxm7rYkHjx8E4ZVGFFmwssmWG4gK1kWovRjMm89pjQbG4r6AB/ouV8RHS0oz/us+hWPlKkZQLNH7YgjCj//VG9/J10e6m1APQ3cHHEPRKt//L+8ElvPTj0EjQ88Eh8dUXdSzXQwRpsmYAucYXcZkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770254143; c=relaxed/simple;
-	bh=1drKgF4ajzya9XhP/CvXuOd9zfTrVrBmZxUCb55OE48=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WlHv57qHuaOcNOyfo8zUkUJU4YStuUXMMYEXbWQBbKhj/AqaXOaro07Pwb6thvpYFUGNdnZy17mjDSdLp3Qbn0xNgmcy1wLtBSH1RWu44JgPW9seZsqg8Yascj7NwfgwFh/ciDGYqUDsQYJjBAC5Jdy6MxZSGcPoO4Mz8rieKUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=jV0AcD2R; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=WE4JzyZWLqvyCLbos5SjtMuecIp4MuU+rHKP0bYJTis=; b=jV0AcD2RHJWVcMGL
-	4GU+iQDl4TXR5N148QPTuAPk5qi8edo6V6uB4t2f3Tf77UVYWsZTIuK4bx1ycw6aET0ajk1am7A4l
-	UcFGmHI1qG4owgoAVS1yacs69Oc+D3Hzzsj1fdFTmhqL9wbY7cSSuas6wawzcmBGl+mErVu9rH4kY
-	hKbZiKAzKkdkyEQ1rZPTwVuixCxjHNzFx4TZiqeQ40LSdFQmQ/OKRQO3UR8tkmdo0WCEEtWXRkT16
-	4NiZBkpp7Ru8Xp4RUTdZm4fWLLJB31yV/5aDsEqI4euyQIdIp5whcoua/wrosIlut1wrvSQctKgnO
-	Pvdx9JbOoxQAKbETxw==;
-Received: from dg by mx.treblig.org with local (Exim 4.98.2)
-	(envelope-from <dg@treblig.org>)
-	id 1vnny3-00000001qop-1LjW;
-	Thu, 05 Feb 2026 01:15:35 +0000
-Date: Thu, 5 Feb 2026 01:15:35 +0000
-From: "Dr. David Alan Gilbert" <dave@treblig.org>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-	Fabiano Rosas <farosas@suse.de>,
-	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
-	Stefan Hajnoczi <stefanha@gmail.com>,
-	qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-	Helge Deller <deller@gmx.de>, Oliver Steffen <osteffen@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Matias Ezequiel Vara Larsen <mvaralar@redhat.com>,
-	Kevin Wolf <kwolf@redhat.com>,
-	German Maglione <gmaglione@redhat.com>,
-	Hanna Reitz <hreitz@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Thomas Huth <thuth@redhat.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Alex Bennee <alex.bennee@linaro.org>,
-	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: Re: Modern HMP
-Message-ID: <aYPvN5fphSObsvGR@gallifrey>
-References: <CAJSP0QVXXX7GV5W4nj7kP35x_4gbF2nG1G1jdh9Q=XgSx=nX3A@mail.gmail.com>
- <CAMxuvaz8hm1dc6XdsbK99Ng5sOBNxwWg_-UJdBhyptwgUYjcrw@mail.gmail.com>
- <871pjigf6z.fsf_-_@pond.sub.org>
- <aXH1ECZ1Nchui9ED@redhat.com>
- <87ikctg8a8.fsf@pond.sub.org>
- <aXIWLi656H8VbrPE@redhat.com>
- <87ikctk5ss.fsf@suse.de>
- <aXJJkd8g0AGZ3EVv@redhat.com>
- <aX-boauFX2Ju7x8Z@gallifrey>
- <875x8d0w32.fsf@pond.sub.org>
+	s=arc-20240116; t=1770254282; c=relaxed/simple;
+	bh=weq0fqo2tPGc5lpeGNhlb77TCji/77VOUp62fcKvqNw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=rpixtcddCqN//ygzn44H1mtKc8BdWSoDF8sBGgqIMjU1QceN9yZscB1NReS8cr/1YX526K5fOzUc+0hv/i9vmKvYY6JpM97LxvbNorZHfIf6PP7pJcvr1ZQXJHqX+PCtBHT20qrDll7W1RFUHlSfEz3y7eokavIX+NtHkkkRlmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s8gVOT6c; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c6c45a843b6so507535a12.2
+        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 17:18:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770254282; x=1770859082; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pyiDI7VPKF7gTzcDOmb56BEbcPVZQnYwftAUhlr4O+0=;
+        b=s8gVOT6ck0bPDE/tbb8L/MwBtZMIMjxWAULn00IJa9BplzYLQDAGklmUDZtpw4n90j
+         VIxN1rxGheF76p0kHf33zdDDknuqGZMHqOJvAKT8tipnFZNj+1ZB7bRu8f2ysIPP8oQp
+         jYbKLBNOS2U84NUL+mfhPY98CUyPHaBGXzK7+1cr4pMXt1f0xbbZqhmUT9/Q3oCKNjF+
+         kXu7ljvm55nJ03lJCaOZkQk+5MluC/ZWr7vsMeGvmx9Et77LYcW4cdM3XIjct3yWfWuJ
+         Q5jGfSmjbdrDVk+dh1n97/8XBF4iHk9N8lXw5gP5QSiq+dUlP75e9I6Xy6btx6RqJFWw
+         dsAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770254282; x=1770859082;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=pyiDI7VPKF7gTzcDOmb56BEbcPVZQnYwftAUhlr4O+0=;
+        b=ez362TaigdOKWnxR+531nN+WaiI8Ax0mTWsVAP48k3+1MedekUDxGwD9RDJfqmuFb3
+         iol7YbhTojhhrh14M/xfxVFrRwxY036gyyoIkI5d336iicPmVE+2tlIgs4fpeSai6W9a
+         iPVUPgpjl66GaQj8zHfpSYmm7ZDr4eR4t2bvNL2Xmq4qE64coq1zNxSlMrV0JbClc/4T
+         go5ufeKAZk4Wk5xQKZdVywkha5ndOIXjgO87iMd0FRDK5bS6Ns+7tRn0IMjIrzbbif9O
+         DYWF2HEh/eL7dOiG1MFvAGhKWkBdxD1tiE652qrvFCI/T20mO5PNO0WeoSV87UJQWpZP
+         vfpw==
+X-Forwarded-Encrypted: i=1; AJvYcCVasNuSFe0sTiyu7dEKQ77zeeO2ulPo72RR4GRQVOrX9zDZLqNh26mCsWYLVZpbDZdNjYk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+LjYIpd69chlfvQeUDI7vC25aFe44VEeavNJSgZ2KdfkZGXkW
+	MbAM3zSDT3YvIjXrXp4nslF7us3OhQJ+q6RGNucm2/RKHeQpnitz6vaW/PDBIQqOfSio5VignTu
+	VA57EVA==
+X-Received: from pjva13.prod.google.com ([2002:a17:90a:d80d:b0:352:d931:fa5b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:a108:b0:393:7575:a8be
+ with SMTP id adf61e73a8af0-3937575c9d5mr3614095637.68.1770254281643; Wed, 04
+ Feb 2026 17:18:01 -0800 (PST)
+Date: Wed, 4 Feb 2026 17:18:00 -0800
+In-Reply-To: <CALMp9eSc=0zS+6Rk-c_0P-Q1Y8_9Xv58G5BYxieKpv_XaSj0wg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <875x8d0w32.fsf@pond.sub.org>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.12.48+deb13-amd64 (x86_64)
-X-Uptime: 00:28:17 up 101 days, 4 min,  3 users,  load average: 0.04, 0.01,
- 0.00
-User-Agent: Mutt/2.2.13 (2024-03-09)
+Mime-Version: 1.0
+References: <20260113225406.273373-1-jmattson@google.com> <aWbmXTJdZDO_tnvE@google.com>
+ <CALMp9eTYakMk0Bogxa_GdGU5_h4PK-YOXcu-cSQ16m1QcusHxw@mail.gmail.com>
+ <CALMp9eQx7EVim4iYGbAhoHrei2YmTra6oxtdmKaY7bw-M0PHbw@mail.gmail.com>
+ <aYKoJ74MWboBuE_M@google.com> <CALMp9eSc=0zS+6Rk-c_0P-Q1Y8_9Xv58G5BYxieKpv_XaSj0wg@mail.gmail.com>
+Message-ID: <aYPvyMDipM9Z9Z7t@google.com>
+Subject: Re: [PATCH] KVM: VMX: Add quirk to allow L1 to set FREEZE_IN_SMM in vmcs12
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	FROM_NAME_HAS_TITLE(1.00)[dr];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[treblig.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[treblig.org:s=bytemarkmx];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70282-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-70281-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[treblig.org:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dave@treblig.org,kvm@vger.kernel.org];
-	FREEMAIL_CC(0.00)[redhat.com,suse.de,gmail.com,nongnu.org,vger.kernel.org,gmx.de,linaro.org,ilande.co.uk];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 26BFEED99F
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 17C68ED9CF
 X-Rspamd-Action: no action
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dave@treblig.org> writes:
-> 
-> > * Daniel P. Berrangé (berrange@redhat.com) wrote:
-> >> On Thu, Jan 22, 2026 at 12:47:47PM -0300, Fabiano Rosas wrote:
-> >> > One question I have is what exactly gets (eventually) removed from QEMU
-> >> > and what benefits we expect from it. Is it the entire "manual"
-> >> > interaction that's undesirable? Or just that to maintain HMP there is a
-> >> > certain amount of duplication? Or even the less-than-perfect
-> >> > readline/completion aspects?
-> >> 
-> >> Over time we've been gradually separating our human targetted code from
-> >> our machine targetted code, whether that's command line argument parsing,
-> >> or monitor parsing. Maintaining two ways todo the same thing is always
-> >> going to be a maint burden, and in QEMU it has been especially burdensome
-> >> as they were parallel impls in many cases, rather than one being exclusively
-> >> built on top of the other.
-> >> 
-> >> Even today we still get contributors sending patches which only impl
-> >> HMP code and not QMP code. Separating HMP fully from QMP so that it
-> >> was mandatory to create QMP first gets contributors going down the
-> >> right path, and should reduce the burden on maint.
+On Wed, Feb 04, 2026, Jim Mattson wrote:
+> On Tue, Feb 3, 2026 at 6:00=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
 > >
-> > Having a separate HMP isn't a bad idea - but it does need some idea of
-> > how to make it easy for contributors to add stuff that's just for debug
-> > or for the dev.   For HMP the bar is very low; if it's useful to the
-> > dev, why not (unless it's copying something that's already in the QMP interface
-> > in a different way);  but although the x- stuff in theory lets
-> > you add something via QMP, in practice it's quite hard to get it through
-> > review without a lot of QMP design bikeshedding.
-> 
-> I think this description has become less accurate than it used to be :)
-> 
-> A long time ago, we started with "QMP is a stable, structured interface
-> for machines, HMP is a plain text interface for humans, and layered on
-> top of QMP."  Layered on top means HMP commands wrap around QMP
-> commands.  Ensures that QMP is obviously complete.  Without such a
-> layering, we'd have to verify completeness by inspection.  Impractical
-> given the size and complexity of the interfaces involved.
-> 
-> Trouble is there are things in HMP that make no sense in QMP.  For
-> instance, HMP command 'cpu' sets the monitor's default CPU, which
-> certain HMP commands use.  To wrap 'cpu' around a QMP command, we'd have
-> to drag the concept "default CPU" into QMP where it's not wanted.
+> > On Thu, Jan 22, 2026, Jim Mattson wrote:
+> > > On Tue, Jan 13, 2026 at 7:47=E2=80=AFPM Jim Mattson <jmattson@google.=
+com> wrote:
+> > > > On Tue, Jan 13, 2026 at 4:42=E2=80=AFPM Sean Christopherson <seanjc=
+@google.com> wrote:
+> > > > >
+> > > > > On Tue, Jan 13, 2026, Jim Mattson wrote:
+> > > > > > Add KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM to allow L1 to set
+> > > > > > IA32_DEBUGCTL.FREEZE_IN_SMM in vmcs12 when using nested VMX.  P=
+rior to
+> > > > > > commit 6b1dd26544d0 ("KVM: VMX: Preserve host's
+> > > > > > DEBUGCTLMSR_FREEZE_IN_SMM while running the guest"), L1 could s=
+et
+> > > > > > FREEZE_IN_SMM in vmcs12 to freeze PMCs during physical SMM coin=
+cident
+> > > > > > with L2's execution.  The quirk is enabled by default for backw=
+ards
+> > > > > > compatibility; userspace can disable it via KVM_CAP_DISABLE_QUI=
+RKS2 if
+> > > > > > consistency with WRMSR(IA32_DEBUGCTL) is desired.
+> > > > >
+> > > > > It's probably worth calling out that KVM will still drop FREEZE_I=
+N_SMM in vmcs02
+> > > > >
+> > > > >         if (vmx->nested.nested_run_pending &&
+> > > > >             (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONT=
+ROLS)) {
+> > > > >                 kvm_set_dr(vcpu, 7, vmcs12->guest_dr7);
+> > > > >                 vmx_guest_debugctl_write(vcpu, vmcs12->guest_ia32=
+_debugctl &
+> > > > >                                                vmx_get_supported_=
+debugctl(vcpu, false)); <=3D=3D=3D=3D
+> > > > >         } else {
+> > > > >                 kvm_set_dr(vcpu, 7, vcpu->arch.dr7);
+> > > > >                 vmx_guest_debugctl_write(vcpu, vmx->nested.pre_vm=
+enter_debugctl);
+> > > > >         }
+> > > > >
+> > > > > both from a correctness standpoint and so that users aren't misle=
+ad into thinking
+> > > > > the quirk lets L1 control of FREEZE_IN_SMM while running L2.
+> > > >
+> > > > Yes, it's probably worth pointing out that the VM is now subject to
+> > > > the whims of the L0 administrators.
+> > > >
+> > > > While that makes some sense for the legacy vPMU, where KVM is just
+> > > > another client of host perf, perhaps the decision should be revisit=
+ed
+> > > > in the case of the MPT vPMU, where KVM owns the PMU while the vCPU =
+is
+> > > > in VMX non-root operation.
+> >
+> > Eh, running guests with FREEZE_IN_SMM=3D0 seems absolutely crazy from a=
+ security
+> > perspective.  If an admin wants to disable FREEZE_IN_SMM, they get to k=
+eep the
+> > pieces.  And KVM definitely isn't going to override the admin, e.g. to =
+allow the
+> > guest to profile host SMM.
+>=20
+> I'm not sure what you mean by "they get to keep the pieces." What is
+> the security problem with allowing L1 to freeze *guest-owned* PMCs
+> during SMM?
 
-That's just state; that's easy!
+To give L1 the option to freeze PMCs, KVM would also need to give L1 the op=
+tion
+to *not* freeze PMCs.  At that point, the guest can use its PMCs to profile=
+ host
+SMM code.  Maybe even leverage a PMI to attack a poorly written SMM handler=
+.
 
-> So we retreated from "all", and permitted exceptions for commands that
-> make no sense in QMP.
-> 
-> We then found out the hard & expensive way that designing a QMP command
-> with its stable, structured interface is often a lot harder than
-> cobbling together an HMP command.  It's not just avoidable social
-> problems ("bikeshedding"); designing stable interfaces is just hard.
-> Sometimes the extra effort is worthwhile.  Sometimes it's not, e.g. when
-> all we really want is print something to aid a human with debugging.
-
-Right.
-
-> So we retreated from "all" some more, and permitted exceptions for
-> commands meant exclusively for human use, typically debugging and
-> development aids.
-> 
-> This effectifely redefined the meaning of "complete": instead of "QMP
-> can do everything HMP can do and more", it's now "... except for certain
-> development and debugging aids and maybe other stuff".
-> 
-> To keep "maybe other stuff" under control, we required (and still
-> require) an *argument* for adding functionality just to HMP.
-> 
-> This turned out to be differently bothersome.  Having to review HMP
-> changes for QMP bypasses is bothersome, and bound to miss things at
-> least occasionally.  Having to ask for an argument is bothersome.
-> Constructing one is bothersome.
-
-Well, it's not too bad as long as the arguments are only asked to be
-reasonable rather than bulletproof.
-
-> To reduce the bother, we retreated from another QMP ideal: the
-> structured interface.  Permit QMP commands to return just text when the
-> command is meant just for humans.  Such commands must be unstable.
-> Possible because we had retreated from "all of QMP is stable" meanwhile.
-> 
-> How does this work?  Instead of adding an HMP-only command, add a QMP
-> command that returns QAPI type HumanReadableText, and a trivial HMP
-> command that wraps around it.  Slightly more work, but no interface
-> design.
-
-Yes, I've seen that - and as long as that continues it's OK;
-although it does feel weird in a few ways; it seems more work
-to implement than just being able to print, but I do worry
-what happens with commands with a lot of output.   It also gets
-weirder when you have to parameterise it, because you get the parameter
-parsing in one place influencing the separate formatting.
-
-> The QMP command addition is much more visible to the QAPI/QMP
-> maintainers than an HMP-only command would be.  This helps avoid missing
-> things.
-> 
-> We still want an argument why a structured interface isn't needed.  But
-> we can be much more lenient there: if it turns out to be needed, we can
-> just add it, and drop the unstructured interface.  Remember, it's
-> unstable.
-> 
-> Hope this helps.
-
-Yeh, it's just something to be watchful of.
-
-I did see you suggesting for Rust for it; which would work - although
-given it wouldn't be performance sensitive, Python would seem reasonable.
-
-Dave
-
-Dave
-
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+In other words, unless I'm missing something, the only reasonable option is=
+ to
+run the guest with FREEZE_IN_SMM=3D1, which means ignoring the guest's wish=
+es.
+Or I guess another way to look at it: you can have any color car you want, =
+as
+long as it's black :-)=20
 
