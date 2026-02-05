@@ -1,79 +1,73 @@
-Return-Path: <kvm+bounces-70351-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70352-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2F3+G3nJhGk45QMAu9opvQ
-	(envelope-from <kvm+bounces-70351-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 17:46:49 +0100
+	id +MYIJKbKhGk45QMAu9opvQ
+	(envelope-from <kvm+bounces-70352-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 17:51:50 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE612F56AE
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 17:46:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF3A7F581E
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 17:51:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A9FC6302257B
-	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 16:46:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2527F305BFE5
+	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 16:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127A0425CCD;
-	Thu,  5 Feb 2026 16:46:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C3243C049;
+	Thu,  5 Feb 2026 16:48:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YJCyzbg2"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MMnVnRsR"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437462EAB64;
-	Thu,  5 Feb 2026 16:46:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2958A421F0F;
+	Thu,  5 Feb 2026 16:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770309989; cv=none; b=B0CLYUj1ZmCOYui7xt9dNWjJ0ifOOFrbhtkNoOvBmEbzq6RQiqegMruZaGNmxoQOOhexjxuky955JT93Wu+ILPdTtL8K2rkCJU0Ndz6Hism8R0tNtgzrycykgj6WQmMWZBvrfJdR6/TZaHaH5qJd9vnHPr1eJY3mZnVWuAxxFHI=
+	t=1770310121; cv=none; b=aJ5vlXae7qgLrqgqRyz/iLJbhB4UmIAi+8ER4p9uXGSDhpWSO0cdHbXrx9e7CB2SfbwqFv+kFnFBvgyabmwV8rRlC30YjHmeGqOgAXukMMwRtWql0AOLS6zCiM4mF8cT7e/uA+YxHfCO1xZ6OysWcljUI77gQLv4eFtRpIi8Jco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770309989; c=relaxed/simple;
-	bh=xZ40A2XkLWxNuM0wtPdSv5FXxZ2RAwf3Y0brB27dkCk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NBQ0lbGApBo5Oayej1E8RKNHPysL2jHbzcy1TTt77ggK9Xbn42/Swf/2v69x+SkRQBHuTz6d+6p+o9O1J9lKmtNTmd1rgHRUp1sCds7i0LkkoNqhB2VkJ4ZZz6Wh09JTjQ5dBVF8Vr1vOv8tHoB+wC+1XoNh7Ta3T1lol8lnNNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YJCyzbg2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36EEDC4CEF7;
-	Thu,  5 Feb 2026 16:46:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770309989;
-	bh=xZ40A2XkLWxNuM0wtPdSv5FXxZ2RAwf3Y0brB27dkCk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YJCyzbg2VBKutZnbfY5RGMyskD50lSS2TpqXqwLIjEQMZfJ1jHKWwl3AaxAi20GLL
-	 VsGf/m0Hd/URQaPfrKzsixUikbp0H2YSTNHc21IbAiVac7NXyTxzw6EzMAIj4PRCC1
-	 IndCBmMBh777Pe6GqDfPwzb/JEaGHX4ZnkELgAgNN8DyDWkaVFMsLJZWHO2m6tNS+2
-	 kTKs4EMqZxe9hCk3CmYekOfAHv1ElOEFy6WWzpQOgbFY+fkp4al9lyra46gHKRJY6h
-	 up9qpJfI5r2ydgFJqHfE3VchHNqJ7eQFa7A7bcQQumBV7jsWqu38n/x4dSFyI+6Su0
-	 Az2gcwSK0iYSw==
-Message-ID: <8fcfe565-4371-47ee-a0de-a9d3e1efa0a1@kernel.org>
-Date: Thu, 5 Feb 2026 17:46:18 +0100
-Precedence: bulk
-X-Mailing-List: kvm@vger.kernel.org
-List-Id: <kvm.vger.kernel.org>
-List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+	s=arc-20240116; t=1770310121; c=relaxed/simple;
+	bh=byhdSIfpXwJJLEbl9yDeWmGc+L3g/CshZfQ1cqwD/xE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XOGIuOo+s4W2xh0jLElVMUlXmT73im6Odx08vLdTflhxvadwsMKu9Z/TjNI6fMvoj4Kr0lnT3BkeR2R8uZoNwZHQgYf7Jlhr2nwNIOFlCMF8OEjo2HXQotEa5IbpPL2FWflWzsQh5xOxHvJzIvQZM5H1qUf6upUdMNSG5H6Vvww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MMnVnRsR; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Yx/d01Y58MDZvuU9Az//GxypXm/UanK1HY+5wvpwfYU=; b=MMnVnRsRRqqFRmmqm8szxt55xC
+	kumtGKJdsNGk1kzy5/T3qafT1MGgU2cyyBGV7bHPnR7O4Gh3dHG7iA4iulap9fnlIK594qOoyzuB4
+	SVND5ODlyYngv7IzrVCeW4d01m9p7gb5Abo1jCv8lodGXGY9zl+G8QcqV0MyUZPRC++OePTTDS+8J
+	uCGDnccOQoLRqUlTap688HhAGnOPvG2RtjFzFGbJZePYaReJhbIxVuCCsQKuqZ/fgpqAVsHkQuyA8
+	iV+1jAgW/LD2kocjmOpkRhJtk9e8aXYQ6I1HL2ds9nwQlDVOgvXaqc2zWr9bHLK+Tx3jF0OJtp0IH
+	wtE6Vjpw==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vo2Wb-00000003tzE-36Oa;
+	Thu, 05 Feb 2026 16:48:13 +0000
+Date: Thu, 5 Feb 2026 16:48:13 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Lance Yang <lance.yang@linux.dev>
+Cc: Dave Hansen <dave.hansen@intel.com>,
+	"David Hildenbrand (Arm)" <david@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>, Liam.Howlett@oracle.com,
+	akpm@linux-foundation.org, aneesh.kumar@kernel.org, arnd@arndb.de,
+	baohua@kernel.org, baolin.wang@linux.alibaba.com,
+	boris.ostrovsky@oracle.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, dev.jain@arm.com, hpa@zytor.com,
+	hughd@google.com, ioworker0@gmail.com, jannh@google.com,
+	jgross@suse.com, kvm@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	lorenzo.stoakes@oracle.com, mingo@redhat.com, npache@redhat.com,
+	npiggin@gmail.com, pbonzini@redhat.com, riel@surriel.com,
+	ryan.roberts@arm.com, seanjc@google.com, shy828301@gmail.com,
+	tglx@linutronix.de, virtualization@lists.linux.dev, will@kernel.org,
+	x86@kernel.org, ypodemsk@redhat.com, ziy@nvidia.com
 Subject: Re: [PATCH v4 0/3] targeted TLB sync IPIs for lockless page table
-To: Lance Yang <lance.yang@linux.dev>, Dave Hansen <dave.hansen@intel.com>,
- Peter Zijlstra <peterz@infradead.org>
-Cc: Liam.Howlett@oracle.com, akpm@linux-foundation.org,
- aneesh.kumar@kernel.org, arnd@arndb.de, baohua@kernel.org,
- baolin.wang@linux.alibaba.com, boris.ostrovsky@oracle.com, bp@alien8.de,
- dave.hansen@linux.intel.com, dev.jain@arm.com, hpa@zytor.com,
- hughd@google.com, ioworker0@gmail.com, jannh@google.com, jgross@suse.com,
- kvm@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- lorenzo.stoakes@oracle.com, mingo@redhat.com, npache@redhat.com,
- npiggin@gmail.com, pbonzini@redhat.com, riel@surriel.com,
- ryan.roberts@arm.com, seanjc@google.com, shy828301@gmail.com,
- tglx@linutronix.de, virtualization@lists.linux.dev, will@kernel.org,
- x86@kernel.org, ypodemsk@redhat.com, ziy@nvidia.com
-References: <20260202095414.GE2995752@noisy.programming.kicks-ass.net>
- <20260202110329.74397-1-lance.yang@linux.dev>
- <20260202125030.GB1395266@noisy.programming.kicks-ass.net>
- <c6fda7c2-ad54-416a-a869-1499c97c7bd7@linux.dev>
- <4700e7ba-8456-4a93-9e28-7e5a3ca2a1be@linux.dev>
- <20260202133713.GF1395266@noisy.programming.kicks-ass.net>
+Message-ID: <aYTJzft5cuqD9akC@casper.infradead.org>
+References: <20260202133713.GF1395266@noisy.programming.kicks-ass.net>
  <540adec9-c483-460a-a682-f2076cf015c2@linux.dev>
  <20260202150957.GD1282955@noisy.programming.kicks-ass.net>
  <d6944cd8-d3b7-4b16-ab52-a61e7dc2221c@linux.dev>
@@ -83,127 +77,62 @@ References: <20260202095414.GE2995752@noisy.programming.kicks-ass.net>
  <c985a8ed-37ad-415e-b7b4-18a66b4da3fe@linux.dev>
  <647cbe2e-a034-4a75-9492-21ea1708eccc@intel.com>
  <99237729-f2b0-4a7a-8213-65a2f1c57744@linux.dev>
-From: "David Hildenbrand (Arm)" <david@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=david@kernel.org; keydata=
- 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
- qIws/H2t
+Precedence: bulk
+X-Mailing-List: kvm@vger.kernel.org
+List-Id: <kvm.vger.kernel.org>
+List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <99237729-f2b0-4a7a-8213-65a2f1c57744@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-70352-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70351-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[oracle.com,linux-foundation.org,kernel.org,arndb.de,linux.alibaba.com,alien8.de,linux.intel.com,arm.com,zytor.com,google.com,gmail.com,suse.com,vger.kernel.org,kvack.org,redhat.com,surriel.com,linutronix.de,lists.linux.dev,nvidia.com];
-	RCPT_COUNT_TWELVE(0.00)[37];
+	FREEMAIL_CC(0.00)[intel.com,kernel.org,infradead.org,oracle.com,linux-foundation.org,arndb.de,linux.alibaba.com,alien8.de,linux.intel.com,arm.com,zytor.com,google.com,gmail.com,suse.com,vger.kernel.org,kvack.org,redhat.com,surriel.com,linutronix.de,lists.linux.dev,nvidia.com];
+	RCPT_COUNT_TWELVE(0.00)[38];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willy@infradead.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DE612F56AE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:dkim]
+X-Rspamd-Queue-Id: EF3A7F581E
 X-Rspamd-Action: no action
 
-On 2/5/26 17:30, Lance Yang wrote:
-> 
-> 
+On Fri, Feb 06, 2026 at 12:30:56AM +0800, Lance Yang wrote:
 > On 2026/2/5 23:41, Dave Hansen wrote:
->> On 2/5/26 07:31, Lance Yang wrote:
->>>
->>> Without IPIs or synchronize_rcu(), IIUC, we have no way to know if there
->>> are ongoing concurrent lockless page-table walks — the walkers just 
->>> disable
->>> IRQs and walk.
->>
->> Yeah, but one aim of RCU is ensuring that readers see valid data but not
->> necessarily the most up to date data.
->>
->> Are there cases where ongoing concurrent lockless page-table walks need
->> to see the writes and they can't tolerate seeing valid but slightly
->> stale data?
+> > Yeah, but one aim of RCU is ensuring that readers see valid data but not
+> > necessarily the most up to date data.
+> > 
+> > Are there cases where ongoing concurrent lockless page-table walks need
+> > to see the writes and they can't tolerate seeing valid but slightly
+> > stale data?
 > 
-> The issue is we're about to free the page table (e.g. 
+> The issue is we're about to free the page table (e.g.
 > pmdp_collapse_flush()).
 > 
 > We have to ensure no walker is still doing a lockless page-table walk
 > when the page directories are freed, otherwise we get use-after-free.
 
-Right, and walking a page table that is suddenly no longer a page table 
-is the real fun :)
+But can't we RCU-free the page table?  Why do we need to wait for the
+RCU readers to finish?
 
-... or trying to lookup the page of something that is not even a page.
-
-> 
->> Don't forget that we also have pesky concurrent lockless page-table
->> walkers called CPUs. They're extra pesky in that they don't even stop
->> for IPIs. ;)
-> 
-> I assume those walkers that don't disable IRQs only read the PMD and
-> don't walk into the table; otherwise the current sync wouldn't work
-> for them.
-CPU page table walkers are much easier to control in that regard :)
-
--- 
-Cheers,
-
-David
 
