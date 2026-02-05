@@ -1,207 +1,249 @@
-Return-Path: <kvm+bounces-70282-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70283-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6H5XN9nvg2mtvwMAu9opvQ
-	(envelope-from <kvm+bounces-70282-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 02:18:17 +0100
+	id gAaqAUTyg2mGwAMAu9opvQ
+	(envelope-from <kvm+bounces-70283-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 02:28:36 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17C68ED9CF
-	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 02:18:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 628F6EDA81
+	for <lists+kvm@lfdr.de>; Thu, 05 Feb 2026 02:28:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4DE483006833
-	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 01:18:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 963293015D20
+	for <lists+kvm@lfdr.de>; Thu,  5 Feb 2026 01:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9382877D4;
-	Thu,  5 Feb 2026 01:18:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA0ED28B7DA;
+	Thu,  5 Feb 2026 01:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s8gVOT6c"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="kQJPMdJM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DDBE18CC13
-	for <kvm@vger.kernel.org>; Thu,  5 Feb 2026 01:18:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD06621ADB7;
+	Thu,  5 Feb 2026 01:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770254282; cv=none; b=uLCkDzes5IZ8h5JenmMLWQkxm7rYkHjx8E4ZVGFFmwssmWG4gK1kWovRjMm89pjQbG4r6AB/ouV8RHS0oz/us+hWPlKkZQLNH7YgjCj//VG9/J10e6m1APQ3cHHEPRKt//L+8ElvPTj0EjQ88Eh8dUXdSzXQwRpsmYAucYXcZkU=
+	t=1770254903; cv=none; b=JRsI8LTPV/BnTX7REVF5LDryAuol4sXq1askbQ7SZ4xokZfVnxRK+bn14aWNwC/Zzs4ivi7nHuxyiSTOmCHmCYXPR4my82IstNLHT6Q6QiBMjG7zeKHsmHonI8m7Z5D3+Xwg6PhWo9fHBAuMYU3EH6dMUyP3RikOb5Cbd0awF/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770254282; c=relaxed/simple;
-	bh=weq0fqo2tPGc5lpeGNhlb77TCji/77VOUp62fcKvqNw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rpixtcddCqN//ygzn44H1mtKc8BdWSoDF8sBGgqIMjU1QceN9yZscB1NReS8cr/1YX526K5fOzUc+0hv/i9vmKvYY6JpM97LxvbNorZHfIf6PP7pJcvr1ZQXJHqX+PCtBHT20qrDll7W1RFUHlSfEz3y7eokavIX+NtHkkkRlmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s8gVOT6c; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c6c45a843b6so507535a12.2
-        for <kvm@vger.kernel.org>; Wed, 04 Feb 2026 17:18:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770254282; x=1770859082; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pyiDI7VPKF7gTzcDOmb56BEbcPVZQnYwftAUhlr4O+0=;
-        b=s8gVOT6ck0bPDE/tbb8L/MwBtZMIMjxWAULn00IJa9BplzYLQDAGklmUDZtpw4n90j
-         VIxN1rxGheF76p0kHf33zdDDknuqGZMHqOJvAKT8tipnFZNj+1ZB7bRu8f2ysIPP8oQp
-         jYbKLBNOS2U84NUL+mfhPY98CUyPHaBGXzK7+1cr4pMXt1f0xbbZqhmUT9/Q3oCKNjF+
-         kXu7ljvm55nJ03lJCaOZkQk+5MluC/ZWr7vsMeGvmx9Et77LYcW4cdM3XIjct3yWfWuJ
-         Q5jGfSmjbdrDVk+dh1n97/8XBF4iHk9N8lXw5gP5QSiq+dUlP75e9I6Xy6btx6RqJFWw
-         dsAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770254282; x=1770859082;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pyiDI7VPKF7gTzcDOmb56BEbcPVZQnYwftAUhlr4O+0=;
-        b=ez362TaigdOKWnxR+531nN+WaiI8Ax0mTWsVAP48k3+1MedekUDxGwD9RDJfqmuFb3
-         iol7YbhTojhhrh14M/xfxVFrRwxY036gyyoIkI5d336iicPmVE+2tlIgs4fpeSai6W9a
-         iPVUPgpjl66GaQj8zHfpSYmm7ZDr4eR4t2bvNL2Xmq4qE64coq1zNxSlMrV0JbClc/4T
-         go5ufeKAZk4Wk5xQKZdVywkha5ndOIXjgO87iMd0FRDK5bS6Ns+7tRn0IMjIrzbbif9O
-         DYWF2HEh/eL7dOiG1MFvAGhKWkBdxD1tiE652qrvFCI/T20mO5PNO0WeoSV87UJQWpZP
-         vfpw==
-X-Forwarded-Encrypted: i=1; AJvYcCVasNuSFe0sTiyu7dEKQ77zeeO2ulPo72RR4GRQVOrX9zDZLqNh26mCsWYLVZpbDZdNjYk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+LjYIpd69chlfvQeUDI7vC25aFe44VEeavNJSgZ2KdfkZGXkW
-	MbAM3zSDT3YvIjXrXp4nslF7us3OhQJ+q6RGNucm2/RKHeQpnitz6vaW/PDBIQqOfSio5VignTu
-	VA57EVA==
-X-Received: from pjva13.prod.google.com ([2002:a17:90a:d80d:b0:352:d931:fa5b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:a108:b0:393:7575:a8be
- with SMTP id adf61e73a8af0-3937575c9d5mr3614095637.68.1770254281643; Wed, 04
- Feb 2026 17:18:01 -0800 (PST)
-Date: Wed, 4 Feb 2026 17:18:00 -0800
-In-Reply-To: <CALMp9eSc=0zS+6Rk-c_0P-Q1Y8_9Xv58G5BYxieKpv_XaSj0wg@mail.gmail.com>
+	s=arc-20240116; t=1770254903; c=relaxed/simple;
+	bh=U6I0qix+enFlE4sbK3k8XgOzt02MZF0j3tf/bMnHaig=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=iNV74Df9Qg+u4SBjFnMRfDGQm+gpoDmgWaBx0xaT91GVulXvn0iXhcxUahjmoBblYeMRmBevC/ggPdWZg9UE70zIcJgDxTO08b1G6wEEKP8EGExLhfpejS/lcz6P6FULduKi/X90UpXvqkRD3ErA8nJwDkRmIxCyHN8pGurTbMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=kQJPMdJM; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1770254893; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=ch2lw3Gkx/tmSQGhjBy06LxNeqZ/lvoi8ni6rWgh66M=;
+	b=kQJPMdJMKpKWi43ymOHB+IBcV8DKgbFDhzi3mgC4TI4159ZhTTeD4tz/b1imKgGkzbhe0O5kaVqnwemoqw7YVE57HNRAWQ4HHy1iuLtfR9KJeOIreYm+lhTDQKgj+ois6e1Cinetkll/nW/rmyeQKVYg6FG1q9in+UMH3BELMRE=
+Received: from localhost.localdomain(mailfrom:fangyu.yu@linux.alibaba.com fp:SMTPD_---0WyZ3nte_1770254889 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 05 Feb 2026 09:28:11 +0800
+From: fangyu.yu@linux.alibaba.com
+To: andrew.jones@oss.qualcomm.com
+Cc: alex@ghiti.fr,
+	anup@brainfault.org,
+	aou@eecs.berkeley.edu,
+	atish.patra@linux.dev,
+	corbet@lwn.net,
+	fangyu.yu@linux.alibaba.com,
+	guoren@kernel.org,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	palmer@dabbelt.com,
+	pbonzini@redhat.com,
+	pjw@kernel.org,
+	radim.krcmar@oss.qualcomm.com
+Subject: Re: Re: [PATCH v5 3/3] RISC-V: KVM: add KVM_CAP_RISCV_SET_HGATP_MODE
+Date: Thu,  5 Feb 2026 09:28:08 +0800
+Message-Id: <20260205012808.98973-1-fangyu.yu@linux.alibaba.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+In-Reply-To: <ocfqo4zpsg6yyaz6kd65jrvudtb35uerdsueazqdk6w7c5lvdf@wvwzhc57gxez>
+References: <ocfqo4zpsg6yyaz6kd65jrvudtb35uerdsueazqdk6w7c5lvdf@wvwzhc57gxez>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260113225406.273373-1-jmattson@google.com> <aWbmXTJdZDO_tnvE@google.com>
- <CALMp9eTYakMk0Bogxa_GdGU5_h4PK-YOXcu-cSQ16m1QcusHxw@mail.gmail.com>
- <CALMp9eQx7EVim4iYGbAhoHrei2YmTra6oxtdmKaY7bw-M0PHbw@mail.gmail.com>
- <aYKoJ74MWboBuE_M@google.com> <CALMp9eSc=0zS+6Rk-c_0P-Q1Y8_9Xv58G5BYxieKpv_XaSj0wg@mail.gmail.com>
-Message-ID: <aYPvyMDipM9Z9Z7t@google.com>
-Subject: Re: [PATCH] KVM: VMX: Add quirk to allow L1 to set FREEZE_IN_SMM in vmcs12
-From: Sean Christopherson <seanjc@google.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-7.66 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70282-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-70283-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NO_DN(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[fangyu.yu@linux.alibaba.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 17C68ED9CF
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 628F6EDA81
 X-Rspamd-Action: no action
 
-On Wed, Feb 04, 2026, Jim Mattson wrote:
-> On Tue, Feb 3, 2026 at 6:00=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> >
-> > On Thu, Jan 22, 2026, Jim Mattson wrote:
-> > > On Tue, Jan 13, 2026 at 7:47=E2=80=AFPM Jim Mattson <jmattson@google.=
-com> wrote:
-> > > > On Tue, Jan 13, 2026 at 4:42=E2=80=AFPM Sean Christopherson <seanjc=
-@google.com> wrote:
-> > > > >
-> > > > > On Tue, Jan 13, 2026, Jim Mattson wrote:
-> > > > > > Add KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM to allow L1 to set
-> > > > > > IA32_DEBUGCTL.FREEZE_IN_SMM in vmcs12 when using nested VMX.  P=
-rior to
-> > > > > > commit 6b1dd26544d0 ("KVM: VMX: Preserve host's
-> > > > > > DEBUGCTLMSR_FREEZE_IN_SMM while running the guest"), L1 could s=
-et
-> > > > > > FREEZE_IN_SMM in vmcs12 to freeze PMCs during physical SMM coin=
-cident
-> > > > > > with L2's execution.  The quirk is enabled by default for backw=
-ards
-> > > > > > compatibility; userspace can disable it via KVM_CAP_DISABLE_QUI=
-RKS2 if
-> > > > > > consistency with WRMSR(IA32_DEBUGCTL) is desired.
-> > > > >
-> > > > > It's probably worth calling out that KVM will still drop FREEZE_I=
-N_SMM in vmcs02
-> > > > >
-> > > > >         if (vmx->nested.nested_run_pending &&
-> > > > >             (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONT=
-ROLS)) {
-> > > > >                 kvm_set_dr(vcpu, 7, vmcs12->guest_dr7);
-> > > > >                 vmx_guest_debugctl_write(vcpu, vmcs12->guest_ia32=
-_debugctl &
-> > > > >                                                vmx_get_supported_=
-debugctl(vcpu, false)); <=3D=3D=3D=3D
-> > > > >         } else {
-> > > > >                 kvm_set_dr(vcpu, 7, vcpu->arch.dr7);
-> > > > >                 vmx_guest_debugctl_write(vcpu, vmx->nested.pre_vm=
-enter_debugctl);
-> > > > >         }
-> > > > >
-> > > > > both from a correctness standpoint and so that users aren't misle=
-ad into thinking
-> > > > > the quirk lets L1 control of FREEZE_IN_SMM while running L2.
-> > > >
-> > > > Yes, it's probably worth pointing out that the VM is now subject to
-> > > > the whims of the L0 administrators.
-> > > >
-> > > > While that makes some sense for the legacy vPMU, where KVM is just
-> > > > another client of host perf, perhaps the decision should be revisit=
-ed
-> > > > in the case of the MPT vPMU, where KVM owns the PMU while the vCPU =
-is
-> > > > in VMX non-root operation.
-> >
-> > Eh, running guests with FREEZE_IN_SMM=3D0 seems absolutely crazy from a=
- security
-> > perspective.  If an admin wants to disable FREEZE_IN_SMM, they get to k=
-eep the
-> > pieces.  And KVM definitely isn't going to override the admin, e.g. to =
-allow the
-> > guest to profile host SMM.
->=20
-> I'm not sure what you mean by "they get to keep the pieces." What is
-> the security problem with allowing L1 to freeze *guest-owned* PMCs
-> during SMM?
+>> From: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>> 
+>> Add a VM capability that allows userspace to select the G-stage page table
+>> format by setting HGATP.MODE on a per-VM basis.
+>> 
+>> Userspace enables the capability via KVM_ENABLE_CAP, passing the requested
+>> HGATP.MODE in args[0]. The request is rejected with -EINVAL if the mode is
+>> not supported by the host, and with -EBUSY if the VM has already been
+>> committed (e.g. vCPUs have been created or any memslot is populated).
+>> 
+>> KVM_CHECK_EXTENSION(KVM_CAP_RISCV_SET_HGATP_MODE) returns a bitmask of the
+>> HGATP.MODE formats supported by the host.
+>> 
+>> Signed-off-by: Fangyu Yu <fangyu.yu@linux.alibaba.com>
+>> ---
+>>  Documentation/virt/kvm/api.rst | 27 +++++++++++++++++++++++++++
+>>  arch/riscv/kvm/vm.c            | 19 +++++++++++++++++--
+>>  include/uapi/linux/kvm.h       |  1 +
+>>  3 files changed, 45 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>> index 01a3abef8abb..62dc120857c1 100644
+>> --- a/Documentation/virt/kvm/api.rst
+>> +++ b/Documentation/virt/kvm/api.rst
+>> @@ -8765,6 +8765,33 @@ helpful if user space wants to emulate instructions which are not
+>>  This capability can be enabled dynamically even if VCPUs were already
+>>  created and are running.
+>>  
+>> +7.47 KVM_CAP_RISCV_SET_HGATP_MODE
+>> +---------------------------------
+>> +
+>> +:Architectures: riscv
+>> +:Type: VM
+>> +:Parameters: args[0] contains the requested HGATP mode
+>> +:Returns:
+>> +  - 0 on success.
+>> +  - -EINVAL if args[0] is outside the range of HGATP modes supported by the
+>> +    hardware.
+>> +  - -EBUSY if vCPUs have already been created for the VM, if the VM has any
+>> +    non-empty memslots.
+>> +
+>
+>Currently the documentation for KVM_SET_ONE_REG has this for EBUSY
+>
+>  EBUSY    (riscv) changing register value not allowed after the vcpu
+>           has run at least once
+>
+>I suggest we update the KVM_SET_ONE_REG EBUSY description to say
+>
+>(riscv) changing register value not allowed. This may occur after the vcpu
+>has run at least once or when other setup has completed which depends on
+>the value of the register.
 
-To give L1 the option to freeze PMCs, KVM would also need to give L1 the op=
-tion
-to *not* freeze PMCs.  At that point, the guest can use its PMCs to profile=
- host
-SMM code.  Maybe even leverage a PMI to attack a poorly written SMM handler=
-.
+Thanks for the suggestion.
 
-In other words, unless I'm missing something, the only reasonable option is=
- to
-run the guest with FREEZE_IN_SMM=3D1, which means ignoring the guest's wish=
-es.
-Or I guess another way to look at it: you can have any color car you want, =
-as
-long as it's black :-)=20
+In this series the HGATP mode is configured via KVM_ENABLE_CAP at the VM level
+(kvm_vm_ioctl_enable_cap), not via KVM_SET_ONE_REG. Updating the KVM_SET_ONE_REG
+-EBUSY description might be misleading since it is vCPU one-reg specific and not
+directly related to this series.
+
+>> +This capability allows userspace to explicitly select the HGATP mode for
+>> +the VM. The selected mode must be supported by both KVM and hardware. This
+>> +capability must be enabled before creating any vCPUs or memslots.
+>> +
+>> +If this capability is not enabled, KVM will select the default HGATP mode
+>> +automatically. The default is the highest HGATP.MODE value supported by
+>> +hardware.
+>> +
+>> +``KVM_CHECK_EXTENSION(KVM_CAP_RISCV_SET_HGATP_MODE)`` returns a bitmask of
+>> +HGATP.MODE values supported by the host. A return value of 0 indicates that
+>> +the capability is not supported. Supported-mode bitmask use HGATP.MODE
+>> +encodings as defined by the RISC-V privileged specification, such as Sv39x4
+>> +corresponds to HGATP.MODE=8, so userspace should test bitmask & BIT(8).
+>> +
+>>  8. Other capabilities.
+>>  ======================
+>>  
+>> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+>> index 4b2156df40fc..7d1e1d257df5 100644
+>> --- a/arch/riscv/kvm/vm.c
+>> +++ b/arch/riscv/kvm/vm.c
+>> @@ -202,6 +202,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  	case KVM_CAP_VM_GPA_BITS:
+>>  		r = kvm_riscv_gstage_gpa_bits(&kvm->arch);
+>>  		break;
+>> +	case KVM_CAP_RISCV_SET_HGATP_MODE:
+>> +		r = kvm_riscv_get_hgatp_mode_mask();
+>> +		break;
+>>  	default:
+>>  		r = 0;
+>>  		break;
+>> @@ -212,12 +215,24 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  
+>>  int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+>>  {
+>> +	if (cap->flags)
+>> +		return -EINVAL;
+>> +
+>>  	switch (cap->cap) {
+>>  	case KVM_CAP_RISCV_MP_STATE_RESET:
+>> -		if (cap->flags)
+>> -			return -EINVAL;
+>>  		kvm->arch.mp_state_reset = true;
+>>  		return 0;
+>> +	case KVM_CAP_RISCV_SET_HGATP_MODE:
+>> +		if (!kvm_riscv_hgatp_mode_is_valid(cap->args[0]))
+>> +			return -EINVAL;
+>> +
+>> +		if (kvm->created_vcpus || !kvm_are_all_memslots_empty(kvm))
+>> +			return -EBUSY;
+>> +#ifdef CONFIG_64BIT
+>> +		kvm->arch.kvm_riscv_gstage_pgd_levels =
+>> +				3 + cap->args[0] - HGATP_MODE_SV39X4;
+>> +#endif
+>
+> 'if (IS_ENABLED(CONFIG_64BIT))' is preferred to the #ifdef.
+>
+>> +		return 0;
+>>  	default:
+>>  		return -EINVAL;
+>>  	}
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index dddb781b0507..00c02a880518 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -974,6 +974,7 @@ struct kvm_enable_cap {
+>>  #define KVM_CAP_GUEST_MEMFD_FLAGS 244
+>>  #define KVM_CAP_ARM_SEA_TO_USER 245
+>>  #define KVM_CAP_S390_USER_OPEREXEC 246
+>> +#define KVM_CAP_RISCV_SET_HGATP_MODE 247
+>>  
+>>  struct kvm_irq_routing_irqchip {
+>>  	__u32 irqchip;
+>> -- 
+>> 2.50.1
+>>
+>
+>Thanks,
+>drew
+
+Thanks,
+Fangyu
 
