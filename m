@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-70410-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70411-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YDnvJgtuhWnqBQQAu9opvQ
-	(envelope-from <kvm+bounces-70410-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 05:28:59 +0100
+	id kC2wAIhuhWnqBQQAu9opvQ
+	(envelope-from <kvm+bounces-70411-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 05:31:04 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2C1EFA119
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 05:28:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56A4DFA16A
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 05:31:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9A332300BE92
-	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 04:24:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1351430C96C7
+	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 04:24:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC0A3343D7D;
-	Fri,  6 Feb 2026 04:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 903F6344059;
+	Fri,  6 Feb 2026 04:22:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B4HIcUK1"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PtUNDhDS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE07834251B
-	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 04:22:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E33B343D6E
+	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 04:22:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770351721; cv=none; b=RblUIkn3IJmtUI545mEwpzJX5q8t/w+5jEdK4h8MeHPeCPiZvVw6VOStDTYAb0J9Kqi11kPZodZeQqyfH1eldDyznTqeqQjVJ1U4HNe7rybp/1Rw5dlHFIG3jHStrywiXEKjOYjleBF3ClE1QB+8PTfYGsZx+z0BKl+obrTndQs=
+	t=1770351722; cv=none; b=tlYg04cb1l/KMCm+BeekaaEnwMuy8F5FTokZ/YpAXqTtvN6bYehpxXhgR3Txy/q1UVNVf5GqLJ88aq/Bgb0Bc3W5lBZD8lV4RmEB0UGip6b0hy0uj/XjwLYrZmVWhfdX9M5WVJvw+0uU6r4bQnZb7sqFPjLivDrl43FV9s3L6kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770351721; c=relaxed/simple;
-	bh=xFaly016xfHWaZVtKRZ8uacyS0acpUhc8X1EjRw8woQ=;
+	s=arc-20240116; t=1770351722; c=relaxed/simple;
+	bh=LEN2BBMfkrCiFTErrp36T7nYUoOlWHSZh/jA0QsmVYQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QL2USwRQUmVM/2wiiy13CROiJJtFIw9n7tnjcPRACPHzy9EF+YWbLheEyQ1VYWyha1lSZYuaxApIaL/Z1BvI/zpvsKpsiv2RcImYsAWR6gEgct6jgNqEpJ12jt/JS22akT10mzDBVxvRcq5glpmxURIpT588SmrIZyEI60DGuA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=B4HIcUK1; arc=none smtp.client-ip=209.85.215.182
+	 MIME-Version; b=DhKeyDv6EmrxtkVd1ObiBPTfkUHofnzfCcX4T8sJ0Q7EJDuZSZC/0Bkss9k4fVarIppJvLcGN8G0qJXjO1l82KkbZbOY8MNHPZCp2gqxARNA0Yp/QIhYbYIqdBQB6/tegXMSt8mWJGkuqLQCHHiBHSvsPbnprnoasFRUrpvrCZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PtUNDhDS; arc=none smtp.client-ip=209.85.215.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-c227206e6dcso975743a12.2
-        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 20:22:01 -0800 (PST)
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-bde0f62464cso107099a12.2
+        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 20:22:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770351721; x=1770956521; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1770351722; x=1770956522; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=msDy34BXNBauha6BX6yiPrC2FkV4a2ByUqGrOK5VCFU=;
-        b=B4HIcUK1cMf2wyto2SIx1dyYPBJBUrMWIki9vWer/PYqOEJCSDm5dZoiFsnEsLLfCx
-         zk3fSTNDKzbmEQZApQ7bpIXBtw6tbRSHos4j1Msv2jt9Fz0HnSAvbXk55w3KL1Mt8Zqz
-         uDPC85/3mJBU4m51Su8paa+iyWNv/TN35mJWhVzxXUIVKDkr4aWWpoF722I1p5xmI1I8
-         CNH8sqmz6ymr3W0DZx0noZ4F7qPMZTgekC/nR67P1ZAn5OIAp4ORQuS9QLIXLk4hcLF6
-         rMuMoGxvZR2T6U5G7aSi1FnsxPjqrdf+6VTI4ccyDlukvyhlsi3USGMbRS0e8G/TARm4
-         rQFA==
+        bh=SLG6GFjz6gMYPUgqxMsYfEaJwPICYaIcXQ6XuIJ4wGg=;
+        b=PtUNDhDSqzqGuWILHAa625zoUdrUZfzmSxX0kQ9uua1nu235NsKxCL2YskmAej13kZ
+         leEQMu8yfKXGehADP1B6vthBC1+bUPucurKtXhSTnyzFrmBjPWgli7LHdQvUwIBdCQlk
+         ylNe/MF0xXWbFrmQIXXx0STk8weWaEdpgXqYZnZbnJuU4gHiEr225QClVbjGdIrCCTF0
+         xbt0eQ9pKqUT7Xvx7i96Tf163y8Va7/bmB8AdppE7fyCS8217X7vG9iQvEykcHUygUNs
+         0m6wP+EPQ8LNq6EuOTctkD3gS9Jqa/xAqCo2vOfYdfVbytTXtL9qI4f4mzYg8bqSAyj/
+         qaAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770351721; x=1770956521;
+        d=1e100.net; s=20230601; t=1770351722; x=1770956522;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=msDy34BXNBauha6BX6yiPrC2FkV4a2ByUqGrOK5VCFU=;
-        b=FPznzA1ozh+jhgVsC7+pek+tZOaF1qvFxH54SVJ/sFM4HOyo0HQk8bndPM2xmcs/Vd
-         cyYCZKTGOVgKi4iD2DwZAHHzkdgZB2BB9NA3xcP4ylBH4AAhYPW8A2hTSUXzHNyKAt+f
-         RmDQ8c+pouBEsm3FHazJHyNlmYWDGFfsD10ypv/GHlp+18RZDbcGSwYp+zk+STlSEKve
-         f9ygHUlfyiWKr5tMvfYyL2GaHhvvwEx7GJ66D9q41SGMhVvSkODs8RjwtX4rd/s7jg5a
-         oGO4Fm+vhrH3h+dN278c1KILRexF5PCuZgfT/tA0UXTSf1r3N/KiwWAzPxD4//f7a4JW
-         gYvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUaEbF7PaoDMp/ANXrMe+XczmQio9eCykMm0NXxff/YCMaxi+hTXNeik4Y5mD3jpwBsRu0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdpdU0o9M77AibbQ0aHQL69j2Jo/yr1cTL8vNbxxnBARJn+som
-	zpduzi9YNb/I8cFVhVFuZc3/8uRBSKPuJ8mo/vFDWvBH2mbEDv5YGDNRAkY24iCZ71A=
-X-Gm-Gg: AZuq6aIcNPjLblyDcJBCAGWLkG7puh6zKp0HWy5HkVC400I0b/M7JY8xrEsaWvpJnfc
-	2Rfj22A5/R74ZLWWyrPX4yL2SEAXUiBon3wtX9n/6ybNlfmecUcmLOddIWiQo5bQ4PXW1tHpJLB
-	eyGk/DxYaDWWkrv0t0oVCXS6cgiqPiCGKKVlbqHWBQ/QWLNXh99fFZlir0BSAWmS0XR8RkKHSlr
-	oTREkSwelUt2k5AacliYKhXaa9ufryyPkiN3TZww5yzlxnfkwqPTxQz2azFi0zSTVINEC+cTgKy
-	S/RPiGhwfGlxmunr4Om5m1quCpK+qx60a+OWvfochtOG9TQDIll+omg1AjSnUMLiUqDlEuombQD
-	R9pZo2/+dgz4P4XZonMDMIvG6nrfL4tS7Fyambdr+tjbqC2goxzwkkGQGgTmdhdK9xzbS9mY/Ob
-	fVkaAeBanHB3QupDJlp3clFLeRh36aKM2xz/rQqCrzIHeklKszfAJV5952+qhF5acI
-X-Received: by 2002:a17:90b:1650:b0:339:ec9c:b275 with SMTP id 98e67ed59e1d1-354b3c41871mr1384005a91.6.1770351721024;
+        bh=SLG6GFjz6gMYPUgqxMsYfEaJwPICYaIcXQ6XuIJ4wGg=;
+        b=A74BBBZu3wTkxBPdUjBL/D7eRXRqNJYSiypJvVx+ruleb5kHcsrXIPysffD3WAf7as
+         a1rXU8NgtpRhgEenKgam7PvoiXdSpSM5Sb8/bX5jsDcBDzrYaGBJfQWmEB+hHnYQySfM
+         dXlwJcyN5AlJGlAgq5FwmpU9N6jqfEZnNESJ24qLP4nixATMfrtlvcrY0NEOPBgWp5nX
+         6CkV8lXXGwyFenvI7ttEuuMcZ3PmATZgr9Hj4ivEZnLGzOex1AKbEv3kLkYLUCpwDngu
+         AOffp7OCxGchfxa92cnkgO9uYx0Hc7wdyqSBVlBhKdIVN6qj6Yf35sn0eBykjYAe2P5c
+         Nxvw==
+X-Forwarded-Encrypted: i=1; AJvYcCXEfhBFugBFV6CwLykzNXMC+6Of9BGUPZOtLCYNpwphFJshqiVtQ2S0cUGIhYp/p4l6OJw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHT7izlMoebOCQNQmS/dGFORXQnV0qisGuN6JXHLrObAIwcy8i
+	07gX9oz3slhDmpO79FdN08rPu8OEWu/H9/WZt2Ge5yyi746bQcl85QkGjNuNnGqyhfw=
+X-Gm-Gg: AZuq6aIJXNKXtCpLKBTt/BG5UCUpWw1wtaDl+S6RltqAceUGot7oTIHAKvIuJHBf08H
+	z21C4unWrX+JX0yCSrXDSbTXwUdpz3lu7aOWESdeI7VgosDHy02gOkRQJW90TnKT/Zn+yVyCN1c
+	aI4OsFGZvOOtYrqZD8Bo9J4LumUzvC/RR65Yr+f1dqSuxKQ0Eg+SICVjEio2Yhcm6x/HOu9uM5D
+	aUTLOSHBVZPUFNCgCIUQaNlK6nRgJbImPcQo9eVjNk07pBQgFi6c9ftN8R9AmdEWC94idyUlqid
+	BaWW0RhlouyA2ngoYBhRMXgPx1hsWeFIL55qmEFud9Re7Awt9AVQP6kEOdR82P1r3Dyy2xdlMij
+	RjGZqucAQjUSoCw5QhKM3H09Js37DEFiPw0AX9WLawHine5sthyX61rsI8qjk+jzjNaim6Oz5LD
+	mvThOPTLAUWnTi3d/ZUh2YFPiSZ8tuic4InXGNrTC4S1ecDWK9Lxt+icmQwZeOLWA6
+X-Received: by 2002:a17:90b:3a05:b0:33b:a906:e40 with SMTP id 98e67ed59e1d1-354b3c3823amr1156910a91.2.1770351721846;
         Thu, 05 Feb 2026 20:22:01 -0800 (PST)
 Received: from pc.taild8403c.ts.net (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8244168fdf5sm926914b3a.17.2026.02.05.20.22.00
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8244168fdf5sm926914b3a.17.2026.02.05.20.22.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Feb 2026 20:22:00 -0800 (PST)
+        Thu, 05 Feb 2026 20:22:01 -0800 (PST)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: anjo@rev.ng,
@@ -88,9 +88,9 @@ Cc: anjo@rev.ng,
 	kvm@vger.kernel.org,
 	qemu-arm@nongnu.org,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 01/12] target/arm/arm-qmp-cmds.c: make compilation unit common
-Date: Thu,  5 Feb 2026 20:21:39 -0800
-Message-ID: <20260206042150.912578-2-pierrick.bouvier@linaro.org>
+Subject: [PATCH v2 02/12] target/arm: extract helper-mve.h from helper.h
+Date: Thu,  5 Feb 2026 20:21:40 -0800
+Message-ID: <20260206042150.912578-3-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260206042150.912578-1-pierrick.bouvier@linaro.org>
 References: <20260206042150.912578-1-pierrick.bouvier@linaro.org>
@@ -100,169 +100,140 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[linaro.org:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70411-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70410-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[pierrick.bouvier@linaro.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linaro.org:email,linaro.org:dkim,linaro.org:mid]
-X-Rspamd-Queue-Id: C2C1EFA119
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linaro.org:email,linaro.org:dkim,linaro.org:mid]
+X-Rspamd-Queue-Id: 56A4DFA16A
 X-Rspamd-Action: no action
 
-Move gic_cap_kvm_probe to target/arm/kvm.c to remove #ifdef CONFIG_KVM.
+A few points to mention:
+- We mix helper prototypes and gen_helper definitions in a single header
+for convenience and to avoid headers boilerplate.
+- We rename existing tcg/helper-mve.h to helper-mve-defs.h to avoid
+conflict when including helper-mve.h.
+- We move mve helper_info definitions to tcg/mve_helper.c
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+We'll repeat the same for other helpers.
+This allow to get rid of TARGET_AARCH64 in target/arm/helper.h.
+
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- target/arm/kvm_arm.h      |  3 +++
- target/arm/arm-qmp-cmds.c | 27 +++------------------------
- target/arm/kvm-stub.c     |  5 +++++
- target/arm/kvm.c          | 21 +++++++++++++++++++++
- target/arm/meson.build    |  2 +-
- 5 files changed, 33 insertions(+), 25 deletions(-)
+ target/arm/helper-mve.h                            | 14 ++++++++++++++
+ target/arm/helper.h                                |  2 --
+ target/arm/tcg/{helper-mve.h => helper-mve-defs.h} |  0
+ target/arm/tcg/mve_helper.c                        |  4 ++++
+ target/arm/tcg/translate-mve.c                     |  1 +
+ target/arm/tcg/translate.c                         |  1 +
+ 6 files changed, 20 insertions(+), 2 deletions(-)
+ create mode 100644 target/arm/helper-mve.h
+ rename target/arm/tcg/{helper-mve.h => helper-mve-defs.h} (100%)
 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 6a9b6374a6d..cc0b374254e 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -11,6 +11,7 @@
- #ifndef QEMU_KVM_ARM_H
- #define QEMU_KVM_ARM_H
- 
-+#include "qapi/qapi-types-misc-arm.h"
- #include "system/kvm.h"
- #include "target/arm/cpu-qom.h"
- 
-@@ -263,4 +264,6 @@ void kvm_arm_enable_mte(Object *cpuobj, Error **errp);
- 
- void arm_cpu_kvm_set_irq(void *arm_cpu, int irq, int level);
- 
-+void arm_gic_cap_kvm_probe(GICCapability *v2, GICCapability *v3);
+diff --git a/target/arm/helper-mve.h b/target/arm/helper-mve.h
+new file mode 100644
+index 00000000000..32ef3f64661
+--- /dev/null
++++ b/target/arm/helper-mve.h
+@@ -0,0 +1,14 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
 +
++#ifndef HELPER_MVE_H
++#define HELPER_MVE_H
++
++#include "exec/helper-proto-common.h"
++#include "exec/helper-gen-common.h"
++
++#define HELPER_H "tcg/helper-mve-defs.h"
++#include "exec/helper-proto.h.inc"
++#include "exec/helper-gen.h.inc"
++#undef HELPER_H
++
++#endif /* HELPER_MVE_H */
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index f340a49a28a..44c7f3ed751 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -7,5 +7,3 @@
+ #include "tcg/helper-sve.h"
+ #include "tcg/helper-sme.h"
  #endif
-diff --git a/target/arm/arm-qmp-cmds.c b/target/arm/arm-qmp-cmds.c
-index 45df15de782..83ec95c290f 100644
---- a/target/arm/arm-qmp-cmds.c
-+++ b/target/arm/arm-qmp-cmds.c
-@@ -43,29 +43,6 @@ static GICCapability *gic_cap_new(int version)
-     return cap;
- }
+-
+-#include "tcg/helper-mve.h"
+diff --git a/target/arm/tcg/helper-mve.h b/target/arm/tcg/helper-mve-defs.h
+similarity index 100%
+rename from target/arm/tcg/helper-mve.h
+rename to target/arm/tcg/helper-mve-defs.h
+diff --git a/target/arm/tcg/mve_helper.c b/target/arm/tcg/mve_helper.c
+index 63ddcf3fecf..f33642df1f9 100644
+--- a/target/arm/tcg/mve_helper.c
++++ b/target/arm/tcg/mve_helper.c
+@@ -19,6 +19,7 @@
  
--static inline void gic_cap_kvm_probe(GICCapability *v2, GICCapability *v3)
--{
--#ifdef CONFIG_KVM
--    int fdarray[3];
--
--    if (!kvm_arm_create_scratch_host_vcpu(fdarray, NULL)) {
--        return;
--    }
--
--    /* Test KVM GICv2 */
--    if (kvm_device_supported(fdarray[1], KVM_DEV_TYPE_ARM_VGIC_V2)) {
--        v2->kernel = true;
--    }
--
--    /* Test KVM GICv3 */
--    if (kvm_device_supported(fdarray[1], KVM_DEV_TYPE_ARM_VGIC_V3)) {
--        v3->kernel = true;
--    }
--
--    kvm_arm_destroy_scratch_host_vcpu(fdarray);
--#endif
--}
--
- GICCapabilityList *qmp_query_gic_capabilities(Error **errp)
+ #include "qemu/osdep.h"
+ #include "cpu.h"
++#include "helper-mve.h"
+ #include "internals.h"
+ #include "vec_internal.h"
+ #include "exec/helper-proto.h"
+@@ -27,6 +28,9 @@
+ #include "fpu/softfloat.h"
+ #include "crypto/clmul.h"
+ 
++#define HELPER_H "tcg/helper-mve-defs.h"
++#include "exec/helper-info.c.inc"
++
+ static uint16_t mve_eci_mask(CPUARMState *env)
  {
-     GICCapabilityList *head = NULL;
-@@ -74,7 +51,9 @@ GICCapabilityList *qmp_query_gic_capabilities(Error **errp)
-     v2->emulated = true;
-     v3->emulated = true;
+     /*
+diff --git a/target/arm/tcg/translate-mve.c b/target/arm/tcg/translate-mve.c
+index b1a8d6a65c0..4ca88f4d3a3 100644
+--- a/target/arm/tcg/translate-mve.c
++++ b/target/arm/tcg/translate-mve.c
+@@ -18,6 +18,7 @@
+  */
  
--    gic_cap_kvm_probe(v2, v3);
-+    if (kvm_enabled()) {
-+        arm_gic_cap_kvm_probe(v2, v3);
-+    }
+ #include "qemu/osdep.h"
++#include "helper-mve.h"
+ #include "translate.h"
+ #include "translate-a32.h"
  
-     QAPI_LIST_PREPEND(head, v2);
-     QAPI_LIST_PREPEND(head, v3);
-diff --git a/target/arm/kvm-stub.c b/target/arm/kvm-stub.c
-index c93462c5b9b..ea67deea520 100644
---- a/target/arm/kvm-stub.c
-+++ b/target/arm/kvm-stub.c
-@@ -124,3 +124,8 @@ bool kvm_arm_cpu_post_load(ARMCPU *cpu)
- {
-     g_assert_not_reached();
- }
-+
-+void arm_gic_cap_kvm_probe(GICCapability *v2, GICCapability *v3)
-+{
-+    g_assert_not_reached();
-+}
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 3e35570f15f..ded582e0da0 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -2580,3 +2580,24 @@ void arm_cpu_kvm_set_irq(void *arm_cpu, int irq, int level)
-     }
-     kvm_arm_set_irq(cs->cpu_index, KVM_ARM_IRQ_TYPE_CPU, irq_id, !!level);
- }
-+
-+void arm_gic_cap_kvm_probe(GICCapability *v2, GICCapability *v3)
-+{
-+    int fdarray[3];
-+
-+    if (!kvm_arm_create_scratch_host_vcpu(fdarray, NULL)) {
-+        return;
-+    }
-+
-+    /* Test KVM GICv2 */
-+    if (kvm_device_supported(fdarray[1], KVM_DEV_TYPE_ARM_VGIC_V2)) {
-+        v2->kernel = true;
-+    }
-+
-+    /* Test KVM GICv3 */
-+    if (kvm_device_supported(fdarray[1], KVM_DEV_TYPE_ARM_VGIC_V3)) {
-+        v3->kernel = true;
-+    }
-+
-+    kvm_arm_destroy_scratch_host_vcpu(fdarray);
-+}
-diff --git a/target/arm/meson.build b/target/arm/meson.build
-index 462c71148d2..1a1bcde2601 100644
---- a/target/arm/meson.build
-+++ b/target/arm/meson.build
-@@ -16,7 +16,7 @@ arm_common_ss.add(files(
-   'mmuidx.c',
- ))
+diff --git a/target/arm/tcg/translate.c b/target/arm/tcg/translate.c
+index 63735d97898..febb7f1532a 100644
+--- a/target/arm/tcg/translate.c
++++ b/target/arm/tcg/translate.c
+@@ -28,6 +28,7 @@
+ #include "cpregs.h"
+ #include "exec/helper-proto.h"
+ #include "exec/target_page.h"
++#include "helper-mve.h"
  
--arm_system_ss.add(files(
-+arm_common_system_ss.add(files(
-   'arm-qmp-cmds.c',
- ))
- arm_system_ss.add(when: 'CONFIG_KVM', if_true: files('hyp_gdbstub.c', 'kvm.c'))
+ #define HELPER_H "helper.h"
+ #include "exec/helper-info.c.inc"
 -- 
 2.47.3
 
