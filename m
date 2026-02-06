@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-70501-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70502-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YBqTEP8+hmnzLAQAu9opvQ
-	(envelope-from <kvm+bounces-70501-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 20:20:31 +0100
+	id wFwyEKM9hmnzLAQAu9opvQ
+	(envelope-from <kvm+bounces-70502-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 20:14:43 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A71BF102A24
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 20:20:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1AB310289D
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 20:14:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CFCD530E8004
-	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 19:12:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D4DC33025D08
+	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 19:12:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 367EC441027;
-	Fri,  6 Feb 2026 19:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7E44418D9;
+	Fri,  6 Feb 2026 19:09:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gETokG6l"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NApjlN/g"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC8D44104E
-	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 19:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA91C4418CA
+	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 19:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770404989; cv=none; b=gnD8v9uLJcMHptGfI/+vnZOddSgrlvkA0LNd017KC6/Yx77ZH2oBZXAUzYKA48yNv2PwS2is3/QoJA5yX9jiw0yh7MwBtku4wo9+AnHPfSBGDNJsSz7EDqjaIspJ/p6PY29qsaUtXej/1h5j+LSuhxFgz//lwLgtwE+3PvdqUiM=
+	t=1770404991; cv=none; b=rE+3A9CoMCq+Yo0D9hvc1p2IjJyc6n6FyUZYpyToO0oeLGxit7LFaCnPn810zPY4mFiWv5j1ZiwYOHMzw2B+NqO+CdPDCEs2l8+tq/W9YF1fZ67NGMU4jvk4rtClkPqB5q6khvrCyKF01g0m0x4KuLqL0PXWtdDrhlwhjxgLnJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770404989; c=relaxed/simple;
-	bh=gleIQRw2r4X/Kz/Vfx/Tr5yKLD3hObEGC9AunVuekOY=;
+	s=arc-20240116; t=1770404991; c=relaxed/simple;
+	bh=tChEFl18ibAzaJ2GEzMTWsWRSgUzH5SqTZHdeomPuqI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RY0oGTSB3ahxDJ0lhjMTiptYQTAFVpdIkJkZuh95+r3V7t6vsQBMbV8yaN4Lz+c6xm5eXmOa1uPguo3xVeB/6dZjwwqknPkzPK94MFr9zjt8ctJjbfgDQZSNnIu67Yw5ZcGn75hvCxbahbPQNOUF7devILAVviPJUHdBQHTV8DQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gETokG6l; arc=none smtp.client-ip=91.218.175.180
+	 MIME-Version; b=X7HSO5uQhMSrQt6GCLe0oY8dBYJAHxuDgmf/GdEDth3PuZ0mWLDH/36BcOPBdvr7j4w63nWvRFDmS1JZfO4Ft6+zKXVfFx3E+V98CYPkOJyvWphGgbKfKjAtUiUPTyoqpM8bgb1+ltXr4VegyT3rbpgA3NZ7Zcm9IavXYRexJV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NApjlN/g; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770404987;
+	t=1770404989;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6qhj1bqjZlmV/jHPCIYZDZlaIwD6o3RqMwKQ5tOk0gw=;
-	b=gETokG6lkSibIqZkSHAu+kSG3fr9THNpEp8IjER1loTLa/NKKBAy/0edjja7gO1zQz2BGV
-	jLWPxAmyEdkaXDhCiy/OwkicwQyfVQht5BwzS1Ox8o8YH1w+oCeylauMfw0C9zS1B39+FU
-	M87OPTcJRFJQY1r5s8lH+42/DvqvE0g=
+	bh=ogj2BvymrjP7EHk/aTikaXPciJhAL1YMt9xpscARaOc=;
+	b=NApjlN/g4iu2vmC3mVXQ9kED1ZA00hE/9PL1K4n0pNqyysf1X6dKzzaWhn8MUir80BLGbP
+	xOeGtC8zeJt9mleG1tbQRnVzPH5O3nQn6UD6UquVm8an1rDZFRCnOFGPQAIee3HTN/E3PD
+	ggH3kA2/IK+QCoAAAAjllRFzUpQHGT4=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH v5 23/26] KVM: nSVM: Cache all used fields from VMCB12
-Date: Fri,  6 Feb 2026 19:08:48 +0000
-Message-ID: <20260206190851.860662-24-yosry.ahmed@linux.dev>
+Subject: [PATCH v5 24/26] KVM: nSVM: Restrict mapping VMCB12 on nested VMRUN
+Date: Fri,  6 Feb 2026 19:08:49 +0000
+Message-ID: <20260206190851.860662-25-yosry.ahmed@linux.dev>
 In-Reply-To: <20260206190851.860662-1-yosry.ahmed@linux.dev>
 References: <20260206190851.860662-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -70,338 +70,154 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	URIBL_MULTI_FAIL(0.00)[linux.dev:server fail];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-70501-lists,kvm=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70502-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[yosry.ahmed@linux.dev,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-0.996];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: A71BF102A24
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: C1AB310289D
 X-Rspamd-Action: no action
 
-Currently, most fields used from VMCB12 are cached in
-svm->nested.{ctl/save}. This is mainly to avoid TOC-TOU bugs. However,
-for the save area, only the fields used in the consistency checks (i.e.
-nested_vmcb_check_save()) were being cached. Other fields are read
-directly from guest memory in nested_vmcb02_prepare_save().
+All accesses to the VMCB12 in the guest memory on nested VMRUN are
+limited to nested_svm_vmrun() and nested_svm_failed_vmrun(). However,
+the VMCB12 remains mapped throughout nested_svm_vmrun().  Mapping and
+unmapping around usages is possible, but it becomes easy-ish to
+introduce bugs where 'vmcb12' is used after being unmapped.
 
-While probably benign, this still makes it possible for TOC-TOU bugs to
-happen. For example, RAX, RSP, and RIP are read twice, once to store in
-VMCB02, and once to store in vcpu->arch.regs. It is possible for the
-guest to modify the value between both reads, potentially causing nasty
-bugs.
+Move reading the VMCB12 and copying to cache from nested_svm_vmrun()
+into a new helper, nested_svm_copy_vmcb12_to_cache(),  that maps the
+VMCB12, caches the needed fields, and unmaps it. Use
+kvm_vcpu_map_readonly() as only reading the VMCB12 is needed.
 
-Harden against such bugs by caching everything in svm->nested.save.
-Cache all the needed fields, and keep all accesses to the VMCB12
-strictly in nested_svm_vmrun() for caching and early error injection.
-Following changes will further limit the access to the VMCB12 in the
-nested VMRUN path.
-
-Introduce vmcb12_is_dirty() to use with the cached control fields
-instead of vmcb_is_dirty(), similar to vmcb12_is_intercept().
-
-Opportunistically order the copies in __nested_copy_vmcb_save_to_cache()
-by the order in which the fields are defined in struct vmcb_save_area.
+Similarly, move mapping the VMCB12 on VMRUN failure into
+nested_svm_failed_vmrun(). Inject a triple fault if the mapping fails,
+similar to nested_svm_vmexit().
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- arch/x86/kvm/svm/nested.c | 116 ++++++++++++++++++++++----------------
- arch/x86/kvm/svm/svm.c    |   2 +-
- arch/x86/kvm/svm/svm.h    |  27 ++++++++-
- 3 files changed, 93 insertions(+), 52 deletions(-)
+ arch/x86/kvm/svm/nested.c | 53 ++++++++++++++++++++++++++++-----------
+ 1 file changed, 38 insertions(+), 15 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 76118bfcb183..b1f3e9df2cd5 100644
+index b1f3e9df2cd5..0a7bb01f5404 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -544,19 +544,34 @@ void nested_copy_vmcb_control_to_cache(struct vcpu_svm *svm,
- static void __nested_copy_vmcb_save_to_cache(struct vmcb_save_area_cached *to,
- 					     struct vmcb_save_area *from)
- {
--	/*
--	 * Copy only fields that are validated, as we need them
--	 * to avoid TOC/TOU races.
--	 */
-+	to->es = from->es;
- 	to->cs = from->cs;
-+	to->ss = from->ss;
-+	to->ds = from->ds;
-+	to->gdtr = from->gdtr;
-+	to->idtr = from->idtr;
-+
-+	to->cpl = from->cpl;
- 
- 	to->efer = from->efer;
--	to->cr0 = from->cr0;
--	to->cr3 = from->cr3;
- 	to->cr4 = from->cr4;
--
--	to->dr6 = from->dr6;
-+	to->cr3 = from->cr3;
-+	to->cr0 = from->cr0;
- 	to->dr7 = from->dr7;
-+	to->dr6 = from->dr6;
-+
-+	to->rflags = from->rflags;
-+	to->rip = from->rip;
-+	to->rsp = from->rsp;
-+
-+	to->s_cet = from->s_cet;
-+	to->ssp = from->ssp;
-+	to->isst_addr = from->isst_addr;
-+
-+	to->rax = from->rax;
-+	to->cr2 = from->cr2;
-+
-+	svm_copy_lbrs(to, from);
+@@ -1102,26 +1102,56 @@ static void __nested_svm_vmexit(struct vcpu_svm *svm, struct vmcb *vmcb12)
+ 		kvm_queue_exception(vcpu, DB_VECTOR);
  }
  
- void nested_copy_vmcb_save_to_cache(struct vcpu_svm *svm,
-@@ -692,8 +707,10 @@ void nested_vmcb02_compute_g_pat(struct vcpu_svm *svm)
- 	svm->nested.vmcb02.ptr->save.g_pat = svm->vmcb01.ptr->save.g_pat;
- }
- 
--static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12)
-+static void nested_vmcb02_prepare_save(struct vcpu_svm *svm)
- {
-+	struct vmcb_ctrl_area_cached *control = &svm->nested.ctl;
-+	struct vmcb_save_area_cached *save = &svm->nested.save;
- 	bool new_vmcb12 = false;
- 	struct vmcb *vmcb01 = svm->vmcb01.ptr;
- 	struct vmcb *vmcb02 = svm->nested.vmcb02.ptr;
-@@ -709,48 +726,48 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
- 		svm->nested.force_msr_bitmap_recalc = true;
- 	}
- 
--	if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_SEG))) {
--		vmcb02->save.es = vmcb12->save.es;
--		vmcb02->save.cs = vmcb12->save.cs;
--		vmcb02->save.ss = vmcb12->save.ss;
--		vmcb02->save.ds = vmcb12->save.ds;
--		vmcb02->save.cpl = vmcb12->save.cpl;
-+	if (unlikely(new_vmcb12 || vmcb12_is_dirty(control, VMCB_SEG))) {
-+		vmcb02->save.es = save->es;
-+		vmcb02->save.cs = save->cs;
-+		vmcb02->save.ss = save->ss;
-+		vmcb02->save.ds = save->ds;
-+		vmcb02->save.cpl = save->cpl;
- 		vmcb_mark_dirty(vmcb02, VMCB_SEG);
- 	}
- 
--	if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_DT))) {
--		vmcb02->save.gdtr = vmcb12->save.gdtr;
--		vmcb02->save.idtr = vmcb12->save.idtr;
-+	if (unlikely(new_vmcb12 || vmcb12_is_dirty(control, VMCB_DT))) {
-+		vmcb02->save.gdtr = save->gdtr;
-+		vmcb02->save.idtr = save->idtr;
- 		vmcb_mark_dirty(vmcb02, VMCB_DT);
- 	}
- 
- 	if (guest_cpu_cap_has(vcpu, X86_FEATURE_SHSTK) &&
--	    (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_CET)))) {
--		vmcb02->save.s_cet  = vmcb12->save.s_cet;
--		vmcb02->save.isst_addr = vmcb12->save.isst_addr;
--		vmcb02->save.ssp = vmcb12->save.ssp;
-+	    (unlikely(new_vmcb12 || vmcb12_is_dirty(control, VMCB_CET)))) {
-+		vmcb02->save.s_cet  = save->s_cet;
-+		vmcb02->save.isst_addr = save->isst_addr;
-+		vmcb02->save.ssp = save->ssp;
- 		vmcb_mark_dirty(vmcb02, VMCB_CET);
- 	}
- 
--	kvm_set_rflags(vcpu, vmcb12->save.rflags | X86_EFLAGS_FIXED);
-+	kvm_set_rflags(vcpu, save->rflags | X86_EFLAGS_FIXED);
- 
- 	svm_set_efer(vcpu, svm->nested.save.efer);
- 
- 	svm_set_cr0(vcpu, svm->nested.save.cr0);
- 	svm_set_cr4(vcpu, svm->nested.save.cr4);
- 
--	svm->vcpu.arch.cr2 = vmcb12->save.cr2;
-+	svm->vcpu.arch.cr2 = save->cr2;
- 
--	kvm_rax_write(vcpu, vmcb12->save.rax);
--	kvm_rsp_write(vcpu, vmcb12->save.rsp);
--	kvm_rip_write(vcpu, vmcb12->save.rip);
-+	kvm_rax_write(vcpu, save->rax);
-+	kvm_rsp_write(vcpu, save->rsp);
-+	kvm_rip_write(vcpu, save->rip);
- 
- 	/* In case we don't even reach vcpu_run, the fields are not updated */
--	vmcb02->save.rax = vmcb12->save.rax;
--	vmcb02->save.rsp = vmcb12->save.rsp;
--	vmcb02->save.rip = vmcb12->save.rip;
-+	vmcb02->save.rax = save->rax;
-+	vmcb02->save.rsp = save->rsp;
-+	vmcb02->save.rip = save->rip;
- 
--	if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_DR))) {
-+	if (unlikely(new_vmcb12 || vmcb12_is_dirty(control, VMCB_DR))) {
- 		vmcb02->save.dr7 = svm->nested.save.dr7 | DR7_FIXED_1;
- 		svm->vcpu.arch.dr6  = svm->nested.save.dr6 | DR6_ACTIVE_LOW;
- 		vmcb_mark_dirty(vmcb02, VMCB_DR);
-@@ -762,7 +779,7 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
- 		 * Reserved bits of DEBUGCTL are ignored.  Be consistent with
- 		 * svm_set_msr's definition of reserved bits.
- 		 */
--		svm_copy_lbrs(&vmcb02->save, &vmcb12->save);
-+		svm_copy_lbrs(&vmcb02->save, save);
- 		vmcb02->save.dbgctl &= ~DEBUGCTL_RESERVED_BITS;
- 	} else {
- 		svm_copy_lbrs(&vmcb02->save, &vmcb01->save);
-@@ -978,28 +995,29 @@ static void nested_svm_copy_common_state(struct vmcb *from_vmcb, struct vmcb *to
- 	to_vmcb->save.spec_ctrl = from_vmcb->save.spec_ctrl;
- }
- 
--int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
--			 struct vmcb *vmcb12, bool from_vmrun)
-+int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa, bool from_vmrun)
+-static void nested_svm_vmrun_error_vmexit(struct kvm_vcpu *vcpu, struct vmcb *vmcb12)
++static void nested_svm_vmrun_error_vmexit(struct kvm_vcpu *vcpu, u64 vmcb12_gpa)
  {
  	struct vcpu_svm *svm = to_svm(vcpu);
-+	struct vmcb_ctrl_area_cached *control = &svm->nested.ctl;
-+	struct vmcb_save_area_cached *save = &svm->nested.save;
- 	int ret;
++	struct kvm_host_map map;
++	struct vmcb *vmcb12;
++	int r;
  
- 	trace_kvm_nested_vmenter(svm->vmcb->save.rip,
- 				 vmcb12_gpa,
--				 vmcb12->save.rip,
--				 vmcb12->control.int_ctl,
--				 vmcb12->control.event_inj,
--				 vmcb12->control.misc_ctl,
--				 vmcb12->control.nested_cr3,
--				 vmcb12->save.cr3,
-+				 save->rip,
-+				 control->int_ctl,
-+				 control->event_inj,
-+				 control->misc_ctl,
-+				 control->nested_cr3,
-+				 save->cr3,
- 				 KVM_ISA_SVM);
+ 	WARN_ON_ONCE(svm->vmcb == svm->nested.vmcb02.ptr);
  
--	trace_kvm_nested_intercepts(vmcb12->control.intercepts[INTERCEPT_CR] & 0xffff,
--				    vmcb12->control.intercepts[INTERCEPT_CR] >> 16,
--				    vmcb12->control.intercepts[INTERCEPT_EXCEPTION],
--				    vmcb12->control.intercepts[INTERCEPT_WORD3],
--				    vmcb12->control.intercepts[INTERCEPT_WORD4],
--				    vmcb12->control.intercepts[INTERCEPT_WORD5]);
-+	trace_kvm_nested_intercepts(control->intercepts[INTERCEPT_CR] & 0xffff,
-+				    control->intercepts[INTERCEPT_CR] >> 16,
-+				    control->intercepts[INTERCEPT_EXCEPTION],
-+				    control->intercepts[INTERCEPT_WORD3],
-+				    control->intercepts[INTERCEPT_WORD4],
-+				    control->intercepts[INTERCEPT_WORD5]);
+ 	leave_guest_mode(vcpu);
  
- 	svm->nested.vmcb12_gpa = vmcb12_gpa;
- 
-@@ -1034,8 +1052,8 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
- 	nested_svm_copy_common_state(svm->vmcb01.ptr, svm->nested.vmcb02.ptr);
- 
- 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
--	nested_vmcb02_prepare_control(svm, vmcb12->save.rip, vmcb12->save.cs.base);
--	nested_vmcb02_prepare_save(svm, vmcb12);
-+	nested_vmcb02_prepare_control(svm, save->rip, save->cs.base);
-+	nested_vmcb02_prepare_save(svm);
- 
- 	if (!from_vmrun)
- 		kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
-@@ -1155,7 +1173,7 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
- 
- 	svm->nested.nested_run_pending = 1;
- 
--	if (enter_svm_guest_mode(vcpu, vmcb12_gpa, vmcb12, true)) {
-+	if (enter_svm_guest_mode(vcpu, vmcb12_gpa, true)) {
- 		svm->nested.nested_run_pending = 0;
- 		svm->nmi_l1_to_l2 = false;
- 		svm->soft_int_injected = false;
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 0e197a2eb339..364915f42e13 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4881,7 +4881,7 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const union kvm_smram *smram)
- 	vmcb12 = map.hva;
- 	nested_copy_vmcb_control_to_cache(svm, &vmcb12->control);
- 	nested_copy_vmcb_save_to_cache(svm, &vmcb12->save);
--	ret = enter_svm_guest_mode(vcpu, smram64->svm_guest_vmcb_gpa, vmcb12, false);
-+	ret = enter_svm_guest_mode(vcpu, smram64->svm_guest_vmcb_gpa, false);
- 
- 	if (ret)
- 		goto unmap_save;
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 304328c33e96..388aaa5d63d2 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -140,13 +140,32 @@ struct kvm_vmcb_info {
- };
- 
- struct vmcb_save_area_cached {
-+	struct vmcb_seg es;
- 	struct vmcb_seg cs;
-+	struct vmcb_seg ss;
-+	struct vmcb_seg ds;
-+	struct vmcb_seg gdtr;
-+	struct vmcb_seg idtr;
-+	u8 cpl;
- 	u64 efer;
- 	u64 cr4;
- 	u64 cr3;
- 	u64 cr0;
- 	u64 dr7;
- 	u64 dr6;
-+	u64 rflags;
-+	u64 rip;
-+	u64 rsp;
-+	u64 s_cet;
-+	u64 ssp;
-+	u64 isst_addr;
-+	u64 rax;
-+	u64 cr2;
-+	u64 dbgctl;
-+	u64 br_from;
-+	u64 br_to;
-+	u64 last_excp_from;
-+	u64 last_excp_to;
- };
- 
- struct vmcb_ctrl_area_cached {
-@@ -421,6 +440,11 @@ static inline bool vmcb_is_dirty(struct vmcb *vmcb, int bit)
-         return !test_bit(bit, (unsigned long *)&vmcb->control.clean);
- }
- 
-+static inline bool vmcb12_is_dirty(struct vmcb_ctrl_area_cached *control, int bit)
-+{
-+	return !test_bit(bit, (unsigned long *)&control->clean);
++	r = kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map);
++	if (r) {
++		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
++		return;
++	}
++
++	vmcb12 = map.hva;
+ 	vmcb12->control.exit_code = SVM_EXIT_ERR;
+ 	vmcb12->control.exit_info_1 = 0;
+ 	vmcb12->control.exit_info_2 = 0;
+ 	__nested_svm_vmexit(svm, vmcb12);
++
++	kvm_vcpu_unmap(vcpu, &map);
 +}
 +
- static __always_inline struct vcpu_svm *to_svm(struct kvm_vcpu *vcpu)
++static int nested_svm_copy_vmcb12_to_cache(struct kvm_vcpu *vcpu, u64 vmcb12_gpa)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++	struct kvm_host_map map;
++	struct vmcb *vmcb12;
++	int r;
++
++	r = kvm_vcpu_map_readonly(vcpu, gpa_to_gfn(vmcb12_gpa), &map);
++	if (r)
++		return r;
++
++	vmcb12 = map.hva;
++
++	nested_copy_vmcb_control_to_cache(svm, &vmcb12->control);
++	nested_copy_vmcb_save_to_cache(svm, &vmcb12->save);
++
++	kvm_vcpu_unmap(vcpu, &map);
++	return 0;
+ }
+ 
+ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
  {
- 	return container_of(vcpu, struct vcpu_svm, vcpu);
-@@ -785,8 +809,7 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	int ret;
+-	struct vmcb *vmcb12;
+-	struct kvm_host_map map;
+ 	u64 vmcb12_gpa;
+ 	struct vmcb *vmcb01 = svm->vmcb01.ptr;
  
- int __init nested_svm_init_msrpm_merge_offsets(void);
+@@ -1142,22 +1172,17 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
+ 		return ret;
+ 	}
  
--int enter_svm_guest_mode(struct kvm_vcpu *vcpu,
--			 u64 vmcb_gpa, struct vmcb *vmcb12, bool from_vmrun);
-+int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb_gpa, bool from_vmrun);
- void svm_leave_nested(struct kvm_vcpu *vcpu);
- void svm_free_nested(struct vcpu_svm *svm);
- int svm_allocate_nested(struct vcpu_svm *svm);
++	if (WARN_ON_ONCE(!svm->nested.initialized))
++		return -EINVAL;
++
+ 	vmcb12_gpa = svm->vmcb->save.rax;
+-	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map)) {
++	if (nested_svm_copy_vmcb12_to_cache(vcpu, vmcb12_gpa)) {
+ 		kvm_inject_gp(vcpu, 0);
+ 		return 1;
+ 	}
+ 
+ 	ret = kvm_skip_emulated_instruction(vcpu);
+ 
+-	vmcb12 = map.hva;
+-
+-	if (WARN_ON_ONCE(!svm->nested.initialized))
+-		return -EINVAL;
+-
+-	nested_copy_vmcb_control_to_cache(svm, &vmcb12->control);
+-	nested_copy_vmcb_save_to_cache(svm, &vmcb12->save);
+-
+ 	/*
+ 	 * Since vmcb01 is not in use, we can use it to store some of the L1
+ 	 * state.
+@@ -1178,11 +1203,9 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
+ 		svm->nmi_l1_to_l2 = false;
+ 		svm->soft_int_injected = false;
+ 
+-		nested_svm_vmrun_error_vmexit(vcpu, vmcb12);
++		nested_svm_vmrun_error_vmexit(vcpu, vmcb12_gpa);
+ 	}
+ 
+-	kvm_vcpu_unmap(vcpu, &map);
+-
+ 	return ret;
+ }
+ 
 -- 
 2.53.0.rc2.204.g2597b5adb4-goog
 
