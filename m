@@ -1,42 +1,42 @@
-Return-Path: <kvm+bounces-70474-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70476-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UPWSCc43hmmcLAQAu9opvQ
-	(envelope-from <kvm+bounces-70474-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 19:49:50 +0100
+	id 4Ok1LfQ3hmmcLAQAu9opvQ
+	(envelope-from <kvm+bounces-70476-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 19:50:28 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CABF91023FF
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 19:49:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CDB102421
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 19:50:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B4F2B301D999
-	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 18:36:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9C7F630598AC
+	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 18:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98090426D0E;
-	Fri,  6 Feb 2026 18:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90661426D23;
+	Fri,  6 Feb 2026 18:37:02 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 927AD3AE6E6;
-	Fri,  6 Feb 2026 18:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1008413238;
+	Fri,  6 Feb 2026 18:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770402962; cv=none; b=Y4lUDGaj7aYaZgvnxiVzeVvESTopA7a6i+jwp+zF8zJLnBe5qOuQCtJkZZKaCiywrR6v6gGkt+Hi7LewlyP25tiAoU6MEuZCVeExvDbsMlfxoumge7js6zbhmLWhBT7OECJ4IvSj6t/dRUOETJErRSx2pLe7lvqHG7kDAL0UsGE=
+	t=1770403022; cv=none; b=lbaw9RfPIOSrEJ7wxTE8CmJ3uqWlGMG4TEaFCnCA0hD7QF7qhgKm+lWws57m9XbtXgVh56uvu8qox+nN2X5aI0dftPv81xciQV4iwfUX190NuT5xzmNjH0W5UuckguAEFdeJ3QqI2sI9hGFUT0B5cebVbWb8k7i1EjgjZ61+3DA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770402962; c=relaxed/simple;
-	bh=fAOnpi1k96zhhNFrBl7HalgkZEIqUwurYuGb5lXndXk=;
+	s=arc-20240116; t=1770403022; c=relaxed/simple;
+	bh=CehQn6ShgSVIZOBhGRqrC5UlJXuOMh3G+/j9hX2CJWM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N7g1FoFvVpPszucxi6YsSv5Ejd2feGwhG9J+iGeYH894h/TfMjJYQ7ViAZLWSa+Iiqh8W0847jtCGMHKMbZjoocMgZsSJDNBRKiHjc3UFHPKPVg78jrk6PwQSU0B8nc91l8JP4rleXomMoDYTEFjo8V5MIVXfU4R6n+nLGnjfjU=
+	 Content-Type:Content-Disposition:In-Reply-To; b=N3JD5l30A8un2Nafj/Ym3um8A5ljHStj1PI0hHnCnmwNizgfXMiywcbmuWtcI0g+BzwpxJ7Tm0fxmqTmh22oMM/M1TSkdC+1R/wzsRqDaXTgFzVgH3A6q2ngIjBgDHZFwCnstSf7V6qlX+rqY0Wx1ukCf4dP+EgCygyIEpXvlV8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA525339;
-	Fri,  6 Feb 2026 10:35:54 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B738E339;
+	Fri,  6 Feb 2026 10:36:54 -0800 (PST)
 Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E124E3F632;
-	Fri,  6 Feb 2026 10:35:57 -0800 (PST)
-Date: Fri, 6 Feb 2026 18:35:51 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 763D53F632;
+	Fri,  6 Feb 2026 10:36:58 -0800 (PST)
+Date: Fri, 6 Feb 2026 18:36:52 +0000
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Yeoreum Yun <yeoreum.yun@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -47,10 +47,10 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	lpieralisi@kernel.org, scott@os.amperecomputing.com,
 	joey.gouly@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com,
 	shuah@kernel.org, mark.rutland@arm.com, arnd@arndb.de
-Subject: Re: [PATCH v12 0/7] support FEAT_LSUI
-Message-ID: <aYY0h1DtvDpEyekd@arm.com>
+Subject: Re: [PATCH v12 1/7] arm64: Kconfig: add support for LSUI
+Message-ID: <aYY0xOdUxn39ZPZh@arm.com>
 References: <20260121190622.2218669-1-yeoreum.yun@arm.com>
- <aYWuqTqM5MvudI5V@e129823.arm.com>
+ <20260121190622.2218669-2-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aYWuqTqM5MvudI5V@e129823.arm.com>
+In-Reply-To: <20260121190622.2218669-2-yeoreum.yun@arm.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -70,7 +70,7 @@ X-Spamd-Result: default: False [-1.36 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70474-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70476-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -84,17 +84,25 @@ X-Spamd-Result: default: False [-1.36 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.875];
+	NEURAL_HAM(-0.00)[-0.872];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,arm.com:mid]
-X-Rspamd-Queue-Id: CABF91023FF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,arm.com:mid,arm.com:email]
+X-Rspamd-Queue-Id: 20CDB102421
 X-Rspamd-Action: no action
 
-On Fri, Feb 06, 2026 at 09:04:41AM +0000, Yeoreum Yun wrote:
-> Gentle ping in case of forgotten.
+On Wed, Jan 21, 2026 at 07:06:16PM +0000, Yeoreum Yun wrote:
+> Since Armv9.6, FEAT_LSUI supplies the load/store instructions for
+> previleged level to access to access user memory without clearing
+> PSTATE.PAN bit.
+> 
+> Add Kconfig option entry for FEAT_LSUI.
+> 
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
 
-Not forgotten but lower priority given that the merging window is about
-to open this Sunday. The LSUI series is now aimed at the next cycle.
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+
+In general we should move the Kconfig addition last for bisectability,
+unless all the other patches introduced are ok on their own.
 
 -- 
 Catalin
