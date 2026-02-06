@@ -1,322 +1,189 @@
-Return-Path: <kvm+bounces-70397-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70392-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ILCyLABIhWkN/QMAu9opvQ
-	(envelope-from <kvm+bounces-70397-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 02:46:40 +0100
+	id wMFGNy5DhWmA+wMAu9opvQ
+	(envelope-from <kvm+bounces-70392-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 02:26:06 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20097F9023
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 02:46:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E0DF8F52
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 02:26:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2CD2D3036ECD
-	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 01:45:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5592C3026585
+	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 01:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2618925742F;
-	Fri,  6 Feb 2026 01:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009FE23ABBF;
+	Fri,  6 Feb 2026 01:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vrfdle7h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEDC5244667;
-	Fri,  6 Feb 2026 01:45:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EEA213DDAE
+	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 01:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770342340; cv=none; b=JUS58B99ERZBvslBryCwwq8RG1P2SCFz0omX6/l2Atua4gNVd0N4ZExuyujTQLKP4jKlKJjSiAg74PDpxFJOOvCrwFBCGDMwGrMco5f4vD2fYv4yEXED/n24jctyG1IGsIlWaVMUwfJYFcQBDdu3HZU2qCw4JKC48N+llIPq4hs=
+	t=1770341118; cv=none; b=DK2Fwi2ANXbh/o1nZB5zMWD3EgsuBX4gmbk+XnpKp8sgSgMry1hC8lPGasRmKnt2gPZEJXJYTT5EKV5VTdAn59edTWgy0/l4diz42uXM4S84Hw6UYManjQljBp4y8EcTycePC5Dwdj0jyDr2Ph2srJoGITrG55UeOjzHuBpd3pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770342340; c=relaxed/simple;
-	bh=4+/9fh/NO9be66BaSCx0h0mZ/1PpvG2EQHIkt/KBefk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nPb2ZIfdfnxVgG6s1hLgerXpOaAGxMaSfpCr7BAgqB9lG7vlDO5ZDJylRHgyOicp87j5rntMldZBOkijokv05OWQBIvml2wL8RRfNrEV/K9YG6uqUDr+UeIHI8dJrSsuVGyBcMvhSUw2FPzV/KfPZiPumbSPSOABxQOXLw3F08o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.185])
-	by gateway (Coremail) with SMTP id _____8AxRcG9R4Vp3FYQAA--.5615S3;
-	Fri, 06 Feb 2026 09:45:33 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.185])
-	by front1 (Coremail) with SMTP id qMiowJCx98C3R4VpgLZAAA--.40823S4;
-	Fri, 06 Feb 2026 09:45:32 +0800 (CST)
-From: Song Gao <gaosong@loongson.cn>
-To: maobibo@loongson.cn,
-	chenhuacai@kernel.org
-Cc: kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	kernel@xen0n.name,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 2/2] LongArch: KVM: Add dmsintc inject msi to the dest vcpu
-Date: Fri,  6 Feb 2026 09:20:28 +0800
-Message-Id: <20260206012028.3318291-3-gaosong@loongson.cn>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20260206012028.3318291-1-gaosong@loongson.cn>
-References: <20260206012028.3318291-1-gaosong@loongson.cn>
+	s=arc-20240116; t=1770341118; c=relaxed/simple;
+	bh=y4reUzXwPFzss/EyunM3xBJJqk2DQfSN4mlbRZVQsVE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fEa2WzZNBDeoHGet51+HcFNvWb+fz5NdH4K/xQ05VtOkOL3h9BHywMCZOsX06jlPDpSew3CwjasKWD9WvLMcyBZUkgw/abNztuJvr/fAgUr1wgaKgdZs7ydH2vhOXpFP61hYI4SnEmztfY/Vv3Xs5aMYUXzCVR/t+StE3OAT4nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vrfdle7h; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a8f8c81d02so14633665ad.2
+        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 17:25:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770341117; x=1770945917; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bByHMfzn4dhH09NijP3EyDZ/iv4YfYmEuujKD3yNi00=;
+        b=vrfdle7hJugO/UPVcDX0PVrMHFh0HBtxJMiPmqqtNje9UcC1QbxWu6IQlf5ySXDJzS
+         0TD7UxAtg95NbGifIi5nbSWHaYDABQm9aqu29YI0l65TSOmkdXElKrh283PG3XwJFyRa
+         hvEfclNhBZuXgZ7YDsbj2c1koS/2ine0OBE4KR2S8QyEmReQKJ04H0ifiB67fNzcUw6q
+         jL6RAKO7HMyKjxn4LIO6E7yGeKFXC2BEMR8Y2dREyDG7osZqPTKHorBSJa00yeGu+U8h
+         t7+2Cl7D7xwzOCOejJWzBb3dgcd+Wk98Ubf6+GGqPZxB6P3UYksyVbWEoAroupuHiPIi
+         hOSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770341117; x=1770945917;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bByHMfzn4dhH09NijP3EyDZ/iv4YfYmEuujKD3yNi00=;
+        b=mjEsHmEAzMopLC7xe+QRTlX4Y8u9qnLjKdt3MUj60dtNatSbGihPe/pE9b/awM7rY7
+         OppSyiOHzvAjj0cCw+F9XaUR0qDo4uc5u5DnxpPBLxF6w6r7HxjzyHfrA5bDiUn7a1Ic
+         EeZe/Aeyhf2MXICcQXohHjv1Hi1y0MAYKF/sYOwDTvX++zA6aCShsqC08p8iGRV/YdT2
+         OBETa6pgaHu/f3xjinK3/mWuiMEPUbvpfglBAFxofP3qqd/QigLaa3k58mASG6fLYAv1
+         ZaM0iFP86AuO5nJ8SuLDQBFQKzOhTZKXLVio5CA+QAL0Sc+/+CGggnLGwz+lRWO1Q7+U
+         PMPw==
+X-Forwarded-Encrypted: i=1; AJvYcCU+pmC0NgHZvghU8vBYu40KphW5e/w591uo/tgnK53rLvw5YdqQehlYtHPo/caSdQKoCHI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7ANFpi3AYqnOOJiXV+iOB5eoOA22MlJPGZOZTxkYXGC184lNi
+	i4pYt8nP/RMujKMEXXYpBXyDj3WKort4w7Nviu1fcWtT/v4k0ojP4KgnZvwY2RISKRZLJEEArLP
+	OOJHSkA==
+X-Received: from pjbil4.prod.google.com ([2002:a17:90b:1644:b0:352:d19a:6739])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3c4d:b0:34a:b4a2:f0bf
+ with SMTP id 98e67ed59e1d1-354b3c950b2mr763265a91.16.1770341117476; Thu, 05
+ Feb 2026 17:25:17 -0800 (PST)
+Date: Thu, 5 Feb 2026 17:25:15 -0800
+In-Reply-To: <b92c2a7c7bcdc02d49eb0c0d481f682bf5d10c76@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJCx98C3R4VpgLZAAA--.40823S4
-X-CM-SenderInfo: 5jdr20tqj6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
+Mime-Version: 1.0
+References: <20260115011312.3675857-1-yosry.ahmed@linux.dev>
+ <20260115011312.3675857-2-yosry.ahmed@linux.dev> <aYU87QeMg8_kTM-G@google.com>
+ <b92c2a7c7bcdc02d49eb0c0d481f682bf5d10c76@linux.dev>
+Message-ID: <aYVC-1Pk01kQVJqD@google.com>
+Subject: Re: [PATCH v4 01/26] KVM: SVM: Switch svm_copy_lbrs() to a macro
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-70392-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_FROM(0.00)[bounces-70397-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[loongson.cn];
-	TAGGED_RCPT(0.00)[kvm];
-	R_DKIM_NA(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gaosong@loongson.cn,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-0.975];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[loongson.cn:mid,loongson.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 20097F9023
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 64E0DF8F52
 X-Rspamd-Action: no action
 
-Implement irqfd deliver msi to vcpu and vcpu dmsintc inject irq.
-Add irqfd choice dmsintc to set msi irq by the msg_addr and
-implement dmsintc set msi irq.
+On Fri, Feb 06, 2026, Yosry Ahmed wrote:
+> February 5, 2026 at 4:59 PM, "Sean Christopherson" <seanjc@google.com> wrote:
+> > On Thu, Jan 15, 2026, Yosry Ahmed wrote:
+> > > In preparation for using svm_copy_lbrs() with 'struct vmcb_save_area'
+> > >  without a containing 'struct vmcb', and later even 'struct
+> > >  vmcb_save_area_cached', make it a macro. Pull the call to
+> > >  vmcb_mark_dirty() out to the callers.
+> > >  
+> > >  Macros are generally not preferred compared to functions, mainly due to
+> > >  type-safety. However, in this case it seems like having a simple macro
+> > >  copying a few fields is better than copy-pasting the same 5 lines of
+> > >  code in different places.
+> > >  
+> > >  On the bright side, pulling vmcb_mark_dirty() calls to the callers makes
+> > >  it clear that in one case, vmcb_mark_dirty() was being called on VMCB12.
+> > >  It is not architecturally defined for the CPU to clear arbitrary clean
+> > >  bits, and it is not needed, so drop that one call.
+> > >  
+> > >  Technically fixes the non-architectural behavior of setting the dirty
+> > >  bit on VMCB12.
+> > > 
+> > Stop. Bundling. Things. Together.
+> > 
+> > /shakes fist angrily
+> > 
+> > I was absolutely not expecting a patch titled "KVM: SVM: Switch svm_copy_lbrs()
+> > to a macro" to end with a Fixes tag, and I was *really* not expecting it to also
+> > be Cc'd for stable.
+> > 
+> > At a glance, I genuinely can't tell if you added a Fixes to scope the backport,
+> > or because of the dirty vmcb12 bits thing.
+> > 
+> > First fix the dirty behavior (and probably tag it for stable to avoid creating
+> > an unnecessary backport conflict), then in a separate patch macrofy the helper.
+> > Yeah, checkpatch will "suggest" that the stable@ patch should have Fixes, but
+> > for us humans, that's _useful_ information, because it says "hey you, this is a
+> > dependency for an upcoming fix!". As written, I look at this patch and go "huh?".
+> > (and then I look at the next patch and it all makes sense).
+> 
+> I agree, but fixing the dirty behavior on its own requires open-coding the
+> function, then the following patch would change it to a macro and use it
+> again. I was trying to minimize the noise of moving code back and forth..
 
-Signed-off-by: Song Gao <gaosong@loongson.cn>
----
- arch/loongarch/include/asm/kvm_dmsintc.h |  1 +
- arch/loongarch/include/asm/kvm_host.h    |  5 ++
- arch/loongarch/kvm/intc/dmsintc.c        |  6 +++
- arch/loongarch/kvm/interrupt.c           |  1 +
- arch/loongarch/kvm/irqfd.c               | 42 +++++++++++++++--
- arch/loongarch/kvm/vcpu.c                | 58 ++++++++++++++++++++++++
- 6 files changed, 109 insertions(+), 4 deletions(-)
+I don't follow.  Isn't it just this?
 
-diff --git a/arch/loongarch/include/asm/kvm_dmsintc.h b/arch/loongarch/include/asm/kvm_dmsintc.h
-index 1d4f66996f3c..9b5436a2fcbe 100644
---- a/arch/loongarch/include/asm/kvm_dmsintc.h
-+++ b/arch/loongarch/include/asm/kvm_dmsintc.h
-@@ -11,6 +11,7 @@ struct loongarch_dmsintc  {
- 	struct kvm *kvm;
- 	uint64_t msg_addr_base;
- 	uint64_t msg_addr_size;
-+	uint32_t cpu_mask;
- };
- 
- struct dmsintc_state {
-diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-index 5e9e2af7312f..91e0190aeaec 100644
---- a/arch/loongarch/include/asm/kvm_host.h
-+++ b/arch/loongarch/include/asm/kvm_host.h
-@@ -258,6 +258,11 @@ struct kvm_vcpu_arch {
- 	} st;
- };
- 
-+void loongarch_dmsintc_inject_irq(struct kvm_vcpu *vcpu);
-+int kvm_loongarch_deliver_msi_to_vcpu(struct kvm *kvm,
-+				struct kvm_vcpu *vcpu,
-+				u32 vector, int level);
-+
- static inline unsigned long readl_sw_gcsr(struct loongarch_csrs *csr, int reg)
- {
- 	return csr->csrs[reg];
-diff --git a/arch/loongarch/kvm/intc/dmsintc.c b/arch/loongarch/kvm/intc/dmsintc.c
-index 00e401de0464..1bb61e55d061 100644
---- a/arch/loongarch/kvm/intc/dmsintc.c
-+++ b/arch/loongarch/kvm/intc/dmsintc.c
-@@ -15,6 +15,7 @@ static int kvm_dmsintc_ctrl_access(struct kvm_device *dev,
- 	void __user *data;
- 	struct loongarch_dmsintc *s = dev->kvm->arch.dmsintc;
- 	u64 tmp;
-+	u32 cpu_bit;
- 
- 	data = (void __user *)attr->addr;
- 	switch (addr) {
-@@ -30,6 +31,11 @@ static int kvm_dmsintc_ctrl_access(struct kvm_device *dev,
- 				s->msg_addr_base = tmp;
- 			else
- 				return  -EFAULT;
-+			s->msg_addr_base = tmp;
-+			cpu_bit = find_first_bit((unsigned long *)&(s->msg_addr_base), 64)
-+						- AVEC_CPU_SHIFT;
-+			cpu_bit = min(cpu_bit, AVEC_CPU_BIT);
-+			s->cpu_mask = GENMASK(cpu_bit - 1, 0) & AVEC_CPU_MASK;
- 		}
- 		break;
- 	case KVM_DEV_LOONGARCH_DMSINTC_MSG_ADDR_SIZE:
-diff --git a/arch/loongarch/kvm/interrupt.c b/arch/loongarch/kvm/interrupt.c
-index a6d42d399a59..893a81ca1079 100644
---- a/arch/loongarch/kvm/interrupt.c
-+++ b/arch/loongarch/kvm/interrupt.c
-@@ -33,6 +33,7 @@ static int kvm_irq_deliver(struct kvm_vcpu *vcpu, unsigned int priority)
- 		irq = priority_to_irq[priority];
- 
- 	if (cpu_has_msgint && (priority == INT_AVEC)) {
-+		loongarch_dmsintc_inject_irq(vcpu);
- 		set_gcsr_estat(irq);
- 		return 1;
- 	}
-diff --git a/arch/loongarch/kvm/irqfd.c b/arch/loongarch/kvm/irqfd.c
-index 9a39627aecf0..3bbb26f4e2b7 100644
---- a/arch/loongarch/kvm/irqfd.c
-+++ b/arch/loongarch/kvm/irqfd.c
-@@ -6,6 +6,7 @@
- #include <linux/kvm_host.h>
- #include <trace/events/kvm.h>
- #include <asm/kvm_pch_pic.h>
-+#include <asm/kvm_vcpu.h>
- 
- static int kvm_set_pic_irq(struct kvm_kernel_irq_routing_entry *e,
- 		struct kvm *kvm, int irq_source_id, int level, bool line_status)
-@@ -16,6 +17,38 @@ static int kvm_set_pic_irq(struct kvm_kernel_irq_routing_entry *e,
- 	return 0;
- }
- 
-+static int kvm_dmsintc_set_msi_irq(struct kvm *kvm, u32 addr, int data, int level)
-+{
-+	unsigned int virq, dest;
-+	struct kvm_vcpu *vcpu;
-+
-+	virq = (addr >> AVEC_IRQ_SHIFT) & AVEC_IRQ_MASK;
-+	dest = (addr >> AVEC_CPU_SHIFT) & kvm->arch.dmsintc->cpu_mask;
-+	if (dest > KVM_MAX_VCPUS)
-+		return -EINVAL;
-+	vcpu = kvm_get_vcpu_by_cpuid(kvm, dest);
-+	if (!vcpu)
-+		return -EINVAL;
-+	return kvm_loongarch_deliver_msi_to_vcpu(kvm, vcpu, virq, level);
-+}
-+
-+static int loongarch_set_msi(struct kvm_kernel_irq_routing_entry *e,
-+			struct kvm *kvm, int level)
-+{
-+	u64 msg_addr;
-+
-+	msg_addr = (((u64)e->msi.address_hi) << 32) | e->msi.address_lo;
-+	if (cpu_has_msgint && kvm->arch.dmsintc &&
-+		msg_addr >= kvm->arch.dmsintc->msg_addr_base &&
-+		msg_addr < (kvm->arch.dmsintc->msg_addr_base  + kvm->arch.dmsintc->msg_addr_size)) {
-+		return kvm_dmsintc_set_msi_irq(kvm, msg_addr, e->msi.data, level);
-+	} else {
-+		pch_msi_set_irq(kvm, e->msi.data, level);
-+	}
-+
-+	return 0;
-+}
-+
- /*
-  * kvm_set_msi: inject the MSI corresponding to the
-  * MSI routing entry
-@@ -29,9 +62,7 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
- 	if (!level)
- 		return -1;
- 
--	pch_msi_set_irq(kvm, e->msi.data, level);
+@@ -848,8 +859,6 @@ void svm_copy_lbrs(struct vmcb *to_vmcb, struct vmcb *from_vmcb)
+        to_vmcb->save.br_to             = from_vmcb->save.br_to;
+        to_vmcb->save.last_excp_from    = from_vmcb->save.last_excp_from;
+        to_vmcb->save.last_excp_to      = from_vmcb->save.last_excp_to;
 -
--	return 0;
-+	return loongarch_set_msi(e, kvm, level);
+-       vmcb_mark_dirty(to_vmcb, VMCB_LBR);
  }
  
- /*
-@@ -71,12 +102,15 @@ int kvm_set_routing_entry(struct kvm *kvm,
- int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
- 		struct kvm *kvm, int irq_source_id, int level, bool line_status)
- {
-+	if (!level)
-+		return -EWOULDBLOCK;
-+
- 	switch (e->type) {
- 	case KVM_IRQ_ROUTING_IRQCHIP:
- 		pch_pic_set_irq(kvm->arch.pch_pic, e->irqchip.pin, level);
- 		return 0;
- 	case KVM_IRQ_ROUTING_MSI:
--		pch_msi_set_irq(kvm, e->msi.data, level);
-+		loongarch_set_msi(e, kvm, level);
- 		return 0;
- 	default:
- 		return -EWOULDBLOCK;
-diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-index 656b954c1134..325bb084d704 100644
---- a/arch/loongarch/kvm/vcpu.c
-+++ b/arch/loongarch/kvm/vcpu.c
-@@ -14,6 +14,64 @@
- #define CREATE_TRACE_POINTS
- #include "trace.h"
+ static void __svm_enable_lbrv(struct kvm_vcpu *vcpu)
+@@ -877,6 +886,8 @@ void svm_update_lbrv(struct kvm_vcpu *vcpu)
+                            (is_guest_mode(vcpu) && guest_cpu_cap_has(vcpu, X86_FEATURE_LBRV) &&
+                            (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK));
  
-+void loongarch_dmsintc_inject_irq(struct kvm_vcpu *vcpu)
-+{
-+	struct dmsintc_state *ds = &vcpu->arch.dmsintc_state;
-+	unsigned int i;
-+	unsigned long temp[4], old;
++       vmcb_mark_dirty(svm->vmcb, VMCB_LBR);
 +
-+	if (!ds)
-+		return;
-+
-+	for (i = 0; i < 4; i++) {
-+		old = atomic64_read(&(ds->vector_map[i]));
-+		if (old)
-+			temp[i] = atomic64_xchg(&(ds->vector_map[i]), 0);
-+	}
-+
-+	if (temp[0]) {
-+		old = kvm_read_hw_gcsr(LOONGARCH_CSR_ISR0);
-+		kvm_write_hw_gcsr(LOONGARCH_CSR_ISR0, temp[0]|old);
-+	}
-+
-+	if (temp[1]) {
-+		old = kvm_read_hw_gcsr(LOONGARCH_CSR_ISR1);
-+		kvm_write_hw_gcsr(LOONGARCH_CSR_ISR1, temp[1]|old);
-+	}
-+
-+	if (temp[2]) {
-+		old = kvm_read_hw_gcsr(LOONGARCH_CSR_ISR2);
-+		kvm_write_hw_gcsr(LOONGARCH_CSR_ISR2, temp[2]|old);
-+	}
-+
-+	if (temp[3]) {
-+		old = kvm_read_hw_gcsr(LOONGARCH_CSR_ISR3);
-+		kvm_write_hw_gcsr(LOONGARCH_CSR_ISR3, temp[3]|old);
-+	}
-+}
-+
-+int kvm_loongarch_deliver_msi_to_vcpu(struct kvm *kvm,
-+				struct kvm_vcpu *vcpu,
-+				u32 vector, int level)
-+{
-+	struct kvm_interrupt vcpu_irq;
-+	struct dmsintc_state *ds;
-+
-+	if (!level)
-+		return 0;
-+	if (!vcpu || vector >= 256)
-+		return -EINVAL;
-+	ds = &vcpu->arch.dmsintc_state;
-+	if (!ds)
-+		return -ENODEV;
-+	set_bit(vector, (unsigned long *)&ds->vector_map);
-+	vcpu_irq.irq = INT_AVEC;
-+	kvm_vcpu_ioctl_interrupt(vcpu, &vcpu_irq);
-+	kvm_vcpu_kick(vcpu);
-+	return 0;
-+}
-+
-+
- const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	KVM_GENERIC_VCPU_STATS(),
- 	STATS_DESC_COUNTER(VCPU, int_exits),
--- 
-2.39.3
-
+        if (enable_lbrv && !current_enable_lbrv)
+                __svm_enable_lbrv(vcpu);
+        else if (!enable_lbrv && current_enable_lbrv)
+@@ -3079,7 +3090,6 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+                        break;
+ 
+                svm->vmcb->save.dbgctl = data;
+-               vmcb_mark_dirty(svm->vmcb, VMCB_LBR);
+                svm_update_lbrv(vcpu);
+                break;
+        case MSR_VM_HSAVE_PA:
 
