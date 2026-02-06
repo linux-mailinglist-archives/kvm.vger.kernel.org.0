@@ -1,257 +1,214 @@
-Return-Path: <kvm+bounces-70426-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70427-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GPKsG82yhWmbFQQAu9opvQ
-	(envelope-from <kvm+bounces-70426-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 10:22:21 +0100
+	id D/uAEvqzhWkpFgQAu9opvQ
+	(envelope-from <kvm+bounces-70427-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 10:27:22 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0426DFBF97
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 10:22:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABEE7FC045
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 10:27:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 16C26302D0EA
-	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 09:22:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2E90230479F5
+	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 09:24:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF4435C1A5;
-	Fri,  6 Feb 2026 09:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDE1A35CBA1;
+	Fri,  6 Feb 2026 09:24:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="xUBZ3rFy"
+	dkim=pass (2048-bit key) header.d=sony.com header.i=@sony.com header.b="AUhgQUQy"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010060.outbound.protection.outlook.com [52.101.193.60])
+Received: from jpms-ob01.noc.sony.co.jp (jpms-ob01.noc.sony.co.jp [211.125.140.164])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B2A348463;
-	Fri,  6 Feb 2026 09:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770369737; cv=fail; b=dYSFh5e08aV2U5cpOAE09iMhl+42p55nVOnF5aYrayOOwbjLorpv09bhvXTAAKR/nAIrVqoQCQw5wecEfpE8j2H6rdQQqNDBCctSphsOn8KxehnwnPnTKSsbB0jo8d2h2rEBYCCHA4xYo3EASTs1lzktRu+QSNLFj0aY3TMQwf0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770369737; c=relaxed/simple;
-	bh=TqIpqDrXEHbtTXzGWsSJLBqfsYb2uYPjLldsdNXWFkI=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=MXLu4e3UOoJsrIYkmT5ZQsMd54iOxMvtD+RaQFU8k1Vbxtt1pRJ5khlH7uo7duajUys11CJzT44Pde9E1L/eViq6uqWxpXlHzVrjTL3vATEXOLgBXk8lmr+Uf7iMyM+QvH03eriOs1BZ6+QFB7KUkrMxLy5+Gr4dMgAxMDwiwhc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=xUBZ3rFy; arc=fail smtp.client-ip=52.101.193.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HFzNpmb2bwtUzGScJkF0DGB4UJEmm0eXUWN0YqtlKHPoxVb17g2jvSAfjXfdm6QdSmQRMIb8EXoQ1066MbpBYzM2STC1c41O+HmllJixMM3IrftzZT8bk+RkEhY+O0nRwGQSo/uHmhBDmbxuXlOtQl3spSuCpF0/WbmfpljDifQIeajvU2RxFY/Mx34VzyhOt9G4aFBkPQe0tYb+WsANZr5WyEdbcz8AU64MpbEwe94JAZkF2mCFmpIBlEgtJfllT05dM8p6ISIeNx5iZ6XL0fm2fQjxtcZmzrwHkoZo57jLJxRYGpv/rzUm/UF90NUeHLATV5KEKCOj8wPBRWNkSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zJc8F+VXJHMpTRxcVFJR7bz7Dw/EpjOZoaoiwjlW/G8=;
- b=bOyzvmQ4HzVffV6D2iNFuQPjY8hcoynym9dsWJkbA6qtGgM8EPlXNQYscKgCcwFalbTa2/zA7+VEKoLBX9vx2J23OqNCuGNJlCZihGQecZ6oQYvWewfEE4Vd7Qms/mzaHoLFE3L+M6cONW1tO61sDa6GF2KQvjPsM6ISnB6Sgbxxyma1DoNYMkyVVFVbS0JNW5SCQRep13xbew5lFQVzp2zEpTXbU3K21JAqSxdQH9mifZelv8lwJJ130SwdcNeMwjSbCH7OgxnVDqsrIWmtQk9XN8dquO3WFDGZw6TJD3u7z8Zq/AZYoPPHzqukSGLaDJbaJ1Feiu3q/DsWwa3z7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zJc8F+VXJHMpTRxcVFJR7bz7Dw/EpjOZoaoiwjlW/G8=;
- b=xUBZ3rFyiu3NkQw019/H86bIZfGwGgKdq8J1aIQyMHBu8DdihrDbPPgSgCySaLQuM3bHjfb7FVTaD+vCXT2AdGBaKJURJ6lm3TFlWglsfvnUoo86EFt6mI+DeHTgP0EP+NsTe01F5faCTslu8l6lg1RlDt9XdaCzZex6Bxjpw2A=
-Received: from CH2PR02CA0011.namprd02.prod.outlook.com (2603:10b6:610:4e::21)
- by CY5PR12MB6597.namprd12.prod.outlook.com (2603:10b6:930:43::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.15; Fri, 6 Feb
- 2026 09:22:10 +0000
-Received: from DS3PEPF0000C380.namprd04.prod.outlook.com
- (2603:10b6:610:4e:cafe::6e) by CH2PR02CA0011.outlook.office365.com
- (2603:10b6:610:4e::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9587.16 via Frontend Transport; Fri,
- 6 Feb 2026 09:21:50 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- DS3PEPF0000C380.mail.protection.outlook.com (10.167.23.10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9587.10 via Frontend Transport; Fri, 6 Feb 2026 09:22:10 +0000
-Received: from Satlexmb09.amd.com (10.181.42.218) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 6 Feb
- 2026 03:22:09 -0600
-Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb09.amd.com
- (10.181.42.218) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 6 Feb
- 2026 01:22:09 -0800
-Received: from [10.136.45.190] (10.180.168.240) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Fri, 6 Feb 2026 03:22:05 -0600
-Message-ID: <85958aa8-98ee-40bc-8fcf-750bbf62ccce@amd.com>
-Date: Fri, 6 Feb 2026 14:52:04 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A5E34F278;
+	Fri,  6 Feb 2026 09:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.125.140.164
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770369848; cv=none; b=m+wbqv9Au4I1vR4HJI/QkP1PLkCViAtEBW5K74aq2K1Sb7RxY1QhLf+u3xvQrjuaoS0G2YDtESPlBcECiMHlphVhHm/0KLHKKuHIoUOHjJNwvH3O77+Clu1wmP8ME0ZQW/7XwGClX3JW9G8SRr431ggMKEjivqy2mMIIX3wHSng=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770369848; c=relaxed/simple;
+	bh=/fkg3oWtZbf+Ill12UaORFsm14SxpgtZUZX+OeaDvMo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TVNem7nVNbDSdKyFBo1zaxIPZlxwl65soFpVfDL3JAuJ254HUh6bSw8WNa0dDva31A9Sf6+fgZ0vdRe/WVdPHzNyExchpjVqCu9XLTlj8fe9tkwANWqXfkmQJ7TFwmHAgXt9tgNVEmm2IpAIZX3jKL/rLQTtGVNXq1AgEJ5X/R0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sony.com; spf=pass smtp.mailfrom=sony.com; dkim=pass (2048-bit key) header.d=sony.com header.i=@sony.com header.b=AUhgQUQy; arc=none smtp.client-ip=211.125.140.164
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sony.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sony.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=sony.com; s=s1jp; t=1770369848; x=1801905848;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wPZfRdP+k5tHXCWNK6Ygu9GCntNiGeUU6L8G+KPNkCQ=;
+  b=AUhgQUQyf4pm4205vXIxckQ4hLvBg+zxDBVgOiXBQTsbLBPuLVcYm6oz
+   eTG/2X+LnqZUhG5qsC9SZyR2o5mri0w7F637E3KpkXkIEren+lU9i9yyh
+   71D5+MRg3FeaYpzV91W8vqESSFKMr6V1BU6Qr/OHRXWv9xi8gaWhDWpko
+   Js9YXR/ER8GaKnOffQMjBuaji3Nu7VAxd2RvasylrKJXEh47mUKR5DDZk
+   p+KOgC4BE6XnoYeEeAscbmGSP4zrlOItV11zfffMRzgCfDlmuRO46d58Y
+   Q01jH+2zLy9wXrg/GK0+nVsaBSP35c98ja214rsvVgOaGH+OlOCShI398
+   A==;
+Received: from unknown (HELO jpmta-ob02.noc.sony.co.jp) ([IPv6:2001:cf8:0:6e7::7])
+  by jpms-ob01.noc.sony.co.jp with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2026 18:23:59 +0900
+X-IronPort-AV: E=Sophos;i="6.21,276,1763391600"; 
+   d="scan'208";a="578889420"
+Received: from unknown (HELO JPC00244420) ([IPv6:2001:cf8:1:573:0:dddd:6b3e:119e])
+  by jpmta-ob02.noc.sony.co.jp with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2026 18:23:56 +0900
+Date: Fri, 6 Feb 2026 18:23:53 +0900
+From: Shashank Balaji <shashank.mahadasyam@sony.com>
+To: Sohil Mehta <sohil.mehta@intel.com>
+Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Jan Kiszka <jan.kiszka@siemens.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Juergen Gross <jgross@suse.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	virtualization@lists.linux.dev, jailhouse-dev@googlegroups.com,
+	kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+	Rahul Bukte <rahul.bukte@sony.com>,
+	Daniel Palmer <daniel.palmer@sony.com>,
+	Tim Bird <tim.bird@sony.com>
+Subject: Re: [PATCH 3/3] x86/virt: rename x2apic_available to
+ x2apic_without_ir_available
+Message-ID: <aYWzKQQTyTZpMAme@JPC00244420>
+References: <20260202-x2apic-fix-v1-0-71c8f488a88b@sony.com>
+ <20260202-x2apic-fix-v1-3-71c8f488a88b@sony.com>
+ <ab7f5935-fd5e-4ba5-a97d-5433f241a089@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/7] KVM: SVM: Enable FRED support
-From: Shivansh Dhiman <shivansh.dhiman@amd.com>
-To: <seanjc@google.com>, <pbonzini@redhat.com>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
-CC: <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
-	<xin@zytor.com>, <nikunj.dadhania@amd.com>, <santosh.shukla@amd.com>,
-	Shivansh Dhiman <shivansh.dhiman@amd.com>
-References: <20260129063653.3553076-1-shivansh.dhiman@amd.com>
-Content-Language: en-US
-In-Reply-To: <20260129063653.3553076-1-shivansh.dhiman@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF0000C380:EE_|CY5PR12MB6597:EE_
-X-MS-Office365-Filtering-Correlation-Id: a9ea69fd-0ac9-4b48-86c3-08de656134c3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|7416014|376014|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TUU2dU5mZzJuak41SXQxRmFHZDV2bmtUWkhmRzVMTTkxMmR6K0hHMnFZU1J0?=
- =?utf-8?B?RzAvZE8wdjM5RWwvSWtJQWE5SzRxSHVkU1R2V2tNVnVrdU1aZnNTSUx0Y3B4?=
- =?utf-8?B?bE5EcDczM0NyNVB1UTdxWFN6Szd2QXl3YTBnZ0s1NkNVY2pCY0ZJclRtazRy?=
- =?utf-8?B?aVNRRVVYeU9vdElSQkhYQUtEU3ArL3I3SFZidG51U2hWamNBdFFNWHZRY1Fy?=
- =?utf-8?B?N0JvUFo3ajI2UDRGUytMRi9hdmF0RUFnUGZoSHh0VElJdjdHN1R4bWsxMG5i?=
- =?utf-8?B?aEdhaWNlZzZPMVBPMW1RTGVqWE9NUXdBSnFsZFJBeVNXVWFHTlpZakxhQ3V0?=
- =?utf-8?B?bGVjcGhRNjBnMFlVbWJSRFVrREc5V01pSFRXUEI4VytSeEc0MXZUU1U2aHZu?=
- =?utf-8?B?ZTAzUGx6NFNnME9ra0NicGE2eEgyMS8wOXZyV3JYZWxIUU1XcU1mRUxpdjFS?=
- =?utf-8?B?YVVGaWcvSnNWd0VvWFRJeEMxMGFDVmF5cEEvNWZRb3RLRWR5ai9pRU9aUmR6?=
- =?utf-8?B?dnJWRzVUcTlqTWFreHE5VW1rRy9XNGIwRnZzSUlrbzZ0TEs2VG84a2FxYUsx?=
- =?utf-8?B?aGlocTMyQlNmaG5Lb3Y3NHp1Y204bDJCSjFKMGI3VE0ra0ZsbkpXc2dBdENy?=
- =?utf-8?B?NlNIVnhJYlA5YlBmT1JnZTZKOEFMU0dSc0VORlNXbHc0WklMUkJtMXg4a3BG?=
- =?utf-8?B?SHY3dStnTmQxK05vNjBIZHNWd3BLYlRMZVIzaGRqZHIzaGJsWE1QTmhrNXJx?=
- =?utf-8?B?VFlMM0dSK1NlRHh1SmlBUXliQmJENk9PODF2YTYxUTZLRlFRSXBHQ2xKZUdu?=
- =?utf-8?B?ZzM2WFU3bGhZMHdQcUZDQTNsQzdINm5QYWJEVE1WMUw2eXlJSHBiVjRQTXBP?=
- =?utf-8?B?NGRXMUp5MHV4T0crNUs0YlloajVuSVcwUzJTM3NKemcveExBcDcwbjJ0RTU4?=
- =?utf-8?B?a2tmSzYyMHZFbXNuUGtDNHNNN1JFb1A3U0NNT0NQUEZ1Rmpaa3pCaHh6aHhi?=
- =?utf-8?B?eFM3R0c5elNENzB1dDdSNzFBOHlGUUVaOGV2VkVuWGpFUlVZU1RqVmh2NGg2?=
- =?utf-8?B?STFtR0lHYXdBSmtwRjRnRnlETy9ySGRacGozRUhEaHRFUWpZSHFaYVVPVVNm?=
- =?utf-8?B?VE5Dd0ZUMjJJYXI2cEk0QnR6dCtrZ3QvcGlhWlhleXFQVDJEZG5na1hGdHdT?=
- =?utf-8?B?SmRPYkQreUtPTGF6elMwWmtyMHJZRVlxU2tQaHhXMkFIZmYxL0xzOWdwd2k1?=
- =?utf-8?B?Rm5ZVTBwRnhTNHVTemxwNExoR3ZHWHVpQnhqN2o5ZEhTQzVadmdtcEg5Ynp5?=
- =?utf-8?B?N1lIZmMzVDlOejRlV3RMU3V0WENqcFFiU20xTFNSUURCUDEvM0RkWFpablk0?=
- =?utf-8?B?OGY2Y2NFTHZWZXlCbkRtaUhLanBybW9ubTJZTlIyenpvemZpV3FCR2J1UEpK?=
- =?utf-8?B?aUMzeWJOcDJJUEZQMHAyK3o1TTBIWUowdS9EOUNzQWM0bk8zOFkwTnY5cjJh?=
- =?utf-8?B?dldDcUx6TXdwOThRYlV4bzNSdThjUjFnUmhUN2tFUFNmb3RNUVZJbFRJc1BU?=
- =?utf-8?B?SE5XNlI4OTJLNDk2ZmpqYUJNN3EwYjFaUlYxaHBLYzA5VFhMeWRRMi9ESlVq?=
- =?utf-8?B?dXdQUU14RzhUbTd0cUNyK29YczVIb3phYWZVZmN3WEwwemdjMkJpZ2JlTEl1?=
- =?utf-8?B?azg0MURSNEpnK0RHTVRRV2tpNkJHZHRHMUNEbExLVkwyTWZVTHExeFZvRkYz?=
- =?utf-8?B?NWJCRjh3VFQrRXQ2WGRLUHFzOVo4OVJHMGV6T3VVeldUSmV5UjE0RDBjMCtV?=
- =?utf-8?B?dVlXUW5lTHhnUmxpbDJ2TTF4aldES3crbjE0bzZFOE5tV3NEZFgyVmZWd0tm?=
- =?utf-8?B?OEFCSUhhOHZEZHdrZk5LcTZTT1pieHo2Zmliay9tTnpLQkxjUXF3S2pPMjND?=
- =?utf-8?B?aTNkblphek1FMWRGcVk0OGlEZyt6NTV4VXg5VVY2NUkwSmkyZ2NTUjRObVN3?=
- =?utf-8?B?cllKaDJSdG90WHgxZUhUL0FhM0VRRGhuR2hMNjErQUZMZDF1L2NvaGFKOWM1?=
- =?utf-8?B?NWtkMW5JdG5TUjZlNHkvKzdsdUlINklFeVk1NWxlWWlzVUlJUzlqeUFZQ1ZN?=
- =?utf-8?B?UVZScmJ4RnV6NUM4aDlNSHJGVUJtdUVQMGoycVdXeG9CaWZuNi9YdFQzL0F2?=
- =?utf-8?B?VE9JMEdwSml4cXBkZWx2UjZnamc2bnd1TnUzYm0vVGh4WEV0WHlYeEhMTUIz?=
- =?utf-8?B?YVoxNUZmeldCOVhxaXpBd0lndXNBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(7416014)(376014)(13003099007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	fbflLSIEPnj5CR+y29BAT8f+ZRb480juKB9Mp8WOLcOiJqs/q6OmmLUyXv+/GAmTpuL/zTHjJ6W1sft+jqv6ZytBphoNe+gwhFUKYPS3XMFcAwx3f3x/XF29/TE2YBl9GVmR7zUGAS4/2G9aUdBFRNIOiRJYJn5GU823z/mpJawvieMqNm7wx7Ue+7nobhnP/8W/KA7zDAUkjvqxC3jaCwo15EDPJg2VFVsbWzHGx3eDMQ0L0vyvuxfymiouXoNNTjp3dCKOxBB90aXXqGfM/0k710tqoRptzHahfHsQcRzhRdxL/D1c5fQEsK2envTNoHykxIS8SFkLUptFsezFeFi+gPjlbBTy+SkgI6VmqiabXkuNHhDomq+gj/ovRNJ5/M/Dl/Gfv/Vh3hFiE0Pqh78ujARs1IyuIOUPPuOX86C+NodOCdnMU/f925UpYObh
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2026 09:22:10.3935
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a9ea69fd-0ac9-4b48-86c3-08de656134c3
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF0000C380.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6597
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ab7f5935-fd5e-4ba5-a97d-5433f241a089@intel.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[sony.com,none];
+	R_DKIM_ALLOW(-0.20)[sony.com:s=s1jp];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70426-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amd.com:dkim,amd.com:url,amd.com:mid];
+	TAGGED_FROM(0.00)[bounces-70427-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	DKIM_TRACE(0.00)[sony.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shivansh.dhiman@amd.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[shashank.mahadasyam@sony.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: 0426DFBF97
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sony.com:dkim]
+X-Rspamd-Queue-Id: ABEE7FC045
 X-Rspamd-Action: no action
 
-Hi,
+On Thu, Feb 05, 2026 at 04:10:37PM -0800, Sohil Mehta wrote:
+> On 2/2/2026 1:51 AM, Shashank Balaji wrote:
+> > No functional change.
+> > 
+> > x86_init.hyper.x2apic_available is used only in try_to_enable_x2apic to check if
+> > x2apic needs to be disabled if interrupt remapping support isn't present. But
+> > the name x2apic_available doesn't reflect that usage.
+> > 
+> 
+> I don't understand the premise of this patch. Shouldn't the variable
+> name reflect what is stored rather than how it is used?
 
-Here is the newly published FRED virtualization spec by AMD for reference:
+Sorry about the confusion, I should have used '()'.
+x86_init.hyper.x2apic_available() is called only in
+try_to_enable_x2apic(). Here's the relevant snippet:
 
-	https://docs.amd.com/v/u/en-US/69191-PUB
+	static __init void try_to_enable_x2apic(int remap_mode)
+	{
+		if (x2apic_state == X2APIC_DISABLED)
+			return;
 
-Please feel free to share any feedback or questions.
+		if (remap_mode != IRQ_REMAP_X2APIC_MODE) {
+			u32 apic_limit = 255;
 
-Regards,
-Shivansh
+			/*
+			 * Using X2APIC without IR is not architecturally supported
+			 * on bare metal but may be supported in guests.
+			 */
+			if (!x86_init.hyper.x2apic_available()) {
+				pr_info("x2apic: IRQ remapping doesn't support X2APIC mode\n");
+				x2apic_disable();
+				return;
+			}
 
-On 29-01-2026 12:06, Shivansh Dhiman wrote:
-> This series adds SVM support for FRED (Flexible Return and Event Delivery)
-> virtualization in KVM.
-> 
-> FRED introduces simplified privilege level transitions to replace IDT-based
-> event delivery and IRET returns, providing lower latency event handling while
-> ensuring complete supervisor context on delivery and full user context on
-> return. FRED defines event delivery for both ring 3->0 and ring 0->0
-> transitions, and introduces ERETU for returning to ring 3 and ERETS for
-> remaining in ring 0.
-> 
-> AMD hardware extends the VMCB to support FRED virtualization with dedicated
-> save area fields for FRED MSRs (RSP0-3, SSP1-3, STKLVLS, CONFIG) and control
-> fields for event injection data (EXITINTDATA, EVENTINJDATA).
-> 
-> The implementation spans seven patches. The important changes are:
-> 
-> 1) Extend VMCB structures with FRED fields mentioned above and disable MSR
->    interception for FRED-enabled guests to avoid unnecessary VM exits.
-> 
-> 2) Support for nested exceptions where we populate event injection data
->    when delivering exceptions like page faults and debug traps. 
-> 
-> This series is based on top of FRED support for VMX patchset [1],
-> patches 1-17. The VMX patchset was rebased on top of v6.18.0 kernel.
-> 
-> [1] https://lore.kernel.org/kvm/20251026201911.505204-1-xin@zytor.com
-> 
-> Regards,
-> Shivansh
-> ---
-> Neeraj Upadhyay (5):
->   KVM: SVM: Initialize FRED VMCB fields
->   KVM: SVM: Disable interception of FRED MSRs for FRED supported guests
->   KVM: SVM: Save restore FRED_RSP0 for FRED supported guests
->   KVM: SVM: Populate FRED event data on event injection
->   KVM: SVM: Support FRED nested exception injection
-> 
-> Shivansh Dhiman (2):
->   KVM: SVM: Dump FRED context in dump_vmcb()
->   KVM: SVM: Enable save/restore of FRED MSRs
-> 
->  arch/x86/include/asm/svm.h |  35 ++++++++++-
->  arch/x86/kvm/svm/svm.c     | 116 +++++++++++++++++++++++++++++++++++--
->  2 files changed, 144 insertions(+), 7 deletions(-)
-> 
-> 
-> base-commit: f76e83ecf6bce6d3793f828d92170b69e636f3c9
+So the question being asked is, "can x2apic be used without IR?", but
+the name "x2apic_available" signals "is x2apic available?". I found this
+confusing while going through the source.
 
+Most hypervisors set their x2apic_available() implementation to
+essentially return if the CPU supports x2apic or not, which is valid
+given the name "x2apic_available", but x2apic availability is not what's in
+question at the callsite.
+
+> > This is what x2apic_available is set to for various hypervisors:
+> > 
+> > 	acrn		boot_cpu_has(X86_FEATURE_X2APIC)
+> > 	mshyperv	boot_cpu_has(X86_FEATURE_X2APIC)
+> > 	xen		boot_cpu_has(X86_FEATURE_X2APIC) or false
+> > 	vmware		vmware_legacy_x2apic_available
+> > 	kvm		kvm_cpuid_base() != 0
+> > 	jailhouse	x2apic_enabled()
+> > 	bhyve		true
+> > 	default		false
+> > 
+> 
+> If both interrupt remapping and x2apic are enabled, what would the name
+> x2apic_without_ir_available signify?
+
+If IR is enabled, then the branch to call x2apic_available() wouldn't be taken :)
+So the meaning of x2apic_without_ir_available wouldn't be relevant
+anymore.
+
+> A value of "true" would mean x2apic is available without IR. But that
+> would be inaccurate for most hypervisors. A value of "false" could be
+> interpreted as x2apic is not available, which is also inaccurate.
+> 
+> To me, x2apic_available makes more sense than
+> x2apic_without_ir_available based on the values being set by the
+> hypervisors.
+ 
+I agree with you, and I think therein lies the problem. Most hypervisors
+are answering the broader question "is x2apic available?", so the name
+"x2apic_available" makes sense.
+
+I think further work is required to check if various implementations of
+x2apic_available() also need to be changed to reflect the "x2apic
+without IR?" semantic, but I don't know enough to do that myself. Maybe
+I should have added TODOs above the implementations.
+
+I would like the feedback of the virt folks too on all this, maybe I'm
+misinterpreting what's going on here.
+
+> > Bare metal and vmware correctly check if x2apic is available without interrupt
+> > remapping. The rest of them check if x2apic is enabled/supported, and kvm just
+> > checks if the kernel is running on kvm. The other hypervisors may have to have
+> > their checks audited.
+> > 
+> AFAIU, the value on bare metal is set to false because this is a
+> hypervisor specific variable. Perhaps I have misunderstood something?
 
