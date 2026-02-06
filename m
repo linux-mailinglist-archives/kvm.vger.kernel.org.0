@@ -1,80 +1,79 @@
-Return-Path: <kvm+bounces-70414-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70415-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cNL6IbRthWnqBQQAu9opvQ
-	(envelope-from <kvm+bounces-70414-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 05:27:32 +0100
+	id QLsHOa1uhWnqBQQAu9opvQ
+	(envelope-from <kvm+bounces-70415-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 05:31:41 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10BE1FA0D5
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 05:27:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78EA6FA186
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 05:31:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8148F30420B1
-	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 04:24:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B57A23077983
+	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 04:25:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22620346765;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9B7346AD4;
 	Fri,  6 Feb 2026 04:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bpKIX6tL"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xw13XdrU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C323451BA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED232345CDC
 	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 04:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770351725; cv=none; b=i0LYV4vRSJOVZwuDPm0YIos+WhT8Z5b+sYmH4vzW+UGPBzOv2a8XJrQjU98Y6LyjNQpvuGwfhzBqEwxDtjzHZIx7P4UnhM2MhGFBjvoXxq/jAq5lNSfE7SynFdSsgPUPKn3R9M483sHkHKuhAYA7r+ugPjzRIXATyyMcsj/mtAg=
+	t=1770351726; cv=none; b=qsFKSRou9mrJ5B+cgdqzEakr/hROmMxZbq7o+6HqVJsB8pqIHhriMfLTJ4IwvNIf4PxrQ0bURQ2bEdA4ZZS8LGzdx8QGwt+geKg4Umte1B9kK35ORg2Cda/jmu4ySMokgPm6fMAc/WhbdKRnAPsX/4VC3ZlGL9FZwjNR8hkvyS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770351725; c=relaxed/simple;
-	bh=QKSIBqkCGdy3J9ll5fTneHV92ZixMqOTyuRe4rTDKsk=;
+	s=arc-20240116; t=1770351726; c=relaxed/simple;
+	bh=/Z9mDI13T+VnYEHkTgB5k5gFAdYXQbonH45Y29nEzz0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BHUbkZo4ZSWyJZIkz4DDxGBjLYWwnRYmhA5MvrZSri8/tKe3BJwcf0FnwrLmBsR3rwcojbNv4AqKngJKwpMlgdPjBnGGbnOM8y6mrXWAziVPeXyXX7irrsIPH52xX6RJ+raODMszcs5gVR0+eH7gNbHnkIWelZ8bhTLmzwrTbEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bpKIX6tL; arc=none smtp.client-ip=209.85.210.179
+	 MIME-Version; b=isykx9zC3uWdSNIdvyLcS/AgSqaindx0cdPxWpTkY5pYLZX1yvQJvCgMotBgLlCKTWAl74Ag9nvBOh+bU6t/06Wl3Iu2jiVQFaVqpc4iUfHI+epsw2VXoAUeiEcVTjkPyzOA8MwkYvCFtTkri+ST8RMldRqpXZmYzgq1bpV7xMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xw13XdrU; arc=none smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-8230f8f27cfso779445b3a.0
-        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 20:22:04 -0800 (PST)
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-34c868b197eso1241373a91.2
+        for <kvm@vger.kernel.org>; Thu, 05 Feb 2026 20:22:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770351724; x=1770956524; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1770351725; x=1770956525; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NNi8czf1/CFVr3JdN24WUseqYsA6Bdj1+/T6IG97cXc=;
-        b=bpKIX6tLnm09o7EiQ+1YYLG03dTE4lFbZLk3q4V2ErSSa4daJmY2+QOdZBOxWNBR7z
-         BNr2fv5i4GODdqg43JM7gonxNVuzI5Sfga9QKoT1JNMgilvDacCSYdjSTXlrevBX/5uI
-         xTfJSSppUjy4qHUr38BIW+YK1Q9X0sq4dSBsCUys/yU28hDWX7aPYh9I72wSg5Wzcui3
-         UqZH581yB7wxsOxD9A6Kwwcfo6GpLKEN3F8h8PwZ4ZAJxSFrQO0dUoWSM3v07QYANYBd
-         LpHUkeRyT7H/XeEokyowFRyl8iNdsFBAXqXos4dvU4mvqv8YLZsxRFnFaRGdTp8CHWks
-         SDuQ==
+        bh=H5cXOVfc0cfcELp2wbWGKaUPyMU0neuGXQOK5SCrE88=;
+        b=xw13XdrUFvvHfDqdyvgzYlCor9g/MFbX14BurVN/x2OCXrqiGSexj9EIO1SiwjaT0R
+         681EGTMjD8hTq2O1rfPK1oLsXoQIs9w7BRJeh9N9u1PyG/KZGX3ug7RQaAeyg+q9hVjy
+         22HUhBUzztUpVoo97cd8TGY/3q+xw82b/1ChOvBjI9YDqHj76GPOgsDgiWmuZQuUWC4n
+         8+pI6zhPtzgk47iL2aRqQgmNvZ4PjhlsATV/E9NJzm1/5VshhEPPH8GuYNa6K7W2rTAX
+         4sn5CvejtLxE28knklj6uAs7rXHopiB2YGNNIiFxQIsa1WMUC4X8BwHdxkiQvUkYXmJN
+         qs1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770351724; x=1770956524;
+        d=1e100.net; s=20230601; t=1770351725; x=1770956525;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=NNi8czf1/CFVr3JdN24WUseqYsA6Bdj1+/T6IG97cXc=;
-        b=BvB9YdmR1VBcOwMKWFVvJgPJ4bcsL0TzOzSBQlmWlAtsRKxBlQAncEE2fzUNPqlH8y
-         bl0YeQmn3W1dw93Tklho8FCVGjSn+vMWgdjBRavfp7oMXYA8hI+Y3jisI3GoUAQGEoOl
-         MK3obiAhd9dzo2qmaalfefvOOUpwAva8m9WT5BTiG7C8uwxVvt/EYwTjRoglxP92QitV
-         kSS7ONRy1crdwIhNpLAK3e8JAv92Hgxemg9ydlMCPggnkPXK1aZlvLGg7RE5Gvbss20Y
-         lgf9tKPDWGZc2sSqXDoRFsTAf9iSgDlwVlJ0zZn24tSujwpXY9gwAxl4DTm5KHpyqO/A
-         4OBA==
-X-Forwarded-Encrypted: i=1; AJvYcCUCW+l9rNK0R/jANjE9WMu3a/MmeeNOOtHziSrGFCfRDTh/6QweVa8a8q9gmoVxL6ZjgfQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywitm2xhgLC+4/i8f+MojwRWHtOKbLr1umlunnbi1sSX8KDVmpF
-	T3KtOhVdLbf3WjrWEBkSEGXEwHM5g6pmobTUDDLZqQiQRu1yVs+WmSWwaeB6keqIlro=
-X-Gm-Gg: AZuq6aLzzxNfvq6jasoksiGGjqdGpKpqsrG5pGPjXqmUqhUeez7DQWPpp4QDqUiFsiU
-	ouiWpd/2swF/TD216iAb83YFAlP49cAb8mbGsommpOEu5sG7aCkaCoYMnRVkKG/r2+Y4NfYa8n4
-	lRllBjqtBJGgJcJgkz/FyIL1yn789i7IDTkhM160d1GPLH9VVj8qB2aO4yS/iO3iZSiNljUP72e
-	OfnixrFe5DVbUYtVuR4aEHHZ2hoMU2PjfXUX+RFtuseWCJ/SsZpeqhGNkwdTxspWUjuRUrG4oBM
-	kPTYJki4fuYGG8hEVDr2PZXlMotU02uoEaYBo3Nn10GViEAb7/FVpBkkPfYUDGZOXqMkpvhf1hc
-	cvG6b/Rn7he+Lh4rzURfslk37cQBhlOeqe5MJMzUISMQuTrathIdP2QQPpy2c3Iv02Ou+rOVkIP
-	Jhu4RtDs5p/6nYIIiBhjp9M5PeVkPWBtMxjpdLRrJWDs30H8KnQHlP2MqYEqxIlRNocGpO0OYS+
-	sQ=
-X-Received: by 2002:a05:6a00:1790:b0:81f:49cc:ea11 with SMTP id d2e1a72fcca58-824417b8d66mr1225060b3a.65.1770351724414;
-        Thu, 05 Feb 2026 20:22:04 -0800 (PST)
+        bh=H5cXOVfc0cfcELp2wbWGKaUPyMU0neuGXQOK5SCrE88=;
+        b=RqdINAqsKczi3ctCNgx/SFGtElkwe0QcEJe4g8cHFnFf3eiT6sSUzXQ8ADbHFhVz+V
+         f4IR8w4Jc4M0PIbk56LILkjjNulEuSqtezRtUtQLkFD92ZYYUYqo2QZPmCk7j8OHysyD
+         wqX91WCr70nXR3TIqQ24p91O8iOEZ/16GpmoF/QYDcuP0N3C1MxNQl0EM9esRqG+g7L0
+         S8dLxQ9D0FGFnKsDC8ILGdpPJ+ad/pCBcrPOXscqgRVRAYfKt2Sww+mMICyAiTPFa32g
+         r3VKqC8phIbxbZ59NMPo/0WmxyQKVvdAHyOQKjEh00S/JtHI8RxgpCxV9YTXitPyQQDn
+         Lfgw==
+X-Forwarded-Encrypted: i=1; AJvYcCXuaUj/oRs0qHboAIT2e3lGuo3CfXvE59rWgmN6ZreRn77Q81qfBwymnW1SwG4sJ8unUgI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoiMbHwS5UXPM31nambBlVRM4PRhD4d3TMxgL+fqTb7AdzIwpr
+	M6inC7sRdycmV4ikSfrJQrQ6ku5pbJOU4NHb5te/0eDngAv8vS1B8i/aVxILNTkuE6s=
+X-Gm-Gg: AZuq6aL7Y7Hr3igsYRV1k6rr2A4swjhcagVDNSBItMcCnkcaY4lMN7bsf1uBwJiCpgO
+	wAgMUZifcrOhHW8uNg6QF/ufi4TYl4xMYz1Ox/ykl0sb43JN6l/qM7H+tEyCuNmPoCq5+NYGs4u
+	NnpPPAENXMIZb8VDz9Is8RbFTmGUJA7uDWhGDwfpho+9EpHvmdmDbPQiupm4arSqTgu6RRGFWb2
+	YAG3XUuBejeMdLW3M7sK6/qvznqL5hWyHghKFr/NtZ9wjh5T6fJiJvzORtDtwgo/EnMFJK5lXgG
+	uXuOdz2C2jXGEYZidRCuWTMXA0ba/tbw2MyHu4zAqm+A95DuviZ9o87osa08VaJxx/2FNA1v8Pf
+	AcfjIz2702jFV5TdoSbixuTepE6+C1yWW54z+Zp0sjoamUCLkRanby8ZfSm9slQCO+2WP4owWTS
+	3pCKAMQ6xJfXpK7wjNNbo2LG2gwozYJ9+irZ8GfqROTzCsIg9EdGa4Se9X/6NcCnDL
+X-Received: by 2002:a17:90b:35c5:b0:34c:f92a:ad05 with SMTP id 98e67ed59e1d1-354b3bc38ebmr1131436a91.11.1770351725298;
+        Thu, 05 Feb 2026 20:22:05 -0800 (PST)
 Received: from pc.taild8403c.ts.net (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8244168fdf5sm926914b3a.17.2026.02.05.20.22.03
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8244168fdf5sm926914b3a.17.2026.02.05.20.22.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 05 Feb 2026 20:22:04 -0800 (PST)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
@@ -89,9 +88,9 @@ Cc: anjo@rev.ng,
 	kvm@vger.kernel.org,
 	qemu-arm@nongnu.org,
 	Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Subject: [PATCH v2 05/12] target/arm: extract helper-sme.h from helper.h
-Date: Thu,  5 Feb 2026 20:21:43 -0800
-Message-ID: <20260206042150.912578-6-pierrick.bouvier@linaro.org>
+Subject: [PATCH v2 06/12] target/arm/tcg: duplicate tcg/arith_helper.c and tcg/crypto_helper.c between user/system
+Date: Thu,  5 Feb 2026 20:21:44 -0800
+Message-ID: <20260206042150.912578-7-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260206042150.912578-1-pierrick.bouvier@linaro.org>
 References: <20260206042150.912578-1-pierrick.bouvier@linaro.org>
@@ -108,7 +107,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -116,7 +115,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[linaro.org:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70414-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70415-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -124,134 +123,80 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[pierrick.bouvier@linaro.org,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linaro.org:email,linaro.org:dkim,linaro.org:mid]
-X-Rspamd-Queue-Id: 10BE1FA0D5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:email,linaro.org:dkim,linaro.org:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 78EA6FA186
 X-Rspamd-Action: no action
+
+In next commit, we'll apply same helper pattern for base helpers
+remaining.
+
+Our new helper pattern always include helper-*-common.h, which ends up
+including include/tcg/tcg.h, which contains one occurrence of
+CONFIG_USER_ONLY.
+Thus, common files not being duplicated between system and target
+relying on helpers will fail to compile. Existing occurrences are:
+- target/arm/tcg/arith_helper.c
+- target/arm/tcg/crypto_helper.c
+
+There is a single occurrence of CONFIG_USER_ONLY, for defining variable
+tcg_use_softmmu. The fix seemed simple, always define it.
+However, it prevents some dead code elimination which ends up triggering:
+include/qemu/osdep.h:283:35: error: call to 'qemu_build_not_reached_always' declared with attribute error: code path is reachable
+  283 | #define qemu_build_not_reached()  qemu_build_not_reached_always()
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tcg/x86_64/tcg-target.c.inc:1907:45: note: in expansion of macro 'qemu_build_not_reached'
+ 1907 | # define x86_guest_base (*(HostAddress *)({ qemu_build_not_reached(); NULL; }))
+      |                                             ^~~~~~~~~~~~~~~~~~~~~~
+tcg/x86_64/tcg-target.c.inc:1934:14: note: in expansion of macro 'x86_guest_base'
+ 1934 |         *h = x86_guest_base;
+      |              ^~~~~~~~~~~~~~
+
+So, roll your eyes, then rollback code, and simply duplicate the two
+files concerned. We could also do a "special include trick" to prevent
+pulling helper-*-common.h but it would be sad since the whole point of
+the series up to here is to have something coherent using the exact same
+pattern.
 
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- target/arm/helper-sme.h                            | 14 ++++++++++++++
- target/arm/helper.h                                |  4 ----
- target/arm/tcg/{helper-sme.h => helper-sme-defs.h} |  0
- target/arm/tcg/sme_helper.c                        |  3 +++
- target/arm/tcg/translate-a64.c                     |  1 +
- target/arm/tcg/translate-sme.c                     |  1 +
- target/arm/tcg/translate-sve.c                     |  1 +
- target/arm/tcg/vec_helper.c                        |  1 +
- 8 files changed, 21 insertions(+), 4 deletions(-)
- create mode 100644 target/arm/helper-sme.h
- rename target/arm/tcg/{helper-sme.h => helper-sme-defs.h} (100%)
+ target/arm/tcg/meson.build | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/helper-sme.h b/target/arm/helper-sme.h
-new file mode 100644
-index 00000000000..27c85fdeef1
---- /dev/null
-+++ b/target/arm/helper-sme.h
-@@ -0,0 +1,14 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+
-+#ifndef HELPER_SME_H
-+#define HELPER_SME_H
-+
-+#include "exec/helper-proto-common.h"
-+#include "exec/helper-gen-common.h"
-+
-+#define HELPER_H "tcg/helper-sme-defs.h"
-+#include "exec/helper-proto.h.inc"
-+#include "exec/helper-gen.h.inc"
-+#undef HELPER_H
-+
-+#endif /* HELPER_SME_H */
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 2f724643d39..b1e83196b3b 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -1,7 +1,3 @@
- /* SPDX-License-Identifier: GPL-2.0-or-later */
+diff --git a/target/arm/tcg/meson.build b/target/arm/tcg/meson.build
+index 1b115656c46..41cf9bad4f1 100644
+--- a/target/arm/tcg/meson.build
++++ b/target/arm/tcg/meson.build
+@@ -58,20 +58,20 @@ arm_user_ss.add(when: 'TARGET_AARCH64', if_false: files('cpu-v7m.c'))
  
- #include "tcg/helper.h"
+ arm_common_ss.add(zlib)
+ 
+-arm_common_ss.add(files(
+-  'arith_helper.c',
+-  'crypto_helper.c',
+-))
 -
--#ifdef TARGET_AARCH64
--#include "tcg/helper-sme.h"
--#endif
-diff --git a/target/arm/tcg/helper-sme.h b/target/arm/tcg/helper-sme-defs.h
-similarity index 100%
-rename from target/arm/tcg/helper-sme.h
-rename to target/arm/tcg/helper-sme-defs.h
-diff --git a/target/arm/tcg/sme_helper.c b/target/arm/tcg/sme_helper.c
-index 075360d8b8a..7729732369f 100644
---- a/target/arm/tcg/sme_helper.c
-+++ b/target/arm/tcg/sme_helper.c
-@@ -22,6 +22,7 @@
- #include "internals.h"
- #include "tcg/tcg-gvec-desc.h"
- #include "exec/helper-proto.h"
-+#include "helper-sme.h"
- #include "accel/tcg/cpu-ldst.h"
- #include "accel/tcg/helper-retaddr.h"
- #include "qemu/int128.h"
-@@ -29,6 +30,8 @@
- #include "vec_internal.h"
- #include "sve_ldst_internal.h"
- 
-+#define HELPER_H "tcg/helper-sme-defs.h"
-+#include "exec/helper-info.c.inc"
- 
- static bool vectors_overlap(ARMVectorReg *x, unsigned nx,
-                             ARMVectorReg *y, unsigned ny)
-diff --git a/target/arm/tcg/translate-a64.c b/target/arm/tcg/translate-a64.c
-index 31fb2ea9cc3..5d261a5e32b 100644
---- a/target/arm/tcg/translate-a64.c
-+++ b/target/arm/tcg/translate-a64.c
-@@ -19,6 +19,7 @@
- #include "qemu/osdep.h"
- #include "exec/target_page.h"
- #include "helper-a64.h"
-+#include "helper-sme.h"
- #include "helper-sve.h"
- #include "translate.h"
- #include "translate-a64.h"
-diff --git a/target/arm/tcg/translate-sme.c b/target/arm/tcg/translate-sme.c
-index 463ece97ab8..7d25ac5a51f 100644
---- a/target/arm/tcg/translate-sme.c
-+++ b/target/arm/tcg/translate-sme.c
-@@ -19,6 +19,7 @@
- 
- #include "qemu/osdep.h"
- #include "cpu.h"
-+#include "helper-sme.h"
- #include "helper-sve.h"
- #include "translate.h"
- #include "translate-a64.h"
-diff --git a/target/arm/tcg/translate-sve.c b/target/arm/tcg/translate-sve.c
-index c68a44aff8c..db25636fa3b 100644
---- a/target/arm/tcg/translate-sve.c
-+++ b/target/arm/tcg/translate-sve.c
-@@ -19,6 +19,7 @@
- 
- #include "qemu/osdep.h"
- #include "cpu.h"
-+#include "helper-sme.h"
- #include "helper-sve.h"
- #include "translate.h"
- #include "translate-a64.h"
-diff --git a/target/arm/tcg/vec_helper.c b/target/arm/tcg/vec_helper.c
-index bc64c8ff374..a070ac90579 100644
---- a/target/arm/tcg/vec_helper.c
-+++ b/target/arm/tcg/vec_helper.c
-@@ -21,6 +21,7 @@
- #include "cpu.h"
- #include "exec/helper-proto.h"
- #include "helper-a64.h"
-+#include "helper-sme.h"
- #include "helper-sve.h"
- #include "tcg/tcg-gvec-desc.h"
- #include "fpu/softfloat.h"
+ arm_common_system_ss.add(files(
++  'arith_helper.c',
++  'crypto_helper.c',
+   'cpregs-at.c',
+   'hflags.c',
+   'neon_helper.c',
+   'tlb_helper.c',
+   'tlb-insns.c',
+   'vfp_helper.c',
++  'crypto_helper.c',
+ ))
+ arm_user_ss.add(files(
++  'arith_helper.c',
++  'crypto_helper.c',
+   'hflags.c',
+   'neon_helper.c',
+   'tlb_helper.c',
 -- 
 2.47.3
 
