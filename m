@@ -1,203 +1,149 @@
-Return-Path: <kvm+bounces-70515-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70516-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oBzLBOhnhmm4MwQAu9opvQ
-	(envelope-from <kvm+bounces-70515-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 23:15:04 +0100
+	id iM54DS1rhmnwMwQAu9opvQ
+	(envelope-from <kvm+bounces-70516-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 23:29:01 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CDEB103AFB
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 23:15:03 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60146103CA5
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 23:29:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3AC9C3043465
-	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 22:14:54 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BBE89301153F
+	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 22:28:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517CA30F803;
-	Fri,  6 Feb 2026 22:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8BDE311955;
+	Fri,  6 Feb 2026 22:28:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="FbYkmeVP";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="eBahRD4D"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X3KstRwu"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE2C30ACE3;
-	Fri,  6 Feb 2026 22:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4FC1301001
+	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 22:28:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770416089; cv=none; b=smZNHgARwETpYKA6opheCuF6WOhk+1MCsdk6f/yoM05ADB4+Ag9Nxm3tvatcZ611keBwZRYH4RXIqphNQQ0/Df0mFy/H/lQtIE6N7uSf1VYrx53Dfsfex+grWJAY1hRFA7QRZe+rQUyqZmO6YqgajVPnZe6ITJvMA2d364oFzhM=
+	t=1770416924; cv=none; b=ifO04Uj6CxgK6iUIB/WQW8uN0tHLHc658CQLJB3Gw/hAyhlqBmmGVvjd7eabtTFJ5DN4lkjnSln/lVJ5EFL40Xbi/meZrxdYmxSqxNu/zww3ehG57dRLTMhjzETHRX+FdUKPvkHDQKP3ixtz2K9b6UzlREZ83Awf0bPk9ouHLzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770416089; c=relaxed/simple;
-	bh=1E4rFn1VCpcMyxGuxoR2kE1jxlZDUtY3dCLCqym/ff8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pg+dHGf+Re80Apbe/E1w29hPDzuMKOzlRK4NLI2B/qBPZdXXoEZBT/y88RnFKq3wER9ftIivvKn9hmWxBrKcepd1wHknOB91sfMzlyVGXmD5Afk3gVC00PdZlXDKC8xAIjmgHh52GQz0aRncd5WYWyZ5Z3zwNKl9YgtZT90SX/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=FbYkmeVP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=eBahRD4D; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 89C1F7A010F;
-	Fri,  6 Feb 2026 17:14:48 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Fri, 06 Feb 2026 17:14:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1770416088;
-	 x=1770502488; bh=JEypNavNi9UjAOn/VSgCKdRPMxSg0dIinMfd7X1nSZk=; b=
-	FbYkmeVPUoRyx33dcc2vaw5x6/vfFQjhyFmKb8M0egFOFqiaByN+atUu+3Tx8Vgo
-	wUM0EW8tYY0ke6aJgRW2OpVbHDDT8byPVWptGEFXFGwnY+oO3O3vg75mzOjeQAKK
-	31nyXj+MAiFspHcgifEPzfzqZPw/ULDhSfmgDfrErX9Q4CpY0mC8y3/n0nJv7AWn
-	D2u1h3Bci+E/1kfbx0EV2nozf5gvWREyCffwGfuBre81EP52Ip4P8a2pA7CilVc7
-	q9+CKfhFbh9FFnVYBDFodcZ0wojEejD/DDRSflsbh3gxqImXjy0Aek6Jr9Nl340N
-	xiUXMlzN8HbcrH7byvYBYg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1770416088; x=
-	1770502488; bh=JEypNavNi9UjAOn/VSgCKdRPMxSg0dIinMfd7X1nSZk=; b=e
-	BahRD4D0y0rZqyCDuvwEW8qBW/9bJa7BUPOPdN2E683GPxPlCdxJ5yed7zcFfxi2
-	aB1DgM5NS8HJUwrMLJV9we9YWY2KFrBCviI0Zqx1GiSZrY/ynSOHJ13G1gPpb5wP
-	Wbstemjxwp/U90lbnksgyDOhMj96tC5KgdB/sXXBDKOrEyJiuKHMuPUD42FtL0nH
-	xmwqWxarjEaiXAIiQb22p4MWXM8xc/jM+MjHccO6POM2Y7+pIXCPRtZA+klMuf9F
-	C9ijKsQjPiecbKi9bRe2E8XGj+W+2EfcyqO4ISOVmulyurFFtvvLea/N58DDv0mf
-	8jvJOAl6f4474l7SsgV1w==
-X-ME-Sender: <xms:2GeGaZVsdCMtedYC7i3oZEC8xlsyCvJd5LrdSE87LQBtKxawfifxxw>
-    <xme:2GeGaRWdRuqDBePaE28Nik--6xV5M-8kNdLQe-woBz_vrV2l8zsIcOTZaoq3fILop
-    FJCgkmPtEMCUVY2LoKY5aV61R-Aj7ghLcP3BAVivthQehrqLy5ggg8>
-X-ME-Received: <xmr:2GeGaYc776CUGSuDVLvhNUdBvZkwKOQ8jMSNNvfYNd-_FK1DtK_bRzIP2do>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddukeelfeegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
-    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
-    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepfedpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtohepihhorghnrgdrtghiohhrnhgvihesnhigphdrtghomh
-    dprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:2GeGaaUjXXKhGbLtlMX26N64rmd5Zq-P1ukKfES4czwIBtk6x88miQ>
-    <xmx:2GeGaRd1nb_yO7ryed-jYai9B9icXpo8X3ydNgaN8aBjRa72QiopMA>
-    <xmx:2GeGaWNFoFOdkzkBy18nAGAZoCZXhRW3gL9aGn1DpTOmVH704jrBWA>
-    <xmx:2GeGafiKwtgLipSge9QA9U6FkAbujCYeysVFgbB_Izn0GPUPU97iCg>
-    <xmx:2GeGaQ4m_Axu3WB-JHFPQkZDNOL7yw0OZaTrw0zKttZOCpLUVRvo1LuU>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 6 Feb 2026 17:14:47 -0500 (EST)
-Date: Fri, 6 Feb 2026 15:14:46 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Ioana Ciornei <ioana.ciornei@nxp.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] vfio/fsl-mc: add myself as maintainer
-Message-ID: <20260206151446.5cc59eb1@shazbot.org>
-In-Reply-To: <20260204100913.3197966-1-ioana.ciornei@nxp.com>
-References: <20260204100913.3197966-1-ioana.ciornei@nxp.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1770416924; c=relaxed/simple;
+	bh=5WlBpXcTHGuxWH4iNnba8FpIkK+3C56TjrsiYnNMy1w=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=g4ylO50/av9oleXySoCdRUR7fT3KwI8fgyynwc1PySkik3cieDbVTrufTTLqNyrf//CEVLa3cVknC7Wy4krI0nFngMsEuiD0OZt08OBVrVxaGlz2AEa1ujSvwNTxjLxVFPviPqUIy4jFzLHCSkWOeBov/Ndh4trARVOykFOtTZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X3KstRwu; arc=none smtp.client-ip=209.85.210.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sagis.bounces.google.com
+Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7cfd0f357dcso1793484a34.2
+        for <kvm@vger.kernel.org>; Fri, 06 Feb 2026 14:28:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770416923; x=1771021723; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Io5HDeIklfld3UNsVscq5IsVk6UhJkXyB1ydmVsm80I=;
+        b=X3KstRwubBoBnx2jtxVJOH3wiYub5qYsshPgjfk4I9jwSmiSNam49P9E4EwI/czdmC
+         FmaOfrKcqEb3bBUHRpcz1UOrR64QmLDIFEOnH6ejc18xcJ+lXJnLZY//N5/Zp4ADqWTh
+         krdarFIzlIFfe86SqiD67OW6bmj/d/NymzrCvNPZg2IkV59l5ayc8loC9MuIn3+xeu1y
+         N8Vmp7802Yyd8IWTVBLSOlRzX5H9Rj5cv21HxYlfa0ne8FVfk72tSdGrUuV76+Ay7z35
+         rsckr+w2xfo4HBQiZdYEovbx9rqW+E//jzL7vokUNqdTXYeUW+IFy8xRpfltwe8nEXDV
+         OMUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770416923; x=1771021723;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Io5HDeIklfld3UNsVscq5IsVk6UhJkXyB1ydmVsm80I=;
+        b=VCA4LAc3BE7deucIyy7g4zUx7KMd50H753Dui+GqXDGSdd0Y8SuXgr7X5746dSKcYT
+         mmSdULmGxOyoVsJAUcVNPGcYWWiukLf6Uh0VkaBxYAYmMwzJUzzCl8eA2CPFBjpLRtWU
+         KIN4Jsugg7XNFMwJAeBggkMw3DhOnQ8g55tC+USvYNJEGmGbVUS6KrZngHNm1wHncSDh
+         quW1O3S8hqwdEnSiS+Kcm0/RTWaslSfIiNaEAjCvSkeli4mE/OMoN+561x6jG6qvvXk0
+         i2yN7Q9S/RIkax31Qui2b0WqYw17L3/DyQ20MsFU3wg4T927ox0j438kLtF4KAAGgqOn
+         tRcA==
+X-Forwarded-Encrypted: i=1; AJvYcCWjGSVH3Q0ZgzL7eHz8egO9+wmmDiMhGLZok1CfsmiscnelUEwfLlFAwtifwfIZRykBnO4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydFOhEXIJ4mg3cuAv2cHBbCtp0xfOOfBd/qfIZu4wIexi90ida
+	34tpU4uVq7aMFtjmA+/+H/cLVq94pzzgEgrp9Dzd8ekJjT6vyDfo1e8nJ6mw9NeQ5UlfRBXTGVV
+	GnQ==
+X-Received: from jasx4.prod.google.com ([2002:a05:6638:1604:b0:5cb:209d:14f7])
+ (user=sagis job=prod-delivery.src-stubby-dispatcher) by 2002:a4a:e911:0:b0:662:e066:7397
+ with SMTP id 006d021491bc7-66d0c855e86mr1825095eaf.71.1770416922857; Fri, 06
+ Feb 2026 14:28:42 -0800 (PST)
+Date: Fri,  6 Feb 2026 22:28:27 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
+Message-ID: <20260206222829.3758171-1-sagis@google.com>
+Subject: [PATCH v3 0/2] Extend KVM_HC_MAP_GPA_RANGE api to allow retry
+From: Sagi Shahar <sagis@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Kiryl Shutsemau <kas@kernel.org>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Thomas Gleixner <tglx@kernel.org>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Michael Roth <michael.roth@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev, 
+	Sagi Shahar <sagis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm2,messagingengine.com:s=fm3];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-70516-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70515-lists,kvm=lfdr.de];
-	RCPT_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.997];
+	FROM_NEQ_ENVFROM(0.00)[sagis@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,shazbot.org:mid,shazbot.org:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7CDEB103AFB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 60146103CA5
 X-Rspamd-Action: no action
 
-On Wed,  4 Feb 2026 12:09:12 +0200
-Ioana Ciornei <ioana.ciornei@nxp.com> wrote:
+In some cases, userspace might decide to split MAP_GPA requests and
+retry them the next time the guest runs. One common case is MAP_GPA
+requests received right before intrahost migration when userspace
+might decide to complete the request after the migration is complete
+to reduce blackout time.
 
-> Add myself as maintainer of the vfio/fsl-mc driver. The driver is still
-> highly in use on Layerscape DPAA2 SoCs.
-> 
-> Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
-> ---
->  MAINTAINERS                       | 3 ++-
->  drivers/vfio/fsl-mc/Kconfig       | 5 +----
->  drivers/vfio/fsl-mc/vfio_fsl_mc.c | 2 --
->  3 files changed, 3 insertions(+), 7 deletions(-)
+This is v3 of the series, v1[1] and v2[2] were posted as standalone
+patches.
 
-I was rather looking forward to removing this, but welcome aboard.
-Applied to vfio next branch for v6.20/7.0.  Thanks,
+Changes from v2:
+ * Rebased on top of v6.19-rc8.
+ * Updated documentation.
+ * Restricted SNP error codes to match TDX restrictions.
 
-Alex
+[1] https://lore.kernel.org/kvm/20260114003015.1386066-1-sagis@google.com/
+[2] https://lore.kernel.org/lkml/20260115225238.2837449-1-sagis@google.com/
 
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 26898ca27409..66882df493cc 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -27677,8 +27677,9 @@ F:	include/uapi/linux/vfio.h
->  F:	tools/testing/selftests/vfio/
->  
->  VFIO FSL-MC DRIVER
-> +M:	Ioana Ciornei <ioana.ciornei@nxp.com>
->  L:	kvm@vger.kernel.org
-> -S:	Obsolete
-> +S:	Maintained
->  F:	drivers/vfio/fsl-mc/
->  
->  VFIO HISILICON PCI DRIVER
-> diff --git a/drivers/vfio/fsl-mc/Kconfig b/drivers/vfio/fsl-mc/Kconfig
-> index 43c145d17971..7d1d690348f0 100644
-> --- a/drivers/vfio/fsl-mc/Kconfig
-> +++ b/drivers/vfio/fsl-mc/Kconfig
-> @@ -2,12 +2,9 @@ menu "VFIO support for FSL_MC bus devices"
->  	depends on FSL_MC_BUS
->  
->  config VFIO_FSL_MC
-> -	tristate "VFIO support for QorIQ DPAA2 fsl-mc bus devices (DEPRECATED)"
-> +	tristate "VFIO support for QorIQ DPAA2 fsl-mc bus devices"
->  	select EVENTFD
->  	help
-> -	  The vfio-fsl-mc driver is deprecated and will be removed in a
-> -	  future kernel release.
-> -
->  	  Driver to enable support for the VFIO QorIQ DPAA2 fsl-mc
->  	  (Management Complex) devices. This is required to passthrough
->  	  fsl-mc bus devices using the VFIO framework.
-> diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> index ba47100f28c1..3985613e6830 100644
-> --- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> +++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-> @@ -531,8 +531,6 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
->  	struct device *dev = &mc_dev->dev;
->  	int ret;
->  
-> -	dev_err_once(dev, "DEPRECATION: vfio-fsl-mc is deprecated and will be removed in a future kernel release\n");
-> -
->  	vdev = vfio_alloc_device(vfio_fsl_mc_device, vdev, dev,
->  				 &vfio_fsl_mc_ops);
->  	if (IS_ERR(vdev))
+Sagi Shahar (1):
+  KVM: SEV: Restrict userspace return codes for KVM_HC_MAP_GPA_RANGE
+
+Vishal Annapurve (1):
+  KVM: TDX: Allow userspace to return errors to guest for MAPGPA
+
+ Documentation/virt/kvm/api.rst |  3 +++
+ arch/x86/kvm/svm/sev.c         | 12 ++++++++++--
+ arch/x86/kvm/vmx/tdx.c         | 15 +++++++++++++--
+ arch/x86/kvm/x86.h             |  6 ++++++
+ 4 files changed, 32 insertions(+), 4 deletions(-)
+
+-- 
+2.53.0.rc2.204.g2597b5adb4-goog
 
 
