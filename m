@@ -1,37 +1,37 @@
-Return-Path: <kvm+bounces-70471-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70472-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kK9dJu8xhmmcKQQAu9opvQ
-	(envelope-from <kvm+bounces-70471-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 19:24:47 +0100
+	id uLEYKHo3hmmHLAQAu9opvQ
+	(envelope-from <kvm+bounces-70472-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 19:48:26 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAE73101C78
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 19:24:46 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC3A81023D1
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 19:48:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 07ACF3045219
-	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 18:23:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D3EAD3049070
+	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 18:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF2C413238;
-	Fri,  6 Feb 2026 18:23:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3217642EEAA;
+	Fri,  6 Feb 2026 18:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Gv4P5OBM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="w61hwdrn"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBDE426D1F;
-	Fri,  6 Feb 2026 18:23:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DEB542E010
+	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 18:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770402230; cv=none; b=p/Ug+lDkwBPN5XoqhpCRrbmlfut1llb4ufM3N2rjfS7LpYlOPW+hzGcydBI+VaSqsZnpY2PHgNdrLDd95IhJ/mZV8dNlso4ilD8dzP3M/+L9GZY3DmhI7cVZewfM5FFfL3AxnHCDQlFVyRsGPL8/Z9VDM1WwOpYhh0eheq/CbCI=
+	t=1770402552; cv=none; b=cIIMDzL2RDuqb4DPfzRqWIQThEBMFlYfZPnBrdzA1tz4GT0Tt+E6MKo7lHwUFWyfarWnzvD4jU63k2jMtLHLIEKG/q5akgjKAFLlgAljAGob+qjJZVN9h9RcofPYX8gnu4H11Cl79YnjHsKy9kfnsaEm7s/h7PMJIJrGDQQHbsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770402230; c=relaxed/simple;
-	bh=PPmf/TTwe2EPf5X2ReEiLE8ehMGgo5rNVgEZzhhuGAw=;
+	s=arc-20240116; t=1770402552; c=relaxed/simple;
+	bh=ymfAs3xB8hAuETyebogRx9mBd07Qw8b8lS7I2myLjSk=;
 	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=eCmBvWIN8jhJFO+4x8kDwjszxTEvku28qbFiyjSdYqqdHddgLXx6ffJozgTU+OgYWLAtr7kocw4kC0lFLCAxt/eXADQIEm7RK751jbCZf6OSsUs6ikr9Zsu6re87DkzvuzdKeraYEkWBguRiifaamQA6m6yhlSUeJwXheIZU5oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Gv4P5OBM; arc=none smtp.client-ip=91.218.175.174
+	 In-Reply-To:References; b=T9rtIljBjXc0K9NGaCPmU5l3jdjcDBBveZ/F7yvMC8rBS58EBD6uMZiFx3VUR0vLnDm5pVHIXkXY0SSUtl52OIlk0k8+7MWlsyMgEuoZlpjw/Cqi3vLthU3dR7BhLnj7J3sC00GC5CG12Jxx1LOoR9tVZQGA2KIbcOcFZl7wSO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=w61hwdrn; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
@@ -41,23 +41,24 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770402217;
+	t=1770402550;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=j8eeD2/8SMFZNgS0pJi9UHSBdDAom1iHyyBEp3tHmS4=;
-	b=Gv4P5OBMyA8MEpTQ3IJyh7Lc47yvlyQnmg10qe4R0sWzykYphIRwK3LanUcUMaIXRIajBQ
-	OmTmSqezteSFncYhEQ8ccI0xyyUZVTYu0gDVMS5Sryn3ukafrg5qycxUFTOcoEom7KoFwk
-	MbHU5YcArar7fkInc4t5m33uiofyOZA=
-Date: Fri, 06 Feb 2026 18:23:35 +0000
+	bh=oEqsT/9o28ooWpXG8lklZvWxvcXOZono2CP5ZVtyGks=;
+	b=w61hwdrnqOhRiR8XiXSao9xW8xRL17RkWx+39mLRCIIk3YV1x8EbiAkvCOqof1kzmj8VYn
+	08G9VMj4R2nQ/4DApBJzcBTXgBGyEy/etkcjF79+zG5WZ5ghjhBo397b3K5QG/E58awrx9
+	QJk9jm89AgUR715SuijijjPvaGyjsBg=
+Date: Fri, 06 Feb 2026 18:29:05 +0000
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: "Yosry Ahmed" <yosry.ahmed@linux.dev>
-Message-ID: <fb750b1bb21bd47f85eb133d69b2c059188f4c05@linux.dev>
+Message-ID: <0468715595718af34a8a3551663cffa79dd3ce2e@linux.dev>
 TLS-Required: No
-Subject: Re: [PATCH v3 2/8] KVM: x86: nSVM: Cache and validate vmcb12 g_pat
+Subject: Re: [PATCH v3 3/8] KVM: x86: nSVM: Set vmcb02.g_pat correctly for
+ nested NPT
 To: "Sean Christopherson" <seanjc@google.com>, "Jim Mattson"
  <jmattson@google.com>
 Cc: "Paolo Bonzini" <pbonzini@redhat.com>, "Thomas Gleixner"
@@ -66,22 +67,22 @@ Cc: "Paolo Bonzini" <pbonzini@redhat.com>, "Thomas Gleixner"
  x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, "Shuah Khan"
  <shuah@kernel.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-kselftest@vger.kernel.org
-In-Reply-To: <aYYwwWjMDJQh6uDd@google.com>
+In-Reply-To: <aYYxh8EiLrBTiq0L@google.com>
 References: <20260205214326.1029278-1-jmattson@google.com>
- <20260205214326.1029278-3-jmattson@google.com>
- <aYYwwWjMDJQh6uDd@google.com>
+ <20260205214326.1029278-4-jmattson@google.com>
+ <aYYxh8EiLrBTiq0L@google.com>
 X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70471-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70472-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
@@ -96,64 +97,103 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[kvm];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:mid,linux.dev:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EAE73101C78
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
+X-Rspamd-Queue-Id: AC3A81023D1
 X-Rspamd-Action: no action
 
-February 6, 2026 at 10:19 AM, "Sean Christopherson" <seanjc@google.com> w=
+February 6, 2026 at 10:23 AM, "Sean Christopherson" <seanjc@google.com> w=
 rote:
-
-
 >=20
 >=20On Thu, Feb 05, 2026, Jim Mattson wrote:
 >=20
 >=20>=20
->=20> Cache g_pat from vmcb12 in svm->nested.gpat to avoid TOCTTOU issues=
-, and
-> >  add a validity check so that when nested paging is enabled for vmcb1=
-2, an
-> >  invalid g_pat causes an immediate VMEXIT with exit code VMEXIT_INVAL=
-ID, as
-> >  specified in the APM, volume 2: "Nested Paging and VMRUN/VMEXIT."
+>=20> When nested NPT is enabled in vmcb12, copy the (cached and validate=
+d)
+> >  vmcb12 g_pat field to the guest PAT register. Under KVM, the guest P=
+AT
+> >  register lives in the vmcb02 g_pat field.
 > >=20=20
->=20>  Fixes: 3d6368ef580a ("KVM: SVM: Add VMRUN handler")
+>=20>  When NPT is enabled, but nested NPT is disabled, copy L1's IA32_PA=
+T MSR to
+> >  the vmcb02 g_pat field, since L2 shares the IA32_PAT MSR with L1.
+> >=20=20
+>=20>  When NPT is disabled, the vmcb02 g_pat field is ignored by hardwar=
+e.
+> >=20
+>=20Uber nit, the "vmcb02" qualifier can be dropped, i.e.
+>=20
+>=20 When NPT is disabled, the g_pat field is ignored by hardware.
+>=20
+>=20Scoping it to vmcb02 makes it sound like there's a special rule about=
+ vmcb02.
+>=20
+>=20>=20
+>=20> Fixes: 15038e147247 ("KVM: SVM: obey guest PAT")
 > >  Signed-off-by: Jim Mattson <jmattson@google.com>
 > >  ---
-> >  arch/x86/kvm/svm/nested.c | 4 +++-
-> >  arch/x86/kvm/svm/svm.h | 3 +++
-> >  2 files changed, 6 insertions(+), 1 deletion(-)
+> >  arch/x86/kvm/svm/nested.c | 16 +++++++++++++---
+> >  1 file changed, 13 insertions(+), 3 deletions(-)
 > >=20=20
 >=20>  diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> >  index f72dbd10dcad..1d4ff6408b34 100644
+> >  index 1d4ff6408b34..1ff2ede96094 100644
 > >  --- a/arch/x86/kvm/svm/nested.c
 > >  +++ b/arch/x86/kvm/svm/nested.c
-> >  @@ -1027,9 +1027,11 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
+> >  @@ -646,9 +646,6 @@ static void nested_vmcb02_prepare_save(struct vc=
+pu_svm *svm, struct vmcb *vmcb12
+> >  struct vmcb *vmcb02 =3D svm->nested.vmcb02.ptr;
+> >  struct kvm_vcpu *vcpu =3D &svm->vcpu;
 > >=20=20
->=20>  nested_copy_vmcb_control_to_cache(svm, &vmcb12->control);
-> >  nested_copy_vmcb_save_to_cache(svm, &vmcb12->save);
-> >  + svm->nested.gpat =3D vmcb12->save.g_pat;
+>=20>  - nested_vmcb02_compute_g_pat(svm);
+> >  - vmcb_mark_dirty(vmcb02, VMCB_NPT);
+> >  -
+> >  /* Load the nested guest state */
+> >  if (svm->nested.vmcb12_gpa !=3D svm->nested.last_vmcb12_gpa) {
+> >  new_vmcb12 =3D true;
+> >  @@ -656,6 +653,19 @@ static void nested_vmcb02_prepare_save(struct v=
+cpu_svm *svm, struct vmcb *vmcb12
+> >  svm->nested.force_msr_bitmap_recalc =3D true;
+> >  }
 > >=20=20
->=20>  if (!nested_vmcb_check_save(vcpu) ||
-> >  - !nested_vmcb_check_controls(vcpu)) {
-> >  + !nested_vmcb_check_controls(vcpu) ||
-> >  + (nested_npt_enabled(svm) && !kvm_pat_valid(svm->nested.gpat))) {
-> >  vmcb12->control.exit_code =3D SVM_EXIT_ERR;
-> >  vmcb12->control.exit_info_1 =3D 0;
-> >  vmcb12->control.exit_info_2 =3D 0;
-> >  diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> >  index 986d90f2d4ca..42a4bf83b3aa 100644
-> >  --- a/arch/x86/kvm/svm/svm.h
-> >  +++ b/arch/x86/kvm/svm/svm.h
-> >  @@ -208,6 +208,9 @@ struct svm_nested_state {
-> >  */
-> >  struct vmcb_save_area_cached save;
-> >=20=20
->=20>  + /* Cached guest PAT from vmcb12.save.g_pat */
-> >  + u64 gpat;
+>=20>  + if (npt_enabled) {
+> >  + if (nested_npt_enabled(svm)) {
+> >  + if (unlikely(new_vmcb12 ||
+> >  + vmcb_is_dirty(vmcb12, VMCB_NPT))) {
+> >  + vmcb02->save.g_pat =3D svm->nested.gpat;
+> >  + vmcb_mark_dirty(vmcb02, VMCB_NPT);
+> >  + }
+> >  + } else {
+> >  + vmcb02->save.g_pat =3D vcpu->arch.pat;
+> >  + vmcb_mark_dirty(vmcb02, VMCB_NPT);
+> >  + }
+> >  + }
 > >=20
->=20Shouldn't this go in vmcb_save_area_cached?
+>=20To reduce indentation, how about this? There's a consistency check fo=
+r
+> nested_npt_enabled() vs. npt_enabled, so it's guaranteed to do the righ=
+t thing.
 
-I believe Jim changed it after this discussion on v2: https://lore.kernel=
-.org/kvm/20260115232154.3021475-4-jmattson@google.com/.
+You mean the one that goes away after this patch: https://lore.kernel.org=
+/kvm/20260115011312.3675857-16-yosry.ahmed@linux.dev/?
+
+>=20
+>=20 if (nested_npt_enabled(svm)) {
+>  if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_NPT))) {
+>  vmcb02->save.g_pat =3D svm->nested.gpat;
+>  vmcb_mark_dirty(vmcb02, VMCB_NPT);
+>  }
+>  } else if (npt_enabled) {
+>  vmcb02->save.g_pat =3D vcpu->arch.pat;
+>  vmcb_mark_dirty(vmcb02, VMCB_NPT);
+>  }
+>=20
+>=20>=20
+>=20> +
+> >  if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_SEG))) {
+> >  vmcb02->save.es =3D vmcb12->save.es;
+> >  vmcb02->save.cs =3D vmcb12->save.cs;
+> >  --=20
+>=20>  2.53.0.rc2.204.g2597b5adb4-goog
+> >
+>
 
