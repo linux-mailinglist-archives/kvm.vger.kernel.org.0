@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-70499-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70500-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNOULDs+hmnzLAQAu9opvQ
-	(envelope-from <kvm+bounces-70499-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 20:17:15 +0100
+	id 0N4wNEE+hmnzLAQAu9opvQ
+	(envelope-from <kvm+bounces-70500-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 20:17:21 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29A5F102963
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 20:17:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E5A310296A
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 20:17:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5CD0430DF7F8
-	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 19:11:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0B60F30E3E34
+	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 19:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A46441032;
-	Fri,  6 Feb 2026 19:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE574429831;
+	Fri,  6 Feb 2026 19:09:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Pqyun2A5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sc+HgOkd"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1730C441024
-	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 19:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26EB428856
+	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 19:09:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770404986; cv=none; b=KGCSGrU6/BFJdN+rSeChk14bsXi0ZqujJAaDBvW0veyoRI1lMd6o3uBVyg3vcBLOrdY7BwHK+I+I7hIAcX1uhW9Qx00+hL/i5jZ0TkSa76sw88UmNfxeeSF+sxPLn46iPHR0/03+1xxBkLxGetpBZ2HDHqbR+Iq3tOFEgX28iCs=
+	t=1770404988; cv=none; b=YTRONNyAIJNcIrtrBDofCx7C0VK+Dm0ZIuGdLdxLpJMzDxlMDaASFPdVGILlFAEt1cBzlzXDWFdCjaacX3YxbT6+PoNJLzjyNHbip4cJM4PZDDYil+GJKgqVn/vzuokFWVYLBFAprMfSFc6JFnn2k3wLz+4VAaBcYrugSKC6jQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770404986; c=relaxed/simple;
-	bh=JUDT+7Eh/cU+Y4SWZVSQLxL80w6YiNf4szRRp1A7WjE=;
+	s=arc-20240116; t=1770404988; c=relaxed/simple;
+	bh=IE2LOMMVzzCq4n63t222erqdX3U+jtTSXvSNeqmRK7I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tpmc2Gri/LTNrCrctE6sIO53HC5Vh13znDV74cqAyQwcYuTYRv349m1Unk2nbCc7YX3rn7tzwRq7oYt8HsrV/mi6O0jdkLOHLon3Wtt2TidFJwGUqB6tjpB0ruRe5pvkrCkQpukf9jVucT7qxEKq6rHPIhA/sKEBFHriYrCL89Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Pqyun2A5; arc=none smtp.client-ip=91.218.175.179
+	 MIME-Version; b=Zi5jJlIpufLGA6Sl5QCHVVAMLJ1LFGewzyTUVsP/JMI9c/8PTCijVFG+Do+zlgFZJoh038F9m9gTIkU9prXKXiAuDOCQW+pktkZThIlEfm8aI2rA2uZJuhx1U4JMSYZguil1VcMj4SR272dWq0BuAnn/aNRUnlI58IbhHpAwZx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sc+HgOkd; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770404984;
+	t=1770404986;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=j/tWCaP02zzkvXRIhMh2iPl6Wt9VXsdZeGUi4/BxY64=;
-	b=Pqyun2A5z1wazY7AQjXzqRRD+3Hc+w8mq7Y8eO4QWhdgK0ObVra3MKD4Z+nYCZ6fpYRmos
-	kstZdDb6qQBvOieLzkd20jHg4CASW3zM3G9ChViSnIANuuLKEZbOWyjWxIr2LWnJ5ZkAl5
-	Snp4f1IYc6fMfpQaIf3A7F+Jl88qGO0=
+	bh=+SRyW8PWhSIJQYz91UL9BaD05QehkW776cdUPG1w3Y4=;
+	b=sc+HgOkdMhYz0Js6xfPj+Q/7JGe6wElOBVNS/tJL+EVJ0qhgdS3xKQJrsfUo/AuMPEPlGW
+	LAmM8urq0+aRiYkARrOwtxADEIfgMU4oL9x6YjvQD1N6kByraWv09W0mratKYp04f+VcZa
+	uyseFQTzU5lcRRAoRxQ4IxtSs3oMYZ0=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH v5 21/26] KVM: SVM: Rename vmcb->nested_ctl to vmcb->misc_ctl
-Date: Fri,  6 Feb 2026 19:08:46 +0000
-Message-ID: <20260206190851.860662-22-yosry.ahmed@linux.dev>
+Subject: [PATCH v5 22/26] KVM: SVM: Rename vmcb->virt_ext to vmcb->misc_ctl2
+Date: Fri,  6 Feb 2026 19:08:47 +0000
+Message-ID: <20260206190851.860662-23-yosry.ahmed@linux.dev>
 In-Reply-To: <20260206190851.860662-1-yosry.ahmed@linux.dev>
 References: <20260206190851.860662-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -75,7 +75,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70499-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70500-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -91,212 +91,333 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 29A5F102963
+X-Rspamd-Queue-Id: 3E5A310296A
 X-Rspamd-Action: no action
 
-The 'nested_ctl' field is misnamed. Although the first bit is for nested
-paging, the other defined bits are for SEV/SEV-ES. Other bits in the
-same field according to the APM (but not defined by KVM) include "Guest
-Mode Execution Trap", "Enable INVLPGB/TLBSYNC", and other control bits
-unrelated to 'nested'.
+'virt' is confusing in the VMCB because it is relative and ambiguous.
+The 'virt_ext' field includes bits for LBR virtualization and
+VMSAVE/VMLOAD virtualization, so it's just another miscellaneous control
+field. Name it as such.
 
-There is nothing common among these bits, so just name the field
-misc_ctl. Also rename the flags accordingly.
+While at it, move the definitions of the bits below those for
+'misc_ctl' and rename them for consistency.
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- arch/x86/include/asm/svm.h                    |  8 ++++----
- arch/x86/kvm/svm/nested.c                     | 14 +++++++-------
- arch/x86/kvm/svm/sev.c                        |  4 ++--
- arch/x86/kvm/svm/svm.c                        |  4 ++--
- arch/x86/kvm/svm/svm.h                        |  4 ++--
- tools/testing/selftests/kvm/include/x86/svm.h |  6 +++---
- tools/testing/selftests/kvm/lib/x86/svm.c     |  2 +-
- 7 files changed, 21 insertions(+), 21 deletions(-)
+ arch/x86/include/asm/svm.h                    |  7 +++----
+ arch/x86/kvm/svm/nested.c                     | 18 ++++++++---------
+ arch/x86/kvm/svm/svm.c                        | 20 +++++++++----------
+ arch/x86/kvm/svm/svm.h                        |  2 +-
+ tools/testing/selftests/kvm/include/x86/svm.h |  8 ++++----
+ .../kvm/x86/nested_vmsave_vmload_test.c       | 16 +++++++--------
+ .../selftests/kvm/x86/svm_lbr_nested_state.c  |  4 ++--
+ 7 files changed, 37 insertions(+), 38 deletions(-)
 
 diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index edde36097ddc..983db6575141 100644
+index 983db6575141..c169256c415f 100644
 --- a/arch/x86/include/asm/svm.h
 +++ b/arch/x86/include/asm/svm.h
-@@ -142,7 +142,7 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- 	u64 exit_info_2;
- 	u32 exit_int_info;
- 	u32 exit_int_info_err;
--	u64 nested_ctl;
-+	u64 misc_ctl;
- 	u64 avic_vapic_bar;
- 	u64 ghcb_gpa;
+@@ -148,7 +148,7 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
  	u32 event_inj;
-@@ -239,9 +239,9 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- #define SVM_IOIO_SIZE_MASK (7 << SVM_IOIO_SIZE_SHIFT)
- #define SVM_IOIO_ASIZE_MASK (7 << SVM_IOIO_ASIZE_SHIFT)
+ 	u32 event_inj_err;
+ 	u64 nested_cr3;
+-	u64 virt_ext;
++	u64 misc_ctl2;
+ 	u32 clean;
+ 	u32 reserved_5;
+ 	u64 next_rip;
+@@ -222,9 +222,6 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ #define X2APIC_MODE_SHIFT 30
+ #define X2APIC_MODE_MASK (1 << X2APIC_MODE_SHIFT)
  
--#define SVM_NESTED_CTL_NP_ENABLE	BIT(0)
--#define SVM_NESTED_CTL_SEV_ENABLE	BIT(1)
--#define SVM_NESTED_CTL_SEV_ES_ENABLE	BIT(2)
-+#define SVM_MISC_ENABLE_NP		BIT(0)
-+#define SVM_MISC_ENABLE_SEV		BIT(1)
-+#define SVM_MISC_ENABLE_SEV_ES	BIT(2)
+-#define LBR_CTL_ENABLE_MASK BIT_ULL(0)
+-#define VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK BIT_ULL(1)
+-
+ #define SVM_INTERRUPT_SHADOW_MASK	BIT_ULL(0)
+ #define SVM_GUEST_INTERRUPT_MASK	BIT_ULL(1)
  
+@@ -243,6 +240,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ #define SVM_MISC_ENABLE_SEV		BIT(1)
+ #define SVM_MISC_ENABLE_SEV_ES	BIT(2)
+ 
++#define SVM_MISC2_ENABLE_V_LBR	BIT_ULL(0)
++#define SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE	BIT_ULL(1)
  
  #define SVM_TSC_RATIO_RSVD	0xffffff0000000000ULL
+ #define SVM_TSC_RATIO_MIN	0x0000000000000001ULL
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 42f0dbd86a89..10673615ab39 100644
+index 10673615ab39..76118bfcb183 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -399,7 +399,7 @@ static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
- 	if (CC(control->asid == 0))
- 		return false;
+@@ -116,7 +116,7 @@ static bool nested_vmcb_needs_vls_intercept(struct vcpu_svm *svm)
+ 	if (!nested_npt_enabled(svm))
+ 		return true;
  
--	if (control->nested_ctl & SVM_NESTED_CTL_NP_ENABLE) {
-+	if (control->misc_ctl & SVM_MISC_ENABLE_NP) {
- 		if (CC(!kvm_vcpu_is_legal_gpa(vcpu, control->nested_cr3)))
- 			return false;
- 		if (CC(!(l1_cr0 & X86_CR0_PG)))
-@@ -494,10 +494,10 @@ void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
- 	nested_svm_sanitize_intercept(vcpu, to, SKINIT);
- 	nested_svm_sanitize_intercept(vcpu, to, RDPRU);
+-	if (!(svm->nested.ctl.virt_ext & VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK))
++	if (!(svm->nested.ctl.misc_ctl2 & SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE))
+ 		return true;
  
--	/* Always clear SVM_NESTED_CTL_NP_ENABLE if the guest cannot use NPTs */
--	to->nested_ctl          = from->nested_ctl;
-+	/* Always clear SVM_MISC_ENABLE_NP if the guest cannot use NPTs */
-+	to->misc_ctl = from->misc_ctl;
- 	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_NPT))
--		to->nested_ctl &= ~SVM_NESTED_CTL_NP_ENABLE;
-+		to->misc_ctl &= ~SVM_MISC_ENABLE_NP;
+ 	return false;
+@@ -179,7 +179,7 @@ void recalc_intercepts(struct vcpu_svm *svm)
+ 		vmcb_set_intercept(c, INTERCEPT_VMLOAD);
+ 		vmcb_set_intercept(c, INTERCEPT_VMSAVE);
+ 	} else {
+-		WARN_ON(!(c->virt_ext & VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK));
++		WARN_ON(!(c->misc_ctl2 & SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE));
+ 	}
+ }
  
- 	to->iopm_base_pa        = from->iopm_base_pa;
- 	to->msrpm_base_pa       = from->msrpm_base_pa;
-@@ -833,7 +833,7 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+@@ -516,7 +516,7 @@ void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
+ 	to->event_inj_err       = from->event_inj_err;
+ 	to->next_rip            = from->next_rip;
+ 	to->nested_cr3          = from->nested_cr3;
+-	to->virt_ext            = from->virt_ext;
++	to->misc_ctl2            = from->misc_ctl2;
+ 	to->pause_filter_count  = from->pause_filter_count;
+ 	to->pause_filter_thresh = from->pause_filter_thresh;
+ 
+@@ -757,7 +757,7 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
  	}
  
- 	/* Copied from vmcb01.  msrpm_base can be overwritten later.  */
--	vmcb02->control.nested_ctl = vmcb01->control.nested_ctl;
-+	vmcb02->control.misc_ctl = vmcb01->control.misc_ctl;
- 	vmcb02->control.iopm_base_pa = vmcb01->control.iopm_base_pa;
- 	vmcb02->control.msrpm_base_pa = vmcb01->control.msrpm_base_pa;
- 	vmcb_mark_dirty(vmcb02, VMCB_PERM_MAP);
-@@ -989,7 +989,7 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
- 				 vmcb12->save.rip,
- 				 vmcb12->control.int_ctl,
- 				 vmcb12->control.event_inj,
--				 vmcb12->control.nested_ctl,
-+				 vmcb12->control.misc_ctl,
- 				 vmcb12->control.nested_cr3,
- 				 vmcb12->save.cr3,
- 				 KVM_ISA_SVM);
-@@ -1801,7 +1801,7 @@ static void nested_copy_vmcb_cache_to_control(struct vmcb_control_area *dst,
- 	dst->exit_info_2          = from->exit_info_2;
- 	dst->exit_int_info        = from->exit_int_info;
- 	dst->exit_int_info_err    = from->exit_int_info_err;
--	dst->nested_ctl           = from->nested_ctl;
-+	dst->misc_ctl		  = from->misc_ctl;
+ 	if (unlikely(guest_cpu_cap_has(vcpu, X86_FEATURE_LBRV) &&
+-		     (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK))) {
++		     (svm->nested.ctl.misc_ctl2 & SVM_MISC2_ENABLE_V_LBR))) {
+ 		/*
+ 		 * Reserved bits of DEBUGCTL are ignored.  Be consistent with
+ 		 * svm_set_msr's definition of reserved bits.
+@@ -914,10 +914,10 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+ 			svm->soft_int_next_rip = vmcb12_rip;
+ 	}
+ 
+-	/* LBR_CTL_ENABLE_MASK is controlled by svm_update_lbrv() */
++	/* SVM_MISC2_ENABLE_V_LBR is controlled by svm_update_lbrv() */
+ 
+ 	if (!nested_vmcb_needs_vls_intercept(svm))
+-		vmcb02->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
++		vmcb02->control.misc_ctl2 |= SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE;
+ 
+ 	if (guest_cpu_cap_has(vcpu, X86_FEATURE_PAUSEFILTER))
+ 		pause_count12 = svm->nested.ctl.pause_filter_count;
+@@ -1330,7 +1330,7 @@ void nested_svm_vmexit(struct vcpu_svm *svm)
+ 		kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+ 
+ 	if (unlikely(guest_cpu_cap_has(vcpu, X86_FEATURE_LBRV) &&
+-		     (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK))) {
++		     (svm->nested.ctl.misc_ctl2 & SVM_MISC2_ENABLE_V_LBR))) {
+ 		svm_copy_lbrs(&vmcb12->save, &vmcb02->save);
+ 	} else {
+ 		svm_copy_lbrs(&vmcb01->save, &vmcb02->save);
+@@ -1805,8 +1805,8 @@ static void nested_copy_vmcb_cache_to_control(struct vmcb_control_area *dst,
  	dst->event_inj            = from->event_inj;
  	dst->event_inj_err        = from->event_inj_err;
  	dst->next_rip             = from->next_rip;
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index ea515cf41168..0ed9cfed1cbc 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -4599,7 +4599,7 @@ static void sev_es_init_vmcb(struct vcpu_svm *svm, bool init_event)
- 	struct kvm_sev_info *sev = to_kvm_sev_info(svm->vcpu.kvm);
- 	struct vmcb *vmcb = svm->vmcb01.ptr;
- 
--	svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ES_ENABLE;
-+	svm->vmcb->control.misc_ctl |= SVM_MISC_ENABLE_SEV_ES;
- 
- 	/*
- 	 * An SEV-ES guest requires a VMSA area that is a separate from the
-@@ -4670,7 +4670,7 @@ void sev_init_vmcb(struct vcpu_svm *svm, bool init_event)
- {
- 	struct kvm_vcpu *vcpu = &svm->vcpu;
- 
--	svm->vmcb->control.nested_ctl |= SVM_NESTED_CTL_SEV_ENABLE;
-+	svm->vmcb->control.misc_ctl |= SVM_MISC_ENABLE_SEV;
- 	clr_exception_intercept(svm, UD_VECTOR);
- 
- 	/*
+-	dst->nested_cr3           = from->nested_cr3;
+-	dst->virt_ext              = from->virt_ext;
++	dst->nested_cr3		  = from->nested_cr3;
++	dst->misc_ctl2		  = from->misc_ctl2;
+ 	dst->pause_filter_count   = from->pause_filter_count;
+ 	dst->pause_filter_thresh  = from->pause_filter_thresh;
+ 	/* 'clean' and 'hv_enlightenments' are not changed by KVM */
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index a534c08fbe61..c9120dc3d6ff 100644
+index c9120dc3d6ff..0e197a2eb339 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -1152,7 +1152,7 @@ static void init_vmcb(struct kvm_vcpu *vcpu, bool init_event)
+@@ -710,7 +710,7 @@ void *svm_alloc_permissions_map(unsigned long size, gfp_t gfp_mask)
+ static void svm_recalc_lbr_msr_intercepts(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+-	bool intercept = !(svm->vmcb->control.virt_ext & LBR_CTL_ENABLE_MASK);
++	bool intercept = !(svm->vmcb->control.misc_ctl2 & SVM_MISC2_ENABLE_V_LBR);
  
- 	if (npt_enabled) {
- 		/* Setup VMCB for Nested Paging */
--		control->nested_ctl |= SVM_NESTED_CTL_NP_ENABLE;
-+		control->misc_ctl |= SVM_MISC_ENABLE_NP;
- 		svm_clr_intercept(svm, INTERCEPT_INVLPG);
- 		clr_exception_intercept(svm, PF_VECTOR);
- 		svm_clr_intercept(svm, INTERCEPT_CR3_READ);
-@@ -3358,7 +3358,7 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
- 	pr_err("%-20s%016llx\n", "exit_info2:", control->exit_info_2);
- 	pr_err("%-20s%08x\n", "exit_int_info:", control->exit_int_info);
- 	pr_err("%-20s%08x\n", "exit_int_info_err:", control->exit_int_info_err);
--	pr_err("%-20s%lld\n", "nested_ctl:", control->nested_ctl);
-+	pr_err("%-20s%lld\n", "misc_ctl:", control->misc_ctl);
- 	pr_err("%-20s%016llx\n", "nested_cr3:", control->nested_cr3);
- 	pr_err("%-20s%016llx\n", "avic_vapic_bar:", control->avic_vapic_bar);
+ 	if (intercept == svm->lbr_msrs_intercepted)
+ 		return;
+@@ -843,7 +843,7 @@ static void svm_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
+ 
+ static void __svm_enable_lbrv(struct kvm_vcpu *vcpu)
+ {
+-	to_svm(vcpu)->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
++	to_svm(vcpu)->vmcb->control.misc_ctl2 |= SVM_MISC2_ENABLE_V_LBR;
+ }
+ 
+ void svm_enable_lbrv(struct kvm_vcpu *vcpu)
+@@ -855,16 +855,16 @@ void svm_enable_lbrv(struct kvm_vcpu *vcpu)
+ static void __svm_disable_lbrv(struct kvm_vcpu *vcpu)
+ {
+ 	KVM_BUG_ON(sev_es_guest(vcpu->kvm), vcpu->kvm);
+-	to_svm(vcpu)->vmcb->control.virt_ext &= ~LBR_CTL_ENABLE_MASK;
++	to_svm(vcpu)->vmcb->control.misc_ctl2 &= ~SVM_MISC2_ENABLE_V_LBR;
+ }
+ 
+ void svm_update_lbrv(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+-	bool current_enable_lbrv = svm->vmcb->control.virt_ext & LBR_CTL_ENABLE_MASK;
++	bool current_enable_lbrv = svm->vmcb->control.misc_ctl2 & SVM_MISC2_ENABLE_V_LBR;
+ 	bool enable_lbrv = (svm->vmcb->save.dbgctl & DEBUGCTLMSR_LBR) ||
+ 			    (is_guest_mode(vcpu) && guest_cpu_cap_has(vcpu, X86_FEATURE_LBRV) &&
+-			    (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK));
++			    (svm->nested.ctl.misc_ctl2 & SVM_MISC2_ENABLE_V_LBR));
+ 
+ 	if (enable_lbrv && !current_enable_lbrv)
+ 		__svm_enable_lbrv(vcpu);
+@@ -1023,7 +1023,7 @@ static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	/*
+-	 * No need to toggle VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK here, it is
++	 * No need to toggle SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE here, it is
+ 	 * always set if vls is enabled. If the intercepts are set, the bit is
+ 	 * meaningless anyway.
+ 	 */
+@@ -1191,7 +1191,7 @@ static void init_vmcb(struct kvm_vcpu *vcpu, bool init_event)
+ 	}
+ 
+ 	if (vls)
+-		svm->vmcb->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
++		svm->vmcb->control.misc_ctl2 |= SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE;
+ 
+ 	if (vcpu->kvm->arch.bus_lock_detection_enabled)
+ 		svm_set_intercept(svm, INTERCEPT_BUSLOCK);
+@@ -3364,7 +3364,7 @@ static void dump_vmcb(struct kvm_vcpu *vcpu)
  	pr_err("%-20s%016llx\n", "ghcb:", control->ghcb_gpa);
+ 	pr_err("%-20s%08x\n", "event_inj:", control->event_inj);
+ 	pr_err("%-20s%08x\n", "event_inj_err:", control->event_inj_err);
+-	pr_err("%-20s%lld\n", "virt_ext:", control->virt_ext);
++	pr_err("%-20s%lld\n", "misc_ctl2:", control->misc_ctl2);
+ 	pr_err("%-20s%016llx\n", "next_rip:", control->next_rip);
+ 	pr_err("%-20s%016llx\n", "avic_backing_page:", control->avic_backing_page);
+ 	pr_err("%-20s%016llx\n", "avic_logical_id:", control->avic_logical_id);
+@@ -4359,7 +4359,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
+ 	 * VM-Exit), as running with the host's DEBUGCTL can negatively affect
+ 	 * guest state and can even be fatal, e.g. due to Bus Lock Detect.
+ 	 */
+-	if (!(svm->vmcb->control.virt_ext & LBR_CTL_ENABLE_MASK) &&
++	if (!(svm->vmcb->control.misc_ctl2 & SVM_MISC2_ENABLE_V_LBR) &&
+ 	    vcpu->arch.host_debugctl != svm->vmcb->save.dbgctl)
+ 		update_debugctlmsr(svm->vmcb->save.dbgctl);
+ 
+@@ -4390,7 +4390,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
+ 	if (unlikely(svm->vmcb->control.exit_code == SVM_EXIT_NMI))
+ 		kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
+ 
+-	if (!(svm->vmcb->control.virt_ext & LBR_CTL_ENABLE_MASK) &&
++	if (!(svm->vmcb->control.misc_ctl2 & SVM_MISC2_ENABLE_V_LBR) &&
+ 	    vcpu->arch.host_debugctl != svm->vmcb->save.dbgctl)
+ 		update_debugctlmsr(vcpu->arch.host_debugctl);
+ 
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 0a5d5a4453b7..f66e5c8565aa 100644
+index f66e5c8565aa..304328c33e96 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -167,7 +167,7 @@ struct vmcb_ctrl_area_cached {
- 	u64 exit_info_2;
- 	u32 exit_int_info;
- 	u32 exit_int_info_err;
--	u64 nested_ctl;
-+	u64 misc_ctl;
- 	u32 event_inj;
+@@ -172,7 +172,7 @@ struct vmcb_ctrl_area_cached {
  	u32 event_inj_err;
  	u64 next_rip;
-@@ -579,7 +579,7 @@ static inline bool gif_set(struct vcpu_svm *svm)
- 
- static inline bool nested_npt_enabled(struct vcpu_svm *svm)
- {
--	return svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
-+	return svm->nested.ctl.misc_ctl & SVM_MISC_ENABLE_NP;
- }
- 
- static inline bool nested_vnmi_enabled(struct vcpu_svm *svm)
+ 	u64 nested_cr3;
+-	u64 virt_ext;
++	u64 misc_ctl2;
+ 	u32 clean;
+ 	u64 bus_lock_rip;
+ 	union {
 diff --git a/tools/testing/selftests/kvm/include/x86/svm.h b/tools/testing/selftests/kvm/include/x86/svm.h
-index 10b30b38bb3f..d81d8a9f5bfb 100644
+index d81d8a9f5bfb..c8539166270e 100644
 --- a/tools/testing/selftests/kvm/include/x86/svm.h
 +++ b/tools/testing/selftests/kvm/include/x86/svm.h
-@@ -97,7 +97,7 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- 	u64 exit_info_2;
- 	u32 exit_int_info;
- 	u32 exit_int_info_err;
--	u64 nested_ctl;
-+	u64 misc_ctl;
- 	u64 avic_vapic_bar;
- 	u8 reserved_4[8];
+@@ -103,7 +103,7 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
  	u32 event_inj;
-@@ -175,8 +175,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- #define SVM_VM_CR_SVM_LOCK_MASK 0x0008ULL
- #define SVM_VM_CR_SVM_DIS_MASK  0x0010ULL
+ 	u32 event_inj_err;
+ 	u64 nested_cr3;
+-	u64 virt_ext;
++	u64 misc_ctl2;
+ 	u32 clean;
+ 	u32 reserved_5;
+ 	u64 next_rip;
+@@ -155,9 +155,6 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ #define AVIC_ENABLE_SHIFT 31
+ #define AVIC_ENABLE_MASK (1 << AVIC_ENABLE_SHIFT)
  
--#define SVM_NESTED_CTL_NP_ENABLE	BIT(0)
--#define SVM_NESTED_CTL_SEV_ENABLE	BIT(1)
-+#define SVM_MISC_ENABLE_NP		BIT(0)
-+#define SVM_MISC_ENABLE_SEV		BIT(1)
+-#define LBR_CTL_ENABLE_MASK BIT_ULL(0)
+-#define VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK BIT_ULL(1)
+-
+ #define SVM_INTERRUPT_SHADOW_MASK 1
  
+ #define SVM_IOIO_STR_SHIFT 2
+@@ -178,6 +175,9 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ #define SVM_MISC_ENABLE_NP		BIT(0)
+ #define SVM_MISC_ENABLE_SEV		BIT(1)
+ 
++#define SVM_MISC2_ENABLE_V_LBR BIT_ULL(0)
++#define SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE BIT_ULL(1)
++
  struct __attribute__ ((__packed__)) vmcb_seg {
  	u16 selector;
-diff --git a/tools/testing/selftests/kvm/lib/x86/svm.c b/tools/testing/selftests/kvm/lib/x86/svm.c
-index 2e5c480c9afd..eb20b00112c7 100644
---- a/tools/testing/selftests/kvm/lib/x86/svm.c
-+++ b/tools/testing/selftests/kvm/lib/x86/svm.c
-@@ -126,7 +126,7 @@ void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_r
- 	guest_regs.rdi = (u64)svm;
+ 	u16 attrib;
+diff --git a/tools/testing/selftests/kvm/x86/nested_vmsave_vmload_test.c b/tools/testing/selftests/kvm/x86/nested_vmsave_vmload_test.c
+index 6764a48f9d4d..71717118d692 100644
+--- a/tools/testing/selftests/kvm/x86/nested_vmsave_vmload_test.c
++++ b/tools/testing/selftests/kvm/x86/nested_vmsave_vmload_test.c
+@@ -79,8 +79,8 @@ static void l1_guest_code(struct svm_test_data *svm)
+ 	svm->vmcb->control.intercept |= (BIT_ULL(INTERCEPT_VMSAVE) |
+ 					 BIT_ULL(INTERCEPT_VMLOAD));
  
- 	if (svm->ncr3_gpa) {
--		ctrl->nested_ctl |= SVM_NESTED_CTL_NP_ENABLE;
-+		ctrl->misc_ctl |= SVM_MISC_ENABLE_NP;
- 		ctrl->nested_cr3 = svm->ncr3_gpa;
- 	}
- }
+-	 /* ..VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK cleared.. */
+-	svm->vmcb->control.virt_ext &= ~VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
++	 /* ..SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE cleared.. */
++	svm->vmcb->control.misc_ctl2 &= ~SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE;
+ 
+ 	svm->vmcb->save.rip = (u64)l2_guest_code_vmsave;
+ 	run_guest(svm->vmcb, svm->vmcb_gpa);
+@@ -90,8 +90,8 @@ static void l1_guest_code(struct svm_test_data *svm)
+ 	run_guest(svm->vmcb, svm->vmcb_gpa);
+ 	GUEST_ASSERT_EQ(svm->vmcb->control.exit_code, SVM_EXIT_VMLOAD);
+ 
+-	/* ..and VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK set */
+-	svm->vmcb->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
++	/* ..and SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE set */
++	svm->vmcb->control.misc_ctl2 |= SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE;
+ 
+ 	svm->vmcb->save.rip = (u64)l2_guest_code_vmsave;
+ 	run_guest(svm->vmcb, svm->vmcb_gpa);
+@@ -106,20 +106,20 @@ static void l1_guest_code(struct svm_test_data *svm)
+ 					  BIT_ULL(INTERCEPT_VMLOAD));
+ 
+ 	/*
+-	 * Without VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK, the GPA will be
++	 * Without SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE, the GPA will be
+ 	 * interpreted as an L1 GPA, so VMCB0 should be used.
+ 	 */
+ 	svm->vmcb->save.rip = (u64)l2_guest_code_vmcb0;
+-	svm->vmcb->control.virt_ext &= ~VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
++	svm->vmcb->control.misc_ctl2 &= ~SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE;
+ 	run_guest(svm->vmcb, svm->vmcb_gpa);
+ 	GUEST_ASSERT_EQ(svm->vmcb->control.exit_code, SVM_EXIT_VMMCALL);
+ 
+ 	/*
+-	 * With VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK, the GPA will be interpeted as
++	 * With SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE, the GPA will be interpeted as
+ 	 * an L2 GPA, and translated through the NPT to VMCB1.
+ 	 */
+ 	svm->vmcb->save.rip = (u64)l2_guest_code_vmcb1;
+-	svm->vmcb->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
++	svm->vmcb->control.misc_ctl2 |= SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE;
+ 	run_guest(svm->vmcb, svm->vmcb_gpa);
+ 	GUEST_ASSERT_EQ(svm->vmcb->control.exit_code, SVM_EXIT_VMMCALL);
+ 
+diff --git a/tools/testing/selftests/kvm/x86/svm_lbr_nested_state.c b/tools/testing/selftests/kvm/x86/svm_lbr_nested_state.c
+index 0a17a2c71634..6c2988a14d1c 100644
+--- a/tools/testing/selftests/kvm/x86/svm_lbr_nested_state.c
++++ b/tools/testing/selftests/kvm/x86/svm_lbr_nested_state.c
+@@ -69,9 +69,9 @@ static void l1_guest_code(struct svm_test_data *svm, bool nested_lbrv)
+ 			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
+ 
+ 	if (nested_lbrv)
+-		vmcb->control.virt_ext = LBR_CTL_ENABLE_MASK;
++		vmcb->control.misc_ctl2 = SVM_MISC2_ENABLE_V_LBR;
+ 	else
+-		vmcb->control.virt_ext &= ~LBR_CTL_ENABLE_MASK;
++		vmcb->control.misc_ctl2 &= ~SVM_MISC2_ENABLE_V_LBR;
+ 
+ 	run_guest(vmcb, svm->vmcb_gpa);
+ 	GUEST_ASSERT(svm->vmcb->control.exit_code == SVM_EXIT_VMMCALL);
 -- 
 2.53.0.rc2.204.g2597b5adb4-goog
 
