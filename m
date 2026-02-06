@@ -1,165 +1,343 @@
-Return-Path: <kvm+bounces-70446-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70447-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OK+qDkIBhmlhJAQAu9opvQ
-	(envelope-from <kvm+bounces-70446-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 15:57:06 +0100
+	id KD4hGdoBhmlhJAQAu9opvQ
+	(envelope-from <kvm+bounces-70447-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 15:59:38 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9B62FF59D
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 15:57:05 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D2DCFF62B
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 15:59:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3BE853010783
-	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 14:56:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8B4363007AC2
+	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 14:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3040842315D;
-	Fri,  6 Feb 2026 14:56:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B6A0421A07;
+	Fri,  6 Feb 2026 14:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JNz0l3KQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D61D4218B6;
-	Fri,  6 Feb 2026 14:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770389805; cv=none; b=FvaCLPGzXfrV55FFHAgyGPEIw8DGUgVfBKQzfohV7Ym48jf6YS7iebjaKBOvAZCI1OvTWxb4BuwSyqc0o/Ec0uSUzcXoBOGu1pnMXg77OYI9qKJKRPVBks2PhQSsnlIoLzKyHOn+uzShuEeaFAIfvabPbwDvOUn6OCZmwgVnonA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770389805; c=relaxed/simple;
-	bh=AON4s7gGNul3vm4e7beL4pwbpsd9djRz8f0TOTDxqws=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OdCkUZg6LOlI7VnYNuh77uPzvpS0PNF58mxJ7ZYwvH27vjcFXb5CHhKIInpVohSrpeilm/EI8VDiFJ2b4xnBajS9q2pJ+90pDjemLZNwhbdhYEumyoIPGpvrqQvgovC5xz1yJYnBP6gCIbrJgWxyV6o3fvJmp0ZHfWN/O2UJjvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [223.64.69.42])
-	by gateway (Coremail) with SMTP id _____8CxZcEoAYZpqoAQAA--.5935S3;
-	Fri, 06 Feb 2026 22:56:40 +0800 (CST)
-Received: from localhost.localdomain (unknown [223.64.69.42])
-	by front1 (Coremail) with SMTP id qMiowJBx58AgAYZpphBBAA--.23473S2;
-	Fri, 06 Feb 2026 22:56:38 +0800 (CST)
-From: Huacai Chen <chenhuacai@loongson.cn>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>
-Cc: kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Xuerui Wang <kernel@xen0n.name>,
-	Jiaxun Yang <jiaxun.yang@flygoat.com>,
-	Huacai Chen <chenhuacai@loongson.cn>
-Subject: [GIT PULL] LoongArch KVM changes for v6.20
-Date: Fri,  6 Feb 2026 22:56:22 +0800
-Message-ID: <20260206145622.2433924-1-chenhuacai@loongson.cn>
-X-Mailer: git-send-email 2.47.3
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030403043CE
+	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 14:59:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.181
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770389968; cv=pass; b=ZU8rNwyq7HHLcWThWZLoBID5XD6Jmy+QmRP4QW4KvA7z45O2Wu2W9QQvl/MhpYqxZo25QvxIPGPQD58xlz6wpgV76oW5CrbF0qd/HxIVVJJjT45LYSaZU6mVhM2+OSVwBIjeQK24to9SDYhCOE9oXc3QmEimd9HelkjLLlCRPCk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770389968; c=relaxed/simple;
+	bh=Mkat1e2fn8fcmAPT5kCb34RZtRGfdOtY9PSHDy/Ep9g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F4ty9fYIyuUS/t3P9f2feSCU7oG0mmspejakwxkQ70x+rMO07pKamGNo9CoRETan1ax+w8WhtjpbVqU+8IPD+rM+RH0QsquwxG/aTiKlzdcRYZE0vqWvg03zq633KN+YwEV/LePz35BXId1TWYt2rV2I5huTbatRIp2TC6DUsXU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JNz0l3KQ; arc=pass smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-79456d5ebf9so8758457b3.2
+        for <kvm@vger.kernel.org>; Fri, 06 Feb 2026 06:59:27 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770389967; cv=none;
+        d=google.com; s=arc-20240605;
+        b=k2mBZtTxaE4UHwdKCvoioPgnXZer3MRokAaemhW7ToYICw/Z3a2MLQuDGLTpI5hBd1
+         kTcjZCRsUl3qxBn6nKv2CrWPN9GvdMwvs5Dt0FW7mEwVeRLXFC2aj62/q08L+UC8GX63
+         eP4sqA22FUGKqMEo8i0yhcXlKMiEqUkMuJ7JhSdH6zWHZlq7pq/T5xvSbO3L2L5yUHYe
+         a9PbLLYV2hT03+RiD4ow6LDpnEDtAf1vjTYyDR42wH+VJyB3ce7AXSdmy/8tjTg6xlRo
+         QEp1Jryq68R8FdODpPABZchiUH4C36yn0YrXip33zVpx9uTEteUs/g+QgCDsihwrtNgO
+         yYsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Djjd+78eL/gLTndXMnYafFf7JN6pIz42e4sPAJ7o4XM=;
+        fh=XdmdWSNSQ3ZD0sHeqgr7COcAV/Z/1wsFOvx6oxSZtAU=;
+        b=UfT2W44LFSVXXffaOnQU2v5y1P82oW19PCQAqCF2RDlZmYnry6974mH5E8IPNpXAk7
+         BgbTnb7y1PulgDs7WqwsIe7WPOSlIy7WMkvE8SL4pFgR0nz19Hh5PaAPzoR7P+/CG/jr
+         ePxnvCwjrPtmy8/nS1q5fLK8E7Qmc5IllnpMDQXFXxQ0UNegxp9wxwu8eyjtRWB+CEI6
+         nrphSTGgHrXfykcwCZff2eOA5n89Y15d0wLpM0TTLEhkk8ck11V+udL3QCjHMZ7oQfaQ
+         NkXrna4mYz/4SdghhhRX0zd6ghQ/rBJ5lidO2pBNYHSSmhM0DWuWZfZM772w+aS85T9G
+         +jcA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1770389967; x=1770994767; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Djjd+78eL/gLTndXMnYafFf7JN6pIz42e4sPAJ7o4XM=;
+        b=JNz0l3KQr238VhdWya997xXxH9tPiCcBZ3tvdecT/kDTi6NLY70crav9Qgo4m8A+D/
+         3jeSdQTVLrYowj2fffrXY3q8f0afVwnIVnXxkdzfq+fPbw48zScDEQ5dZsrOJNdaZnGR
+         Ywky8kChwBJya1ftYD2C8Q0rA2SPsvJZ3ILP66RU+8rk+Qm0ePhqtJPOhUFPetvQ3J1w
+         PCNNi8eSo3y69fjL/aROwzvgXsyI0mmK/c91KmnNhdm1pThk+u01adx9JOER1MbhyPdT
+         K80PTRskHck6eiaflCPb9vGygfDwIYWPFF94hdHNfvAjO4RQRGyWYT0cHGqaVikJX4z5
+         Qo0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770389967; x=1770994767;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Djjd+78eL/gLTndXMnYafFf7JN6pIz42e4sPAJ7o4XM=;
+        b=tTOyrTWKM4UBZJ8eAT4i5TB9YoNf35r/7ZJUBvuCOUozfKCLo52NQiMpptii7yV6/a
+         EAzpHRhENiImzEcsk92cnYEOayFWGiE28XEWucDJcGX3uDc3KAElvVwdpQTn4bnAfsOQ
+         ac2+P2o6+/PrWWkPLfHAHMZM40sMHQz650E/jc8aa4o0GSRyeEWK5wc0glhJC+W7qlla
+         iQzufTeE29SpLnrace15J+P+vCZMMNio+zdswSvDZZAwRBbzNWs0h7fQ/SdAYeQ8NgeK
+         lvQSwqqZ1NwxPcpJHR5L2Emch/mQe5prf/focoMYCoBS8cOnWBgH8D53U0rZF98/9SO1
+         fUoA==
+X-Forwarded-Encrypted: i=1; AJvYcCXpUfh5WoeSzV5YXFsgBOpQzzjDVr5uGtI3USQzX+Nu/m+Be6LDOBUxZNSABb0oAtNHRac=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXiddMo9kcOWjXmJBYKCD+S8Dsx69m/IvIQF0L07d9kaus5Hmb
+	pg86K21LdfcEom0yBmThs6PF6OksrHQuxmch1POxpRlRKKqu7QpKIJ68CKwu8x0RDJX0Mzszskg
+	S9aDmmMgqxqKEtNMXm8hZLA9KFOLrlRSNgcHNYImnng==
+X-Gm-Gg: AZuq6aJzEgm1KMIbkwIvv9W5Cgsw69CNySyEHHksbVzYXZDtUQtnRhEzB9o4S1VO5iI
+	hAn0Lct7yGTBSL8fu7XDyOMDrC6wur8LjKyK1yLx1IcEYrMAPAwsRar1bSa6osXg1UYBD51uBSI
+	BEg64hVsPfxUXxl8Y/4dj+q241Hoe2VGo7GGqh8hEMrqTzNY/85y4IXdcf8Bo6oFPL+swsP3Hbz
+	Hh5an8nZwZtOJOsI+CLuHY3inyzZfPlqe7yfP715N6hGC3P+qChbClcf1JHbE3x2TDog17WjXZD
+	Wq5X0HRgi3Q53bsR7bVe1AMrOocbwg9d2W2kqvGlVSyO+jhDJP4Sktw=
+X-Received: by 2002:a05:690c:88a:b0:796:2976:a452 with SMTP id
+ 00721157ae682-7962976ac35mr4095557b3.23.1770389966783; Fri, 06 Feb 2026
+ 06:59:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJBx58AgAYZpphBBAA--.23473S2
-X-CM-SenderInfo: hfkh0x5xdftxo6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxWF1rCr1DXFWUXrWUGFyUArc_yoW5Gw15pF
-	y3Crn3Ar4rGr4fZrnxt34Uur13Jr1xGF1aqayayry8Cr4jvF1UJr48JrykXFy5CayrJry0
-	vF1rGw1j9F1UJacCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUU9Yb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
-	AKI48JMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v2
-	6r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17
-	CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF
-	0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIx
-	AIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIev
-	Ja73UjIFyTuYvjxUc0eHDUUUU
+References: <20251202160853.22560-1-sebott@redhat.com> <20251202160853.22560-3-sebott@redhat.com>
+In-Reply-To: <20251202160853.22560-3-sebott@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Feb 2026 14:59:14 +0000
+X-Gm-Features: AZwV_QgieJzeeTFJCFpBW88yIXQg35x305xf0x9-4d4AF9icH8OLR1uAx6S_ojM
+Message-ID: <CAFEAcA8oi1Xs2kv66dFV9NZore+Q2vHUsgMikveVdN1c+3SBJQ@mail.gmail.com>
+Subject: Re: [PATCH v4 2/2] target/arm/kvm: add kvm-psci-version vcpu property
+To: Sebastian Ott <sebott@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org, 
+	qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-70446-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[loongson.cn];
-	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FROM_NEQ_ENVFROM(0.00)[chenhuacai@loongson.cn,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-70447-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.882];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_DKIM_NA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,loongson.cn:mid]
-X-Rspamd-Queue-Id: E9B62FF59D
+	FROM_NEQ_ENVFROM(0.00)[peter.maydell@linaro.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 7D2DCFF62B
 X-Rspamd-Action: no action
 
-The following changes since commit 18f7fcd5e69a04df57b563360b88be72471d6b62:
+On Tue, 2 Dec 2025 at 16:09, Sebastian Ott <sebott@redhat.com> wrote:
+>
+> Provide a kvm specific vcpu property to override the default
+> (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
+> by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+>
+> Note: in order to support PSCI v0.1 we need to drop vcpu
+> initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
+>
+> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  docs/system/arm/cpu-features.rst |  5 +++
+>  target/arm/cpu.h                 |  6 +++
+>  target/arm/kvm.c                 | 64 +++++++++++++++++++++++++++++++-
+>  3 files changed, 74 insertions(+), 1 deletion(-)
 
-  Linux 6.19-rc8 (2026-02-01 14:01:13 -0800)
+Hi; this patch seems generally reasonable to me as a way to handle
+this kind of "control" register; for more discussion I wrote a
+longer email in reply to Eric's series handling other kinds of
+migration failure:
+https://lore.kernel.org/qemu-devel/CAFEAcA-gi42JObOjLuPudABX8WRdWf5SzSbkzU-bd06ecF1Vog@mail.gmail.com/T/#me03ebff8dbd8f58189cd98c3a21812781693277e
 
-are available in the Git repository at:
+Unless discussion in that thread reveals that we have so many of
+this kind of "control" knob that we would prefer a generic
+solution rather than per-knob user-friendly names and values,
+I'm OK with taking this patch without completely resolving the
+design discussion on that other series first.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson.git tags/loongarch-kvm-6.20
+My review comments below are fairly minor, and patch 1 of
+this series has already been applied upstream now.
 
-for you to fetch changes up to 2d94a3f7088b69ae25e27fb98d7f1ef572c843f9:
+> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
+> index 37d5dfd15b..1d32ce0fee 100644
+> --- a/docs/system/arm/cpu-features.rst
+> +++ b/docs/system/arm/cpu-features.rst
+> @@ -204,6 +204,11 @@ the list of KVM VCPU features and their descriptions.
+>    the guest scheduler behavior and/or be exposed to the guest
+>    userspace.
+>
+> +``kvm-psci-version``
+> +  Override the default (as of kernel v6.13 that would be PSCI v1.3)
+> +  PSCI version emulated by the kernel. Current valid values are:
+> +  0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
 
-  KVM: LoongArch: selftests: Add steal time test case (2026-02-06 09:28:01 +0800)
+I think we could be a little more detailed here.
 
-----------------------------------------------------------------
-LoongArch KVM changes for v6.20
 
-1. Add more CPUCFG mask bits.
-2. Improve feature detection.
-3. Add FPU/LBT delay load support.
-4. Set default return value in KVM IO bus ops.
-5. Add paravirt preempt feature support.
-6. Add KVM steal time test case for tools/selftests.
+``kvm-psci-version``
 
-----------------------------------------------------------------
-Bibo Mao (13):
-      LoongArch: KVM: Add more CPUCFG mask bits
-      LoongArch: KVM: Move feature detection in kvm_vm_init_features()
-      LoongArch: KVM: Add msgint registers in kvm_init_gcsr_flag()
-      LoongArch: KVM: Check VM msgint feature during interrupt handling
-      LoongArch: KVM: Handle LOONGARCH_CSR_IPR during vCPU context switch
-      LoongArch: KVM: Move LSX capability check in exception handler
-      LoongArch: KVM: Move LASX capability check in exception handler
-      LoongArch: KVM: Move LBT capability check in exception handler
-      LoongArch: KVM: Add FPU/LBT delay load support
-      LoongArch: KVM: Set default return value in KVM IO bus ops
-      LoongArch: KVM: Add paravirt preempt feature in hypervisor side
-      LoongArch: KVM: Add paravirt vcpu_is_preempted() support in guest side
-      KVM: LoongArch: selftests: Add steal time test case
+  Set the Power State Coordination Interface (PSCI) firmware ABI version
+  that KVM provides to the guest. By default KVM will use the newest
+  version that it knows about (which is PSCI v1.3 in Linux v6.13).
 
- arch/loongarch/include/asm/kvm_host.h      |   9 +++
- arch/loongarch/include/asm/kvm_para.h      |   4 +-
- arch/loongarch/include/asm/loongarch.h     |   1 +
- arch/loongarch/include/asm/qspinlock.h     |   4 +
- arch/loongarch/include/uapi/asm/kvm.h      |   1 +
- arch/loongarch/include/uapi/asm/kvm_para.h |   1 +
- arch/loongarch/kernel/paravirt.c           |  21 ++++-
- arch/loongarch/kvm/exit.c                  |  21 ++++-
- arch/loongarch/kvm/intc/eiointc.c          |  43 ++++------
- arch/loongarch/kvm/intc/ipi.c              |  26 ++----
- arch/loongarch/kvm/intc/pch_pic.c          |  31 ++++---
- arch/loongarch/kvm/interrupt.c             |   4 +-
- arch/loongarch/kvm/main.c                  |   8 ++
- arch/loongarch/kvm/vcpu.c                  | 125 +++++++++++++++++++++++------
- arch/loongarch/kvm/vm.c                    |  39 +++++----
- tools/testing/selftests/kvm/Makefile.kvm   |   1 +
- tools/testing/selftests/kvm/steal_time.c   |  96 ++++++++++++++++++++++
- 17 files changed, 319 insertions(+), 116 deletions(-)
+  You only need to set this if you want to be able to migrate this
+  VM to a host machine running an older kernel that does not
+  recognize the PSCI version that this host's kernel defaults to.
 
+  Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3.
+
+
+> +
+>  TCG VCPU Features
+>  =================
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 39f2b2e54d..e2b6b587ea 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -1035,6 +1035,12 @@ struct ArchCPU {
+>      bool kvm_vtime_dirty;
+>      uint64_t kvm_vtime;
+>
+> +    /*
+> +     * Intermediate value used during property parsing.
+> +     * Once finalized, the value should be read from psci_version.
+> +     */
+> +    uint32_t kvm_prop_psci_version;
+> +
+>      /* KVM steal time */
+>      OnOffAuto kvm_steal_time;
+>
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 0d57081e69..cf2de87287 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -484,6 +484,49 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
+>      ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+>  }
+>
+> +struct psci_version {
+
+Nit: our coding style says struct type names should be in
+CamelCase, and structs should have a typedef rather than
+being used as "struct foo".
+
+> +    uint32_t number;
+> +    const char *str;
+> +};
+> +
+> +static const struct psci_version psci_versions[] = {
+> +    { QEMU_PSCI_VERSION_0_1, "0.1" },
+> +    { QEMU_PSCI_VERSION_0_2, "0.2" },
+> +    { QEMU_PSCI_VERSION_1_0, "1.0" },
+> +    { QEMU_PSCI_VERSION_1_1, "1.1" },
+> +    { QEMU_PSCI_VERSION_1_2, "1.2" },
+> +    { QEMU_PSCI_VERSION_1_3, "1.3" },
+> +    { -1, NULL },
+> +};
+> +
+> +static char *kvm_get_psci_version(Object *obj, Error **errp)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +    const struct psci_version *ver;
+> +
+> +    for (ver = psci_versions; ver->number != -1; ver++) {
+
+Using ARRAY_SIZE() to set the loop bound is nicer than requiring
+a sentinel value at the end of the array.
+
+> +        if (ver->number == cpu->psci_version)
+> +            return g_strdup(ver->str);
+> +    }
+> +
+> +    return g_strdup_printf("Unknown PSCI-version: %x", cpu->psci_version);
+
+Is this ever possible?
+
+> +}
+> +
+> +static void kvm_set_psci_version(Object *obj, const char *value, Error **errp)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +    const struct psci_version *ver;
+> +
+> +    for (ver = psci_versions; ver->number != -1; ver++) {
+> +        if (!strcmp(value, ver->str)) {
+> +            cpu->kvm_prop_psci_version = ver->number;
+> +            return;
+> +        }
+> +    }
+> +
+> +    error_setg(errp, "Invalid PSCI-version value");
+
+"PSCI version".
+
+> +}
+> +
+>  /* KVM VCPU properties should be prefixed with "kvm-". */
+>  void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
+>  {
+> @@ -505,6 +548,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
+>                               kvm_steal_time_set);
+>      object_property_set_description(obj, "kvm-steal-time",
+>                                      "Set off to disable KVM steal time.");
+> +
+> +    object_property_add_str(obj, "kvm-psci-version", kvm_get_psci_version,
+> +                            kvm_set_psci_version);
+> +    object_property_set_description(obj, "kvm-psci-version",
+> +                                    "Set PSCI version. "
+> +                                    "Valid values are 0.1, 0.2, 1.0, 1.1, 1.2, 1.3");
+>  }
+>
+>  bool kvm_arm_pmu_supported(void)
+> @@ -1959,7 +2008,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      if (cs->start_powered_off) {
+>          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
+>      }
+> -    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
+> +    if (cpu->kvm_prop_psci_version != QEMU_PSCI_VERSION_0_1 &&
+> +        kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
+> +        /*
+> +         * Versions >= v0.2 are backward compatible with v0.2
+> +         * omit the feature flag for v0.1 .
+> +         */
+>          cpu->psci_version = QEMU_PSCI_VERSION_0_2;
+>          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_PSCI_0_2;
+>      }
+> @@ -1998,6 +2052,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          }
+>      }
+>
+> +    if (cpu->kvm_prop_psci_version) {
+> +        psciver = cpu->kvm_prop_psci_version;
+> +        ret = kvm_set_one_reg(cs, KVM_REG_ARM_PSCI_VERSION, &psciver);
+> +        if (ret) {
+> +            error_report("PSCI version %"PRIx64" is not supported by KVM", psciver);
+
+Could we make the PSCI version human-readable rather than hex here?
+If hex, we need the leading 0x.
+
+We can also suggest to the user the solution to this problem:
+
+  error_report("KVM in this kernel does not support PSCI version 0x%" PRIx64 ");
+  error_printf("Consider setting the kvm-psci-version property on the
+migration source.\n")
+
+(watch out that error_report() strings end without a trailing \n
+but error_printf() ones must have a \n.)
+
+thanks
+-- PMM
 
