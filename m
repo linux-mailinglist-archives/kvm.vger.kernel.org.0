@@ -1,316 +1,189 @@
-Return-Path: <kvm+bounces-70434-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70435-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WO3QFvTKhWlWGgQAu9opvQ
-	(envelope-from <kvm+bounces-70434-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 12:05:24 +0100
+	id iHKfEPPShWmOGwQAu9opvQ
+	(envelope-from <kvm+bounces-70435-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 12:39:31 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2743FCFE0
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 12:05:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34935FD514
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 12:39:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 154DB300E5E5
-	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 11:05:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 95F0230205FF
+	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 11:39:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094E639527E;
-	Fri,  6 Feb 2026 11:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60BD93A0E90;
+	Fri,  6 Feb 2026 11:39:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ax6teyx0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hr0K/6DC"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AD53203A0;
-	Fri,  6 Feb 2026 11:05:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944702EA732;
+	Fri,  6 Feb 2026 11:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770375916; cv=none; b=Hr4DcznDuAHs1ssShhbOEeRKcYOBCRTj4DipRa83I0LxYTw4f0Bv7ZLovAMixKnOvW4Rb5i1fmgO0blCrV5IpUSE6fhfyOs1pQTN+sQkeEc4KF00QOkj0OtiQRwsVLWwA72sIj0UOMBz9qOABXl5//dOQcLaE6CqMCXoMD/ypxQ=
+	t=1770377962; cv=none; b=KRpoQ0BbYHuYQ/RuW4bCcV+vyZ65tg0kcGgEpCN5uTOEXAMw62J5cpyxwZythudB+RRsrN02/7/fNt3QButryZ6HOAWH3FaJHZCCkpvRx06FFEED4UAFNCOAiDab6o5JtuH1Xz3Rhb0+2yGI3pDx+UBumQfCmoR26J0A7eXsssE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770375916; c=relaxed/simple;
-	bh=25m2T55SWRbdR2cT8IrGffz1Yvd5445dsgakP4kraKQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EVHsMZJkCTq7nr70ZXn+tlbcftAHSSpim+ARuH1vWal242FpWrrCYdKPlmquUS8M/Y7jfLnyxClsk2XfhFM9I9HeltNK7agBPY4Qdqri57Jj/JdpbU84K/dq0+GA2QIkQgCcz043PCOXg2tn0y6b8TxAeJigzPz1bWhmcibl8dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ax6teyx0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8994C116C6;
-	Fri,  6 Feb 2026 11:05:15 +0000 (UTC)
+	s=arc-20240116; t=1770377962; c=relaxed/simple;
+	bh=w5cKQjFsOjcIjME+bKTjgyct3g6oNQjGUh6F1YZyWpg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m3v1PYfVIsXPxfwhY6LSWvLW3yZEAIuJcXLqqmVFdZuetyHp4gYEDln0YRqh2owbaYRdKLEpk+i+T9Jti3pSURd43RbEjvfBh9uXKNpWcm/oG9+UUV9k7G/0XuJTs5omT5D9QJ/HMfUAfzsLXDnGXetRbTWxOBIfb4ejFtRgmUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hr0K/6DC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D795C19422;
+	Fri,  6 Feb 2026 11:39:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770375915;
-	bh=25m2T55SWRbdR2cT8IrGffz1Yvd5445dsgakP4kraKQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ax6teyx0JD00nfcomgRVjoGpqHZyfULPaaojJQWcJkWBQasIXfNd08th7Kpba7wMF
-	 gR+pG/Lu4pqKsiwx/W/YG3VXEPvyulto/h/Cf0PmQ/c82W46PYduGVf93rmV4l2v0y
-	 5r1R6cH3Fu1bCGdbsDaVJlAjJ0kXgzRcoMdQBLL537v+N+QfMl/jq2u79VPaKB5YJu
-	 sTJ7ZOBbgrHSLJapFrHzZUjSBSe2+nYgGpsmO+krz9P9HCseBH4uErvEphU5T4pSnX
-	 hkFEfCjT0JMFrmaYCjgdFn2on9uGcHyjg5F8E5zQU+90yUJHkRGGki3M0Aj076wA8C
-	 AYNDgFusrB61g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1voJeD-000000097M2-1U8N;
-	Fri, 06 Feb 2026 11:05:13 +0000
-Date: Fri, 06 Feb 2026 11:05:12 +0000
-Message-ID: <86ms1m9lp3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <zenghui.yu@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei
- <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	wanghaibin.wang@huawei.com
-Subject: Re: [PATCH v3 02/16] KVM: arm64: nv: Implement nested Stage-2 page table walk logic
-In-Reply-To: <3f88cd49-68f1-4276-a067-b7c6beadb27c@linux.dev>
-References: <20240614144552.2773592-1-maz@kernel.org>
-	<20240614144552.2773592-3-maz@kernel.org>
-	<3f88cd49-68f1-4276-a067-b7c6beadb27c@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1770377962;
+	bh=w5cKQjFsOjcIjME+bKTjgyct3g6oNQjGUh6F1YZyWpg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hr0K/6DCn5r6l9+6puYu4goS8nBZ2DFP1Lww9R6v8EG5qqoGX0FzDMBRUcRQJ3uYZ
+	 ythy0wLLjl0BusWtqBD+SAmIC2k4i3R0nFQD+YJrII71Li8TLBRPc64IoYZROYWkRs
+	 fJf6TFoCC+cf8AihGbEJybKUMuWQBp3v42B9IA0VZxkaxDf74SMdVAM+xs6od1h3gT
+	 f1JOSxlQJ4gSpMKZpmaCwfgiINfVn3HZrtOEAivn9JF/gR+tl60srr13GY3A5l0mKb
+	 nRkU9iMjdA6bkEc27s50oahKfB8faxW5hzmxwyVkT0YypGwD0c3akpkIGSOqadCme0
+	 gpsOLA5hEKiHg==
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 92A3FF40068;
+	Fri,  6 Feb 2026 06:39:19 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Fri, 06 Feb 2026 06:39:19 -0500
+X-ME-Sender: <xms:59KFaSzYE_RXr164vn8CttXgN9sd8r9pfS75AJBy-bKp8iZEQPgIZQ>
+    <xme:59KFaeZyQp8ydK5JX1S6juGT0hFlXnDy05jte73ecaVfjwX4VLk2PVdKkyGTSDAYc
+    X0hpNb5UdOykuZF4qIllsTHJpN6naOopSxup2wLAtf71ShmWEoq-Dc>
+X-ME-Received: <xmr:59KFaSLuY91bfZZIssrsPlFcVLfKDJrQBGAlq0swoXs9XaXhsUNr53_tPu6d9w>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddukeektdejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepmfhirhihlhcu
+    ufhhuhhtshgvmhgruhcuoehkrghssehkvghrnhgvlhdrohhrgheqnecuggftrfgrthhtvg
+    hrnhepffffkeegffejgfekvdejgeegtddtleejkefhhfduieduhfeigfduuefghfehffdu
+    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpehkihhrihhllhdomhgvshhmthhprghuthhhphgv
+    rhhsohhnrghlihhthidqudeiudduiedvieehhedqvdekgeeggeejvdekqdhkrghspeepkh
+    gvrhhnvghlrdhorhhgsehshhhuthgvmhhovhdrnhgrmhgvpdhnsggprhgtphhtthhopedv
+    kedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepvhhishhhrghlrdhlrdhvvghrmh
+    grsehinhhtvghlrdgtohhmpdhrtghpthhtohepuggrvhgvrdhhrghnshgvnheslhhinhhu
+    gidrihhnthgvlhdrtghomhdprhgtphhtthhopehkvhhmsehvghgvrhdrkhgvrhhnvghlrd
+    horhhgpdhrtghpthhtoheplhhinhhugidqtghotghosehlihhsthhsrdhlihhnuhigrdgu
+    vghvpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrd
+    horhhgpdhrtghpthhtoheptghhrghordhgrghosehinhhtvghlrdgtohhmpdhrtghpthht
+    oheprhhitghkrdhprdgvughgvggtohhmsggvsehinhhtvghlrdgtohhmpdhrtghpthhtoh
+    epkhgrihdrhhhurghnghesihhnthgvlhdrtghomhdprhgtphhtthhopegsphesrghlihgv
+    nhekrdguvg
+X-ME-Proxy: <xmx:59KFacwvzKIac4Vumi31z5SwA3ol-Q_nWNalg4rSW1ynJfECr9BQjg>
+    <xmx:59KFaSNQCxaQeLYlCE-viH92mc8xw3J9tv1_TPeOo1w2OyafbCuhQg>
+    <xmx:59KFaYuEmna0Q5KOujSwvg4Q-hnhSGqKN7wJYelgMHrKBu01YkfnHA>
+    <xmx:59KFaX13dfCly2p18ZGXOji3LZn-XOZNKUn0o7mx8Rxx_IE0XDRkwQ>
+    <xmx:59KFadAvLXJeCVoB8BeDRqbfdQZX63ea1AYR22mIpW8gajwoypSrYf6q>
+Feedback-ID: i10464835:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 6 Feb 2026 06:39:17 -0500 (EST)
+Date: Fri, 6 Feb 2026 11:39:11 +0000
+From: Kiryl Shutsemau <kas@kernel.org>
+To: "Verma, Vishal L" <vishal.l.verma@intel.com>, 
+	dave.hansen@linux.intel.com
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"Gao, Chao" <chao.gao@intel.com>, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, 
+	"Huang, Kai" <kai.huang@intel.com>, "bp@alien8.de" <bp@alien8.de>, 
+	"mingo@redhat.com" <mingo@redhat.com>, "Williams, Dan J" <dan.j.williams@intel.com>, 
+	"tglx@linutronix.de" <tglx@linutronix.de>, "hpa@zytor.com" <hpa@zytor.com>, 
+	"x86@kernel.org" <x86@kernel.org>
+Subject: Re: [PATCH v2 0/2] x86/virt/tdx: Print TDX module version to dmesg
+Message-ID: <aYXSd8B00OtKZcAU@thinkstation>
+References: <20260109-tdx_print_module_version-v2-0-e10e4ca5b450@intel.com>
+ <6d8d37740459963e6fd7f16a890a837b34ebdf17.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: zenghui.yu@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, wanghaibin.wang@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6d8d37740459963e6fd7f16a890a837b34ebdf17.camel@intel.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70434-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70435-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[kas@kernel.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:email,linux.dev:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C2743FCFE0
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 34935FD514
 X-Rspamd-Action: no action
 
-On Wed, 04 Feb 2026 08:28:57 +0000,
-Zenghui Yu <zenghui.yu@linux.dev> wrote:
-> 
-> Hi Marc,
-> 
-> [ chewing through the NV code.. ;-) ]
-
-You fool! :)
-
-> 
-> On 6/14/24 10:45 PM, Marc Zyngier wrote:
-> > From: Christoffer Dall <christoffer.dall@linaro.org>
+On Thu, Feb 05, 2026 at 07:05:39PM +0000, Verma, Vishal L wrote:
+> On Fri, 2026-01-09 at 12:14 -0700, Vishal Verma wrote:
+> > === Problem & Solution ===
 > > 
-> > Based on the pseudo-code in the ARM ARM, implement a stage 2 software
-> > page table walker.
+> > Currently, there is neither an ABI, nor any other way to determine from
+> > the host system, what version of the TDX module is running. A sysfs ABI
+> > for this has been proposed in [1], but it may need additional discussion.
+> > 
+> > Many/most TDX developers already carry patches like this in their
+> > development branches. It can be tricky to know which TDX module is
+> > actually loaded on a system, and so this functionality has been needed
+> > regularly for development and processing bug reports. Hence, it is
+> > prudent to break out the patches to retrieve and print the TDX module
+> > version, as those parts are very straightforward, and get some level of
+> > debugability and traceability for TDX host systems.
+> > 
+> > === Dependencies ===
+> > 
+> > None. This is based on v6.19-rc4, and applies cleanly to tip.git.
+> > 
+> > === Patch details ===
+> > 
+> > Patch 1 is a prerequisite that adds the infrastructure to retrieve the
+> > TDX module version from its global metadata. This was originally posted in [2].
+> > 
+> > Patch 2 is based on a patch from Kai Huang [3], and prints the version to
+> > dmesg during init.
+> > 
+> > === Testing ===
+> > 
+> > This has passed the usual suite of tests, including successful 0day
+> > builds, KVM Unit tests, KVM selftests, a TD creation smoke test, and
+> > selected KVM tests from the Avocado test suite.
+> > 
+> > [1]: https://lore.kernel.org/all/20260105074350.98564-1-chao.gao@intel.com/
+> > [2]: https://lore.kernel.org/all/20260105074350.98564-2-chao.gao@intel.com/
+> > [3]: https://lore.kernel.org/all/57eaa1b17429315f8b5207774307f3c1dd40cf37.1730118186.git.kai.huang@intel.com/
+> > 
+> > Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
 > 
-> [...]
-> 
-> > +static u32 compute_fsc(int level, u32 fsc)
-> > +{
-> > +	return fsc | (level & 0x3);
-> > +}
-> > +
-> > +static int get_ia_size(struct s2_walk_info *wi)
-> > +{
-> > +	return 64 - wi->t0sz;
-> > +}
-> > +
-> > +static int check_base_s2_limits(struct s2_walk_info *wi,
-> > +				int level, int input_size, int stride)
-> > +{
-> > +	int start_size, ia_size;
-> > +
-> > +	ia_size = get_ia_size(wi);
-> > +
-> > +	/* Check translation limits */
-> > +	switch (BIT(wi->pgshift)) {
-> > +	case SZ_64K:
-> > +		if (level == 0 || (level == 1 && ia_size <= 42))
-> 
-> It looks broken as the pseudocode checks the limits based on
-> *implemented PA size*, rather than on ia_size, which is essentially the
-> input address size (64 - T0SZ) programmed by L1 hypervisor. They're
-> different.
->
-> We can probably get the implemented PA size by:
-> 
-> AArch64.PAMax()
-> {
-> 	parange = get_idreg_field_enum(kvm, ID_AA64MMFR0_EL1, PARANGE);
-> 	return id_aa64mmfr0_parange_to_phys_shift(parange);
-> }
-> 
-> Not sure if I've read the spec correctly.
+> Hi Kiryl, just wanted to check on the plan for this, I didn't see it
+> merged in tip.git x86/tdx (or any other tip branch). Were you planning
+> to take it through x86/tdx? Can I help with anything to move it along?
 
-I think that's also the way I read AArch64_S2InvalidSL(), which more
-or less mirrors the above.
+I guess it has to wait after the merge window at this point.
 
-The question is what should we limit it to? Is it PARange, as you
-suggest? Or the IPA range defined by userspace at VM creation (the
-type argument, which ends up in kvm->arch.mmu.pgt->ia_bits)?
-
-I think this is the former, but we probably also need to handle the
-later on actual access (when reading the descriptor). Failure to read
-the descriptor (because it is outside of a memslot) should result in a
-SEA being injected in the guest.
-
-> 
-> > +			return -EFAULT;
-> > +		break;
-> > +	case SZ_16K:
-> > +		if (level == 0 || (level == 1 && ia_size <= 40))
-> > +			return -EFAULT;
-> > +		break;
-> > +	case SZ_4K:
-> > +		if (level < 0 || (level == 0 && ia_size <= 42))
-> > +			return -EFAULT;
-> > +		break;
-> > +	}
-> > +
-> > +	/* Check input size limits */
-> > +	if (input_size > ia_size)
-> 
-> This is always false for the current code. ;-)
-
-Yup. At least that doesn't introduce any extra bug! :)
-
->
-> > +		return -EFAULT;
-> > +
-> > +	/* Check number of entries in starting level table */
-> > +	start_size = input_size - ((3 - level) * stride + wi->pgshift);
-> > +	if (start_size < 1 || start_size > stride + 4)
-> > +		return -EFAULT;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +/* Check if output is within boundaries */
-> > +static int check_output_size(struct s2_walk_info *wi, phys_addr_t output)
-> > +{
-> > +	unsigned int output_size = wi->max_oa_bits;
-> > +
-> > +	if (output_size != 48 && (output & GENMASK_ULL(47, output_size)))
-> > +		return -1;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +/*
-> > + * This is essentially a C-version of the pseudo code from the ARM ARM
-> > + * AArch64.TranslationTableWalk  function.  I strongly recommend looking at
-> > + * that pseudocode in trying to understand this.
-> > + *
-> > + * Must be called with the kvm->srcu read lock held
-> > + */
-> > +static int walk_nested_s2_pgd(phys_addr_t ipa,
-> > +			      struct s2_walk_info *wi, struct kvm_s2_trans *out)
-> > +{
-> > +	int first_block_level, level, stride, input_size, base_lower_bound;
-> > +	phys_addr_t base_addr;
-> > +	unsigned int addr_top, addr_bottom;
-> > +	u64 desc;  /* page table entry */
-> > +	int ret;
-> > +	phys_addr_t paddr;
-> > +
-> > +	switch (BIT(wi->pgshift)) {
-> > +	default:
-> > +	case SZ_64K:
-> > +	case SZ_16K:
-> > +		level = 3 - wi->sl;
-> > +		first_block_level = 2;
-> > +		break;
-> > +	case SZ_4K:
-> > +		level = 2 - wi->sl;
-> > +		first_block_level = 1;
-> > +		break;
-> > +	}
-> > +
-> > +	stride = wi->pgshift - 3;
-> > +	input_size = get_ia_size(wi);
-> > +	if (input_size > 48 || input_size < 25)
-> > +		return -EFAULT;
-> > +
-> > +	ret = check_base_s2_limits(wi, level, input_size, stride);
-> > +	if (WARN_ON(ret))
-> > +		return ret;
-> > +
-> > +	base_lower_bound = 3 + input_size - ((3 - level) * stride +
-> > +			   wi->pgshift);
-> > +	base_addr = wi->baddr & GENMASK_ULL(47, base_lower_bound);
-> > +
-> > +	if (check_output_size(wi, base_addr)) {
-> > +		out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
-> 
-> With a wrongly programmed base address, we should report the ADDRSZ
-> fault at level 0 (as per R_BFHQH and the pseudocode). It's easy to fix.
->
-
-Yup. Although this rule describe S1 rather than S2 (we don't seem to
-have anything saying the same thing for S2), but I expect the
-behaviour to be exactly the same.
-
-> > +static void vtcr_to_walk_info(u64 vtcr, struct s2_walk_info *wi)
-> > +{
-> > +	wi->t0sz = vtcr & TCR_EL2_T0SZ_MASK;
-> > +
-> > +	switch (vtcr & VTCR_EL2_TG0_MASK) {
-> > +	case VTCR_EL2_TG0_4K:
-> > +		wi->pgshift = 12;	 break;
-> > +	case VTCR_EL2_TG0_16K:
-> > +		wi->pgshift = 14;	 break;
-> > +	case VTCR_EL2_TG0_64K:
-> > +	default:	    /* IMPDEF: treat any other value as 64k */
-> > +		wi->pgshift = 16;	 break;
-> > +	}
-> > +
-> > +	wi->sl = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
-> > +	/* Global limit for now, should eventually be per-VM */
-> > +	wi->max_oa_bits = min(get_kvm_ipa_limit(),
->                               ^^^
-> 
-> Should we use AArch64.PAMax() instead? As the output address size is
-> never larger than the implemented PA size.
-> 
-> Now I'm wondering if we can let kvm_get_pa_bits() just return PAMax for
-> (based on the exposed (to-L1) AA64MFR0.PARange value) and use it when
-> possible.
-
-Yes, that was the plan all along, but I got sidetracked.
-
-Thanks,
-
-	M.
+Dave, could you queue this after -rc1 is tagged?
 
 -- 
-Without deviation from the norm, progress is not possible.
+  Kiryl Shutsemau / Kirill A. Shutemov
 
