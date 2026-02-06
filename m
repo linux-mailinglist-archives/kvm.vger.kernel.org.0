@@ -1,89 +1,94 @@
-Return-Path: <kvm+bounces-70455-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70456-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uKzVGisPhmkRJQQAu9opvQ
-	(envelope-from <kvm+bounces-70455-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 16:56:27 +0100
+	id eOrhC7IRhmk1JgQAu9opvQ
+	(envelope-from <kvm+bounces-70456-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 17:07:14 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F343AFFF14
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 16:56:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C1827100076
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 17:07:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19D243060BFB
-	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 15:55:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DAEFF3082DB0
+	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 16:04:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05F5B2DF706;
-	Fri,  6 Feb 2026 15:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB6029E113;
+	Fri,  6 Feb 2026 16:04:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FC0I4egj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fwISnHxL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3132E2DC791
-	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 15:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFA12DC772
+	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 16:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770393299; cv=none; b=b+CZHnEyaNhAUjqp4xJCElichStMM9jZt9b6GFDqvPEX7wIWIbcRCvNMOS9XIBEXWi618KZswMfmgSgERJWoRQfECMYy8v8ymwR2D4uPgw5R55UVwxf3tiDt1xRa/J1oobbR+Js/IdAfauApTwsxtyJuYrdPbwDZNzIERvsCXlw=
+	t=1770393840; cv=none; b=ANGLoXqBq5qJ6WswWvFoI5Bg7bwqJLgywE1fFeLHUlFT94/INkbMjxGS9c1O0DCfIglJ9wa2f0Dm0P0fuRbRCUwp2UAZyxdFvHdIXCtMJuweEAcd1D7LhzfpveDrrHcGmvNB8ohQp14w9vac40zVWVSN/T5rg+KJ2crGtzZOeNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770393299; c=relaxed/simple;
-	bh=cgmJVZ880y6fsSrKxXrWzDlfqGTJmjedvvvvXiyLrZM=;
+	s=arc-20240116; t=1770393840; c=relaxed/simple;
+	bh=3raR9XQBcm6pX1dp9l802LPULeByXkutMSrcWOv542Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XY8Ym+GefRd+NBYAMt5FRAgCLTZyZdxUQeY5+GTLHJ0em90e9KKJS60CNh2Opi2QWOSkIfhB3vhouGUQ3BPyIoecgLoclczxRObg9nWbFwf8+Hj64Mc6s0+m8IhBa7N+Rx32JRorIjBykDEKZpTLV/wY+pM8L9F1KmSJgnr3xaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FC0I4egj; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=RroaUwuK+mpbAxAnD8DzYibhvJR1rhJWC8qAhkz8eLSJBYlt7BJcJee0REbPFatNrRNne/biVOGw9TKKTCWaHVUelmx7vUUX7RK0avcvqdhMBhXSdMyTdie+yqr+p8MRWJ2qvw+W02HxJurhOzxfreurUN4KlJpiU2sx54LWa7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fwISnHxL; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-bce224720d8so1611095a12.1
-        for <kvm@vger.kernel.org>; Fri, 06 Feb 2026 07:54:59 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b6097ca315bso4621095a12.3
+        for <kvm@vger.kernel.org>; Fri, 06 Feb 2026 08:04:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770393298; x=1770998098; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770393839; x=1770998639; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ub20w3PlllwjJeB9g6N1sMss/WG4eHbIgCfgJZaRr98=;
-        b=FC0I4egjFeXp2B0xMjUCPMRqF79/2/J3fL6tuNmPSjR19KijtDe9hW7STZ3mnBI5TK
-         u0gKK+PYQl7pW0oeu9cUNRB5G0Yu3Dm7L9UgzpWdxSihxSWjH266Cjy0FtxIe3/cFvwx
-         /cWjgOj0d/YbyTeuEvVKhYckk7RTUblwgfmSoyuznKCrb/fHTGs6Eekz5F+mBxxvKHaM
-         n9etEpfbg8NF6Et/QpuROXjo6Mx7zJry1MC7La3BeHnIHYhrzGiAnLdkw/zVjdVG59FU
-         DmjuhLUwHVP3JLshqdWgG6zh+plPbrF+jzt6c7MJD/O/7yvWNwQlurAun01IhTXuoMXk
-         k9fQ==
+        bh=6W5ywYYSvCRSPwqFTbeco0aLvB9nOdCSyf5b4W1ZEGc=;
+        b=fwISnHxLUHvTJxXPPImFixXw/KAxi7FQo0otgOhlgSXwvyd9QUn0x81chIcWRTHC1z
+         im6Jr8ulBYBMS6Gs3cBBMjhqSxL0RMXN11CijNs13K1rKvJZQXbnpS+ylcsjkyFYfnqg
+         i+rcK+n/nsPvKE9TUG908/DhEo/VfC52Dk7AlTuMYwrT0pdkd1DsmEkePzP/KJC+tSfw
+         4YfJAgd9xboRoOSOd05FVpB+1JI+yU+fKn3BAgXoKS4UY8dAUQ0mjwvLUzfZYI//Ruqg
+         r39v9Jpim1VdwuDQVgaRhWCaO8/D45Du3ozhLL1jznY13SsNStKNsXzarkGgVPRyroAk
+         ruNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770393298; x=1770998098;
+        d=1e100.net; s=20230601; t=1770393839; x=1770998639;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ub20w3PlllwjJeB9g6N1sMss/WG4eHbIgCfgJZaRr98=;
-        b=vI6QPy/BBEDlTYSDYPPV1yBaxZ37LExiSPIBXKm8Yhn0AUb63FOibYikDwXZ1rI+44
-         JS5X/iYcuWi3pmNFtoATkxCPJsJzc1x76Zoue+qfp+RSiGVNwmn8uWuteFOYA7zlJ/Ar
-         UMGQKw3Fu9EVBbANgGfLTC1MpzlUGCIo4Lx8g5XqvbOhPBZ8QBveIfJpFBrRpAmsS7an
-         P5kd/rngOB068Yydh3PDle4yZqXcg+k9H0oHNHKkhyZSq4ZlbQ4CmiJQRvq8imNe8RlQ
-         1213RbswuCctvQJkDYat7SaJBZ0va/jUZYEiYDNiMsE+Wi7psO9+6EPUGygCrBsj4qZf
-         NB+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUR3662qFfBh27AhCTvJKzyXIgSWOZQvJ0EFjpAxn2msCCxlBFAZubopOulBW2hKNtNCoA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzL0/5XE36WmN577nV65M1IeJ8zAxMOtQEUusBsRLMC9eqhomDp
-	wqVJatlBCV1ZSTS59DhuciYYkO8h9GrbHqUqR9D+nlNAkbIMsOl3uj6F9V7FJpDyTWRse5ktHpF
-	zvcrooQ==
-X-Received: from pgbcr4.prod.google.com ([2002:a05:6a02:4104:b0:c63:6312:fcb5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:1f8e:b0:38b:e750:bc31
- with SMTP id adf61e73a8af0-393acffded6mr3151496637.32.1770393298473; Fri, 06
- Feb 2026 07:54:58 -0800 (PST)
-Date: Fri, 6 Feb 2026 07:54:57 -0800
-In-Reply-To: <usc5ysverr7gtt4itnw2s22s5hpfbtgwttm74i25gxbqm3b6cb@x2i4nzlo2wbz>
+        bh=6W5ywYYSvCRSPwqFTbeco0aLvB9nOdCSyf5b4W1ZEGc=;
+        b=Ghl89PZSgxsN3itaBLsnJS7r326Dk7lOb4Vvniy66IJjovwqVHckydWmuIA3mw5Gg5
+         WqYTxFAfbxYA9Enfknj3EsLNWbqOuDBynicxn2KMiZKYsrYYJhbMH1bli1N/AZY3JNYQ
+         0C4X8bQEWbECf9Qks+eBP5zTdqB5TSS2KlYY3TS5IVG4MvmlhnwwS7djzyS8876Xx8vP
+         tULekdyksT+lfFWb6MpIbf96J9gnKb3Bslxw4CnNyrwgwpIszoWHNAiMvLFDgeyT45rE
+         pxVH/gFxYgtboqx9SIChjPJs8k1v4vU5rBNVyBvPfoVOzlWen9KS9+NUqRjbWdzG/GMF
+         Z6rA==
+X-Forwarded-Encrypted: i=1; AJvYcCWyOm+npoxb+6cH94N2BEpQ/7dTRGxJFj7D2riiQzyS6FAeqd0ZVOYPtlE/IPBk9is9weM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyY2bfgdDrs8Bf986AsjKzBrMAvRcfbb1wa0ztQiTUcpQZXm//x
+	OPMCgbBwOn3b71y9/ieYRQfNg6ZmjrFhWXGZ0egtH82BaIgkxWADvBKFNqNyDcUeH05N/S5Qyqg
+	bQMg/bQ==
+X-Received: from pjbss7.prod.google.com ([2002:a17:90b:2ec7:b0:34c:37db:8f1b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3290:b0:393:8afb:3559
+ with SMTP id adf61e73a8af0-393ad0265a9mr3268415637.32.1770393839552; Fri, 06
+ Feb 2026 08:03:59 -0800 (PST)
+Date: Fri, 6 Feb 2026 08:03:57 -0800
+In-Reply-To: <aYXAdJV8rvWn4EQf@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260115011312.3675857-1-yosry.ahmed@linux.dev>
- <20260115011312.3675857-2-yosry.ahmed@linux.dev> <aYU87QeMg8_kTM-G@google.com>
- <b92c2a7c7bcdc02d49eb0c0d481f682bf5d10c76@linux.dev> <aYVC-1Pk01kQVJqD@google.com>
- <usc5ysverr7gtt4itnw2s22s5hpfbtgwttm74i25gxbqm3b6cb@x2i4nzlo2wbz>
-Message-ID: <aYYO0WqVDTSA8siv@google.com>
-Subject: Re: [PATCH v4 01/26] KVM: SVM: Switch svm_copy_lbrs() to a macro
+References: <20260129011517.3545883-1-seanjc@google.com> <20260129011517.3545883-23-seanjc@google.com>
+ <aYXAdJV8rvWn4EQf@yzhao56-desk.sh.intel.com>
+Message-ID: <aYYQ7Vx95ZrsqwCv@google.com>
+Subject: Re: [RFC PATCH v5 22/45] KVM: TDX: Get/put PAMT pages when
+ (un)mapping private memory
 From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	Kiryl Shutsemau <kas@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-coco@lists.linux.dev, kvm@vger.kernel.org, 
+	Kai Huang <kai.huang@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Sagi Shahar <sagis@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
@@ -95,13 +100,13 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70455-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70456-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	DKIM_TRACE(0.00)[google.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
@@ -110,33 +115,48 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F343AFFF14
+X-Rspamd-Queue-Id: C1827100076
 X-Rspamd-Action: no action
 
-On Fri, Feb 06, 2026, Yosry Ahmed wrote:
-> On Thu, Feb 05, 2026 at 05:25:15PM -0800, Sean Christopherson wrote:
-> > On Fri, Feb 06, 2026, Yosry Ahmed wrote:
-> > @@ -848,8 +859,6 @@ void svm_copy_lbrs(struct vmcb *to_vmcb, struct vmcb *from_vmcb)
-> >         to_vmcb->save.br_to             = from_vmcb->save.br_to;
-> >         to_vmcb->save.last_excp_from    = from_vmcb->save.last_excp_from;
-> >         to_vmcb->save.last_excp_to      = from_vmcb->save.last_excp_to;
-> > -
-> > -       vmcb_mark_dirty(to_vmcb, VMCB_LBR);
-> >  }
+On Fri, Feb 06, 2026, Yan Zhao wrote:
+> On Wed, Jan 28, 2026 at 05:14:54PM -0800, Sean Christopherson wrote:
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 6e84dbc89e79..a6e4ab76b1b2 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1863,6 +1863,7 @@ struct kvm_x86_ops {
+> >  				    struct kvm_mmu_page *sp);
+> >  	void (*remove_external_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+> >  				     u64 mirror_spte);
+> > +	int (*topup_external_cache)(struct kvm_vcpu *vcpu, int min);
 > >  
-> >  static void __svm_enable_lbrv(struct kvm_vcpu *vcpu)
-> > @@ -877,6 +886,8 @@ void svm_update_lbrv(struct kvm_vcpu *vcpu)
-> >                             (is_guest_mode(vcpu) && guest_cpu_cap_has(vcpu, X86_FEATURE_LBRV) &&
-> >                             (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK));
 > >  
-> > +       vmcb_mark_dirty(svm->vmcb, VMCB_LBR);
+> >  	bool (*has_wbinvd_exit)(void);
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 9b5a6861e2a4..4ecbf216d96f 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -605,6 +605,10 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+> >  					       PT64_ROOT_MAX_LEVEL);
+> >  		if (r)
+> >  			return r;
 > > +
-> 
-> Although I would rather keep this in callers of svm_copy_lbrs(), instead
-> of hiding it here. 
+> > +		r = kvm_x86_call(topup_external_cache)(vcpu, PT64_ROOT_MAX_LEVEL);
+> If this external cache is for PAMT pages allocation for guest pages only, here
+> the min count should be 1 instead of PT64_ROOT_MAX_LEVEL?
 
-No objection on my end.
+Oh!  Right.  Hmm, with that in mind, it seems like topup_external_cache() isn't
+quite the right interace.  It's not at all clear that, unlike the other caches,
+the DPAMT cache isn't tied to the page tables, it's tied to the physical memory
+being mapped into the guest.
+
+At the very least, it seems like we should drop the @min parameter?
+
+	int (*topup_external_cache)(struct kvm *kvm, struct kvm_vcpu *vcpu);
+
+Though if someone has a name that better captures what the cache is used for,
+without bleeding too many details into common x86...
 
