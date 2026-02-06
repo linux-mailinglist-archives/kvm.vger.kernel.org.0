@@ -1,107 +1,106 @@
-Return-Path: <kvm+bounces-70465-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70467-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QEEKLgcrhmm1KAQAu9opvQ
-	(envelope-from <kvm+bounces-70465-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 18:55:19 +0100
+	id sLytF/Irhmm1KAQAu9opvQ
+	(envelope-from <kvm+bounces-70467-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 18:59:14 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3844510186B
-	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 18:55:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B83A51018FB
+	for <lists+kvm@lfdr.de>; Fri, 06 Feb 2026 18:59:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1B5C4301CC69
-	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 17:55:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 87B05302B395
+	for <lists+kvm@lfdr.de>; Fri,  6 Feb 2026 17:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 437AC426D15;
-	Fri,  6 Feb 2026 17:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2006B426D11;
+	Fri,  6 Feb 2026 17:59:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="irfEJoQ0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lLSI8Pi4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B0D42669B
-	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 17:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473C0296BD3
+	for <kvm@vger.kernel.org>; Fri,  6 Feb 2026 17:58:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770400504; cv=none; b=Df1ucCNTdWpaErMPdHnVklXxQLkMVRmJUffQa/iMDhm+FG6f0R3KK0CFFT0kAzSK1GM+fG3K6W6seqZcadbToXAvxlPwQ4GxoyePR4d4DEYioUYEFcumZ8RpX6qmj1KJs3y07790OY3NXJZYsufH13CXm19vlMft2OqDMnP9eK0=
+	t=1770400739; cv=none; b=qgtBjrjOg5lSreiXwkWEoIUVnR1RRdmsCdTfTblsWX5upU+t4hcTzoYKxz4FToFXA1D6luSwPilTK7Jc2Tah+SrGVw9+gkLKzw2JA8cSLe8zmiwbetzMi9IjcoCjy7fqaCMLcWLgreoKImitXcUAAjt76SMpqa4117ivqD7rqnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770400504; c=relaxed/simple;
-	bh=GlpFnTDi8D4k/ZhVBxdkp4L72SyTwpevsbx9g3COs64=;
+	s=arc-20240116; t=1770400739; c=relaxed/simple;
+	bh=8d1BD4eF30+KyWgVRBOma68bMrR8sNdqhiQDUmpNgpM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YYbBq05EtXpNsSDNszg89Zo4TaX+QVrDQj/hGRzHhA5ERagPVIcFy1ob9wycdXoRoRQGuwGWwLyjWLNqsAaJAiubwIyeeoLIaKJGNFqF2V/dyPG89LilInZY/J3WwTXivr5CQJXefgMlSx5kMX9j3tH3jGvwZkbUcVvjFjnahuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=irfEJoQ0; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=IeeGEreKverWmJKbBTrFMx9pJJq2wLk8wg+VasIArjfqhTDD7me7slijT5GN2BNcW1WZaP0ZZT3o48Q4S5uB79SNKlZ5XpFONKQ9wbqN2NmlvxHwYe2/ukNDCw1BjAkWUK+EMl9G/51F6zHvCPrnWnBvkBqBF+ZHCMyGimDC2tA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lLSI8Pi4; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a90e8b54f0so26904055ad.2
-        for <kvm@vger.kernel.org>; Fri, 06 Feb 2026 09:55:04 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a0a4b748a0so59308105ad.1
+        for <kvm@vger.kernel.org>; Fri, 06 Feb 2026 09:58:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770400504; x=1771005304; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770400739; x=1771005539; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=B8q7C/N88SwT4oefqY74mjYEGWdcBFY/qeCdLmO+nbo=;
-        b=irfEJoQ0vRjuujv6wvFkTwAuSRR7mWcWJxAVcE1xXorrOBickHki8OvpL5STEO20fa
-         tdiQkfv5fvPJkEWzqdD+XFpNzyYCTAMMcvrDxawg/e6WIy1SFNl2F7Lv0vdWxiFmWLzb
-         w33snzB/v7mFJpavCDg+RIzREaSnI/IE4ulrZT6O9xkgS1iAsAEE4fjYQYYc5efzZ7jX
-         GpG1HtOzPUGx+mRaC2YkZXZcnny9fjRA4FZjV7Rq4RlL6+WpoWpT59RYYeNN6QoNaHg8
-         rYm/yUakTi3uY9bjy6qDw3aPudzIrKY5Qok15GyLT53qwhuJlEg1dotUGNMsTEilNx5H
-         M0kA==
+        bh=Njl6WISo/cIP/yX5hq9KMqO4jpKhLSD8WrbMSm0p7fU=;
+        b=lLSI8Pi4MNI9wZxAain+SMlxBsUL2lidYR6rX0PGVDS7JAfKxH9zkWGcBLroIA/uDf
+         WhaMZs9D0+jaGKhEATGpQBZbhZFqlwDbCtt5dR0XT7I1NCK9JSW7k/XV6babBKizFcIF
+         /4BXviohFEWC/U48rOU/iuenE+HQvwlpkjzGg7bqQTMG9oM+Xx/TetB2D1XVIV02Cr2T
+         oUKi4TUNHJBog+wGoyO53LBOf2HWcU/xyHSrhV5zGCuBG4zLnGN3ILb89DyI9vRvVbnd
+         NH9qBbKMePPhFzRDYjw1UKdUa+UV5szLQlH4wmB0XGA9AbDyjtnAOhtjuRs26T5IXuAW
+         tgKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770400504; x=1771005304;
+        d=1e100.net; s=20230601; t=1770400739; x=1771005539;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B8q7C/N88SwT4oefqY74mjYEGWdcBFY/qeCdLmO+nbo=;
-        b=j3rvldbc0wjDFzC2LYJ3XKzUs2gwxMjqpnuD87AowaJHMNzlQrox2sxzx9xETktN+o
-         MPAjthJLbUub6Lw3hbpWcVCcvLYUfUk8Nja10Q6y+Zo8j4wYVxzmYJLHiqrZ2BdKcPzj
-         3wBppiSOi+DOK9K9K+q7WW2sHqhKu0AhZn2/D7iv5EYcpRtQ2cZ8/v/TuClLUfkZOsEK
-         +TedjoTJD7+qixo+Ov0ngBRF9Z2O+44I6Sn0jbQAlv7wOxgcRYZmmWM99VxWHHHWJsXf
-         75h/yPDKtSefTkOo4bmqT8GysQrZ75un+fbU90f0wMLyMZmzsCTspBR7zlfL0gdBy/Wb
-         LkGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWkNB25umUgLvgw2D80JuxtIwkKV99OHBrE71+iI4d3tzbmgDUu/tuTJC5Nz6ctu1fsmAg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyps/cjr6zzY4Osb0FxIHs5qIgIcAZMITPPPEGMlOSLWLyef8eY
-	2RDVGuyCVkzk8KxHH9XeT8LUUPj6JbpLjgNvtJHbjSIc9p4mJtcXtQC27lijnhllW+cfbJ7p/xB
-	GdTGAiw==
-X-Received: from plhs13.prod.google.com ([2002:a17:903:320d:b0:2a8:74f9:83b2])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3d0e:b0:2a9:484c:ff19
- with SMTP id d9443c01a7336-2a95194a492mr34248905ad.42.1770400503711; Fri, 06
- Feb 2026 09:55:03 -0800 (PST)
-Date: Fri, 6 Feb 2026 09:55:02 -0800
-In-Reply-To: <aYYgShD2-47P51ZM@blrnaveerao1>
+        bh=Njl6WISo/cIP/yX5hq9KMqO4jpKhLSD8WrbMSm0p7fU=;
+        b=oEJ6Nk030t+aL/b1E+/ezRbOL4fgXrJY/7lVPhwl8T+/aGKeFGMzQjyyZXDjDN63PI
+         O++GzJGT1T+FaZ+7Fl/lIhwt4uknf7IL2oMl2XPQTa2isp8X9mdwtgTL/TmcTRPHA2/Q
+         AXrSx46S2/IG2GJNBYyIQpLtCfpWb3DBkHGo9h+Bt/lHpSq8bHKRxe6y3OU3WPmhWnR2
+         /lGYE/MdbPHpgsQirTce3NU8BOfrJjv3ggftufYUFFC5awZo/6lgIBVfrx8bZ6tu/msj
+         KAYDzAsknQNNuUavZeN2gr5ZQsHD03oMq3F7eO7tH9FKbk3LlyPS+A4yUsxgApANMJNX
+         N9EA==
+X-Forwarded-Encrypted: i=1; AJvYcCXAHOvEd1TxVt6I9crHsDWMULIaKApXs7h2TVKVyjjRWxkhuJMd1uG1FvtgiiW0wSm1wEY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbpIqkGDdw7hGpu+yAHMgBWepKPAcrYtDRgnL8HMIZMmTNcwGn
+	/tz1ekfnl1jL8t8O8uWp+B4BrGTXOYDKzGBWxB4aolidHHMhPoTFuqQQYTxg3WprwB3k7jcX32V
+	/RthjfQ==
+X-Received: from plcb1.prod.google.com ([2002:a17:902:d301:b0:2a0:81d1:64f4])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e947:b0:2a0:b066:3f55
+ with SMTP id d9443c01a7336-2a951605e26mr31266215ad.10.1770400738628; Fri, 06
+ Feb 2026 09:58:58 -0800 (PST)
+Date: Fri, 6 Feb 2026 09:58:57 -0800
+In-Reply-To: <k6wja36wxzcgyef255vl7rds56hfs25gvueqo7xoyhget2suz2@vvio2nz6zjo5>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260203190711.458413-1-seanjc@google.com> <20260203190711.458413-3-seanjc@google.com>
- <aYYgShD2-47P51ZM@blrnaveerao1>
-Message-ID: <aYYq9u7bZWsmJNMr@google.com>
-Subject: Re: [PATCH 2/2] KVM: SVM: Set/clear CR8 write interception when AVIC
- is (de)activated
+References: <20260115011312.3675857-1-yosry.ahmed@linux.dev>
+ <20260115011312.3675857-22-yosry.ahmed@linux.dev> <aYVEVRV-ASogp5dF@google.com>
+ <k6wja36wxzcgyef255vl7rds56hfs25gvueqo7xoyhget2suz2@vvio2nz6zjo5>
+Message-ID: <aYYr4R2tgwaajwjQ@google.com>
+Subject: Re: [PATCH v4 21/26] KVM: SVM: Rename vmcb->virt_ext to vmcb->misc_ctl2
 From: Sean Christopherson <seanjc@google.com>
-To: Naveen N Rao <naveen@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jim Mattson <jmattson@google.com>, "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70465-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[google.com:+];
+	TAGGED_FROM(0.00)[bounces-70467-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -109,25 +108,35 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6]
-X-Rspamd-Queue-Id: 3844510186B
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: B83A51018FB
 X-Rspamd-Action: no action
 
-On Fri, Feb 06, 2026, Naveen N Rao wrote:
-> On Tue, Feb 03, 2026 at 11:07:10AM -0800, Sean Christopherson wrote:
-> > Explicitly set/clear CR8 write interception when AVIC is (de)activated to
-> > fix a bug where KVM leaves the interception enabled after AVIC is
-> > activated.  E.g. if KVM emulates INIT=>WFS while AVIC is deactivated, CR8
-> > will remain intercepted in perpetuity.
+On Fri, Feb 06, 2026, Yosry Ahmed wrote:
+> On Thu, Feb 05, 2026 at 05:31:01PM -0800, Sean Christopherson wrote:
+> > On Thu, Jan 15, 2026, Yosry Ahmed wrote:
+> > > @@ -244,6 +241,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+> > >  #define SVM_MISC_CTL_SEV_ENABLE		BIT(1)
+> > >  #define SVM_MISC_CTL_SEV_ES_ENABLE	BIT(2)
+> > >  
+> > > +#define SVM_MISC_CTL2_LBR_CTL_ENABLE		BIT_ULL(0)
+> > > +#define SVM_MISC_CTL2_V_VMLOAD_VMSAVE_ENABLE	BIT_ULL(1)
+> > 
+> > Since you're changing names anyways, What do you think about shortening things
+> > a bit, and using the more standard syle of <scope>_<action>_<flag>?  E.g.
+> > 
+> >   #define SVM_MISC2_ENABLE_LBR_VIRTUALIZATION	BIT_ULL(0)
+> >   #define SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE	BIT_ULL(1)
 > 
-> Looking at svm_update_cr8_intercept(), I suppose this could also more 
-> commonly happen whenever AVIC is inhibited (IRQ Windows, as an example)?
+> SVM_MISC2_ENABLE_LBR_VIRTUALIZATION is actually longer,
 
-Maybe?  I don't think it's actually common in practice.  Because the bug requires
-the source of the inhibition to be removed while the vCPU still has a pending IRQ
-that is below PPR.  Which is definitely possible, but that seems overall unlikely,
-and it'd also be self-healing to some extent.  E.g. if a workload is triggering
-ExtINT, then odds are good it's going to _keep_ generating ExtINT, keep toggling
-the inhibit, and thus reconcile CR8 interception every time AVIC is inhibited.
+Heh, yeah, I knew that when I hit "send", I just wasn't sure if V_LBR was a good
+name.
+
+> how about SVM_MISC2_ENABLE_V_LBR? Shorter and more consistent with
+> SVM_MISC2_ENABLE_V_VMLOAD_VMSAVE.
+
+Works for me.  I was mildly concerned that V_LBR wouldn't be intuitive, but since
+you independently came up with the name too, apparently not :-)
 
