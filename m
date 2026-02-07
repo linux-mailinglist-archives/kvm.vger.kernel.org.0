@@ -1,398 +1,296 @@
-Return-Path: <kvm+bounces-70532-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70534-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gEIVLd+UhmkUPAQAu9opvQ
-	(envelope-from <kvm+bounces-70532-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 07 Feb 2026 02:26:55 +0100
+	id nriwGrmvhmkCQAQAu9opvQ
+	(envelope-from <kvm+bounces-70534-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 07 Feb 2026 04:21:29 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B63B1047F9
-	for <lists+kvm@lfdr.de>; Sat, 07 Feb 2026 02:26:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B21DE104C70
+	for <lists+kvm@lfdr.de>; Sat, 07 Feb 2026 04:21:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 005383022975
-	for <lists+kvm@lfdr.de>; Sat,  7 Feb 2026 01:24:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DB6F8301739F
+	for <lists+kvm@lfdr.de>; Sat,  7 Feb 2026 03:21:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4565428C009;
-	Sat,  7 Feb 2026 01:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A892D33D6F6;
+	Sat,  7 Feb 2026 03:21:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="diRXKb4h"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="U3tNzHqP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67CE4284B3B
-	for <kvm@vger.kernel.org>; Sat,  7 Feb 2026 01:24:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770427443; cv=none; b=Xoak5SMakWOb92/x+DCB5mdgMbmVfTdj3MSceWKRZJqYQLwcJmEyinGnLSImvaJaaZDE3tIBvavuiUJVFkEtxVVw0/oT0/od3CPRundpObLV8pUA3pxxIW6ohW+gRmgPcURdHBW4z2od1CnzDvwVlqjRcBL4Eeb9ZkaPdH9mWJg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770427443; c=relaxed/simple;
-	bh=mQ5q0HDnakbHZK2u/uTVHdKjCxIgiQ2sBFsmmZJNZvY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hPiAOV25Tql0Rz+uxKXOLvNEbJPL/FFOxQAeAqzY/wVtmX+7iy07aPKwyNJHP+2iDHGELvvim3C4WePwlTzssMLJNJhXVAT294eHy5WPF/tcW4mTfv1kQ4bYt7PsoSwB/GkP/AZ6c3OuCJhwwOc8SrkV99Etd7nLylwojYVQCK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=diRXKb4h; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a7d7b87977so27935585ad.0
-        for <kvm@vger.kernel.org>; Fri, 06 Feb 2026 17:24:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A330D252917
+	for <kvm@vger.kernel.org>; Sat,  7 Feb 2026 03:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770434484; cv=pass; b=bZr3waDgqUTX3dNRbRl/VcFOBIJTK6q8WIxVxu7D47yjiX4fSh12bA6VEJk7eCv66UXdCLgQBt8VWQUU3DaL6CbXbye5Yf4Ht66U5S6pML/9kez9GqcG6ubX1EgIqsxxxAmoz3QrXDtlTW3OXlu9bymCggNKB9Gnqw1SsKVrIKM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770434484; c=relaxed/simple;
+	bh=W5mJvwHC/NVykufeQ+msSyj6wEsGgnLifWNe+ZddKGo=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=qaPWHAdFNoSaL/nmHx74O2maLmSpgs/rINnVQucWMAbrjx5BpOJoTQRWAVNAMXjcs2VGM8Di4uGRR1jmE+KBRh8VyB2kp1E/GFQPw7SNICaJohXvXbtjiwCGgqWYDV9LLwqN823Shj4SpvZ2x9bFg1OfCraybBaacInjdBKLRZE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=U3tNzHqP; arc=pass smtp.client-ip=209.85.161.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-66a12c77a2cso1561511eaf.3
+        for <kvm@vger.kernel.org>; Fri, 06 Feb 2026 19:21:24 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770434483; cv=none;
+        d=google.com; s=arc-20240605;
+        b=L9Oo7OTNMuDvrOAmXCbo6/0EMjNcHUxGg0sZfp9A2pvNGloMf+7spYkJ237awvXZcD
+         7PVfXDv8uHMiOwiZg87faJdUKAq6ODS4ZmMbjvP9zc33xEFxoXuzbdzKkL52jl9GtJmo
+         8U4PlJS02XeMNf4FqEH20MT5+5fwuFMXsHI9RAVfVNANaopiJOZiYCKm1VZJEqKdSqqj
+         T0xpXdiVQcIGXMgArJxJ/6SqVQ5T/wpEmwGLyopCInX2On9a16vBmJoCJTCom3Vrs4vW
+         9RAUpNTU81UcDsZZ/bpY0LC8OeLuFylLf7drY/OUbDaZOEppVkRMRPtOyIy5E4UB5/E/
+         sNvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=DDnvhXep83DlBOrKWoBYx9m4Ze6xzsCfCU7TNyv34F8=;
+        fh=6SVwKkNmmLwa7LUy5OrGKLxNdUyB35iQFAsQTtRvfBk=;
+        b=WHK3JnVXy0ezCWRzXvVpG5mGA0gZnQX2gvXi+1xchVU+QNDLzayQjAq0j66SGxV6Vu
+         TVx+DzTpuBgodgGmeV3UJmHGq99kNmRPpuhm3Gnr51h9jZanVLQnKQ9kX01Cfu4tzIka
+         ZyjRtxYnw+d9g9iZVeyM2tjN+1dlK4+2zlE/uRpQPaMtAm04ITQaSWDFxeQlz3SyOL5/
+         3OlGp2LNdNKH3bLKzYXkH8TKMKYHn42UArwWR27an8BBTwLiOWiMM08ZMOsiJa1s/zDE
+         ejxFu8+jPLKCeasOHg1KpN1U87kxHmX0iKIVW2olUQIJZf9Ge+9TzTycVfwYQx1aI3d7
+         ttIQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770427441; x=1771032241; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K4Q9ET/TKOgMPaBFA8KfQMo0cbmVTdTajIMx+Sh9uYE=;
-        b=diRXKb4hCcG6gHjq/zAnZWtJSDpIbkI6n+P1xmfteNCZbRwDIk50qwRgdIfaxpEEvr
-         4eZTaa7ks9jyEFeysvDb3YhObDQxdnJvJY64dpQ8luZnWdbXQRpAxX/vofc5BS7H/NsJ
-         4A6iYxnVuCQkdgbhgAZRXBW5NYCEWQNLfj9PnYId6GD5i85FQFsj+zzWCDpxN3YjYAxp
-         RkfQYESkPG/p1feMJMIkLjTvl1dDjS4wRPGeGvR1Qt4LTfLOq05h6wVLoFdxaaI9AoQS
-         6HYDdavo9ZMc8w5Uoi9DV2I2FnI6GGAdRCM7jtiuXc5PS/NK1PevfRv78izxKs+hlhWk
-         hf6w==
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1770434483; x=1771039283; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DDnvhXep83DlBOrKWoBYx9m4Ze6xzsCfCU7TNyv34F8=;
+        b=U3tNzHqP7ymAIPqzOlaCocaOZoDwgEtHN5pOQiXaPjFKMZGNmK7PbsxwEdc+yFrew1
+         hpLXIGw4Ld8GdQFBcoZdXCUTDkwkE9g0VqseXFfS48Z5pEV/wLEbH3Us8WB+02X6DA2l
+         q4iAqlgw8lPPHARhYk9IrVzhTFo2GDaG+ocJvVl3tFiGbGsUeJt46wfNBnbeh4Fljn8P
+         7dizx+Xnr7d+JCXirLA2qHbJqQ6pSAFN9oCjhGSgtO3llCmauMji/w/0yXqE1ozxjBjD
+         DkJcUqkkEw/gRLIfSClO1EJ8O57G/3WdI3/sSPzk+p3IIPRgAS6aC42ggBZ7v9NCZikA
+         0cmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770427441; x=1771032241;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K4Q9ET/TKOgMPaBFA8KfQMo0cbmVTdTajIMx+Sh9uYE=;
-        b=etRCDeLPcMrfkJD5woRDoGdQMvVsb6MV5MxnIprmnXskr2xBaNnrfurO9WyZDkDldW
-         DPOkptkxpXoJB1AW8OM1V1zWJ7XHlKQfVU+PJuKTaoDAZLDXa8deVBNGwZ2yLPeYfGQI
-         WRTrFC6Qu3t90sGSrgPOHspnwNGYDmov2/McRJUcGJ0PJUNWZiy7jmk4BBRIvXd2B3IX
-         +bl3O3ZwJ0X3slJhDMiJt3XpReLiZCo34AjZDK45E+VnDaLoo4R9hH5eqoAqSvdbm+As
-         UZgThSe46niEjkRRa3V2UFVPHeDEFQwmXzfOO97RxBXbEbOO4HNU4eiGJzT/i+pHSt9f
-         vopg==
-X-Forwarded-Encrypted: i=1; AJvYcCXLKk+P7979reZ0Wji5h+YuYsb+vfqVjUJ70kMNgoLQsonbruGScFV2hY6uEn0tha9CS3c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy05opYOd8VDLxus32PG9Ng5eQHbXKYa9SL9DiqsWnfXMH56wXH
-	2DE5zm3+Y4RKiV3zE+V//jbcHlPf5nhzQupXEsMeVR4dgL8TqiWKaBFvWEZGZribvBEEkzv5xUn
-	Ktj7rimsUt5Uqcw==
-X-Received: from pleu16.prod.google.com ([2002:a17:903:41d0:b0:29f:2fcb:60c8])
- (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:3885:b0:29f:1bf:6424 with SMTP id d9443c01a7336-2a95163750fmr44168655ad.18.1770427440755;
- Fri, 06 Feb 2026 17:24:00 -0800 (PST)
-Date: Fri,  6 Feb 2026 17:23:31 -0800
-In-Reply-To: <20260207012339.2646196-1-jmattson@google.com>
+        d=1e100.net; s=20230601; t=1770434483; x=1771039283;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DDnvhXep83DlBOrKWoBYx9m4Ze6xzsCfCU7TNyv34F8=;
+        b=wrxveBs63LtoLPuEOaSc5xkX95ROQHc48P8VVZ7adp/yfb+aV4Vikq4Vz4bSZ3W0n8
+         N6sY+AQPIWOkGyjxFafbbOAPcABc3Q5/Wx09OKNHRVBNvCch20yagj4Ssb8ip6B/G6VZ
+         dbuZ3mybvCyhiYz2jhzSqGxhw8fX/FqfLVzMpLFHQxfOhC88jviHDx3pFPanR/tk/dQR
+         5M31yJWINJYnQ53zBSu6A/i6iTW0vwgWRWnjjc2UeKrGdmQ0xpPGbv2xB0R64+q01MpE
+         PAr2b2W/ygfdJ1GuWzPU4bw6OZebw6kaVJ/Dooljsiz/sEkxtCEmm5gb2z10VRoFF7PS
+         7xuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVRYfUT4f3V26aYsbb2yzoXheKBaapBTmEFPBjJeRZKVcB1jQ/enBnJnADoCgsAbtgcVBE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjsTUd+kYpShOWZDV1uakuaxuRFvy66PljnAl7+tVYihqIVU+D
+	yJqNaahAQHqtZ1tK4rwcdY8z/GVTSrM5a4nseSkb7fMK1JpiuYas51RvHYr6YCf5jrQ/CnY/l4X
+	C8nCo6tKY5cijgZQjEghTz3Jq+DF3xfFyeN5cuukhJQ==
+X-Gm-Gg: AZuq6aJpKxyeXpeSrRCut6eqR31Y3fGsx/r4aNs0xHdE6M72ATu5hbGJtOhHGrZX/k9
+	PXPO0zkUPc0MNBz4icACrYyITLA+6HQy+X6xf6JXkyvTWtJ94RYyNvklUYJhQ1Fp7YCZcaXn9J0
+	uv/cRxE977nEDdXxB5YOneCY+TUOyKfdt7UvLfdsuQm0WlabLylDGhYmNigqdEJjQOOUOJJRAbM
+	CK2+FVZ6pjF6PitPMEOZCRgWsgXXRJN4ATBOKa0AovMvMhJkhe6TQtQx4tlQG9UBmHD/cGe9glM
+	GRvBZONQR8LaQz9dXyvUvTllbPaz6HAar+tMJqrVK7a4y93IYXX+gWMY7A==
+X-Received: by 2002:a05:6820:180e:b0:662:f347:75ea with SMTP id
+ 006d021491bc7-66d0a380580mr2281379eaf.28.1770434483383; Fri, 06 Feb 2026
+ 19:21:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260207012339.2646196-1-jmattson@google.com>
-X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260207012339.2646196-6-jmattson@google.com>
-Subject: [PATCH v3 5/5] KVM: selftests: x86: Add svm_pmu_host_guest_test for
- Host-Only/Guest-Only bits
-From: Jim Mattson <jmattson@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	James Clark <james.clark@linaro.org>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Yosry Ahmed <yosry.ahmed@linux.dev>, 
-	Mingwei Zhang <mizhang@google.com>, Sandipan Das <sandipan.das@amd.com>
-Cc: Jim Mattson <jmattson@google.com>
+MIME-Version: 1.0
+From: Anup Patel <anup@brainfault.org>
+Date: Sat, 7 Feb 2026 08:51:12 +0530
+X-Gm-Features: AZwV_Qgt6jGZeh_4zfnnbt8_F11u5jr2-fPeHJpG-DyOXqW_XCH4wBnJqmdFURc
+Message-ID: <CAAhSdy3z70oEePkgOBziVOKgFGae-0xMD+8xmsMV2PWM1v0ToA@mail.gmail.com>
+Subject: [GIT PULL] KVM/riscv changes for 6.20
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, 
+	Andrew Jones <andrew.jones@oss.qualcomm.com>, Atish Patra <atish.patra@linux.dev>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[brainfault-org.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70532-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[26];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TO_DN_ALL(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[brainfault.org];
+	TAGGED_FROM(0.00)[bounces-70534-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[brainfault-org.20230601.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[anup@brainfault.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3B63B1047F9
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,brainfault-org.20230601.gappssmtp.com:dkim,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: B21DE104C70
 X-Rspamd-Action: no action
 
-Add a selftest to verify KVM correctly virtualizes the AMD PMU Host-Only
-(bit 41) and Guest-Only (bit 40) event selector bits across all relevant
-SVM state transitions.
+Hi Paolo,
 
-The test programs 4 PMCs simultaneously with all combinations of the
-Host-Only and Guest-Only bits, then verifies correct counting behavior:
-  1. SVME=0: all counters count (Host-Only/Guest-Only bits ignored)
-  2. Set SVME=1: Host-Only and neither/both count; Guest-Only stops
-  3. VMRUN to L2: Guest-Only and neither/both count; Host-Only stops
-  4. VMEXIT to L1: Host-Only and neither/both count; Guest-Only stops
-  5. Clear SVME=0: all counters count (bits ignored again)
+We have the following KVM RISC-V changes for 6.20:
+1) Fixes for issues discovered by KVM API fuzzing in
+    AIA virtualization
+2) Allow Zalasr, Zilsd and Zclsd extensions for Guest/VM
+3) Add riscv vm satp modes in KVM selftests
+4) Transparent huge support for G-stage
+5) Adjust the number of available guest irq files based
+    on MMIO register sizes
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- tools/testing/selftests/kvm/include/x86/pmu.h |   6 +
- .../selftests/kvm/include/x86/processor.h     |   2 +
- .../kvm/x86/svm_pmu_host_guest_test.c         | 199 ++++++++++++++++++
- 4 files changed, 208 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/svm_pmu_host_guest_test.c
+Please pull.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 58eee0474db6..f20ddd58ee81 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -112,6 +112,7 @@ TEST_GEN_PROGS_x86 += x86/svm_vmcall_test
- TEST_GEN_PROGS_x86 += x86/svm_int_ctl_test
- TEST_GEN_PROGS_x86 += x86/svm_nested_shutdown_test
- TEST_GEN_PROGS_x86 += x86/svm_nested_soft_inject_test
-+TEST_GEN_PROGS_x86 += x86/svm_pmu_host_guest_test
- TEST_GEN_PROGS_x86 += x86/tsc_scaling_sync
- TEST_GEN_PROGS_x86 += x86/sync_regs_test
- TEST_GEN_PROGS_x86 += x86/ucna_injection_test
-diff --git a/tools/testing/selftests/kvm/include/x86/pmu.h b/tools/testing/selftests/kvm/include/x86/pmu.h
-index 72575eadb63a..af9b279c78df 100644
---- a/tools/testing/selftests/kvm/include/x86/pmu.h
-+++ b/tools/testing/selftests/kvm/include/x86/pmu.h
-@@ -38,6 +38,12 @@
- #define ARCH_PERFMON_EVENTSEL_INV		BIT_ULL(23)
- #define ARCH_PERFMON_EVENTSEL_CMASK		GENMASK_ULL(31, 24)
- 
-+/*
-+ * These are AMD-specific bits.
-+ */
-+#define AMD64_EVENTSEL_GUESTONLY		BIT_ULL(40)
-+#define AMD64_EVENTSEL_HOSTONLY			BIT_ULL(41)
-+
- /* RDPMC control flags, Intel only. */
- #define INTEL_RDPMC_METRICS			BIT_ULL(29)
- #define INTEL_RDPMC_FIXED			BIT_ULL(30)
-diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-index 4ebae4269e68..10ee2d4db1e3 100644
---- a/tools/testing/selftests/kvm/include/x86/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86/processor.h
-@@ -19,6 +19,8 @@
- #include "kvm_util.h"
- #include "ucall_common.h"
- 
-+#define __stack_aligned__	__aligned(16)
-+
- extern bool host_cpu_is_intel;
- extern bool host_cpu_is_amd;
- extern uint64_t guest_tsc_khz;
-diff --git a/tools/testing/selftests/kvm/x86/svm_pmu_host_guest_test.c b/tools/testing/selftests/kvm/x86/svm_pmu_host_guest_test.c
-new file mode 100644
-index 000000000000..a08c03a40d4f
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/svm_pmu_host_guest_test.c
-@@ -0,0 +1,199 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * KVM nested SVM PMU Host-Only/Guest-Only test
-+ *
-+ * Copyright (C) 2026, Google LLC.
-+ *
-+ * Test that KVM correctly virtualizes the AMD PMU Host-Only (bit 41) and
-+ * Guest-Only (bit 40) event selector bits across all SVM state
-+ * transitions.
-+ *
-+ * Programs 4 PMCs simultaneously with all combinations of Host-Only and
-+ * Guest-Only bits, then verifies correct counting behavior through:
-+ *   1. SVME=0: all counters count (Host-Only/Guest-Only bits ignored)
-+ *   2. Set SVME=1: Host-Only and neither/both count; Guest-Only stops
-+ *   3. VMRUN to L2: Guest-Only and neither/both count; Host-Only stops
-+ *   4. VMEXIT to L1: Host-Only and neither/both count; Guest-Only stops
-+ *   5. Clear SVME=0: all counters count (bits ignored again)
-+ */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "svm_util.h"
-+#include "pmu.h"
-+
-+#define L2_GUEST_STACK_SIZE	255
-+
-+#define EVENTSEL_RETIRED_INSNS	(ARCH_PERFMON_EVENTSEL_OS |	\
-+				 ARCH_PERFMON_EVENTSEL_USR |	\
-+				 ARCH_PERFMON_EVENTSEL_ENABLE |	\
-+				 AMD_ZEN_INSTRUCTIONS_RETIRED)
-+
-+/* PMC configurations: index corresponds to Host-Only | Guest-Only bits */
-+#define PMC_NEITHER	0  /* Neither bit set */
-+#define PMC_GUESTONLY	1  /* Guest-Only bit set */
-+#define PMC_HOSTONLY	2  /* Host-Only bit set */
-+#define PMC_BOTH	3  /* Both bits set */
-+#define NR_PMCS		4
-+
-+/* Bitmasks for which PMCs should be counting in each state */
-+#define COUNTS_ALL	(BIT(PMC_NEITHER) | BIT(PMC_GUESTONLY) | \
-+			 BIT(PMC_HOSTONLY) | BIT(PMC_BOTH))
-+#define COUNTS_L1	(BIT(PMC_NEITHER) | BIT(PMC_HOSTONLY) | BIT(PMC_BOTH))
-+#define COUNTS_L2	(BIT(PMC_NEITHER) | BIT(PMC_GUESTONLY) | BIT(PMC_BOTH))
-+
-+#define LOOP_INSNS	1000
-+
-+static __always_inline void run_instruction_loop(void)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < LOOP_INSNS; i++)
-+		__asm__ __volatile__("nop");
-+}
-+
-+static __always_inline void read_counters(uint64_t *counts)
-+{
-+	int i;
-+
-+	for (i = 0; i < NR_PMCS; i++)
-+		counts[i] = rdmsr(MSR_F15H_PERF_CTR + 2 * i);
-+}
-+
-+static __always_inline void run_and_measure(uint64_t *deltas)
-+{
-+	uint64_t before[NR_PMCS], after[NR_PMCS];
-+	int i;
-+
-+	read_counters(before);
-+	run_instruction_loop();
-+	read_counters(after);
-+
-+	for (i = 0; i < NR_PMCS; i++)
-+		deltas[i] = after[i] - before[i];
-+}
-+
-+static void assert_pmc_counts(uint64_t *deltas, unsigned int expected_counting)
-+{
-+	int i;
-+
-+	for (i = 0; i < NR_PMCS; i++) {
-+		if (expected_counting & BIT(i))
-+			GUEST_ASSERT_NE(deltas[i], 0);
-+		else
-+			GUEST_ASSERT_EQ(deltas[i], 0);
-+	}
-+}
-+
-+struct test_data {
-+	uint64_t l2_deltas[NR_PMCS];
-+	bool l2_done;
-+};
-+
-+static struct test_data *test_data;
-+
-+static void l2_guest_code(void)
-+{
-+	run_and_measure(test_data->l2_deltas);
-+	test_data->l2_done = true;
-+	vmmcall();
-+}
-+
-+static void l1_guest_code(struct svm_test_data *svm, struct test_data *data)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE] __stack_aligned__;
-+	struct vmcb *vmcb = svm->vmcb;
-+	uint64_t deltas[NR_PMCS];
-+	uint64_t eventsel;
-+	int i;
-+
-+	test_data = data;
-+
-+	/* Program 4 PMCs with all combinations of Host-Only/Guest-Only bits */
-+	for (i = 0; i < NR_PMCS; i++) {
-+		eventsel = EVENTSEL_RETIRED_INSNS;
-+		if (i & PMC_GUESTONLY)
-+			eventsel |= AMD64_EVENTSEL_GUESTONLY;
-+		if (i & PMC_HOSTONLY)
-+			eventsel |= AMD64_EVENTSEL_HOSTONLY;
-+		wrmsr(MSR_F15H_PERF_CTL + 2 * i, eventsel);
-+		wrmsr(MSR_F15H_PERF_CTR + 2 * i, 0);
-+	}
-+
-+	/* Step 1: SVME=0 - Host-Only/Guest-Only bits ignored; all count */
-+	wrmsr(MSR_EFER, rdmsr(MSR_EFER) & ~EFER_SVME);
-+	run_and_measure(deltas);
-+	assert_pmc_counts(deltas, COUNTS_ALL);
-+
-+	/* Step 2: Set SVME=1 - In L1 "host mode"; Guest-Only stops */
-+	wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_SVME);
-+	run_and_measure(deltas);
-+	assert_pmc_counts(deltas, COUNTS_L1);
-+
-+	/* Step 3: VMRUN to L2 - In "guest mode"; Host-Only stops */
-+	generic_svm_setup(svm, l2_guest_code,
-+			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+	vmcb->control.intercept &= ~(1ULL << INTERCEPT_MSR_PROT);
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-+	GUEST_ASSERT(data->l2_done);
-+	assert_pmc_counts(data->l2_deltas, COUNTS_L2);
-+
-+	/* Step 4: After VMEXIT to L1 - Back in "host mode"; Guest-Only stops */
-+	run_and_measure(deltas);
-+	assert_pmc_counts(deltas, COUNTS_L1);
-+
-+	/* Step 5: Clear SVME - Host-Only/Guest-Only bits ignored; all count */
-+	wrmsr(MSR_EFER, rdmsr(MSR_EFER) & ~EFER_SVME);
-+	run_and_measure(deltas);
-+	assert_pmc_counts(deltas, COUNTS_ALL);
-+
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	vm_vaddr_t svm_gva, data_gva;
-+	struct test_data *data_hva;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
-+	TEST_REQUIRE(kvm_is_pmu_enabled());
-+	TEST_REQUIRE(get_kvm_amd_param_bool("enable_mediated_pmu"));
-+	TEST_REQUIRE(host_cpu_is_amd && kvm_cpu_family() >= 0x17);
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
-+
-+	vcpu_alloc_svm(vm, &svm_gva);
-+
-+	data_gva = vm_vaddr_alloc_page(vm);
-+	data_hva = addr_gva2hva(vm, data_gva);
-+	memset(data_hva, 0, sizeof(*data_hva));
-+
-+	vcpu_args_set(vcpu, 2, svm_gva, data_gva);
-+
-+	vcpu_run(vcpu);
-+	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	case UCALL_DONE:
-+		break;
-+	default:
-+		TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+	}
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.53.0.rc2.204.g2597b5adb4-goog
+Also, please note that we have a conflict with kvm-x86
+tree in tools/testing/selftests/kvm/lib/riscv/processor.c due
+to patch "KVM: riscv: selftests: Add riscv vm satp modes"
+discovered on linux-next. This can be resolved as follows:
 
+diff --cc tools/testing/selftests/kvm/lib/riscv/processor.c
+index 373cf4d1ed809,e6ec7c224fc3e..0000000000000
+--- a/tools/testing/selftests/kvm/lib/riscv/processor.c
++++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+@@@ -64,15 -68,15 +64,15 @@@ static uint64_t pte_index(struct kvm_v
+
+  void virt_arch_pgd_alloc(struct kvm_vm *vm)
+  {
+ -      size_t nr_pages = page_align(vm, ptrs_per_pte(vm) * 8) / vm->page_size;
+ +      size_t nr_pages = vm_page_align(vm, ptrs_per_pte(vm) * 8) /
+vm->page_size;
+
+-       if (vm->pgd_created)
++       if (vm->mmu.pgd_created)
+                return;
+
+-       vm->pgd = vm_phy_pages_alloc(vm, nr_pages,
+-                                    KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+-                                    vm->memslots[MEM_REGION_PT]);
+-       vm->pgd_created = true;
++       vm->mmu.pgd = vm_phy_pages_alloc(vm, nr_pages,
++                                        KVM_GUEST_PAGE_TABLE_MIN_PADDR,
++                                        vm->memslots[MEM_REGION_PT]);
++       vm->mmu.pgd_created = true;
+  }
+
+  void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+@@@ -220,14 -212,8 +221,14 @@@ void riscv_vcpu_mmu_setup(struct kvm_vc
+                TEST_FAIL("Unknown guest mode, mode: 0x%x", vm->mode);
+        }
+
+ +      max_satp_mode = vcpu_get_reg(vcpu, RISCV_CONFIG_REG(satp_mode));
+ +
+ +      if ((satp_mode >> SATP_MODE_SHIFT) > max_satp_mode)
+ +              TEST_FAIL("Unable to set satp mode 0x%lx, max mode 0x%lx\n",
+ +                        satp_mode >> SATP_MODE_SHIFT, max_satp_mode);
+ +
+-       satp = (vm->pgd >> PGTBL_PAGE_SIZE_SHIFT) & SATP_PPN;
++       satp = (vm->mmu.pgd >> PGTBL_PAGE_SIZE_SHIFT) & SATP_PPN;
+ -      satp |= SATP_MODE_48;
+ +      satp |= satp_mode;
+
+        vcpu_set_reg(vcpu, RISCV_GENERAL_CSR_REG(satp), satp);
+  }
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c
+b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 265e173b73709..1959bf556e88e 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -359,17 +359,17 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
+        case VM_MODE_P56V57_4K:
+        case VM_MODE_P50V57_4K:
+        case VM_MODE_P41V57_4K:
+-               vm->pgtable_levels = 5;
++               vm->mmu.pgtable_levels = 5;
+                break;
+        case VM_MODE_P56V48_4K:
+        case VM_MODE_P50V48_4K:
+        case VM_MODE_P41V48_4K:
+-               vm->pgtable_levels = 4;
++               vm->mmu.pgtable_levels = 4;
+                break;
+        case VM_MODE_P56V39_4K:
+        case VM_MODE_P50V39_4K:
+        case VM_MODE_P41V39_4K:
+-               vm->pgtable_levels = 3;
++               vm->mmu.pgtable_levels = 3;
+                break;
+        default:
+                TEST_FAIL("Unknown guest mode: 0x%x", vm->mode);
+
+Regards,
+Anup
+
+The following changes since commit 63804fed149a6750ffd28610c5c1c98cce6bd377:
+
+  Linux 6.19-rc7 (2026-01-25 14:11:24 -0800)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.20-1
+
+for you to fetch changes up to 376e2f8cca2816c489a9196e65cc904d1a907fd2:
+
+  irqchip/riscv-imsic: Adjust the number of available guest irq files
+(2026-02-06 19:05:34 +0530)
+
+----------------------------------------------------------------
+KVM/riscv changes for 6.20
+
+- Fixes for issues discovered by KVM API fuzzing in
+  kvm_riscv_aia_imsic_has_attr(), kvm_riscv_aia_imsic_rw_attr(),
+  and kvm_riscv_vcpu_aia_imsic_update()
+- Allow Zalasr, Zilsd and Zclsd extensions for Guest/VM
+- Add riscv vm satp modes in KVM selftests
+- Transparent huge support for G-stage
+- Adjust the number of available guest irq files based on
+  MMIO register sizes in DeviceTree or ACPI
+
+----------------------------------------------------------------
+Jessica Liu (1):
+      RISC-V: KVM: Transparent huge page support
+
+Jiakai Xu (3):
+      RISC-V: KVM: Fix null pointer dereference in
+kvm_riscv_aia_imsic_has_attr()
+      RISC-V: KVM: Fix null pointer dereference in kvm_riscv_aia_imsic_rw_attr()
+      RISC-V: KVM: Skip IMSIC update if vCPU IMSIC state is not initialized
+
+Pincheng Wang (2):
+      riscv: KVM: allow Zilsd and Zclsd extensions for Guest/VM
+      KVM: riscv: selftests: add Zilsd and Zclsd extension to get-reg-list test
+
+Qiang Ma (1):
+      RISC-V: KVM: Remove unnecessary 'ret' assignment
+
+Wu Fei (1):
+      KVM: riscv: selftests: Add riscv vm satp modes
+
+Xu Lu (3):
+      RISC-V: KVM: Allow Zalasr extensions for Guest/VM
+      RISC-V: KVM: selftests: Add Zalasr extensions to get-reg-list test
+      irqchip/riscv-imsic: Adjust the number of available guest irq files
+
+ arch/riscv/include/uapi/asm/kvm.h                  |   3 +
+ arch/riscv/kvm/aia.c                               |   2 +-
+ arch/riscv/kvm/aia_imsic.c                         |  13 +-
+ arch/riscv/kvm/mmu.c                               | 140 +++++++++++++++++++++
+ arch/riscv/kvm/vcpu_onereg.c                       |   4 +
+ arch/riscv/kvm/vcpu_pmu.c                          |   5 +-
+ arch/riscv/mm/pgtable.c                            |   2 +
+ drivers/irqchip/irq-riscv-imsic-state.c            |  12 +-
+ include/linux/irqchip/riscv-imsic.h                |   3 +
+ tools/testing/selftests/kvm/include/kvm_util.h     |  17 ++-
+ .../selftests/kvm/include/riscv/processor.h        |   2 +
+ tools/testing/selftests/kvm/lib/guest_modes.c      |  41 ++++--
+ tools/testing/selftests/kvm/lib/kvm_util.c         |  33 +++++
+ tools/testing/selftests/kvm/lib/riscv/processor.c  |  63 +++++++++-
+ tools/testing/selftests/kvm/riscv/get-reg-list.c   |  12 ++
+ 15 files changed, 330 insertions(+), 22 deletions(-)
 
