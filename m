@@ -1,80 +1,84 @@
-Return-Path: <kvm+bounces-70535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70536-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4N7UOTK7hmkEQgQAu9opvQ
-	(envelope-from <kvm+bounces-70535-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 07 Feb 2026 05:10:26 +0100
+	id 5nhmDU67hmkNQgQAu9opvQ
+	(envelope-from <kvm+bounces-70536-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 07 Feb 2026 05:10:54 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BDBD104D35
-	for <lists+kvm@lfdr.de>; Sat, 07 Feb 2026 05:10:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF361104D44
+	for <lists+kvm@lfdr.de>; Sat, 07 Feb 2026 05:10:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6AAC5303388E
-	for <lists+kvm@lfdr.de>; Sat,  7 Feb 2026 04:10:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4260F3048084
+	for <lists+kvm@lfdr.de>; Sat,  7 Feb 2026 04:10:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ADD42D5410;
-	Sat,  7 Feb 2026 04:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589F02C11D3;
+	Sat,  7 Feb 2026 04:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ivZmofTG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JtRNnDA1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C5C2BE7BA
-	for <kvm@vger.kernel.org>; Sat,  7 Feb 2026 04:10:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C92E2D7804
+	for <kvm@vger.kernel.org>; Sat,  7 Feb 2026 04:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770437413; cv=none; b=Gay8/dRDgFPUTZ5x7m0K1X3BxJWx+sTswlTgf+QL//lVXpQdunFNLRY/TfGWMeUeQZQwPYwgsHRnlh/cJq6wFJ7I/tbOdK0EDC4/hESb4T2AZnLoCODebAjVlk0wSWmPQ0+2ELcPDptOdg0b96NCIY5rhjxQJjRVXrXW4RjgI6o=
+	t=1770437415; cv=none; b=aR1LC89q331vlpBBjXfSg4qlxT4BEZ6DX+z4gpALv5mrMEYmDErM+UQp5NyG9Jli4UNb0RBR8fKYyiRL7qsSDvoEotVvHpg88uiTcZlLxQJGzdXtchgZMSkhYynMIDSuJk3KoMIIZJE4GWV5xtO4QWM01VdMNRkVlALI4LnoJLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770437413; c=relaxed/simple;
-	bh=fSFzt38dXY+Z/qZjzgHR6tTM00WDVeyu1C4eIOX26Kg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DtLetI78OK1SW5UlaL801ZavOW1NthvT98AO33pSGVLXRXP48apiCEspNXgqOKTXu/Ve5PWhI+Remc3WejKsUXXjPJntjgA20CBJdckvuzJBaMeGClSgCeH1z9f9o5t9DJDMMdcg/ZtxHXg0fbVC93PDwLFYtaAVsOt3pU8+wFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ivZmofTG; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1770437415; c=relaxed/simple;
+	bh=5qfnrj3G1xNYE98CkRPRtOxsLzJem6iX9oFznGPRF+Q=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=nifc6Wewcwv9evDVH9lU4PhPYmXRpZUVsyY9Kjo3q+HVoKe8fwpllRXPiWco8pAVQaj8/TDcmjVBKUFvW0dQK3QX+FnmR+ASPmh93r5AOpfc03xhV0mmnEEv8OhDZDUdqnhpCnfrtKuYffYYR4CNbtkTEZ2xyqPGer6Q5P3V5Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JtRNnDA1; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-352c7924ebcso1360736a91.3
-        for <kvm@vger.kernel.org>; Fri, 06 Feb 2026 20:10:13 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a79164b686so34329715ad.0
+        for <kvm@vger.kernel.org>; Fri, 06 Feb 2026 20:10:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770437413; x=1771042213; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aI358xutY4h10C5E+x9L96wqWeotiSmpx+a8envX0WE=;
-        b=ivZmofTG55D1LgJnHO2RdqIFREP1VtihvhQIHTh7zgHZo1VS/PpMzRc4dLG0GWwFv4
-         Rh1WzDvnT1jh3UAe3yQQlhDv0ShBX3vEjIkNm5TxTmamTS7mQHMN8WF7KCGvwNn9nl41
-         5RiWs/3NHHq+Y7qk7v+S6j0xKl+wxCYfhBgAmcFm6ore0vMVgXlN1Rnddn6hs6eVT29a
-         HHok8jw1VAI0S1547F6/9Ep8Q5kdZi+kyIf55cwBKkrYRUmgv2C/KtmntA8qjyf0sGHo
-         pf0lpAM11sDNtsXEL38dR/Ra20j+L4tIHvWcS5TxP7f3zPQPtsrZwkQ8BKokJlN/y0o+
-         H8wA==
+        d=google.com; s=20230601; t=1770437415; x=1771042215; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=X9ehPSc+/m11r/Lpb5VMOSkPuQY5TIHayM+j3lFOULU=;
+        b=JtRNnDA1VS0WC/f9V78mzMMPTGxjdS6IMPvTLyJt+izCv1682xCFY7aCzM+sUxqFu0
+         A2SrkO3Br4UX733AfJgn54l1ktp0cDKRG7RLCTieFLRSKLvkFyRThWWoOrB5x3mtXgUh
+         CBytYrjIl8sTggcVpwlLgRcJ7wb9M7y9al03HePNFul7QsMMNbHWq6CRnnGoQMK7Iml/
+         bKlwYx8DPZnR0EFXjidJK3lydckXkMHpf5yUVETbBWosT/Cueqj7NkCMjAxZAVCFuXhA
+         f5oW1oMDEc7w7h2wJVAiROsr7eQDKk96tC+EOwe3IW8InWdPa2s+5YWnhtHOmI3cQjqB
+         2lhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770437413; x=1771042213;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aI358xutY4h10C5E+x9L96wqWeotiSmpx+a8envX0WE=;
-        b=es5kwtVo2gzmNfK26KolPHdfDYZ+JZij0EP7bMUVRHGD9COtYlnylcqUd8l6xak6n3
-         LpSCY0fJ+0uZe99EaromWWngiDwmlfrTztcTsIIwRinDo4yvyNf1nnSJNZ23Gya/z++K
-         CW0GlVwiTGN9kHetncK6L5LQuTXm6iKsN321lZaX//2VBVvnRzuYYAilzpvXJbRlrHl6
-         6D2TxjcJU5FBZCDJWVX9B/O2sldTvaTDME7KXfv04jOzT0NApAmkZQ38m/LVJtUyaa7E
-         fsHYmfNG7TuTH1nuWhokvfJWLxaBLPIR7PBYM6edIiMsvQQhjky96u7qyPDU0Cfkzfl8
-         tFeA==
-X-Gm-Message-State: AOJu0Yx+NlO7zeSAynm7zS3y2kmDm7s93vH0jXSMEdX0V8s7UmJUV7Jp
-	ehp+TEmSR/AbVAvMXivMTpzpkPWVrE4ffqcoOVgN6IiCqwVRLSs3u6/heVYgZR/NhtmvFWiMxW2
-	0kiaunA==
-X-Received: from pjtl24.prod.google.com ([2002:a17:90a:c598:b0:354:c16d:17b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c86:b0:340:ecad:414
- with SMTP id 98e67ed59e1d1-354b3e4b5bcmr4085440a91.27.1770437412960; Fri, 06
- Feb 2026 20:10:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1770437415; x=1771042215;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X9ehPSc+/m11r/Lpb5VMOSkPuQY5TIHayM+j3lFOULU=;
+        b=LnywGsfITMg3buOjLTCb99kjgQCGpskFiFKuKuM2TTr15EFUM7QcmZ1TsO81d5Ao6X
+         +XgenQbz9303cDiGcZRtFfSiCjeXdpaa+Sfd2Q7Fbf5Otawa2d45hpgrMzoLl4Yyo836
+         SsAfY6PNumlYrbkplxzmtr3fgo/yHbqIKTBJMXuKh5Jto0A6uNC+OZWc5tgOAjVviVNG
+         mzuqJzfiuK6pfsNXtwEqHSOElGlaLBYnCTWX8esk9ubjtdZ3jUGbUZOOxA1jk9saM2dm
+         RX69Pd0Oz3cj5/84UTSyOUQpFSmDPP3UPZSSZ8FypaRM/Xu5IB3YERdcIBFgEOCNOQ+m
+         SJsw==
+X-Gm-Message-State: AOJu0YxVzWVvB4PTLcPyxfBMkdLyLYHJWhHhtmOjjrcjTf/lTn967BAB
+	KQ/D4+sOEZ28nbOZKvXTEYenKXGy3KzD/qoSXCbcmnT1he1hJbQQyyccVHYCLcjOxoLiWzuffFX
+	mOsSkwA==
+X-Received: from plzt8.prod.google.com ([2002:a17:902:bc48:b0:2a9:5b22:145a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:b4e:b0:2a8:ac0f:9ae9
+ with SMTP id d9443c01a7336-2a951709c40mr45532335ad.41.1770437414890; Fri, 06
+ Feb 2026 20:10:14 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  6 Feb 2026 20:10:02 -0800
+Date: Fri,  6 Feb 2026 20:10:03 -0800
+In-Reply-To: <20260207041011.913471-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260207041011.913471-1-seanjc@google.com>
 X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260207041011.913471-1-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86 pull requests for 6.20
+Message-ID: <20260207041011.913471-2-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: APIC related changes for 6.20
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -86,14 +90,14 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70535-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70536-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -107,21 +111,106 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: 4BDBD104D35
+X-Rspamd-Queue-Id: BF361104D44
 X-Rspamd-Action: no action
 
-Unless I'm forgetting something, there's only one conflict, between "selftests"
-and the kvm-riscv tree[*] (Anup also mentioned this in his pull request).
+A variety of cleanups and minor fixes, mostly related to APIC and APICv.
 
-There are two ABI changes, both of which I'm confident won't break userspace:
+The following changes since commit 9ace4753a5202b02191d54e9fdf7f9e3d02b85eb:
 
- - When populating guest_memfd, require the source to be 4KiB aligned.
- - Disallow changing the virtual CPU model when L2 is active (basically an
-   extension of the existing rule that the model can't be changed after KVM_RUN.
+  Linux 6.19-rc4 (2026-01-04 14:41:55 -0800)
 
-Oh, and except for the PMU pull request, these are all against 6.19-rc4.
+are available in the Git repository at:
 
-[*] https://lore.kernel.org/all/aXt2F2jIm5YK8LB1@sirena.org.uk
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-apic-6.20
+
+for you to fetch changes up to ac4f869c56301831a60706a84acbf13b4f0f9886:
+
+  KVM: VMX: Remove declaration of nested_mark_vmcs12_pages_dirty() (2026-01-14 06:01:03 -0800)
+
+----------------------------------------------------------------
+KVM x86 APIC-ish changes for 6.20
+
+ - Fix a benign bug where KVM could use the wrong memslots (ignored SMM) when
+   creating a vCPU-specific mapping of guest memory.
+
+ - Clean up KVM's handling of marking mapped vCPU pages dirty.
+
+ - Drop a pile of *ancient* sanity checks hidden behind in KVM's unused
+   ASSERT() macro, most of which could be trivially triggered by the guest
+   and/or user, and all of which were useless.
+
+ - Fold "struct dest_map" into its sole user, "struct rtc_status", to make it
+   more obvious what the weird parameter is used for, and to allow burying the
+   RTC shenanigans behind CONFIG_KVM_IOAPIC=y.
+
+ - Bury all of ioapic.h and KVM_IRQCHIP_KERNEL behind CONFIG_KVM_IOAPIC=y.
+
+ - Add a regression test for recent APICv update fixes.
+
+ - Rework KVM's handling of VMCS updates while L2 is active to temporarily
+   switch to vmcs01 instead of deferring the update until the next nested
+   VM-Exit.  The deferred updates approach directly contributed to several
+   bugs, was proving to be a maintenance burden due to the difficulty in
+   auditing the correctness of deferred updates, and was polluting
+   "struct nested_vmx" with a growing pile of booleans.
+
+ - Handle "hardware APIC ISR", a.k.a. SVI, updates in kvm_apic_update_apicv()
+   to consolidate the updates, and to co-locate SVI updates with the updates
+   for KVM's own cache of ISR information.
+
+ - Drop a dead function declaration.
+
+----------------------------------------------------------------
+Binbin Wu (1):
+      KVM: VMX: Remove declaration of nested_mark_vmcs12_pages_dirty()
+
+Fred Griffoul (1):
+      KVM: nVMX: Mark APIC access page dirty when syncing vmcs12 pages
+
+Sean Christopherson (21):
+      KVM: Use vCPU specific memslots in __kvm_vcpu_map()
+      KVM: x86: Mark vmcs12 pages as dirty if and only if they're mapped
+      KVM: nVMX: Precisely mark vAPIC and PID maps dirty when delivering nested PI
+      KVM: VMX: Move nested_mark_vmcs12_pages_dirty() to vmx.c, and rename
+      KVM: x86: Drop ASSERT()s on APIC/vCPU being non-NULL
+      KVM: x86: Drop guest/user-triggerable asserts on IRR/ISR vectors
+      KVM: x86: Drop ASSERT() on I/O APIC EOIs being only for LEVEL_to WARN_ON_ONCE
+      KVM: x86: Drop guest-triggerable ASSERT()s on I/O APIC access alignment
+      KVM: x86: Drop MAX_NR_RESERVED_IOAPIC_PINS, use KVM_MAX_IRQ_ROUTES directly
+      KVM: x86: Add a wrapper to handle common case of IRQ delivery without dest_map
+      KVM: x86: Fold "struct dest_map" into "struct rtc_status"
+      KVM: x86: Bury ioapic.h definitions behind CONFIG_KVM_IOAPIC
+      KVM: x86: Hide KVM_IRQCHIP_KERNEL behind CONFIG_KVM_IOAPIC=y
+      KVM: selftests: Add a test to verify APICv updates (while L2 is active)
+      KVM: nVMX: Switch to vmcs01 to update PML controls on-demand if L2 is active
+      KVM: nVMX: Switch to vmcs01 to update TPR threshold on-demand if L2 is active
+      KVM: nVMX: Switch to vmcs01 to update SVI on-demand if L2 is active
+      KVM: nVMX: Switch to vmcs01 to refresh APICv controls on-demand if L2 is active
+      KVM: nVMX: Switch to vmcs01 to update APIC page on-demand if L2 is active
+      KVM: nVMX: Switch to vmcs01 to set virtual APICv mode on-demand if L2 is active
+      KVM: x86: Update APICv ISR (a.k.a. SVI) as part of kvm_apic_update_apicv()
+
+ arch/x86/include/asm/kvm_host.h                    |   2 +
+ arch/x86/kvm/hyperv.c                              |   2 +-
+ arch/x86/kvm/ioapic.c                              |  43 +++---
+ arch/x86/kvm/ioapic.h                              |  38 ++---
+ arch/x86/kvm/irq.c                                 |   4 +-
+ arch/x86/kvm/lapic.c                               |  97 ++++++-------
+ arch/x86/kvm/lapic.h                               |  21 ++-
+ arch/x86/kvm/vmx/nested.c                          |  54 +------
+ arch/x86/kvm/vmx/nested.h                          |   1 -
+ arch/x86/kvm/vmx/vmx.c                             | 106 +++++++++-----
+ arch/x86/kvm/vmx/vmx.h                             |   9 --
+ arch/x86/kvm/x86.c                                 |  11 +-
+ arch/x86/kvm/xen.c                                 |   2 +-
+ include/linux/kvm_host.h                           |   9 +-
+ tools/testing/selftests/kvm/Makefile.kvm           |   1 +
+ tools/testing/selftests/kvm/include/x86/apic.h     |   4 +
+ .../selftests/kvm/x86/vmx_apicv_updates_test.c     | 155 +++++++++++++++++++++
+ virt/kvm/kvm_main.c                                |   2 +-
+ 18 files changed, 334 insertions(+), 227 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/vmx_apicv_updates_test.c
 
