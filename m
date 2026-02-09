@@ -1,169 +1,173 @@
-Return-Path: <kvm+bounces-70601-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70602-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wLh1Je76iWkiFQAAu9opvQ
-	(envelope-from <kvm+bounces-70601-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 16:19:10 +0100
+	id EKA7GV/9iWluFQAAu9opvQ
+	(envelope-from <kvm+bounces-70602-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 16:29:35 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3123B111D3D
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 16:19:10 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C079111EAE
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 16:29:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C28D63020E96
-	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 15:18:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5B7173008C2B
+	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 15:29:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7CA37D13B;
-	Mon,  9 Feb 2026 15:18:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0970337F751;
+	Mon,  9 Feb 2026 15:29:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LKoGnH63"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="si1Rz/dR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465CA37E302
-	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 15:18:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770650337; cv=pass; b=CEM+HbolMYZGhTGIQieIsF5ipgeWpGkWrrpB50HM/YJwvk+SgijyjmmswCMkapnJHPh0DMxSpFBked3IovIHt5/31QXKPYJphaa+tMBfwrd+orLinbCbaSrS/NKS+DiSRDUMcwRTu63rn2ivz7w2S/JBjN4Dh9O5UoE0QfgO/vU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770650337; c=relaxed/simple;
-	bh=e3bUDvDDCERCxLHccqCKh5cXslCrqGzgEb8uS+QsJ98=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sLu5vUwsbyoH+rTqvPQ6N8CuoH9FM4eBR8Kkcm7XC0u94jjtuZ0IHoEYOUpvFXg1cr2LfYfyxdRG0FuBMHGL5KVdXOz/18V8jWlLHaqy09UHkMqmFrCyir8PbSf6V8TJCk3s7DSoWf0oVQi+LrKs+ReoDQ7SRCIDMTlVtJ6urXM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LKoGnH63; arc=pass smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-7963aa14dbbso20832067b3.1
-        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 07:18:57 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770650336; cv=none;
-        d=google.com; s=arc-20240605;
-        b=C5BUQAeZS0sk7phOBhBipPCkFUQUM1z+S/hu+JO8B3sZvET4h2E00p5ochAfGAMPKb
-         DuJbZpj/1ujrpvHqq091J6EQAYnq3wDsPG4KaMA1hPRxAaO8K6Uw7Bi3odNFGpcKQ/cR
-         j8utwhG7rY9VYz4z9Bucngm/5Jv03oyBCyg263UbBZEjrXt/QxbgeCbV5WexjQMz1wZK
-         PNsZA8t0NGYsTSBPTC/fxvli1UGkcQ8hqgA1XQOps2FN+sR5Q4iEQIopF2sdZJ68buaN
-         koUu+od9MCnif25fp+8KTnW31QV4NKenJ4zdWKLqGnKWO0s1/ahLuorvAoM4LGavCqaH
-         vIeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=e3bUDvDDCERCxLHccqCKh5cXslCrqGzgEb8uS+QsJ98=;
-        fh=OCYfF5pv4FZb80V2VZ8dK283ODq3FfHJtetCXjxSq9k=;
-        b=jnAem3tl2D6eUNCLrh/nRFUSg1aRk0/V85Ch93Ix0uzuZ26wPeqNykNDfhPn7jRsEW
-         63mXgiTwMQ4Dva2crSNa/OX77kgvbLi+lw/RA+LkSYfQwMu4bkLdbo9rjVa8eYtb937q
-         trkdIexEYOg8fcg0g7z/e0Vx3O1AUIkgM7uNxiQ7t3JsPbI+B5cKcx2oIfd8LDxtuxkQ
-         oteoI+Kx4MR7Kav7bh1Jmh7DAWDL4K1DSbtTBf52iOgZf3tji794HGyM65D3PT8o27PQ
-         GxR9vaT/q8UGrT4GtYFP+97i4/ZXKVFcQJ383y750oBc7UpBRdPcDTY3LPOJs79Ip4Nw
-         nAzw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770650336; x=1771255136; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=e3bUDvDDCERCxLHccqCKh5cXslCrqGzgEb8uS+QsJ98=;
-        b=LKoGnH63YlYTTc2EIEVciBLSbEozVqYrEQBhkRJIkpiAtwcmgege5rWCHdYgIz6CZ/
-         KLC73lgO1wpVMp19dGD4PfVCAYOqFQp2HSFIVPmRT8QvDvj7TyOx/yF6xGUATLAYJv+f
-         Yp6XuheWTZhNVWe49qlpUGI7GTWmO0Xk1BFbILzHm2bwipWkLNrgoiQKQJumvOU5b6c9
-         tkLIYzmYePQJL7+FxatCuXFWFpujuYzclSemiCpYhtI++E8QWZzWB9rn+yBWUw9aa2gN
-         6GVNeQpMCdNB9i3So36vnniCPXmys1AjdIHqNp1BPExc8ojus28BCkacoD6wR+CUBb0P
-         JtOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770650336; x=1771255136;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e3bUDvDDCERCxLHccqCKh5cXslCrqGzgEb8uS+QsJ98=;
-        b=h5Su0BDQFu5NV21ed42mD1a9whKpIn8y460Is41KpRMVcPSz4ZcOw8rTWqVeiTo0I+
-         IS7x3XeL/zVbWHlKIKSeLATbobPTCRDzS2X8ScW6QfEITIN6Rvjm6YCQMzB2Gufm5xfZ
-         vY2O9metpmh/5gHzzsdYRblfCn6FfvoU28vVA5/8dWuRfVJ43F3ocdesv5fKcz0XkUNB
-         pFzCgs9dkgg8o40LE1vkKRWA44SYLelX+Z4G4MYcIIyc2cjBeFppnGqCF4C4o/0k6YxV
-         /LY24qZdqacXoFgq3WtPLTBnw13PpORxGwoMfVVCMhOEPL2qWTPon331XdBmLpX3IRhB
-         wMDA==
-X-Forwarded-Encrypted: i=1; AJvYcCWdhkCD0QtfLSaTWODZigfl4p6mSY2CuD9CGWs6urzyNe1l+ygrsVYb4xONUGP2Soy/2zI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrFqePr1401MFyFjpIKVhbBuhIB0ThwBbcyghX+/MtNXyFgRlu
-	8wODn4Uzs9T7rJuTZxKzsrj9Sc7wCS88VE5Qy5vpCFtycXz0dic/8JEIKzmFbbSFpxMMRW3XblW
-	L83y1BYkFOx+lxq8ZZP/rWryv+RrEUgIHNfzXh73bsA==
-X-Gm-Gg: AZuq6aLtwOkp6GBko/EaJ7v7idnftgqZsE1y3H75fytRf8Ejpkyz5vE/Q7yAO9jeh8w
-	Gx5yCFAa4mV8RRLKQ1LqC7f4kMzaSlFxEGWAFa7U7ZBiMETiVjdaTdvYE91KWZM86We+jmGiEnM
-	GuihI0EursP7qUlOHQPJ1VHM2Z7TaVG6Xa95mdF13dlcqbm2L3vSxuXbSPRZ96COwUqlaov1wc9
-	y5Bj0LCn/VG7y8xMrkIFNSwLMi0MHSpIN6zER6dm7u41uDy1x7JK0uY0wCditdDIBpJqvzrrdWz
-	fZUdU9+eQKoMy/3bH+/AnjQ2GySeNxYy/5hZ8vRk29LFvSxPvvx3dSU=
-X-Received: by 2002:a05:690c:e08:b0:794:87bf:76ef with SMTP id
- 00721157ae682-7952a63ec7amr99106367b3.7.1770650335943; Mon, 09 Feb 2026
- 07:18:55 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224553793C6;
+	Mon,  9 Feb 2026 15:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770650972; cv=none; b=cYPlGBAAP88T9YvWYGB1mNchSDmZC4C+S0UPxJsSrrEVNg90qTTwoV0tys3CiRu4nZ0SSrxDP/c6R9YYRIXz9dIeACDww0C3aBroqknf29xqnS6OtqtCIMaJ8/XVZwC1kbbDPQGDY29M5YSjnWDVSXwUgGZcgiNDCr4lsrcERIg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770650972; c=relaxed/simple;
+	bh=8rh/5nyvKx1OUvPTe9dHQuymZme3RENu7OYXRyc6UVg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qLcH3To7EPY/qfD/SgBvw31chAa7St4IyjxrD5igPynrCCjr/2xHctL3Wr/BWS0gKV+ogGBOuREkbGdludD7iCwy92vH2W46yYMySnRjLyiXyNRDSiSc18vIXqjq+QfyhTZto1dHeY2joG3BSgmTva/Do7UIJORVr6O2QDIb1eY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=si1Rz/dR; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 619FR9Gb169452;
+	Mon, 9 Feb 2026 15:29:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=Hx617PIOI3M1xDuib2pP8eVTssD+bpbR9hn4wNydx
+	vM=; b=si1Rz/dRSoeVRd4YASnwNUUOM49XfVWjlTx/Ms8JkFz4jftba+71I/EYi
+	HEW/j/WkC3/Ht7is1FBY7MK22wr2967kS1m0a14iNiBB6XW3pyWwaeVKVGKE5Aq7
+	t22Qxnl9QOtvXhEdC/OQ+OUgIq5cdLQQ1CFsQJ0ajGimh1fbSMyP32yN0rVaN78d
+	nuuNqneGf/O73IGPPVHVXXFYoyCq1pIk7ab8F35aEXmwuaoGLwQpXvSma3+GaDBs
+	02dtqba4XLjVYD/aNC+2mgvtzv/GJDliy4XxfcLERT63MkwBKULR3zZLkOhK3eVD
+	P36E6QbH8Vk1tJbkFWoNnhhSc0k9g==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c696vyt5j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Feb 2026 15:29:31 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 619E2v27012626;
+	Mon, 9 Feb 2026 15:29:30 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4c6h7k5k76-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Feb 2026 15:29:29 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 619FTPLO40763712
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 9 Feb 2026 15:29:25 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AE48D2004F;
+	Mon,  9 Feb 2026 15:29:25 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7B0DA2004E;
+	Mon,  9 Feb 2026 15:29:25 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  9 Feb 2026 15:29:25 +0000 (GMT)
+From: Steffen Eiden <seiden@linux.ibm.com>
+To: linux-s390@vger.kernel.org
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Andreas Grapentin <gra@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>
+Subject: [PATCH v1 1/1] KVM: s390: Increase permitted SE header size to 1 MiB
+Date: Mon,  9 Feb 2026 16:29:25 +0100
+Message-ID: <20260209152925.578872-1-seiden@linux.ibm.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-10-8be3867cb883@kernel.org>
-In-Reply-To: <20251223-kvm-arm64-sme-v9-10-8be3867cb883@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Feb 2026 15:18:43 +0000
-X-Gm-Features: AZwV_Qj3JfZxsU8iVNrT9S4IUwlHEkuMD3WG7W3HRrHxULDnwFPH-_uH0mM-meA
-Message-ID: <CAFEAcA-nhHdwuQODmT4-dBCEuiut-jbHsCGVYByoMF77-UWbCg@mail.gmail.com>
-Subject: Re: [PATCH v9 10/30] KVM: arm64: Document the KVM ABI for SME
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
-	Fuad Tabba <tabba@google.com>, Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Eric Auger <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=YeCwJgRf c=1 sm=1 tr=0 ts=6989fd5b cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22
+ a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8 a=nzWhWrZSqZcqTgXQ2MUA:9
+ a=ZXulRonScM0A:10
+X-Proofpoint-GUID: U0uLEOU4ljsiM3tpfPotPj2JwLK3BClG
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA5MDEyOCBTYWx0ZWRfXw8dE5JOjUjo8
+ 6q41KlIjSr2og0MxWOWZh8tGZWb/SlR0tocg2lTIJIA0lk+0xLglcXZJ5wqyoc7vhrDSvqR3yfO
+ uNHMh2I+TPPSqmgTUzNnKVCVkPMj3DnVmwOevwmYHZ1U5S9ByB0qyhzbfNWuge80QtUQoY4ecp7
+ MNfTsY1fd+wrFZxGJB30zQ1qo5yKnlEufiNQDm4IciJ9rJI8ShA5xDW6kB4azrHJtUsyUVjf7j/
+ a1UVNB3Za/V2HxphDW4qZHX3wTuaJuz+7d5QkAvGH32mHjmEtI6lzJjEvOZe24To/ILQvqxd6DU
+ VBVDpPo4ZNm1mPMGGOy31K44BXS63RbjKwZq4cOkORIh588Vg2dNePdIZwLJ6SLoWgKXpwZ7G33
+ zzJg28jrVUoVUK1plB61URemR69u8QT5w63QSl3bALpZ2ENpvrvbbPDSrg/y4/D3//929jIvjjO
+ P6l7uXsEKwm79x/Xt9A==
+X-Proofpoint-ORIG-GUID: U0uLEOU4ljsiM3tpfPotPj2JwLK3BClG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-09_01,2026-02-09_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 adultscore=0 bulkscore=0 malwarescore=0 phishscore=0
+ priorityscore=1501 lowpriorityscore=0 clxscore=1015 impostorscore=0
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2602090128
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70602-lists,kvm=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.ibm.com:mid];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seiden@linux.ibm.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[peter.maydell@linaro.org,kvm@vger.kernel.org];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DKIM_TRACE(0.00)[ibm.com:+];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,linaro.org:dkim];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70601-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[linaro.org:+]
-X-Rspamd-Queue-Id: 3123B111D3D
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: 0C079111EAE
 X-Rspamd-Action: no action
 
-On Tue, 23 Dec 2025 at 01:22, Mark Brown <broonie@kernel.org> wrote:
->
-> SME, the Scalable Matrix Extension, is an arm64 extension which adds
-> support for matrix operations, with core concepts patterned after SVE.
+Relax the maximum allowed Secure Execution (SE) header size from
+8 KiB to 1 MiB. This allows individual secure guest images to run on a
+wider range of physical machines.
 
-A late reply, but I just noticed that the cover letter says:
+Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+---
+ arch/s390/kvm/kvm-s390.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> Userspace access to ZA and (if configured) ZT0 is always available, they
-> will be zeroed when the guest runs if disabled in SVCR and the value
-> read will be zero if the guest stops with them disabled. This mirrors
-> the behaviour of the architecture, enabling access causes ZA and ZT0 to
-> be zeroed, while allowing access to SVCR, ZA and ZT0 to be performed in
-> any order.
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 56a50524b3ee..3428a8d427b2 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -2744,9 +2744,9 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
+ 		if (copy_from_user(&parms, argp, sizeof(parms)))
+ 			break;
+ 
+-		/* Currently restricted to 8KB */
++		/* Currently restricted to 1MiB */
+ 		r = -EINVAL;
+-		if (parms.length > PAGE_SIZE * 2)
++		if (parms.length > SZ_1M)
+ 			break;
+ 
+ 		r = -ENOMEM;
+-- 
+2.51.0
 
-but the doc patch itself says:
-
-> +Access to the ZA and ZT0 registers is only available if SVCR.ZA is set
-> +to 1.
-
-Which one is the intention here ?
-
-thanks
--- PMM
 
