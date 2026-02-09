@@ -1,148 +1,214 @@
-Return-Path: <kvm+bounces-70590-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70591-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mFxHD9i0iWlLBAUAu9opvQ
-	(envelope-from <kvm+bounces-70590-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 11:20:08 +0100
+	id WGopMr62iWlLBAUAu9opvQ
+	(envelope-from <kvm+bounces-70591-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 11:28:14 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA02410E146
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 11:20:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3130310E294
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 11:28:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B05753017509
-	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 10:20:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 459D13024128
+	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 10:27:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DADD135E530;
-	Mon,  9 Feb 2026 10:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DAD2366DC6;
+	Mon,  9 Feb 2026 10:27:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="L7SgNe1H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bBjkcjlE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D87134B1A1;
-	Mon,  9 Feb 2026 10:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7351E30F547;
+	Mon,  9 Feb 2026 10:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770632398; cv=none; b=rrhp+x7tkg8d6o/UZBYlPRdJymMNFBxd6gAbYrcxxaAH9v+Yt3MInpBghPe99N7Nx1buzgtpeCCobfu9wpfq22oXk1h+rcyBWRkPRHP3QaB/BnYaaGcJrEkdTxqYRRhSzPLnZ515vqXaJcN8K9Rnsg0i7sXe/+er2PdvtjWAW3g=
+	t=1770632848; cv=none; b=dGZwdM2piV+MpBMMFaxhq97+jKpq+9uTltfRmKdMUztBqPqBzWPkPrndXTuZPKQOZ60mm/H+BEmL9M+vPm3nGTAFs7USV41pLvwicZUOSjd8eN4r0aq8bfSFr2ca5xADaQDpPNC6uoZLoCMPtsIqEgiohHIEKNwNBl8vnjGSoEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770632398; c=relaxed/simple;
-	bh=frF/ygmT6BMadE5omuNNyjVPtF9+GASqvwXA/+PB+88=;
+	s=arc-20240116; t=1770632848; c=relaxed/simple;
+	bh=65CFyMKHT1SSZJ/ePteP8Ph+oXMUwR+XmES5SE7hF8g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M0yE49BUgIOAdoyzbiv0l7AJaSQw6uAv3hhQbCr3M+hrHUPubbjgO7FSAURH84q9cm2kfwSaPEVrX8CQun88koUSXgAhdcb+w97MdusyPDwOwCaufSVsZSO0fSh+O3MeKkW2J+vICPG7v06Pr1oSXYrhTAZ+zdBGQWTe6qCCMSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=fail (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=L7SgNe1H reason="signature verification failed"; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id ACEAC40E02E5;
-	Mon,  9 Feb 2026 10:19:55 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=fail (4096-bit key)
-	reason="fail (body has been altered)" header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 4C9Q5WVVx173; Mon,  9 Feb 2026 10:19:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1770632389; bh=qEUrs9aV2UevLern7cWNO8zzbe1KAW/M2x98IuKSaBo=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=LfniYEqyi8O0e1xlWyVUI4fKNOgHgE+prCVO/fLjPvoMjI6Sf8toRLQb46Lrfp+zUOtFPGvZppB2Ha46TM65mWWUddTIC/OpBm90DkVDGGx5NTw/OmFe3iT+G7QSEnIGaQyFKizZqzbPzsr9s9NC1LgcjY0myPyrVxa3fRcP4Xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bBjkcjlE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D319C116C6;
+	Mon,  9 Feb 2026 10:27:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770632848;
+	bh=65CFyMKHT1SSZJ/ePteP8Ph+oXMUwR+XmES5SE7hF8g=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=L7SgNe1HGQWJrNNPxIw1k6KgoWfev2wqz1jZbCcdXa3N+r4Sl/iSwK3+WgzxAFLP8
-	 QDIumwRX6KDqKNsBiOjqrW8IUFJtEx9sgCqb/bAzmbANjrv039vpmzj4gjo9THzeU+
-	 YSeKDxKiC0bvOQQrRgAmB1w4YLy5TCWky0ssa46YJD12Zf3DncxHeqLZnCEyiDvmok
-	 ImdQ26bRkjFZie01PrBcG6QN7TlXcb7KBJhmBUxPdA+piF7m7xZKSZWgb7o4p/oBoW
-	 65Eq70rBCFjVlN2eomT3o1+/ySJUpqMssMZEfzXq/CyGEHZVfOrzEhVna54KL/dc4S
-	 7ZeL+vs8Y7GtRdbrr9C4RHiMxtgKQPEoyMTb//9gb0Y2+3+7wDLh1B9yHuqbWjz+Kr
-	 Yb/Ws3PqB19EwD6aoi/Tt1w25wr/ScLec10clV/Mjn/qpU5jib/sg2vHOJVaaKm4Sh
-	 oDhL5LGnFq1wjriJrXcmG4Vw3VjwohtUAQmP5GMIB5HnkpO6y85vAK8EPWtn6A4K9+
-	 TJ9NGVpHZA3Fht96JrON+2jvKS3NfRstQvYDeF17seJMrMjba69iIQPkiaMVYjiH5s
-	 0ihBjjGUpmtKls4QpuZphm5tynBcgqWNyCG4hiKuLtwqpBtWM+74IOdgKLcwwzTB+v
-	 5v/tPeD19u9TgLlvgaBntID4=
-Received: from zn.tnic (pd95306e3.dip0.t-ipconnect.de [217.83.6.227])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 917DA40E0326;
-	Mon,  9 Feb 2026 10:19:30 +0000 (UTC)
-Date: Mon, 9 Feb 2026 11:19:18 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Juergen Gross <jgross@suse.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	linux-block@vger.kernel.org, Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ajay Kaher <ajay.kaher@broadcom.com>,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	xen-devel@lists.xenproject.org, Denis Efremov <efremov@linux.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v4 0/6] x86: Cleanups around slow_down_io()
-Message-ID: <20260209101918.GAaYm0plbeXIBr8p9a@fat_crate.local>
-References: <20260119182632.596369-1-jgross@suse.com>
- <6ee93510-1f43-4cd2-952e-8ed3ce7ba0e5@suse.com>
+	b=bBjkcjlE8X1tOmApHpqMF3m3NJQ7vvclkI0UsAdHzGxP+Iq3rwlyMWF42765S61Oq
+	 WhzNWjiO4FF5V3oqG5tA4ru1cXGJkr5JayBvC/SNugtlihGc2RMxeRLR1XOSalbOaV
+	 DAFyXZEI0BJVaWHdvKeHwKvKBr3uw0Vh0SYGNT5cHETQaayqieuV17D9qgdIWML+q+
+	 M9SsWzbHRKxF33iVYXDY/lo0jL5q2xUyiD31jjUMvde6R7BA7I+Y9xrBOBT36Lmh7C
+	 EggJ6OC/e4oFwtQxnITUR2s2WgFMJg6zgE5b1Z8N+7p9DObMCjan5Ex/ZiAiughZoY
+	 pL+TEuBs6616Q==
+Date: Mon, 9 Feb 2026 15:53:01 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>, 
+	"Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
+Subject: Re: [PATCH 1/2] KVM: SVM: Initialize AVIC VMCB fields if AVIC is
+ enabled with in-kernel APIC
+Message-ID: <aYmvWLjNaJ5fbOcO@blrnaveerao1>
+References: <20260203190711.458413-1-seanjc@google.com>
+ <20260203190711.458413-2-seanjc@google.com>
+ <aYXvp1S7lg2sq4AS@blrnaveerao1>
+ <aYYwOTSIJsdafEvJ@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6ee93510-1f43-4cd2-952e-8ed3ce7ba0e5@suse.com>
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <aYYwOTSIJsdafEvJ@google.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	R_DKIM_REJECT(1.00)[alien8.de:s=alien8];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[alien8.de : SPF not aligned (strict),none];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70590-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[alien8.de:-];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70591-lists,kvm=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bp@alien8.de,kvm@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[naveen@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.986];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AA02410E146
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3130310E294
 X-Rspamd-Action: no action
 
-On Mon, Feb 09, 2026 at 10:11:49AM +0100, Juergen Gross wrote:
-> PING?
->=20
-> Now 3 weeks without any reaction...
+On Fri, Feb 06, 2026 at 10:17:29AM -0800, Sean Christopherson wrote:
+> On Fri, Feb 06, 2026, Naveen N Rao wrote:
+> > On Tue, Feb 03, 2026 at 11:07:09AM -0800, Sean Christopherson wrote:
+> > > Initialize all per-vCPU AVIC control fields in the VMCB if AVIC is enabled
+> > > in KVM and the VM has an in-kernel local APIC, i.e. if it's _possible_ the
+> > > vCPU could activate AVIC at any point in its lifecycle.  Configuring the
+> > > VMCB if and only if AVIC is active "works" purely because of optimizations
+> > > in kvm_create_lapic() to speculatively set apicv_active if AVIC is enabled
+> > > *and* to defer updates until the first KVM_RUN.  In quotes because KVM
+> > 
+> > I think it will be good to clarify that two issues are being addressed 
+> > here (it wasn't clear to me to begin with):
+> > - One, described above, is about calling into avic_init_vmcb() 
+> >   regardless of the vCPU APICv status.
+> > - Two, described below is about using the vCPU APICv status for init and 
+> >   not consulting the VM-level APICv inhibit status.
+> 
+> Yeah, I was worried the changelog didn't capture the second one well, but I was
+> struggling to come up with wording.  How about this as a penultimate paragraph?
+> 
+>   Note!  Use the vCPU's current APICv status when initializing the VMCB,
+>   not the VM-level inhibit status.  The state of the VMCB *must* be kept
+>   consistent with the vCPU's APICv status at all times (KVM elides updates
+>   that are supposed be nops).  If the vCPU's APICv status isn't up-to-date
+>   with the VM-level status, then there is guaranteed to be a pending
+>   KVM_REQ_APICV_UPDATE, i.e. KVM will sync the vCPU with the VM before
+>   entering the guest.
 
-J=C3=BCrgen, there are other patchsets that need review too. And we have =
-merge
-window right now so no reviewing anyway.
+LGTM.
 
-And you know all that damn well!
+>  
+> > > likely won't do the right thing if kvm_apicv_activated() is false, i.e. if
+> > > a vCPU is created while APICv is inhibited at the VM level for whatever
+> > > reason.  E.g. if the inhibit is *removed* before KVM_REQ_APICV_UPDATE is
+> > > handled in KVM_RUN, then __kvm_vcpu_update_apicv() will elide calls to
+> > > vendor code due to seeing "apicv_active == activate".
+> > >
+> > > Cleaning up the initialization code will also allow fixing a bug where KVM
+> > > incorrectly leaves CR8 interception enabled when AVIC is activated without
+> > > creating a mess with respect to whether AVIC is activated or not.
+> > > 
+> > > Cc: stable@vger.kernel.org
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > 
+> > Any reason not to add a Fixes: tag?
+> 
+> Purely that I couldn't pin down exactly what commit(s) to blame.  Well, that's a
+> bit of a lie.  If I'm being 100% truthful, I got as far as commit 67034bb9dd5e
+> and decided I didn't care enough to spend the effort to figure out whether or not
+> that commit was truly to blame :-)
+> 
+> > It looks like the below commits are to blame, but those are really old so I
+> > understand if you don't think this is useful:
+> > Fixes: 67034bb9dd5e ("KVM: SVM: Add irqchip_split() checks before enabling AVIC")
+> > Fixes: 6c3e4422dd20 ("svm: Add support for dynamic APICv")
+> 
+> LGTM, I'll tack them on.
+> 
+> > Other than that:
+> > Reviewed-by: Naveen N Rao (AMD) <naveen@kernel.org>
+> 
+> Thanks!  (Seriously, I really appreciate the in-depth reviews)
 
-How about you help us out and you start reviewing x86 patches instead of
-pinging every week?
+Glad to hear that!
 
-Thx.
+> 
+> > > ---
+> > >  arch/x86/kvm/svm/avic.c | 2 +-
+> > >  arch/x86/kvm/svm/svm.c  | 2 +-
+> > >  2 files changed, 2 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> > > index f92214b1a938..44e07c27b190 100644
+> > > --- a/arch/x86/kvm/svm/avic.c
+> > > +++ b/arch/x86/kvm/svm/avic.c
+> > > @@ -368,7 +368,7 @@ void avic_init_vmcb(struct vcpu_svm *svm, struct vmcb *vmcb)
+> > >  	vmcb->control.avic_physical_id = __sme_set(__pa(kvm_svm->avic_physical_id_table));
+> > >  	vmcb->control.avic_vapic_bar = APIC_DEFAULT_PHYS_BASE;
+> > >  
+> > > -	if (kvm_apicv_activated(svm->vcpu.kvm))
+> > > +	if (kvm_vcpu_apicv_active(&svm->vcpu))
+> > >  		avic_activate_vmcb(svm);
+> > >  	else
+> > >  		avic_deactivate_vmcb(svm);
+> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > > index 5f0136dbdde6..e8313fdc5465 100644
+> > > --- a/arch/x86/kvm/svm/svm.c
+> > > +++ b/arch/x86/kvm/svm/svm.c
+> > > @@ -1189,7 +1189,7 @@ static void init_vmcb(struct kvm_vcpu *vcpu, bool init_event)
+> > >  	if (guest_cpu_cap_has(vcpu, X86_FEATURE_ERAPS))
+> > >  		svm->vmcb->control.erap_ctl |= ERAP_CONTROL_ALLOW_LARGER_RAP;
+> > >  
+> > > -	if (kvm_vcpu_apicv_active(vcpu))
+> > > +	if (enable_apicv && irqchip_in_kernel(vcpu->kvm))
+> > >  		avic_init_vmcb(svm, vmcb);
+> > 
+> > Doesn't have to be done as part of this series, but I'm wondering if it 
+> > makes sense to turn this into a helper to clarify the intent and to make 
+> > it more obvious:
+> 
+> Hmm, yeah, though my only hesitation is the name.  For whatever reason, "possible"
+> makes me think "is APICv possible *right now*" (ignoring that I wrote exactly that
+> in the changelog).
+> 
+> What if we go with kvm_can_use_apicv()?  That would align with vmx_can_use_ipiv()
+> and vmx_can_use_vtd_pi(), which are pretty much identical in concept.
 
---=20
-Regards/Gruss,
-    Boris.
+Yes, that's better. I'll use that and post it as a subsequent cleanup, 
+unless you want to pick it up rightaway.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+
+Thanks!
+- Naveen
+
 
