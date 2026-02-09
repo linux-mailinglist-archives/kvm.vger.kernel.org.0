@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-70572-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70569-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OJ5jAlNjiWla8AQAu9opvQ
-	(envelope-from <kvm+bounces-70572-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 05:32:19 +0100
+	id 4EYTEeJiiWla8AQAu9opvQ
+	(envelope-from <kvm+bounces-70569-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 05:30:26 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B42A10B930
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 05:32:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97FA010B8F5
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 05:30:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4B7163032F4E
-	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 04:30:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 63E2A300E157
+	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 04:30:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DABF27877F;
-	Mon,  9 Feb 2026 04:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C862E764D;
+	Mon,  9 Feb 2026 04:30:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="QBzsauYQ"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="HtxkG33z"
 X-Original-To: kvm@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66B6126F3B;
-	Mon,  9 Feb 2026 04:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF25026B95B;
+	Mon,  9 Feb 2026 04:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770611420; cv=none; b=LEcCIbaW/QFkYbjtc/ThWRYaY3XqTVwlRt9lt8cwn/lq5ORVOd4l2/8CmdKikC/NIcBqlVbUyY7LJhym7Dxoj/HHUcYBme2QtLgkqMd0kkp+878LwpBxMvfys32tM0Rr2SYpWi3v9/07PqAVtZ3nDw44UmsecLQz2TkxIr0WNtQ=
+	t=1770611407; cv=none; b=kaKAeH1Ya0NcIvYlpZFTg1YjILiBJ3VGrZ5xerrIDaxsXXGdCrb737cy9kE7f78Lk6wwNHsAmwMp92eynZqD+Azgg9CpsAHosn5S0RAWbDqSi9Oiyr319AWR4F/3TKSxzsUTGh0y3jjJs6vg0qJMAUgjt96VLTaWGmW8UXkPKMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770611420; c=relaxed/simple;
-	bh=C52bEq3TH6+WHwZGbu1J0ND/tgmNrbDcmiG6ddcdr3g=;
+	s=arc-20240116; t=1770611407; c=relaxed/simple;
+	bh=c7YoCkM2BmZJdHk5jLwsWyiMECmd1q2WP5rs2cebOqo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Eh9RAK31nwBJW9S+2sskNMAnA3uciQP942DT5K6YM1Rf+vDmxVKcWgMJMyzhVviHZbKPrwn7x63+BqtUQpWAxwT7lOPxObn6q/VoHB22ZHMRPFmzvsuincSJ5vyO6q9bytrXVvvtU60byjFnBS+IqCyD8U37KTyu96SY5FAf2ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=QBzsauYQ; arc=none smtp.client-ip=220.197.31.4
+	 MIME-Version; b=SrDm1xusKIut7ENUl/j22hG7iy7iKFh8v7oeLa6NADXfUWyB7YmNEsxokKZyYW5LymbTU3h5TlwwuWmKPJTQjdHc8BjFMvfobkwT/jLHuzIKiqvSg1PMJhJCLvTPX+SRide7hpswMlKcBIaoOEOCG49hJvlPzuVZoYgYBDJAMX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=HtxkG33z; arc=none smtp.client-ip=117.135.210.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=7Z
-	X6gO4s1/g6DTK9BvrcJ2ewwGz0oC37XJnSwSguWaE=; b=QBzsauYQJaiYyPbJMB
-	NxlyZSZRmrthq4RX9KNMLoKMJAiUF8RcuCNdZf6VQgIscDiJxdsWJCbAqv2Ovhts
-	LHMgL+2lLmOzGm+b2F+7syFNuj2ZuLwWMgQAvq5wxS+e2Lq7eQGPIYoHS9LvsSa/
-	dl+iPLSU31THRfS9ZlFPZmXP4=
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=wR
+	rHYlhhICurRuaTmyvIiO5aCoWfhZPWn5WuToLYHEE=; b=HtxkG33ztbKbHKsY74
+	rID1tGVXD3YA2NI41GVML+QKE9N9bwH4L4gDRSr4AaBkwvIVZkw9Pkf66FdNLRdj
+	dqeURzAmAn42JmMjKY+CzB7Mls8Crtfb9gl/HmsqVMAwqwHwhrDYmxqif3l8cg09
+	nTKzk6Wocrpjf54Um0Lw/oSsw=
 Received: from 163.com (unknown [])
-	by gzsmtp2 (Coremail) with SMTP id PSgvCgD3F+yvYolpOQZEQw--.25673S3;
+	by gzsmtp2 (Coremail) with SMTP id PSgvCgD3F+yvYolpOQZEQw--.25673S4;
 	Mon, 09 Feb 2026 12:29:36 +0800 (CST)
 From: Zhiquan Li <zhiquan_li@163.com>
 To: seanjc@google.com,
@@ -50,9 +50,9 @@ To: seanjc@google.com,
 Cc: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	zhiquan_li@163.com
-Subject: [PATCH RESEND 1/5] KVM: x86: selftests: Add CPU vendor detection for Hygon
-Date: Mon,  9 Feb 2026 12:13:01 +0800
-Message-ID: <20260209041305.64906-2-zhiquan_li@163.com>
+Subject: [PATCH RESEND 2/5] KVM: x86: selftests: Alter the instruction of hypercall on Hygon
+Date: Mon,  9 Feb 2026 12:13:02 +0800
+Message-ID: <20260209041305.64906-3-zhiquan_li@163.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260209041305.64906-1-zhiquan_li@163.com>
 References: <20260209041305.64906-1-zhiquan_li@163.com>
@@ -63,12 +63,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PSgvCgD3F+yvYolpOQZEQw--.25673S3
-X-Coremail-Antispam: 1Uf129KBjvJXoWxWFW5Zw48Zr1xJF4kWr1fCrg_yoW5Jw45pF
-	ykAr1rKF10gFnxta4xXr4ktryxWrZ7Wa10q3yUZry3Aa12yry7Xrs7Ka4jvrZI9FWrW3s8
-	Zas7tF4YgFsrZaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pi89N5UUUUU=
-X-CM-SenderInfo: 52kl13xdqbzxi6rwjhhfrp/xtbC6hCBammJYrA9QgAA3c
+X-CM-TRANSID:PSgvCgD3F+yvYolpOQZEQw--.25673S4
+X-Coremail-Antispam: 1Uf129KBjvJXoW7ury8XrWkKw4rGF1UZryDAwb_yoW8AF4kp3
+	WkJw1FkF1IqF1aya4xGr4kXry8GrZrWay8tw4IyFZxAF17Jw1xXF47KF12kasxuFZ5Zwnx
+	Z3Z2vF1Uur1UJwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRHGQDUUUUU=
+X-CM-SenderInfo: 52kl13xdqbzxi6rwjhhfrp/xtbCwhCBammJYrCJQgAA3A
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
@@ -76,11 +76,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
 	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70572-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70569-lists,kvm=lfdr.de];
 	FREEMAIL_CC(0.00)[vger.kernel.org,163.com];
 	FREEMAIL_FROM(0.00)[163.com];
 	RCVD_TLS_LAST(0.00)[];
@@ -96,76 +96,51 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9B42A10B930
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 97FA010B8F5
 X-Rspamd-Action: no action
 
-Currently some KVM selftests are failed on Hygon CPUs due to missing
-vendor detection and edge-case handling specific to Hygon's
-architecture.
+Hygon architecture uses VMMCALL as guest hypercall instruction.  Now,
+the test like "fix hypercall" uses VMCALL and then results in test
+failure.
 
-Add CPU vendor detection for Hygon and add a global variable
-"host_cpu_is_hygon" as the basic facility for the following fixes.
+Utilize the Hygon-specific flag to identify if the test is running on
+Hygon CPU and alter the instruction of hypercall if needed.
 
 Signed-off-by: Zhiquan Li <zhiquan_li@163.com>
 ---
- tools/testing/selftests/kvm/include/x86/processor.h | 6 ++++++
- tools/testing/selftests/kvm/lib/x86/processor.c     | 3 +++
- 2 files changed, 9 insertions(+)
+ tools/testing/selftests/kvm/lib/x86/processor.c      | 3 ++-
+ tools/testing/selftests/kvm/x86/fix_hypercall_test.c | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-index 57d62a425109..9ac18e0fca54 100644
---- a/tools/testing/selftests/kvm/include/x86/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86/processor.h
-@@ -21,6 +21,7 @@
- 
- extern bool host_cpu_is_intel;
- extern bool host_cpu_is_amd;
-+extern bool host_cpu_is_hygon;
- extern uint64_t guest_tsc_khz;
- 
- #ifndef MAX_NR_CPUID_ENTRIES
-@@ -701,6 +702,11 @@ static inline bool this_cpu_is_amd(void)
- 	return this_cpu_vendor_string_is("AuthenticAMD");
- }
- 
-+static inline bool this_cpu_is_hygon(void)
-+{
-+	return this_cpu_vendor_string_is("HygonGenuine");
-+}
-+
- static inline uint32_t __this_cpu_has(uint32_t function, uint32_t index,
- 				      uint8_t reg, uint8_t lo, uint8_t hi)
- {
 diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-index 36104d27f3d9..bbd3336f22eb 100644
+index bbd3336f22eb..64f9ecd2387d 100644
 --- a/tools/testing/selftests/kvm/lib/x86/processor.c
 +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-@@ -21,6 +21,7 @@
- vm_vaddr_t exception_handlers;
- bool host_cpu_is_amd;
- bool host_cpu_is_intel;
-+bool host_cpu_is_hygon;
- bool is_forced_emulation_enabled;
- uint64_t guest_tsc_khz;
- 
-@@ -671,6 +672,7 @@ void kvm_arch_vm_post_create(struct kvm_vm *vm, unsigned int nr_vcpus)
- 
- 	sync_global_to_guest(vm, host_cpu_is_intel);
- 	sync_global_to_guest(vm, host_cpu_is_amd);
-+	sync_global_to_guest(vm, host_cpu_is_hygon);
- 	sync_global_to_guest(vm, is_forced_emulation_enabled);
- 	sync_global_to_guest(vm, pmu_errata_mask);
- 
-@@ -1303,6 +1305,7 @@ void kvm_selftest_arch_init(void)
- {
- 	host_cpu_is_intel = this_cpu_is_intel();
- 	host_cpu_is_amd = this_cpu_is_amd();
-+	host_cpu_is_hygon = this_cpu_is_hygon();
- 	is_forced_emulation_enabled = kvm_is_forced_emulation_enabled();
- 
- 	kvm_init_pmu_errata();
+@@ -1229,7 +1229,8 @@ const struct kvm_cpuid_entry2 *get_cpuid_entry(const struct kvm_cpuid2 *cpuid,
+ 		     "1: vmmcall\n\t"					\
+ 		     "2:"						\
+ 		     : "=a"(r)						\
+-		     : [use_vmmcall] "r" (host_cpu_is_amd), inputs);	\
++		     : [use_vmmcall] "r"				\
++		     (host_cpu_is_amd || host_cpu_is_hygon), inputs);	\
+ 									\
+ 	r;								\
+ })
+diff --git a/tools/testing/selftests/kvm/x86/fix_hypercall_test.c b/tools/testing/selftests/kvm/x86/fix_hypercall_test.c
+index 762628f7d4ba..0377ab5b1238 100644
+--- a/tools/testing/selftests/kvm/x86/fix_hypercall_test.c
++++ b/tools/testing/selftests/kvm/x86/fix_hypercall_test.c
+@@ -52,7 +52,7 @@ static void guest_main(void)
+ 	if (host_cpu_is_intel) {
+ 		native_hypercall_insn = vmx_vmcall;
+ 		other_hypercall_insn  = svm_vmmcall;
+-	} else if (host_cpu_is_amd) {
++	} else if (host_cpu_is_amd || host_cpu_is_hygon) {
+ 		native_hypercall_insn = svm_vmmcall;
+ 		other_hypercall_insn  = vmx_vmcall;
+ 	} else {
 -- 
 2.43.0
 
