@@ -1,258 +1,237 @@
-Return-Path: <kvm+bounces-70599-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70600-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iC7SOk3piWlnEAAAu9opvQ
-	(envelope-from <kvm+bounces-70599-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 15:03:57 +0100
+	id EK0TB534iWn5FAAAu9opvQ
+	(envelope-from <kvm+bounces-70600-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 16:09:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48627110027
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 15:03:57 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF04C1119E6
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 16:09:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0CA68302C6E0
-	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 14:01:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A0F483023E3F
+	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 15:06:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 856113783A9;
-	Mon,  9 Feb 2026 14:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D2737D122;
+	Mon,  9 Feb 2026 15:06:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FjGUTD6b"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QLOZVTfJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9258E1BC2A
-	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 14:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED48A21CA0D
+	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 15:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770645700; cv=none; b=DyavY+igwdnUZRVuCGk4QuqpgvukfuUJta6mbor30fvl/3qTq4s5m9DLmBCjuZR/J91BMinl+4oA5BGXBX05GPImTu+EKNm339zO6c0NuU1HgfbJoC47g1WgBmBL5RgpNQW10ofdlLzHkJP83ghRyXJdAyR5B/LG+DLgssq9CoY=
+	t=1770649599; cv=none; b=FplinwukDCtYM2MUZq1az2aDCjsbUs576bsCc9etdWsRvoqxrpyjfJaRknA5lGST+ryIqDvtwJ8UG+rYC7DbFrCSyZ0pt+pYdpsEQiR4mUE+T3x/2ei0aDlOsOCL5hoiOKfDPuIP6usKL9ikTCEWJGlMS0mzJjScMw7Qgaj6o/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770645700; c=relaxed/simple;
-	bh=H7SHg/HIQVCFd5+yTlv/QbGyurju2rQwRMv6s9OaPUI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u/Ce4K1/3RKk6oGcdcUmGjPQ6rPq9DIV8wc6I6gUfOPSpgwguAzebaeaXoxUW/Y8czfAogNNBO/lmDAZzfySYmKJnrRQW6CpnEtlUw1ca5kNPMrFkmeesMbxOI+5TFXQViHjtmlQKrTVrYQxRWjiv6pYe7UKrRtgG0sSYZeTDow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FjGUTD6b; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770645699;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b8omTL/Q2D7P0BE2Jd0peC7Yv2e28e01vw3FhakdFHA=;
-	b=FjGUTD6bihD1Ijx2205GUf4K4Ht9Py6dmZF3NF8HYe+tohc8BUSy7XBp0JS2Z/iOuSAHt2
-	KtnxNQGc9XysiKD+0PGcieswhpPLrvChWHcwGAperWDiaT0sB5t+xgs97O843r8zOQ9uFI
-	oiLu469+xjdfFhZ1BzJA1rF46hCmU08=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-580-DxBAMHtFNQOX0A3LFgxYKQ-1; Mon,
- 09 Feb 2026 09:01:35 -0500
-X-MC-Unique: DxBAMHtFNQOX0A3LFgxYKQ-1
-X-Mimecast-MFC-AGG-ID: DxBAMHtFNQOX0A3LFgxYKQ_1770645693
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 003D5195608F;
-	Mon,  9 Feb 2026 14:01:33 +0000 (UTC)
-Received: from redhat.com (unknown [10.45.225.116])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5E00618003F6;
-	Mon,  9 Feb 2026 14:01:28 +0000 (UTC)
-Date: Mon, 9 Feb 2026 14:01:24 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
-	qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	"open list:X86 KVM CPUs" <kvm@vger.kernel.org>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>, Zhao Liu <zhao1.liu@intel.com>
-Subject: Re: [PATCH] Add query-tdx-capabilities
-Message-ID: <aYnotPEv3aJAClPm@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <aV41CQP0JODTdRqy@redhat.com>
- <87qzrzku9z.fsf@pond.sub.org>
- <aWDMU7WOlGIdNush@redhat.com>
- <87jyxrksug.fsf@pond.sub.org>
- <aWDTXvXxPRj2fs2b@redhat.com>
- <87cy3jkrj8.fsf@pond.sub.org>
- <aWDatqLQYBV9fznm@redhat.com>
- <871pjzkm4y.fsf@pond.sub.org>
- <CAJ+F1CLR4wt-bA+V+oV6N4iKTK_=Hn8TSD0pP7Uwj=jWHWvZRA@mail.gmail.com>
- <87343i71hm.fsf@pond.sub.org>
+	s=arc-20240116; t=1770649599; c=relaxed/simple;
+	bh=Gts1Ng9MjaplRBeyctmjPBUYdESDzVMN/Nq+GrTb/eg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gYn33+5GksKaT/x6M7RGB0E87b5x+8Uor1+JXPG1juWuVazL5xiWdCcLfLOqCLMYWw6tPzhycjiwtaTroeHBiBuy6ouOFHZ+RbW8VoJ8igYCJJLcG7iev2W4wiNuUK1j2TFmIO1gitIRYVB/SVO1JrPpx35OMYoESUe7q6NxV+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QLOZVTfJ; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c6187bdadcdso2886374a12.0
+        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 07:06:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770649598; x=1771254398; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=emQ4N3VMon9pGtGOQvwqAYXNUvoy4vRVfNiTFhHBt90=;
+        b=QLOZVTfJkG/Xqnn25TwIjszhUjzgGZpUmu0mvvFjMeocUzEomBgaUvA9h/W/HTGg18
+         euAaFT7XlEHatOl27q8L88joKrJDNYWnWetdEP5lBf19R7MJMMldRttiSB7SQHaVQnNI
+         I+/06pqfhqhuFJwtLVwDgWKAG+O+H4RrVgb8aYgy6HHoPPOMSM1cm4R0oLuKcyrRecvF
+         UTl2shWTQPAoulOptxchKvqyyyH6UPAsd68J8y+/TeP3WL+nCJQKMS3MbYLKIYsQTScf
+         PbMyea+uWW3BpvX+dcowBBedsWTzBEJxHR+H9OrkFgPKNx8bDTL0oIatTKxt6g3FG0/p
+         Lh+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770649598; x=1771254398;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=emQ4N3VMon9pGtGOQvwqAYXNUvoy4vRVfNiTFhHBt90=;
+        b=wsYA92nsnIxVUDhwfdswqF2kNkYTUniR4o2rFMRbYAt6PvB3BxqznqOdVU2tUQx+4Z
+         UfksKvz5H/50jp6KoN82maWeWj2AyLDDC4S98m2XAQ8ReR2z/0mlBPLY03pohkCPYlgF
+         YKICXe32I81Al2kxpimRt8NGNfZQkHBz5UQku1qFyOtBSm3MZ2rWHbSJzQ0ugWO/oiS5
+         bVfaAWiGehfW2z4iVuznyIyzZqysnkD+iA5E6dI1gPfu0Eqv6CWyPycVseg05duVQ2I+
+         UyZdHYUxw3GP4jeKYRW5h7rUAOhGpDJx3dvtsfYu8eNY8GktqhOUSZSPioKte4aPQNYL
+         JhsA==
+X-Forwarded-Encrypted: i=1; AJvYcCUUSa68wE5VX2p4KyW0aRTQidKAmXC4h11fWWGy0KlV00FP6pwyLwpJPbrINySnP6Hv5KU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx39N0v86EUe+LzGnSGTntP9/9W0fkgRUyvhrf19Md/2ykmZDj4
+	8Oz2aA9cZV/brKae1v8kot7TEZPxecKgOEmDipfTWMGexyoRQBHN9AoMKt3xNz3H/fpY04F/FQ9
+	NOHjMmA==
+X-Received: from pjbds12.prod.google.com ([2002:a17:90b:8cc:b0:354:c5cd:9f73])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:670f:b0:304:313a:4bcd
+ with SMTP id adf61e73a8af0-393ad002d22mr10233501637.30.1770649598223; Mon, 09
+ Feb 2026 07:06:38 -0800 (PST)
+Date: Mon, 9 Feb 2026 07:06:36 -0800
+In-Reply-To: <e19b9666-b224-4fbd-92c9-82c712916a07@suse.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87343i71hm.fsf@pond.sub.org>
-User-Agent: Mutt/2.2.14 (2025-02-20)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Mime-Version: 1.0
+References: <20260208164233.30405-1-clopez@suse.de> <20260208182849.GAaYjV4Vh8i0kznTEK@fat_crate.local>
+ <CALMp9eQmwsND7whnvVof1i=OsCdo6wcwBWyDRwS3Ud69WkKf-g@mail.gmail.com>
+ <20260208211342.GBaYj8hhtYM-lYfq-X@fat_crate.local> <CALMp9eSVB=iRec2A0tmRzkTBa9zz4BVS8Lu79vUuRPrTawYFcQ@mail.gmail.com>
+ <e19b9666-b224-4fbd-92c9-82c712916a07@suse.de>
+Message-ID: <aYn3_PhRvHPCJTo7@google.com>
+Subject: Re: [PATCH] KVM: x86: synthesize TSA CPUID bits via SCATTERED_F()
+From: Sean Christopherson <seanjc@google.com>
+To: "Carlos =?utf-8?B?TMOzcGV6?=" <clopez@suse.de>
+Cc: Jim Mattson <jmattson@google.com>, Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, 
+	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, 
+	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>, Babu Moger <bmoger@amd.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70599-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,nongnu.org,redhat.com,vger.kernel.org,habkost.net,linaro.org,huawei.com,intel.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[libvirt.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,instagram.com:url,entangle-photo.org:url];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_REPLYTO(0.00)[berrange@redhat.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[berrange@redhat.com,kvm@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70600-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[kvm];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: 48627110027
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,alien8.de:email]
+X-Rspamd-Queue-Id: CF04C1119E6
 X-Rspamd-Action: no action
 
-On Tue, Feb 03, 2026 at 08:03:17AM +0100, Markus Armbruster wrote:
-> Cc: machine core maintainers for an opinion on query-machines.
-> 
-> Marc-André Lureau <marcandre.lureau@gmail.com> writes:
-> 
-> > Hi
-> >
-> > On Fri, Jan 9, 2026 at 4:27 PM Markus Armbruster <armbru@redhat.com> wrote:
+On Mon, Feb 09, 2026, Carlos L=C3=B3pez wrote:
+> Hi,
+>=20
+> On 2/9/26 6:48 AM, Jim Mattson wrote:
+> > On Sun, Feb 8, 2026 at 1:14=E2=80=AFPM Borislav Petkov <bp@alien8.de> w=
+rote:
 > >>
-> >> Daniel P. Berrangé <berrange@redhat.com> writes:
-> >>
-> >> > On Fri, Jan 09, 2026 at 11:29:47AM +0100, Markus Armbruster wrote:
-> >> >> Daniel P. Berrangé <berrange@redhat.com> writes:
-> >> >>
-> >> >> > On Fri, Jan 09, 2026 at 11:01:27AM +0100, Markus Armbruster wrote:
-> >> >> >> Daniel P. Berrangé <berrange@redhat.com> writes:
-> >> >> >>
-> >> >> >> > On Fri, Jan 09, 2026 at 10:30:32AM +0100, Markus Armbruster wrote:
-> >> >> >> >> Daniel P. Berrangé <berrange@redhat.com> writes:
-> >> >> >> >>
-> >> >> >> >> > On Tue, Jan 06, 2026 at 10:36:20PM +0400, marcandre.lureau@redhat.com wrote:
-> >> >> >> >> >> From: Marc-André Lureau <marcandre.lureau@redhat.com>
-> >> >> >> >> >>
-> >> >> >> >> >> Return an empty TdxCapability struct, for extensibility and matching
-> >> >> >> >> >> query-sev-capabilities return type.
-> >> >> >> >> >>
-> >> >> >> >> >> Fixes: https://issues.redhat.com/browse/RHEL-129674
-> >> >> >> >> >> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> 
-> [...]
-> 
-> >> >> >> Do management applications need to know more than "this combination of
-> >> >> >> host + KVM + QEMU can do SEV, yes / no?
-> >> >> >>
-> >> >> >> If yes, what do they need?  "No" split up into serval "No, because X"?
-> >> >> >
-> >> >> > When libvirt runs  query-sev-capabilities it does not care about the
-> >> >> > reason for it being unsupported.   Any "GenericError" is considered
-> >> >> > to mark the lack of host support, and no fine grained checks are
-> >> >> > performed on the err msg.
-> >> >> >
-> >> >> > If query-sev-capabilities succeeds (indicating SEV is supported), then
-> >> >> > all the returned info is exposed to mgmt apps in the libvirt domain
-> >> >> > capabilities XML document.
-> >> >>
-> >> >> So query-sev-capabilities is good enough as is?
-> >> >
-> >> > IIUC, essentially all QEMU errors that could possibly be seen with
-> >> > query-sev-capabilities are "GenericError" these days, except for
-> >> > the small possibility of "CommandNotFound".
-> >> >
-> >> > The two scenarios with lack of SEV support are covered by GenericError
-> >> > but I'm concerned that other things that should be considered fatal
-> >> > will also fall under GenericError.
-> >> >
-> >> > eg take a look at qmp_dispatch() and see countless places where we can
-> >> > return GenericError which ought to be treated as fatal by callers.
-> >> >
-> >> > IMHO  "SEV not supported" is not conceptually an error, it is an
-> >> > expected informational result of query-sev-capabilities, and thus
-> >> > shouldn't be using the QMP error object, it should have been a
-> >> > boolean result field.
-> >>
-> >> I agree that errors should be used only for "abnormal" outcomes, not for
-> >> the "no" answer to a simple question like "is SEV available, and if yes,
-> >> what are its capabilities?"
-> >>
-> >> I further agree that encoding "no" as GenericError runs the risk of
-> >> conflating "no" with other errors.  Since query-sev itself can fail just
-> >> one way, these can only come from the QMP core.  For the core's syntax
-> >> and type errors, the risk is only theoretical: just don't do that.
-> >> Errors triggered by state, like the one in qmp_command_available(), are
-> >> a bit more worrying.  I think they're easy enough to avoid if you're
-> >> aware, but "if you're aware" is admittedly rittle.
-> >>
-> >> Anyway, that's what we have.  Badly designed, but it seems to be
-> >> workable.
-> >>
-> >> Is the bad enough to justify revising the interface?  I can't see how to
-> >> do that compatibly.
-> >>
-> >> Is it bad enough to justify new interfaces for similar things to be
-> >> dissimilar?
-> >>
-> >
-> > Maybe query-{sev,tdx,*}-capabilities should only be called when the
-> > host is actually capable, thus throwing an Error is fine.
-> >
-> > What about a new "query-confidential-guest-supports" command that
-> > checks the host capability and returns ["sev", "tdx", "pef"...] then ?
-> 
-> Some similarity to query-accelerators.  Feels reasonable.
+> >> On Sun, Feb 08, 2026 at 12:50:18PM -0800, Jim Mattson wrote:
+> >>>> /*
+> >>>>  * Synthesized Feature - For features that are synthesized into boot=
+_cpu_data,
+> >>>>  * i.e. may not be present in the raw CPUID, but can still be advert=
+ised to
+> >>>>  * userspace.  Primarily used for mitigation related feature flags.
+> >>>>                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> >>>>  */
+> >>>> #define SYNTHESIZED_F(name)
+> >>>>
+> >>>>> +             SCATTERED_F(TSA_SQ_NO),
+> >>>>> +             SCATTERED_F(TSA_L1_NO),
+> >>>>
+> >>>> And scattered are of the same type.
+> >>>>
+> >>>> Sean, what's the subtle difference here?
+> >>>
+> >>> SYNTHESIZED_F() sets the bit unconditionally. SCATTERED_F() propagate=
+s
+> >>> the bit (if set) from the host's cpufeature flags.
 
-It feels like if we do that, then we would fold the -capbilities into
-this command too:
+As noted below, SYNTHESIZED_F() isn't entirely unconditional.  kvm_cpu_cap_=
+init()
+factors in boot_cpu_data.x86_capability, the problem here is that SYNTHESIZ=
+ED_F()
+is now being used for KVM-only leafs, and so the common code doesn't work a=
+s
+intended.
 
-{ 'enum': 'ConfidentialGuestType',
-  'data': ['sev', 'sev-snp', 'tdx', .. ] }
+> >> Yah, and I was hinting at the scarce documentation.
 
-{ 'union': 'ConfidentialGuestSupport',
-  'base': { 'type': 'ConfidentialGuestType' },
-  'discriminator': { 'type' },
-  'data': { 'sev': 'SevCapabilities',
-            'sev-snp': 'SevCapabilities' } }
+Maybe I could add a table showing how the XXX_F() macros map to various con=
+trols?
 
-{ 'command': 'query-confidential-guest-capabilities',
-  'returns': 'ConfidentialGuestCapability' }
+> >> SYNTHESIZED_F() is "Primarily used for mitigation related feature flag=
+s."
+> >> SCATTERED_F() is "For features that are scattered by cpufeatures.h."
+> >=20
+> > Ugh. I have to rescind my Reviewed-by. IIUC, SCATTERED_F() implies a
+> > logical and with hardware CPUID, which means that the current proposal
+> > will never set the ITS_NO bits.
+>=20
+> Right, I see what you mean now. SCATTERED_F() will set kvm_cpu_caps
+> correctly, but then this will clear the bits, because
+> kvm_cpu_cap_synthesized is now 0:
+>=20
+>     kvm_cpu_caps[leaf] &=3D (raw_cpuid_get(cpuid) |
+>         kvm_cpu_cap_synthesized);
+>=20
+> So to me it seems like SYNTHESIZED_F() is just wrong,
 
+It was right when I wrote it :-)=20
 
+> since it always enables bits for KVM-only leafs.
 
-> > Or maybe this should be provided at the MachineInfo level instead
-> > (query-machines).
-> 
-> Also reasonable, I think.  Machine core maintainers, got an opinion?
+Yes, I didn't anticipate synthesizing flags into KVM-only leafs. =20
 
-MachineInfo level seems interesting because of the 'confidential-guest-support'
-property against the machine classes.
+> So how about the following
+> (I think Binbin Wu suggests this in his other email):
+>=20
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 819c176e02ff..5e863e213f54 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -769,7 +769,8 @@ do {                                                 =
+                       \
+>   */
+>  #define SYNTHESIZED_F(name)                                    \
+>  ({                                                             \
+> -       kvm_cpu_cap_synthesized |=3D feature_bit(name);           \
+> +       if (boot_cpu_has(X86_FEATURE_##name))                   \
+> +               kvm_cpu_cap_synthesized |=3D feature_bit(name);          =
+ \
 
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+I would rather do this:
 
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 88a5426674a1..5f41924987c7 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -770,7 +770,10 @@ do {                                                  =
+                     \
+ #define SYNTHESIZED_F(name)                                    \
+ ({                                                             \
+        kvm_cpu_cap_synthesized |=3D feature_bit(name);           \
+-       F(name);                                                \
++                                                               \
++       BUILD_BUG_ON(X86_FEATURE_##name >=3D MAX_CPU_FEATURES);   \
++       if (boot_cpu_has(X86_FEATURE_##name))                   \
++               F(name);                                        \
+ })
+=20
+ /*
+
+because I'd like to keep kvm_cpu_cap_synthesized unconditional and have
+kvm_cpu_cap_features reflect what is supported.  And with
+
+  Fixes: 31272abd5974 ("KVM: SVM: Advertise TSA CPUID bits to guests")
+
+because everything was fine before that commit (though it was set up to fai=
+l).
+
+>         F(name);                                                \
+>  })
+>=20
 
