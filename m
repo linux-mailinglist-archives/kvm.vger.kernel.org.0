@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-70649-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70650-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cFHXIAVbimn1JgAAu9opvQ
-	(envelope-from <kvm+bounces-70649-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 23:09:09 +0100
+	id yOJNEY1iimleJwAAu9opvQ
+	(envelope-from <kvm+bounces-70650-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 23:41:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCEC8114FAD
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 23:09:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3EE011518B
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 23:41:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F2679301A395
-	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 22:08:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DFB84303183B
+	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 22:40:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82534311948;
-	Mon,  9 Feb 2026 22:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0705318EE5;
+	Mon,  9 Feb 2026 22:40:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PWKdJtcE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HhXL+lHX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-dy1-f202.google.com (mail-dy1-f202.google.com [74.125.82.202])
+Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533002FE567
-	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 22:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD18315760
+	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 22:40:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770674936; cv=none; b=YtR/J9GSAN78pw8EQBa+DEBwFWdz91ab73nuLDa5d+fIMI+ZhYd9hnuaEr0755LmIkVOYIpsa2kc6xznqdmI9tsvXMZ85h1W4BhRw8v0Mr+qdRetbWbLauG702Bno+4bU6+va7RHaWy8NLW3pSRv54DhqzQ7EBGT/A9lDDYGQbI=
+	t=1770676847; cv=none; b=uRam+QFeHeuDlWRNQetJZHB8ld2zz70oGRSr3DLSNEeyZkdwGTRq8QWMtjk9GJyMIQFX3HhCNr0WoJvdfIm1al20MagJVHkly1DvfbZzBbBNerLvbA+aiF7OA2Luu0lr+wub4lk/YUd25KTL/V6rIVrhtVPZ0NUAqIyHZW2ao2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770674936; c=relaxed/simple;
-	bh=vGlO5GzNGcvyqW9UIHG9qniVfx2bJni8Hc98j84Fg5Q=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DngafsKi76/Tkd1TcVQlc+S+XkWnjYAWfUVQLFiRs8NIvpJka2HK7c0vGqvBR9FiM0P3JkikfMG7qbzimVOvazpOcnZGsPvlPcdRVktFORH2HqPcyC0Ldq2GJjqqmXoM8f1MMitq3uYf7XA3ru0Z9PbT4CCk97J2563bt0AyOss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--surenb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PWKdJtcE; arc=none smtp.client-ip=74.125.82.202
+	s=arc-20240116; t=1770676847; c=relaxed/simple;
+	bh=2w2NkSfnUYCtKCT1TvD2j7eUbaB9dlOlqow5wyJZoKY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=eIXPv3K4pxXQE1MVBKlA5CTLbMY5KlFDTysGPQlFvjzu04+x3DM1NhX1+lKnHaKcR8h7WpVZHX2EdGSUmZ8fOyB39lBj08QS2aw0XlASQqFyugEYuJ989xnjcCsXgiJfrUH+kQmGgmuxlu5kzWmnG4PfeMQCPy4CaAc1AIs+pps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HhXL+lHX; arc=none smtp.client-ip=209.85.161.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--surenb.bounces.google.com
-Received: by mail-dy1-f202.google.com with SMTP id 5a478bee46e88-2ba8a461dd9so244771eec.1
-        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 14:08:54 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-663006e4c3cso1123175eaf.2
+        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 14:40:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770674933; x=1771279733; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770676844; x=1771281644; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=JnRS/eBggwfyKbmgq76fGd1D8MW17NObeJngFpCnif0=;
-        b=PWKdJtcEmif+9q3AR+Z6AZe9t8IrD5MFv8KlB7BR8l1ZWdbvXBIymGYUfc0iN2J2J6
-         sIKuX0tpeoM0uUb5yEoN7LQFBBGOK5FiZLAKZgbcVGVpg4EJw2LwdxLAR+ekqwlOFZex
-         LAotUqGMLfFzV5XKz6Sg1+5Nh8X2elOgSG1Iiqhr8ul2oUs8Ds8JYCE9RD3Mi8OazDTt
-         iZUrMmWzc3WgBCEo4C0PMcyLdQ6qZus73nc1/fei6zhfye5ElSiHpbrIvPyXlA+07Zbh
-         p5qebRpP97AW/Z/Agb/+pug5WRXaWsv4bTyliuhC7wPEt/yjd58g7MyUWouhd/AY5J9D
-         0iow==
+        bh=30Nas80AMvo6RyW+BR+2WwHJbWJfG1zda4JX9g84//U=;
+        b=HhXL+lHXdq2/jXdePqpenUlxL1QhrhU2eUgJlgQ2aztzvzgtrzsF+snXRALa4WyjCs
+         Jfy175SB0ER6ISIkj+UJh4Jsn2qk578bJphXpHTEanqTwfx3xZx8kaCkZGX7OCWSpc55
+         IAxUvrn3sOiiH33g4L1rLvoVfGKPYeaf45TRrAihX3HPIH4UwpifJQ05kROyFEXLmMN4
+         nBCIPnm7DWSoJ3kX1v0u03wO5VwM5Rwgp9m7OZqcXWR50n42iRCtdXLWig17PgkjoHTf
+         qJ+AA2Ezb6tzVTMCriGAdffxGVFgodmCAkup/s/+qESwB5LIiDt0DHIyYZcSdUP+oKca
+         INFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770674933; x=1771279733;
+        d=1e100.net; s=20230601; t=1770676844; x=1771281644;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=JnRS/eBggwfyKbmgq76fGd1D8MW17NObeJngFpCnif0=;
-        b=Fa4WhMVQw0YxVQWG5vSTZWLVIB5u0WrRp6AueuM3tgrULJ6PYbLGlKZP2qYTL+05QO
-         kfHAq5jqhNInVmHe6X7VEMYArhHMLGZ3/LPG8RXz86i+q81Btu4p+235p2o08krf+c4N
-         3agVyLeZ0xDCRxkZ8uEJmO9rat7i4mEvL1yy8T1Q5U6imPC2OnuM715iWXjhTp4NC3H3
-         Lrl1T0fNsKE2iLE1RZDFDA5Yu19YidN3CfF6qr91/6XMldIoyGN8YDpWsjPV9fzrFcvo
-         Yua+Pa2vRPqWel9RnyfBUbXCh6XhxsW++Ggqdk2JpfFP1+DWrMK3FRvMU87i6a5a+dpg
-         Akrg==
-X-Forwarded-Encrypted: i=1; AJvYcCWRIVg1lMdWoI0L+9KOHrTy6jLiOhU+WEOPgupbj3A5FRshTI/eHaETwe6OLuJ6L58yN50=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2FKYrMLvkXDxghtAgEoDD8yY0GLYb2V87YFJsamFWyQKITtqQ
-	IrM8D+QQa+b437zlt2p3ODVGyLm3OAZyS93kKXXx8wDExpfIMt9IeUk+JQtW+eUy0uvBiAxDwYq
-	eCB+NoA==
-X-Received: from dlbrb16.prod.google.com ([2002:a05:7022:f010:b0:123:3409:1518])
- (user=surenb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7301:1687:b0:2ba:7717:2bdd
- with SMTP id 5a478bee46e88-2ba771732a0mr1454182eec.27.1770674933227; Mon, 09
- Feb 2026 14:08:53 -0800 (PST)
-Date: Mon,  9 Feb 2026 14:08:49 -0800
+        bh=30Nas80AMvo6RyW+BR+2WwHJbWJfG1zda4JX9g84//U=;
+        b=jOdqZl7eLGuA6zHHWGrEnYk5qP3oXxjP/RaXqKUhNL1iZqtU3aPyMKH8SrqwWsmc0/
+         GpQm2HgVgcXL7JtmLp41uXraTXfUjR0Pu3pGYpnfKO0TmcCPRjNSEI9ssgHhybA9TWsd
+         qhLBcVh+Z9jOn7gDxs4w0/EEMwWiX3u+h/5Ntm2SuPn3TBMFQWYKCtkOcn9Jg8URMGKh
+         ryIaL+57TuerlzyFEYAva/+l0GeJnoGpIk/jEoT4WU2COJoIZHJHCF91bR6zPbUno5Zx
+         d+4StDjkY27fupr67P+3h/c9b/2rf7Njkhy+e427Evwqufz6iMekYqBVYPpViaC8HjUU
+         ryPg==
+X-Gm-Message-State: AOJu0Yz/qnLyHQHU3zXGhettOZ0WXgkNuBU0HtYEgDsa2CoaTtdrXz4f
+	AVIbhr0Ik8Kbzlo+1C8pSJGG51fZKUNltpvW/bhfw0/kunS3EuJMOiScRm99iJxua8oAek5Zlj9
+	0HTh/wCGIBIW7kPG43Cnb9frhaxaTpUFqvpdLNWg5jlaVBUy5/1E7mRPXQiauE5q6vlqKRYC46/
+	hNmiqd7zSsVSf0F6qkiQcM0DF+PNhM32biAc3doE2FATPeYy2/IZkD2YxflSI=
+X-Received: from ileg3.prod.google.com ([2002:a05:6e02:1a23:b0:467:9e40:e391])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6820:220b:b0:664:86ce:df46 with SMTP id 006d021491bc7-66d0c472fd0mr6437177eaf.57.1770676843797;
+ Mon, 09 Feb 2026 14:40:43 -0800 (PST)
+Date: Mon,  9 Feb 2026 22:13:55 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,690 +73,193 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260209220849.2126486-1-surenb@google.com>
-Subject: [PATCH 1/1] mm: replace vma_start_write() with vma_start_write_killable()
-From: Suren Baghdasaryan <surenb@google.com>
-To: akpm@linux-foundation.org
-Cc: willy@infradead.org, david@kernel.org, ziy@nvidia.com, 
-	matthew.brost@intel.com, joshua.hahnjy@gmail.com, rakie.kim@sk.com, 
-	byungchul@sk.com, gourry@gourry.net, ying.huang@linux.alibaba.com, 
-	apopple@nvidia.com, lorenzo.stoakes@oracle.com, baolin.wang@linux.alibaba.com, 
-	Liam.Howlett@oracle.com, npache@redhat.com, ryan.roberts@arm.com, 
-	dev.jain@arm.com, baohua@kernel.org, lance.yang@linux.dev, vbabka@suse.cz, 
-	jannh@google.com, rppt@kernel.org, mhocko@suse.com, pfalcato@suse.de, 
-	kees@kernel.org, maddy@linux.ibm.com, npiggin@gmail.com, mpe@ellerman.id.au, 
-	chleroy@kernel.org, linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, surenb@google.com
+Message-ID: <20260209221414.2169465-1-coltonlewis@google.com>
+Subject: [PATCH v6 00/19] ARM64 PMU Partitioning
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Russell King <linux@armlinux.org.uk>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Mingwei Zhang <mizhang@google.com>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Shuah Khan <shuah@kernel.org>, Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70649-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[infradead.org,kernel.org,nvidia.com,intel.com,gmail.com,sk.com,gourry.net,linux.alibaba.com,oracle.com,redhat.com,arm.com,linux.dev,suse.cz,google.com,suse.com,suse.de,linux.ibm.com,ellerman.id.au,kvack.org,lists.ozlabs.org,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TAGGED_FROM(0.00)[bounces-70650-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[surenb@google.com,kvm@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[coltonlewis@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[infradead.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DCEC8114FAD
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,gitlab.com:url]
+X-Rspamd-Queue-Id: A3EE011518B
 X-Rspamd-Action: no action
 
-Now that we have vma_start_write_killable() we can replace most of the
-vma_start_write() calls with it, improving reaction time to the kill
-signal.
+This series creates a new PMU scheme on ARM, a partitioned PMU that
+allows reserving a subset of counters for more direct guest access,
+significantly reducing overhead. More details, including performance
+benchmarks, can be read in the v1 cover letter linked below.
 
-There are several places which are left untouched by this patch:
+An overview of what this series accomplishes was presented at KVM
+Forum 2025. Slides [1] and video [2] are linked below.
 
-1. free_pgtables() because function should free page tables even if a
-fatal signal is pending.
+IMPORTANT: This iteration does not yet implement the dynamic counter
+reservation approach suggested by Will Deacon in January [3]. I am
+working on it, but wanted to send this version first to keep momentum
+going and ensure I've addressed all issues besides that.
 
-2. userfaultd code, where some paths calling vma_start_write() can
-handle EINTR and some can't without a deeper code refactoring.
+v6:
+* Rebase onto v6.19-rc7
 
-3. vm_flags_{set|mod|clear} require refactoring that involves moving
-vma_start_write() out of these functions and replacing it with
-vma_assert_write_locked(), then callers of these functions should
-lock the vma themselves using vma_start_write_killable() whenever
-possible.
+* Drop the reorganization patches I had previously included from Sean
+  and Anish and rework without them.
 
-Suggested-by: Matthew Wilcox <willy@infradead.org>
-Signed-off-by: Suren Baghdasaryan <surenb@google.com>
----
- arch/powerpc/kvm/book3s_hv_uvmem.c |  5 +-
- include/linux/mempolicy.h          |  5 +-
- mm/khugepaged.c                    |  5 +-
- mm/madvise.c                       |  4 +-
- mm/memory.c                        |  2 +
- mm/mempolicy.c                     | 23 ++++++--
- mm/mlock.c                         | 20 +++++--
- mm/mprotect.c                      |  4 +-
- mm/mremap.c                        |  4 +-
- mm/pagewalk.c                      | 20 +++++--
- mm/vma.c                           | 94 +++++++++++++++++++++---------
- mm/vma_exec.c                      |  6 +-
- 12 files changed, 139 insertions(+), 53 deletions(-)
+* Inline FGT programming for easier readability
 
-diff --git a/arch/powerpc/kvm/book3s_hv_uvmem.c b/arch/powerpc/kvm/book3s_hv_uvmem.c
-index 7cf9310de0ec..69750edcf8d5 100644
---- a/arch/powerpc/kvm/book3s_hv_uvmem.c
-+++ b/arch/powerpc/kvm/book3s_hv_uvmem.c
-@@ -410,7 +410,10 @@ static int kvmppc_memslot_page_merge(struct kvm *kvm,
- 			ret = H_STATE;
- 			break;
- 		}
--		vma_start_write(vma);
-+		if (vma_start_write_killable(vma)) {
-+			ret = H_STATE;
-+			break;
-+		}
- 		/* Copy vm_flags to avoid partial modifications in ksm_madvise */
- 		vm_flags = vma->vm_flags;
- 		ret = ksm_madvise(vma, vma->vm_start, vma->vm_end,
-diff --git a/include/linux/mempolicy.h b/include/linux/mempolicy.h
-index 0fe96f3ab3ef..762930edde5a 100644
---- a/include/linux/mempolicy.h
-+++ b/include/linux/mempolicy.h
-@@ -137,7 +137,7 @@ bool vma_policy_mof(struct vm_area_struct *vma);
- extern void numa_default_policy(void);
- extern void numa_policy_init(void);
- extern void mpol_rebind_task(struct task_struct *tsk, const nodemask_t *new);
--extern void mpol_rebind_mm(struct mm_struct *mm, nodemask_t *new);
-+extern int mpol_rebind_mm(struct mm_struct *mm, nodemask_t *new);
- 
- extern int huge_node(struct vm_area_struct *vma,
- 				unsigned long addr, gfp_t gfp_flags,
-@@ -251,8 +251,9 @@ static inline void mpol_rebind_task(struct task_struct *tsk,
- {
- }
- 
--static inline void mpol_rebind_mm(struct mm_struct *mm, nodemask_t *new)
-+static inline int mpol_rebind_mm(struct mm_struct *mm, nodemask_t *new)
- {
-+	return 0;
- }
- 
- static inline int huge_node(struct vm_area_struct *vma,
-diff --git a/mm/khugepaged.c b/mm/khugepaged.c
-index fa1e57fd2c46..392dde66fa86 100644
---- a/mm/khugepaged.c
-+++ b/mm/khugepaged.c
-@@ -1150,7 +1150,10 @@ static enum scan_result collapse_huge_page(struct mm_struct *mm, unsigned long a
- 	if (result != SCAN_SUCCEED)
- 		goto out_up_write;
- 	/* check if the pmd is still valid */
--	vma_start_write(vma);
-+	if (vma_start_write_killable(vma)) {
-+		result = SCAN_FAIL;
-+		goto out_up_write;
-+	}
- 	result = check_pmd_still_valid(mm, address, pmd);
- 	if (result != SCAN_SUCCEED)
- 		goto out_up_write;
-diff --git a/mm/madvise.c b/mm/madvise.c
-index 8debb2d434aa..b41e64231c31 100644
---- a/mm/madvise.c
-+++ b/mm/madvise.c
-@@ -173,7 +173,9 @@ static int madvise_update_vma(vm_flags_t new_flags,
- 	madv_behavior->vma = vma;
- 
- 	/* vm_flags is protected by the mmap_lock held in write mode. */
--	vma_start_write(vma);
-+	if (vma_start_write_killable(vma))
-+		return -EINTR;
-+
- 	vm_flags_reset(vma, new_flags);
- 	if (set_new_anon_name)
- 		return replace_anon_vma_name(vma, anon_name);
-diff --git a/mm/memory.c b/mm/memory.c
-index d6d273eb2189..3831e3026615 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -379,6 +379,8 @@ void free_pgd_range(struct mmu_gather *tlb,
-  * page tables that should be removed.  This can differ from the vma mappings on
-  * some archs that may have mappings that need to be removed outside the vmas.
-  * Note that the prev->vm_end and next->vm_start are often used.
-+ * Note: we don't use vma_start_write_killable() because page tables should be
-+ * freed even if the task is being killed.
-  *
-  * The vma_end differs from the pg_end when a dup_mmap() failed and the tree has
-  * unrelated data to the mm_struct being torn down.
-diff --git a/mm/mempolicy.c b/mm/mempolicy.c
-index dbd48502ac24..3de7ab4f4cee 100644
---- a/mm/mempolicy.c
-+++ b/mm/mempolicy.c
-@@ -556,17 +556,25 @@ void mpol_rebind_task(struct task_struct *tsk, const nodemask_t *new)
-  *
-  * Call holding a reference to mm.  Takes mm->mmap_lock during call.
-  */
--void mpol_rebind_mm(struct mm_struct *mm, nodemask_t *new)
-+int mpol_rebind_mm(struct mm_struct *mm, nodemask_t *new)
- {
- 	struct vm_area_struct *vma;
- 	VMA_ITERATOR(vmi, mm, 0);
-+	int ret = 0;
-+
-+	if (mmap_write_lock_killable(mm))
-+		return -EINTR;
- 
--	mmap_write_lock(mm);
- 	for_each_vma(vmi, vma) {
--		vma_start_write(vma);
-+		if (vma_start_write_killable(vma)) {
-+			ret = -EINTR;
-+			break;
-+		}
- 		mpol_rebind_policy(vma->vm_policy, new);
- 	}
- 	mmap_write_unlock(mm);
-+
-+	return ret;
- }
- 
- static const struct mempolicy_operations mpol_ops[MPOL_MAX] = {
-@@ -1785,7 +1793,8 @@ SYSCALL_DEFINE4(set_mempolicy_home_node, unsigned long, start, unsigned long, le
- 		return -EINVAL;
- 	if (end == start)
- 		return 0;
--	mmap_write_lock(mm);
-+	if (mmap_write_lock_killable(mm))
-+		return -EINTR;
- 	prev = vma_prev(&vmi);
- 	for_each_vma_range(vmi, vma, end) {
- 		/*
-@@ -1808,7 +1817,11 @@ SYSCALL_DEFINE4(set_mempolicy_home_node, unsigned long, start, unsigned long, le
- 			break;
- 		}
- 
--		vma_start_write(vma);
-+		if (vma_start_write_killable(vma)) {
-+			err = -EINTR;
-+			break;
-+		}
-+
- 		new->home_node = home_node;
- 		err = mbind_range(&vmi, vma, &prev, start, end, new);
- 		mpol_put(new);
-diff --git a/mm/mlock.c b/mm/mlock.c
-index 2f699c3497a5..2885b858aa0f 100644
---- a/mm/mlock.c
-+++ b/mm/mlock.c
-@@ -420,7 +420,7 @@ static int mlock_pte_range(pmd_t *pmd, unsigned long addr,
-  * Called for mlock(), mlock2() and mlockall(), to set @vma VM_LOCKED;
-  * called for munlock() and munlockall(), to clear VM_LOCKED from @vma.
-  */
--static void mlock_vma_pages_range(struct vm_area_struct *vma,
-+static int mlock_vma_pages_range(struct vm_area_struct *vma,
- 	unsigned long start, unsigned long end, vm_flags_t newflags)
- {
- 	static const struct mm_walk_ops mlock_walk_ops = {
-@@ -441,7 +441,9 @@ static void mlock_vma_pages_range(struct vm_area_struct *vma,
- 	 */
- 	if (newflags & VM_LOCKED)
- 		newflags |= VM_IO;
--	vma_start_write(vma);
-+	if (vma_start_write_killable(vma))
-+		return -EINTR;
-+
- 	vm_flags_reset_once(vma, newflags);
- 
- 	lru_add_drain();
-@@ -452,6 +454,7 @@ static void mlock_vma_pages_range(struct vm_area_struct *vma,
- 		newflags &= ~VM_IO;
- 		vm_flags_reset_once(vma, newflags);
- 	}
-+	return 0;
- }
- 
- /*
-@@ -501,10 +504,12 @@ static int mlock_fixup(struct vma_iterator *vmi, struct vm_area_struct *vma,
- 	 */
- 	if ((newflags & VM_LOCKED) && (oldflags & VM_LOCKED)) {
- 		/* No work to do, and mlocking twice would be wrong */
--		vma_start_write(vma);
-+		ret = vma_start_write_killable(vma);
-+		if (ret)
-+			goto out;
- 		vm_flags_reset(vma, newflags);
- 	} else {
--		mlock_vma_pages_range(vma, start, end, newflags);
-+		ret = mlock_vma_pages_range(vma, start, end, newflags);
- 	}
- out:
- 	*prev = vma;
-@@ -733,9 +738,12 @@ static int apply_mlockall_flags(int flags)
- 
- 		error = mlock_fixup(&vmi, vma, &prev, vma->vm_start, vma->vm_end,
- 				    newflags);
--		/* Ignore errors, but prev needs fixing up. */
--		if (error)
-+		/* Ignore errors except EINTR, but prev needs fixing up. */
-+		if (error) {
-+			if (error == -EINTR)
-+				break;
- 			prev = vma;
-+		}
- 		cond_resched();
- 	}
- out:
-diff --git a/mm/mprotect.c b/mm/mprotect.c
-index c0571445bef7..49dbb7156936 100644
---- a/mm/mprotect.c
-+++ b/mm/mprotect.c
-@@ -765,7 +765,9 @@ mprotect_fixup(struct vma_iterator *vmi, struct mmu_gather *tlb,
- 	 * vm_flags and vm_page_prot are protected by the mmap_lock
- 	 * held in write mode.
- 	 */
--	vma_start_write(vma);
-+	error = vma_start_write_killable(vma);
-+	if (error < 0)
-+		goto fail;
- 	vm_flags_reset_once(vma, newflags);
- 	if (vma_wants_manual_pte_write_upgrade(vma))
- 		mm_cp_flags |= MM_CP_TRY_CHANGE_WRITABLE;
-diff --git a/mm/mremap.c b/mm/mremap.c
-index 2be876a70cc0..aef1e5f373c7 100644
---- a/mm/mremap.c
-+++ b/mm/mremap.c
-@@ -1286,7 +1286,9 @@ static unsigned long move_vma(struct vma_remap_struct *vrm)
- 		return -ENOMEM;
- 
- 	/* We don't want racing faults. */
--	vma_start_write(vrm->vma);
-+	err = vma_start_write_killable(vrm->vma);
-+	if (err)
-+		return err;
- 
- 	/* Perform copy step. */
- 	err = copy_vma_and_data(vrm, &new_vma);
-diff --git a/mm/pagewalk.c b/mm/pagewalk.c
-index a94c401ab2cf..dc9f7a7709c6 100644
---- a/mm/pagewalk.c
-+++ b/mm/pagewalk.c
-@@ -425,14 +425,13 @@ static inline void process_mm_walk_lock(struct mm_struct *mm,
- 		mmap_assert_write_locked(mm);
- }
- 
--static inline void process_vma_walk_lock(struct vm_area_struct *vma,
-+static inline int process_vma_walk_lock(struct vm_area_struct *vma,
- 					 enum page_walk_lock walk_lock)
- {
- #ifdef CONFIG_PER_VMA_LOCK
- 	switch (walk_lock) {
- 	case PGWALK_WRLOCK:
--		vma_start_write(vma);
--		break;
-+		return vma_start_write_killable(vma);
- 	case PGWALK_WRLOCK_VERIFY:
- 		vma_assert_write_locked(vma);
- 		break;
-@@ -444,6 +443,7 @@ static inline void process_vma_walk_lock(struct vm_area_struct *vma,
- 		break;
- 	}
- #endif
-+	return 0;
- }
- 
- /*
-@@ -487,7 +487,9 @@ int walk_page_range_mm_unsafe(struct mm_struct *mm, unsigned long start,
- 			if (ops->pte_hole)
- 				err = ops->pte_hole(start, next, -1, &walk);
- 		} else { /* inside vma */
--			process_vma_walk_lock(vma, ops->walk_lock);
-+			err = process_vma_walk_lock(vma, ops->walk_lock);
-+			if (err)
-+				break;
- 			walk.vma = vma;
- 			next = min(end, vma->vm_end);
- 			vma = find_vma(mm, vma->vm_end);
-@@ -704,6 +706,7 @@ int walk_page_range_vma_unsafe(struct vm_area_struct *vma, unsigned long start,
- 		.vma		= vma,
- 		.private	= private,
- 	};
-+	int err;
- 
- 	if (start >= end || !walk.mm)
- 		return -EINVAL;
-@@ -711,7 +714,9 @@ int walk_page_range_vma_unsafe(struct vm_area_struct *vma, unsigned long start,
- 		return -EINVAL;
- 
- 	process_mm_walk_lock(walk.mm, ops->walk_lock);
--	process_vma_walk_lock(vma, ops->walk_lock);
-+	err = process_vma_walk_lock(vma, ops->walk_lock);
-+	if (err)
-+		return err;
- 	return __walk_page_range(start, end, &walk);
- }
- 
-@@ -734,6 +739,7 @@ int walk_page_vma(struct vm_area_struct *vma, const struct mm_walk_ops *ops,
- 		.vma		= vma,
- 		.private	= private,
- 	};
-+	int err;
- 
- 	if (!walk.mm)
- 		return -EINVAL;
-@@ -741,7 +747,9 @@ int walk_page_vma(struct vm_area_struct *vma, const struct mm_walk_ops *ops,
- 		return -EINVAL;
- 
- 	process_mm_walk_lock(walk.mm, ops->walk_lock);
--	process_vma_walk_lock(vma, ops->walk_lock);
-+	err = process_vma_walk_lock(vma, ops->walk_lock);
-+	if (err)
-+		return err;
- 	return __walk_page_range(vma->vm_start, vma->vm_end, &walk);
- }
- 
-diff --git a/mm/vma.c b/mm/vma.c
-index be64f781a3aa..3cfb81b3b7cf 100644
---- a/mm/vma.c
-+++ b/mm/vma.c
-@@ -540,8 +540,12 @@ __split_vma(struct vma_iterator *vmi, struct vm_area_struct *vma,
- 	if (new->vm_ops && new->vm_ops->open)
- 		new->vm_ops->open(new);
- 
--	vma_start_write(vma);
--	vma_start_write(new);
-+	err = vma_start_write_killable(vma);
-+	if (err)
-+		goto out_fput;
-+	err = vma_start_write_killable(new);
-+	if (err)
-+		goto out_fput;
- 
- 	init_vma_prep(&vp, vma);
- 	vp.insert = new;
-@@ -574,6 +578,9 @@ __split_vma(struct vma_iterator *vmi, struct vm_area_struct *vma,
- 
- 	return 0;
- 
-+out_fput:
-+	if (new->vm_file)
-+		fput(new->vm_file);
- out_free_mpol:
- 	mpol_put(vma_policy(new));
- out_free_vmi:
-@@ -895,16 +902,22 @@ static __must_check struct vm_area_struct *vma_merge_existing_range(
- 	}
- 
- 	/* No matter what happens, we will be adjusting middle. */
--	vma_start_write(middle);
-+	err = vma_start_write_killable(middle);
-+	if (err)
-+		goto abort;
- 
- 	if (merge_right) {
--		vma_start_write(next);
-+		err = vma_start_write_killable(next);
-+		if (err)
-+			goto abort;
- 		vmg->target = next;
- 		sticky_flags |= (next->vm_flags & VM_STICKY);
- 	}
- 
- 	if (merge_left) {
--		vma_start_write(prev);
-+		err = vma_start_write_killable(prev);
-+		if (err)
-+			goto abort;
- 		vmg->target = prev;
- 		sticky_flags |= (prev->vm_flags & VM_STICKY);
- 	}
-@@ -1155,10 +1168,12 @@ int vma_expand(struct vma_merge_struct *vmg)
- 	struct vm_area_struct *next = vmg->next;
- 	bool remove_next = false;
- 	vm_flags_t sticky_flags;
--	int ret = 0;
-+	int ret;
- 
- 	mmap_assert_write_locked(vmg->mm);
--	vma_start_write(target);
-+	ret = vma_start_write_killable(target);
-+	if (ret)
-+		return ret;
- 
- 	if (next && target != next && vmg->end == next->vm_end)
- 		remove_next = true;
-@@ -1186,17 +1201,19 @@ int vma_expand(struct vma_merge_struct *vmg)
- 	 * Note that, by convention, callers ignore OOM for this case, so
- 	 * we don't need to account for vmg->give_up_on_mm here.
- 	 */
--	if (remove_next)
-+	if (remove_next) {
-+		ret = vma_start_write_killable(next);
-+		if (ret)
-+			return ret;
- 		ret = dup_anon_vma(target, next, &anon_dup);
-+	}
- 	if (!ret && vmg->copied_from)
- 		ret = dup_anon_vma(target, vmg->copied_from, &anon_dup);
- 	if (ret)
- 		return ret;
- 
--	if (remove_next) {
--		vma_start_write(next);
-+	if (remove_next)
- 		vmg->__remove_next = true;
--	}
- 	if (commit_merge(vmg))
- 		goto nomem;
- 
-@@ -1229,6 +1246,7 @@ int vma_shrink(struct vma_iterator *vmi, struct vm_area_struct *vma,
- 	       unsigned long start, unsigned long end, pgoff_t pgoff)
- {
- 	struct vma_prepare vp;
-+	int err;
- 
- 	WARN_ON((vma->vm_start != start) && (vma->vm_end != end));
- 
-@@ -1240,7 +1258,11 @@ int vma_shrink(struct vma_iterator *vmi, struct vm_area_struct *vma,
- 	if (vma_iter_prealloc(vmi, NULL))
- 		return -ENOMEM;
- 
--	vma_start_write(vma);
-+	err = vma_start_write_killable(vma);
-+	if (err) {
-+		vma_iter_free(vmi);
-+		return err;
-+	}
- 
- 	init_vma_prep(&vp, vma);
- 	vma_prepare(&vp);
-@@ -1430,7 +1452,9 @@ static int vms_gather_munmap_vmas(struct vma_munmap_struct *vms,
- 			if (error)
- 				goto end_split_failed;
- 		}
--		vma_start_write(next);
-+		error = vma_start_write_killable(next);
-+		if (error)
-+			goto munmap_gather_failed;
- 		mas_set(mas_detach, vms->vma_count++);
- 		error = mas_store_gfp(mas_detach, next, GFP_KERNEL);
- 		if (error)
-@@ -1824,12 +1848,17 @@ static void vma_link_file(struct vm_area_struct *vma, bool hold_rmap_lock)
- static int vma_link(struct mm_struct *mm, struct vm_area_struct *vma)
- {
- 	VMA_ITERATOR(vmi, mm, 0);
-+	int err;
- 
- 	vma_iter_config(&vmi, vma->vm_start, vma->vm_end);
- 	if (vma_iter_prealloc(&vmi, vma))
- 		return -ENOMEM;
- 
--	vma_start_write(vma);
-+	err = vma_start_write_killable(vma);
-+	if (err) {
-+		vma_iter_free(&vmi);
-+		return err;
-+	}
- 	vma_iter_store_new(&vmi, vma);
- 	vma_link_file(vma, /* hold_rmap_lock= */false);
- 	mm->map_count++;
-@@ -2211,9 +2240,8 @@ int mm_take_all_locks(struct mm_struct *mm)
- 	 * is reached.
- 	 */
- 	for_each_vma(vmi, vma) {
--		if (signal_pending(current))
-+		if (vma_start_write_killable(vma))
- 			goto out_unlock;
--		vma_start_write(vma);
- 	}
- 
- 	vma_iter_init(&vmi, mm, 0);
-@@ -2549,7 +2577,9 @@ static int __mmap_new_vma(struct mmap_state *map, struct vm_area_struct **vmap)
- #endif
- 
- 	/* Lock the VMA since it is modified after insertion into VMA tree */
--	vma_start_write(vma);
-+	error = vma_start_write_killable(vma);
-+	if (error)
-+		goto free_iter_vma;
- 	vma_iter_store_new(vmi, vma);
- 	map->mm->map_count++;
- 	vma_link_file(vma, map->hold_file_rmap_lock);
-@@ -2860,6 +2890,7 @@ int do_brk_flags(struct vma_iterator *vmi, struct vm_area_struct *vma,
- 		 unsigned long addr, unsigned long len, vm_flags_t vm_flags)
- {
- 	struct mm_struct *mm = current->mm;
-+	int err = -ENOMEM;
- 
- 	/*
- 	 * Check against address space limits by the changed size
-@@ -2904,7 +2935,10 @@ int do_brk_flags(struct vma_iterator *vmi, struct vm_area_struct *vma,
- 	vma_set_range(vma, addr, addr + len, addr >> PAGE_SHIFT);
- 	vm_flags_init(vma, vm_flags);
- 	vma->vm_page_prot = vm_get_page_prot(vm_flags);
--	vma_start_write(vma);
-+	if (vma_start_write_killable(vma)) {
-+		err = -EINTR;
-+		goto mas_store_fail;
-+	}
- 	if (vma_iter_store_gfp(vmi, vma, GFP_KERNEL))
- 		goto mas_store_fail;
- 
-@@ -2924,7 +2958,7 @@ int do_brk_flags(struct vma_iterator *vmi, struct vm_area_struct *vma,
- 	vm_area_free(vma);
- unacct_fail:
- 	vm_unacct_memory(len >> PAGE_SHIFT);
--	return -ENOMEM;
-+	return err;
- }
- 
- /**
-@@ -3085,7 +3119,7 @@ int expand_upwards(struct vm_area_struct *vma, unsigned long address)
- 	struct mm_struct *mm = vma->vm_mm;
- 	struct vm_area_struct *next;
- 	unsigned long gap_addr;
--	int error = 0;
-+	int error;
- 	VMA_ITERATOR(vmi, mm, vma->vm_start);
- 
- 	if (!(vma->vm_flags & VM_GROWSUP))
-@@ -3122,12 +3156,14 @@ int expand_upwards(struct vm_area_struct *vma, unsigned long address)
- 
- 	/* We must make sure the anon_vma is allocated. */
- 	if (unlikely(anon_vma_prepare(vma))) {
--		vma_iter_free(&vmi);
--		return -ENOMEM;
-+		error = -ENOMEM;
-+		goto free;
- 	}
- 
- 	/* Lock the VMA before expanding to prevent concurrent page faults */
--	vma_start_write(vma);
-+	error = vma_start_write_killable(vma);
-+	if (error)
-+		goto free;
- 	/* We update the anon VMA tree. */
- 	anon_vma_lock_write(vma->anon_vma);
- 
-@@ -3156,6 +3192,7 @@ int expand_upwards(struct vm_area_struct *vma, unsigned long address)
- 		}
- 	}
- 	anon_vma_unlock_write(vma->anon_vma);
-+free:
- 	vma_iter_free(&vmi);
- 	validate_mm(mm);
- 	return error;
-@@ -3170,7 +3207,7 @@ int expand_downwards(struct vm_area_struct *vma, unsigned long address)
- {
- 	struct mm_struct *mm = vma->vm_mm;
- 	struct vm_area_struct *prev;
--	int error = 0;
-+	int error;
- 	VMA_ITERATOR(vmi, mm, vma->vm_start);
- 
- 	if (!(vma->vm_flags & VM_GROWSDOWN))
-@@ -3201,12 +3238,14 @@ int expand_downwards(struct vm_area_struct *vma, unsigned long address)
- 
- 	/* We must make sure the anon_vma is allocated. */
- 	if (unlikely(anon_vma_prepare(vma))) {
--		vma_iter_free(&vmi);
--		return -ENOMEM;
-+		error = -ENOMEM;
-+		goto free;
- 	}
- 
- 	/* Lock the VMA before expanding to prevent concurrent page faults */
--	vma_start_write(vma);
-+	error = vma_start_write_killable(vma);
-+	if (error)
-+		goto free;
- 	/* We update the anon VMA tree. */
- 	anon_vma_lock_write(vma->anon_vma);
- 
-@@ -3236,6 +3275,7 @@ int expand_downwards(struct vm_area_struct *vma, unsigned long address)
- 		}
- 	}
- 	anon_vma_unlock_write(vma->anon_vma);
-+free:
- 	vma_iter_free(&vmi);
- 	validate_mm(mm);
- 	return error;
-diff --git a/mm/vma_exec.c b/mm/vma_exec.c
-index 8134e1afca68..a4addc2a8480 100644
---- a/mm/vma_exec.c
-+++ b/mm/vma_exec.c
-@@ -40,6 +40,7 @@ int relocate_vma_down(struct vm_area_struct *vma, unsigned long shift)
- 	struct vm_area_struct *next;
- 	struct mmu_gather tlb;
- 	PAGETABLE_MOVE(pmc, vma, vma, old_start, new_start, length);
-+	int err;
- 
- 	BUG_ON(new_start > new_end);
- 
-@@ -55,8 +56,9 @@ int relocate_vma_down(struct vm_area_struct *vma, unsigned long shift)
- 	 * cover the whole range: [new_start, old_end)
- 	 */
- 	vmg.target = vma;
--	if (vma_expand(&vmg))
--		return -ENOMEM;
-+	err = vma_expand(&vmg);
-+	if (err)
-+		return err;
- 
- 	/*
- 	 * move the page tables downwards, on failure we rely on
+* Change register access path to drop simultaneous writing of the
+  virtual and physical registers and write only where the canonical
+  state should reside. The PMU register fast path behaves like a
+  simple accessor now, relying on generic helpers when needed.
 
-base-commit: a1a876489abcc1e75b03bd3b2f6739ceeaaec8c5
--- 
+* Related to the previous, drop several patches modifying sys_regs.c
+  and incorporate PMOVS and PMEVTYPER into the fast path instead.
+
+* Move the register fast path call to kvm_hyp_handle_sysreg_vhe since
+  this feature depends on VHE mode
+
+* Remove the heavyweight access checks from the fast path that had the
+  potential to inject an undefined exception. For what checks are
+  necessary, just return false and let the normal path handle
+  injecting exceptions
+
+* Remove the legacy support for writeable PMCR.N. VMMs must use the
+  vCPU attribute to change the number of counters.
+
+* Simplify kvm_pmu_hpmn by relying on kvm_vcpu_on_unsupported_cpu and
+  moving HPMN validation of nr_pmu_counters to the ioctl boundary when
+  it is set.
+
+* Disable preemption during context swap
+
+* Simplify iteration of counters to context swap by iterating a bitmask
+
+* Clear PMOVS flags during load to avoid the possibility of generating
+  a spurious interrupt when writing PMINTEN or PMCNTEN
+
+* Make kvm_pmu_apply_event_filter() hyp safe
+
+* Cleanly separate interrupt handling so the host driver clears the
+  overflow flags for the host counters only and KVM handles clearing
+  the guest counter flags.
+
+* Ensure the guest PMU state is on hardware before checking hardware
+  for the purposes of determining if an overflow should be injected
+  into the guest.
+
+* Naming and commit message improvements
+
+* Change uAPI to vCPU device attribute selected when other PMU
+  attributes are selected.
+
+* Remove some checks for exceptions when accessing invalid counter
+  indices with the Partitioned PMU. Hardware does not guarantee them
+  so the Partitioned PMU can't either.
+
+v5:
+https://lore.kernel.org/kvmarm/20251209205121.1871534-1-coltonlewis@google.com/
+
+v4:
+https://lore.kernel.org/kvmarm/20250714225917.1396543-1-coltonlewis@google.com/
+
+v3:
+https://lore.kernel.org/kvm/20250626200459.1153955-1-coltonlewis@google.com/
+
+v2:
+https://lore.kernel.org/kvm/20250620221326.1261128-1-coltonlewis@google.com/
+
+v1:
+https://lore.kernel.org/kvm/20250602192702.2125115-1-coltonlewis@google.com/
+
+[1] https://gitlab.com/qemu-project/kvm-forum/-/raw/main/_attachments/2025/Optimizing__itvHkhc.pdf
+[2] https://www.youtube.com/watch?v=YRzZ8jMIA6M&list=PLW3ep1uCIRfxwmllXTOA2txfDWN6vUOHp&index=9
+[3] https://lore.kernel.org/kvmarm/aWjlfl85vSd6sMwT@willie-the-truck/
+
+Colton Lewis (18):
+  arm64: cpufeature: Add cpucap for HPMN0
+  KVM: arm64: Reorganize PMU functions
+  perf: arm_pmuv3: Introduce method to partition the PMU
+  perf: arm_pmuv3: Generalize counter bitmasks
+  perf: arm_pmuv3: Keep out of guest counter partition
+  KVM: arm64: Set up FGT for Partitioned PMU
+  KVM: arm64: Define access helpers for PMUSERENR and PMSELR
+  KVM: arm64: Write fast path PMU register handlers
+  KVM: arm64: Setup MDCR_EL2 to handle a partitioned PMU
+  KVM: arm64: Context swap Partitioned PMU guest registers
+  KVM: arm64: Enforce PMU event filter at vcpu_load()
+  KVM: arm64: Implement lazy PMU context swaps
+  perf: arm_pmuv3: Handle IRQs for Partitioned PMU guest counters
+  KVM: arm64: Detect overflows for the Partitioned PMU
+  KVM: arm64: Add vCPU device attr to partition the PMU
+  KVM: selftests: Add find_bit to KVM library
+  KVM: arm64: selftests: Add test case for partitioned PMU
+  KVM: arm64: selftests: Relax testing for exceptions when partitioned
+
+Marc Zyngier (1):
+  KVM: arm64: Reorganize PMU includes
+
+ arch/arm/include/asm/arm_pmuv3.h              |  28 +
+ arch/arm64/include/asm/arm_pmuv3.h            |  12 +-
+ arch/arm64/include/asm/kvm_host.h             |  17 +-
+ arch/arm64/include/asm/kvm_types.h            |   6 +-
+ arch/arm64/include/uapi/asm/kvm.h             |   2 +
+ arch/arm64/kernel/cpufeature.c                |   8 +
+ arch/arm64/kvm/Makefile                       |   2 +-
+ arch/arm64/kvm/arm.c                          |   2 +
+ arch/arm64/kvm/config.c                       |  41 +-
+ arch/arm64/kvm/debug.c                        |  31 +-
+ arch/arm64/kvm/hyp/vhe/switch.c               | 240 ++++++
+ arch/arm64/kvm/pmu-direct.c                   | 439 +++++++++++
+ arch/arm64/kvm/pmu-emul.c                     | 674 +---------------
+ arch/arm64/kvm/pmu.c                          | 717 ++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c                     |   9 +-
+ arch/arm64/tools/cpucaps                      |   1 +
+ arch/arm64/tools/sysreg                       |   6 +-
+ drivers/perf/arm_pmuv3.c                      | 149 +++-
+ include/kvm/arm_pmu.h                         | 126 +++
+ include/linux/perf/arm_pmu.h                  |   1 +
+ include/linux/perf/arm_pmuv3.h                |  14 +-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/arm64/vpmu_counter_access.c | 112 ++-
+ tools/testing/selftests/kvm/lib/find_bit.c    |   1 +
+ 24 files changed, 1889 insertions(+), 750 deletions(-)
+ create mode 100644 arch/arm64/kvm/pmu-direct.c
+ create mode 100644 tools/testing/selftests/kvm/lib/find_bit.c
+
+
+base-commit: 63804fed149a6750ffd28610c5c1c98cce6bd377
+--
 2.53.0.rc2.204.g2597b5adb4-goog
-
 
