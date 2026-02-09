@@ -1,168 +1,170 @@
-Return-Path: <kvm+bounces-70627-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70628-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cN8BHVAdimmtHAAAu9opvQ
-	(envelope-from <kvm+bounces-70627-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:45:52 +0100
+	id iBLjMXMdimmtHAAAu9opvQ
+	(envelope-from <kvm+bounces-70628-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:46:27 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61AF11132CA
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:45:52 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 813631132F1
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:46:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E415C3033FCC
-	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 17:43:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EBA6D30205EE
+	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 17:46:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C3438A73B;
-	Mon,  9 Feb 2026 17:42:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509EB30DEA7;
+	Mon,  9 Feb 2026 17:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="W6WMPEB8"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="K6jt0sSv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3713C3803D6;
-	Mon,  9 Feb 2026 17:42:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E49469D;
+	Mon,  9 Feb 2026 17:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770658973; cv=none; b=U7oG8m5sbc8eIG57/plnvHHlynvqpiF60c6D+3kb2KW2xZ1zZBZ9vkUwcy285wVaAB2X8j78LUKVizP5R0JRFgrfnQl0al0zmNGDS21UqEj4qPqT2lqndhzP/bndTkQZS7aahA9YU/7gu0KeAt31Vfd7TTv1fsBXEjBUtl+7NAk=
+	t=1770659178; cv=none; b=ix/Xa/apLXwq+Xadlov0agQIYWaDfb1WrZ8xYdxau9DKUWk83T6M+Xt8MYvGdCgMAbqcvGN29e8lBpnuLvotDMSeePX0ILUNZI6k0MRR9K2hXzLKhlYjxDGIkyKycLG6Vm6hwjC2sGqm4SJhDsDh2eHW4ztCfWV4m992B3bfpE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770658973; c=relaxed/simple;
-	bh=4Ph7yzJBp1muwEHbFkXhjAB+O+UID50nelFAeq61LU8=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Cc:To:Subject:
-	 References:In-Reply-To; b=WyHqDIwak330+e6pUB/FnCqzM5znwQ3VvAogXFhIwgO/z8b33e2JQGmumpXwaSQmx6wEPzIMfA1bxP2Z/mZWSyRwc0cU8kwKTkEU5WUzjiszrxZPyNDYmDEHFplFsbAMCVekt4TfFjccJwQvLdRR8Si+/mrcbuevvtTWNiVZvN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=W6WMPEB8; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 619EBudl235984;
-	Mon, 9 Feb 2026 17:42:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=SoPnFT
-	eum20VCTputo4e45a7cCikqKyIY0Fca6BeD3w=; b=W6WMPEB8Uy7e2ZjqLfz4rz
-	o16gYm4D/BQW+Y6qHoqjmhxGsdhZ47LOrfpFF7KHgkreuVWNmtTvi+NFJAXlVhW+
-	LN+pFypRcph5OPsZERsSLkqTqf5RT26R7r8KJgHXbMplvB4BwoY/9urpjglKxQVh
-	0OSUp0YohgTsEVLuhc/F7sqOHOZszmX2ehvnbJKcqlIG/pO77V7MrxhI+IdVIYvM
-	x9yTSIxKcZgI4vXMNb0cKHv3MExPZKUuYt4VxaW6G++JGsiaJ+CMOsvsPRkAMW7R
-	T53cp4pPSUpnw+KSjtW/LG4TBH2eUaZBLh2tg5SH4VfW2DDt9Sd5nroLk2vaSJgg
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c696u8hya-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Feb 2026 17:42:51 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 619Gecdk002631;
-	Mon, 9 Feb 2026 17:42:50 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4c6fqseb4t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Feb 2026 17:42:50 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 619HgkAK61669670
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 9 Feb 2026 17:42:46 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1534C20043;
-	Mon,  9 Feb 2026 17:42:46 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E3CDA20040;
-	Mon,  9 Feb 2026 17:42:45 +0000 (GMT)
-Received: from darkmoore (unknown [9.87.130.153])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  9 Feb 2026 17:42:45 +0000 (GMT)
+	s=arc-20240116; t=1770659178; c=relaxed/simple;
+	bh=Aafl29YCpY9wL9VpWAuhlnYGQvdJhfos3x4bcokfCqQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GFUAtVw9zaB6kCHyuPND1rpGVa8WYKazNJhEXIkaxOQHHTt2yGrEJBgr9UwgP2+fcrxO3ihTApZeXTFY7scRITAs5ScWFxv8fhXfeECe507h3TZku1rmzBOPyFFPBX8hUPe0KKPDg0ZPX7Hisjx6PWmLUCwRgkIO6CfNpw7pkKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=K6jt0sSv; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 14D6540E035F;
+	Mon,  9 Feb 2026 17:46:16 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id OYgnUfpnbzad; Mon,  9 Feb 2026 17:46:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1770659172; bh=Mo4BiC8iK3Fxr4SmIv16+TFf9sfdghs1TCw0pO7CiXY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=K6jt0sSv0v4HH5NmN5IwPu52GKfZy/9bn/56Q7Q4Hmcqq0wMix8d7YNTxyb9nr3z1
+	 ABBYwZu0uihU9JY1Z3cK3Z3wg2yJcjFd5VmtBCFTuZd/Ij1oDkXiM9gnKtZ2tkT7de
+	 qojhrbvFljsAvIVOszzZ9DASBw/Qz/0XM+jhCf7M0IKMvhLUH04XaPzQLnXxMqr110
+	 9g4gTrludxmngiTDU+nPIE7aGR8fthwbLtaDZKWVDxWVppyFjATRUSHgLYpAFexUur
+	 3sJdYg52fDEoXRSMVf7W0GrAuF2h5RfLwQ10wnq4cHcukIU5IexXwZ1ZWH0bPjmRHv
+	 WRXbX71r+tEiZFJkcxVrSawhbiPwTGZ1xVUmcpivD1Wx1Dcm26KPw5bVVgrJfyPAm7
+	 nUAoJcw4dOkE9MZsvitLxx322KfVRo25WK3bJdoKZOiLGZ3mJK4QDB/f380EyYW73W
+	 V4Vt/UEn1cEchnOsK+sWr2uWb8f5bO7+lXOsPJxes3MrzgcTSUlk2evlwFX4wpHYgU
+	 mQ1QBpt+6ykRrdcrh5MqNratSzoAigOquViPQpLZ8O1jeajLoyFmVPNQV+BvT1TfsV
+	 RDp3+inVwdvQ0aXE/1FcQwzp4kaJBX3nAmI1AzIRljeLDsyfQc2rrHXLUehPnmy77w
+	 1L0v7Ecm91hMiRcriRwYlS94=
+Received: from zn.tnic (pd95306e3.dip0.t-ipconnect.de [217.83.6.227])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id AC13740E02E5;
+	Mon,  9 Feb 2026 17:46:00 +0000 (UTC)
+Date: Mon, 9 Feb 2026 18:45:59 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Carlos =?utf-8?B?TMOzcGV6?= <clopez@suse.de>,
+	Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>,
+	Babu Moger <bmoger@amd.com>
+Subject: Re: [PATCH] KVM: x86: synthesize TSA CPUID bits via SCATTERED_F()
+Message-ID: <20260209174559.GDaYodVxWsiesiedLJ@fat_crate.local>
+References: <20260208164233.30405-1-clopez@suse.de>
+ <20260208182849.GAaYjV4Vh8i0kznTEK@fat_crate.local>
+ <CALMp9eQmwsND7whnvVof1i=OsCdo6wcwBWyDRwS3Ud69WkKf-g@mail.gmail.com>
+ <20260208211342.GBaYj8hhtYM-lYfq-X@fat_crate.local>
+ <CALMp9eSVB=iRec2A0tmRzkTBa9zz4BVS8Lu79vUuRPrTawYFcQ@mail.gmail.com>
+ <e19b9666-b224-4fbd-92c9-82c712916a07@suse.de>
+ <aYn3_PhRvHPCJTo7@google.com>
+ <20260209153243.GBaYn-G02QE86Fje7g@fat_crate.local>
+ <aYoLcPkjJChCQM7E@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 09 Feb 2026 18:42:40 +0100
-Message-Id: <DGAM7SZPZQU4.3UM38Z6R1DB7Q@linux.ibm.com>
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-Cc: <linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <borntraeger@de.ibm.com>, <frankja@linux.ibm.com>, <nsg@linux.ibm.com>,
-        <nrb@linux.ibm.com>, <seiden@linux.ibm.com>, <gra@linux.ibm.com>,
-        <schlameuss@linux.ibm.com>, <hca@linux.ibm.com>, <svens@linux.ibm.com>,
-        <agordeev@linux.ibm.com>, <gor@linux.ibm.com>, <david@kernel.org>,
-        <gerald.schaefer@linux.ibm.com>
-To: "Claudio Imbrenda" <imbrenda@linux.ibm.com>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH v1 3/3] KVM: s390: vsie: Fix race in
- acquire_gmap_shadow()
-X-Mailer: aerc 0.21.0
-References: <20260206143553.14730-1-imbrenda@linux.ibm.com>
- <20260206143553.14730-4-imbrenda@linux.ibm.com>
-In-Reply-To: <20260206143553.14730-4-imbrenda@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=KZnfcAYD c=1 sm=1 tr=0 ts=698a1c9b cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8
- a=XBZ43gOJIXd42L75nJwA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA5MDE0NSBTYWx0ZWRfX0KGuyhabyvkx
- 2i5TIUIwyiSLieiy70DJxfdx6DSfxEqMoaQ/clG1CSkSlql1l/CGLMhefg6GDD1eC2eP6ri6Kfb
- 450ndgBT1kX6Qg0JGOt1uZGe5msFgy/c8HWoWKacV+c4qRcg65fO9SPZM7hbQ6SG8TSKEspOUbB
- y8kpt34IaYqasiRvFJ6lU2qdHR21rG89wD488nFPGh215z+reX/+L5/Jo0HprIVoOvkvgQ50ig6
- /YQyt+4pHUGCDb969ly9ZQmhrfV0BX/59VRSx4MwggHMO6t0H61OkJp1brAv1LhwydtgGs3Lujn
- 5mygFKkgQZMMbFesHyk0WXl7dWh9gujOtlnVRrp70z8u37brIDzP6buu8qfKnzPDA8WTNTrooRt
- lWBsXozztnSX7wnoqH9VJCda9zFbiIYz1xc6FvAId4IvJ5KzpAaXiKDXMa68gs+B6JuHowmsvQK
- 1Z9HEziQZvplg9cL7dA==
-X-Proofpoint-ORIG-GUID: NksxR-cadwXkKTxqUI262NmHaQ2oiJEU
-X-Proofpoint-GUID: NksxR-cadwXkKTxqUI262NmHaQ2oiJEU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-09_01,2026-02-09_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 impostorscore=0 bulkscore=0 priorityscore=1501 adultscore=0
- clxscore=1015 suspectscore=0 phishscore=0 malwarescore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602090145
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aYoLcPkjJChCQM7E@google.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	DMARC_POLICY_ALLOW(-0.50)[alien8.de,none];
+	R_DKIM_ALLOW(-0.20)[alien8.de:s=alien8];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-70627-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.ibm.com:mid];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[schlameuss@linux.ibm.com,kvm@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70628-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bp@alien8.de,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[alien8.de:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 61AF11132CA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[alien8.de:dkim,fat_crate.local:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 813631132F1
 X-Rspamd-Action: no action
 
-On Fri Feb 6, 2026 at 3:35 PM CET, Claudio Imbrenda wrote:
-> The shadow gmap returned by gmap_create_shadow() could get dropped
-> before taking the gmap->children_lock. This meant that the shadow gmap
-> was sometimes being used while its reference count was 0.
->
-> Fix this by taking the additional reference inside gmap_create_shadow()
-> while still holding gmap->children_lock, instead of afterwards.
->
-> Fixes: e38c884df921 ("KVM: s390: Switch to new gmap")
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+On Mon, Feb 09, 2026 at 08:29:36AM -0800, Sean Christopherson wrote:
+> Nope.  KVM cares about what KVM can virtualize/emulate, and about helping userspace
+> accurately represent the virtual CPU that will be enumerated to the guest.
 
-Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+So why don't you key on that in those macros instead of how they're defined?
 
-> ---
->  arch/s390/kvm/gmap.c | 15 ++++++++++++---
->  arch/s390/kvm/vsie.c |  6 +++++-
->  2 files changed, 17 insertions(+), 4 deletions(-)
+	EXPOSE_TO_GUEST_F()
+
+and then underneath we can figure out how to expose them.
+
+We could have a helper table which determines what each feature is and how it
+should interact with raw host CPUID or something slicker.
+
+>   F               : Features that must be present in boot_cpu_data and raw CPUID
+>   SCATTERED_F     : Same as F(), but are scattered by the kernel
+>   X86_64_F        : Same as F(), but are restricted to 64-bit kernels
+>   EMULATED_F      : Always supported; the feature is unconditionally emulated in software
+>   SYNTHESIZED_F   : Features that must be present in boot_cpu_data, but may or
+>                     may not be in raw CPUID.  May also be scattered.
+>   PASSTHROUGH_F   : Features that must be present in raw CPUID, but may or may
+>                     not be present in boot_cpu_data
+>   ALIASED_1_EDX_F : Features in 0x8000_0001.EDX that are duplicates of identical 0x1.EDX features
+>   VENDOR_F        : Features that are controlled by vendor code, often because
+>                     they are guarded by a vendor specific module param.  Rules
+>                     vary, but typically they are handled like basic F() features
+>   RUNTIME_F       : Features that KVM dynamically sets/clears at runtime, but that
+>                     are never adveristed to userspace.  E.g. OSXSAVE and OSPKE.
+
+And for the time being, I'd love if this were somewhere in
+arch/x86/kvm/cpuid.c so that it is clear how one should use those macros.
+
+The end goal of having the user not care about which macro to use would be the
+ultimate, super-duper thing tho.
+
+I'd say.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
