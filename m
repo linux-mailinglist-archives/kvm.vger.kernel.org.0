@@ -1,244 +1,224 @@
-Return-Path: <kvm+bounces-70631-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70632-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oIktAxIgimnLHQAAu9opvQ
-	(envelope-from <kvm+bounces-70631-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:57:38 +0100
+	id 0KEtEC0gimkAHgAAu9opvQ
+	(envelope-from <kvm+bounces-70632-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:58:05 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19D9E1134CE
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:57:34 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0330113506
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:58:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9745F3006932
-	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 17:57:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3FDD83008302
+	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 17:58:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15ED038A71A;
-	Mon,  9 Feb 2026 17:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40956388868;
+	Mon,  9 Feb 2026 17:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C3rTuoS9";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="tsioLPbG"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AVzIrf4q"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C59438A718
-	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 17:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770659831; cv=pass; b=pp5uEeGQ6mcEWONHrQ5bNzykWYYmM2wfWo3860DioX0gbHZVhU5HEywqzw0PE2uVZWQGFxV8xrX4s4iOYru/I88cQIsTIrOES3u8QAqzm065LaWJQoKrgCAOCphRUg87hX/o90ncRwgdeenPr73kh9zb+jCInt8Xg5df6+iKcrE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770659831; c=relaxed/simple;
-	bh=iyf5LW7Q2q2SZrfrG6VzUnV6etNUwfmVVCw1SJ24uns=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dqD/w+rqPTOcYDDeS4ZoVlkJRacuGzYTdbmSCM/R8OID5aK4DYHpXnz2eSKdy0AJMdhcb8ep1tDX0r8V02xRQ+c/jEo9IuyTFLGCCvSgrDHh+KWMNqthCTd04fwAMWICvo7SFdv8Q729UphUErZbHKLwqWT0YrY90mFCoZPbn0I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C3rTuoS9; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=tsioLPbG; arc=pass smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770659830;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j3Tnz2ob5sHCn1DUQ27zBsLiCopUHY52MduCqB5z46M=;
-	b=C3rTuoS9kz/GOoIFBtBCx36V0Pn2dJWoDtiuMfb1DmOI2OslFfPAx4y4wdKmHIZH6Kpo1U
-	9pmp9QGxVD3WZt7B9HddUkaxM5izjeFRC0p5CR2UIFX0vKuaO44fvdaGXRAaDJxrmBMTYd
-	Pujp9qdNhu+6PRmoCbFj8O+grkek20g=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-510-mSUe759QNNGFUjeSHa_dWA-1; Mon, 09 Feb 2026 12:57:08 -0500
-X-MC-Unique: mSUe759QNNGFUjeSHa_dWA-1
-X-Mimecast-MFC-AGG-ID: mSUe759QNNGFUjeSHa_dWA_1770659828
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-435991d4a3aso2928199f8f.1
-        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 09:57:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770659827; cv=none;
-        d=google.com; s=arc-20240605;
-        b=F9jfYuEEiYuJkD3h5XKFhWuR0urzt6XfG7q79ws9OUL0A58wW9rTldefHCyHxS5uNA
-         pk9VfW7Zs8hNvb90LdKrvff7zGMerMQu8psNT7ghrfb7Qg/MibnoR+zRrsMg2EHB8/i3
-         epVEkBTU4FWddPivrULGWqZnaIw0rxxrvRbKi/6LE+a8NQ9eiu067FEvCf9KrLGu1s7q
-         xsRcjtKrQma7eTdnzYryhLPTju43qsrnqon/CSsLrNuvLUxnFhECa3SC/8pj/mWQcVcm
-         qSFTGMgzuzIvL/eUaIc2rUiorwAnw4SWRmffS21xoLq4INL6ASI18N/ncuiXxVtPh7fE
-         eW8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=j3Tnz2ob5sHCn1DUQ27zBsLiCopUHY52MduCqB5z46M=;
-        fh=qaYm4b6GKYlZ0T3gtLZ7fjEfCEC8jMv5XzYe6fOhw1Y=;
-        b=QZiSVr4VyYhOYDcEiIMZerXy7zZjCkPRXlSkCUnfuUcdcVEnor8eglmFH5cNjRtNIV
-         P5C12WOmlX31QvRgB7HPCkzG9KmSrSKPyrUZqTdTSRVH0YozfVqA5ZGS5Ism4e+UXSrC
-         2P4kEkOUL26ZXvdLz4c2qF7qUnHkOOHHO7WMhbGbPsV48u+kFU+YzbZIlFoGgZJfAyOX
-         VmADbWSt9P2xXcww4MG8900/P0iicz0RX3LouIIZszfa2xsNfNuO36ZkNgx2ZMFYjFDQ
-         rrIQ7FDmmK2PckrSnozOuXT8o2flgVIHSNDRhUsLtNeFl63NrHAmXzxC6iHUSFOqYM99
-         cq8A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDD33859F7
+	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 17:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770659879; cv=none; b=bt6vhG2wwdFM/19YYIja4y4UzJL7Jswl0UX9sxXevYpVDewyRNwNk42uml1Ae8mHnyZjHMa+RJDCGDjia3SC4cRdA4VTCvpMbF+W5q+7yLTpeIHQD5LEV/ZHtM/roiLUAr7P9YlQTHQzLx/WqJIk5/NZhBxTrd2RpK3ZRPNHoeY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770659879; c=relaxed/simple;
+	bh=3NyXFa+S89ymbQkKUMeDnz0h6yIR4gp82l+doxmHYoU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XmmDMI9g2Hpw5bpUGHOO4Z9/bUaWtOrKfM6oWa13ZEdmaDFDu/M7vROvc0a9RGHLHb34Y+gRfaQrQQ/u72Z2Ih4siyk8YRy/finJbevpH3GtlkN4VRmz2LrB++HH5BeWkubW4PWhzRqYrY9ejyv499TMZBH5fxttgnTG1YjVoNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AVzIrf4q; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-8230c33f477so2100666b3a.2
+        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 09:57:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770659827; x=1771264627; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j3Tnz2ob5sHCn1DUQ27zBsLiCopUHY52MduCqB5z46M=;
-        b=tsioLPbGYcNtvAiycioM1FY7HA1RYkdeA17p40+LxiMJolkpG+/bdSpKvfphv7K04i
-         V2owFzin2CHwh1YGVxf3YYrtHUPeS9dEF/zy9vM6L882NA2Opi+x8OYLjrLlADdMkBXo
-         xI/+2c+7Ed1JDXv+Zh56+1+pk93fZensvFjpU8x6KOlzk13Juh1bQM1UX6f/SnUtF2aY
-         RiDe36beQ8Sc1bLKP2ziWZ7DfsRgTmOA4DozkZVzAsogC70zmBsIgae5nJ+a1tukg8tu
-         6ss+9VqkA7ofMCQ1527myagX9JHmg3vIo1vTOEv8oyFYVR//QNMn6sH/89YJRJSsIMeB
-         jC+w==
+        d=linaro.org; s=google; t=1770659878; x=1771264678; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=goZOlZLCqcIlvHYlFxEFSnDWqilzIfXz2/b0/0428dk=;
+        b=AVzIrf4qu6KhmCP24capWrU3X0TqF1BUdxICzDHhvdfACLGRxfCv5wnN7wWmT7IMZ5
+         v4hTvQIgKDKIMuKX5g3rH0rBthi+7u6kJ7MRRfScs51qqjl/sv+ytXBuEwj5ogZCCldh
+         t8r4SKVeq3P5oAMvUPOlsAPbOawPRrapc6gmRFNNz9W3gF3LPX+VvEvP/E3pOSP20lYk
+         bAQBC+qKTk860tzx4mtasQeXWRyk///mObvxQBBrZFKc9zbY14e7vsvf9TzE0tVQhq0I
+         MgwNiszCGhTA4S/GMaZWMobloc1vhWpXaCF3xMbwUNSEq8MxiHTeK0TVHxTPaoqZDq3S
+         t/Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770659827; x=1771264627;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=j3Tnz2ob5sHCn1DUQ27zBsLiCopUHY52MduCqB5z46M=;
-        b=gWNlqNGXtXA+3dXzHxqgFKFaLuWRmpzgJU33SBld5lr9Jxt0kcD1orqh1dud0j/IQz
-         76OUXL0Ngl9Kq/7oS6ZcLTq1bcV+UuhRrMXGoPJfhEdkyMS8BiFSo7ZcpWawbEdQPOdj
-         UNep499Vl/0FkBtnPcPovxpT2AfgzzFqVQYdzVJ2ah3cCdodwzmtAQ3z/DEoX+n8aqvn
-         PSfTqzrQDgRKDt/EJYm/A7GU8QOhOt9bRmqraYIV7FHvm/HKDB54mZ+0fbuIFU2OrN/u
-         XZery2STuQHgauunCb8BVqt2M4rOBhiqwK7JlxAbfCd5dLs+ezDwnERemvC7SfGv28oM
-         Vvvg==
-X-Gm-Message-State: AOJu0YwDnQAMN9mISgWimp5j4e8vCrjX1n+LUAbVrnYWc4So0uZ+pq0I
-	NaeoPQ58eyjn4yK0AvfSQiouhbS3qTLBorXYU5yZqvyLiJfmqnfyEyRLyVfeeLhvxg5KziGjAS9
-	DQYSrL6EgwuL3rNSJMUL01RjIc1x5G5A1beva55I0QQgQLo9AiJbkmyb72GFWvMcyHVqGOIUMjJ
-	j2kGjxpase2Mphojxdwhr5W+w29J9C
-X-Gm-Gg: AZuq6aLmZ3wrMsAV7BfODhos7wMJV0fLE64ENjL59pal4cCW7dE8oBDopmklChm7cJc
-	clplwHBi02bNtGJDb6yG6FBC4un3pCagmfBHHo4WxW0kd+gOxJu+z3XGc6xB9PeiBL0cXiH2wZt
-	v2/4pfDAhqcSb8IQrEfsUQDMqOPEpBpRK5dQh51YhJftOqvqLhcY6eYyADzSSyE5zgxop0lvVhy
-	BN8xMGLcR8ti2Q2C83kSV02Rg1wBXR2NXSjDtc7ZBVgZCSRkUwJs4eNFTrgqUKZuAsw3w==
-X-Received: by 2002:a5d:5f54:0:b0:435:9ce0:f93c with SMTP id ffacd0b85a97d-4362969509amr18892133f8f.62.1770659827512;
-        Mon, 09 Feb 2026 09:57:07 -0800 (PST)
-X-Received: by 2002:a5d:5f54:0:b0:435:9ce0:f93c with SMTP id
- ffacd0b85a97d-4362969509amr18892099f8f.62.1770659827040; Mon, 09 Feb 2026
- 09:57:07 -0800 (PST)
+        d=1e100.net; s=20230601; t=1770659878; x=1771264678;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=goZOlZLCqcIlvHYlFxEFSnDWqilzIfXz2/b0/0428dk=;
+        b=J/yS1oZlnxoyeD1M9ieS0Sz97p2sfwGzBNIJZHwnOAYyESkHnAhwWic9Y7dNT1REw/
+         +2+YaSWYIzNe6Mazth+lZAUlXTKIFdlJhL8SN06z7yhYwWm/Hk0XE/4h61GatjN/Usqu
+         y5wlqPK3UVti40eIx/T85N/KGoJ1kqeqZWvbQw1Akg9bTv6y3pAdA8yPqjwTMdl7JCgQ
+         6FOe/7wYVPMjO/Z6qZ7kLYiBcvlIGaVvpJhZSRt/401ATh16dNnP4q+usWUgcjb7QCsL
+         YSBa7GeQfjibSC3yp6UDdh/a4mqWwDyM6bv/R1WxGIvhAKHwYexx/2STgZlWGLWaMWqc
+         IOCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUd/HTUDDZuN+zrNH0rbqe3EuMcZxR6fA2U9y/oiibWKTMABjxHi8kc8Xz9gZnOrGge0wM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwChTS65FzxoS/m6JOuZL2sXluVyyG8MzNZ2dk0yRPaT/ohQ8p9
+	SylMHOoNP56q3JkwduFku9yLo5l126CEdC5V2uXVq+qD2hu4xCkTCH4UQox0elsU6NibK6YZlIl
+	9OCuh
+X-Gm-Gg: AZuq6aLd7cMbPlvIMWV/d5B/L0mG7UUjokiBnaQL8Kpwq64i/hYvWlGd7btp0F2vr9v
+	c9szbrLUA1nr9693fzkvqUG7pknfFBXrovPUS4NLuA0RfzNbhUVe5RGMFa6W/usdcpPlE5izWiD
+	0QrBAfyP2cho2V8+iUrlcC3zGbtIrhHfcrLLzXQhDkQegCYCngw+VcqcwLVJQ6Y3IwIfCWoj116
+	kyNmeZJAsqBZBYtr+TOD/EDXVy8roEDvy88i/fLU7hUuuRWeDL0NXiY4CMwijTfHcIoUhnoLM0z
+	VXhPlyNKn1iN0lHKh2Yy2B5+xvXuPfpT/plNN4M1CB1AIMkVSKMkhxXIwYaQTxW6mDUMOAYqbsR
+	JzCbW8Zd8TyV7goxO6SM8HJn2elgtL1hbHWx/GoEgqwOq4VrHdVjvWRdrMEgoORkY0644J1yRdu
+	Xidz8Mxc5d4Zd8asy9kr+MzTOj76YW1DEYQZiBgWbKx3fXhIYdznXYy66r
+X-Received: by 2002:aa7:888f:0:b0:81f:41c8:765a with SMTP id d2e1a72fcca58-8244160089amr11519701b3a.4.1770659878485;
+        Mon, 09 Feb 2026 09:57:58 -0800 (PST)
+Received: from [192.168.1.87] (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-824418b60easm11015905b3a.55.2026.02.09.09.57.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Feb 2026 09:57:58 -0800 (PST)
+Message-ID: <c0b0691b-3cef-4ec7-8d68-227420167481@linaro.org>
+Date: Mon, 9 Feb 2026 09:57:56 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260207041011.913471-1-seanjc@google.com> <20260207041011.913471-5-seanjc@google.com>
-In-Reply-To: <20260207041011.913471-5-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 9 Feb 2026 18:56:55 +0100
-X-Gm-Features: AZwV_Qjz0Pqw1xueGCX-m7gFxI4JunDDvBMSnNdsK0oHlKuKr529ZXVqkSUL8WM
-Message-ID: <CABgObfatae4rtioViKGueFG9=Qm=qEmvXQp=8LWhZnUMML7_9w@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM: x86: Misc changes for 6.20
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 06/12] target/arm/tcg: duplicate tcg/arith_helper.c and
+ tcg/crypto_helper.c between user/system
+Content-Language: en-US
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: anjo@rev.ng, Jim MacArthur <jim.macarthur@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, kvm@vger.kernel.org, qemu-arm@nongnu.org
+References: <20260206042150.912578-1-pierrick.bouvier@linaro.org>
+ <20260206042150.912578-7-pierrick.bouvier@linaro.org>
+ <6c5eb308-56e6-487a-ad7b-8f0da70ab7cd@linaro.org>
+ <e291f290-a188-4106-8648-48d4c464dfed@linaro.org>
+ <a6320ab4-7ece-4618-8d73-549df7a34886@linaro.org>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Autocrypt: addr=pierrick.bouvier@linaro.org; keydata=
+ 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
+ ZtfdHNZotF092MIH0IQC3poExQpV/WBYFAI=
+In-Reply-To: <a6320ab4-7ece-4618-8d73-549df7a34886@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	TAGGED_FROM(0.00)[bounces-70632-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pbonzini@redhat.com,kvm@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-70631-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+]
-X-Rspamd-Queue-Id: 19D9E1134CE
+	FROM_NEQ_ENVFROM(0.00)[pierrick.bouvier@linaro.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F0330113506
 X-Rspamd-Action: no action
 
-On Sat, Feb 7, 2026 at 5:10=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->  - Add WARNs to guard against modifying KVM's CPU caps outside of the int=
-ended
->    setup flow, as nested VMX in particular is sensitive to unexpected cha=
-nges
->    in KVM's golden configuration.
+On 2/8/26 11:08 PM, Richard Henderson wrote:
+> On 2/9/26 15:52, Pierrick Bouvier wrote:
+>> On 2/8/26 9:00 PM, Richard Henderson wrote:
+>>> On 2/6/26 14:21, Pierrick Bouvier wrote:
+>>>> In next commit, we'll apply same helper pattern for base helpers
+>>>> remaining.
+>>>>
+>>>> Our new helper pattern always include helper-*-common.h, which ends up
+>>>> including include/tcg/tcg.h, which contains one occurrence of
+>>>> CONFIG_USER_ONLY.
+>>>> Thus, common files not being duplicated between system and target
+>>>> relying on helpers will fail to compile. Existing occurrences are:
+>>>> - target/arm/tcg/arith_helper.c
+>>>> - target/arm/tcg/crypto_helper.c
+>>>>
+>>>> There is a single occurrence of CONFIG_USER_ONLY, for defining variable
+>>>> tcg_use_softmmu. The fix seemed simple, always define it.
+>>>> However, it prevents some dead code elimination which ends up triggering:
+>>>> include/qemu/osdep.h:283:35: error: call to 'qemu_build_not_reached_always' declared
+>>>> with attribute error: code path is reachable
+>>>>      283 | #define qemu_build_not_reached()  qemu_build_not_reached_always()
+>>>>          |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>> tcg/x86_64/tcg-target.c.inc:1907:45: note: in expansion of macro 'qemu_build_not_reached'
+>>>>     1907 | # define x86_guest_base (*(HostAddress *)({ qemu_build_not_reached(); NULL; }))
+>>>>          |                                             ^~~~~~~~~~~~~~~~~~~~~~
+>>>> tcg/x86_64/tcg-target.c.inc:1934:14: note: in expansion of macro 'x86_guest_base'
+>>>>     1934 |         *h = x86_guest_base;
+>>>>          |              ^~~~~~~~~~~~~~
+>>>>
+>>>> So, roll your eyes, then rollback code, and simply duplicate the two
+>>>> files concerned. We could also do a "special include trick" to prevent
+>>>> pulling helper-*-common.h but it would be sad since the whole point of
+>>>> the series up to here is to have something coherent using the exact same
+>>>> pattern.
+>>>
+>>> tcg_use_softmmu is a stub, waiting for softmmu to be enabled for user-only.
+>>> Which is a long way away.
+>>>
+>>> It's also not used outside of tcg/, which means we should move it to tcg/tcg-internal.h.
+>>>
+>>
+>> Thanks, I didn't think about moving it somewhere else.
+>> This does the trick indeed.
+> 
+> You can also make it always a #define.  The variable for user-only is never set to true.
+> 
+> 
+> r~
 
-Possible follow-up: does it make sense to sync kvm_caps.supported_xss
-by calling kvm_setup_xss_caps() from kvm_finalize_cpu_caps()?
+Sure, let's go for a define then. :)
 
-In the meanwhile I've pulled this of course---thanks!
-
-Paolo
-
->  - Add a quirk to allow userspace to opt-in to actually suppress EOI broa=
-dcasts
->    when the suppression feature is enabled by the guest (currently limite=
-d to
->    split IRQCHIP, i.e. userspace I/O APIC).  Sadly, simply fixing KVM to =
-honor
->    Suppress EOI Broadcasts isn't an option as some userspaces have come t=
-o rely
->    on KVM's buggy behavior (KVM advertises Supress EOI Broadcast irrespec=
-tive
->    of whether or not userspace I/O APIC supports Directed EOIs).
->
->  - Minor cleanups.
->
-> ----------------------------------------------------------------
-> Jun Miao (1):
->       KVM: x86: align the code with kvm_x86_call()
->
-> Khushit Shah (1):
->       KVM: x86: Add x2APIC "features" to control EOI broadcast suppressio=
-n
->
-> Sean Christopherson (6):
->       KVM: x86: Disallow setting CPUID and/or feature MSRs if L2 is activ=
-e
->       KVM: x86: Return "unsupported" instead of "invalid" on access to un=
-supported PV MSR
->       KVM: x86: Enforce use of EXPORT_SYMBOL_FOR_KVM_INTERNAL
->       KVM: x86: Ignore -EBUSY when checking nested events from vcpu_block=
-()
->       KVM: x86: Drop WARN on INIT/SIPI being blocked when vCPU is in Wait=
--For-SIPI
->       KVM: x86: Harden against unexpected adjustments to kvm_cpu_caps
->
-> Vasiliy Kovalev (1):
->       KVM: x86: Add SRCU protection for reading PDPTRs in __get_sregs2()
->
-> Xiaoyao Li (1):
->       KVM: x86: Don't read guest CR3 when doing async pf while the MMU is=
- direct
->
-> Zhao Liu (4):
->       KVM: x86: Advertise MOVRS CPUID to userspace
->       KVM: x86: Advertise AMX CPUIDs in subleaf 0x1E.0x1 to userspace
->       KVM: x86: Advertise AVX10.2 CPUID to userspace
->       KVM: x86: Advertise AVX10_VNNI_INT CPUID to userspace
->
->  Documentation/virt/kvm/api.rst     | 28 ++++++++++++-
->  arch/x86/include/asm/cpufeatures.h |  1 +
->  arch/x86/include/asm/kvm_host.h    |  9 +++++
->  arch/x86/include/uapi/asm/kvm.h    |  6 ++-
->  arch/x86/kvm/Makefile              | 49 +++++++++++++++++++++++
->  arch/x86/kvm/cpuid.c               | 75 +++++++++++++++++++++++++++++---=
----
->  arch/x86/kvm/cpuid.h               | 12 +++++-
->  arch/x86/kvm/ioapic.c              |  2 +-
->  arch/x86/kvm/lapic.c               | 77 +++++++++++++++++++++++++++++++-=
-----
->  arch/x86/kvm/lapic.h               |  2 +
->  arch/x86/kvm/mmu/mmu.c             | 11 +++---
->  arch/x86/kvm/pmu.c                 |  2 +-
->  arch/x86/kvm/reverse_cpuid.h       | 19 +++++++++
->  arch/x86/kvm/svm/svm.c             |  4 +-
->  arch/x86/kvm/vmx/vmx.c             |  4 +-
->  arch/x86/kvm/x86.c                 | 81 +++++++++++++++++++++++---------=
-------
->  arch/x86/kvm/x86.h                 | 15 ++++++-
->  17 files changed, 328 insertions(+), 69 deletions(-)
->
-
+Regards,
+Pierrick
 
