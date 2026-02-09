@@ -1,80 +1,83 @@
-Return-Path: <kvm+bounces-70650-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70651-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yOJNEY1iimleJwAAu9opvQ
-	(envelope-from <kvm+bounces-70650-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 23:41:17 +0100
+	id +BtqDppiimleJwAAu9opvQ
+	(envelope-from <kvm+bounces-70651-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 23:41:30 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3EE011518B
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 23:41:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B51A11151BA
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 23:41:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DFB84303183B
-	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 22:40:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 375343037D43
+	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 22:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0705318EE5;
-	Mon,  9 Feb 2026 22:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF2A314A94;
+	Mon,  9 Feb 2026 22:40:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HhXL+lHX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="omAswZb5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
+Received: from mail-oi1-f202.google.com (mail-oi1-f202.google.com [209.85.167.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD18315760
-	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 22:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E034E317708
+	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 22:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770676847; cv=none; b=uRam+QFeHeuDlWRNQetJZHB8ld2zz70oGRSr3DLSNEeyZkdwGTRq8QWMtjk9GJyMIQFX3HhCNr0WoJvdfIm1al20MagJVHkly1DvfbZzBbBNerLvbA+aiF7OA2Luu0lr+wub4lk/YUd25KTL/V6rIVrhtVPZ0NUAqIyHZW2ao2M=
+	t=1770676847; cv=none; b=M3AZosabvKbeWegj6C0jD9JNVfOwR0WX67A/ZsNm9pME2619C7OK9pl8ms2LnxGZ5AUGGuhCKIL96LCuLpOpxDS9q5SxSyl01Y89LPi6apV78q6CYl/0WfzFShOp7Gx8CzfegFUyOlB3BvlDNJ5H6s8GU381xD55Ln/TZhnuYtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1770676847; c=relaxed/simple;
-	bh=2w2NkSfnUYCtKCT1TvD2j7eUbaB9dlOlqow5wyJZoKY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=eIXPv3K4pxXQE1MVBKlA5CTLbMY5KlFDTysGPQlFvjzu04+x3DM1NhX1+lKnHaKcR8h7WpVZHX2EdGSUmZ8fOyB39lBj08QS2aw0XlASQqFyugEYuJ989xnjcCsXgiJfrUH+kQmGgmuxlu5kzWmnG4PfeMQCPy4CaAc1AIs+pps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HhXL+lHX; arc=none smtp.client-ip=209.85.161.74
+	bh=6+/AAsrIcJ/tlip7YRHDsjoPFsDxdedlbrM0lqMPkcI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=KX8rnpJIiQ73wjfSDn2bGGpg0ZAk88ZUIDL9ndv1WFeerq5cAmbLr5rgDsK+W24Uxdam9U/yQ1hZiYgbhjxDbDBT2lMsuvxt1duH6U6nmrDpjqYFJCFipVLJPKIOYEMM1/bx5Pbr3IMhfWDvqz0QcPDobbBICJq2euKSbk+ZIHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=omAswZb5; arc=none smtp.client-ip=209.85.167.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-663006e4c3cso1123175eaf.2
-        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 14:40:44 -0800 (PST)
+Received: by mail-oi1-f202.google.com with SMTP id 5614622812f47-45ee72d15f7so877552b6e.2
+        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 14:40:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770676844; x=1771281644; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=30Nas80AMvo6RyW+BR+2WwHJbWJfG1zda4JX9g84//U=;
-        b=HhXL+lHXdq2/jXdePqpenUlxL1QhrhU2eUgJlgQ2aztzvzgtrzsF+snXRALa4WyjCs
-         Jfy175SB0ER6ISIkj+UJh4Jsn2qk578bJphXpHTEanqTwfx3xZx8kaCkZGX7OCWSpc55
-         IAxUvrn3sOiiH33g4L1rLvoVfGKPYeaf45TRrAihX3HPIH4UwpifJQ05kROyFEXLmMN4
-         nBCIPnm7DWSoJ3kX1v0u03wO5VwM5Rwgp9m7OZqcXWR50n42iRCtdXLWig17PgkjoHTf
-         qJ+AA2Ezb6tzVTMCriGAdffxGVFgodmCAkup/s/+qESwB5LIiDt0DHIyYZcSdUP+oKca
-         INFQ==
+        d=google.com; s=20230601; t=1770676845; x=1771281645; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iRE+uiZ0XUNzFGmxnXVrfreBhjJPUlvjb1s52PGeIK4=;
+        b=omAswZb566EMnpAmqCd+XqybWKN04qDDUrYy76S7aZy77qMqpscdVzb/Vz7F8lmUft
+         3UVkv2E8jnXFgitrE5Jsr3Y/Px++T9H1wBsRTbiyNFfUuVjSNKE3/B8I+C4dDHux2aob
+         ASGUEguW8TbH6qcs065+ciu2mW/OR5mTxqDr3oTe+VGBSkYshszX0V0ydbwSQW4dwTM+
+         iCM3KQOg9kfRAiQpnZv1ittXdoo0PI3KHhIFkCQyeZhdHALRZy+FWQIMs0CJ92KtSMEL
+         S+S0r2nkA3AyZ0kaHy9ueGxkIX3IM2feyIONtaEQeN2owvKrrbm2OQvoScSo/RFfrFUN
+         0e0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770676844; x=1771281644;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=30Nas80AMvo6RyW+BR+2WwHJbWJfG1zda4JX9g84//U=;
-        b=jOdqZl7eLGuA6zHHWGrEnYk5qP3oXxjP/RaXqKUhNL1iZqtU3aPyMKH8SrqwWsmc0/
-         GpQm2HgVgcXL7JtmLp41uXraTXfUjR0Pu3pGYpnfKO0TmcCPRjNSEI9ssgHhybA9TWsd
-         qhLBcVh+Z9jOn7gDxs4w0/EEMwWiX3u+h/5Ntm2SuPn3TBMFQWYKCtkOcn9Jg8URMGKh
-         ryIaL+57TuerlzyFEYAva/+l0GeJnoGpIk/jEoT4WU2COJoIZHJHCF91bR6zPbUno5Zx
-         d+4StDjkY27fupr67P+3h/c9b/2rf7Njkhy+e427Evwqufz6iMekYqBVYPpViaC8HjUU
-         ryPg==
-X-Gm-Message-State: AOJu0Yz/qnLyHQHU3zXGhettOZ0WXgkNuBU0HtYEgDsa2CoaTtdrXz4f
-	AVIbhr0Ik8Kbzlo+1C8pSJGG51fZKUNltpvW/bhfw0/kunS3EuJMOiScRm99iJxua8oAek5Zlj9
-	0HTh/wCGIBIW7kPG43Cnb9frhaxaTpUFqvpdLNWg5jlaVBUy5/1E7mRPXQiauE5q6vlqKRYC46/
-	hNmiqd7zSsVSf0F6qkiQcM0DF+PNhM32biAc3doE2FATPeYy2/IZkD2YxflSI=
-X-Received: from ileg3.prod.google.com ([2002:a05:6e02:1a23:b0:467:9e40:e391])
+        d=1e100.net; s=20230601; t=1770676845; x=1771281645;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iRE+uiZ0XUNzFGmxnXVrfreBhjJPUlvjb1s52PGeIK4=;
+        b=pHGWMS8IsH69rQ0n805mrmxVEt7cVYgyCV60dqipvsg8+GDuDgGodw0csLqYsJZEla
+         BzXkoHhlO1+NAOrR3df3XVGyIxpA/3CWGMZC+46GqFU0q1wnY+OzND89T6NRW32Gndhq
+         Q1DZGL+nUt4gNJfLXn87Sc46pT48IHrBgU+GXppKhYTB0+FO4ftyOJVdH87cGGZoQoot
+         Yclio+QrOaw3WVawWL//+LA4qy1gTFzlkRWEBl/kr+DSqevZ9xYjVLw5tYCeEFuvSYHx
+         6D4uc9O1ZE2bltUrN6Pcrwtu/VlPLgZQWHf094LNo7GP2yJhITCB451x7f7nH+rlnjjF
+         GWCA==
+X-Gm-Message-State: AOJu0Yy4+YmTttc4kYWY31nNA/Bd4rvYwoiwrPBB2oangVHFFMwuP9LL
+	pxT4FoR9XxLH+XM9wxpczzTnKNltvzsgnis803VgJkKCrvp/ccj2DJZibX317ncBDlc3Rc6HAbG
+	0OapmLSDXY+6YXP/0ayNOco7Ubtv45B6I7c+VAkePQQg//hnaJO74jsSvK7BkDCdZgxwuZFJHcn
+	6ekCiFKcorzZXdsz2Cn4ulKhrdYg0vatckwpRRVriIHIiqUPAXjgDMdfoopMU=
+X-Received: from jamu20.prod.google.com ([2002:a02:c054:0:b0:5ca:f895:d041])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:220b:b0:664:86ce:df46 with SMTP id 006d021491bc7-66d0c472fd0mr6437177eaf.57.1770676843797;
- Mon, 09 Feb 2026 14:40:43 -0800 (PST)
-Date: Mon,  9 Feb 2026 22:13:55 +0000
+ 2002:a05:6820:4b17:b0:663:93:5146 with SMTP id 006d021491bc7-66d0bdae77emr5791796eaf.43.1770676844869;
+ Mon, 09 Feb 2026 14:40:44 -0800 (PST)
+Date: Mon,  9 Feb 2026 22:13:56 +0000
+In-Reply-To: <20260209221414.2169465-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260209221414.2169465-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260209221414.2169465-1-coltonlewis@google.com>
-Subject: [PATCH v6 00/19] ARM64 PMU Partitioning
+Message-ID: <20260209221414.2169465-2-coltonlewis@google.com>
+Subject: [PATCH v6 01/19] arm64: cpufeature: Add cpucap for HPMN0
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -106,7 +109,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[23];
-	TAGGED_FROM(0.00)[bounces-70650-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70651-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[coltonlewis@google.com,kvm@vger.kernel.org];
@@ -114,152 +117,97 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,gitlab.com:url]
-X-Rspamd-Queue-Id: A3EE011518B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B51A11151BA
 X-Rspamd-Action: no action
 
-This series creates a new PMU scheme on ARM, a partitioned PMU that
-allows reserving a subset of counters for more direct guest access,
-significantly reducing overhead. More details, including performance
-benchmarks, can be read in the v1 cover letter linked below.
+Add a capability for FEAT_HPMN0, whether MDCR_EL2.HPMN can specify 0
+counters reserved for the guest.
 
-An overview of what this series accomplishes was presented at KVM
-Forum 2025. Slides [1] and video [2] are linked below.
+This required changing HPMN0 to an UnsignedEnum in tools/sysreg
+because otherwise not all the appropriate macros are generated to add
+it to arm64_cpu_capabilities_arm64_features.
 
-IMPORTANT: This iteration does not yet implement the dynamic counter
-reservation approach suggested by Will Deacon in January [3]. I am
-working on it, but wanted to send this version first to keep momentum
-going and ensure I've addressed all issues besides that.
+Acked-by: Mark Rutland <mark.rutland@arm.com>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
+ arch/arm64/kernel/cpufeature.c | 8 ++++++++
+ arch/arm64/kvm/sys_regs.c      | 3 ++-
+ arch/arm64/tools/cpucaps       | 1 +
+ arch/arm64/tools/sysreg        | 6 +++---
+ 4 files changed, 14 insertions(+), 4 deletions(-)
 
-v6:
-* Rebase onto v6.19-rc7
-
-* Drop the reorganization patches I had previously included from Sean
-  and Anish and rework without them.
-
-* Inline FGT programming for easier readability
-
-* Change register access path to drop simultaneous writing of the
-  virtual and physical registers and write only where the canonical
-  state should reside. The PMU register fast path behaves like a
-  simple accessor now, relying on generic helpers when needed.
-
-* Related to the previous, drop several patches modifying sys_regs.c
-  and incorporate PMOVS and PMEVTYPER into the fast path instead.
-
-* Move the register fast path call to kvm_hyp_handle_sysreg_vhe since
-  this feature depends on VHE mode
-
-* Remove the heavyweight access checks from the fast path that had the
-  potential to inject an undefined exception. For what checks are
-  necessary, just return false and let the normal path handle
-  injecting exceptions
-
-* Remove the legacy support for writeable PMCR.N. VMMs must use the
-  vCPU attribute to change the number of counters.
-
-* Simplify kvm_pmu_hpmn by relying on kvm_vcpu_on_unsupported_cpu and
-  moving HPMN validation of nr_pmu_counters to the ioctl boundary when
-  it is set.
-
-* Disable preemption during context swap
-
-* Simplify iteration of counters to context swap by iterating a bitmask
-
-* Clear PMOVS flags during load to avoid the possibility of generating
-  a spurious interrupt when writing PMINTEN or PMCNTEN
-
-* Make kvm_pmu_apply_event_filter() hyp safe
-
-* Cleanly separate interrupt handling so the host driver clears the
-  overflow flags for the host counters only and KVM handles clearing
-  the guest counter flags.
-
-* Ensure the guest PMU state is on hardware before checking hardware
-  for the purposes of determining if an overflow should be injected
-  into the guest.
-
-* Naming and commit message improvements
-
-* Change uAPI to vCPU device attribute selected when other PMU
-  attributes are selected.
-
-* Remove some checks for exceptions when accessing invalid counter
-  indices with the Partitioned PMU. Hardware does not guarantee them
-  so the Partitioned PMU can't either.
-
-v5:
-https://lore.kernel.org/kvmarm/20251209205121.1871534-1-coltonlewis@google.com/
-
-v4:
-https://lore.kernel.org/kvmarm/20250714225917.1396543-1-coltonlewis@google.com/
-
-v3:
-https://lore.kernel.org/kvm/20250626200459.1153955-1-coltonlewis@google.com/
-
-v2:
-https://lore.kernel.org/kvm/20250620221326.1261128-1-coltonlewis@google.com/
-
-v1:
-https://lore.kernel.org/kvm/20250602192702.2125115-1-coltonlewis@google.com/
-
-[1] https://gitlab.com/qemu-project/kvm-forum/-/raw/main/_attachments/2025/Optimizing__itvHkhc.pdf
-[2] https://www.youtube.com/watch?v=YRzZ8jMIA6M&list=PLW3ep1uCIRfxwmllXTOA2txfDWN6vUOHp&index=9
-[3] https://lore.kernel.org/kvmarm/aWjlfl85vSd6sMwT@willie-the-truck/
-
-Colton Lewis (18):
-  arm64: cpufeature: Add cpucap for HPMN0
-  KVM: arm64: Reorganize PMU functions
-  perf: arm_pmuv3: Introduce method to partition the PMU
-  perf: arm_pmuv3: Generalize counter bitmasks
-  perf: arm_pmuv3: Keep out of guest counter partition
-  KVM: arm64: Set up FGT for Partitioned PMU
-  KVM: arm64: Define access helpers for PMUSERENR and PMSELR
-  KVM: arm64: Write fast path PMU register handlers
-  KVM: arm64: Setup MDCR_EL2 to handle a partitioned PMU
-  KVM: arm64: Context swap Partitioned PMU guest registers
-  KVM: arm64: Enforce PMU event filter at vcpu_load()
-  KVM: arm64: Implement lazy PMU context swaps
-  perf: arm_pmuv3: Handle IRQs for Partitioned PMU guest counters
-  KVM: arm64: Detect overflows for the Partitioned PMU
-  KVM: arm64: Add vCPU device attr to partition the PMU
-  KVM: selftests: Add find_bit to KVM library
-  KVM: arm64: selftests: Add test case for partitioned PMU
-  KVM: arm64: selftests: Relax testing for exceptions when partitioned
-
-Marc Zyngier (1):
-  KVM: arm64: Reorganize PMU includes
-
- arch/arm/include/asm/arm_pmuv3.h              |  28 +
- arch/arm64/include/asm/arm_pmuv3.h            |  12 +-
- arch/arm64/include/asm/kvm_host.h             |  17 +-
- arch/arm64/include/asm/kvm_types.h            |   6 +-
- arch/arm64/include/uapi/asm/kvm.h             |   2 +
- arch/arm64/kernel/cpufeature.c                |   8 +
- arch/arm64/kvm/Makefile                       |   2 +-
- arch/arm64/kvm/arm.c                          |   2 +
- arch/arm64/kvm/config.c                       |  41 +-
- arch/arm64/kvm/debug.c                        |  31 +-
- arch/arm64/kvm/hyp/vhe/switch.c               | 240 ++++++
- arch/arm64/kvm/pmu-direct.c                   | 439 +++++++++++
- arch/arm64/kvm/pmu-emul.c                     | 674 +---------------
- arch/arm64/kvm/pmu.c                          | 717 ++++++++++++++++++
- arch/arm64/kvm/sys_regs.c                     |   9 +-
- arch/arm64/tools/cpucaps                      |   1 +
- arch/arm64/tools/sysreg                       |   6 +-
- drivers/perf/arm_pmuv3.c                      | 149 +++-
- include/kvm/arm_pmu.h                         | 126 +++
- include/linux/perf/arm_pmu.h                  |   1 +
- include/linux/perf/arm_pmuv3.h                |  14 +-
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/arm64/vpmu_counter_access.c | 112 ++-
- tools/testing/selftests/kvm/lib/find_bit.c    |   1 +
- 24 files changed, 1889 insertions(+), 750 deletions(-)
- create mode 100644 arch/arm64/kvm/pmu-direct.c
- create mode 100644 tools/testing/selftests/kvm/lib/find_bit.c
-
-
-base-commit: 63804fed149a6750ffd28610c5c1c98cce6bd377
---
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index c840a93b9ef95..e6a8373d8625b 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -555,6 +555,7 @@ static const struct arm64_ftr_bits ftr_id_mmfr0[] = {
+ };
+ 
+ static const struct arm64_ftr_bits ftr_id_aa64dfr0[] = {
++	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_HPMN0_SHIFT, 4, 0),
+ 	S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_DoubleLock_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_PMSVer_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_EL1_CTX_CMPs_SHIFT, 4, 0),
+@@ -2950,6 +2951,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		ARM64_CPUID_FIELDS(ID_AA64MMFR0_EL1, FGT, FGT2)
+ 	},
++	{
++		.desc = "HPMN0",
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.capability = ARM64_HAS_HPMN0,
++		.matches = has_cpuid_feature,
++		ARM64_CPUID_FIELDS(ID_AA64DFR0_EL1, HPMN0, IMP)
++	},
+ #ifdef CONFIG_ARM64_SME
+ 	{
+ 		.desc = "Scalable Matrix Extension",
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 88a57ca36d96c..a460e93b1ad0a 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3229,7 +3229,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 		    ID_AA64DFR0_EL1_DoubleLock_MASK |
+ 		    ID_AA64DFR0_EL1_WRPs_MASK |
+ 		    ID_AA64DFR0_EL1_PMUVer_MASK |
+-		    ID_AA64DFR0_EL1_DebugVer_MASK),
++		    ID_AA64DFR0_EL1_DebugVer_MASK |
++		    ID_AA64DFR0_EL1_HPMN0_MASK),
+ 	ID_SANITISED(ID_AA64DFR1_EL1),
+ 	ID_UNALLOCATED(5,2),
+ 	ID_UNALLOCATED(5,3),
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 0fac75f015343..1e3f6e9cc2c86 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -42,6 +42,7 @@ HAS_GIC_PRIO_MASKING
+ HAS_GIC_PRIO_RELAXED_SYNC
+ HAS_ICH_HCR_EL2_TDIR
+ HAS_HCR_NV1
++HAS_HPMN0
+ HAS_HCX
+ HAS_LDAPR
+ HAS_LPA2
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 8921b51866d64..c9cf3d139c2da 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -1666,9 +1666,9 @@ EndEnum
+ EndSysreg
+ 
+ Sysreg	ID_AA64DFR0_EL1	3	0	0	5	0
+-Enum	63:60	HPMN0
+-	0b0000	UNPREDICTABLE
+-	0b0001	DEF
++UnsignedEnum	63:60	HPMN0
++	0b0000	NI
++	0b0001	IMP
+ EndEnum
+ UnsignedEnum	59:56	ExtTrcBuff
+ 	0b0000	NI
+-- 
 2.53.0.rc2.204.g2597b5adb4-goog
+
 
