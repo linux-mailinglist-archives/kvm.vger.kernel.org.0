@@ -1,482 +1,182 @@
-Return-Path: <kvm+bounces-70671-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70672-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Nw8K9ZrimnnKAAAu9opvQ
-	(envelope-from <kvm+bounces-70671-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 00:20:54 +0100
+	id AFuCDm9wimmuKQAAu9opvQ
+	(envelope-from <kvm+bounces-70672-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 00:40:31 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29B291155EE
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 00:20:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC85E11569F
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 00:40:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DF1C4301DC0A
-	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 23:20:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E81FC302A54B
+	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 23:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6540432ABE1;
-	Mon,  9 Feb 2026 23:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D7E318140;
+	Mon,  9 Feb 2026 23:40:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="29rPncKT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UhhyTET0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF3D240611
-	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 23:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D192264D3;
+	Mon,  9 Feb 2026 23:40:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770679243; cv=none; b=MQLz15sZZjb0FdYKDZKxi8hCs2TJdLUGJwvdt1SR0OcC7Ls+F08c4OA9A3o4VyniX9jR7pvMkP58cAlFJ3vt9B7A+ahzBXjiMjNnFULvXGr3XLCsVr4+HED5n2F/XK+1LM/a+RnotaQxxUD/0veTMQbHYHyVlTYKH3V3pboZ2aw=
+	t=1770680416; cv=none; b=sLTukfe3Fgn9TZu3QcT1WTWMGFce1xci6IQbfAJ+Gk+3Qmia0A+PO+O2/1TXEbEAP3LLEv78B+C+V0+GjzroEi9zphnlbKC3ngq2HNlUpQRWRMvTePSi8kkov5PAmxD+3tOsrNnN7f4D0QtrP91ARTGCPs/nHxKUVhoIUXgoFoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770679243; c=relaxed/simple;
-	bh=bn/UueIbCkCry1KDTN2ELb3EiaMqnSgE2L04L0oykBg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nMXZKYN+6eIlNpStyoDbmBRRfe9fhqylWNr/FTGyIZU37BJap//9vbGuxaXTX964i3sX04YPmzDRm0UvjJnrFgVg4dQl8BrDCtBJBc64o4P3KXh+uIqVNGUWjE6TKYueyhF0MRJ3ruHt01wSZRFpPtMSSucMOglh4pHMT905zJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=29rPncKT; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a8fc061ce1so125044495ad.0
-        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 15:20:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770679240; x=1771284040; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OGdS4aVfp/4Noa5EuN6UtGsxU49auEP4elM492S8F0E=;
-        b=29rPncKTE9xtq+8xLCn3UCu/C46X4kL48YrjiihQw66c1uokj/eGetjeX/3L4HBMcF
-         dHpESlIFoQbEOAqMuWOf7jzenzBDv2Ai8bD/qzuvRi0CImtcgB73I6WibpZnJhYl5DgU
-         NCIj/RjPBi81Lm+zSAD7ox5YqhlZ6JiInhUtEIXWuC7MM4mYnnhyWobSCpyRhajihVvK
-         Eiv+jPjB39k2VX32eFVUTCCB6fws/aMK5QdErzzZj7MBfWigKdID48jw7WHyhRsCDB95
-         r7fLD8Psu7PqZ/jfl3QxVaUktsZQAvI+O+je6ojXwGZsELRc4V6NeIZ+CjBrBa8CZHeF
-         V8fA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770679240; x=1771284040;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OGdS4aVfp/4Noa5EuN6UtGsxU49auEP4elM492S8F0E=;
-        b=MGq201YOQQyi6rCsXrYLFvYb19wXzhpcQzFlCL0ri+XUW2JDyXweXqS8b/Qnibb/iy
-         Ruz8oKW6hXLWRsy+vza/qaoHtRwcdMAH4t1ROpHc/4rtmeHbeczBR6RpqwCXzzER0d6o
-         bBc2XpAtxO5ZoSpPhy1Pewhd79pDk+ceppIn+o6NF4Sn3t92rrbsb3hvmWLYtbvx94RJ
-         Zh8c9JsHGaNA9xa0pZ7FssAORqBJYcpLY9wo11KP6Xr0U0VVay2qeuU+KMhD4iws0G5X
-         OT6IjLElbTKLELqjypyK6Y35QQ6ac2QRquDl7HIskj/uY4idzNugMnO1PCSVvk6DIlNR
-         2dcw==
-X-Forwarded-Encrypted: i=1; AJvYcCVryUwJtGZmAw4RpG3MmCe0Oi2emp1ZndXGHLmEi59TOGTQrdghhMUu2/LKjPM8PSx2pmk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywooz7D3p4IXpl0rwdAQiVYqRdMJiuqgdoJ5zuQoi0JwSNybFxl
-	ME1ph8Rxwwl5dsqVGjB3y8O5iFJnOrpJuxOpC/pRjXMLJ60biTMxkrTfG8WA+ZuLuc0Elcgve6c
-	0pxhCtA==
-X-Received: from plbcp16.prod.google.com ([2002:a17:902:e790:b0:27e:ed03:b5a5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ebc7:b0:2aa:e075:c914
- with SMTP id d9443c01a7336-2ab10575b1emr3409985ad.15.1770679240149; Mon, 09
- Feb 2026 15:20:40 -0800 (PST)
-Date: Mon, 9 Feb 2026 15:20:38 -0800
-In-Reply-To: <aYmoIaFwgR6+hnGp@yzhao56-desk.sh.intel.com>
+	s=arc-20240116; t=1770680416; c=relaxed/simple;
+	bh=9A5S9nopwRiPHHY+httJ9p+6h2Kk6ivbQjRVAwgbY6M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Uu34XC1CFsiFKBAQMkPjR+IqO4fePBu5BFhL4A2tar7BuAuMQL0Gh+jirkjOCVTi1kFIF4AcrxJKb2HXteB3zNAJKbMingUUPiyOYji6Jk4rNgSevc1TQG4q2SreZ9AMouqF12xgbv6MN2woDZgjVVa+qnFDTd555hlNs6xAo4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UhhyTET0; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770680415; x=1802216415;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=9A5S9nopwRiPHHY+httJ9p+6h2Kk6ivbQjRVAwgbY6M=;
+  b=UhhyTET0Cmhi/rCbgcIaJ1wAjECMyzkyDl+Js94D+NvqyRz0FmJBfNVz
+   7nln5sGgqmwYSbHqwBr6k9PzT9fI91F0TyzGe/DWISa7aoBfr45dnHNK2
+   3MKkpFYvFeSaGQ8ftsk015gIXCIhtT8+eVJn2JvIpewvK9ZnIaWfBNLum
+   Ols4EJ4Wfp3H4TRUrBBKrBHsDQ2RUHSNLPhzUOUtlJ0O+ZMi05W8qHXOp
+   SzDlNqyvtLI1ftHMfWMOVTQJ09Wd/cgaYH//4HAJazeLnZJR0p7KAN+IY
+   Gf4pQH7bCctclCQlfRDLHmWnfXfzd379VPxYmq6fT0nsqkmZFxpQxzV+2
+   Q==;
+X-CSE-ConnectionGUID: UcWCuNHHTDWega1VRj1jDA==
+X-CSE-MsgGUID: atEgcmypQz2JiSVp4hiP0w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11696"; a="89384944"
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="89384944"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2026 15:40:15 -0800
+X-CSE-ConnectionGUID: TqtcN5gxS5qH3O7f2ZL8Tg==
+X-CSE-MsgGUID: HeiiRROmQyOTMYMKknidqA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="249361075"
+Received: from rchatre-mobl4.amr.corp.intel.com (HELO [10.125.108.24]) ([10.125.108.24])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2026 15:40:15 -0800
+Message-ID: <e81151ce-6e67-48e8-a722-da9ff03d686b@intel.com>
+Date: Mon, 9 Feb 2026 15:40:13 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260129011517.3545883-1-seanjc@google.com> <20260129011517.3545883-21-seanjc@google.com>
- <aYW5CbUvZrLogsWF@yzhao56-desk.sh.intel.com> <aYYCOiMvWfSJR1AL@google.com> <aYmoIaFwgR6+hnGp@yzhao56-desk.sh.intel.com>
-Message-ID: <aYprxnSHKHUtk7pt@google.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC PATCH v5 20/45] KVM: x86/mmu: Allocate/free S-EPT pages
  using tdx_{alloc,free}_control_page()
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	Kiryl Shutsemau <kas@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
-	linux-coco@lists.linux.dev, kvm@vger.kernel.org, 
-	Kai Huang <kai.huang@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Sagi Shahar <sagis@google.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, Yan Zhao <yan.y.zhao@intel.com>
+Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, Kiryl Shutsemau <kas@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+ linux-coco@lists.linux.dev, kvm@vger.kernel.org,
+ Kai Huang <kai.huang@intel.com>, Rick Edgecombe
+ <rick.p.edgecombe@intel.com>, Vishal Annapurve <vannapurve@google.com>,
+ Ackerley Tng <ackerleytng@google.com>, Sagi Shahar <sagis@google.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>
+References: <20260129011517.3545883-1-seanjc@google.com>
+ <20260129011517.3545883-21-seanjc@google.com>
+ <aYW5CbUvZrLogsWF@yzhao56-desk.sh.intel.com> <aYYCOiMvWfSJR1AL@google.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <aYYCOiMvWfSJR1AL@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70671-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 29B291155EE
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70672-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+]
+X-Rspamd-Queue-Id: AC85E11569F
 X-Rspamd-Action: no action
 
-On Mon, Feb 09, 2026, Yan Zhao wrote:
-> On Fri, Feb 06, 2026 at 07:01:14AM -0800, Sean Christopherson wrote:
-> > @@ -2348,7 +2348,7 @@ void __tdx_pamt_put(u64 pfn)
-> >         if (!atomic_dec_and_test(pamt_refcount))
-> >                 return;
-> >  
-> > -       scoped_guard(spinlock, &pamt_lock) {
-> > +       scoped_guard(raw_spinlock_irqsave, &pamt_lock) {
-> >                 /* Lost race with tdx_pamt_get(). */
-> >                 if (atomic_read(pamt_refcount))
-> >                         return;
-> 
-> This option can get rid of the warning.
-> 
-> However, given the pamt_lock is a global lock, which may be acquired even in the
-> softirq context, not sure if this irq disabled version is good.
-
-FWIW, the SEAMCALL itself disables IRQs (and everything else), so it's not _that_
-big of a change.  But yeah, waiting on the spinlock with IRQs disabled isn't
-exactly idea.
-
-> For your reference, I measured some test data by concurrently launching and
-> destroying 4 TDs for 3 rounds:
-> 
->                                t0 ---------------------
-> scoped_guard(spinlock, &pamt_lock) {       |->T1=t1-t0 |
->                                t1 ----------           |
->  ...                                                   |
->                                t2 ----------           |->T3=t4-t0
->  tdh_phymem_pamt_add/remove()              |->T2=t3-t2 |
->                                t3 ----------           |
->  ...                                                   |
->                                t4 ---------------------
-> }
-> 
-> (1) for __tdx_pamt_get()
-> 
->        avg us   min us   max us
-> ------|---------------------------
->   T1  |   4       0       69
->   T2  |   4       2       18
->   T3  |  10       3       83
-> 
-> 
-> (2) for__tdx_pamt_put()
-> 
->        avg us   min us   max us
-> ------|---------------------------
->   T1  |   0        0       5
->   T2  |   2        1      11
->   T3  |   3        2      15
-> 
+On 2/6/26 07:01, Sean Christopherson wrote:
+>  /* Bump PAMT refcount for the given page and allocate PAMT memory if needed */
+>  int __tdx_pamt_get(u64 pfn, struct tdx_pamt_cache *cache)
+> @@ -2272,7 +2272,7 @@ int __tdx_pamt_get(u64 pfn, struct tdx_pamt_cache *cache)
+>         if (ret)
+>                 goto out_free;
 >  
-> > Option #2 would be to immediately free the page in tdx_sept_reclaim_private_sp(),
-> > so that pages that freed via handle_removed_pt() don't defer freeing the S-EPT
-> > page table (which, IIUC, is safe since the TDX-Module forces TLB flushes and exits).
-> > 
-> > I really, really don't like this option (if it even works).
-> I don't like its asymmetry with tdx_sept_link_private_spt().
-> 
-> However, do you think it would be good to have the PAMT pages of the sept pages
-> allocated from (*topup_private_mapping_cache) [1]?
+> -       scoped_guard(spinlock, &pamt_lock) {
+> +       scoped_guard(raw_spinlock_irqsave, &pamt_lock) {
+>                 /*
+>                  * Lost race to other tdx_pamt_add(). Other task has already allocated
+>                  * PAMT memory for the HPA.
+> @@ -2348,7 +2348,7 @@ void __tdx_pamt_put(u64 pfn)
 
-Hrm, dunno about "good", but it's definitely not terrible.  To get the cache
-management right, it means adding yet another use of kvm_get_running_vcpu(), which
-I really dislike.
+Why does this need to be a raw spinlock? irqsave, sure, but raw?
 
-On the other hand, if we combine that with TDX freeing in-use S-EPT page tables,
-unless I'm overly simplifying things, it would avoid having to extend
-kvm_mmu_memory_cache with the page_{get,free}() hook, and would then eliminate
-two kvm_x86_ops hooks, because the alloc/free of _unused_ S-EPT page tables is
-no different than regular page tables.
-
-As a bonus, we could keep the topup_external_cache() name and just clarify that
-the parameter specifies the number of page table pages, i.e. account for the +1
-for the mapping page in TDX code.
-
-All in all, I'm kinda leaning in this direction, because as much as I dislike
-kvm_get_running_vcpu(), it does minimize the number of kvm_x86_ops hooks.
-
-Something like this?  Also pushed to 
-
-  https://github.com/sean-jc/linux.git x86/tdx_huge_sept_alt
-
-if it doesn't apply.
-
----
- arch/x86/include/asm/kvm-x86-ops.h |  6 +--
- arch/x86/include/asm/kvm_host.h    | 15 ++------
- arch/x86/kvm/mmu/mmu.c             |  3 --
- arch/x86/kvm/mmu/tdp_mmu.c         | 23 +++++++-----
- arch/x86/kvm/vmx/tdx.c             | 60 ++++++++++++++++++++----------
- 5 files changed, 61 insertions(+), 46 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 6083fb07cd3b..4b865617a421 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -94,11 +94,9 @@ KVM_X86_OP_OPTIONAL_RET0(set_tss_addr)
- KVM_X86_OP_OPTIONAL_RET0(set_identity_map_addr)
- KVM_X86_OP_OPTIONAL_RET0(get_mt_mask)
- KVM_X86_OP(load_mmu_pgd)
--KVM_X86_OP_OPTIONAL(alloc_external_sp)
--KVM_X86_OP_OPTIONAL(free_external_sp)
--KVM_X86_OP_OPTIONAL_RET0(set_external_spte)
--KVM_X86_OP_OPTIONAL(reclaim_external_sp)
-+KVM_X86_OP_OPTIONAL(reclaim_external_spt)
- KVM_X86_OP_OPTIONAL_RET0(topup_external_cache)
-+KVM_X86_OP_OPTIONAL_RET0(set_external_spte)
- KVM_X86_OP(has_wbinvd_exit)
- KVM_X86_OP(get_l2_tsc_offset)
- KVM_X86_OP(get_l2_tsc_multiplier)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index cd3e7dc6ab9b..d3c31eaf18b1 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1850,19 +1850,12 @@ struct kvm_x86_ops {
- 	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
- 			     int root_level);
- 
--	/*
--	 * Callbacks to allocate and free external page tables, a.k.a. S-EPT,
--	 * and to propagate changes in mirror page tables to the external page
--	 * tables.
--	 */
--	unsigned long (*alloc_external_sp)(gfp_t gfp);
--	void (*free_external_sp)(unsigned long addr);
-+	void (*reclaim_external_spt)(struct kvm *kvm, gfn_t gfn,
-+				     struct kvm_mmu_page *sp);
-+	int (*topup_external_cache)(struct kvm *kvm, struct kvm_vcpu *vcpu,
-+				    int min_nr_spts);
- 	int (*set_external_spte)(struct kvm *kvm, gfn_t gfn, u64 old_spte,
- 				 u64 new_spte, enum pg_level level);
--	void (*reclaim_external_sp)(struct kvm *kvm, gfn_t gfn,
--				    struct kvm_mmu_page *sp);
--	int (*topup_external_cache)(struct kvm *kvm, struct kvm_vcpu *vcpu, int min);
--
- 
- 	bool (*has_wbinvd_exit)(void);
- 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 62bf6bec2df2..f7cf456d9404 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6714,9 +6714,6 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
- 	if (!vcpu->arch.mmu_shadow_page_cache.init_value)
- 		vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
- 
--	vcpu->arch.mmu_external_spt_cache.page_get = kvm_x86_ops.alloc_external_sp;
--	vcpu->arch.mmu_external_spt_cache.page_free = kvm_x86_ops.free_external_sp;
--
- 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
- 	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
- 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index fef856323821..732548a678d8 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -53,14 +53,18 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
- 	rcu_barrier();
- }
- 
--static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
-+static void __tdp_mmu_free_sp(struct kvm_mmu_page *sp)
- {
--	if (sp->external_spt)
--		kvm_x86_call(free_external_sp)((unsigned long)sp->external_spt);
- 	free_page((unsigned long)sp->spt);
- 	kmem_cache_free(mmu_page_header_cache, sp);
- }
- 
-+static void tdp_mmu_free_unused_sp(struct kvm_mmu_page *sp)
-+{
-+	free_page((unsigned long)sp->external_spt);
-+	__tdp_mmu_free_sp(sp);
-+}
-+
- /*
-  * This is called through call_rcu in order to free TDP page table memory
-  * safely with respect to other kernel threads that may be operating on
-@@ -74,7 +78,8 @@ static void tdp_mmu_free_sp_rcu_callback(struct rcu_head *head)
- 	struct kvm_mmu_page *sp = container_of(head, struct kvm_mmu_page,
- 					       rcu_head);
- 
--	tdp_mmu_free_sp(sp);
-+	WARN_ON_ONCE(sp->external_spt);
-+	__tdp_mmu_free_sp(sp);
- }
- 
- void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
-@@ -458,7 +463,7 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
- 	}
- 
- 	if (is_mirror_sp(sp))
--		kvm_x86_call(reclaim_external_sp)(kvm, base_gfn, sp);
-+		kvm_x86_call(reclaim_external_spt)(kvm, base_gfn, sp);
- 
- 	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
- }
-@@ -1266,7 +1271,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		 * failed, e.g. because a different task modified the SPTE.
- 		 */
- 		if (r) {
--			tdp_mmu_free_sp(sp);
-+			tdp_mmu_free_unused_sp(sp);
- 			goto retry;
- 		}
- 
-@@ -1461,7 +1466,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
- 		goto err_spt;
- 
- 	if (is_mirror_sp) {
--		sp->external_spt = (void *)kvm_x86_call(alloc_external_sp)(GFP_KERNEL_ACCOUNT);
-+		sp->external_spt = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
- 		if (!sp->external_spt)
- 			goto err_external_spt;
- 
-@@ -1472,7 +1477,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
- 	return sp;
- 
- err_external_split:
--	kvm_x86_call(free_external_sp)((unsigned long)sp->external_spt);
-+	free_page((unsigned long)sp->external_spt);
- err_external_spt:
- 	free_page((unsigned long)sp->spt);
- err_spt:
-@@ -1594,7 +1599,7 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
- 	 * installs its own sp in place of the last sp we tried to split.
- 	 */
- 	if (sp)
--		tdp_mmu_free_sp(sp);
-+		tdp_mmu_free_unused_sp(sp);
- 
- 	return 0;
- }
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index ae7b9beb3249..b0fc17baa1fc 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1701,7 +1701,7 @@ static struct tdx_pamt_cache *tdx_get_pamt_cache(struct kvm *kvm,
- }
- 
- static int tdx_topup_external_pamt_cache(struct kvm *kvm,
--					 struct kvm_vcpu *vcpu, int min)
-+					 struct kvm_vcpu *vcpu, int min_nr_spts)
- {
- 	struct tdx_pamt_cache *pamt_cache;
- 
-@@ -1712,7 +1712,11 @@ static int tdx_topup_external_pamt_cache(struct kvm *kvm,
- 	if (!pamt_cache)
- 		return -EIO;
- 
--	return tdx_topup_pamt_cache(pamt_cache, min);
-+	/*
-+	 * Each S-EPT page tables requires a DPAMT pair, plus one more for the
-+	 * memory being mapped into the guest.
-+	 */
-+	return tdx_topup_pamt_cache(pamt_cache, min_nr_spts + 1);
- }
- 
- static int tdx_mem_page_add(struct kvm *kvm, gfn_t gfn, enum pg_level level,
-@@ -1911,23 +1915,41 @@ static int tdx_sept_split_private_spte(struct kvm *kvm, gfn_t gfn, u64 old_spte,
- static int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn, u64 new_spte,
- 				     enum pg_level level)
- {
-+	struct tdx_pamt_cache *pamt_cache;
- 	gpa_t gpa = gfn_to_gpa(gfn);
- 	u64 err, entry, level_state;
- 	struct page *external_spt;
-+	int r;
- 
- 	external_spt = tdx_spte_to_external_spt(kvm, gfn, new_spte, level);
- 	if (!external_spt)
- 		return -EIO;
- 
-+	pamt_cache = tdx_get_pamt_cache(kvm, kvm_get_running_vcpu());
-+	if (!pamt_cache)
-+		return -EIO;
-+
-+	r = tdx_pamt_get(page_to_pfn(external_spt), PG_LEVEL_4K, pamt_cache);
-+	if (r)
-+		return r;
-+
- 	err = tdh_mem_sept_add(&to_kvm_tdx(kvm)->td, gpa, level, external_spt,
- 			       &entry, &level_state);
--	if (unlikely(IS_TDX_OPERAND_BUSY(err)))
--		return -EBUSY;
-+	if (unlikely(IS_TDX_OPERAND_BUSY(err))) {
-+		r = -EBUSY;
-+		goto err;
-+	}
- 
--	if (TDX_BUG_ON_2(err, TDH_MEM_SEPT_ADD, entry, level_state, kvm))
--		return -EIO;
-+	if (TDX_BUG_ON_2(err, TDH_MEM_SEPT_ADD, entry, level_state, kvm)) {
-+		r = -EIO;
-+		goto err;
-+	}
- 
- 	return 0;
-+
-+err:
-+	tdx_pamt_put(page_to_pfn(external_spt), PG_LEVEL_4K);
-+	return r;
- }
- 
- static int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
-@@ -1995,8 +2017,8 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn, u64 old_spte,
- 	return tdx_sept_map_leaf_spte(kvm, gfn, new_spte, level);
- }
- 
--static void tdx_sept_reclaim_private_sp(struct kvm *kvm, gfn_t gfn,
--					struct kvm_mmu_page *sp)
-+static void tdx_sept_reclaim_private_spt(struct kvm *kvm, gfn_t gfn,
-+					 struct kvm_mmu_page *sp)
- {
- 	/*
- 	 * KVM doesn't (yet) zap page table pages in mirror page table while
-@@ -2014,7 +2036,16 @@ static void tdx_sept_reclaim_private_sp(struct kvm *kvm, gfn_t gfn,
- 	 */
- 	if (KVM_BUG_ON(is_hkid_assigned(to_kvm_tdx(kvm)), kvm) ||
- 	    tdx_reclaim_page(virt_to_page(sp->external_spt)))
--		sp->external_spt = NULL;
-+		goto out;
-+
-+	/*
-+	 * Immediately free the S-EPT page as the TDX subsystem doesn't support
-+	 * freeing pages from RCU callbacks, and more importantly because
-+	 * TDH.PHYMEM.PAGE.RECLAIM ensures there are no outstanding readers.
-+	 */
-+	tdx_free_control_page((unsigned long)sp->external_spt);
-+out:
-+	sp->external_spt = NULL;
- }
- 
- void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
-@@ -3869,17 +3900,8 @@ void __init tdx_hardware_setup(void)
- 	 */
- 	vt_x86_ops.vm_size = max_t(unsigned int, vt_x86_ops.vm_size, sizeof(struct kvm_tdx));
- 
--	/*
--	 * TDX uses the external_spt cache to allocate S-EPT page table pages,
--	 * which (a) don't need to be initialized by KVM as the TDX-Module will
--	 * initialize the page (using the guest's encryption key), and (b) need
--	 * to use a custom allocator to be compatible with Dynamic PAMT.
--	 */
--	vt_x86_ops.alloc_external_sp = tdx_alloc_control_page;
--	vt_x86_ops.free_external_sp = tdx_free_control_page;
--
-+	vt_x86_ops.reclaim_external_spt = tdx_sept_reclaim_private_spt;
- 	vt_x86_ops.set_external_spte = tdx_sept_set_private_spte;
--	vt_x86_ops.reclaim_external_sp = tdx_sept_reclaim_private_sp;
- 
- 	vt_x86_ops.gmem_convert = tdx_gmem_convert;
- 
-
-base-commit: 7adb9e428488cf7873a122043385a50dc1eebc8f
--- 
-
+The page allocator locks are used in this context and aren't raw.
 
