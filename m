@@ -1,186 +1,233 @@
-Return-Path: <kvm+bounces-70620-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70621-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id COW6EXoWimlrGAAAu9opvQ
-	(envelope-from <kvm+bounces-70620-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:16:42 +0100
+	id QIGmLsgWimlrGAAAu9opvQ
+	(envelope-from <kvm+bounces-70621-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:18:00 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B50C0112FBD
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:16:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66BA6112FCD
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:18:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3ADAF302087A
-	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 17:16:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0EB67302003B
+	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 17:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E161D385EEA;
-	Mon,  9 Feb 2026 17:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D925385EE5;
+	Mon,  9 Feb 2026 17:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qvLkadHt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DbQSPqW2";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="slE6rZXk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFCD43806AA;
-	Mon,  9 Feb 2026 17:16:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770657379; cv=none; b=D81muHvdLl1TebBgGSLCSzgjl9jmd9QHJNTsgPOriHfx+jwIsq1tMh2amNYYJq5GWT0ZDhKGoCKbZ1N6i83PbTgoz4yuiFjdPoberBeHf65DFgNmtq1Xo93cFmgdzJq/33RbpXx6SVeiwh7FeSqzzkDEbdfQ7Nc4gBzlMBScmvg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770657379; c=relaxed/simple;
-	bh=S/3dy0LZvzdYg2cl05G3RhIvBpiAacPctOuBf3b6pXU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kPikyTVoWnCVgjnbe8u9bVy+s6lbrv2sSO1mqkbZUpg7tZrdWRRAbWdfyHc6pBsO0T24j7GilR6gXlwmu5r9HLhNNSF7Nwe5LNM7HxdFgFrygqjos9qRfz/oBYfyT9PUT2Quuh293WOVKcWfo9H+DS6S2R72e+LjjiaxmquJ324=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qvLkadHt; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 619ExF2U241452;
-	Mon, 9 Feb 2026 17:16:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Bj5D5t
-	CmPYGSPf0QKj4iOIQS13T3lX2tNxirF5p+FYw=; b=qvLkadHtJ84XugAw4PkCi5
-	sZBplVI6o0zNpsfYgOwnU3Hl9Ok9hCPLThY4y4zm4WLuKDq+Yqg5lfC0BWDyt2Yy
-	fqc8gcRYgPA7ZFfVe2iT8Rprd89FSHjIEozuhvVvduaFC+jO2uVF46flhikbEDxV
-	4/EtoUnuR80jzAzkS+MEjdmY+T6oHZNuNalY5iDDPTzO4K6aj3rTPfstx4ZkeG1E
-	4TWGj0eFhin0vG1GTcPvSeIJrKEXnI0RbBrDA1bSozq4H3PLC4AHgsdgZI1jHpX9
-	AtEP16Q6ejaC6PkQKtgOXvZxevAYwzNJ5YbmgLWnR4HYU1Iom1mhllP2XGyx2HRg
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c696upwhq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Feb 2026 17:16:17 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 619EBXJJ019225;
-	Mon, 9 Feb 2026 17:16:17 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4c6hxjwvb5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Feb 2026 17:16:16 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 619HGCA234800062
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 9 Feb 2026 17:16:13 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DE0EA20043;
-	Mon,  9 Feb 2026 17:16:12 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4AFEE20040;
-	Mon,  9 Feb 2026 17:16:12 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.111.49.104])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Mon,  9 Feb 2026 17:16:12 +0000 (GMT)
-Date: Mon, 9 Feb 2026 18:16:10 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Steffen Eiden <seiden@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Andreas
- Grapentin <gra@linux.ibm.com>,
-        Hendrik Brueckner <brueckner@linux.ibm.com>
-Subject: Re: [PATCH v1 1/1] KVM: s390: Increase permitted SE header size to
- 1 MiB
-Message-ID: <20260209181610.550b8ff0@p-imbrenda>
-In-Reply-To: <20260209152925.578872-1-seiden@linux.ibm.com>
-References: <20260209152925.578872-1-seiden@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115D1385536
+	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 17:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770657464; cv=pass; b=UqHH/PSoDbEWHmb+r/Q8vJ6xiagz+QMdojlEJZin9mwjw9h2lDRxyCXBjlEd6u40ocPUlYeXhF6FMbxjTl5JtNx+WYjLXf8lkfe8DyiePetpa1Q2ZpNa0ighin14WxWoHbozw0URRE+eop+z6En74beId+nw6a0PefiHrumqeW0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770657464; c=relaxed/simple;
+	bh=3femj1AcnoV3TonaUwh7+xzY2aG/Sot2KV0a5e28QcA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kE/oVFjOZk/XIB6O7aVHEu+8mD/K2b92YXzkxGuiZ0Q0V+Or5+dXqpGsB4NBtKpfBSo0BBGrWNOk7HhSV6WVWOKrIpgw+ZHjK0RIwyQ9fY82vQwQMdyMmd6lrnVRlOfJ/Qvx4dit4mfrX528xGEeTVD3ZdN2WvtHZOYseDtsaRs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DbQSPqW2; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=slE6rZXk; arc=pass smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770657462;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=obiVR3q8SepdZAU9neUIjR9lqNQPaWsMI1bD68lMK6M=;
+	b=DbQSPqW2ylaK6xua/kKyibeZURGInnhgr/beyns5UYsrJp3Ew0NBdastvLyz/ZqbsfKuyS
+	OLJgxJByt6K1BnVPtt0hJpOCJmGPa6Z7Vv2Iku8Ry8vLDgjV0YESvwdcPsHid9JUNKiOBC
+	DB0Q8MPcx3OX5yLcIptzjLGk//yE76k=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-186-omsczntVNHGgBJrbcsdUTw-1; Mon, 09 Feb 2026 12:17:41 -0500
+X-MC-Unique: omsczntVNHGgBJrbcsdUTw-1
+X-Mimecast-MFC-AGG-ID: omsczntVNHGgBJrbcsdUTw_1770657460
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-4376761037bso1581295f8f.1
+        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 09:17:41 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770657460; cv=none;
+        d=google.com; s=arc-20240605;
+        b=kkIHkHvgvvaVlTSqAI4zbTElTggVFQDOwwjbWWgMpLvLKIvW8MLVV2eU5LsNtfjCkN
+         zSenVZ90pWhA7DdhKutNow8fBr22inmMarMqPCr5X/C1Vpqc23S5NvAJ5sOPrDRQMt9B
+         DMYTmeReadoNgXavLjahQ8QtlCaSpT0OT/d+/8LAVcVot3aSvkZfPypGRO/7vhAG1UVT
+         ZQufN6PJhVSoKVgoqJF4K6fbqLsptpreS7SoDu1V/INqECf09GOQDK4gr5zZEwXZ8C2W
+         mLqzLFiyTrzu0IbLc6oORivjsrM1sO+txa7HKr/VSqDqEJDK2oi1Zb2/v5gXzKeUMAfv
+         qZIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=obiVR3q8SepdZAU9neUIjR9lqNQPaWsMI1bD68lMK6M=;
+        fh=6y7G8kXoasgaBwsznqcGSbs7VdlLI3HN5scWWUqdNkQ=;
+        b=WNJd/u0nUTAWQqWrI/yANWGRDY16UduZhBB9fw7+CNFeYVUNR1qhCDUKRMi0WiY8Fp
+         fHtruf3HyrOIuj1odNOEO5bYyWherdfdy3aXJihjrOqRR44c5bFoJI4Q0V6LwGWJATm8
+         qRpMBBAEct2/qs79GmjXlsGU9yqSDeAHEjdrCY5kjk3xQ/uywsTK1Ey+CAAQ12jSqpBb
+         uTH+9AZ5gsLRXe/dIBgNqhReruk9BahxMOGEn+7RMsFNru1ZAA729Bepgjx8XTB382tl
+         Hno+wcCN13NpT17VRLU8Ek6EDwZjm8yUlP0ZzeEy1l4lTPG8Ozn/XBFZLDYYOesgZd/E
+         ndWQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1770657460; x=1771262260; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=obiVR3q8SepdZAU9neUIjR9lqNQPaWsMI1bD68lMK6M=;
+        b=slE6rZXkVe6/Jbt8x1436hIhExCC02bKUh1C5wxIBQfbG2vebgalnuEHuv4xB3gbVV
+         yQdBxFbVOHmjuOp2QzEa7uNotmJiHbIhpsdOMEYKNN8R1cj6mDyv57InHhbbqgFNpo/Q
+         ea+qHMl6Rx0Ol2gkXRbSbjlNGqKExl9F2k5LwhHXVv4T7xBaD3/UZRpHrUsIRsD0aukL
+         nWRbuwntBixeTxbtVr03ClBTeqiCFcTZHLuxm9p3Ud5YmESWoSwt1FqtESV+5komNRmV
+         c7/5UCMP1/XV+fPGxvD8EraJQu6fqLSCpN3+m+BuFU1BysFGnKNIVMfkQG0nkJFp2wQD
+         TnIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770657460; x=1771262260;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=obiVR3q8SepdZAU9neUIjR9lqNQPaWsMI1bD68lMK6M=;
+        b=KCSuYCJYBXsxh7Q0HTvcRQcUmvL3B7HTRYPNVBFAuhcPKpdh/igPp0o+EA+nKE7pBt
+         CzDPukUtQAWBgOuBPf8vQnJ8TWzs8FoXaoiVqCf7JKRv8A8ODR0nqJcwJvD4J83ZUDDy
+         uYiCSUtuLW1LvRJfbaU1vWLm1WXgQfI1QL2BgNrjL2kc5dX8KMbDOrCeG16t/vbroZSJ
+         3Mf+kugICXbaUx4AZOsGb1Ui0QwF6pwDHPwzpjhdaKG68C7s8hIDZwhfxzpT/jOiixtF
+         zup2g5JRaBc2hQE5+1FbhPplQHSo7wjqYof7J0K/tJU/BSEpyquZ4/FWF1TvqpGGhRqB
+         msrg==
+X-Forwarded-Encrypted: i=1; AJvYcCWJaPkKFZVTQTy4noYRfyG8jN8ajdyg45tzSwH9XeJbTjrZyvA1yqimP8cJA05ofTcoudw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywkc67KWxskApqnYmbHELbMOUpPF1YUj2u4I6V8e9wpTIvcSsT0
+	Li3SyiD7/ZWDoPX2hTrWq2+1bWT3uYcQLUEgYvjHWqefP/cpUt4EbsJKLOKXOA8QK3aYXAVUtpt
+	YUs4cH8YjGNHx+91jdhN1EEj/pYEUj3PmOcIkKF0vFERtzDJ0I0RO42yMuaah/vKHci0ikPJwry
+	Ri8HRHON6VvhvL7Gt++5i+tmwOpbL5
+X-Gm-Gg: AZuq6aKCvWjs/ZgpGIskXdl5OSoA4u6DGLupanSN99vefw+g0FXejJJPBgnBSLhlP05
+	/sIM0h8XI1ledWX/kTgoes4JD63vAeCKX4Q0wajrQvrwW2dwGmuwCWicBXQUEix3Lvmyu4R1csT
+	8rwxh7p9ZoyO+eaDcaFbUGF+TxnzejnWFKNTofiI96FiQa1t4vH3bIsB0XxNvMi8FqJtRALeF4z
+	D2bgovJXJM7r6HrOu/WNPYF8xEU1hH2lz15WLjEMbjgPJd07z1+FycHk+TvmE34+giAHA==
+X-Received: by 2002:a05:6000:400b:b0:436:14fa:a3fd with SMTP id ffacd0b85a97d-437791ea33amr172519f8f.24.1770657460337;
+        Mon, 09 Feb 2026 09:17:40 -0800 (PST)
+X-Received: by 2002:a05:6000:400b:b0:436:14fa:a3fd with SMTP id
+ ffacd0b85a97d-437791ea33amr172482f8f.24.1770657459828; Mon, 09 Feb 2026
+ 09:17:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA5MDE0MSBTYWx0ZWRfXyVgTMZVWs59l
- mKJk0mGhiuKhtd9ZSk+7XREZUJVsmJsmMbIpBLAEb9pjxq0mFZ6oXjnRgTE3iuwa9NO6gGkO6bw
- t43Rk9ZOSvcuCccm8BJLlXsdxu9X0AOkglVFmji6rXigKV7YbDHSTGyeqqdw8CaB15ZRcXn9s4O
- CT/O2QAoHYWdZr+tD6VszA7kYTcQOyCKN48HgYNZKBGVHbVLXI8bq3yOLne/aNGjXJzSQKMMc3Z
- tN47vv/+bQHNG5XcFo6sIiboeaTF7/tHGRb4AVVN0TWUcwHih231JTHcahIduPYm4Yt0/qqIaql
- yOCHGLTNDlVCbztC3XQc//eLI46e1SsM/HbjPOXB+PiwMMjIJzc0daoWlTucOYgZ4pXO/NEWuz7
- 2ssYRnvELEIup/F0lJc86vkAVpLPBUE0cfIY3EdOZU0lqNIe392JUW+hmYAi3ylzRjSK3GDq6gP
- S3awOmY9Lme/q21yvLw==
-X-Proofpoint-ORIG-GUID: -bdRg4JV-HfEOiun5W4b7CfV-1t40n8v
-X-Proofpoint-GUID: -bdRg4JV-HfEOiun5W4b7CfV-1t40n8v
-X-Authority-Analysis: v=2.4 cv=O+Y0fR9W c=1 sm=1 tr=0 ts=698a1661 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8
- a=yz80Hj2ai0dgsENxVL4A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-09_01,2026-02-09_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 priorityscore=1501 phishscore=0 adultscore=0
- malwarescore=0 impostorscore=0 bulkscore=0 clxscore=1015 spamscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2602090141
+References: <20260206145622.2433924-1-chenhuacai@loongson.cn>
+In-Reply-To: <20260206145622.2433924-1-chenhuacai@loongson.cn>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 9 Feb 2026 18:17:26 +0100
+X-Gm-Features: AZwV_QjBtz9lA_DiHImRN_CVO1-zyt5IKnzotZXjwj61dvndjwONXCdx2J-FJDI
+Message-ID: <CABgObfYtQcXV-GWYktTq04KZKEVLyVGx4wz7XzgA6sdy=iTHsw@mail.gmail.com>
+Subject: Re: [GIT PULL] LoongArch KVM changes for v6.20
+To: Huacai Chen <chenhuacai@loongson.cn>
+Cc: Huacai Chen <chenhuacai@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>, 
+	Jiaxun Yang <jiaxun.yang@flygoat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70620-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,loongson.cn:email];
 	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
-	HAS_ORG_HEADER(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[imbrenda@linux.ibm.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: B50C0112FBD
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pbonzini@redhat.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70621-lists,kvm=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+]
+X-Rspamd-Queue-Id: 66BA6112FCD
 X-Rspamd-Action: no action
 
-On Mon,  9 Feb 2026 16:29:25 +0100
-Steffen Eiden <seiden@linux.ibm.com> wrote:
+On Fri, Feb 6, 2026 at 3:56=E2=80=AFPM Huacai Chen <chenhuacai@loongson.cn>=
+ wrote:
+>
+> The following changes since commit 18f7fcd5e69a04df57b563360b88be72471d6b=
+62:
+>
+>   Linux 6.19-rc8 (2026-02-01 14:01:13 -0800)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson=
+.git tags/loongarch-kvm-6.20
+>
+> for you to fetch changes up to 2d94a3f7088b69ae25e27fb98d7f1ef572c843f9:
+>
+>   KVM: LoongArch: selftests: Add steal time test case (2026-02-06 09:28:0=
+1 +0800)
 
-> Relax the maximum allowed Secure Execution (SE) header size from
-> 8 KiB to 1 MiB. This allows individual secure guest images to run on a
-> wider range of physical machines.
-> 
-> Signed-off-by: Steffen Eiden <seiden@linux.ibm.com>
+Pulled, thanks.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Paolo
 
-> ---
->  arch/s390/kvm/kvm-s390.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 56a50524b3ee..3428a8d427b2 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2744,9 +2744,9 @@ static int kvm_s390_handle_pv(struct kvm *kvm, struct kvm_pv_cmd *cmd)
->  		if (copy_from_user(&parms, argp, sizeof(parms)))
->  			break;
->  
-> -		/* Currently restricted to 8KB */
-> +		/* Currently restricted to 1MiB */
->  		r = -EINVAL;
-> -		if (parms.length > PAGE_SIZE * 2)
-> +		if (parms.length > SZ_1M)
->  			break;
->  
->  		r = -ENOMEM;
+> ----------------------------------------------------------------
+> LoongArch KVM changes for v6.20
+>
+> 1. Add more CPUCFG mask bits.
+> 2. Improve feature detection.
+> 3. Add FPU/LBT delay load support.
+> 4. Set default return value in KVM IO bus ops.
+> 5. Add paravirt preempt feature support.
+> 6. Add KVM steal time test case for tools/selftests.
+>
+> ----------------------------------------------------------------
+> Bibo Mao (13):
+>       LoongArch: KVM: Add more CPUCFG mask bits
+>       LoongArch: KVM: Move feature detection in kvm_vm_init_features()
+>       LoongArch: KVM: Add msgint registers in kvm_init_gcsr_flag()
+>       LoongArch: KVM: Check VM msgint feature during interrupt handling
+>       LoongArch: KVM: Handle LOONGARCH_CSR_IPR during vCPU context switch
+>       LoongArch: KVM: Move LSX capability check in exception handler
+>       LoongArch: KVM: Move LASX capability check in exception handler
+>       LoongArch: KVM: Move LBT capability check in exception handler
+>       LoongArch: KVM: Add FPU/LBT delay load support
+>       LoongArch: KVM: Set default return value in KVM IO bus ops
+>       LoongArch: KVM: Add paravirt preempt feature in hypervisor side
+>       LoongArch: KVM: Add paravirt vcpu_is_preempted() support in guest s=
+ide
+>       KVM: LoongArch: selftests: Add steal time test case
+>
+>  arch/loongarch/include/asm/kvm_host.h      |   9 +++
+>  arch/loongarch/include/asm/kvm_para.h      |   4 +-
+>  arch/loongarch/include/asm/loongarch.h     |   1 +
+>  arch/loongarch/include/asm/qspinlock.h     |   4 +
+>  arch/loongarch/include/uapi/asm/kvm.h      |   1 +
+>  arch/loongarch/include/uapi/asm/kvm_para.h |   1 +
+>  arch/loongarch/kernel/paravirt.c           |  21 ++++-
+>  arch/loongarch/kvm/exit.c                  |  21 ++++-
+>  arch/loongarch/kvm/intc/eiointc.c          |  43 ++++------
+>  arch/loongarch/kvm/intc/ipi.c              |  26 ++----
+>  arch/loongarch/kvm/intc/pch_pic.c          |  31 ++++---
+>  arch/loongarch/kvm/interrupt.c             |   4 +-
+>  arch/loongarch/kvm/main.c                  |   8 ++
+>  arch/loongarch/kvm/vcpu.c                  | 125 +++++++++++++++++++++++=
+------
+>  arch/loongarch/kvm/vm.c                    |  39 +++++----
+>  tools/testing/selftests/kvm/Makefile.kvm   |   1 +
+>  tools/testing/selftests/kvm/steal_time.c   |  96 ++++++++++++++++++++++
+>  17 files changed, 319 insertions(+), 116 deletions(-)
+>
 
 
