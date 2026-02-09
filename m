@@ -1,228 +1,184 @@
-Return-Path: <kvm+bounces-70582-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70583-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uLwZK9aBiWkg+QQAu9opvQ
-	(envelope-from <kvm+bounces-70582-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 07:42:30 +0100
+	id d3zZOgWIiWl1+gQAu9opvQ
+	(envelope-from <kvm+bounces-70583-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 08:08:53 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EEC910C301
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 07:42:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64DF410C544
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 08:08:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4022930066B2
-	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 06:42:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D91E43008D34
+	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 07:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1348C318B96;
-	Mon,  9 Feb 2026 06:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50AA62E54B6;
+	Mon,  9 Feb 2026 07:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AcIp51Zd";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="SL2/9lAP"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KX3zzn0U"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088502EBBB3
-	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 06:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770619334; cv=pass; b=GjD/z2QZKMIDeBN72hF5YDODCCIyM0x5c6Ap5CoB5Yk6yeq7ngcfx05aUwWeKg+sii+4B5IMMxfHV/DIqiS7E9m8U2VbjRZacruCOc34+A24R1wSOQgFvkbyCHAKqoSax2G5FeYQsNEljHpFyt9uipPrxA4ZHKUg3yBEByZ16wI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770619334; c=relaxed/simple;
-	bh=O8cJ6Kj90NvIyQjjqT95QHWqU8SDK+V3+SP8mwmcVYc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Lux7NHfQjkaXMHHvuONxzrLBqJEUU+/9h77pzwN0s3adwFkfL7eQetay32Q00rb8R64j2cGkPftTZRx8uDx8K+/RkobEjBeH5RQOAFwXTy5oVOTpoLEBYDRdlpTvhldAtW1GZi25rN8A/VLH0IhWHcQ5bXYh88eD6B2Pky0qPIU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AcIp51Zd; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=SL2/9lAP; arc=pass smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770619333;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+rAEkP/ENKOKGthOaBA1iQpwk+zp5uugkrzm6gZ8wcU=;
-	b=AcIp51ZdvrrSeSz2lLcTJPB35s38Mze4+WmTjAMRhySO8xZ+l4KGYThx8QzW3nQD/5QlcR
-	0lO+Zscqy0VOUAo5xrz7uVji6R8Z4XQr1YaTx1VI6Sc5r6Sq1w3kUzzNq9YMljXZNO4i5u
-	swUIRdua0OsCSywz7wqLDbURzq8OgR8=
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
- [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-471-aa763GclPf2Iu4kssNZkNg-1; Mon, 09 Feb 2026 01:42:11 -0500
-X-MC-Unique: aa763GclPf2Iu4kssNZkNg-1
-X-Mimecast-MFC-AGG-ID: aa763GclPf2Iu4kssNZkNg_1770619331
-Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-5fa75a19f21so10633849137.1
-        for <kvm@vger.kernel.org>; Sun, 08 Feb 2026 22:42:11 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770619331; cv=none;
-        d=google.com; s=arc-20240605;
-        b=dOjowAT/Ll0ZKWSWDTtqgZ2G8fYb8sRP5BKVA70Do861KArxnUFXJ1oCtHWtj9hsQH
-         i+TcR+4dVMULWG13sXS3tJLaG+12X4ECDBoVWOmbv4vQq0ByJyW6bUj/oXFvOoPFaIg5
-         S5UORj/2+sYe0TL29zhIPLIr9jskiIJBuripyxZl6txFdr/yJJtbMGvV2TffO1aA8wVs
-         Zxo4li17c6C5Bzkp1V4wYrcoCxPYr9u3icXXiY42WKHX+lCuNF/7UA91Qi+IANrTs7K7
-         sAba5cEcLeskI2byR5piutadAvyW0YpbTaGHwKIvUEJJbG7TiyW8pARHyphKpfocEzQL
-         odKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=+rAEkP/ENKOKGthOaBA1iQpwk+zp5uugkrzm6gZ8wcU=;
-        fh=PaeNc6+BMbmFjapG1tXZ/5tKRZTBOg8jrqAv/CX7iNs=;
-        b=SkSPPfQq3NPh183/a0mMatEfOP7rWZGHW1S2R9o9akTJbRbTRAup+LGEZivY7zlbhw
-         YqPRPUWJ58OuT4T9pcZwj0xX61lhoF4LU22/QwkFD/3n6xXREpDtQ3fy/5OrydcxPUQm
-         gvzcfe31RLeI45qfeW1x2Nxl1x51ZRm97IrdUR9KbBojhLAcnPLE2l9r/3KDWb7TaCRj
-         6kVev497SbpOUvPPc9i/gy0tsbasJPRlEylhrBBo495JlpEjuHeOfE7kW5N2NB+zUoi2
-         iKW3h92o3sO8en3D430X+VIp4QgyQkl8Iw5bXOjUhf//AetwnAlnEjEGUamiJ9mkeQ+Q
-         zdOg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9C2450F2
+	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 07:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770620923; cv=none; b=EzNeaspIVrj93xnYe1A1Ws8KGK+e1jE0MQeD/FUys+0spbl0gSlN5owSlqBOMmJtEfmeEjnswabE7HXxR3hXPmnXobK6ArB59uoFwOEVwqCSz/+WRARLFNFIgKY83XfsINxVL2dX4Pp5BfL6juYhQQQK7TxTAr1xR3PtX3AE5vw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770620923; c=relaxed/simple;
+	bh=EZYUD5+KJqUgR0yt7DOS/mqm8ez6Rb2C05scox1rwMI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kuv/zjqkqSVP4+uUJOeHN+MKqxHLL2DXc3PggzG3mn40yAbqwjOSL+NyaGKptIf3wX82sxFampTcByMLtTHuJ7aEYDYQPTml0earDV8PAyX74CMgUN2Ow7DOlUYTuWHBOsgD92otOG94qDE51XjRAnDLFEe/YiA6yYycFi+sN24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KX3zzn0U; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-81f4ba336b4so3326260b3a.1
+        for <kvm@vger.kernel.org>; Sun, 08 Feb 2026 23:08:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770619331; x=1771224131; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+rAEkP/ENKOKGthOaBA1iQpwk+zp5uugkrzm6gZ8wcU=;
-        b=SL2/9lAPYkmcyzw1pHxouL+AgTG+qAmi6/pDxi4Zp1UqjlVHm23AKzp2D/7IXLe26U
-         +XKwu5uyuqso08OiAoStwDyIN0IVjwBeJA1quEh97fldnKC427Qoy1dwkHph318NaApd
-         BqWbiAkh80AdEAcD6IfGYCRbK2Ka5I9QI2j2wogf2yOfXqPQUAblIyZrXbeL8ZvXWDLa
-         faXEuaZfwe8Ry2eO/Dd9u3DalOYnqFrmKwa0/Y58AdwWBaTjo+4yBd2h8EQyW5lZ50zi
-         1z9MIIQrThBYytgwOREuMaezsKCRGCouLArJciHEZ/LXb8kVMSA78nSdaXw+d9JzOm88
-         celA==
+        d=linaro.org; s=google; t=1770620923; x=1771225723; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wncuITwrtEChkffVzXmna42OBWtwxX9kHQYFhcI0LHY=;
+        b=KX3zzn0UPaNi0abvvQgqFU42EmFPe025tYMIwV9DR2dZSb5Xe8MJSSN8qicLkqZZcP
+         memOYElgoz2eADNVodLMVG09aJHzxPc+MhGIYukffIp3lh8f2/GhQjRlwQG/2VzxPOln
+         b3uwGcSbXIpY0/A1fPbWSbNz9jSvDL2JiWGzX7JcOLmFGHcD7ZVMUe/7vHKFGLjEBZZA
+         TtuM1pA2UvtTOkZK4eTO/mmjwLjFVUukytGi8MwYaWn35OkVsjL4liAGxp/7T0qqdrMq
+         MWXBMm8PqnCdGkJ3DRPZtA9JprGQYYxE93xY9LFspmrCRIYwW6fVymuw7ON38IK1VaKQ
+         ddkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770619331; x=1771224131;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+rAEkP/ENKOKGthOaBA1iQpwk+zp5uugkrzm6gZ8wcU=;
-        b=AWyIuvN/E6PpOSE5GNq0GztiSR6U/b/h1CXUBAG022EKVgfWR/jJmFB2WyhcSB3Pww
-         v33hettGbXUEH6nVLTrVNLwhgJgXzogTW2vqE1k3vyVjQsYNc/ZFp+WKUll/zMS8j1gf
-         CzTd3aYB6Vs3tB2XwvrEnOGahq9Jj34c5fQ7vgkBWGAj5Kwcj8EOcn/7BR/vmhM7HE/a
-         rxeisQO01LgHS6fOpht133USAlzQEdXy+YsjNT5n5eE9D4SQFh/lzPKx2m6T+yV1lcqg
-         Qt1uHbOs7DqCD6TBfrnu7abH9go6ZJ9UO217fOUTZjsGRjB4aetrf1LTD/5MVCKiDKMa
-         /CSw==
-X-Forwarded-Encrypted: i=1; AJvYcCWNVDJgaRQpMrLqYlGmDgsY9IPpC16+j6bJyfxHjYzhf4AcD/edE/uzsZu44YjNjEeoqS8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKmRVLy8CqOfmQcMk3KJd9ouWal9O/kYt3YNGOadIVM8JAczTq
-	wrV8knJCiRNiCnr21HOxEhCCXhkptKXGE5wjpiDlWJ2QLERtFAZgW1ZQvNo5wO9hYCIlLs3Ysa2
-	dWkkjrg0T4krEQRr5GTkkE2Y30exGSfuYvoX2Yx41AktgubpuLY6HiA7OWYnOOEbjVszApPdnAf
-	Bi7HSavJuUhi7mXy/FMGvou8keRnVJ
-X-Gm-Gg: AZuq6aKTVbNS4JxS5M8UbhzIIROydX1OGhrNlcqBQjwEyg8yGxNdZcI4pPqTQeVxZET
-	jEXGbNkhqFtX6M6f9yBJM45btVrc27/3V2KW8u69N6Z8opx6tIfA/+QJDGFtC+rhG50Yjn9ilfk
-	Y6/HZUF/bTYUMCrEIdw8xZV3xf42pJvf5barkbm7IOYy9BoHt0w0jJ+OsP53XIXFMZN70=
-X-Received: by 2002:a05:6102:5108:b0:5ef:af68:e6bd with SMTP id ada2fe7eead31-5fae76bedd7mr2971616137.2.1770619331275;
-        Sun, 08 Feb 2026 22:42:11 -0800 (PST)
-X-Received: by 2002:a05:6102:5108:b0:5ef:af68:e6bd with SMTP id
- ada2fe7eead31-5fae76bedd7mr2971613137.2.1770619330991; Sun, 08 Feb 2026
- 22:42:10 -0800 (PST)
+        d=1e100.net; s=20230601; t=1770620923; x=1771225723;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wncuITwrtEChkffVzXmna42OBWtwxX9kHQYFhcI0LHY=;
+        b=tp8n5QvqnfAEUr4b2z6pj89xZ3fYtiqp/kxIfTuolExaZqGa8xRQj258De2FxTByCX
+         ODdDS29QP75Fh0KLg2MQCngsfF+A2D7+uswGqQdFmLIhE08T8Z8QXRL+WgupCKvYRejv
+         TilovPUq7ajWTcCtgtModVRCh36Gsa2bd70aiMh4VQOSgSqxgdEvQXWKpOHtUIkJ149i
+         ghXhsrWntukke0SkEET2PnkOvsnBmh/mkuQyXDLqyFajwHd8brQ7SjdNnyMFQJunQTqZ
+         6/Toblm5qJqnkDEnhFYVC4YcOD6luBoSBHCcuwUetyIFxYsxzzpHrImfxrAxfKR8O+Tq
+         ++8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUD8EpuPNdYzZNVGqQgW2zoFExcy+VxPlGTWwL+4FpYybsv5kLW5ZPdzHzB3LMiajELb2k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9uLFthSbFI7LcFOilPLu0IIEJqVOdU36O4wNVhMhA3ZSPZDSx
+	2NPMBDAuCBdpGxswJdD5nvvRuqftdQKN1NSxy2f1lKeGhLnyvUF38pxZlx9CzoIfQNY=
+X-Gm-Gg: AZuq6aLTAak3THFIBh1zKLETYDAwFYe6ppDqI+7aqlzxh09SuW7ENLnStI6bqSnHxqB
+	Ep4PotDgPk55ptR1GSsBmunil9lgJLdwMJgfDEiFsfDlUbgWx5tL0Q+3MRPr7ekEzjivWblrjtS
+	qLJWmijRU+qVvVtZillSJ/Eze1nq2vgHbTHVuKo7AjFnbDMiXFRTBBPFivMlwhfjXhebwMj5FwN
+	vjFU2SilBth0rgQp8TzPKal1A2RSwmGk15VKqTL3GbUPZ8Tc+M9bLXERco6vEXMtEKQnS2orfRT
+	moT3+Pr/A2c88Cc1xXixj1fPP4NE06x6mV992JyDsqdDBfq3J67CvlUrxvAOBIwRs8l9Ac5j50T
+	T6C6Zfk2iMyTarn7R5EYRYiNHeVK9J5PolWFfCgZ0zWecZFicbaQhhvmP8lh7Z8S+Rbftc5/bny
+	wRUr1qxNrWkMLlZegyATZtdQK6iUpwLhJ1tWY5b345uJ5Bjj3bHVw5J+IPn3zKhkqRQ/lJ5nzk4
+	A==
+X-Received: by 2002:a05:6a00:1253:b0:81f:997e:59a0 with SMTP id d2e1a72fcca58-8244176e218mr9717502b3a.64.1770620922529;
+        Sun, 08 Feb 2026 23:08:42 -0800 (PST)
+Received: from ?IPV6:2001:8003:e109:dd00:7b35:2dcc:ff07:8193? ([2001:8003:e109:dd00:7b35:2dcc:ff07:8193])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82441695f50sm8737954b3a.22.2026.02.08.23.08.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 08 Feb 2026 23:08:42 -0800 (PST)
+Message-ID: <a6320ab4-7ece-4618-8d73-549df7a34886@linaro.org>
+Date: Mon, 9 Feb 2026 17:08:34 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260208143441.2177372-1-lulu@redhat.com> <20260208143441.2177372-2-lulu@redhat.com>
- <20260208123029-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20260208123029-mutt-send-email-mst@kernel.org>
-From: Cindy Lu <lulu@redhat.com>
-Date: Mon, 9 Feb 2026 14:41:27 +0800
-X-Gm-Features: AZwV_Qiz8bHINy5XI2QvLVezbxk6iTbCBvt72uLxPgwE6Zaly7hURPFi-VGLC_8
-Message-ID: <CACLfguX6o5Uj4SKsPAsX53wjuNtvCxsCgK5AzfffHpdt1NrZNQ@mail.gmail.com>
-Subject: Re: [RFC 1/3] uapi: vhost: add vhost-net netfilter offload API
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 06/12] target/arm/tcg: duplicate tcg/arith_helper.c and
+ tcg/crypto_helper.c between user/system
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
+Cc: anjo@rev.ng, Jim MacArthur <jim.macarthur@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, kvm@vger.kernel.org, qemu-arm@nongnu.org
+References: <20260206042150.912578-1-pierrick.bouvier@linaro.org>
+ <20260206042150.912578-7-pierrick.bouvier@linaro.org>
+ <6c5eb308-56e6-487a-ad7b-8f0da70ab7cd@linaro.org>
+ <e291f290-a188-4106-8648-48d4c464dfed@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Content-Language: en-US
+In-Reply-To: <e291f290-a188-4106-8648-48d4c464dfed@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70582-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lulu@redhat.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70583-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.994];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 8EEC910C301
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[richard.henderson@linaro.org,kvm@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linaro.org:mid,linaro.org:dkim]
+X-Rspamd-Queue-Id: 64DF410C544
 X-Rspamd-Action: no action
 
-s
+On 2/9/26 15:52, Pierrick Bouvier wrote:
+> On 2/8/26 9:00 PM, Richard Henderson wrote:
+>> On 2/6/26 14:21, Pierrick Bouvier wrote:
+>>> In next commit, we'll apply same helper pattern for base helpers
+>>> remaining.
+>>>
+>>> Our new helper pattern always include helper-*-common.h, which ends up
+>>> including include/tcg/tcg.h, which contains one occurrence of
+>>> CONFIG_USER_ONLY.
+>>> Thus, common files not being duplicated between system and target
+>>> relying on helpers will fail to compile. Existing occurrences are:
+>>> - target/arm/tcg/arith_helper.c
+>>> - target/arm/tcg/crypto_helper.c
+>>>
+>>> There is a single occurrence of CONFIG_USER_ONLY, for defining variable
+>>> tcg_use_softmmu. The fix seemed simple, always define it.
+>>> However, it prevents some dead code elimination which ends up triggering:
+>>> include/qemu/osdep.h:283:35: error: call to 'qemu_build_not_reached_always' declared 
+>>> with attribute error: code path is reachable
+>>>     283 | #define qemu_build_not_reached()  qemu_build_not_reached_always()
+>>>         |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>> tcg/x86_64/tcg-target.c.inc:1907:45: note: in expansion of macro 'qemu_build_not_reached'
+>>>    1907 | # define x86_guest_base (*(HostAddress *)({ qemu_build_not_reached(); NULL; }))
+>>>         |                                             ^~~~~~~~~~~~~~~~~~~~~~
+>>> tcg/x86_64/tcg-target.c.inc:1934:14: note: in expansion of macro 'x86_guest_base'
+>>>    1934 |         *h = x86_guest_base;
+>>>         |              ^~~~~~~~~~~~~~
+>>>
+>>> So, roll your eyes, then rollback code, and simply duplicate the two
+>>> files concerned. We could also do a "special include trick" to prevent
+>>> pulling helper-*-common.h but it would be sad since the whole point of
+>>> the series up to here is to have something coherent using the exact same
+>>> pattern.
+>>
+>> tcg_use_softmmu is a stub, waiting for softmmu to be enabled for user-only.
+>> Which is a long way away.
+>>
+>> It's also not used outside of tcg/, which means we should move it to tcg/tcg-internal.h.
+>>
+> 
+> Thanks, I didn't think about moving it somewhere else.
+> This does the trick indeed.
 
-On Mon, Feb 9, 2026 at 1:32=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->
-> On Sun, Feb 08, 2026 at 10:32:22PM +0800, Cindy Lu wrote:
-> > Add VHOST_NET_SET_FILTER ioctl and the filter socket protocol used for
-> > vhost-net filter offload.
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > ---
-> >  include/uapi/linux/vhost.h | 20 ++++++++++++++++++++
-> >  1 file changed, 20 insertions(+)
-> >
-> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> > index c57674a6aa0d..d9a0ca7a3df0 100644
-> > --- a/include/uapi/linux/vhost.h
-> > +++ b/include/uapi/linux/vhost.h
-> > @@ -131,6 +131,26 @@
-> >   * device.  This can be used to stop the ring (e.g. for migration). */
-> >  #define VHOST_NET_SET_BACKEND _IOW(VHOST_VIRTIO, 0x30, struct vhost_vr=
-ing_file)
-> >
-> > +/* VHOST_NET filter offload (kernel vhost-net dataplane through QEMU n=
-etfilter) */
-> > +struct vhost_net_filter {
-> > +     __s32 fd;
-> > +};
-> > +
-> > +enum {
-> > +     VHOST_NET_FILTER_MSG_REQUEST =3D 1,
-> > +};
-> > +
-> > +#define VHOST_NET_FILTER_DIRECTION_TX 1
-> > +
-> > +struct vhost_net_filter_msg {
-> > +     __u16 type;
-> > +     __u16 direction;
-> > +     __u32 len;
-> > +};
-> > +
-> > +
-> > +#define VHOST_NET_SET_FILTER _IOW(VHOST_VIRTIO, 0x31, struct vhost_net=
-_filter)
-> > +
-> >  /* VHOST_SCSI specific defines */
->
-> can we get some info on what this is supposed to be doing, pls?
-> it belongs here where userspace devs can find it, not hidden
-> in code.
->
-Hi Michael
-We plan to add a new feature to support zero packet loss during live
-migration, so we=E2=80=99re introducing this new UAPI. Thanks, I'll add mor=
-e
-information here.
-Thanks
-Cindy
->
-> >
-> >  #define VHOST_SCSI_SET_ENDPOINT _IOW(VHOST_VIRTIO, 0x40, struct vhost_=
-scsi_target)
-> > --
-> > 2.52.0
->
+You can also make it always a #define.  The variable for user-only is never set to true.
 
+
+r~
 
