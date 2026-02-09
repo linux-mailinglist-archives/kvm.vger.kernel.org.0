@@ -1,136 +1,228 @@
-Return-Path: <kvm+bounces-70639-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70640-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6N8cERYuimmVIAAAu9opvQ
-	(envelope-from <kvm+bounces-70639-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 19:57:26 +0100
+	id KIkoNbI3immhIQAAu9opvQ
+	(envelope-from <kvm+bounces-70640-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 20:38:26 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01E30113E63
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 19:57:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76AA91142AD
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 20:38:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E4067301AB82
-	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 18:57:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E0C603004223
+	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 19:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1FFC3D903F;
-	Mon,  9 Feb 2026 18:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B489B42668A;
+	Mon,  9 Feb 2026 19:38:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NROPUwIV"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31DBC3033D2;
-	Mon,  9 Feb 2026 18:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9183F23C3;
+	Mon,  9 Feb 2026 19:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770663432; cv=none; b=puS6ztst0pXrguCXV//PcydCuRIJTpZPzbH3bXqZ3vNZi8bmuVGESUCBg3yVPBYm8k5qS5kHyM5MBlcmKa10tydhGG2hdlvNeTNjBldXP+WU5QMtyBgK19yxReHtFy6C+UJQskAeZuGVktVeMos5oYl5XmWk0da/HCcynU9CdIk=
+	t=1770665893; cv=none; b=nHg32Gibvsnmt+cB02Pa7El92Qksg+KXi4/hIpq8z96ABoBT67YWb7wLFpocUy1pXHoF9TuTzAOfGglwdq9MHI0ITPzd3IqazhUzjwXbW6Ai+ajCUdVjiOESCydJGp+OQDgEHwIFiM5fDkwpzGalPnAMti3ePHe5WYxEiQcz5qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770663432; c=relaxed/simple;
-	bh=Pd6X/zKUpHxyzsOzhkFBQXmftpIR9RT4sACEVCZ1rs0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hbnABhU1FI6ynYL/QzOVqM/zztHZbYvrBzwaAT6ZOsKQcpKqy+HBp7fsHsKNwBsOoGdPXbb7pmoyAq7pCRTuBC8HkR9lqGqngBjIdoH9TuxvarD6bXFOpXlg69x85yHO1CUawZsJMaUHAHWxTEp2VzXJzSeW0ZIjaKaFvEvqyvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0BAC1339;
-	Mon,  9 Feb 2026 10:57:05 -0800 (PST)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B8D043F740;
-	Mon,  9 Feb 2026 10:57:08 -0800 (PST)
-Date: Mon, 9 Feb 2026 18:57:06 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, will@kernel.org, maz@kernel.org,
-	broonie@kernel.org, oliver.upton@linux.dev, miko.lenczewski@arm.com,
-	kevin.brodsky@arm.com, ardb@kernel.org, suzuki.poulose@arm.com,
-	lpieralisi@kernel.org, scott@os.amperecomputing.com,
-	joey.gouly@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com,
-	shuah@kernel.org, mark.rutland@arm.com, arnd@arndb.de
-Subject: Re: [PATCH v12 2/7] arm64: cpufeature: add FEAT_LSUI
-Message-ID: <aYouAv_EjICIN8oA@arm.com>
-References: <20260121190622.2218669-1-yeoreum.yun@arm.com>
- <20260121190622.2218669-3-yeoreum.yun@arm.com>
- <aYY2CyHWtplQ-fuS@arm.com>
+	s=arc-20240116; t=1770665893; c=relaxed/simple;
+	bh=WUrsjMXh3pCtMDG6ztjXdnirrLv7ZfvESTsITHNcuIk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bp0YXh0YjDCWYGoqNN/Ptgl+diYjP3PSGk8IGfx/B/XOh3Q6JEoAfVCybnRe5RzZrUQrJlMynnLjTsP2rLQkWB/uGsgHzZlYImaFMJfu+F7ssmMaXUrexL6I6Ui1gdozfOAiGC1Oe3myS3Y4IRphTPROLvqCRIyy+smh8nPX9z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NROPUwIV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8445FC116C6;
+	Mon,  9 Feb 2026 19:38:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770665892;
+	bh=WUrsjMXh3pCtMDG6ztjXdnirrLv7ZfvESTsITHNcuIk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NROPUwIVpEs+0lkbQgRVAMYM0KWltV1UEvnfc5KeyE50drflHAoFbtUqFjiqTqFs6
+	 tohg1prbhlL0gLz9/ViTyhkgUikNRuISrKQ5Xw8R0JOpk8qWWY2xWfb52km+lUDIoR
+	 v3oe8Ntt9fqCwZfOJIcKlqkdUeGnFsZXeyr6C80qbEwr8+ykoUgpicU/44Pc6rYWCu
+	 5mLHMoR13r9ctMMhCsgJYt0+cblqjqcBcTd4UXjMzaQg0q1TZvibzmToKWZBSGMNsW
+	 Kro4PB4mYCMZ6GXGq8fn7huOjXf2YEggPuoHZEHFEo5IpExc1teHwWUfmzMIP5LTRW
+	 d9aVaLJ+MchTw==
+Message-ID: <d3df9637-18f6-4143-befd-1550320b4dc8@kernel.org>
+Date: Mon, 9 Feb 2026 20:38:06 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aYY2CyHWtplQ-fuS@arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: guest_memfd: Disable VMA merging with VM_DONTEXPAND
+To: Ackerley Tng <ackerleytng@google.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: syzbot+33a04338019ac7e43a44@syzkaller.appspotmail.com,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+ syzkaller-bugs@googlegroups.com, michael.roth@amd.com,
+ vannapurve@google.com, kartikey406@gmail.com
+References: <697d115a.050a0220.1d61ec.0004.GAE@google.com>
+ <20260204170144.2904483-1-ackerleytng@google.com>
+ <CAEvNRgF75EsHL8idLzFzbk0K9uhE70AMj5Vitp4cKNg_5WqQKw@mail.gmail.com>
+ <aYO8DLCWw8FEQUAU@google.com>
+ <16e5a36e-fff0-4a54-9c5c-a8e411659108@kernel.org>
+ <CAEvNRgHX7MPSBX7pMeSWEtzc0-bJhAZ=pv+WF0VtOv9Tx0Jpxw@mail.gmail.com>
+ <CAEvNRgEO3gB6Oee2C-+8Pu=+3KY0C98yrmesKO2SMVSvs3anfA@mail.gmail.com>
+ <442d7ce8-0de3-4f5a-95ed-3be9bdaa7e47@kernel.org>
+ <CAEvNRgGjcMY-DMLu1ZaCRXA8uCeueBD9a-a1gh-UEB7nqpfTfg@mail.gmail.com>
+From: "David Hildenbrand (Arm)" <david@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=david@kernel.org; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <CAEvNRgGjcMY-DMLu1ZaCRXA8uCeueBD9a-a1gh-UEB7nqpfTfg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70639-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[syzkaller.appspotmail.com,vger.kernel.org,redhat.com,googlegroups.com,amd.com,google.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[catalin.marinas@arm.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-70640-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,arm.com:mid]
-X-Rspamd-Queue-Id: 01E30113E63
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[kvm,33a04338019ac7e43a44];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 76AA91142AD
 X-Rspamd-Action: no action
 
-On Fri, Feb 06, 2026 at 06:42:19PM +0000, Catalin Marinas wrote:
-> On Wed, Jan 21, 2026 at 07:06:17PM +0000, Yeoreum Yun wrote:
-> > +#ifdef CONFIG_ARM64_LSUI
-> > +static bool has_lsui(const struct arm64_cpu_capabilities *entry, int scope)
-> > +{
-> > +	if (!has_cpuid_feature(entry, scope))
-> > +		return false;
-> > +
-> > +	/*
-> > +	 * A CPU that supports LSUI should also support FEAT_PAN,
-> > +	 * so that SW_PAN handling is not required.
-> > +	 */
-> > +	if (WARN_ON(!__system_matches_cap(ARM64_HAS_PAN)))
-> > +		return false;
-> > +
-> > +	return true;
-> > +}
-> > +#endif
+On 2/9/26 19:24, Ackerley Tng wrote:
+> "David Hildenbrand (Arm)" <david@kernel.org> writes:
 > 
-> I still find this artificial dependency a bit strange. Maybe one doesn't
-> want any PAN at all (software or hardware) and won't get LSUI either
-> (it's unlikely but possible).
+>> On 2/8/26 18:34, Ackerley Tng wrote:
+>>> Ackerley Tng <ackerleytng@google.com> writes:
+>>>
+>>>
+>>> I trimmed the repro to this:
+>>>
+>>> static void test_guest_memfd_repro(void)
+>>> {
+>>> 	struct kvm_vcpu *vcpu;
+>>> 	uint8_t *unaligned_mem;
+>>> 	struct kvm_vm *vm;
+>>> 	uint8_t *mem;
+>>> 	int fd;
+>>>
+>>> 	vm = __vm_create_shape_with_one_vcpu(VM_SHAPE_DEFAULT, &vcpu, 1, guest_code);
+>>>
+>>> 	fd = vm_create_guest_memfd(vm, SZ_2M * 2, GUEST_MEMFD_FLAG_MMAP |
+>>> GUEST_MEMFD_FLAG_INIT_SHARED);
+>>>
+>>> 	unaligned_mem = mmap(NULL, SZ_2M + SZ_2M, PROT_READ | PROT_WRITE,
+>>> MAP_FIXED | MAP_SHARED, fd, 0);
+>>> 	mem = align_ptr_up(unaligned_mem, SZ_2M);
+>>> 	TEST_ASSERT(((unsigned long)mem & (SZ_2M - 1)) == 0, "returned
+>>> address must be aligned to SZ_2M");
+>>>
+>>> 	TEST_ASSERT_EQ(madvise(mem, SZ_2M, MADV_HUGEPAGE), 0);
+>>>
+>>> 	for (int i = 0; i < SZ_2M; i += SZ_4K)
+>>> 		READ_ONCE(mem[i]);
+>>>
+>>> 	TEST_ASSERT_EQ(madvise(mem, SZ_2M, MADV_COLLAPSE), 0);
+>>>
+>>> 	TEST_ASSERT_EQ(madvise(mem, SZ_2M, MADV_DONTNEED), 0);
+>>>
+>>> 	/* This triggers the WARNing. */
+>>> 	READ_ONCE(mem[0]);
+>>>
+>>> 	munmap(unaligned_mem, SZ_2M * 2);
+>>>
+>>> 	close(fd);
+>>> 	kvm_vm_free(vm);
+>>> }
+>>>
+>>> And tried to replace the fd creation the secretmem equivalent
+>>>
+>>> 	fd = syscall(__NR_memfd_secret, 0);
+>>> 	TEST_ASSERT(fd >= 0, "Couldn't create secretmem fd.");
+>>> 	TEST_ASSERT_EQ(ftruncate(fd, SZ_2M * 2), 0);
+>>>
+>>> Should a guest_memfd selftest be added to cover this?
+>>>
+>>> MADV_COLLAPSE fails with EINVAL, but it does go through to
+>>> hpage_collapse_scan_file() -> collapse_file(), before failing because
+>>> when collapsing the page, copy_mc_highpage() returns > 0.
+>>
+>> Just what I suspected. :)
+>>
+>> Thanks for digging into the details!
+>>
 > 
-> We have the uaccess_ttbr0_*() calls already for !LSUI, so maybe
-> structuring the macros in a way that they also take effect with LSUI.
-> For futex, we could add some new functions like uaccess_enable_futex()
-> which wouldn't do anything if LSUI is enabled with hw PAN.
+> Happy to help :)
+> 
+> In general, do we want the reproducers added as selftests? Should this
+> be added as part of tools/testing/selftests/kvm/guest_memfd_test.c
 
-Hmm, I forgot that we removed CONFIG_ARM64_PAN for 7.0, so it makes it
-harder to disable. Give it a try but if the macros too complicated, we
-can live with the additional check in has_lsui().
-
-However, for completeness, we need to check the equivalent of
-!system_uses_ttbr0_pan() but probing early, something like:
-
-	if (IS_ENABLED(CONFIG_ARM64_SW_TTBR0_PAN) &&
-	    !__system_matches_cap(ARM64_HAS_PAN)) {
-		pr_info_once("TTBR0 PAN incompatible with FEAT_LSUI; disabling FEAT_LSUI");
-		return false;
-	}
+I guess adding it to guest_memfd_test.c and asserting that MADV_COLLAPSE 
+fails as expected could be a reasonable test case. It's not a lot of 
+code and easy to verify.
 
 -- 
-Catalin
+Cheers,
+
+David
 
