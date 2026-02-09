@@ -1,238 +1,196 @@
-Return-Path: <kvm+bounces-70617-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70618-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MIS+FBIPimlrGAAAu9opvQ
-	(envelope-from <kvm+bounces-70617-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 17:45:06 +0100
+	id EKj+G/0SimlrGAAAu9opvQ
+	(envelope-from <kvm+bounces-70618-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:01:49 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5724D112A22
-	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 17:45:05 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 260E6112CFC
+	for <lists+kvm@lfdr.de>; Mon, 09 Feb 2026 18:01:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 537083007213
-	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 16:45:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F2418300BBA2
+	for <lists+kvm@lfdr.de>; Mon,  9 Feb 2026 17:01:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16D1038552C;
-	Mon,  9 Feb 2026 16:45:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46739385ECB;
+	Mon,  9 Feb 2026 17:01:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="To2cRWNE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4lAoT8TW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 198E23815C5
-	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 16:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770655499; cv=pass; b=qCCijILtR3pSpOTAF7jC3jXRqr/l8GHMvPyhUjDspa4xoT74RmbPrae9GmNyvrzg+Mn0uDihqhNO3gkZms6NPdC8noxzdzQi6LtCuzhmPhGL6CM+sa+cPF8zehu18LQufrJLKBilzDObbQWQdtC8oUzOuKcsvmpQ3NasNXx/0UU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770655499; c=relaxed/simple;
-	bh=wrdplUFA6RKQnfr1gdqv3J36haYwyiXQ+Y3/DHl6WiA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jWf7pdwNkla+7OsQPXGa5aG5OTYsnWEiUYv8dwWieUkTOjuMrrG5YurKNQlxMXYlHCOHLuOPCDf+iQc8bKSj/bZoO+5jyRwcq0BjRr8xd77hAPWyrg0vjqIs4V0YuRsgO6qFLehzbVUna9FFWntdgHINIaOED3xwmCqN9+TnzNU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=To2cRWNE; arc=pass smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFB82D372D
+	for <kvm@vger.kernel.org>; Mon,  9 Feb 2026 17:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770656485; cv=none; b=JRg6vTkLPhzloj1bPNfVqnpmnj+dwuPc+sIa/JKRIN5W6rolaZCX4m/7RQCQb8HFGub4hOmh0kCAU8V8473IrUWmL2SVp0RovhxTP3nPQns1+VmlQXrp09IUdRr/58j92pCsFwK4N9l04OJO8IyT7+PJ/4iGUhLs/WUFy2aYT10=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770656485; c=relaxed/simple;
+	bh=ZgnQqes4djfrfi9IYR4uHMRZrCYkJ/8HL12/68MoSIw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=E5txz7NEpKRILr59zyZrsgrtIPpPFcQvSV+OqzW+P91zmfzrt9NMcEtbHNAFxfmSE5ld62C9CID4mp43JyGxUN2tiiecE+aSA9MYsVoVn8pnBtyoHZ/ceg55ZUpO5RDDyLXbTmM9ciuthRmqcRE8ZXWl3r4DIxobYH1gcTvYCBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4lAoT8TW; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-65821afe680so14377a12.1
-        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 08:44:58 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770655497; cv=none;
-        d=google.com; s=arc-20240605;
-        b=geK2Wt99XJf3dMqWCIl/oOV2wwpDBgLFpJh6AirgVJQgH+A40T+rFoDl2QeezX1IGJ
-         FfeY9Sva9CLVDVVhyq6NBDVOQ1ywFfMmw+csHACpsW7+hTsOV22oHnPl6eGvU5ldZzzE
-         FlODPsOR0UV0Ey0jd5Qo4PLfoJ3IPyL41hwtc4zLIlDBvTI5i2B3KS0DGg5IHGpA5+3a
-         4lIHa/w9oEPFZnm6nOHo/i+Wi+HGg7k4/N0gqXcHOjyVjEm6sUKecD37uqVrwPmsltml
-         JZG9Rm7mMRSSIMlFWZHOCso/zvMaeS/RM5RfhDeyvcnEsNI1mCkVelqGu4EaI1qGmaRL
-         woCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=tmyTl6q+tqeF975POxGfJcIFC8oCHkJvZ2/ujs9yNDE=;
-        fh=RHEl9ny36dQs0duNVJnXM5m1t2j+Dz+8hTNch3QJRow=;
-        b=DyHEvWSsuyjUt/Bci3r+O22TFsth/2EogbqS2zosiHz/uwsMzoXNKhWEE7NSp7AE2T
-         VN0yHcBhG7YIK1/aXiNt/qrtl3AfmlmyeEFRVvjBeqRRSmC8aSgdVuxbw66EblMeWcMR
-         UKmXP5BVP2UMa6DqNeeNLdWDc+YV8cCvBe2RxhpK8oZeRE4yqgurfO3wXvkg5OkEk+3X
-         RW6ZaHFJnxJ/Y1Mkp0sGqgjJDe34bK3xR6/RvLEfe7FEL8oXmMv5xXisbAm4I7StmVq0
-         FxXhQrAIdYf5/i4iOPEZJXRblmPSlRzC8pKDBpOyADJpnwq66oyj73in0iuqXrWrfQ+z
-         7G5A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c6dded42ec4so1578618a12.2
+        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 09:01:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770655497; x=1771260297; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tmyTl6q+tqeF975POxGfJcIFC8oCHkJvZ2/ujs9yNDE=;
-        b=To2cRWNE6e1wPUuwK+alUHmmPkgmsDFZNBNFUblIFSNZ+YQMKtWFDLiDHBDRqRr0sI
-         ZlyOciUTc/AqGOZnglish7Ov6HHg6PtaO5pBWlxx9eHytl1gZWo5OPZ/U3WzLvYZN5qu
-         ybHnZqGZoPO7sKU4+3Zj5HdlGKM1louIt/ZzOMFWh16/0YJYaLecSwHEBZHId+ksoAmA
-         Udj8kSDFuuMCAijS4ulUMzM8hne+zhrWMjPEL4t44UdeMgwTAvLFgBNpNXb1mOiGLUj2
-         uvFPL92zT6wBmWXE8GFNdhmVJ71bPNrPu4VTyY+CjksBdkBBJIITs/aCf1pE57gtTZv2
-         bW8g==
+        d=google.com; s=20230601; t=1770656485; x=1771261285; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YO6+F3jNsnF76vkonyTGMuR54wo2HffVdoLaCoDx93U=;
+        b=4lAoT8TW4TkNrPVxRaCtU84vlrV3QRMd7QX7qxz3GIEiFgSlLzhIkAdeWk2hY9atgw
+         IhLGI4a7POkF+NVnZ5vD8nr3BsM79GvkOf3TusmhnIL5YrpJKEBYExS1Z+O0VcYvLdP0
+         3qs1/zUF3Ff1MZEIgfqi4UVpG/2dxUpK0FOTQSu3gWpm7xoXljYce5heWrjFTYazNeJZ
+         kgp5l+Su5xw5aZhC2mkKYmbsZvUO8yo/2MCmtQBkT93I79DcgpJaEt5mFISgPjSBm/aL
+         +mpi8dh5I0NcCRHZs1QstThaa8Xcr0MyHn3kH2CDfBTMbFoN7aTMjNnQjBAhh0yAtyvH
+         TEIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770655497; x=1771260297;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tmyTl6q+tqeF975POxGfJcIFC8oCHkJvZ2/ujs9yNDE=;
-        b=BCuCSxk0/9KF0XtD9ZK2utLiJL/CQf5VBmiWOsijOhxtQU1ebTq/ULMSvNgMuFUppr
-         2OO+YuAYkFEl7ppQwJBsIE/nsU5Aeu/5YqYd9IMbQvHfiC0neomohsv7q7bkLUkM4q0R
-         2iKERdG0ji4nn9EOBYthvYvIAp0NfPwpinRd7vINXqhU1z7KP0IRZ3sSS0F4WXxeneEH
-         r2vv9pCNIuVuVAY/uz+Q3dUl+c1ZRriQYYhS8Zw3umvJZeVK3nPv1o/fk6YsjUVC4Gr6
-         S0PpRZQbT//1kzmLD5RdC84jHDdEPwe8meEIqqw9/Vj9RPGx1VNuzBLeMCMwOv9b2zlT
-         ZZBw==
-X-Forwarded-Encrypted: i=1; AJvYcCV75h+W7XIlD1lJZrA8HJwwZ/8jr4YkR9Casox7RpTPO54AsYf4UGdg4BBIHhxr27kJ+Qs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPNPpXh/i32/mIu8el2SstjM1TBnq+Rn4cuAW+U4Y38zAnsLHk
-	7C1nr8DJ2Ao7HVDwoLcAnYHCM6Ul+fatQwRFsKCfK/YnGqyZ4XFF6d81ZIc51PeVart0Le+bIrQ
-	Sm1p/x1BX2ofx33/NBpDdN1FshUc4d+yTfZgzT275
-X-Gm-Gg: AZuq6aLVQwbPw6If7SB3fMvRIrncekq+4Kl64ne48srcQ9Yq/XEFh92dZKg4SSrkskq
-	R9prF/+J6Y3tZJfFK5jZwY5OkmCJUIiPTEQn0KDfQeeEn8Wf5TCBcrAJ6Z5dgOIRwmn25vwuZ1d
-	KRjCUgtfT68/a311k8eOETEADF5Ba1v2uz5MXQcd12UkPZpMUmrWrqA1CLeXIA9hU1+z73iYmb/
-	y72leeyBP3hTvp/kOAIENDnE39fq6BDD3QwkQAARtbNaGDOaphBQDEV7CaHPrTODobRLzY=
-X-Received: by 2002:aa7:c617:0:b0:63e:447d:6aee with SMTP id
- 4fb4d7f45d1cf-659a7265904mr60684a12.0.1770655497156; Mon, 09 Feb 2026
- 08:44:57 -0800 (PST)
+        d=1e100.net; s=20230601; t=1770656485; x=1771261285;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YO6+F3jNsnF76vkonyTGMuR54wo2HffVdoLaCoDx93U=;
+        b=PNxvM2+ivfJbef/j+A43saTGXfteiUBOxJ1RWK3aPDClinU0o587i+ZaBBqWYasgo5
+         EYo55+QpVNFxmQMTWL/4mXi+WCNmMWZn9uwzdCbB3Vpe8meCTXdLJVf2oFxjIUQofkDK
+         i+bIG8SvJtlMEv6HegBdVMufKSoUoyZ6KF3BFCqpbwQXaQsEYPNrZVsj21EcVV1soDJx
+         kKia6voMWbZ2dJOr/cfsGiTIKw2cUo6vj+dEC/Ao26JBIezDWZzXsncWMWvMU1pV27F2
+         kt3IYCtnX3l1mjUT20Pf1q2+cl5b9M2SG2wTi72nbmIvJK4OCgnqnn77c8YXRFA4CCVu
+         IPRw==
+X-Forwarded-Encrypted: i=1; AJvYcCU43Gty4aWETnMB/SeSxPvij3hf37a6advz834Seb+1x50qGou30hkQ4w9uAonNZfTh3Tc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjVsfaNrVWGlbnnXHX1ZxEE5Zij9dknSSsuLjv14hSGlMO7sSD
+	CWrLSz3vWuThN5FmAs6NGXlUndiHXHiJxS5zi1AYwUeBA8kjYg18PX5abWGXdIJxu+GftZCQkmE
+	j2dbC4A==
+X-Received: from pjtl24.prod.google.com ([2002:a17:90a:c598:b0:354:c16d:17b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2d86:b0:34c:c50e:9b80
+ with SMTP id 98e67ed59e1d1-354b3e42c3emr9815813a91.27.1770656484526; Mon, 09
+ Feb 2026 09:01:24 -0800 (PST)
+Date: Mon, 9 Feb 2026 09:01:23 -0800
+In-Reply-To: <aYG9ZyvpS6AZiRAl@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260207012339.2646196-1-jmattson@google.com> <20260207012339.2646196-3-jmattson@google.com>
- <8e032a54-1444-46ce-8ddf-371ca74debc9@amd.com>
-In-Reply-To: <8e032a54-1444-46ce-8ddf-371ca74debc9@amd.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Mon, 9 Feb 2026 08:44:44 -0800
-X-Gm-Features: AZwV_QjUWlKwn7roG1diwoLDEG8hWuwKopezzs7giHM4EoO_JkdZbGU4Y-mmfc0
-Message-ID: <CALMp9eRpNxDz_AkeZ8GgfbLr1fnYRrKDUJY4SsZ97oJZGsGiuA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/5] KVM: x86/pmu: Disable Host-Only/Guest-Only events
- as appropriate for vCPU state
-To: Sandipan Das <sandipan.das@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>, 
-	James Clark <james.clark@linaro.org>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Yosry Ahmed <yosry.ahmed@linux.dev>, 
-	Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <aWdgfXNdBuzpVE2Z@yzhao56-desk.sh.intel.com> <aWe1tKpFw-As6VKg@google.com>
+ <f4240495-120b-4124-b91a-b365e45bf50a@intel.com> <aWgyhmTJphGQqO0Y@google.com>
+ <ac46c07e421fa682ef9f404f2ec9f2f2ba893703.camel@intel.com>
+ <aWpn8pZrPVyTcnYv@google.com> <6184812b4449947395417b07ae3bad2f191d178f.camel@intel.com>
+ <aW3G6yZuvclYABzP@yzhao56-desk.sh.intel.com> <aXzPIO2qZwuwaeLi@google.com> <aYG9ZyvpS6AZiRAl@yzhao56-desk.sh.intel.com>
+Message-ID: <aYoS45AZNY0rUJQD@google.com>
+Subject: Re: [PATCH v3 00/24] KVM: TDX huge page support for private memory
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, Fan Du <fan.du@intel.com>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Dave Hansen <dave.hansen@intel.com>, 
+	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"tabba@google.com" <tabba@google.com>, "david@kernel.org" <david@kernel.org>, "kas@kernel.org" <kas@kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ira Weiny <ira.weiny@intel.com>, 
+	"francescolavra.fl@gmail.com" <francescolavra.fl@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>, "nik.borisov@suse.com" <nik.borisov@suse.com>, 
+	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Chao P Peng <chao.p.peng@intel.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
+	Vishal Annapurve <vannapurve@google.com>, "sagis@google.com" <sagis@google.com>, Chao Gao <chao.gao@intel.com>, 
+	Jun Miao <jun.miao@intel.com>, "jgross@suse.com" <jgross@suse.com>, 
+	"pgonda@google.com" <pgonda@google.com>, "x86@kernel.org" <x86@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70618-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,vger.kernel.org,amd.com,suse.cz,google.com,kernel.org,gmail.com,redhat.com,suse.com,linux.intel.com];
+	RCPT_COUNT_TWELVE(0.00)[29];
 	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[25];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,amd.com:email];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70617-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[google.com:+]
-X-Rspamd-Queue-Id: 5724D112A22
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 260E6112CFC
 X-Rspamd-Action: no action
 
-On Sun, Feb 8, 2026 at 11:46=E2=80=AFPM Sandipan Das <sandipan.das@amd.com>=
- wrote:
->
-> On 2/7/2026 6:53 AM, Jim Mattson wrote:
-> > Update amd_pmu_set_eventsel_hw() to clear the event selector's hardware
-> > enable bit when the PMC should not count based on the guest's Host-Only=
- and
-> > Guest-Only event selector bits and the current vCPU state.
-> >
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > ---
-> >  arch/x86/include/asm/perf_event.h |  2 ++
-> >  arch/x86/kvm/svm/pmu.c            | 18 ++++++++++++++++++
-> >  2 files changed, 20 insertions(+)
-> >
-> > diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/p=
-erf_event.h
-> > index 0d9af4135e0a..4dfe12053c09 100644
-> > --- a/arch/x86/include/asm/perf_event.h
-> > +++ b/arch/x86/include/asm/perf_event.h
-> > @@ -58,6 +58,8 @@
-> >  #define AMD64_EVENTSEL_INT_CORE_ENABLE                       (1ULL << =
-36)
-> >  #define AMD64_EVENTSEL_GUESTONLY                     (1ULL << 40)
-> >  #define AMD64_EVENTSEL_HOSTONLY                              (1ULL << =
-41)
-> > +#define AMD64_EVENTSEL_HOST_GUEST_MASK                       \
-> > +     (AMD64_EVENTSEL_HOSTONLY | AMD64_EVENTSEL_GUESTONLY)
-> >
-> >  #define AMD64_EVENTSEL_INT_CORE_SEL_SHIFT            37
-> >  #define AMD64_EVENTSEL_INT_CORE_SEL_MASK             \
-> > diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> > index d9ca633f9f49..8d451110a94d 100644
-> > --- a/arch/x86/kvm/svm/pmu.c
-> > +++ b/arch/x86/kvm/svm/pmu.c
-> > @@ -149,8 +149,26 @@ static int amd_pmu_get_msr(struct kvm_vcpu *vcpu, =
-struct msr_data *msr_info)
-> >
-> >  static void amd_pmu_set_eventsel_hw(struct kvm_pmc *pmc)
-> >  {
-> > +     struct kvm_vcpu *vcpu =3D pmc->vcpu;
-> > +     u64 host_guest_bits;
-> > +
-> >       pmc->eventsel_hw =3D (pmc->eventsel & ~AMD64_EVENTSEL_HOSTONLY) |
-> >                          AMD64_EVENTSEL_GUESTONLY;
-> > +
-> > +     if (!(pmc->eventsel & ARCH_PERFMON_EVENTSEL_ENABLE))
-> > +             return;
-> > +
-> > +     if (!(vcpu->arch.efer & EFER_SVME))
-> > +             return;
-> > +
-> > +     host_guest_bits =3D pmc->eventsel & AMD64_EVENTSEL_HOST_GUEST_MAS=
-K;
-> > +     if (!host_guest_bits || host_guest_bits =3D=3D AMD64_EVENTSEL_HOS=
-T_GUEST_MASK)
-> > +             return;
-> > +
-> > +     if (!!(host_guest_bits & AMD64_EVENTSEL_GUESTONLY) =3D=3D is_gues=
-t_mode(vcpu))
-> > +             return;
->
-> This seems to disable the PMCs after exits from an L2 guest to the L0 hyp=
-ervisor.
-> For such transitions, the corresponding L1 vCPU's PMC has GuestOnly set b=
-ut
-> is_guest_mode() is false as this function is called at the very end of
-> leave_guest_mode() after vcpu->stat.guest_mode is set to 0.
->
-> Is this a correct interpretation of the condition above?
+On Tue, Feb 03, 2026, Yan Zhao wrote:
+> On Fri, Jan 30, 2026 at 07:32:48AM -0800, Sean Christopherson wrote:
+> > On Mon, Jan 19, 2026, Yan Zhao wrote:
+> > > On Sat, Jan 17, 2026 at 12:58:02AM +0800, Edgecombe, Rick P wrote:
+> > > > On Fri, 2026-01-16 at 08:31 -0800, Sean Christopherson wrote:
+> > > IIUC, this concern should be gone as Dave has agreed to use "pfn" as the
+> > > SEAMCALL parameter [1]?
+> > > Then should we invoke "KVM_MMU_WARN_ON(!tdx_is_convertible_pfn(pfn));" in KVM
+> > > for every pfn of a huge mapping? Or should we keep the sanity check inside the
+> > > SEAMCALL wrappers?
+> > 
+> > I don't have a strong preference.  But if it goes in KVM, definitely guard it with
+> > KVM_MMU_WARN_ON().
+> Thank you for your insights, Sean!
+> 
+> > > BTW, I have another question about the SEAMCALL wrapper implementation, as Kai
+> > > also pointed out in [2]: since the SEAMCALL wrappers now serve as APIs available
+> > > to callers besides KVM, should the SEAMCALL wrappers return TDX_OPERAND_INVALID
+> > > or WARN_ON() (or WARN_ON_ONCE()) on sanity check failure?
+> > 
+> > Why not both?  But maybe TDX_SW_ERROR instead of TDX_OPERAND_INVALID?
+> Hmm, I previously returned TDX_OPERAND_INVALID for non-aligned base PFN.
+> TDX_SW_ERROR is also ok if we want to indicate that passing an invalid PFN is a
+> software error.
+> (I had tdh_mem_page_demote() return TDX_SW_ERROR when an incompatible TDX module
+> is used, i.e., when !tdx_supports_demote_nointerrupt()).
+> 
+> > If an API has a defined contract and/or set of expectations, and those expectations
+> > aren't met by the caller, then a WARN is justified.  But the failure still needs
+> > to be communicated to the caller.
+> Ok.
+> 
+> The reason for 'not both' is that there's already TDX_BUG_ON_2() in KVM after
+> the SEAMCALL wrapper returns a non-BUSY error. I'm not sure if having double
+> WARN_ON_ONCE() calls is good, so I intended to let the caller decide whether to
+> warn.
 
-I think you are confusing the VMCB02 bits (that always have Guest-Only
-set) and the VMCB12 bits (which are under the control of L1.
+Two WARNs isn't the end of the world.  It might even be helpful in some cases,
+e.g. to more precisely document what went wrong.
 
-If L1 sets only Guest-Only, that indicates a desire to monitor only L2
-execution. So, yes, after emulating an exit from L2 to L1, the PMC is
-disabled.
+> > > By returning TDX_OPERAND_INVALID, the caller can check the return code, adjust
+> > > the input or trigger WARN_ON() by itself;
+> > > By triggering WARN_ON() directly in the SEAMCALL wrapper, we need to document
+> > > this requirement for the SEAMCALL wrappers and have the caller invoke the API
+> > > correctly.
+> > 
+> > Document what exactly?  Most of this should be common sense.  E.g. we don't generally
+> > document that pointers must be non-NULL, because that goes without saying 99.9%
+> > of the time.
+> Document the SEAMCALL wrapper's expectations. e.g., for demote, a PFN must be
+> 2MB-aligned, or the caller must not invoke tdh_mem_page_demote() if a TDX module
+> does not support feature ENHANCED_DEMOTE_INTERRUPTIBILITY...
 
-> > +
-> > +     pmc->eventsel_hw &=3D ~ARCH_PERFMON_EVENTSEL_ENABLE;
-> >  }
-> >
-> >  static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr=
-_info)
->
+FWIW, for me, all of those are self-explanatory and/or effectively covered by the
+TDX specs.
+
+> > IMO, that holds true here as well.  E.g. trying to map memory into a TDX guest
+> > that isn't convertible is obviously a bug, I don't see any value in formally
+> > documenting that requirement.
+> Do we need a comment for documentation above the tdh_mem_page_demote() API?
+
+I wouldn't bother, but I truly don't care if the TDX subsystem wants to document
+everything in gory detail.
 
