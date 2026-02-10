@@ -1,663 +1,258 @@
-Return-Path: <kvm+bounces-70795-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70796-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ACzUE0ySi2kmWQAAu9opvQ
-	(envelope-from <kvm+bounces-70795-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:17:16 +0100
+	id EEw4B7KSi2kVWQAAu9opvQ
+	(envelope-from <kvm+bounces-70796-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:18:58 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB09C11EF8E
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:17:15 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7416011EFF3
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:18:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6391B3079A64
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 20:16:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 97C9C304B5C8
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 20:18:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A677E3346A5;
-	Tue, 10 Feb 2026 20:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F0A2FE07D;
+	Tue, 10 Feb 2026 20:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kUQM276h"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JS1frftL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4057333859A
-	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 20:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2321B23B604
+	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 20:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770754557; cv=none; b=gjTSECoSiR78EdyvY5z0nmUdaGmh0rxoslJh8knd3e93Iszbww/GZdAjYelFk+Beigl0cTZyNB1u8gGVv0ngC5DM3JDi6nYal2+ie9CFCYZAE7/pNOaSn+JL9MDrAjSS0jSG0n3Y8joPIw2NqvAlixF2qC6SGUtnGwGi9uDjdKg=
+	t=1770754730; cv=none; b=KVFjnjWY7CxmtntL1uQfTssNgKPP7s+6w2CEp12ovW0UYe4xs9AuTe7aLxJhg8OlSZQ8jOIKhZvXkyHIv24152f+kbzKNHZ69KzdxIhyWWBbY+wAPRSThSda062NYHWmesD8jxGbl0mbOaB812+5+pf604ECOkzngDG2eTGsr6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770754557; c=relaxed/simple;
-	bh=hLmmGwPJErDU169HPk9U+NztJtVsS6d8KgPeaB+zPPA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=svY0fzqrmlrZmsGxh768uOeXY5JTWEhEK+kHx1iKIEiVcrv8QMzJx5O5t5/e05sKKjwbbvGPl6Ap3xHLskV/pOzhnopgR3czFQPoAoOpszcDTh7Ch4oIeDM71qwl8plZ5dFWZd3jhy4zS+vqbYNp0wMGnCSLV7gfFx/xbicgVn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kUQM276h; arc=none smtp.client-ip=209.85.214.170
+	s=arc-20240116; t=1770754730; c=relaxed/simple;
+	bh=MGPeLhBGxg/ZF1DpFcOkMREqrd0xbx+gJtkgScgbAqY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J1Oo7mDcPetfdcYIXmNGsmZ6bpLIwvBpSyjD4bk1XpeeJhCuymVDLCqxI3jNq7Joy6fCrwvCYiifJVGOd7RzrDjCVtbYQ6ZDjBTfg7fV2+UErIHuLQYS8RkQ40QHWcNaeiFz6G3SDMJWEZyPwMFRPH08jQ/JPx/hjp0FuL3ElZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JS1frftL; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2a102494058so965015ad.0
-        for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 12:15:56 -0800 (PST)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-8217f2ad01eso5076874b3a.2
+        for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 12:18:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770754555; x=1771359355; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iUFL9nxPB9bUeP42+0V7hNRdWE9EqDSh0B0IVvPLqNg=;
-        b=kUQM276hBPH6SwBRlRbJEpuG9z2/f4PmMfuJ1U6aq9MhBakw/kh9vDGBBl2z8VW4zq
-         Y719A3Hq68i1+T4AIYN1qvu4bNuIDMoHPB3HObAjm22SK+qTBlpwPKzwX7rsKvTb1AIX
-         zcbiEYXWacH3rT95u88rByBsltrLB43ugjKjyZ9ca2mUtqRTqjxqNtdtNI7V9VkjN+UL
-         Sz/lH3+eanOcDhHyRbPjH9CwekaqzmTDNX16T+n08x06h6wmIRV5SBkoIpo0FwlouP2M
-         iWrAnzDMcGq4ljzYV5WV4RS1ofSVpFWQDF13Fz1GMp9VWklcMe3NynRKU/ySg+pMzIrX
-         KdQw==
+        d=linaro.org; s=google; t=1770754728; x=1771359528; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Vk1AQAl1soVZV08bSYmk+fpl1vhx4T7RJvodI5vrQ0g=;
+        b=JS1frftLYsWh30Sijn/J2hrIWkRXMX76LcxGfUwZVksB3SMgnk1FdRvHv8Vu8ohIeW
+         PJhvC3AYsOB9USL+9fSHB6TyelU6QP0F7fJBQ69hXqHOfnU996/kY0lF+OL7Ch8qq+aO
+         jf7s9hmgO7JIb6nSSIRvKr5Ob6306/3pSOIEser02gfwHtO/22H75j2xa/6tCwmT54Kg
+         iVyIzD1rqNw7W1/iD8ol36+97lka/3mUCAotSW9EIjojy40D6ldVBAWYoYOsLqJczGR3
+         8yY5rYUCnmgVRbB2WZ/N1PZ0wVg4XyY+z+eBVsw4xUdJSO/jTsWHV+IavlJ8Q3hKWkIg
+         HPVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770754555; x=1771359355;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=iUFL9nxPB9bUeP42+0V7hNRdWE9EqDSh0B0IVvPLqNg=;
-        b=dhXdKhkWKnhzuyQ1XHvXE7oQxPQfcfRsk8zTEjiF+DLt7aOOTD1N3EaKQ5yh4ECkLK
-         sbLPZ/4R8oav7VOccMTwUBfw74UcGJz6DWDA22hx0j8RIjI3sELt83xWDxHHQxSRfuUh
-         UUeZAOKMPEDtnmmKQF7hVO7nJx65KmSh9Rp4NMA45jaTPPPoOrvR/Om+7JzwUoQi0Msv
-         yQoEnpxWHX+oSOSH89ND5CY6J/aG44SS13fks5PAZf6T6UK2lDFd1taONYbrQgavfTLE
-         WfioLnxNg8zuFyw3n1CKSFh18nowNTdHMcqiA7dxi4RTzGitPAGNrJC9HWaP/Ujn8AvT
-         oBVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUsl0m8MVcgBHyw04hnFnElI4NrCxBwz3/agw5HuP+LWxUu76ba9dlW6sI5iKca41d/uCc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynAAKHuTz+trlMHqw4ZyEHUIFu1AiLmAbqA+qc9blL0pHLZiSI
-	aI5JfVjmXwdPpmDh/64zIpEbSlrOoYD5UphC0EI50SDCO8GeFA5jyKeCr6Tq2RmdCUw=
-X-Gm-Gg: AZuq6aJ+KvN9xrs9sY5yKzBC49tjdbbHKxP6XiXky2q2cXUD3Fk9u4sJjV92FIgs9Cr
-	/RTC1cIZ3v0dLgl04OmJ9h8Sp7dj8v2qkdqB36njazlCfjfezgl/GrJdM3BmL0foXe2gjpgUVdT
-	0m7NA/SV0RtjbatKg0mYey/Nnf7Ppqu3Zgom2LiHEg7l7mp/7iN+0L2K9YaZ9gwq2+dlVyXev3R
-	XSkczI8BcubMfXoodS+eAE1PfXwT801TJPGWhoXHDs/kcsHxE/mrfKecVshefidxONK70fJyRpv
-	JdN8AKsrFrv+gL25uQOrZuS0+WpUajDHqn9seQNhU+3FejZ6ayAjNu7FRd2I9Psy0bhV+bwZApK
-	gdQhypnUeV5QSj3zbR+sOo/qdUSAKoGYqZG8u3oH8AI8YqXEbDGbISzE2cwBu2zWhkI9D1HBrHh
-	UmiuASS363dd6uK7vRxISERC7k2yZ4lqmBX19SEqAO/MfJvmdX+YQL+flzjaaNus9+4GuoBiVRW
-	+rC
-X-Received: by 2002:a17:903:2c0d:b0:2aa:e1f0:5481 with SMTP id d9443c01a7336-2ab0feb8d59mr32910465ad.30.1770754555306;
-        Tue, 10 Feb 2026 12:15:55 -0800 (PST)
-Received: from pc.taild8403c.ts.net (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ab0b392cb5sm38523225ad.70.2026.02.10.12.15.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 12:15:54 -0800 (PST)
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-To: qemu-devel@nongnu.org
-Cc: anjo@rev.ng,
-	Jim MacArthur <jim.macarthur@linaro.org>,
-	kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	qemu-arm@nongnu.org,
-	Richard Henderson <richard.henderson@linaro.org>
-Subject: [PATCH v3 12/12] include/tcg/tcg-op.h: eradicate TARGET_INSN_START_EXTRA_WORDS
-Date: Tue, 10 Feb 2026 12:15:40 -0800
-Message-ID: <20260210201540.1405424-13-pierrick.bouvier@linaro.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260210201540.1405424-1-pierrick.bouvier@linaro.org>
-References: <20260210201540.1405424-1-pierrick.bouvier@linaro.org>
+        d=1e100.net; s=20230601; t=1770754728; x=1771359528;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Vk1AQAl1soVZV08bSYmk+fpl1vhx4T7RJvodI5vrQ0g=;
+        b=ntZOxmAbXHdRlWqpjmr7uBV0cwZWWBF2xTWuthozsbA96+Wnz2PNwwg8EB7xeZd8tQ
+         yDQiItd01GFwq+bKA4ZYloMzdOaqwCvUdVZ23Si63XzV+4dr1sVO3R7skV8iVxprlpjQ
+         rK2LVZpBWcAD7s79fbayrSMcWJfffZZYVK3tYBpebN3rSpCeov2c7EhHyAbQsm+qhssh
+         sAyK5HkPWdCx8JAc44Va8ipNi+w0ROyzI/KDo2xfXNC9/iPUpe19xWT5LcZOnoF2iSML
+         N8Y/BsJUK9TvEpAi9QcNx59XIH5zvehcaajglTRuJVE1uY8O9doGuvg1oSbzFwBvx3nQ
+         w5mA==
+X-Forwarded-Encrypted: i=1; AJvYcCWcDVbTzfbID9+b1V5h34EB4Se3o0Y+pJ+jzbGn4g+02881NiBy7cb//Apau8ozmSeFeHw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUNpVEua5NxuIXurqR07taIt7EV2svo+S0VM7H/3OMTTIYq+4h
+	DWW4r6MjNkS4jGWu6E+74WfVqHMYdCagFFU8VkSlMahAM7DvPJ6FRy+1q+N5XPLr7uQ=
+X-Gm-Gg: AZuq6aJ84fmhinG8TjCdBQKkKLnS9KRAP5KNfnbCN6k9QCD8PMyIkQWHh0V1FJINCn8
+	rU0fC9gBZdXLma31TjeF8MHCaW7ThEx5hgkPdVrIz9jUw6DDgv/QDkqOljsEMqw2Cyyq6Ta5Nqq
+	iVdlp7CuIPdOt9gW1xn1ZSbi1A+iWQjh8TCAYCw8p1srEQFrwkbHk0pkqGpfqv4Za55NoI5ks1f
+	FUjrTiUf1Y0ffsTpkIuAvLf99AaUsfAWyibzh8xTwOTocW6IaxNUFb4EW2stTPKznVIkJqEGLya
+	no+Wp54icPC7i4avqRWmmdRDr1OavlWcjuWRJv6WmyrJu7L2yQNk9DkVggzTid5dalasDyuDatM
+	nxCWJh7FXfqafv2UW1uRimalGAxsJuAp+LJRGJpVsXmNiUecvmqqmKmUG5JNO7TKZ5L0uHlUpDV
+	75Z6Rq4WcRn5gZ1UwyExvK0/Ow5MO7KafGzNsPXIPf22QLhVTetkPd4emAtnNcaN/Apxsn
+X-Received: by 2002:a05:6a00:6b95:10b0:824:93e4:2ddf with SMTP id d2e1a72fcca58-82493e431a0mr884781b3a.13.1770754728379;
+        Tue, 10 Feb 2026 12:18:48 -0800 (PST)
+Received: from [192.168.1.87] (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8244169804bsm14018650b3a.27.2026.02.10.12.18.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Feb 2026 12:18:47 -0800 (PST)
+Message-ID: <c13897e1-cf21-4131-af74-14153c5fbd0c@linaro.org>
+Date: Tue, 10 Feb 2026 12:18:47 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 00/12] target/arm: single-binary
+Content-Language: en-US
+To: qemu-devel@nongnu.org
+Cc: anjo@rev.ng, Richard Henderson <richard.henderson@linaro.org>,
+ Jim MacArthur <jim.macarthur@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, kvm@vger.kernel.org, qemu-arm@nongnu.org
+References: <20260206042150.912578-1-pierrick.bouvier@linaro.org>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Autocrypt: addr=pierrick.bouvier@linaro.org; keydata=
+ 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
+ ZtfdHNZotF092MIH0IQC3poExQpV/WBYFAI=
+In-Reply-To: <20260206042150.912578-1-pierrick.bouvier@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70795-lists,kvm=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pierrick.bouvier@linaro.org,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	DKIM_TRACE(0.00)[linaro.org:+];
+	TAGGED_FROM(0.00)[bounces-70796-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linaro.org:mid,linaro.org:dkim,linaro.org:email]
-X-Rspamd-Queue-Id: BB09C11EF8E
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pierrick.bouvier@linaro.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linaro.org:mid,linaro.org:dkim]
+X-Rspamd-Queue-Id: 7416011EFF3
 X-Rspamd-Action: no action
 
-This commit removes TARGET_INSN_START_EXTRA_WORDS and force all arch to
-call the same version of tcg_gen_insn_start, with additional 0 arguments
-if needed. Since all arch have a single call site (in translate.c), this
-is as good documentation as having a single define.
+On 2/5/26 8:21 PM, Pierrick Bouvier wrote:
+> This series continues cleaning target/arm, especially tcg folder.
+> 
+> For now, it contains some cleanups in headers, and it splits helpers per
+> category, thus removing several usage of TARGET_AARCH64.
+> First version was simply splitting 32 vs 64-bit helpers, and Richard asked
+> to split per sub category.
+> 
+> v2
+> --
+> 
+> - add missing kvm_enabled() in arm-qmp-cmds.c
+> - didn't extract arm_wfi for tcg/psci.c. If that's a hard requirement, I can do
+>    it in next version.
+> - restricted scope of series to helper headers, so we can validate things one
+>    step at a time. Series will keep on growing once all patches are reviewed.
+> - translate.h: use vaddr where appropriate, as asked by Richard.
+> 
+> Pierrick Bouvier (12):
+>    target/arm/arm-qmp-cmds.c: make compilation unit common
+>    target/arm: extract helper-mve.h from helper.h
+>    target/arm: extract helper-a64.h from helper.h
+>    target/arm: extract helper-sve.h from helper.h
+>    target/arm: extract helper-sme.h from helper.h
+>    target/arm/tcg: duplicate tcg/arith_helper.c and tcg/crypto_helper.c
+>      between user/system
+>    target/arm: move exec/helper-* plumbery to helper.h
+>    target/arm/tcg/psci.c: make compilation unit common
+>    target/arm/tcg/cpu-v7m.c: make compilation unit common
+>    target/arm/tcg/vec_helper.c: make compilation unit common
+>    target/arm/tcg/translate.h: replace target_ulong with vaddr
+>    target/arm/tcg/translate.h: replace target_long with int64_t
+> 
+>   target/arm/helper-a64.h                       |  14 ++
+>   target/arm/helper-mve.h                       |  14 ++
+>   target/arm/helper-sme.h                       |  14 ++
+>   target/arm/helper-sve.h                       |  14 ++
+>   target/arm/helper.h                           |  17 +-
+>   target/arm/kvm_arm.h                          |   3 +
+>   .../tcg/{helper-a64.h => helper-a64-defs.h}   |   0
+>   target/arm/tcg/{helper.h => helper-defs.h}    |   0
+>   .../tcg/{helper-mve.h => helper-mve-defs.h}   |   0
+>   .../tcg/{helper-sme.h => helper-sme-defs.h}   |   0
+>   .../tcg/{helper-sve.h => helper-sve-defs.h}   |   0
+>   target/arm/tcg/translate-a32.h                |   2 +-
+>   target/arm/tcg/translate.h                    |  22 +-
+>   target/arm/tcg/vec_internal.h                 |  49 ++++
+>   target/arm/arm-qmp-cmds.c                     |  27 +--
+>   target/arm/debug_helper.c                     |   4 +-
+>   target/arm/helper.c                           |   5 +-
+>   target/arm/kvm-stub.c                         |   5 +
+>   target/arm/kvm.c                              |  21 ++
+>   target/arm/tcg/arith_helper.c                 |   4 +-
+>   target/arm/tcg/crypto_helper.c                |   4 +-
+>   target/arm/tcg/gengvec64.c                    |   3 +-
+>   target/arm/tcg/helper-a64.c                   |   6 +-
+>   target/arm/tcg/hflags.c                       |   4 +-
+>   target/arm/tcg/m_helper.c                     |   2 +-
+>   target/arm/tcg/mte_helper.c                   |   3 +-
+>   target/arm/tcg/mve_helper.c                   |   6 +-
+>   target/arm/tcg/neon_helper.c                  |   4 +-
+>   target/arm/tcg/op_helper.c                    |   2 +-
+>   target/arm/tcg/pauth_helper.c                 |   3 +-
+>   target/arm/tcg/psci.c                         |   4 +-
+>   target/arm/tcg/sme_helper.c                   |   5 +-
+>   target/arm/tcg/sve_helper.c                   |   6 +-
+>   target/arm/tcg/tlb_helper.c                   |   4 +-
+>   target/arm/tcg/translate-a64.c                |   3 +
+>   target/arm/tcg/translate-mve.c                |   1 +
+>   target/arm/tcg/translate-sme.c                |   3 +
+>   target/arm/tcg/translate-sve.c                |   3 +
+>   target/arm/tcg/translate.c                    |  25 +-
+>   target/arm/tcg/vec_helper.c                   | 224 ++----------------
+>   target/arm/tcg/vec_helper64.c                 | 142 +++++++++++
+>   target/arm/tcg/vfp_helper.c                   |   4 +-
+>   target/arm/meson.build                        |   2 +-
+>   target/arm/tcg/meson.build                    |  21 +-
+>   44 files changed, 391 insertions(+), 308 deletions(-)
+>   create mode 100644 target/arm/helper-a64.h
+>   create mode 100644 target/arm/helper-mve.h
+>   create mode 100644 target/arm/helper-sme.h
+>   create mode 100644 target/arm/helper-sve.h
+>   rename target/arm/tcg/{helper-a64.h => helper-a64-defs.h} (100%)
+>   rename target/arm/tcg/{helper.h => helper-defs.h} (100%)
+>   rename target/arm/tcg/{helper-mve.h => helper-mve-defs.h} (100%)
+>   rename target/arm/tcg/{helper-sme.h => helper-sme-defs.h} (100%)
+>   rename target/arm/tcg/{helper-sve.h => helper-sve-defs.h} (100%)
+>   create mode 100644 target/arm/tcg/vec_helper64.c
+> 
 
-The notable exception is target/arm, which has two different translate
-files for 32/64 bits. Since it's the only one, we accept to have two
-call sites for this.
-
-As well, we update parameter type to use uint64_t instead of
-target_ulong, so it can be called from common code.
-
-Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
----
- include/tcg/tcg-op-common.h      |  8 ++++++++
- include/tcg/tcg-op.h             | 29 -----------------------------
- target/alpha/cpu-param.h         |  2 --
- target/arm/cpu-param.h           |  7 -------
- target/avr/cpu-param.h           |  2 --
- target/hexagon/cpu-param.h       |  2 --
- target/hppa/cpu-param.h          |  2 --
- target/i386/cpu-param.h          |  2 --
- target/loongarch/cpu-param.h     |  2 --
- target/m68k/cpu-param.h          |  2 --
- target/microblaze/cpu-param.h    |  2 --
- target/mips/cpu-param.h          |  2 --
- target/or1k/cpu-param.h          |  2 --
- target/ppc/cpu-param.h           |  2 --
- target/riscv/cpu-param.h         |  7 -------
- target/rx/cpu-param.h            |  2 --
- target/s390x/cpu-param.h         |  2 --
- target/sh4/cpu-param.h           |  2 --
- target/sparc/cpu-param.h         |  2 --
- target/tricore/cpu-param.h       |  2 --
- target/xtensa/cpu-param.h        |  2 --
- target/alpha/translate.c         |  4 ++--
- target/avr/translate.c           |  2 +-
- target/hexagon/translate.c       |  2 +-
- target/i386/tcg/translate.c      |  2 +-
- target/loongarch/tcg/translate.c |  2 +-
- target/m68k/translate.c          |  2 +-
- target/microblaze/translate.c    |  2 +-
- target/or1k/translate.c          |  2 +-
- target/ppc/translate.c           |  2 +-
- target/rx/translate.c            |  2 +-
- target/sh4/translate.c           |  4 ++--
- target/sparc/translate.c         |  2 +-
- target/tricore/translate.c       |  2 +-
- target/xtensa/translate.c        |  2 +-
- 35 files changed, 24 insertions(+), 93 deletions(-)
-
-diff --git a/include/tcg/tcg-op-common.h b/include/tcg/tcg-op-common.h
-index f752ef440b2..e02f209c093 100644
---- a/include/tcg/tcg-op-common.h
-+++ b/include/tcg/tcg-op-common.h
-@@ -30,6 +30,14 @@ TCGv_i64 tcg_global_mem_new_i64(TCGv_ptr reg, intptr_t off, const char *name);
- TCGv_ptr tcg_global_mem_new_ptr(TCGv_ptr reg, intptr_t off, const char *name);
- 
- /* Generic ops.  */
-+static inline void tcg_gen_insn_start(uint64_t pc, uint64_t a1,
-+                                      uint64_t a2)
-+{
-+    TCGOp *op = tcg_emit_op(INDEX_op_insn_start, INSN_START_WORDS);
-+    tcg_set_insn_start_param(op, 0, pc);
-+    tcg_set_insn_start_param(op, 1, a1);
-+    tcg_set_insn_start_param(op, 2, a2);
-+}
- 
- void gen_set_label(TCGLabel *l);
- void tcg_gen_br(TCGLabel *l);
-diff --git a/include/tcg/tcg-op.h b/include/tcg/tcg-op.h
-index ee379994e76..7024be938e6 100644
---- a/include/tcg/tcg-op.h
-+++ b/include/tcg/tcg-op.h
-@@ -28,35 +28,6 @@
- # error Mismatch with insn-start-words.h
- #endif
- 
--#if TARGET_INSN_START_EXTRA_WORDS == 0
--static inline void tcg_gen_insn_start(target_ulong pc)
--{
--    TCGOp *op = tcg_emit_op(INDEX_op_insn_start, INSN_START_WORDS);
--    tcg_set_insn_start_param(op, 0, pc);
--    tcg_set_insn_start_param(op, 1, 0);
--    tcg_set_insn_start_param(op, 2, 0);
--}
--#elif TARGET_INSN_START_EXTRA_WORDS == 1
--static inline void tcg_gen_insn_start(target_ulong pc, target_ulong a1)
--{
--    TCGOp *op = tcg_emit_op(INDEX_op_insn_start, INSN_START_WORDS);
--    tcg_set_insn_start_param(op, 0, pc);
--    tcg_set_insn_start_param(op, 1, a1);
--    tcg_set_insn_start_param(op, 2, 0);
--}
--#elif TARGET_INSN_START_EXTRA_WORDS == 2
--static inline void tcg_gen_insn_start(target_ulong pc, target_ulong a1,
--                                      target_ulong a2)
--{
--    TCGOp *op = tcg_emit_op(INDEX_op_insn_start, INSN_START_WORDS);
--    tcg_set_insn_start_param(op, 0, pc);
--    tcg_set_insn_start_param(op, 1, a1);
--    tcg_set_insn_start_param(op, 2, a2);
--}
--#else
--#error Unhandled TARGET_INSN_START_EXTRA_WORDS value
--#endif
--
- #if TARGET_LONG_BITS == 32
- typedef TCGv_i32 TCGv;
- #define tcg_temp_new() tcg_temp_new_i32()
-diff --git a/target/alpha/cpu-param.h b/target/alpha/cpu-param.h
-index a799f42db31..c9da620ab3e 100644
---- a/target/alpha/cpu-param.h
-+++ b/target/alpha/cpu-param.h
-@@ -24,6 +24,4 @@
- # define TARGET_VIRT_ADDR_SPACE_BITS  (30 + TARGET_PAGE_BITS)
- #endif
- 
--#define TARGET_INSN_START_EXTRA_WORDS 0
--
- #endif
-diff --git a/target/arm/cpu-param.h b/target/arm/cpu-param.h
-index 8b46c7c5708..7de0099cbfa 100644
---- a/target/arm/cpu-param.h
-+++ b/target/arm/cpu-param.h
-@@ -32,11 +32,4 @@
- # define TARGET_PAGE_BITS_LEGACY 10
- #endif /* !CONFIG_USER_ONLY */
- 
--/*
-- * ARM-specific extra insn start words:
-- * 1: Conditional execution bits
-- * 2: Partial exception syndrome for data aborts
-- */
--#define TARGET_INSN_START_EXTRA_WORDS 2
--
- #endif
-diff --git a/target/avr/cpu-param.h b/target/avr/cpu-param.h
-index f74bfc25804..ea7887919a7 100644
---- a/target/avr/cpu-param.h
-+++ b/target/avr/cpu-param.h
-@@ -25,6 +25,4 @@
- #define TARGET_PHYS_ADDR_SPACE_BITS 24
- #define TARGET_VIRT_ADDR_SPACE_BITS 24
- 
--#define TARGET_INSN_START_EXTRA_WORDS 0
--
- #endif
-diff --git a/target/hexagon/cpu-param.h b/target/hexagon/cpu-param.h
-index 635d509e743..45ee7b46409 100644
---- a/target/hexagon/cpu-param.h
-+++ b/target/hexagon/cpu-param.h
-@@ -23,6 +23,4 @@
- #define TARGET_PHYS_ADDR_SPACE_BITS 36
- #define TARGET_VIRT_ADDR_SPACE_BITS 32
- 
--#define TARGET_INSN_START_EXTRA_WORDS 0
--
- #endif
-diff --git a/target/hppa/cpu-param.h b/target/hppa/cpu-param.h
-index 9bf7ac76d0c..e0b2c7c9157 100644
---- a/target/hppa/cpu-param.h
-+++ b/target/hppa/cpu-param.h
-@@ -19,6 +19,4 @@
- 
- #define TARGET_PAGE_BITS 12
- 
--#define TARGET_INSN_START_EXTRA_WORDS 2
--
- #endif
-diff --git a/target/i386/cpu-param.h b/target/i386/cpu-param.h
-index ebb844bcc83..909bc027923 100644
---- a/target/i386/cpu-param.h
-+++ b/target/i386/cpu-param.h
-@@ -22,6 +22,4 @@
- #endif
- #define TARGET_PAGE_BITS 12
- 
--#define TARGET_INSN_START_EXTRA_WORDS 1
--
- #endif
-diff --git a/target/loongarch/cpu-param.h b/target/loongarch/cpu-param.h
-index 58cc45a377e..071567712b3 100644
---- a/target/loongarch/cpu-param.h
-+++ b/target/loongarch/cpu-param.h
-@@ -13,6 +13,4 @@
- 
- #define TARGET_PAGE_BITS 12
- 
--#define TARGET_INSN_START_EXTRA_WORDS 0
--
- #endif
-diff --git a/target/m68k/cpu-param.h b/target/m68k/cpu-param.h
-index 256a2b5f8b2..7afbf6d302d 100644
---- a/target/m68k/cpu-param.h
-+++ b/target/m68k/cpu-param.h
-@@ -17,6 +17,4 @@
- #define TARGET_PHYS_ADDR_SPACE_BITS 32
- #define TARGET_VIRT_ADDR_SPACE_BITS 32
- 
--#define TARGET_INSN_START_EXTRA_WORDS 1
--
- #endif
-diff --git a/target/microblaze/cpu-param.h b/target/microblaze/cpu-param.h
-index e0a37945136..6a0714bb3d7 100644
---- a/target/microblaze/cpu-param.h
-+++ b/target/microblaze/cpu-param.h
-@@ -27,6 +27,4 @@
- /* FIXME: MB uses variable pages down to 1K but linux only uses 4k.  */
- #define TARGET_PAGE_BITS 12
- 
--#define TARGET_INSN_START_EXTRA_WORDS 1
--
- #endif
-diff --git a/target/mips/cpu-param.h b/target/mips/cpu-param.h
-index 58f450827f7..a71e7383d24 100644
---- a/target/mips/cpu-param.h
-+++ b/target/mips/cpu-param.h
-@@ -20,6 +20,4 @@
- #endif
- #define TARGET_PAGE_BITS 12
- 
--#define TARGET_INSN_START_EXTRA_WORDS 2
--
- #endif
-diff --git a/target/or1k/cpu-param.h b/target/or1k/cpu-param.h
-index b4f57bbe692..3011bf5fcca 100644
---- a/target/or1k/cpu-param.h
-+++ b/target/or1k/cpu-param.h
-@@ -12,6 +12,4 @@
- #define TARGET_PHYS_ADDR_SPACE_BITS 32
- #define TARGET_VIRT_ADDR_SPACE_BITS 32
- 
--#define TARGET_INSN_START_EXTRA_WORDS 1
--
- #endif
-diff --git a/target/ppc/cpu-param.h b/target/ppc/cpu-param.h
-index e4ed9080ee9..ca7602d8983 100644
---- a/target/ppc/cpu-param.h
-+++ b/target/ppc/cpu-param.h
-@@ -37,6 +37,4 @@
- # define TARGET_PAGE_BITS 12
- #endif
- 
--#define TARGET_INSN_START_EXTRA_WORDS 0
--
- #endif
-diff --git a/target/riscv/cpu-param.h b/target/riscv/cpu-param.h
-index cfdc67c258c..039e877891a 100644
---- a/target/riscv/cpu-param.h
-+++ b/target/riscv/cpu-param.h
-@@ -17,13 +17,6 @@
- #endif
- #define TARGET_PAGE_BITS 12 /* 4 KiB Pages */
- 
--/*
-- * RISC-V-specific extra insn start words:
-- * 1: Original instruction opcode
-- * 2: more information about instruction
-- */
--#define TARGET_INSN_START_EXTRA_WORDS 2
--
- /*
-  * The current MMU Modes are:
-  *  - U mode 0b000
-diff --git a/target/rx/cpu-param.h b/target/rx/cpu-param.h
-index 84934f3bcaf..ef1970a09e9 100644
---- a/target/rx/cpu-param.h
-+++ b/target/rx/cpu-param.h
-@@ -24,6 +24,4 @@
- #define TARGET_PHYS_ADDR_SPACE_BITS 32
- #define TARGET_VIRT_ADDR_SPACE_BITS 32
- 
--#define TARGET_INSN_START_EXTRA_WORDS 0
--
- #endif
-diff --git a/target/s390x/cpu-param.h b/target/s390x/cpu-param.h
-index abfae3bedfb..a5f798eeae7 100644
---- a/target/s390x/cpu-param.h
-+++ b/target/s390x/cpu-param.h
-@@ -12,6 +12,4 @@
- #define TARGET_PHYS_ADDR_SPACE_BITS 64
- #define TARGET_VIRT_ADDR_SPACE_BITS 64
- 
--#define TARGET_INSN_START_EXTRA_WORDS 2
--
- #endif
-diff --git a/target/sh4/cpu-param.h b/target/sh4/cpu-param.h
-index f328715ee86..2b6e11dd0ac 100644
---- a/target/sh4/cpu-param.h
-+++ b/target/sh4/cpu-param.h
-@@ -16,6 +16,4 @@
- # define TARGET_VIRT_ADDR_SPACE_BITS 32
- #endif
- 
--#define TARGET_INSN_START_EXTRA_WORDS 1
--
- #endif
-diff --git a/target/sparc/cpu-param.h b/target/sparc/cpu-param.h
-index 45eea9d6bac..6e8e2a51469 100644
---- a/target/sparc/cpu-param.h
-+++ b/target/sparc/cpu-param.h
-@@ -21,6 +21,4 @@
- # define TARGET_VIRT_ADDR_SPACE_BITS 32
- #endif
- 
--#define TARGET_INSN_START_EXTRA_WORDS 1
--
- #endif
-diff --git a/target/tricore/cpu-param.h b/target/tricore/cpu-param.h
-index eb33a67c419..790242ef3d2 100644
---- a/target/tricore/cpu-param.h
-+++ b/target/tricore/cpu-param.h
-@@ -12,6 +12,4 @@
- #define TARGET_PHYS_ADDR_SPACE_BITS 32
- #define TARGET_VIRT_ADDR_SPACE_BITS 32
- 
--#define TARGET_INSN_START_EXTRA_WORDS 0
--
- #endif
-diff --git a/target/xtensa/cpu-param.h b/target/xtensa/cpu-param.h
-index 7a0c22c9005..06d85218b84 100644
---- a/target/xtensa/cpu-param.h
-+++ b/target/xtensa/cpu-param.h
-@@ -16,6 +16,4 @@
- #define TARGET_VIRT_ADDR_SPACE_BITS 32
- #endif
- 
--#define TARGET_INSN_START_EXTRA_WORDS 0
--
- #endif
-diff --git a/target/alpha/translate.c b/target/alpha/translate.c
-index 4442462891e..4d22d7d5a45 100644
---- a/target/alpha/translate.c
-+++ b/target/alpha/translate.c
-@@ -2899,9 +2899,9 @@ static void alpha_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
- 
-     if (ctx->pcrel) {
--        tcg_gen_insn_start(dcbase->pc_next & ~TARGET_PAGE_MASK);
-+        tcg_gen_insn_start(dcbase->pc_next & ~TARGET_PAGE_MASK, 0, 0);
-     } else {
--        tcg_gen_insn_start(dcbase->pc_next);
-+        tcg_gen_insn_start(dcbase->pc_next, 0, 0);
-     }
- }
- 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
-index 78ae83df219..649dd4b0112 100644
---- a/target/avr/translate.c
-+++ b/target/avr/translate.c
-@@ -2689,7 +2689,7 @@ static void avr_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
- 
--    tcg_gen_insn_start(ctx->npc);
-+    tcg_gen_insn_start(ctx->npc, 0, 0);
- }
- 
- static void avr_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-diff --git a/target/hexagon/translate.c b/target/hexagon/translate.c
-index e88e19cc1af..1c9ab29bd12 100644
---- a/target/hexagon/translate.c
-+++ b/target/hexagon/translate.c
-@@ -978,7 +978,7 @@ static void hexagon_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
- 
--    tcg_gen_insn_start(ctx->base.pc_next);
-+    tcg_gen_insn_start(ctx->base.pc_next, 0, 0);
- }
- 
- static bool pkt_crosses_page(CPUHexagonState *env, DisasContext *ctx)
-diff --git a/target/i386/tcg/translate.c b/target/i386/tcg/translate.c
-index 7186517239c..14210d569f7 100644
---- a/target/i386/tcg/translate.c
-+++ b/target/i386/tcg/translate.c
-@@ -3501,7 +3501,7 @@ static void i386_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
-     if (tb_cflags(dcbase->tb) & CF_PCREL) {
-         pc_arg &= ~TARGET_PAGE_MASK;
-     }
--    tcg_gen_insn_start(pc_arg, dc->cc_op);
-+    tcg_gen_insn_start(pc_arg, dc->cc_op, 0);
- }
- 
- static void i386_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-diff --git a/target/loongarch/tcg/translate.c b/target/loongarch/tcg/translate.c
-index 30f375b33f0..b9ed13d19c6 100644
---- a/target/loongarch/tcg/translate.c
-+++ b/target/loongarch/tcg/translate.c
-@@ -159,7 +159,7 @@ static void loongarch_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
- 
--    tcg_gen_insn_start(ctx->base.pc_next);
-+    tcg_gen_insn_start(ctx->base.pc_next, 0, 0);
- }
- 
- /*
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index a0309939012..abc1c79f3cd 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -6041,7 +6041,7 @@ static void m68k_tr_tb_start(DisasContextBase *dcbase, CPUState *cpu)
- static void m68k_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
--    tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
-+    tcg_gen_insn_start(dc->base.pc_next, dc->cc_op, 0);
- }
- 
- static void m68k_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 0be3c98dc17..2af67beecec 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1630,7 +1630,7 @@ static void mb_tr_insn_start(DisasContextBase *dcb, CPUState *cs)
- {
-     DisasContext *dc = container_of(dcb, DisasContext, base);
- 
--    tcg_gen_insn_start(dc->base.pc_next, dc->tb_flags & ~MSR_TB_MASK);
-+    tcg_gen_insn_start(dc->base.pc_next, dc->tb_flags & ~MSR_TB_MASK, 0);
- }
- 
- static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
-diff --git a/target/or1k/translate.c b/target/or1k/translate.c
-index ce2dc466dc7..de81dc6ef8d 100644
---- a/target/or1k/translate.c
-+++ b/target/or1k/translate.c
-@@ -1552,7 +1552,7 @@ static void openrisc_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
-     tcg_gen_insn_start(dc->base.pc_next, (dc->delayed_branch ? 1 : 0)
--                       | (dc->base.num_insns > 1 ? 2 : 0));
-+                       | (dc->base.num_insns > 1 ? 2 : 0), 0);
- }
- 
- static void openrisc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index e9acfa239ec..a09a6df93fd 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6575,7 +6575,7 @@ static void ppc_tr_tb_start(DisasContextBase *db, CPUState *cs)
- 
- static void ppc_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
- {
--    tcg_gen_insn_start(dcbase->pc_next);
-+    tcg_gen_insn_start(dcbase->pc_next, 0, 0);
- }
- 
- static bool is_prefix_insn(DisasContext *ctx, uint32_t insn)
-diff --git a/target/rx/translate.c b/target/rx/translate.c
-index 26d41548294..a245b9db8fe 100644
---- a/target/rx/translate.c
-+++ b/target/rx/translate.c
-@@ -2217,7 +2217,7 @@ static void rx_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
- 
--    tcg_gen_insn_start(ctx->base.pc_next);
-+    tcg_gen_insn_start(ctx->base.pc_next, 0, 0);
- }
- 
- static void rx_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index b3ae0a3814c..b1057727c55 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -2181,7 +2181,7 @@ static void decode_gusa(DisasContext *ctx, CPUSH4State *env)
-      * tb->icount * insn_start.
-      */
-     for (i = 1; i < max_insns; ++i) {
--        tcg_gen_insn_start(pc + i * 2, ctx->envflags);
-+        tcg_gen_insn_start(pc + i * 2, ctx->envflags, 0);
-         ctx->base.insn_start = tcg_last_op();
-     }
- }
-@@ -2241,7 +2241,7 @@ static void sh4_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
- 
--    tcg_gen_insn_start(ctx->base.pc_next, ctx->envflags);
-+    tcg_gen_insn_start(ctx->base.pc_next, ctx->envflags, 0);
- }
- 
- static void sh4_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index 57b50ff8b9a..7e8558dbbd8 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -5735,7 +5735,7 @@ static void sparc_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
-             g_assert_not_reached();
-         }
-     }
--    tcg_gen_insn_start(dc->pc, npc);
-+    tcg_gen_insn_start(dc->pc, npc, 0);
- }
- 
- static void sparc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-diff --git a/target/tricore/translate.c b/target/tricore/translate.c
-index 18d8726af6d..0eaf7a82f87 100644
---- a/target/tricore/translate.c
-+++ b/target/tricore/translate.c
-@@ -8410,7 +8410,7 @@ static void tricore_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
- 
--    tcg_gen_insn_start(ctx->base.pc_next);
-+    tcg_gen_insn_start(ctx->base.pc_next, 0, 0);
- }
- 
- static bool insn_crosses_page(DisasContext *ctx, CPUTriCoreState *env)
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index bb8d2ed86cf..5e3707d3fdf 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -1159,7 +1159,7 @@ static void xtensa_tr_tb_start(DisasContextBase *dcbase, CPUState *cpu)
- 
- static void xtensa_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
- {
--    tcg_gen_insn_start(dcbase->pc_next);
-+    tcg_gen_insn_start(dcbase->pc_next, 0, 0);
- }
- 
- static void xtensa_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
--- 
-2.47.3
-
+v3 sent:
+https://lore.kernel.org/qemu-devel/20260210201540.1405424-1-pierrick.bouvier@linaro.org/T/#t
 
