@@ -1,110 +1,111 @@
-Return-Path: <kvm+bounces-70727-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70728-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IPeZCC9Ni2mWTwAAu9opvQ
-	(envelope-from <kvm+bounces-70727-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 16:22:23 +0100
+	id kPQyDIRNi2mWTwAAu9opvQ
+	(envelope-from <kvm+bounces-70728-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 16:23:48 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CC4611C6CB
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 16:22:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E0AE11C6D3
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 16:23:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 737DE3039807
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 15:22:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D8F8E303982F
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 15:23:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E25633BBAF;
-	Tue, 10 Feb 2026 15:22:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A69E33BBAF;
+	Tue, 10 Feb 2026 15:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NLAYXqqn";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="EtO932pm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XcM8sENa";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hp9Xzyyr"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E1026ED48
-	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 15:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4723626ED48
+	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 15:23:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770736931; cv=none; b=TNdApQrpV4QlOBkzQeie2IyfJMmWqjw9wKgQXOFiK9vs/n3pLTKOmjZapwNHt+zYgMrTCjSx8Mu4ZMZTqT7H93WscdBA3lKoqUk9dct0kN8kOhzXWdlFpGDLyvQ6O1l67EnxxNPsMhqlGrryPIqR8nzG2BtSJS+X1mqq6gBXQNE=
+	t=1770737018; cv=none; b=boP0c0zuYBABhxOX7sTf+kJFw5BxY2jxCb7zfpPeyBHwe+rn+JFvj9m/+C6e6lsnMYclxIAXvxEJr56CvfL8w0iwPbic9SgGZTozokAwWaNjTAd1tWLbk6MOHKLCSD86D8YXW/vURdVOHjJaX5JGxQhQae5Gk4t0Wn8cwhwxsn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770736931; c=relaxed/simple;
-	bh=u2OVsxHAXcG11SANG9Xt/uSYpel3jn4TmPAUQpcFijc=;
+	s=arc-20240116; t=1770737018; c=relaxed/simple;
+	bh=Ky8+Gi1YLPF+d0cjrPfnbJ5mA8pBCa9z5DRDnkOOg9w=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Cl1Gx8NyYhDgtFW4M4v9Ncw0ODVikQWy/cC+xZY5wq1fUtCDpAC3xYpYOkHvSqUxYTnW+tHBXJ/bP6cryj9X12PfeXlNo+2aFCUMKwY3UvES1K/wSniQbWW3P9P3/9qVcrRnHWgA2IKlKCgLAqa075pSB8MuPdqY+78L7v5rKrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NLAYXqqn; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EtO932pm; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:MIME-Version; b=h7aos8rWZ5/LlmB+rnF0VBOO2Juz2cDG5KS86K3c/rLhyQ4PK8xGlrSO1Ahb/kTHFVZrxXT9wg/wJTJ3BbhiDBSD1/MhZGJSt7RHeafGadyjnIZ67Bz1M1XgxooJgMatON5Ymi5rx53zpMqQ3GFSN2w4d82vwwziEERE4KEgmT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XcM8sENa; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hp9Xzyyr; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770736929;
+	s=mimecast20190719; t=1770737016;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OBEga/U7sWndeK3K709LiSG0w7JQZvu6UkLvuItg/zk=;
-	b=NLAYXqqn6yHJ3xFqX/O4LscVdqogmf9yQxb1zDw9CKaO5QWD6OlYEGqDS5KGRb+FgfZJfH
-	8Mp+M7QOTMNyjRlDTt3Tb9uxIXVisYQ+byABFINlpl+IY2zZWN2W3ZnRYqWsNZfJZrZs7u
-	hLCIEgDwblBUrtBBwCaIkQn/J/HPV10=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=4KpXs4HueBD4PLnzFUzxY05xrYaFOtjFsDd93FCVpl4=;
+	b=XcM8sENa/YHmtDAkIE3doe7OJIfsIzlwe/eQCZ6Nf3uX4tW/kw+bDMpXaed4meQbo7PfX7
+	qIM40It7NAqVaJDTLr8hudrFBkNXa0b9ONlTdaxsK7GCJGDckl9CLZ3VJ/0cNAtPSIzi56
+	Dxm7hUSPCLBQkWI+Wc6JQiiEQ9mCcJc=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-159-NaRl99Z5MNSFsULyv6jOrQ-1; Tue, 10 Feb 2026 10:22:08 -0500
-X-MC-Unique: NaRl99Z5MNSFsULyv6jOrQ-1
-X-Mimecast-MFC-AGG-ID: NaRl99Z5MNSFsULyv6jOrQ_1770736928
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-89700915423so87910036d6.2
-        for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 07:22:08 -0800 (PST)
+ us-mta-687-MUAa2OKCORmKncG6Gkedew-1; Tue, 10 Feb 2026 10:23:35 -0500
+X-MC-Unique: MUAa2OKCORmKncG6Gkedew-1
+X-Mimecast-MFC-AGG-ID: MUAa2OKCORmKncG6Gkedew_1770737014
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-5033b4d599eso200346731cf.2
+        for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 07:23:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770736926; x=1771341726; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1770737013; x=1771341813; darn=vger.kernel.org;
         h=mime-version:user-agent:content-transfer-encoding:references
          :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=OBEga/U7sWndeK3K709LiSG0w7JQZvu6UkLvuItg/zk=;
-        b=EtO932pmCEEFMtm88DKbq4OWA8YBjNTqAF+ylm5XtD5R4ncjTk3b8rq0j1f39L7u6b
-         EnBCAUPqWjs1v4J7gu/0uDT8MRZMXD5msIEmhjreUErdeBXDB4bzO+S6nlMzRM9SIg9c
-         j+4fZj8LvgNAJAPX3eBpAFVisrluGiXbzPpcXKhIzp5CPWP7v/V7ly77T/5fsFCddXKT
-         pskjB1vR/0j0DhxsWTDgXcxtStVkFA0PjeDWUIIBqDxpRD6+dVN9zaPy3o7rgeFsd/Tr
-         JFyG0YCVPHUf2e3iUVK3cm2vduaYwOxM5whGTB02bvLt1RD9QWp4ZTl3QG+/eUYzxubl
-         CVcA==
+        bh=4KpXs4HueBD4PLnzFUzxY05xrYaFOtjFsDd93FCVpl4=;
+        b=Hp9XzyyrDpd4htuD6V1GsJDgQNQ83DB87J+G7l6jkOhAVQ4/PkETqNSa/oE95G9Z2k
+         AFPvCGqgZB0g9wn09Dd23l8cSA35QzBlJd2cHY+03Xu86DGhtPkwFrT6mUOOR40J6uQS
+         wo4xbx57dyi9Z78aD0Jn5I/Wi3IljTzsl7hRUPSoIiF/j+s1sQWzDdhHK9thRHoBPCDv
+         JEo3FGAjOxpggEvrTNyR3nSl9+qwLvrCnfn3O/EpveVaChiHk0kobwJBIPk6XmSefsR6
+         5HN3bjXKftQUtNYwkfcwzOkzeZ32GcZ8v0elK2Gy34QeGaQ6QOD9jIIN6dssmPO10Iwy
+         T/0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770736926; x=1771341726;
+        d=1e100.net; s=20230601; t=1770737013; x=1771341813;
         h=mime-version:user-agent:content-transfer-encoding:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OBEga/U7sWndeK3K709LiSG0w7JQZvu6UkLvuItg/zk=;
-        b=mDKBJ3LFS7+PK8miO8Bg6W7uQ7Z4pS4Yb40GNHK3To5IXwz8NChTi+PYJm5rMjkwUw
-         vJIqOF4P9uEyM4L+pANQFm7UH2+e96JuZ+iy4TxLojrAHjqSjbPzkGw6MEsEmuwIbSjg
-         rnuNE5cVPAgzprqQ/dZc5OtSAxA4t0yexJaSe9YppG1WVT0ibD6hXJf5Mgt6WEzJ2l5i
-         p+mZfuJf05T0gXJFFKZN/IbJfrnJHESwHMW/2KMuauKINZn6pvLtcbS/Ca5gsYlSh1C3
-         7fGcTuVOkHldO66p+p5zRiEGDVV8gqNILu6z4+iuIWWWyvl0aBXch7yaMcscJxGruw9U
-         1dcQ==
-X-Gm-Message-State: AOJu0YxgA1hFynY0WzrwmPPoXnz59yu20ZkyBZzJ1ldT6UVyDM/zX12J
-	LOWbc8veJ6RvUg7GstBiGO4izAu18Is+WXIyA1jEmMDfRHwdIdlI5Auo2Mmap5EhczNV9PKGmvK
-	Kmcu6+MSsoxdVcPfISaJsdtFZ8WGJ+/ep0V3amDudq/A+2jWBwtPqYlxQPk706llOBNb17eXT72
-	9VVjGAIlxqYdSSsCAg/r2LBdb2ABJmTszGPFD8iA==
-X-Gm-Gg: AZuq6aIhofdzGmDzp01RnQO+Db/vCdWhvOx1PLzGwpuBFFdJXhyqMKVb60QtwYtmrBV
-	8eOah3Ohyq/WJTIUEyDz7mpD0djPlu102HMLwGw0j5cz6t9GajNHigmPID55K7qVgSQeKSPPisV
-	Yg+6DK9N7f7jkfp+9QUF2Nsz+BeRmdlo72VeLA8U5KPKkFHu3zZ43RED7ALKtSG6qtCNEQ3LfZa
-	sblm03wDmviiB6Rxb9lAPUlyRUDDN0GC+uX7BgI9iIwIOmVWYAa9Wd71T1yzfbHsL+N5Y0fXOTp
-	IVxE3xZ6m1oZrotJf+cIAWvLwz39dG9mI+kp7NhXDOcscZF4rw6q66vv1LUX0wEk8zg/cwXDdE4
-	my6gfLEg65n20n/v6ZM2xLQOfXiZZ
-X-Received: by 2002:ad4:596f:0:b0:894:7852:9bd3 with SMTP id 6a1803df08f44-8953ca7bb89mr205998846d6.42.1770736926393;
-        Tue, 10 Feb 2026 07:22:06 -0800 (PST)
-X-Received: by 2002:ad4:596f:0:b0:894:7852:9bd3 with SMTP id 6a1803df08f44-8953ca7bb89mr205998446d6.42.1770736925986;
-        Tue, 10 Feb 2026 07:22:05 -0800 (PST)
+        bh=4KpXs4HueBD4PLnzFUzxY05xrYaFOtjFsDd93FCVpl4=;
+        b=E0jsTHYSl0dJOdXa27MkTClQoSWQcXtBenWYzBonSmZOmnyFKrvWYNp4MHbo6aVzUF
+         cFjiXCSmvudRjFkUHhQ+gsZUz9DQu6AGzG0cdFf2cqqdNYyu4WDHjaIewLD8GxfKYNm6
+         DBvM6Jqk0fJSeqBz5L3KDTsyWR93Ct9KEouVRMnd4zRFFhv5Tx6lBZs4htmIe0+R6AAw
+         eVZn7YEIUHAVaXpljLj22CNWaczjo/MSIPS+QkPDP5t8/jDDwe95E50W2ngiUMPpReKG
+         QISY7M0du2Vy3JGM/5T6+IUmGWnNKQTkl4gaM1uFd9lVTYXV8s5hxdPE/caAQqTXep0v
+         7cjA==
+X-Gm-Message-State: AOJu0YyVW0SzxouY+Dr+sgFbofzshrn8aU8tsYxW4lz3Sh3pxLDFQKkK
+	Qw7NEn86Z1tHbKo69Fylsb6C86pC6zJe05aIVF6vHskwZ58fPgdAg/dEZYVioW/AysO1DeOw0+1
+	EiVGFqdyJKye7XpVp5wGykOht+lO1/YPrqy2HHV45z6K9plkg3O1Q/MCw1Q+1GlL4HTghJ2NHN2
+	Xr35GwxEWILuSxpp6ieQUVbkX0RCg5gTdU22h+UA==
+X-Gm-Gg: AZuq6aJb7XJM/+SRXtZCvBs1babRuJBK5KoQNdNJCBEbIB0Nqy6FaWd2+zENVyDo1Zk
+	oZDr8qHpc1bYrTOTwWkofUi9iHx09imFCtculwJ5K83PndFA2I82kxC6jYgbUvIx83u38UeJcVp
+	MCP8LzVXI3mEBGpkTPWZsfyo3SpS8v/FOxf1Sy++yQXabesXaBSMoLbH12cLEc+tr6TMRxfm/F7
+	7vgYWHeENk6MMkO8otGEofpxiUbiIV52BecigQ9dsjAnU1E7aiN87GtESOl/N3VYxoB1PtVBN7d
+	veDDjNPiztlg7LgY/L+PACZxbIsa7eaHxCLdPF4UzQFe0dFducLbr8iXZG1XLdJSpLpYY7A/JiD
+	VOM7iGKma3wUs2aZgi3eipBky5fUm
+X-Received: by 2002:ac8:580c:0:b0:4ed:66bd:95ea with SMTP id d75a77b69052e-50673cdf42fmr31146571cf.29.1770737013247;
+        Tue, 10 Feb 2026 07:23:33 -0800 (PST)
+X-Received: by 2002:ac8:580c:0:b0:4ed:66bd:95ea with SMTP id d75a77b69052e-50673cdf42fmr31146151cf.29.1770737012833;
+        Tue, 10 Feb 2026 07:23:32 -0800 (PST)
 Received: from intellaptop.lan ([2607:fea8:fc01:88aa:f1de:f35:7935:804f])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-506392f2e5csm100035561cf.33.2026.02.10.07.22.04
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5063928e05csm98081041cf.19.2026.02.10.07.23.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 07:22:04 -0800 (PST)
-Message-ID: <8ffd86d8fc000da72a7607a810cae30fe3c9f6c6.camel@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] Skip PMU portion of vmware_backdoors
- test if PMU is not enabled.
+        Tue, 10 Feb 2026 07:23:31 -0800 (PST)
+Message-ID: <d4ae36c621a77d21985396d5dc6247d76b08ba97.camel@redhat.com>
+Subject: Re: Question: 'pmu' kvm unit test fails when run nested with NMI
+ watchdog on the host
 From: mlevitsk@redhat.com
 To: kvm@vger.kernel.org
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>
-Date: Tue, 10 Feb 2026 10:22:03 -0500
-In-Reply-To: <20251208233910.1000465-1-mlevitsk@redhat.com>
-References: <20251208233910.1000465-1-mlevitsk@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Date: Tue, 10 Feb 2026 10:23:30 -0500
+In-Reply-To: <b0bdc3f140238d23e2de8f706c06331db1d57e79.camel@redhat.com>
+References: <10d3f95717b7072e30576b7e3931ea277399fdf8.camel@redhat.com>
+	 <2eae45e037c938785b9e36d0f5265becca953d9f.camel@redhat.com>
+	 <b0bdc3f140238d23e2de8f706c06331db1d57e79.camel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
@@ -118,19 +119,19 @@ X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-70727-lists,kvm=lfdr.de];
 	FROM_NEQ_ENVFROM(0.00)[mlevitsk@redhat.com,kvm@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70728-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_NO_DN(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
@@ -139,86 +140,64 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oracle.com:email]
-X-Rspamd-Queue-Id: 8CC4611C6CB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7E0AE11C6D3
 X-Rspamd-Action: no action
 
-On Mon, 2025-12-08 at 18:39 -0500, Maxim Levitsky wrote:
-> Since 2019, KVM has an explicit check that if guest's PMC is disabled,
-> then VMware backdoor via RDPCM is disabled as well.
+On Wed, 2025-11-26 at 13:14 -0500, mlevitsk@redhat.com wrote:
+> On Mon, 2025-11-10 at 14:51 -0500, mlevitsk@redhat.com=C2=A0wrote:
+> > On Wed, 2025-11-05 at 15:29 -0500, mlevitsk@redhat.com=C2=A0wrote:
+> > > Hi,
+> > >=20
+> > > I have a small, a bit philosophical question about the pmu kvm unit t=
+est:
+> > >=20
+> > > One of the subtests of this test, tests all GP counters at once, and =
+it depends on the NMI watchdog being disabled,
+> > > because it occupies one GP counter.
+> > >=20
+> > > This works fine, except when this test is run nested. In this case, a=
+ssuming that the host has the NMI watchdog enabled,
+> > > the L1 still can=E2=80=99t use all counters and has no way of working=
+ this around.
+> > >=20
+> > > Since AFAIK the current long term direction is vPMU, which is especia=
+lly designed to address those kinds of issues,
+> > > I am not sure it is worthy to attempt to fix this at L0 level (by red=
+ucing the number of counters that the guest can see for example,
+> > > which also won=E2=80=99t always fix the issue, since there could be m=
+ore perf users on the host, and NMI watchdog can also
+> > > get dynamically enabled and disabled).
+> > >=20
+> > > My question is: Since the test fails and since it interferes with CI,=
+ does it make sense to add a workaround to the test,
+> > > by making it use 1 counter less if run nested?=20
+> > >=20
+> > > As a bonus the test can also check the NMI watchdog state and also re=
+duce the number of tested counters instead of being skipped,
+> > > improving coverage.
+> > >=20
+> > > Does all this make sense? If not, what about making the =E2=80=98all_=
+counters=E2=80=99 testcase optional (only print a warning) in case the test=
+ is run nested?
+> > >=20
+> > > Best regards,
+> > > 	Maxim Levitsky
+> > >=20
+> >=20
+> > Kind ping on this question.
 >=20
-> =C2=A0commit 672ff6cff80ca43bf3258410d2b887036969df5f
-> =C2=A0Author: Liran Alon <liran.alon@oracle.com>
-> =C2=A0Date:=C2=A0=C2=A0 Mon Mar 25 21:10:17 2019 +0200
-> =C2=A0KVM: x86: Raise #GP when guest vCPU do not support PMU
+> Another kind ping on this question.
+
+A ping on this question.
+
 >=20
-> Fix the test failure by checking if PMU is enabled first.
+> Best regards,
+> =C2=A0=C2=A0=C2=A0 Maxim Levitsky
 >=20
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-
-Hi,
-Any update?
-
-Best regards,
-	Maxim Levitsky
-
-
-> ---
-> =C2=A0x86/vmware_backdoors.c | 18 +++++++++++++++---
-> =C2=A01 file changed, 15 insertions(+), 3 deletions(-)
+> >=20
+> > Best regards,
+> > 	Maxim Levitsky
 >=20
-> diff --git a/x86/vmware_backdoors.c b/x86/vmware_backdoors.c
-> index f8cf7ecb150b..c18f0bf86356 100644
-> --- a/x86/vmware_backdoors.c
-> +++ b/x86/vmware_backdoors.c
-> @@ -1,5 +1,6 @@
-> =C2=A0
-> =C2=A0#include "x86/msr.h"
-> +#include "x86/pmu.h"
-> =C2=A0#include "x86/processor.h"
-> =C2=A0#include "x86/apic-defs.h"
-> =C2=A0#include "x86/apic.h"
-> @@ -101,7 +102,7 @@ static uint64_t vmware_backdoor_port(uint64_t vmport,=
- uint64_t vmport_magic,
-> =C2=A0		PORT_ARG(a, b, c, m, sf))
-> =C2=A0
-> =C2=A0
-> -struct fault_test vmware_backdoor_tests[] =3D {
-> +struct fault_test vmware_backdoor_tests_rdpcm[] =3D {
-> =C2=A0	RDPMC_TEST("HOST_TSC kernel", VMWARE_BACKDOOR_PMC_HOST_TSC,
-> =C2=A0			KERNEL_MODE, NO_FAULT),
-> =C2=A0	RDPMC_TEST("REAL_TIME kernel", VMWARE_BACKDOOR_PMC_REAL_TIME,
-> @@ -116,6 +117,10 @@ struct fault_test vmware_backdoor_tests[] =3D {
-> =C2=A0			USER_MODE, NO_FAULT),
-> =C2=A0	RDPMC_TEST("RANDOM PMC user", 0xfff, USER_MODE, FAULT),
-> =C2=A0
-> +	{ NULL },
-> +};
-> +
-> +struct fault_test vmware_backdoor_tests_ioport[] =3D {
-> =C2=A0	PORT_TEST("CMD_GETVERSION user", VMWARE_BACKDOOR_PORT, VMWARE_MAGI=
-C,
-> =C2=A0			VMPORT_CMD_GETVERSION, USER_MODE, NO_FAULT),
-> =C2=A0	PORT_TEST("CMD_GETVERSION kernel", VMWARE_BACKDOOR_PORT, VMWARE_MA=
-GIC,
-> @@ -165,8 +170,15 @@ static void check_vmware_backdoors(void)
-> =C2=A0
-> =C2=A0	report_prefix_push("vmware_backdoors");
-> =C2=A0
-> -	for (i =3D 0; vmware_backdoor_tests[i].name !=3D NULL; i++)
-> -		test_run(&vmware_backdoor_tests[i]);
-> +	if (this_cpu_has_pmu()) {
-> +		for (i =3D 0; vmware_backdoor_tests_rdpcm[i].name !=3D NULL; i++)
-> +			test_run(&vmware_backdoor_tests_rdpcm[i]);
-> +	} else {
-> +		report_skip("Skipping VMWARE pseudo RDPCM tests, PMU not enabled");
-> +	}
-> +
-> +	for (i =3D 0; vmware_backdoor_tests_ioport[i].name !=3D NULL; i++)
-> +		test_run(&vmware_backdoor_tests_ioport[i]);
-> =C2=A0
-> =C2=A0	report_prefix_pop();
-> =C2=A0}
 
 
