@@ -1,215 +1,317 @@
-Return-Path: <kvm+bounces-70800-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70801-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mE6iHLefi2kKXQAAu9opvQ
-	(envelope-from <kvm+bounces-70800-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 22:14:31 +0100
+	id iK/7Ouegi2l1XQAAu9opvQ
+	(envelope-from <kvm+bounces-70801-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 22:19:35 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB0E911F54C
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 22:14:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F66211F5BD
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 22:19:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3DB1C300E5BB
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:14:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 605C63019D46
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C08B83382E5;
-	Tue, 10 Feb 2026 21:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF65338F45;
+	Tue, 10 Feb 2026 21:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EfAiVoF0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MxNn5Hls"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B25E283C93
-	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 21:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770758066; cv=none; b=RD9/YJLAnlgFUYAUu8sPD5I4NusiF1SjhBMzaVTa4BnzafUyf4sFxVL2ZDLKC7jfehjT0N9qMHHGPW6fsewgSqLiqtJSXlLRfBYpBnUYDkr1fPCcOiLF/swmw0MShdjBkZgETI1ZtEUJoKSwI1ACYVEp07j47V8NOA5SB/RuQtc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770758066; c=relaxed/simple;
-	bh=qO92ZMhArGYgyGIX4QpgjDk76nDRI10pvEdc/CMH+9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nqE6fLVCkaiy6sxc+kxd1/RUYjyuOUay2e4nAWJhOCyHBXSsVP87uYlJGw8K1fsj3yavVBtWb2iO/smmXTRnc2YNoTnNlkVr12q8CA0aq7M1a6/+CjLfwMQbjTXLP9BKh5u2L1ik/3mM6HSOSVlGOZZkqxBRljVNrlz+c+0wGDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EfAiVoF0; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 10 Feb 2026 21:14:15 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770758061;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZD2QQlyuCd2R95LSt20FsvwjTTPGfL3ZMei1mP3UCQo=;
-	b=EfAiVoF0YsIrmUMeIEQ4F23T5zYuZ3JgZsJzg7evmEIDwro+6Gt/Ek/AVgXIvNvbb+tWXq
-	tcVUMs1ahbmZEVXkgXRqeV6eLO6eJ0/QgAqcClGHEUOcYCtBZvI4B+PcNjpowmp2FwPpNV
-	I4FwRpo0U7SYl1+aWjZ5WIF5SR+f3JA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Jim Mattson <jmattson@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Josh Hilke <jrhilke@google.com>
-Subject: Re: [PATCH v2] Introduce KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC
-Message-ID: <cjmbfd5uexxzqzfzzwpgbehpyv7iqz6du4wfvwqnrenwlaaujs@42fhftddlgyx>
-References: <20260205231537.1278753-1-jmattson@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC61328B7B
+	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 21:19:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770758367; cv=pass; b=Nfsmr5MXDs8o2qcVLzTy3YAkaO7SNxxpkTRGXxgtkhBiPnZ6w7HOI/GqAxj3vz3yS5Svvd/anhjAbEWunEBQ1NFohpGJtmUBmwyP+jtlvXOwMQw5d9CZm04y/jAX9MDsIf5NsSodpsNT+Ei5ONRO6Y2+XJlluI2HjwhIhTrXzYs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770758367; c=relaxed/simple;
+	bh=+LaNhwPFeD1BT8BG86YL8wzmJ/KKkGGhFp/e5ms9N/A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f0GlH9PVHGWVPj5fM/FlPvXvbztoN7jNlddp31FoNyVry5OstWwMrPjuaHPmqQNBxPn0P7Lpf355pmnsH2P4TUGJz14Kq9d/GbLkHIirzwN5ffr7iO8VqlhyvmnIF+xtqh4FaJfMpxxrA5mOV0fIOujiNo2r2uw6Ikk/ekIZfSI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MxNn5Hls; arc=pass smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-65a38c42037so943a12.0
+        for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 13:19:25 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770758364; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RCW25rALyi5xmjv8MrfY84h4uxFaXtRVweImtSoiroVxIjKsl/2JoNRoXkl2PkMKwK
+         zLJ791aWXDi4IYkRun56UcM4q6TVZTMlQS3r3QjzKJG38I1su7wU6hQOMGx00LfYJ/XU
+         4sIKhxQ3Z4YzGIGxPx0HKqSPA5/+vh0WVG5wyQMdDoXeO9GYnD2/3sHq9gpQDT/zol0y
+         Qs3MJa4YW27FtvrkRDpUGXYiXOv0Z4UP2p27VPHv4SNxbzcaeWDTndrkmWQkd2Hl7aIP
+         +/KAGZiXIcX0AHrK9Ikq0bUXBa644DktTbVIwDZZf03bhOAN4IYw2mH2H2Q1pP15WWiu
+         Zgpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=7ueb2XLAZgSMqdZ7FzkgHkbOJxEx/nDgdsJxz5kcjsQ=;
+        fh=1rlUv1a7I+zBYkzkuMPxA5lbdjvFqgkLrtk96zKZsF0=;
+        b=LaQ5O1UYQNBOLaNFNXwfIK/PHBHTiyOIXKVMepBce+gyLvUOnWy2yugY0FlWjmrIEM
+         oL7iP/+Ml/bLjtA9S46VzRym5IRdBXqlZ1aaksdsln0/uPA54rVq2dOaDnwitb0YN5Fd
+         hpuyHwYiBhDntV5y1gv4NdWm2wQ16mrFYHmTj9Ur2orbNK54gTUVF6jSLn57Hzx8UaM6
+         JrIKdpcv3S+kkU+zdWl/1TWIzXRCiC3T2qvAfcR/Ut23cPJumsQSYHct32IDVpXSeDiF
+         8Zhf1B5qKZB12O4rmSUeJrQJeNQN5dS0IQhMlzhZ8qkMzKrczM544Py5yJP8KyKeR+jU
+         FzWw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770758364; x=1771363164; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7ueb2XLAZgSMqdZ7FzkgHkbOJxEx/nDgdsJxz5kcjsQ=;
+        b=MxNn5HlsHMhJFbhTT8HfzhqtAjgnQ0MqYNNrYG+lZpI6RwzbzeefsZq8eypKBF5y3a
+         eA3kfew2ceKx+HmmrkyavBzLjHGcyk4VTVsfS+k0GEg5MRHEduvkiSoJj255UEDyKKlB
+         oC+MlC6eP7CMDAJxRWo8sl7KdqQezG++8mr7FyYiEoTY0EpAjXVlLUPSiQW/9NbAGjmx
+         Wn7Ll8vIYhnTkjsOy7V3gN+LkQfkXXcndIusR1T73zwyhAXrl05X/BVnwdZhH/y8s/Gd
+         25KqjjNtma7v49zvc3Rcp5MnkTmdGkqfYHv3HmSu0rL+xY1Dl4MuFy26bs7gM6RRGGiK
+         zN2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770758364; x=1771363164;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7ueb2XLAZgSMqdZ7FzkgHkbOJxEx/nDgdsJxz5kcjsQ=;
+        b=ZNDfz2PxdC2rn3uM9FRQqb7C/GAzFfh8z94/6Ak/W5roBJckus4k9cxYrr69brUZpn
+         J3icbuJ+VkVxiBAiAESFo9DqmhXByT23ZlhM52MOgSVbxErX3aMHhvIwdXP5s4B9cLXx
+         zlaOhDAD5BYaR5fy7GF60zLLM5dYJqtG5Ad0oMLQXXgkaouB+VKCMv9Lg4hdghK/lUpu
+         iXmnDWRD2mKjRlOW5Cx5PZSMcODacTrF9vebmSEACJwPISO10+J4XTPuGpb7kDepUBae
+         9Y3bX/bZr7ngNMrz3LUkopEN+XRlKgPNmkwUZ+cfDBeGvdsQjABOTHwOp5VHGnrgokuU
+         wK7g==
+X-Forwarded-Encrypted: i=1; AJvYcCUzwO6Vm2Nz2IcaPMRjaYsj7JO3BOheJFQ3NPQVw2wX1RHPz3+EdrdosM2t71ibqdIZNrA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPkqk7WIu32l8Dft0abixvelSQ5MU0YwI0mJJfLjv8mxokuRmI
+	FDBtL41BGl5/fmGuxQyFOazdKt6jyb458OL7q4TqQ6dgQV1bau6rsn1dPQDgGyK+Iov0x1/XeO0
+	ev8wHfDqX73/6csp05A9naBvyWOiUy8LsidMvEtRE
+X-Gm-Gg: AZuq6aIuv7DpWi6kQMcqA0Ht+nQAFhlUnxsQgtNgjjgXtuvjLh8M+SR+GcQy+/Y42z7
+	s/MIVl3DJbiX+0Grb6BLn7pbmZieZYiugiEdNlHdfAVDt954khJcCqKizhsmjEOeOiAcgFvTVaW
+	AIl5FTNx7n8GawhgOyFYypC2XU5QrxFJE3EURt2HTWA4GhMUwAQT4ySCtVWQFfovYPvNFfZEDc6
+	XhxQ6V54xqzXBrLjbjaFeKmzuEC/zkcjmhjLO+MD3fZCdpg8BRSeF55cHM8aOat+8ipychOw4fY
+	ZBM7FvYvrnlriG14N2BEK1Hmg1l6EmAo/qb5
+X-Received: by 2002:a05:6402:8cf:b0:659:7696:432c with SMTP id
+ 4fb4d7f45d1cf-65a390b5a13mr6380a12.16.1770758363456; Tue, 10 Feb 2026
+ 13:19:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260205231537.1278753-1-jmattson@google.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20260209220849.2126486-1-surenb@google.com>
+In-Reply-To: <20260209220849.2126486-1-surenb@google.com>
+From: Jann Horn <jannh@google.com>
+Date: Tue, 10 Feb 2026 22:18:47 +0100
+X-Gm-Features: AZwV_Qj1nCcIQNkC6tpOVx93iwKZtT2dbqwR4XsX_m7M7cfMNKnVzbH_C365zC4
+Message-ID: <CAG48ez2zFfCO7RKhHKaATFge7DWzaTfO+Yta0y4_HXGHZAtkqw@mail.gmail.com>
+Subject: Re: [PATCH 1/1] mm: replace vma_start_write() with vma_start_write_killable()
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: akpm@linux-foundation.org, willy@infradead.org, david@kernel.org, 
+	ziy@nvidia.com, matthew.brost@intel.com, joshua.hahnjy@gmail.com, 
+	rakie.kim@sk.com, byungchul@sk.com, gourry@gourry.net, 
+	ying.huang@linux.alibaba.com, apopple@nvidia.com, lorenzo.stoakes@oracle.com, 
+	baolin.wang@linux.alibaba.com, Liam.Howlett@oracle.com, npache@redhat.com, 
+	ryan.roberts@arm.com, dev.jain@arm.com, baohua@kernel.org, 
+	lance.yang@linux.dev, vbabka@suse.cz, rppt@kernel.org, mhocko@suse.com, 
+	pfalcato@suse.de, kees@kernel.org, maddy@linux.ibm.com, npiggin@gmail.com, 
+	mpe@ellerman.id.au, chleroy@kernel.org, linux-mm@kvack.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-70801-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-70800-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry.ahmed@linux.dev,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FROM_NEQ_ENVFROM(0.00)[jannh@google.com,kvm@vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux-foundation.org,infradead.org,kernel.org,nvidia.com,intel.com,gmail.com,sk.com,gourry.net,linux.alibaba.com,oracle.com,redhat.com,arm.com,linux.dev,suse.cz,suse.com,suse.de,linux.ibm.com,ellerman.id.au,kvack.org,lists.ozlabs.org,vger.kernel.org];
 	TAGGED_RCPT(0.00)[kvm];
 	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CB0E911F54C
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 8F66211F5BD
 X-Rspamd-Action: no action
 
-On Thu, Feb 05, 2026 at 03:15:26PM -0800, Jim Mattson wrote:
-> Add KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC to allow L1 to set FREEZE_IN_SMM
-> in vmcs12's GUEST_IA32_DEBUGCTL field, as permitted prior to
-> commit 6b1dd26544d0 ("KVM: VMX: Preserve host's DEBUGCTLMSR_FREEZE_IN_SMM
-> while running the guest").  The quirk is enabled by default for backwards
-> compatibility; userspace can disable it via KVM_CAP_DISABLE_QUIRKS2 for
-> consistency with the constraints on WRMSR(IA32_DEBUGCTL).
-> 
-> Note that the quirk only bypasses the consistency check. The vmcs02 bit is
-> still owned by the host, and PMCs are not frozen during virtualized SMM.
-> In particular, if a host administrator decides that PMCs should not be
-> frozen during physical SMM, then L1 has no say in the matter.
-> 
-> Fixes: 095686e6fcb4 ("KVM: nVMX: Check vmcs12->guest_ia32_debugctl on nested VM-Enter")
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
->  Documentation/virt/kvm/api.rst  | 10 ++++++++++
->  arch/x86/include/asm/kvm_host.h |  3 ++-
->  arch/x86/include/uapi/asm/kvm.h |  1 +
->  arch/x86/kvm/vmx/nested.c       | 23 +++++++++++++++++++----
->  4 files changed, 32 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index d04b4bdd60c1..325e565ff99e 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8482,6 +8482,16 @@ KVM_X86_QUIRK_IGNORE_GUEST_PAT      By default, on Intel platforms, KVM ignores
->                                      guest software, for example if it does not
->                                      expose a bochs graphics device (which is
->                                      known to have had a buggy driver).
+On Mon, Feb 9, 2026 at 11:08=E2=80=AFPM Suren Baghdasaryan <surenb@google.c=
+om> wrote:
+> Now that we have vma_start_write_killable() we can replace most of the
+> vma_start_write() calls with it, improving reaction time to the kill
+> signal.
+[...]
+> diff --git a/mm/mempolicy.c b/mm/mempolicy.c
+> index dbd48502ac24..3de7ab4f4cee 100644
+> --- a/mm/mempolicy.c
+> +++ b/mm/mempolicy.c
+[...]
+> @@ -1808,7 +1817,11 @@ SYSCALL_DEFINE4(set_mempolicy_home_node, unsigned =
+long, start, unsigned long, le
+>                         break;
+>                 }
+>
+> -               vma_start_write(vma);
+> +               if (vma_start_write_killable(vma)) {
+> +                       err =3D -EINTR;
+
+Doesn't this need mpol_put(new)? Or less complicated, move the
+vma_start_write_killable() up to somewhere above the mpol_dup() call.
+
+> +                       break;
+> +               }
 > +
-> +KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC
-> +				    By default, KVM relaxes the consistency
-> +				    check for GUEST_IA32_DEBUGCTL in vmcb12
+>                 new->home_node =3D home_node;
+>                 err =3D mbind_range(&vmi, vma, &prev, start, end, new);
+>                 mpol_put(new);
+[...]
+> diff --git a/mm/pagewalk.c b/mm/pagewalk.c
+> index a94c401ab2cf..dc9f7a7709c6 100644
+> --- a/mm/pagewalk.c
+> +++ b/mm/pagewalk.c
+> @@ -425,14 +425,13 @@ static inline void process_mm_walk_lock(struct mm_s=
+truct *mm,
+>                 mmap_assert_write_locked(mm);
+>  }
+>
+> -static inline void process_vma_walk_lock(struct vm_area_struct *vma,
+> +static inline int process_vma_walk_lock(struct vm_area_struct *vma,
+>                                          enum page_walk_lock walk_lock)
+>  {
+>  #ifdef CONFIG_PER_VMA_LOCK
+>         switch (walk_lock) {
+>         case PGWALK_WRLOCK:
+> -               vma_start_write(vma);
+> -               break;
+> +               return vma_start_write_killable(vma);
 
-vmcs12*
+There are two users of PGWALK_WRLOCK in arch/s390/mm/gmap.c code that
+don't check pagewalk return values, have you checked that they are not
+negatively affected by this new possible error return?
 
-> +				    to allow FREEZE_IN_SMM to be set.  When
-> +				    this quirk is disabled, KVM requires
-> +				    this bit to be cleared.  Note that the
-> +				    vmcs02 bit is still completely
-> +				    controlled by the host, regardless of
-> +				    the quirk setting.
->  =================================== ============================================
->  
->  7.32 KVM_CAP_MAX_VCPU_ID
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index ff07c45e3c73..1669d4797f0b 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2485,7 +2485,8 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
->  	 KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS |	\
->  	 KVM_X86_QUIRK_SLOT_ZAP_ALL |		\
->  	 KVM_X86_QUIRK_STUFF_FEATURE_MSRS |	\
-> -	 KVM_X86_QUIRK_IGNORE_GUEST_PAT)
-> +	 KVM_X86_QUIRK_IGNORE_GUEST_PAT |	\
-> +	 KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC)
->  
->  #define KVM_X86_CONDITIONAL_QUIRKS		\
->  	(KVM_X86_QUIRK_CD_NW_CLEARED |		\
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 846a63215ce1..76128958bbca 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -476,6 +476,7 @@ struct kvm_sync_regs {
->  #define KVM_X86_QUIRK_SLOT_ZAP_ALL		(1 << 7)
->  #define KVM_X86_QUIRK_STUFF_FEATURE_MSRS	(1 << 8)
->  #define KVM_X86_QUIRK_IGNORE_GUEST_PAT		(1 << 9)
-> +#define KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC	(1 << 10)
->  
->  #define KVM_STATE_NESTED_FORMAT_VMX	0
->  #define KVM_STATE_NESTED_FORMAT_SVM	1
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 248635da6766..9bd29b9375fb 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -3300,10 +3300,25 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
->  	if (CC(vmcs12->guest_cr4 & X86_CR4_CET && !(vmcs12->guest_cr0 & X86_CR0_WP)))
->  		return -EINVAL;
->  
-> -	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) &&
-> -	    (CC(!kvm_dr7_valid(vmcs12->guest_dr7)) ||
-> -	     CC(!vmx_is_valid_debugctl(vcpu, vmcs12->guest_ia32_debugctl, false))))
-> -		return -EINVAL;
-> +	if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) {
-> +		u64 debugctl = vmcs12->guest_ia32_debugctl;
-> +
-> +		/*
-> +		 * FREEZE_IN_SMM is not virtualized, but allow L1 to set it
-> +		 * in VMCB12's DEBUGCTL under a quirk for backwards
+>         case PGWALK_WRLOCK_VERIFY:
+>                 vma_assert_write_locked(vma);
+>                 break;
+[...]
+> diff --git a/mm/vma.c b/mm/vma.c
+> index be64f781a3aa..3cfb81b3b7cf 100644
+> --- a/mm/vma.c
+> +++ b/mm/vma.c
+> @@ -540,8 +540,12 @@ __split_vma(struct vma_iterator *vmi, struct vm_area=
+_struct *vma,
+>         if (new->vm_ops && new->vm_ops->open)
+>                 new->vm_ops->open(new);
+>
+> -       vma_start_write(vma);
+> -       vma_start_write(new);
+> +       err =3D vma_start_write_killable(vma);
+> +       if (err)
+> +               goto out_fput;
+> +       err =3D vma_start_write_killable(new);
+> +       if (err)
+> +               goto out_fput;
 
-VMCS12's
+What about the new->vm_ops->open() call and the anon_vma_clone()
+above? I don't think the error path properly undoes either. These
+calls should probably be moved further up, so that the point of no
+return in this function stays where it was.
 
-> +		 * compatibility.  Note that the quirk only relaxes the
-> +		 * consistency check. The vmcb02 bit is still under the
+>         init_vma_prep(&vp, vma);
+>         vp.insert =3D new;
+[...]
+> @@ -1155,10 +1168,12 @@ int vma_expand(struct vma_merge_struct *vmg)
+>         struct vm_area_struct *next =3D vmg->next;
+>         bool remove_next =3D false;
+>         vm_flags_t sticky_flags;
+> -       int ret =3D 0;
+> +       int ret;
+>
+>         mmap_assert_write_locked(vmg->mm);
+> -       vma_start_write(target);
+> +       ret =3D vma_start_write_killable(target);
+> +       if (ret)
+> +               return ret;
+>
+>         if (next && target !=3D next && vmg->end =3D=3D next->vm_end)
+>                 remove_next =3D true;
+> @@ -1186,17 +1201,19 @@ int vma_expand(struct vma_merge_struct *vmg)
+>          * Note that, by convention, callers ignore OOM for this case, so
+>          * we don't need to account for vmg->give_up_on_mm here.
+>          */
+> -       if (remove_next)
+> +       if (remove_next) {
+> +               ret =3D vma_start_write_killable(next);
+> +               if (ret)
+> +                       return ret;
+>                 ret =3D dup_anon_vma(target, next, &anon_dup);
+> +       }
+>         if (!ret && vmg->copied_from)
+>                 ret =3D dup_anon_vma(target, vmg->copied_from, &anon_dup)=
+;
+>         if (ret)
+>                 return ret;
 
-vmcs02
+nit: the control flow here is kinda chaotic, with some "if (ret)
+return ret;" mixed with "if (!ret && ...) ret =3D ...;".
 
-> +		 * control of the host. In particular, if a host
-> +		 * administrator decides to clear the bit, then L1 has no
-> +		 * say in the matter.
-> +		 */
-> +		if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC))
-> +			debugctl &= ~DEBUGCTLMSR_FREEZE_IN_SMM;
-> +
-> +		if (CC(!kvm_dr7_valid(vmcs12->guest_dr7)) ||
-> +		    CC(!vmx_is_valid_debugctl(vcpu, debugctl, false)))
-> +			return -EINVAL;
-> +	}
->  
->  	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PAT) &&
->  	    CC(!kvm_pat_valid(vmcs12->guest_ia32_pat)))
-> 
-> base-commit: e944fe2c09f405a2e2d147145c9b470084bc4c9a
-> -- 
-> 2.53.0.rc2.204.g2597b5adb4-goog
-> 
+>
+> -       if (remove_next) {
+> -               vma_start_write(next);
+> +       if (remove_next)
+>                 vmg->__remove_next =3D true;
+> -       }
+>         if (commit_merge(vmg))
+>                 goto nomem;
+>
+[...]
+> @@ -2211,9 +2240,8 @@ int mm_take_all_locks(struct mm_struct *mm)
+>          * is reached.
+>          */
+>         for_each_vma(vmi, vma) {
+> -               if (signal_pending(current))
+> +               if (vma_start_write_killable(vma))
+>                         goto out_unlock;
+> -               vma_start_write(vma);
+
+nit: might want to keep the signal_pending() so that this can sort of
+be interrupted by non-fatal signals, which seems to be the intention
+
+>         }
+>
+>         vma_iter_init(&vmi, mm, 0);
+> @@ -2549,7 +2577,9 @@ static int __mmap_new_vma(struct mmap_state *map, s=
+truct vm_area_struct **vmap)
+>  #endif
+>
+>         /* Lock the VMA since it is modified after insertion into VMA tre=
+e */
+> -       vma_start_write(vma);
+> +       error =3D vma_start_write_killable(vma);
+> +       if (error)
+> +               goto free_iter_vma;
+
+This seems way past the point of no return, we've already called the
+->mmap() handler which I think means removing the VMA again would
+require a ->close() call. The VMA should be locked further up if we
+want to do it killably.
+
+>         vma_iter_store_new(vmi, vma);
+>         map->mm->map_count++;
+>         vma_link_file(vma, map->hold_file_rmap_lock);
+>
 
