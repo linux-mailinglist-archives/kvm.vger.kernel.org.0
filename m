@@ -1,104 +1,68 @@
-Return-Path: <kvm+bounces-70773-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70774-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GL6uKtNti2lhUQAAu9opvQ
-	(envelope-from <kvm+bounces-70773-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 18:41:39 +0100
+	id WEaiCoVui2lhUQAAu9opvQ
+	(envelope-from <kvm+bounces-70774-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 18:44:37 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B437411E07A
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 18:41:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7861511E0D5
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 18:44:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C024C300463C
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 17:41:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0F73D30480E8
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 17:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B2938A9CE;
-	Tue, 10 Feb 2026 17:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0E138A9AD;
+	Tue, 10 Feb 2026 17:44:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gfpfvw66";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HFnz1K7b"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GJp0oHk4"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396D938A9AA
-	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 17:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 178321DF755;
+	Tue, 10 Feb 2026 17:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770745282; cv=none; b=H7JLIEgWLCMD3c2Br8ce+vnnO+5PvWLstXj8aT15OTfs+qk+Pz68HjuteCHPsWf12h8Z55+4DIvECFKE75b3oJiFKgzyaKrb7OP8vDSVh5QmdYqdRHL1zo4dNbzBAdGcOI854Ej40f+y1xLkMWsWRwrL+MYs1tb9E5z95JtkJBg=
+	t=1770745462; cv=none; b=pRCHNsBrVx6scTB7Ij8lpQNDMwET6L56qEh6+oRTmw8v+4wqt+obHiiQ9UVyrc6MpJrwTu13RzJtxHfRpJw5slx8fgW3jw6Du1J0AzCcU4vdBS9mSneqawY2tCfAPIemyNebnFnBum8LsMghl4ayEsow9IpY+nWJBB7qriMqCB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770745282; c=relaxed/simple;
-	bh=ZQsoWUT9FMX4cjjVwzRilFpIIYG2IX61f548cWJWlBA=;
+	s=arc-20240116; t=1770745462; c=relaxed/simple;
+	bh=GBfp7VAcsGihaIW8bLJChMlUnw0f/xZsxn42XWl3Brg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BfgmyFEDGxu+VxBG+zwLtxWpN4Eh3fZPzxfaJwW0sqtEoVVxluPENKkQXEBYj8nmpd94Zv9wDhRK1d5pp7mTMq6fzBf3q9J/Fe8HKsWem/0UKo23e6s7bD2vVDkZeEXMFW6+jvAOyKRLFA+49Hx9pmW6e7kkZ2xWVucgyo8OLSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gfpfvw66; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HFnz1K7b; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770745279;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Yo5EtKyXczJYQnTQtXSt9wnj+YOsv5TNLYHtToa8jgw=;
-	b=gfpfvw6688JmPJAUuYYxpJ0IXzVadilbmN+bfR0uvM3SVc5C2Dg6kjlVxBKtM48oExizTX
-	NygrjtqebAfwDvg2iI8yWv7Rdgx1bS7KiPAWDU+TOSB381YVyMmrMbj2YM+nCRKwOd7ojE
-	jmWP/AyBLWVpBgSy1xxL+WzwSJtst/Y=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-627-hRPCjIcEOYuMauF1OaQ2qg-1; Tue, 10 Feb 2026 12:41:17 -0500
-X-MC-Unique: hRPCjIcEOYuMauF1OaQ2qg-1
-X-Mimecast-MFC-AGG-ID: hRPCjIcEOYuMauF1OaQ2qg_1770745277
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b8749dd495dso606100766b.1
-        for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 09:41:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770745277; x=1771350077; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Yo5EtKyXczJYQnTQtXSt9wnj+YOsv5TNLYHtToa8jgw=;
-        b=HFnz1K7bXyTuJPRiX3vDerl/cTLm3gIIllp4NB8l3OQP3rz5bocRiY+ZfVTu8JvYSy
-         xDZoQuOUqvRK5k6thQp/VFejj3DTrPPesGaDaQDDoKpPd8btIn8IUpFZVoeZZgTxuBGl
-         uE/BgLFB/+4HUXVUTKThmKbTlCBXpzlNTAz8KTuhbKcIbB5d5LoThwFMRilW5I+UbSSw
-         Ep+77S1n7h7CEY9DK0NMc2I/UxBP3m8FhdUDStLCKcO9jggL62+KSPNPN32hhKr14uSE
-         2hBsq70kVEsNGdTNeg/PxB+Hr966RAwE/JZT5RSNMC/++reKSPXmbYKpYullu8dz8Yy/
-         LQCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770745277; x=1771350077;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Yo5EtKyXczJYQnTQtXSt9wnj+YOsv5TNLYHtToa8jgw=;
-        b=wn1hg+7Lqrdn5O2zaL0Khiy2NkJa7QfSYQh6jrI0mj0JJU4U+tPVOYr79v+xzgX1NY
-         hoUheFAeZWOrTszexyADhea/c+mcMVETnPOUSKkVLfVzuo4OYRGAoyRe4D+tBpvxNSko
-         BB0TzKIwQYAhaU1qY5WvjazkivVvxLZY02FxwqPvCF/Hy/UBX7hvpFc8JAmy9DUp3UJA
-         jfcVXApobUNYl67QZRURZ44QAlGlSwKQzh8xWahzm++DoWuYa1X36j1cMCLZiNPXdYIR
-         OyVzlabc72zetaIGuSov14wQuhfLzCkI21A5RQ9dAbpc9GssTHfibjomP7MX5Uh9MRMs
-         n2HA==
-X-Forwarded-Encrypted: i=1; AJvYcCX6GjE8lEKVCCm0ljWSycuOWiqsSHOpTxWDoWNi6PDki/IxxQzjHNAIIKwBn6Q2FG4hlNQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWBYG4bh8MblkkYHIL4QnUxWq1QJ+J2VQdGez0em3Eow7sX/Mt
-	VmWZD+4I0cZXRr3XCJiADXG9U9+7HwKae/DlyV04zbCro+sg/49+L1MQVhbxnLGSJ9HyPE2GeVU
-	jkeW6LXg4oizhbCherrzHXM+3tFu3gOOELlokm8txvoW0Lt9Qz4DaWA==
-X-Gm-Gg: AZuq6aKSyEy5b3+fuYirylzMqMYNFtMxsufOzoNoFv6pv08E3Q/V7gwFaKn+MIBWPpm
-	6P9QmMn3vW+IMnoa8wMwx+mryIQegZqxRbcWnwA4k2z4NCuzcT97waC9t7N0KnL2VI11ZzcX30j
-	Qw7gVJ4vPbpFmqrBQWaarCC9Q7cpSOLewGwVQ7R0FVCt2qQl+qNDA9R+6a/rdgl/RRAwa62xwQ1
-	i4XRRpmVSEtLyOpeWc9VRMMLZywEak6DBzF8tMMTZX4VTtDjRkGWq0qrhU9H8IvMHRTAKVrUxrQ
-	c3HatoeNMVwCcIouWsBBNGHYPMfAtIrYjeBuzkvbEW9MpKnyVpoZ527/HRz4E9ZH/0isnW/nITT
-	BWqLxcmsSgmzhdMfzI1duNqoG5HgzyAwW+IPtYlp3zeSiCFdWSAQuZR9+XiO8XxJb1cHNMt3khi
-	doAT9rfFqBd7FsM6M8LxJkZA5+zg==
-X-Received: by 2002:a17:907:da9:b0:b8e:b366:58c1 with SMTP id a640c23a62f3a-b8f546a8f99mr160656366b.49.1770745276636;
-        Tue, 10 Feb 2026 09:41:16 -0800 (PST)
-X-Received: by 2002:a17:907:da9:b0:b8e:b366:58c1 with SMTP id a640c23a62f3a-b8f546a8f99mr160654766b.49.1770745276183;
-        Tue, 10 Feb 2026 09:41:16 -0800 (PST)
-Received: from [192.168.10.81] ([151.61.26.160])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b8edae6f106sm540183566b.65.2026.02.10.09.41.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Feb 2026 09:41:15 -0800 (PST)
-Message-ID: <32cbecce-5635-42b1-9095-b5ae6443384e@redhat.com>
-Date: Tue, 10 Feb 2026 18:41:12 +0100
+	 In-Reply-To:Content-Type; b=d1U60lahi9m5wYBpq7UUS3SLQNWxQr++bAdAH11672VLdRDFV1PGhyrn/M63kf7fpyUOFfReH4pf3qoZNoDpaWhmhhA26S18AGCoO5F6w/OFTQyzRzHhTfFdBRTLwIlVtFD9T6yjb2RxvpMSzKBbCAbAES5S5tdoW+feT+9RoDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GJp0oHk4; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770745461; x=1802281461;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=GBfp7VAcsGihaIW8bLJChMlUnw0f/xZsxn42XWl3Brg=;
+  b=GJp0oHk4mWhCByrE5nmd2piN6xH9r5W7/COOJ69U+varwtR5FjxKrEmR
+   mom1kNOzhfcrm2wLDtree2JrgnqEgr/SqEWWGWNLseal2AGxzO8gdip2L
+   HIf7z9g4qvNwNQ/rjDT43HEKFhaMS6oGg2JEtafgPw8eJl63I18kikjlB
+   Rit5LlkKXO7bfkqnVBpzNMJfrbiapTb99BS6qFLfg7ZacpYdHSBgHjc7w
+   MEbG9YPF4tEgDUoiKXTLOS3GnFrNaKl9B4UmFQoOimBGRh7I8dhMm6MeQ
+   OHYJKRFICGqLwH1Gf5Cr1sAE2ZENj94Db0SA/7DAuuVkkeJAFFFOeaXX7
+   g==;
+X-CSE-ConnectionGUID: lNAatpKbQGiUh9DTSCNVOQ==
+X-CSE-MsgGUID: QjEyPdf3RmqE1VKNXTDI0Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11697"; a="82203613"
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="82203613"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2026 09:44:20 -0800
+X-CSE-ConnectionGUID: CNwJLfqhQmSfL/wFmjKzww==
+X-CSE-MsgGUID: xqCxx7TZQY6wgvCnr3+w1Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="249628945"
+Received: from cjhill-mobl.amr.corp.intel.com (HELO [10.125.108.43]) ([10.125.108.43])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2026 09:44:19 -0800
+Message-ID: <655724f8-0098-40ee-a097-ce4c0249933d@intel.com>
+Date: Tue, 10 Feb 2026 09:44:16 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -106,82 +70,197 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG REPORT] USE_AFTER_FREE in complete_emulated_mmio found by
- KASAN/Syzkaller fuzz test (v5.10.0)
-To: Sean Christopherson <seanjc@google.com>
-Cc: Zhangjiaji <zhangjiaji1@huawei.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Wangqinxiao (Tom)" <wangqinxiao@huawei.com>,
- zhangyashu <zhangyashu2@h-partners.com>,
- "wangyanan (Y)" <wangyanan55@huawei.com>
-References: <369eaaa2b3c1425c85e8477066391bc7@huawei.com>
- <5f3e0ca5-cf60-4f07-bbc6-663b04192c49@redhat.com>
- <aYtCMAPK4xVnE_FS@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC PATCH v5 16/45] x86/virt/tdx: Add
+ tdx_alloc/free_control_page() helpers
+To: Sean Christopherson <seanjc@google.com>, Thomas Gleixner
+ <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, Kiryl Shutsemau <kas@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
+ kvm@vger.kernel.org, Kai Huang <kai.huang@intel.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Yan Zhao
+ <yan.y.zhao@intel.com>, Vishal Annapurve <vannapurve@google.com>,
+ Ackerley Tng <ackerleytng@google.com>, Sagi Shahar <sagis@google.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>
+References: <20260129011517.3545883-1-seanjc@google.com>
+ <20260129011517.3545883-17-seanjc@google.com>
 Content-Language: en-US
-In-Reply-To: <aYtCMAPK4xVnE_FS@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20260129011517.3545883-17-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-70773-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pbonzini@redhat.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	TAGGED_RCPT(0.00)[kvm];
-	FORGED_SENDER_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: B437411E07A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70774-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+]
+X-Rspamd-Queue-Id: 7861511E0D5
 X-Rspamd-Action: no action
 
-On 2/10/26 15:35, Sean Christopherson wrote:
-> On Tue, Feb 10, 2026, Paolo Bonzini wrote:
->>
->>> I've analyzed the Syzkaller output and the complete_emulated_mmio() code path.
->>> The buggy address is created in em_enter(), where it passes its local variable `ulong rbp` to emulate_push(), finally ends in emulator_read_write_onepage() putting the address into vcpu->mmio_fragments[].data .
->>> The bug happens when kvm guest executes an "enter" instruction, and top of the stack crosses the mem page.
->>> In that case, the em_enter() function cannot complete the instruction within itself, but leave the rest data (which is in the other page) to complete_emulated_mmio().
->>> When complete_emulated_mmio() starts, em_enter() has exited, so local variable `ulong rbp` is also released.
->>> Now complete_emulated_mmio() trys to access vcpu->mmio_fragments[].data , and the bug happened.
->>>
->>> any idea?
->>
->> Ouch, the bug is certainly legit.  The easiest way to fix it is something
->> like this:
->>
->> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
->> index c8e292e9a24d..1c8698139dd5 100644
->> --- a/arch/x86/kvm/emulate.c
->> +++ b/arch/x86/kvm/emulate.c
->> @@ -1905,7 +1905,7 @@ static int em_enter(struct x86_emulate_ctxt *ctxt)
->>   	rbp = reg_read(ctxt, VCPU_REGS_RBP);
->>   	rc = emulate_push(ctxt, &rbp, stack_size(ctxt));
->>   	if (rc != X86EMUL_CONTINUE)
->> -		return rc;
->> +		return X86EMUL_UNHANDLEABLE;
-> 
-> This won't do anything, rc == X86EMUL_CONTINUE when MMIO is needed.
+On 1/28/26 17:14, Sean Christopherson wrote:
+> +static void tdx_pamt_put(struct page *page)
+> +{
+> +	u64 pamt_pa_array[MAX_NR_DPAMT_ARGS];
+> +	atomic_t *pamt_refcount;
+> +	u64 tdx_status;
+> +
+> +	if (!tdx_supports_dynamic_pamt(&tdx_sysinfo))
+> +		return;
+> +
+> +	pamt_refcount = tdx_find_pamt_refcount(page_to_pfn(page));
+> +
+> +	scoped_guard(spinlock, &pamt_lock) {
+> +		/*
+> +		 * If the there are more than 1 references on the pamt page,
+> +		 * don't remove it yet. Just decrement the refcount.
+> +		 */
+> +		if (atomic_read(pamt_refcount) > 1) {
+> +			atomic_dec(pamt_refcount);
+> +			return;
+> +		}
+> +
+> +		/* Try to remove the pamt page and take the refcount 1->0. */
+> +		tdx_status = tdh_phymem_pamt_remove(page, pamt_pa_array);
+> +
+> +		/*
+> +		 * Don't free pamt_pa_array as it could hold garbage when
+> +		 * tdh_phymem_pamt_remove() fails.  Don't panic/BUG_ON(), as
+> +		 * there is no risk of data corruption, but do yell loudly as
+> +		 * failure indicates a kernel bug, memory is being leaked, and
+> +		 * the dangling PAMT entry may cause future operations to fail.
+> +		 */
+> +		if (WARN_ON_ONCE(!IS_TDX_SUCCESS(tdx_status)))
+> +			return;
+> +
+> +		atomic_dec(pamt_refcount);
+> +	}
+> +
+> +	/*
+> +	 * pamt_pa_array is populated up to tdx_dpamt_entry_pages() by the TDX
+> +	 * module with pages, or remains zero inited. free_pamt_array() can
+> +	 * handle either case. Just pass it unconditionally.
+> +	 */
+> +	free_pamt_array(pamt_pa_array);
+> +}
 
-Yeah, I was thinking of X86EMUL_IO_NEEDED but that's only for reads.
+This looks funky.
 
-Paolo
+Right now, this is:
 
+	spin_lock(pamt_lock)
+	atomic_inc/dec(fine-grained-refcount)
+	tdcall_blah_blah()
+	spin_unlock(pamt_lock)
+
+Where it *always* acquires the global lock when DPAMT is supported.
+Couldn't we optimize it so that it only acquires it when it has to keep
+the refcount stable at zero?
+
+Roughly:
+
+	slow_path = atomic_dec_and_lock(fine-grained-refcount,
+					pamt_lock)
+	if (!slow_path)
+		goto out;
+
+	// fine-grained-refcount==0 and must stay that way with
+	// pamt_lock held. Remove the DPAMT pages:
+	tdh_phymem_pamt_remove(page, pamt_pa_array)
+out:	
+	spin_unlock(pamt_lock)
+
+On the acquire side, you do:
+
+	fast_path = atomic_inc_not_zero(fine-grained-refcount)
+	if (fast_path)
+		return;
+
+	// slow path:
+	spin_lock(pamt_lock)
+
+	// Was the race lost with another 0=>1 increment?
+	if (atomic_read(fine-grained-refcount) > 0)
+		goto out_inc
+
+	tdh_phymem_pamt_add(page, pamt_pa_array)
+	// Inc after the TDCALL so another thread won't race ahead of us
+	// and try to use a non-existent PAMT entry
+out_inc:
+	atomic_inc(fine-grained-refcount)
+	spin_unlock(pamt_lock)
+
+Then, at least only the 0=>1 and 1=>0 transitions need the global lock.
+The fast paths only touch the refcount which isn't shared nearly as much
+as the global lock.
+
+BTW, this probably still needs to be spin_lock_irq(), not what I wrote
+above, but that's not a big deal to add.
+
+I've stared at this for a bit and don't see any holes. Does anyone else
+see any?
 
