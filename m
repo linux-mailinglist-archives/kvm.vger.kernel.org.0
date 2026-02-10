@@ -1,283 +1,145 @@
-Return-Path: <kvm+bounces-70709-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70710-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yHsTIa3bimkOOgAAu9opvQ
-	(envelope-from <kvm+bounces-70709-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 08:18:05 +0100
+	id 0K/ABYvdimlIOgAAu9opvQ
+	(envelope-from <kvm+bounces-70710-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 08:26:03 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F40BC117CC9
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 08:18:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C755117E5A
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 08:26:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 65A58302A04C
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 07:14:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC32E3036743
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 07:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C52B5330B10;
-	Tue, 10 Feb 2026 07:14:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U8ln3JB0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F40334C19;
+	Tue, 10 Feb 2026 07:25:42 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7FA879CD
-	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 07:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6501331A6D
+	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 07:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770707696; cv=none; b=lGLkyzomgfRbGdhOM86d26jRX3f61GSScxbD1b7q1AbkCdXTT9WM2lp5yb3qkkpe6onzakn+3s/x1NlfpAlmoFj2t0p9sr8H2hMuxI4rVM3iMsLH6g/wzt/ivjHtXtQ8yLEGMZ2gb2j3KOU1ZQqKGi1pHBZOl5avu7eNs5jTO/Y=
+	t=1770708341; cv=none; b=ubt9U550WDHZKI5co+R6peSEk7zJpsqSfqPv2jf+GyDOq0qRg5fWV5pb+z7F/+r/1vMBAi8vOwd7jfXMxMiH6XbCX1rtGNt0pdrJBg5o2uNhXCTdaWQ4hOwztyAgttXjrjQbsigd/GkLHoHdvNSOD9bYRIfShYQp0Vo0mjBAa1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770707696; c=relaxed/simple;
-	bh=skPpdXck19RJFs/p+cWcI0O12SRZOQZ8nvGFWWjcjpY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Izr/MnoQwIGcGEsBpdlr5si5QBHXxKd+MYpP2n6G8jf73A4dU2Q89QnNoqX0VvIf5yMQvHlMJsydcf6C8OtdVrfeJGUsVDku4Y23BVyJaWaWluOt/wNUZu+mnk6r2dmdKLSCWC6GAF9bKWJYqm7IsV2v5kezknrawCs0C/eFHF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U8ln3JB0; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770707695; x=1802243695;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=skPpdXck19RJFs/p+cWcI0O12SRZOQZ8nvGFWWjcjpY=;
-  b=U8ln3JB0WLVj93DKxSvhnTAPMyZPzdyuN/jTblpjByd7IXVd17NTOYaq
-   LIN/x1VAuAzTviTahcgpatl6Ppxmb/nYpGkrwDPSGxlZr/qGBlV8ESRSP
-   HBZcy5NNqNnmNUKSdyYNXgumEkvEDR1CBLDQFcTZIMtOMN25LPz+Csbzy
-   So6x9P0BWYn1gkVD9CJ1YvAoctvhH3Qp7nLo9vQdLYUkQTtCU7h48/jpw
-   aIkN2C1P9Qw4APd6InMKY4xlB5s/mi9gNLWVezoHE6AsExceKWngmW1cL
-   UXRcYJ/KedHYym/kx+IkqgkUvNPue2NII9Ce/L7P2/lyvkSaAXsXVReWc
-   A==;
-X-CSE-ConnectionGUID: ro7+4cqSRn2tX3G8e3FivQ==
-X-CSE-MsgGUID: uol4i5phRGOBBs34kI0TnA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11696"; a="75454268"
-X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
-   d="scan'208";a="75454268"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2026 23:14:54 -0800
-X-CSE-ConnectionGUID: o6f/FJTATqGCLj0+sVZ/VQ==
-X-CSE-MsgGUID: l6hIKXY0QM+gnm62VSkaHA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
-   d="scan'208";a="216361627"
-Received: from qianm-mobl2.ccr.corp.intel.com (HELO [10.238.1.184]) ([10.238.1.184])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2026 23:14:53 -0800
-Message-ID: <4b0ca0ab-bf5c-427d-bfe9-18aee47572ff@linux.intel.com>
-Date: Tue, 10 Feb 2026 15:14:49 +0800
+	s=arc-20240116; t=1770708341; c=relaxed/simple;
+	bh=D79oDfikccmJTO2nzCKp5nyOQP5H0uAsjYlZUbPUbB4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L7H4ouW4EscwZFk/GXuIM0LTVrJZsZVmN0BWkikSvGEbe5GydpARoBTypuP2afUEPtv2d23VF32dd3Rm1lYxq9dXjYTIdGZQhwVVtKJ0EaHaNg1QNdmd1dq90bq7PhBZZMpLW+MsMLYchorrj/js+gJKGGNQykpkI6OE7ivrzI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ooseel.net; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ooseel.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2aad1dc8856so16522955ad.1
+        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 23:25:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770708339; x=1771313139;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NlIK6Drh5/5Im48t/VJk8VIZOF2y0mJxE9VOY1y6hzY=;
+        b=mLjhO71U65NC6jj345pZ03Nw+JYaknztjX6hST0G625lqN5FNJaNw8zDokbx76DJ0z
+         9e3fkqJGTHiuEukB4ga5tGFnVlhCPix/GZZsVKApJRtT4gitqN6KAQk0eJWAA8Pco4Fi
+         rpmZ7FOUu89qNwayC4J1rHaLVLKklzWC3NbpBpiy0dqCcHbjok2ioP0c6am0TomgTCUQ
+         7I5Ek0qAGpLta1+MrqezdkgntT+zPOkd4VYSsXv5jCe4U+vY1OTvA2NtYpSu7ncqIoWN
+         GrkOu1Bp47UTxWaFKnVk/bbanTyNlU1F1BRSvo5HymM5bxAZ/Yt4khW/wVn5HtGR/5c3
+         NPow==
+X-Forwarded-Encrypted: i=1; AJvYcCV2KHi1p8VdpOff3VpvIWSg1Oxta/1q1askJlNs8XbZPpsYCyXg1gg0l/boRK7GOYufJuM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7go+x9pRGnAkqyUToa2R6SJnUyPkUxoyAN2OXaW1nTnLsk6hy
+	dzweunq5ROdS3bSlDtWQao58uk9L0CpRbnjPPG/g7YpNnC7VgfC17Hd0
+X-Gm-Gg: AZuq6aI5SzEElU3dfq7VS2rB1UT01ungaC591RH7yMZBBEjdT+kICAdRBdVO1thtZMM
+	NH3bFWwYx1ctVnTvSkgTvzsYQC2dxuEEj0ML9PPAP91Ul4rKFF1U0oZzaXBEGWqOCqdywCjH4Q1
+	eOl48oITP9tbQqIiuS6a1xMsc6fwWboPJ7yUul2Bh8q/ANCY1BAbiLmgbZcqn7j0lOg7EePe0v/
+	rebktlrrKtQ1fQissVnewpwmX8jQMMTpZCrEDx4RxnM5ySdOW1vQTiGKBB+3Qqi2tNy/u35L1PB
+	rpjJS9KEaaWRTn6Pms8tosO+VnEL/p5WNqZWf+nrqVENnIp+8NyNxSmoswxDGmT8sT7Q+rCeddH
+	D2rqt9KCLwEG2xhCWEIfdHe/mwETEsTAnnMDSB3DniXxeQFSaAjfoa6zUpVy/l3Bph+yZqU24Hm
+	zLg7Di2zhC9elq2A==
+X-Received: by 2002:a17:902:e88d:b0:2a1:e19:ff4 with SMTP id d9443c01a7336-2a9516f5a0bmr130714385ad.29.1770708339174;
+        Mon, 09 Feb 2026 23:25:39 -0800 (PST)
+Received: from MILKYWAY ([1.213.237.162])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a9521b9bebsm125323425ad.56.2026.02.09.23.25.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Feb 2026 23:25:38 -0800 (PST)
+From: Leesoo Ahn <lsahn@ooseel.net>
+To: lsahn@ooseel.net
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE (KVM)),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH v1] KVM: Use memdup_user instead of kernel stack to allocate kvm_guest_debug
+Date: Tue, 10 Feb 2026 16:25:30 +0900
+Message-ID: <20260210072530.918038-1-lsahn@ooseel.net>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 09/11] target/i386: Refactor LBR format handling
-To: Zide Chen <zide.chen@intel.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Zhao Liu <zhao1.liu@intel.com>, Peter Xu <peterx@redhat.com>,
- Fabiano Rosas <farosas@suse.de>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, Dongli Zhang <dongli.zhang@oracle.com>
-References: <20260128231003.268981-1-zide.chen@intel.com>
- <20260128231003.268981-10-zide.chen@intel.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20260128231003.268981-10-zide.chen@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,intel.com:dkim,linux.intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dapeng1.mi@linux.intel.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70709-lists,kvm=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+]
-X-Rspamd-Queue-Id: F40BC117CC9
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[ooseel.net];
+	TAGGED_FROM(0.00)[bounces-70710-lists,kvm=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lsahn@ooseel.net,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ooseel.net:mid,ooseel.net:email]
+X-Rspamd-Queue-Id: 6C755117E5A
 X-Rspamd-Action: no action
 
+Switch to using memdup_user to allocate its memory because the size of
+kvm_guest_debug is over 512 bytes on Arm64 and is burdened allocation
+from kernel stack.
 
-On 1/29/2026 7:09 AM, Zide Chen wrote:
-> Detach x86_cpu_pmu_realize() from x86_cpu_realizefn() to keep the latter
-> focused and easier to follow.  Introduce a dedicated helper,
-> x86_cpu_apply_lbr_pebs_fmt(), in preparation for adding PEBS format
-> support without duplicating code.
->
-> Convert PERF_CAP_LBR_FMT into separate mask and shift macros to allow
-> x86_cpu_apply_lbr_pebs_fmt() to be shared with PEBS format handling.
->
-> No functional change intended
+Signed-off-by: Leesoo Ahn <lsahn@ooseel.net>
+---
+ virt/kvm/kvm_main.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-Seems a period is missed for above line.
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 5b5b69c97665..bc0a53129df7 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4592,12 +4592,15 @@ static long kvm_vcpu_ioctl(struct file *filp,
+ 		break;
+ 	}
+ 	case KVM_SET_GUEST_DEBUG: {
+-		struct kvm_guest_debug dbg;
++		struct kvm_guest_debug *dbg;
+ 
+-		r = -EFAULT;
+-		if (copy_from_user(&dbg, argp, sizeof(dbg)))
++		dbg = memdup_user(argp, sizeof(*dbg));
++		if (IS_ERR(dbg)) {
++			r = PTR_ERR(dbg);
+ 			goto out;
+-		r = kvm_arch_vcpu_ioctl_set_guest_debug(vcpu, &dbg);
++		}
++		r = kvm_arch_vcpu_ioctl_set_guest_debug(vcpu, dbg);
++		kfree(dbg);
+ 		break;
+ 	}
+ 	case KVM_SET_SIGNAL_MASK: {
+-- 
+2.51.0
 
-Others look good to me.
-
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-
-
->
-> Signed-off-by: Zide Chen <zide.chen@intel.com>
-> ---
-> V2:
-> - New patch.
->
->  target/i386/cpu.c | 94 +++++++++++++++++++++++++++++++----------------
->  target/i386/cpu.h |  3 +-
->  2 files changed, 65 insertions(+), 32 deletions(-)
->
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 09180c718d58..54f04adb0b48 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -9781,6 +9781,66 @@ static bool x86_cpu_update_smp_cache_topo(MachineState *ms, X86CPU *cpu,
->  }
->  #endif
->  
-> +static bool x86_cpu_apply_lbr_pebs_fmt(X86CPU *cpu, uint64_t host_perf_cap,
-> +                                  uint64_t user_req, bool is_lbr_fmt,
-> +                                  Error **errp)
-> +{
-> +    CPUX86State *env = &cpu->env;
-> +    uint64_t mask;
-> +    unsigned shift;
-> +    unsigned user_fmt;
-> +    const char *name;
-> +
-> +    if (is_lbr_fmt) {
-> +        mask = PERF_CAP_LBR_FMT_MASK;
-> +        shift = PERF_CAP_LBR_FMT_SHIFT;
-> +        name = "lbr";
-> +    } else {
-> +        return false;
-> +    }
-> +
-> +    if (user_req != -1) {
-> +        env->features[FEAT_PERF_CAPABILITIES] &= ~(mask << shift);
-> +        env->features[FEAT_PERF_CAPABILITIES] |= (user_req << shift);
-> +    }
-> +
-> +    user_fmt = (env->features[FEAT_PERF_CAPABILITIES] >> shift) & mask;
-> +
-> +    if (user_fmt) {
-> +        unsigned host_fmt = (host_perf_cap >> shift) & mask;
-> +
-> +        if (!cpu->enable_pmu) {
-> +            error_setg(errp, "vPMU: %s is unsupported without pmu=on", name);
-> +            return false;
-> +        }
-> +        if (user_fmt != host_fmt) {
-> +            error_setg(errp, "vPMU: the %s-fmt value (0x%x) does not match "
-> +                        "the host value (0x%x).",
-> +                        name, user_fmt, host_fmt);
-> +            return false;
-> +        }
-> +    }
-> +
-> +    return true;
-> +}
-> +
-> +static int x86_cpu_pmu_realize(X86CPU *cpu, Error **errp)
-> +{
-> +    uint64_t host_perf_cap =
-> +        x86_cpu_get_supported_feature_word(NULL, FEAT_PERF_CAPABILITIES);
-> +
-> +    /*
-> +     * Override env->features[FEAT_PERF_CAPABILITIES].LBR_FMT
-> +     * with user-provided setting.
-> +     */
-> +    if (!x86_cpu_apply_lbr_pebs_fmt(cpu, host_perf_cap,
-> +                                    cpu->lbr_fmt, true, errp)) {
-> +        return -EINVAL;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->  {
->      CPUState *cs = CPU(dev);
-> @@ -9788,7 +9848,6 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->      X86CPUClass *xcc = X86_CPU_GET_CLASS(dev);
->      CPUX86State *env = &cpu->env;
->      Error *local_err = NULL;
-> -    unsigned guest_fmt;
->  
->      if (!kvm_enabled())
->          cpu->enable_pmu = false;
-> @@ -9824,35 +9883,8 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->          goto out;
->      }
->  
-> -    /*
-> -     * Override env->features[FEAT_PERF_CAPABILITIES].LBR_FMT
-> -     * with user-provided setting.
-> -     */
-> -    if (cpu->lbr_fmt != -1) {
-> -        env->features[FEAT_PERF_CAPABILITIES] &= ~PERF_CAP_LBR_FMT;
-> -        env->features[FEAT_PERF_CAPABILITIES] |= cpu->lbr_fmt;
-> -    }
-> -
-> -    /*
-> -     * vPMU LBR is supported when 1) KVM is enabled 2) Option pmu=on and
-> -     * 3)vPMU LBR format matches that of host setting.
-> -     */
-> -    guest_fmt = env->features[FEAT_PERF_CAPABILITIES] & PERF_CAP_LBR_FMT;
-> -    if (guest_fmt) {
-> -        uint64_t host_perf_cap =
-> -            x86_cpu_get_supported_feature_word(NULL, FEAT_PERF_CAPABILITIES);
-> -        unsigned host_lbr_fmt = host_perf_cap & PERF_CAP_LBR_FMT;
-> -
-> -        if (!cpu->enable_pmu) {
-> -            error_setg(errp, "vPMU: LBR is unsupported without pmu=on");
-> -            return;
-> -        }
-> -        if (guest_fmt != host_lbr_fmt) {
-> -            error_setg(errp, "vPMU: the lbr-fmt value (0x%x) does not match "
-> -                        "the host value (0x%x).",
-> -                        guest_fmt, host_lbr_fmt);
-> -            return;
-> -        }
-> +    if (x86_cpu_pmu_realize(cpu, errp)) {
-> +        return;
->      }
->  
->      if (x86_cpu_filter_features(cpu, cpu->check_cpuid || cpu->enforce_cpuid)) {
-> @@ -10445,7 +10477,7 @@ static const Property x86_cpu_properties[] = {
->  #endif
->      DEFINE_PROP_INT32("node-id", X86CPU, node_id, CPU_UNSET_NUMA_NODE_ID),
->      DEFINE_PROP_BOOL("pmu", X86CPU, enable_pmu, false),
-> -    DEFINE_PROP_UINT64_CHECKMASK("lbr-fmt", X86CPU, lbr_fmt, PERF_CAP_LBR_FMT),
-> +    DEFINE_PROP_UINT64_CHECKMASK("lbr-fmt", X86CPU, lbr_fmt, PERF_CAP_LBR_FMT_MASK),
->  
->      DEFINE_PROP_UINT32("hv-spinlocks", X86CPU, hyperv_spinlock_attempts,
->                         HYPERV_SPINLOCK_NEVER_NOTIFY),
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 3e2222e105bc..aa3c24e0ba13 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -420,7 +420,8 @@ typedef enum X86Seg {
->  #define ARCH_CAP_TSX_CTRL_MSR		(1<<7)
->  
->  #define MSR_IA32_PERF_CAPABILITIES      0x345
-> -#define PERF_CAP_LBR_FMT                0x3f
-> +#define PERF_CAP_LBR_FMT_MASK           0x3f
-> +#define PERF_CAP_LBR_FMT_SHIFT          0x0
->  #define PERF_CAP_FULL_WRITE             (1U << 13)
->  #define PERF_CAP_PEBS_BASELINE          (1U << 14)
->  
 
