@@ -1,142 +1,121 @@
-Return-Path: <kvm+bounces-70680-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70685-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8IFQKUR9imkgLAAAu9opvQ
-	(envelope-from <kvm+bounces-70680-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 01:35:16 +0100
+	id oJDlNKmDimmfLQAAu9opvQ
+	(envelope-from <kvm+bounces-70685-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 02:02:33 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 155E9115AB0
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 01:35:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C4E115E36
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 02:02:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3E18F303CA5A
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 00:33:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 09E7730792C7
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 00:56:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF7823C4F2;
-	Tue, 10 Feb 2026 00:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C8425F78F;
+	Tue, 10 Feb 2026 00:55:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vMUCDjaY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hE7ehndJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B3816F0FE
-	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 00:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57A327CCF0
+	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 00:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770683628; cv=none; b=N7eg1PoY7bXZMkWiJKredLDnvpJIurRTEbwBPfmFkqIga9sXVT6luompmg2nfFzreAGDDn1UEsSGDrxEcI3tvAB3ONQSLbEbErWAc5D/kSxqToJZ80oRWbgUYmPSeXMDOvjavjXX2tqbkaS5wvPhHvilHEFPY1RYWIOPf91LdAk=
+	t=1770684927; cv=none; b=jE+qZXwUVoVA5x2riHnnLMOWIVUzCOBYZQjUF3/yt8GCM9UHqOYvwsm/9fHlroqf9QbM232OjmXWeyxliUjVpTSIAaChhGdHoEE4QdY9GJMZFXDV5lJMsxWSUnC7a5m0mz+vHjpNDYI2Jrvbc3RVbI500vm5GVPFjLQ1uXDLp0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770683628; c=relaxed/simple;
-	bh=7ydWrjlCepD6nB2ObFrNdCIBZVDXv0TnWs2DKYuT5zI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pFXQzN205Jp8mBqfYjRj2swEOxuf3O50vj2HEcmUlw/3r2DvZn3vvBPLCL/ymzepiRP1wNMcjxgHjEhWZhvqXG6FWCqP1SYuTfSw7Fl917TVTlWGkakazuskOt1ey7w0oYztTOvm47Phu5Wg+7xbMZLU7x9JpgoRdiympzIPpXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vMUCDjaY; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2aadeb3dee4so62844215ad.2
-        for <kvm@vger.kernel.org>; Mon, 09 Feb 2026 16:33:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770683627; x=1771288427; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7k/XzuZM96p1tSUw8bPt3a7YL5QqswpTlWe5QXEZ234=;
-        b=vMUCDjaYssh9Tk83i2OJ1P4gjDBZXIskB6CytTQT5TCXDI6oHhArD1u7dkuMFrs5F9
-         J6tzxVp494/dM1GC9qRuQV2IhG/n1VfuIMl0dBEoMHUM6JB5NNC8RlJKh7QauR9ja4ps
-         jtmSkMQ3edhUFcm6sqkGOoWcnZA4Rv3lKQPJ57x5kFC4EBRkjFS3EwG9Bt/1nJ1UyufC
-         f1Ch3QaCgp0aXsHG84hD+ZL3E2YhJ4dm0/hWdDmD5XGNXglq66XpqYRhIh4tBETu7aK7
-         YE34NyhTI35Be9yXUluBXUoMlztRATePqSYnZISUyvLj/6N1SlSPgAFfu5cjD0HEqBLB
-         Cb9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770683627; x=1771288427;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7k/XzuZM96p1tSUw8bPt3a7YL5QqswpTlWe5QXEZ234=;
-        b=GQCKhF/YqH8GnIPXYHeagzOEGO1HTFu/1IkgeW2xJ8m9ix7/u7/PNlWP60R0m7Q0+B
-         5iDnKdyCnDh7SK6wtcoOQxAIj/ITisFLRBh22gi/Suu/4s3MJWlJKKLUrH2JWVSOLTFn
-         Az7PQYJEiDSkDyG1KaqP0VrWwPxklkFZ2OwWNU10f/LKUHFZ14VcoY4McbUhWsC+HDVW
-         Y+DVW1nXX8ByNLTuwoPbzY49WXqhFRGi+o29G2MUsrWaH6BmWXfs3UN+DrNdcsBUIgSS
-         46DjjSMUAbG4Piysm9W9lH3kHsePk0wLxaMOovck+2pY6+yfj05JcpgjKWoteiiukf9s
-         wiKQ==
-X-Gm-Message-State: AOJu0YyPKwSxt5TTeQykQlHTJb0axcNEzSIpSnX8HIbKz6Qe8TKZlErX
-	Cp30DFQlENluFGaqEWDYRKdX8sSiA+8uR7BtnbCrvUK1Mehrde5eS+f2eRsY91dwPYl83EClGRP
-	BkFPzLQ==
-X-Received: from plbcp16.prod.google.com ([2002:a17:902:e790:b0:29f:68b:3550])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:41c7:b0:2a9:410:23fe
- with SMTP id d9443c01a7336-2ab10a1a54bmr4579545ad.36.1770683626791; Mon, 09
- Feb 2026 16:33:46 -0800 (PST)
-Date: Mon, 9 Feb 2026 16:33:45 -0800
-In-Reply-To: <CABgObfbKh1Tbzv63GfopW3KQhYtfAGgXXBgGn6EiR2kSBgH_jA@mail.gmail.com>
+	s=arc-20240116; t=1770684927; c=relaxed/simple;
+	bh=Zd6b2Meo5Mf8sqR2tZUAuE6SnsLApq2sbIjcN11I+uE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=geLhQ+oUQOOy924kS0BMRoODIR0vvpDMJCdEp2CaPoVokP72jkxoke6wlPfLHYy/jnojGBjlughjWnFkVnTnCPuTIAQbBMjlCWVG8QaRmGOw6AijMGOlvXg1rpL4D4Uff+c7SiCurp8tZ8ba9b9tQfdKLB3N2E6zndV7Mv6ubZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hE7ehndJ; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770684914;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Nf46oM5cgHfGu8ZR1tCRW4OSvAsJ8SAp5wx5Yw4PLoM=;
+	b=hE7ehndJNuCsW0t+jTn/vxCvUJWohtHn+trcK2OAB2ceo7x1ygAIs0WLCMlE91LGwmVsaY
+	LDHqnZNzokSKXT7GIUdu7m8o54nsqF0CbtOUC30SsdnjDDWra9dAY9T161/9fsjYhr/bS6
+	vlGXr8chkFZ/TiKrAIHLNA5kCV474jQ=
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Subject: [PATCH 0/4] KVM: nSVM: Fix save/restore of next_rip & int_state
+Date: Tue, 10 Feb 2026 00:54:45 +0000
+Message-ID: <20260210005449.3125133-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260207041011.913471-1-seanjc@google.com> <20260207041011.913471-3-seanjc@google.com>
- <CABgObfZeV6D-2cEht1300xNgxYtz=mi6oX4-D8x7exittEe22Q@mail.gmail.com> <CABgObfbKh1Tbzv63GfopW3KQhYtfAGgXXBgGn6EiR2kSBgH_jA@mail.gmail.com>
-Message-ID: <aYp86UFynnoBLy3m@google.com>
-Subject: Re: [GIT PULL] KVM: Generic changes for 6.20
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70680-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70685-lists,kvm=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[yosry.ahmed@linux.dev,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 155E9115AB0
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
+X-Rspamd-Queue-Id: 48C4E115E36
 X-Rspamd-Action: no action
 
-On Mon, Feb 09, 2026, Paolo Bonzini wrote:
-> On Mon, Feb 9, 2026 at 6:38=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com=
-> wrote:
-> >
-> > On Sat, Feb 7, 2026 at 5:10=E2=80=AFAM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> > >  - Document that vcpu->mutex is take outside of kvm->slots_lock, whic=
-h is all
-> > >    kinds of unintuitive, but is unfortunately the existing behavior f=
-or
-> > >    multiple architectures, and in a weird way actually makes sense.
-> >
-> > I disagree that it is "arguably wrong" how you put it in the commit
-> > message. vcpu->mutex is really a "don't worry about multiple ioctls at
-> > the same time" mutex that tries to stay out of the way.  It only
-> > becomes unintuitive in special cases like
-> > tdx_acquire_vm_state_locks().
-> >
-> > By itself this would not be a reason to resend, but while at it you
-> > could mention that vcpu->mutex is taken outside kvm->slots_arch_lock?
->=20
-> ... as well as mention kvm_alloc_apic_access_page() in the commit message=
-.
+next_rip and int_state are both not sync'd correctly to the cached
+vmcb12 after VMRUN of L2. Sync the cached vmcb12 is the payload of
+nested state, these fields are not saved/restored correctly.
 
-Ya, will do.
+Sync both fields correctly, and extend state_test to check vGIF (already
+sync'd field) and next_rip. Checking the interrupt shadow would be
+tricky, as GUEST_SYNC() executes several instructions before exiting to
+L0, so the interrupt shadow will be consumed before the test can check
+for it. L2 could execute STI followed directly by in/out, but that would
+not handle transitioning between L2 and L2 correctly (see
+ucall_arch_do_ucall()).
+
+Yosry Ahmed (4):
+  KVM: nSVM: Sync next_rip to cached vmcb12 after VMRUN of L2
+  KVM: nSVM: Sync int_state to cached vmcb12 after VMRUN of L2
+  KVM: selftests: Extend state_test to check vGIF
+  KVM: selftests: Extend state_test to check next_rip
+
+ arch/x86/kvm/svm/nested.c                    |  7 ++--
+ arch/x86/kvm/svm/svm.c                       | 26 +++++++++------
+ tools/testing/selftests/kvm/x86/state_test.c | 35 ++++++++++++++++++++
+ 3 files changed, 55 insertions(+), 13 deletions(-)
+
+
+base-commit: e944fe2c09f405a2e2d147145c9b470084bc4c9a
+-- 
+2.53.0.rc2.204.g2597b5adb4-goog
+
 
