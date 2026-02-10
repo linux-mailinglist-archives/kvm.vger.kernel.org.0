@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-70787-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70788-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id INGBFBiSi2kTWQAAu9opvQ
-	(envelope-from <kvm+bounces-70787-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:16:24 +0100
+	id 2Cq3CR+Si2kVWQAAu9opvQ
+	(envelope-from <kvm+bounces-70788-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:16:31 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB22411EF1E
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:16:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E92711EF3F
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:16:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 01845305F324
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 20:16:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E0EC8306343A
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 20:16:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A767335081;
-	Tue, 10 Feb 2026 20:15:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264EE31AABA;
+	Tue, 10 Feb 2026 20:15:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qs6efzjV"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n4QqpDiT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76F6332EA0
-	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 20:15:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44630334694
+	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 20:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770754550; cv=none; b=kZEdPgS+FKLEoyhhQquzXgnkGbIaXoLBi4yHoE4YUnkU497bXF6jfz1E5GmHxy3izSzpKuJKxxoMYq/tAh/UMv7Q3WqqfkdCUzyGhLIyQLbYMuhri9HxtmzGJdgnGBQ1oVJ7IzfPy7ARg+rqIeCy8LcZBnUEsb+cguIDHszJnn0=
+	t=1770754551; cv=none; b=GqusmFuoWKLAHIbqFB8E0HZgHUX9ob3TdFlixZudwbf03K49Ihb5VFIRb/C9Q6wIpH8gfox6NYl8IktdR/c4L3XFphnSG36W3fVJBEsR78YyCoscXoAHllQRNMBFczbtQhD9xj2FDqDj9RJ4xQ9+sfgnktYrSchczjrCDJTPsmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770754550; c=relaxed/simple;
-	bh=pnl/P8w5pEw7A/CmN9dmaLblHe/ecSGFStwTB2gtr3Y=;
+	s=arc-20240116; t=1770754551; c=relaxed/simple;
+	bh=vq2c1rRSG0L4bWZMyy+WIYxOc6zrEcYn8r9S5+uf2bw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fC/sZa1V8X0a18I6YB80bSR/pXZbqwFg3XISOKq1kwou0jBsOnsx6RW82aljv0am5Vv/aTPUOknz0oPfUowOxKE5nOJqrW4osVi1I8aKc/INGD42NMdu4oWy9amsS8xjUKpn1l2jtUVXUs/LPU687JUm3dyGAexJ/g0pv53tGiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qs6efzjV; arc=none smtp.client-ip=209.85.215.178
+	 MIME-Version; b=SEBCIvBwPAzu/b6/PFvG2JX5OpWn8IQI1YBCJyvtG46e6wNZmB/uwNhHHbyn0ULY5Yo65i3OUgM7dALGLc+y4TGCtiY3FhK0aH1hrsbrrnHBXdjek/NWcj/+nXUQTPB4Xp2xidnfhoQionPPKsCTuHwq3AnLUzxEtBnh0C6+qDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=n4QqpDiT; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-c6541e35fc0so665954a12.3
-        for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 12:15:49 -0800 (PST)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2a95de4b5cbso39076855ad.1
+        for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 12:15:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770754549; x=1771359349; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1770754550; x=1771359350; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4N3HX+SvrJxNpLSjRFYSmasI3xjsp55w7IRFqv+Mp/s=;
-        b=qs6efzjVhhe1UfnqJDTVrOm/U/+3Yjor7hM/VWb/FP1rEpl2E3RahsAAFPiVk7Piqe
-         ZAnCHVGyl3bHFjZeLqtZcEsasnOXV3KgdhOiJJMXyg142ry5aHuxa1j6XZ7jQJ4NVrp5
-         U0JZ/enA9qG657YD7CbL/62frE91lB40CK/ySlQLwijEU54tXnCJQrxfeUPeOVuY91/i
-         J+me9+GYwpGwYMEn2bqZbm31UPh5moEBzpQLI09q3sBvgjXlv3bBJLKqcwOA7TIuTWbI
-         nESrZiG3FAHNOIrKiWdSNUac6Wq8btuke8o3/p9V/7Eo8qGVPhgB3cHzZBRV52wtb4Vm
-         JRHw==
+        bh=VA/qlQJvE8uq8B0wfP8QzURuC1Jx2blScgULUKFJUFo=;
+        b=n4QqpDiTmv+cUmihdVIKo8cpCDdpTTo0PO8OOJreFRDyWS7F6UIiVt6U8Qj0BLJYWc
+         0PptYqx3WMYu9cPl1tBsPtYoUikv4E397+OBrK3fK0gvlTGkb2O7zwe2/tODG4RdBgNO
+         14Aiw+0pL/tzC/MrceP3aiq7O5QDTMFAm/WCXZuq51DzfNqoH4Tx313Kebdb+NzZ14r+
+         LB5fwVCQofuoJuH5cWUguu6XAjNdSbpcikE/m8XRnur3w3n8jo7/249QBg+L4orTpx6N
+         883HttaXE6AeyeKQ2QvDF/0RNWRt7iIUCO4CtAkHp4jgvZQWQVbdMbFz1BjSz1cQHoDy
+         Akwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770754549; x=1771359349;
+        d=1e100.net; s=20230601; t=1770754550; x=1771359350;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=4N3HX+SvrJxNpLSjRFYSmasI3xjsp55w7IRFqv+Mp/s=;
-        b=lJH2zz8mDPozyR0oR+VUHtQ1coByxPNIuNuWF5bgK6YLPwzZt3fy2y67LRoQhpJ2sQ
-         XceHD1UClL1KE6ln9dHQgHiDby6M66q/onMXHRFumo330BL1ZgsldlI1qjsufOx/O+Hh
-         qO6ZoG+I9CNahcrSYUNr/jcPFhJuEPMacBU+YY4DNLWQTbGt3A29cyT+wlTravUaUC6x
-         clRpWGut7zFeYxQcxOIL1NCOvznMUTJloC/aTw6hrWXHtUNUYxiiitGoCLtis+Oc605M
-         P1a7oZkdQd3B6Cm//OiQPUfa0ODXniE1KqSuC95C+FZL7IojSKPjLIazrB1GD9KT72ym
-         NsaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXhx8tkd1PjrNCZElzbiE1hXY5ySv6TgKzbEdVFpHzHc1D/T1yOqBb3UmP8uVAR0MjF2WM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9NtzT8MVlwVJppi4WLls3iNjm/vvv1eJLdNUobKm1efxwbs9s
-	ktWwWGGFwcbH1hrX8cgBb8752NfXz0bj5IsHOJ3nCogpMwN536A+Al5ybMfEs6tnWiE=
-X-Gm-Gg: AZuq6aLap8/m9gkj8AJFipREewrkmcGDuTvTPkguRUISNoXXWCKyHqUsHxIDPpVAVO2
-	Oy1ns2LACdA9yjZwJlhx6ZUQzWkl1hYpEVJD/sB7oCvjA/d4qP9u6rIw7u5ubN0CTiya4a9Neqh
-	bGbMsgOScRx5lF7P+xNUKZ9LthDxn8VazK15SkC896+ptyHWFzaxKxHbkxm0ofyvZSAmevpJdkt
-	HSd85WbLeKr84fsjBag9azNhn0WBE+gak9KsfV0ZtjF9OuJj1tn3dnOAOqD7RKtadPlBRAnuIec
-	RfG4I/gWRz9p0ZVKFm7lFFm4XaEN0QgIJLVADRClBF2MAAGsasUMgc+kmhKi1jtfRUkTIGNj9Bi
-	tcCuLFdqgESEPQ23PgfvKl9iuCrCetVghacN83EAAWFmB07sh7Z9L4w7zypHVaQ4XGRieJp1GES
-	uV7KMbSiU5Y/R8ZmFLpkiqHRDI0zJANnMo56Z6KpsptB5cbgZsQwm5pO+FLTekrizWcrYfcyKIR
-	pZL
-X-Received: by 2002:a17:902:e951:b0:2a9:62ce:1c0f with SMTP id d9443c01a7336-2a962ce20aemr124796015ad.55.1770754548813;
-        Tue, 10 Feb 2026 12:15:48 -0800 (PST)
+        bh=VA/qlQJvE8uq8B0wfP8QzURuC1Jx2blScgULUKFJUFo=;
+        b=QDyhQovQYUSaCK7+npxTHVodWWTa7ZapWyVKlWdOTxCqOhv8McL9l1v0azGLuy2CKa
+         cudkkvkaTV50Pf3HUFY68t7jE9HnGjJ2eBihN/vMFbD0IIxjhj2tITMS8u0N0jAGD4Qh
+         AxOoBWl//5yNJJJFhvz3byVtGf+GyCtkjXXIJdtM7B4QQrfNijuZJ7EgJ2u04A8z2CK4
+         V6XbASCuoISTaNDhVL8trSR/GIhTLIhWHCvqFLypJgKhpOyADWbH7TwHiYNEwUVPxkEq
+         2NOFdsXlL50N5AjRybtLOA9Nxmc/FYUtS2HA+4VmSiqn//zx5MX/pYFqNBzowmSqysBP
+         f62A==
+X-Forwarded-Encrypted: i=1; AJvYcCX3e6HfGy21EYLErShz74iXg1OGuvZ8QGDYavsjuIH76KmNi+0lVDwchjd9YicR9cTuONc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4rfCqeYWEdB5DsfA5LlsOCkvRPuufEdUJPCdNEBikf78ijzK3
+	Uo7zzrA1vkyT2Bk+gf6OmxbacP0V31guVERGq2GG8NgB76px4GtZNcdOA8UIJRIMnwU=
+X-Gm-Gg: AZuq6aJWNskgFSwdkAvTPH3wVp+zEqR0qHcF8kJGaHqRPMKJ1tZEzsewyqEbFRrnjUn
+	pqdIX9f33Wv3bX/6gL0oGJvq0UPywxiEE7YQFu86fKOkq+XGoMo37MQbK4oyJB1+7ZIph8i93Tc
+	J3sTDu2y8DB7JfUVwCwYL8uyDQ0b4GqS40BmtCadmhROhrsJwJiuuTm7OwEW7l4qTe6bvrTLVMv
+	MixWYetV26EWNRlYVrJd/rP+HdvEI34wA1KR6QKO9h5wmZ7V/dW6T8xiuJ+7+oXvavCaWXsdPK4
+	TyqhSwxFbr0oYd9O7yPeC9jzRrYp5LjVod6fV3MSGUEiZXMR1h3YoF7gt/UafX6eh8o7Tmi6Kfo
+	Fk1G3+EIvAfnOiFth3gEsQGd6UZ5ePQPrGxg2IXVj0djjEiqMH2Md5Y3pOhAPIs/lPqmz8OCUN9
+	66vjktS4I+8xFCdsFqvGs6VwDYPT4J9DIdn96lBBoukOD2VnS6dznGxuMF9KabkfRSJ+FcShMix
+	p3pjRqmYzg0jc4=
+X-Received: by 2002:a17:902:f601:b0:2a7:5751:5b30 with SMTP id d9443c01a7336-2ab10549744mr34280145ad.12.1770754549501;
+        Tue, 10 Feb 2026 12:15:49 -0800 (PST)
 Received: from pc.taild8403c.ts.net (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
         by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ab0b392cb5sm38523225ad.70.2026.02.10.12.15.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 12:15:48 -0800 (PST)
+        Tue, 10 Feb 2026 12:15:49 -0800 (PST)
 From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 To: qemu-devel@nongnu.org
 Cc: anjo@rev.ng,
@@ -89,9 +89,9 @@ Cc: anjo@rev.ng,
 	Peter Maydell <peter.maydell@linaro.org>,
 	qemu-arm@nongnu.org,
 	Richard Henderson <richard.henderson@linaro.org>
-Subject: [PATCH v3 04/12] target/arm: extract helper-sme.h from helper.h
-Date: Tue, 10 Feb 2026 12:15:32 -0800
-Message-ID: <20260210201540.1405424-5-pierrick.bouvier@linaro.org>
+Subject: [PATCH v3 05/12] tcg: move tcg_use_softmmu to tcg/tcg-internal.h
+Date: Tue, 10 Feb 2026 12:15:33 -0800
+Message-ID: <20260210201540.1405424-6-pierrick.bouvier@linaro.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260210201540.1405424-1-pierrick.bouvier@linaro.org>
 References: <20260210201540.1405424-1-pierrick.bouvier@linaro.org>
@@ -109,12 +109,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70787-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70788-lists,kvm=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -126,132 +126,88 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	DKIM_TRACE(0.00)[linaro.org:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:mid,linaro.org:dkim,linaro.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CB22411EF1E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linaro.org:mid,linaro.org:dkim,linaro.org:email,c.inc:url]
+X-Rspamd-Queue-Id: 7E92711EF3F
 X-Rspamd-Action: no action
+
+In next commit, we'll apply same helper pattern for base helpers
+remaining.
+
+Our new helper pattern always include helper-*-common.h, which ends up
+including include/tcg/tcg.h, which contains one occurrence of
+CONFIG_USER_ONLY.
+Thus, common files not being duplicated between system and target
+relying on helpers will fail to compile. Existing occurrences are:
+- target/arm/tcg/arith_helper.c
+- target/arm/tcg/crypto_helper.c
+
+This occurrence of CONFIG_USER_ONLY is for defining variable
+tcg_use_softmmu, and we rely on dead code elimination with it in various
+tcg-target.c.inc.
+
+Thus, move its definition to tcg/tcg-internal.h, so helpers can be
+included by common files. Also, change it to a define, as it has fixed
+values for now.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 ---
- target/arm/helper-sme.h                            | 14 ++++++++++++++
- target/arm/helper.h                                |  4 ----
- target/arm/tcg/{helper-sme.h => helper-sme-defs.h} |  0
- target/arm/tcg/sme_helper.c                        |  3 +++
- target/arm/tcg/translate-a64.c                     |  1 +
- target/arm/tcg/translate-sme.c                     |  1 +
- target/arm/tcg/translate-sve.c                     |  1 +
- target/arm/tcg/vec_helper.c                        |  1 +
- 8 files changed, 21 insertions(+), 4 deletions(-)
- create mode 100644 target/arm/helper-sme.h
- rename target/arm/tcg/{helper-sme.h => helper-sme-defs.h} (100%)
+ include/tcg/tcg.h  | 6 ------
+ tcg/tcg-internal.h | 6 ++++++
+ tcg/tcg.c          | 4 ----
+ 3 files changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/target/arm/helper-sme.h b/target/arm/helper-sme.h
-new file mode 100644
-index 00000000000..27c85fdeef1
---- /dev/null
-+++ b/target/arm/helper-sme.h
-@@ -0,0 +1,14 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+
-+#ifndef HELPER_SME_H
-+#define HELPER_SME_H
-+
-+#include "exec/helper-proto-common.h"
-+#include "exec/helper-gen-common.h"
-+
-+#define HELPER_H "tcg/helper-sme-defs.h"
-+#include "exec/helper-proto.h.inc"
-+#include "exec/helper-gen.h.inc"
-+#undef HELPER_H
-+
-+#endif /* HELPER_SME_H */
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 2f724643d39..b1e83196b3b 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -1,7 +1,3 @@
- /* SPDX-License-Identifier: GPL-2.0-or-later */
+diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
+index 60942ce05c2..45c7e118c3d 100644
+--- a/include/tcg/tcg.h
++++ b/include/tcg/tcg.h
+@@ -445,12 +445,6 @@ static inline bool temp_readonly(TCGTemp *ts)
+     return ts->kind >= TEMP_FIXED;
+ }
  
- #include "tcg/helper.h"
--
--#ifdef TARGET_AARCH64
--#include "tcg/helper-sme.h"
+-#ifdef CONFIG_USER_ONLY
+-extern bool tcg_use_softmmu;
+-#else
+-#define tcg_use_softmmu  true
 -#endif
-diff --git a/target/arm/tcg/helper-sme.h b/target/arm/tcg/helper-sme-defs.h
-similarity index 100%
-rename from target/arm/tcg/helper-sme.h
-rename to target/arm/tcg/helper-sme-defs.h
-diff --git a/target/arm/tcg/sme_helper.c b/target/arm/tcg/sme_helper.c
-index 075360d8b8a..7729732369f 100644
---- a/target/arm/tcg/sme_helper.c
-+++ b/target/arm/tcg/sme_helper.c
-@@ -22,6 +22,7 @@
- #include "internals.h"
- #include "tcg/tcg-gvec-desc.h"
- #include "exec/helper-proto.h"
-+#include "helper-sme.h"
- #include "accel/tcg/cpu-ldst.h"
- #include "accel/tcg/helper-retaddr.h"
- #include "qemu/int128.h"
-@@ -29,6 +30,8 @@
- #include "vec_internal.h"
- #include "sve_ldst_internal.h"
+-
+ extern __thread TCGContext *tcg_ctx;
+ extern const void *tcg_code_gen_epilogue;
+ extern uintptr_t tcg_splitwx_diff;
+diff --git a/tcg/tcg-internal.h b/tcg/tcg-internal.h
+index 2cbfb5d5caa..26156846120 100644
+--- a/tcg/tcg-internal.h
++++ b/tcg/tcg-internal.h
+@@ -34,6 +34,12 @@ extern TCGContext **tcg_ctxs;
+ extern unsigned int tcg_cur_ctxs;
+ extern unsigned int tcg_max_ctxs;
  
-+#define HELPER_H "tcg/helper-sme-defs.h"
-+#include "exec/helper-info.c.inc"
++#ifdef CONFIG_USER_ONLY
++#define tcg_use_softmmu false
++#else
++#define tcg_use_softmmu true
++#endif
++
+ void tcg_region_init(size_t tb_size, int splitwx, unsigned max_threads);
+ bool tcg_region_alloc(TCGContext *s);
+ void tcg_region_initial_alloc(TCGContext *s);
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index e7bf4dad4ee..3111e1f4265 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -236,10 +236,6 @@ static TCGAtomAlign atom_and_align_for_opc(TCGContext *s, MemOp opc,
+                                            MemOp host_atom, bool allow_two_ops)
+     __attribute__((unused));
  
- static bool vectors_overlap(ARMVectorReg *x, unsigned nx,
-                             ARMVectorReg *y, unsigned ny)
-diff --git a/target/arm/tcg/translate-a64.c b/target/arm/tcg/translate-a64.c
-index 31fb2ea9cc3..5d261a5e32b 100644
---- a/target/arm/tcg/translate-a64.c
-+++ b/target/arm/tcg/translate-a64.c
-@@ -19,6 +19,7 @@
- #include "qemu/osdep.h"
- #include "exec/target_page.h"
- #include "helper-a64.h"
-+#include "helper-sme.h"
- #include "helper-sve.h"
- #include "translate.h"
- #include "translate-a64.h"
-diff --git a/target/arm/tcg/translate-sme.c b/target/arm/tcg/translate-sme.c
-index 463ece97ab8..7d25ac5a51f 100644
---- a/target/arm/tcg/translate-sme.c
-+++ b/target/arm/tcg/translate-sme.c
-@@ -19,6 +19,7 @@
+-#ifdef CONFIG_USER_ONLY
+-bool tcg_use_softmmu;
+-#endif
+-
+ TCGContext tcg_init_ctx;
+ __thread TCGContext *tcg_ctx;
  
- #include "qemu/osdep.h"
- #include "cpu.h"
-+#include "helper-sme.h"
- #include "helper-sve.h"
- #include "translate.h"
- #include "translate-a64.h"
-diff --git a/target/arm/tcg/translate-sve.c b/target/arm/tcg/translate-sve.c
-index c68a44aff8c..db25636fa3b 100644
---- a/target/arm/tcg/translate-sve.c
-+++ b/target/arm/tcg/translate-sve.c
-@@ -19,6 +19,7 @@
- 
- #include "qemu/osdep.h"
- #include "cpu.h"
-+#include "helper-sme.h"
- #include "helper-sve.h"
- #include "translate.h"
- #include "translate-a64.h"
-diff --git a/target/arm/tcg/vec_helper.c b/target/arm/tcg/vec_helper.c
-index bc64c8ff374..a070ac90579 100644
---- a/target/arm/tcg/vec_helper.c
-+++ b/target/arm/tcg/vec_helper.c
-@@ -21,6 +21,7 @@
- #include "cpu.h"
- #include "exec/helper-proto.h"
- #include "helper-a64.h"
-+#include "helper-sme.h"
- #include "helper-sve.h"
- #include "tcg/tcg-gvec-desc.h"
- #include "fpu/softfloat.h"
 -- 
 2.47.3
 
