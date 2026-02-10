@@ -1,236 +1,263 @@
-Return-Path: <kvm+bounces-70782-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70783-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4IOtBxiQi2nYWAAAu9opvQ
-	(envelope-from <kvm+bounces-70782-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:07:52 +0100
+	id WJzlNPmRi2n/WAAAu9opvQ
+	(envelope-from <kvm+bounces-70783-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:15:53 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA05E11EE73
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:07:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 79E5D11EEF9
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 21:15:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4E36F301B03B
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 20:07:47 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 40AEF30186B1
+	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 20:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C201F332ECC;
-	Tue, 10 Feb 2026 20:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1BB32E745;
+	Tue, 10 Feb 2026 20:15:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="U4W7KasF"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aZaIAaBa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA38A215F7D;
-	Tue, 10 Feb 2026 20:07:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7916125B1DA
+	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 20:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770754058; cv=none; b=bOYf+E900Mb3+cQRK7lcilG2dbpfLAvjX2bKJ4hDwRLkMxg4n06lkJLQpvyLO8dCmmFEPiGYfMgp/3RUt9lc4J3ReoOqiGF3AbWwFVkxelH/pwJcHStQLvYLs6dLfVVPX1tg7fD9oToaKfXeBXLZdf+tU4PVli2+71kDzjTly88=
+	t=1770754547; cv=none; b=TxpetBBpbCBt0/xcZR1d8w9Wj61U5yYiRv8goREtPh9RXIv9UHWwQ2inJrLuf+/1y8/hh1g3sNgX82bz3FW1BPoDiep0gCccMfleLmkNcRqSQeTcz3anNUj56BDWEtiNyHgr3tEyd23soHEDp5cKUymF+K24lQp64uGuYKiawGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770754058; c=relaxed/simple;
-	bh=VhFJszymG5UsGrOAO76ZfmpDZA7cchBFqxn8sDmqZBs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sy/C/nq5061hcYycmExmWiX5aBQcH6mXfX+lA3pwj0Jax3Q1cMAkYGOBprAPtLHYnADebSpQH2VaBCeqwNIG5T4TOTy0pqOHhw8sqdbwZ9Gn9JqBIQNKelECxNloLy+/zaez4AZWeL90GhWxPz8Xwn06RRuJqsSZSn2EO3rbM/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=U4W7KasF; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7215B40E0366;
-	Tue, 10 Feb 2026 20:07:33 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 3vEh4xaYEgHU; Tue, 10 Feb 2026 20:07:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1770754050; bh=Sdope15o0UJIxClOXBEHvBOv7OhcfMkPCTgucnMwaBE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U4W7KasFRX/T2r6ukMaHv/0kLNMQFtSud+sok0c035o6mXBFOX+LthMN5XZsSFzMo
-	 eVTYYj+xwDEaP8aH1b1yIhizL9qypT2N7hC9DpVgOUnuhB8dIsZsTmeoIpNHt1ZYbw
-	 n+zLATUb+t3JFtWX4mEVkFRRgcAdSOWqn45wzRHZQ6r7qFPu9kMtXGf4M3qm9oAthK
-	 a1gu/hOScAoRmHjxeHNh7XOtb6usSBDUEiWArA/XhSslZAmHdJcCSBXue8XjwNcPzf
-	 gcC8w6QUvy1VmkSfNFFAVbaH9zxR8bymWkQBQOsgdcn+sLK40/ELfDJMBxmmqAHixY
-	 b5Bw4xPpGZL+uAN430cOPbJ2xdZC4FlnUTThAb1wwde7KvSdWi4xc3dYlWgE/Lo7Kw
-	 bZc/lY/e/3y7sJ6XzmJzwDfPwjLeFQD2UZGRjb2gH8XNQpsLBtVjtbEhw9IQxtCfVB
-	 oc98ioNH/TVT6/apUhopoc1JXOemVDgRaJ7h5p6h+Y3O1jDFc4aBpv3c3ARZaxWMzy
-	 dlTKpZFgS8BxFWmp4sE6fCi4336YCQdnben24W86LsqquHheFvizm/KiNqEMD6HKYr
-	 MDRgQkjb5L5KReKGMOZU20etnss4WZ/Ey7NPFPLwaDQ3KuzXhNHrOMl3MYekiGCaVW
-	 cthWktazeDn9SPY07pJ82xdc=
-Received: from zn.tnic (pd95306e3.dip0.t-ipconnect.de [217.83.6.227])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id D71B440E0359;
-	Tue, 10 Feb 2026 20:07:17 +0000 (UTC)
-Date: Tue, 10 Feb 2026 21:07:11 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Carlos =?utf-8?B?TMOzcGV6?= <clopez@suse.de>,
-	Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+	s=arc-20240116; t=1770754547; c=relaxed/simple;
+	bh=ENCOm5pKoxKcbUojV7OvrvhxjS6StazE8+SVMUkX9xM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jUA6lZdaEYQ2DoEvltGkZeLs2kl3Ndmfm3FHxwQwkSJcd2+dLfkfR4FSXhEmQV1GFDpvroFHbcpnbPhQxGEsuKyqHD2Ma8pBVvqK2HViAHrqRBOuDxWMN2gdLqNgznrx1E1W8hOjFl9zCj1Fes0hF5tfejvb6Ommh3j7hOsCJyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=aZaIAaBa; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-c0c24d0f4ceso1617322a12.1
+        for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 12:15:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1770754546; x=1771359346; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sIWUOqnZLyGKePk6QDBiFdhDuhnslcwsH8LlDsj2/ZI=;
+        b=aZaIAaBaq13bTxKwoVz6+AiXJqRXNXBiGifkNuwQjdVniskF96pOdrP91gS3bQ3KjH
+         j13tXEYpvzqGaY+IX7HOZHSfNUCDR3xP03YwYcA7zYJEmSnz6oYaUOBl8m5TAkhnpPLZ
+         O02DhSsRbfCExWL8kgZddDxNKNlxbWzuGoPF1a09h5RaxTeS97542oMIGoAwlCyxeiov
+         v88c1mCkrslBhXEir+r1aGqxqA4JbnTiRcBftjA0DgA62+KCT3tCZmhcWlDQO5E612Rd
+         yRNmcH66bY4Kcje4rWoVFuUKK5aiU0lNN+DuYwwcT0yDQ66PfTs2Ks9A7AZkERNR+k2i
+         M16A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770754546; x=1771359346;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sIWUOqnZLyGKePk6QDBiFdhDuhnslcwsH8LlDsj2/ZI=;
+        b=MLsQEit+Du3HsTJ/QrSnBzWA2d6w2di9pHs+XbV9xbqOVi21mny7zNI+GfwCjGo+Bi
+         7T4+AMhWZxHh9O5j4Q3Vvmjv7LtrYf9ekOGkfwDslImVQnH3bi3bFNa03zYmDo3VIy7T
+         Fk1E0M6IkS/poLdt43MU8YyuS8gA/NjdHgcqkxoeN3NmxIJpWJdqCgunr7JFZjaW8SYR
+         Fv0xex5jaQ98fHubrVWgYgBDJb2lrLdKOr1sa0+N8jNo5MqW1CF6/Dnk5QgGnmKH3+31
+         qDQWcy7h66+sGYqMabKXVzW1cQaztZccNDB4TDM1znwDEFMHeYtkZh5O5LDIIwZV8+wv
+         kqsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWjRV+XKGEOryYYVcARyhl8TlyiKHfxHqL2X6dXZ6O2kKEjsJCrh5GKZ4tqyiIk0WEVb1o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOxanwZZ/tr/iSOJm4gkq/D/dJvkbegTceyTpEXozn0+m/MiEg
+	+jAiqlOh6dTdheyiVMJrHDo3Tbp9Wzzh294cHLKTT7ArcOjl42a+i2RRvf0SUCmIJV4=
+X-Gm-Gg: AZuq6aLH2TCWHq5XMx2AdJsRFkOoo+2gYaowjYa2XH80n5/X3eANaLgkhqg6d3/mwTv
+	9u4GpTCz6xKnm5xJVN3InzCHYFPGnoCDy63YpvxQO1WAnhdWh+sv0ie7lAyAHsaxatrDcr7ImP7
+	CW61044Ak6JvvwLOaUBygK4m0VZQSESFMmJBvkjJoIDzDDuTDuB7Tq3ipXymhy3PpI+rIlHVZEQ
+	0oVKBVU8ovMkdR4OI2wevULxRpTz3zCpFWgOAjzJQ6lcvF0ggWsulTlU3/I1dsNFihjTZZ5tKu+
+	XqX7TV4pFdhFb9vBTfMwxwiJNZ/oeGGtceJ6vJsZXnK95w3yRwffqhtXLnBGRrsVJQQMtBoVnxf
+	TRpILWBh0UdTRdKfr5WR8QNmGQYWDYNYg/RuFI8fmonL8VitfyvS/IT9eU5W3bLOjuTEKHY+c74
+	YvTuF9KLeItavFfS02cqihwjNd5zSVDN8hHMHdHwlu/5TLmb2/CORusrYdyfOLrkf1assMnwGoy
+	njf
+X-Received: by 2002:a17:902:d48a:b0:2a9:43a9:d367 with SMTP id d9443c01a7336-2ab27f57751mr2999185ad.51.1770754545632;
+        Tue, 10 Feb 2026 12:15:45 -0800 (PST)
+Received: from pc.taild8403c.ts.net (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ab0b392cb5sm38523225ad.70.2026.02.10.12.15.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Feb 2026 12:15:45 -0800 (PST)
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: anjo@rev.ng,
+	Jim MacArthur <jim.macarthur@linaro.org>,
+	kvm@vger.kernel.org,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>,
-	Babu Moger <bmoger@amd.com>
-Subject: Re: [PATCH] KVM: x86: synthesize TSA CPUID bits via SCATTERED_F()
-Message-ID: <20260210200711.GCaYuP74dOknGNV1DT@fat_crate.local>
-References: <20260208182849.GAaYjV4Vh8i0kznTEK@fat_crate.local>
- <CALMp9eQmwsND7whnvVof1i=OsCdo6wcwBWyDRwS3Ud69WkKf-g@mail.gmail.com>
- <20260208211342.GBaYj8hhtYM-lYfq-X@fat_crate.local>
- <CALMp9eSVB=iRec2A0tmRzkTBa9zz4BVS8Lu79vUuRPrTawYFcQ@mail.gmail.com>
- <e19b9666-b224-4fbd-92c9-82c712916a07@suse.de>
- <aYn3_PhRvHPCJTo7@google.com>
- <20260209153243.GBaYn-G02QE86Fje7g@fat_crate.local>
- <aYoLcPkjJChCQM7E@google.com>
- <20260209174559.GDaYodVxWsiesiedLJ@fat_crate.local>
- <aYpNzX8KhnQTmzyH@google.com>
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	qemu-arm@nongnu.org,
+	Richard Henderson <richard.henderson@linaro.org>
+Subject: [PATCH v3 00/12] target/arm: single-binary
+Date: Tue, 10 Feb 2026 12:15:28 -0800
+Message-ID: <20260210201540.1405424-1-pierrick.bouvier@linaro.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aYpNzX8KhnQTmzyH@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[alien8.de,none];
-	R_DKIM_ALLOW(-0.20)[alien8.de:s=alien8];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70782-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70783-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bp@alien8.de,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[alien8.de:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[alien8.de:dkim,fat_crate.local:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BA05E11EE73
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pierrick.bouvier@linaro.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:mid,linaro.org:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 79E5D11EEF9
 X-Rspamd-Action: no action
 
-On Mon, Feb 09, 2026 at 01:12:45PM -0800, Sean Christopherson wrote:
-> On Mon, Feb 09, 2026, Borislav Petkov wrote:
-> > On Mon, Feb 09, 2026 at 08:29:36AM -0800, Sean Christopherson wrote:
-> > > Nope.  KVM cares about what KVM can virtualize/emulate, and about helping userspace
-> > > accurately represent the virtual CPU that will be enumerated to the guest.
-> > 
-> > So why don't you key on that in those macros instead of how they're defined?
-> > 
-> > 	EXPOSE_TO_GUEST_F()
-> > 
-> > and then underneath we can figure out how to expose them.
-> 
-> Huh?  That's what the macros do, they describe KVM's handling of the associated
-> feature.  SYNTHESIZED is a bit weird because it bleeds some kernel details into
-> KVM, but ultimately it's still KVM decision as to whether or not "forced" features
-> can be synthesized for the guest.
+This series continues cleaning target/arm, especially tcg folder.
 
-My point is that you have to know *which* macro of all the available ones you
-need to use, in order to expose the feature. This thread is a case-in-point
-example about how it can get confusing. And it dudn't have to...
+For now, it contains some cleanups in headers, and it splits helpers per
+category, thus removing several usage of TARGET_AARCH64.
+First version was simply splitting 32 vs 64-bit helpers, and Richard asked
+to split per sub category.
 
-> 
-> > We could have a helper table which determines what each feature is and how it
-> > should interact with raw host CPUID or something slicker.
-> > 
-> > >   F               : Features that must be present in boot_cpu_data and raw CPUID
-> > >   SCATTERED_F     : Same as F(), but are scattered by the kernel
+v3
+--
 
-Right, so what happens if we unscatter a leaf?
+- translate.h: missing vaddr replacement
+- move tcg_use_softmmu to tcg/tcg-internal.h to avoid duplicating compilation
+  units between system and user builds.
+- eradicate TARGET_INSN_START_EXTRA_WORDS by calling tcg_gen_insn_start with
+  additional 0 parameters if needed.
 
-And why does it matter to KVM if the baremetal feature is scattered or not?
-KVM should only care whether the kernel has set it or not.
+v2
+--
 
-> > >   X86_64_F        : Same as F(), but are restricted to 64-bit kernels
-> > >   EMULATED_F      : Always supported; the feature is unconditionally emulated in software
+- add missing kvm_enabled() in arm-qmp-cmds.c
+- didn't extract arm_wfi for tcg/psci.c. If that's a hard requirement, I can do
+  it in next version.
+- restricted scope of series to helper headers, so we can validate things one
+  step at a time. Series will keep on growing once all patches are reviewed.
+- translate.h: use vaddr where appropriate, as asked by Richard.
 
-And an emulated feature *can* be scattered or synthesized or whatever...
+Pierrick Bouvier (12):
+  target/arm: extract helper-mve.h from helper.h
+  target/arm: extract helper-a64.h from helper.h
+  target/arm: extract helper-sve.h from helper.h
+  target/arm: extract helper-sme.h from helper.h
+  tcg: move tcg_use_softmmu to tcg/tcg-internal.h
+  target/arm: move exec/helper-* plumbery to helper.h
+  target/arm/tcg/psci.c: make compilation unit common
+  target/arm/tcg/cpu-v7m.c: make compilation unit common
+  target/arm/tcg/vec_helper.c: make compilation unit common
+  target/arm/tcg/translate.h: replace target_ulong with vaddr
+  target/arm/tcg/translate.h: replace target_long with int64_t
+  include/tcg/tcg-op.h: eradicate TARGET_INSN_START_EXTRA_WORDS
 
-> > >   SYNTHESIZED_F   : Features that must be present in boot_cpu_data, but may or
-> > >                     may not be in raw CPUID.  May also be scattered.
-
-So which one do I use here?
-
-This is the confusion I'm taking about.
-
-> > >   PASSTHROUGH_F   : Features that must be present in raw CPUID, but may or may
-> > >                     not be present in boot_cpu_data
-
-Maybe there's a reason for it but why would the guest care if the feature is
-present in raw CPUID or not? The hypervisor controls what the guest sees in
-CPUID...
-
-> > >   ALIASED_1_EDX_F : Features in 0x8000_0001.EDX that are duplicates of identical 0x1.EDX features
-> > >   VENDOR_F        : Features that are controlled by vendor code, often because
-> > >                     they are guarded by a vendor specific module param.  Rules
-> > >                     vary, but typically they are handled like basic F() features
-> > >   RUNTIME_F       : Features that KVM dynamically sets/clears at runtime, but that
-> > >                     are never adveristed to userspace.  E.g. OSXSAVE and OSPKE.
-> > 
-
-Also, we're rewriting the whole CPUID handling on baremetal and someday the
-CPUID table in the kernel will be the only thing you query - not the CPUID
-insn. Then those names above become wrong/obsolete.
-
-> > And for the time being, I'd love if this were somewhere in
-> > arch/x86/kvm/cpuid.c so that it is clear how one should use those macros.
-> 
-> I'll a patch with the above and more guidance.
-> 
-> > The end goal of having the user not care about which macro to use would be the
-> > ultimate, super-duper thing tho.
-> 
-> And impossible, for all intents and purposes.  The user/contributor/developer
-> needs to define KVM's handling semantics *somehwere*. 
-
-I still don't get this: why does KVM need to know whether a X86_FEATURE is
-scattered or synthesized or whatnot?
-
-> Sure, we could to that in a big array or something, but that's just
-> a different way of dressing up the same pig.  All of this very much is an
-> ugly pig, but it's the concepts and mechanics that are ugly and convoluted.
-
-Well, if we're redoing how feature flags and CPUID leafs etc are being handled
-on baremetal, why not extend that handling so that KVM can put info there too,
-about each feature and how it is going to be exposed to the guest instead of
-doing a whole bucket of _F() macros?
-
-> E.g. if we define a giant array or table, the contributor will need to map the
-> feature to one of the above macros.
-
-We are on the way to a giant array/table anyway:
-
-https://lore.kernel.org/r/20250905121515.192792-1-darwi@linutronix.de
-
-> In other words, kvm_initialize_cpu_caps() _is_ the helper table.
-
-$ git grep kvm_initialize_cpu_caps
-$
-
-I'm on current Linus/master.
-
-Thx.
+ include/tcg/tcg-op-common.h                   |   8 +
+ include/tcg/tcg-op.h                          |  29 ---
+ include/tcg/tcg.h                             |   6 -
+ target/alpha/cpu-param.h                      |   2 -
+ target/arm/cpu-param.h                        |   7 -
+ target/arm/helper-a64.h                       |  14 ++
+ target/arm/helper-mve.h                       |  14 ++
+ target/arm/helper-sme.h                       |  14 ++
+ target/arm/helper-sve.h                       |  14 ++
+ target/arm/helper.h                           |  17 +-
+ .../tcg/{helper-a64.h => helper-a64-defs.h}   |   0
+ target/arm/tcg/{helper.h => helper-defs.h}    |   0
+ .../tcg/{helper-mve.h => helper-mve-defs.h}   |   0
+ .../tcg/{helper-sme.h => helper-sme-defs.h}   |   0
+ .../tcg/{helper-sve.h => helper-sve-defs.h}   |   0
+ target/arm/tcg/translate-a32.h                |   2 +-
+ target/arm/tcg/translate.h                    |  22 +-
+ target/arm/tcg/vec_internal.h                 |  49 ++++
+ target/avr/cpu-param.h                        |   2 -
+ target/hexagon/cpu-param.h                    |   2 -
+ target/hppa/cpu-param.h                       |   2 -
+ target/i386/cpu-param.h                       |   2 -
+ target/loongarch/cpu-param.h                  |   2 -
+ target/m68k/cpu-param.h                       |   2 -
+ target/microblaze/cpu-param.h                 |   2 -
+ target/mips/cpu-param.h                       |   2 -
+ target/or1k/cpu-param.h                       |   2 -
+ target/ppc/cpu-param.h                        |   2 -
+ target/riscv/cpu-param.h                      |   7 -
+ target/rx/cpu-param.h                         |   2 -
+ target/s390x/cpu-param.h                      |   2 -
+ target/sh4/cpu-param.h                        |   2 -
+ target/sparc/cpu-param.h                      |   2 -
+ target/tricore/cpu-param.h                    |   2 -
+ target/xtensa/cpu-param.h                     |   2 -
+ tcg/tcg-internal.h                            |   6 +
+ target/alpha/translate.c                      |   4 +-
+ target/arm/debug_helper.c                     |   4 +-
+ target/arm/helper.c                           |   5 +-
+ target/arm/tcg/arith_helper.c                 |   4 +-
+ target/arm/tcg/crypto_helper.c                |   4 +-
+ target/arm/tcg/gengvec64.c                    |   3 +-
+ target/arm/tcg/helper-a64.c                   |   6 +-
+ target/arm/tcg/hflags.c                       |   4 +-
+ target/arm/tcg/m_helper.c                     |   2 +-
+ target/arm/tcg/mte_helper.c                   |   3 +-
+ target/arm/tcg/mve_helper.c                   |   6 +-
+ target/arm/tcg/neon_helper.c                  |   4 +-
+ target/arm/tcg/op_helper.c                    |   2 +-
+ target/arm/tcg/pauth_helper.c                 |   3 +-
+ target/arm/tcg/psci.c                         |   4 +-
+ target/arm/tcg/sme_helper.c                   |   5 +-
+ target/arm/tcg/sve_helper.c                   |   6 +-
+ target/arm/tcg/tlb_helper.c                   |   4 +-
+ target/arm/tcg/translate-a64.c                |   3 +
+ target/arm/tcg/translate-mve.c                |   1 +
+ target/arm/tcg/translate-sme.c                |   3 +
+ target/arm/tcg/translate-sve.c                |   3 +
+ target/arm/tcg/translate.c                    |  25 +-
+ target/arm/tcg/vec_helper.c                   | 224 ++----------------
+ target/arm/tcg/vec_helper64.c                 | 142 +++++++++++
+ target/arm/tcg/vfp_helper.c                   |   4 +-
+ target/avr/translate.c                        |   2 +-
+ target/hexagon/translate.c                    |   2 +-
+ target/i386/tcg/translate.c                   |   2 +-
+ target/loongarch/tcg/translate.c              |   2 +-
+ target/m68k/translate.c                       |   2 +-
+ target/microblaze/translate.c                 |   2 +-
+ target/or1k/translate.c                       |   2 +-
+ target/ppc/translate.c                        |   2 +-
+ target/rx/translate.c                         |   2 +-
+ target/sh4/translate.c                        |   4 +-
+ target/sparc/translate.c                      |   2 +-
+ target/tricore/translate.c                    |   2 +-
+ target/xtensa/translate.c                     |   2 +-
+ tcg/tcg.c                                     |   4 -
+ target/arm/tcg/meson.build                    |  11 +-
+ 77 files changed, 383 insertions(+), 381 deletions(-)
+ create mode 100644 target/arm/helper-a64.h
+ create mode 100644 target/arm/helper-mve.h
+ create mode 100644 target/arm/helper-sme.h
+ create mode 100644 target/arm/helper-sve.h
+ rename target/arm/tcg/{helper-a64.h => helper-a64-defs.h} (100%)
+ rename target/arm/tcg/{helper.h => helper-defs.h} (100%)
+ rename target/arm/tcg/{helper-mve.h => helper-mve-defs.h} (100%)
+ rename target/arm/tcg/{helper-sme.h => helper-sme-defs.h} (100%)
+ rename target/arm/tcg/{helper-sve.h => helper-sve-defs.h} (100%)
+ create mode 100644 target/arm/tcg/vec_helper64.c
 
 -- 
-Regards/Gruss,
-    Boris.
+2.47.3
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
