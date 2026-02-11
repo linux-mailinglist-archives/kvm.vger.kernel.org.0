@@ -1,65 +1,66 @@
-Return-Path: <kvm+bounces-70829-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70830-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wPxrCaZEjGlxkQAAu9opvQ
-	(envelope-from <kvm+bounces-70829-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 09:58:14 +0100
+	id pXWQEKxEjGl+kQAAu9opvQ
+	(envelope-from <kvm+bounces-70830-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 09:58:20 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CFDE122768
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 09:58:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80913122770
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 09:58:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0982F3011A5F
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 08:58:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 38706300B45E
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 08:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2FC0309F1D;
-	Wed, 11 Feb 2026 08:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE253542F9;
+	Wed, 11 Feb 2026 08:58:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="maHr2SOJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iAHCPnIC"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9517C342539;
-	Wed, 11 Feb 2026 08:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068F1354AD4;
+	Wed, 11 Feb 2026 08:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770800289; cv=none; b=hxpQehtKRwIWkZzTGaAQwBFbCnFkmBM/yCCf3+te2KxzAsLSAAK2Zl/o5gycTKD6E/DAOYEekrMBSNTEBnPjMRxJayTctvB2FmbFkJJQ8+X/dQ1cA3rVeeBaeSbiLmU8wkFMctcjJQ+apVAgwE/s40NUa2mUoGneiz+c9BhcGc4=
+	t=1770800293; cv=none; b=tuL8u5n3GFNsk0AAUF0hsz9xt5FbaqQvQkLcnNFHkgA5021iyYxESac57m6HigU+JhTPKCGG3PcoRNIUAmq8jxSQUMklOX4Ze9gI2/JpvMMYOrDdagC9e0cd9Hj0w0y0XRxgwgOt2uCNHK4a1ErEUDQ4pQ2hnbwz+Q6fWqFvYIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770800289; c=relaxed/simple;
-	bh=1P8/Aj+KLSO2UwFUQGGb75QRc86jiUTlgfFmsVS2V4c=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=sm2pTsVUX90KzEnA91N4mVADEEsDeGdwRWcyS6FraZSkj5sD2/rP//EVkqAI6wLfqwcaMwW45kqMmN9TGlBoLEMWDOyMwNr138adJPI8NqlI+4vgX0I47+2ZM1VtyUI17n6urD/gp9zaafWkfPkqgyh3o4sMRVnnq12z2MU2TGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=maHr2SOJ; arc=none smtp.client-ip=192.198.163.17
+	s=arc-20240116; t=1770800293; c=relaxed/simple;
+	bh=vbXWSR6dG3bltC8HdcCEJENHZTI+G290TKxZwcxoBA0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pqNHTY6W9rn6qXQpU29oDkHJN+TY6p6x4bqBctHftsZX8MeRkxmf6om1oxY7h11cVtyMQhqL3VO617XOhPXUn7uNz7YDtJlXxGTIA3ySYUPgFkk0RDY5+guJZIImMMw9gLnXZC55ewyj9RYhKd3/2bXjqsMFZQqX1jlN0I5r54I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iAHCPnIC; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770800289; x=1802336289;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=1P8/Aj+KLSO2UwFUQGGb75QRc86jiUTlgfFmsVS2V4c=;
-  b=maHr2SOJf4+xaDAzu5/CEqXb/s6HzohjqLK2qJF030xkd5e0i/yc94Wj
-   EckqjeAfEf+7xOp5eJirpfjoNfoALDt5XXkq1ISMuURmfYgrYnsvoRnXV
-   MczjNR79q/2mz31/gM3uDHp/dMR+k1V0ZMfUuDy1P6c/WwnWu130vyaVK
-   u0LgZYLbPwfsY9xTiqgyyIJzWsIl5c42DJsEUoga/1O9rAVLP/GWCdTBa
-   61AgU+Zz3buTpW0xQ+RVAc/6VRZ4r6eyXm4Tw/BNkjXn49y88zFlpv95K
-   Fuo7sbMdJlH0suACSRKLiH5y6DlJDMK6giuI0LOrt2vcHyv0vx8a8x/9H
-   Q==;
-X-CSE-ConnectionGUID: ONdLbLCeQbSlto6eDJBgKw==
-X-CSE-MsgGUID: 6bruQEpzTsO8P8VwsFRePA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11697"; a="71840756"
+  t=1770800292; x=1802336292;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=vbXWSR6dG3bltC8HdcCEJENHZTI+G290TKxZwcxoBA0=;
+  b=iAHCPnICkYtwr+nJLOPtmanc+/Xh8Y9ryMzd3u0lZhin6ksdB+eB6/0l
+   LNwcp+VSDPUlQhfoSBqGxeMvHhXKn2S7uRHQt58vBHgwqyyiVmZMoi7wX
+   X/FILeMrgBAxV5CrZ6DBHXAaSC2WB5hc6F3w7Y9R0LR1poEE8AaV/uEDw
+   dfkaa1C5qsLW5F6fMG2389u8mYSCOuJ20NzUgrtc9k7wUGPkOxBduqkOD
+   GeK5ofeq6WuWDfzrps0MVCjkoRW77D+YGqSo/HLLkBwIhj0y/41j/iZj1
+   jxODOZXbLNPW6SoE6HD5vUmKBMVu33korjhGnk+3Dsi9/kDSR1qO8iI77
+   A==;
+X-CSE-ConnectionGUID: vkEeKak6TG64wrhZeJ6WsA==
+X-CSE-MsgGUID: PzLFJHtTQxGt6Qoi5eHpxA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11697"; a="71840758"
 X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
-   d="scan'208";a="71840756"
+   d="scan'208";a="71840758"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2026 00:58:08 -0800
-X-CSE-ConnectionGUID: yT9/sHxaQ82znlwh32vVoA==
-X-CSE-MsgGUID: JYEhrPw2QWeTSkhMWkepZA==
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2026 00:58:12 -0800
+X-CSE-ConnectionGUID: YUOCP3GHShm6uCA9C/5U7A==
+X-CSE-MsgGUID: fEHVFDleR8SjbN72lG6ulg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
-   d="scan'208";a="211592551"
+   d="scan'208";a="211592557"
 Received: from ubuntu.bj.intel.com ([10.238.152.35])
-  by fmviesa010.fm.intel.com with ESMTP; 11 Feb 2026 00:58:06 -0800
+  by fmviesa010.fm.intel.com with ESMTP; 11 Feb 2026 00:58:10 -0800
 From: Jun Miao <jun.miao@intel.com>
 To: kas@kernel.org,
 	dave.hansen@linux.intel.com,
@@ -69,10 +70,12 @@ Cc: linux-coco@lists.linux.dev,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	jun.miao@intel.com
-Subject: [PATCH 0/1] [Test Report] get qutoe time via tdvmcall
-Date: Wed, 11 Feb 2026 16:58:00 +0800
-Message-Id: <20260211085801.4036464-1-jun.miao@intel.com>
+Subject: [PATCH 1/1] virt: tdx-guest: Optimize the get-quote polling interval time
+Date: Wed, 11 Feb 2026 16:58:01 +0800
+Message-Id: <20260211085801.4036464-2-jun.miao@intel.com>
 X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20260211085801.4036464-1-jun.miao@intel.com>
+References: <20260211085801.4036464-1-jun.miao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,16 +90,16 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jun.miao@intel.com,kvm@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-70829-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70830-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,inteltdx:email];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	RCPT_COUNT_SEVEN(0.00)[8];
@@ -106,64 +109,65 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+]
-X-Rspamd-Queue-Id: 8CFDE122768
+X-Rspamd-Queue-Id: 80913122770
 X-Rspamd-Action: no action
 
-[Background]
-Currently, many mobile device vendors (such as OPPO and Xiaomi) use TDVM for security management.
-Each mobile terminal must perform remote attestation before it can access the TDVM confidential container.
-As a result, there are a large number of remote attestation get-quote requests, especially in cases 
-where vsock is not configured or misconfigured and cannot be used.
+The TD guest sends TDREPORT to the TD Quoting Enclave via a vsock or
+a tdvmcall. In general, vsock is indeed much faster than tdvmcall,
+and Quote requests usually take a few millisecond to complete rather
+than seconds based on actual measurements.
 
-[Limitation]
-Currently, the polling interval is set to 1 second, which allows at most one quote to be retrieved per second.
-For workloads with frequent remote attestations, polling once per second severely limits performance.
-Test like this:
-[root@INTELTDX ~]# ./test_tdx_attest-thread
-Start tdx_att_get_quote concurrent loop, duration: 1 s, threads: 1
-Summary (tdx_att_get_quote)
-Threads: 1
-Mode: concurrent
-Duration: requested 1 s, actual 1.036 s
-Total:   1
-Success: 1
-Failure: 0
-Avg total per 1s:   0.97
-Avg success per 1s: 0.97
-Avg total per 1s per thread:   0.97
-Avg success per 1s per thread: 0.97
-Min elapsed_time: 1025.95 ms
-Max elapsed_time: 1025.95 ms
+The following get quote time via tdvmcall were obtained on the GNR:
 
-[Optimization Rationale]
-But the actual trace the get quote time on GNR platform:
-test_tdx_attest-598     [001] .....   371.214611: tdx_report_new: [debug start wait]===: I am in function wait_for_quote_completion    LINE=155===
-test_tdx_attest-598     [001] .....   371.220287: tdx_report_new: [debug end wait]===: I am in function wait_for_quote_completion    LINE=162===
-
-Cost time: 371.220287 - 371.215611 = 0.004676 = 4.6ms
-
-The following test results were obtained on the GNR platform:
-| msleep_interruptible(time)     | 1ms      | 5ms      | 1s         |
+| msleep_interruptible(time)     | 1s       | 5ms      | 1ms        |
 | ------------------------------ | -------- | -------- | ---------- |
 | Duration                       | 1.004 s  | 1.005 s  | 1.036 s    |
-| Total(Get Quote)               | 167      | 142      | 1          |
-| Success:                       | 167      | 142      | 1          |
+| Total(Get Quote)               | 167      | 142      | 167        |
+| Success:                       | 167      | 142      | 167        |
 | Failure:                       | 0        | 0        | 0          |
-| Avg total / 1s                 | 166.35   | 141.31   | 0.97       |
-| Avg success / 1s               | 166.35   | 141.31   | 0.97       |
-| Avg total / 1s / thread        | 166.35   | 141.31   | 0.97       |
-| Avg success / 1s / thread      | 166.35   | 141.31   | 0.97       |
-| Min elapsed_time               | 2.99 ms  | 6.85 ms  | 1025.95 ms |
-| Max elapsed_time               | 10.76 ms | 10.93 ms | 1025.95 ms |
+| Avg total / 1s                 | 0.97     | 141.31   | 166.35     |
+| Avg success / 1s               | 0.97     | 141.31   | 166.35     |
+| Avg total / 1s / thread        | 0.97     | 141.31   | 166.35     |
+| Avg success / 1s / thread      | 0.97     | 141.31   | 166.35     |
+| Min elapsed_time               | 1025.95ms| 6.85 ms  | 2.99 ms    |
+| Max elapsed_time               | 1025.95ms| 10.93 ms | 10.76 ms   |
 
+According to trace analysis, the typical execution tdvmcall get the
+quote time is 4 ms. Therefore, 5 ms is a reasonable balance between
+performance efficiency and CPU overhead.
 
+And compared to the previous throughput of one request per second,
+the current 5ms can get 142 requests per second delivers a
+142× performance improvement, which is critical for high-frequency
+use cases without vsock.
 
-Jun Miao (1):
-  virt: tdx-guest: Optimize the get-quote polling interval time
+So, change the 1s (MSEC_PER_SEC) -> 5ms (MSEC_PER_SEC / 200)
 
+Signed-off-by: Jun Miao <jun.miao@intel.com>
+---
  drivers/virt/coco/tdx-guest/tdx-guest.c | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/drivers/virt/coco/tdx-guest/tdx-guest.c b/drivers/virt/coco/tdx-guest/tdx-guest.c
+index 4e239ec960c9..71d2d7304b1a 100644
+--- a/drivers/virt/coco/tdx-guest/tdx-guest.c
++++ b/drivers/virt/coco/tdx-guest/tdx-guest.c
+@@ -251,11 +251,11 @@ static int wait_for_quote_completion(struct tdx_quote_buf *quote_buf, u32 timeou
+ 	int i = 0;
+ 
+ 	/*
+-	 * Quote requests usually take a few seconds to complete, so waking up
+-	 * once per second to recheck the status is fine for this use case.
++	 * Quote requests usually take a few milliseconds to complete, so waking up
++	 * once per 5 milliseconds to recheck the status is fine for this use case.
+ 	 */
+-	while (quote_buf->status == GET_QUOTE_IN_FLIGHT && i++ < timeout) {
+-		if (msleep_interruptible(MSEC_PER_SEC))
++	while (quote_buf->status == GET_QUOTE_IN_FLIGHT && i++ < 200 * timeout) {
++		if (msleep_interruptible(MSEC_PER_SEC / 200))
+ 			return -EINTR;
+ 	}
+ 
 -- 
 2.32.0
 
