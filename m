@@ -1,110 +1,106 @@
-Return-Path: <kvm+bounces-70813-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70814-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qJZZCPbDi2mEagAAu9opvQ
-	(envelope-from <kvm+bounces-70813-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 00:49:10 +0100
+	id 6BxpFLfIi2kwbAAAu9opvQ
+	(envelope-from <kvm+bounces-70814-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 01:09:27 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE69D1202D8
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 00:49:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE4681203A9
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 01:09:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A995530488AB
-	for <lists+kvm@lfdr.de>; Tue, 10 Feb 2026 23:49:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9984630557DF
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 00:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1791833B6D0;
-	Tue, 10 Feb 2026 23:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3EB51427A;
+	Wed, 11 Feb 2026 00:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mXpO4ooS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VXLdUAYV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54F43191C8
-	for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 23:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5CF1FC8
+	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 00:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770767340; cv=none; b=GR0dWsbmoVlc0iHsHYwxz1nITF9qhnL4OnK9VeOaGvN9T5/ADvAYJxoZGAXK7JNGl9iartwrBWwWKkA3/CxuBrvXd3oEQqxF9LglAkLmAjRlkjFjJNUGOLDyAhhGzE6AHPrSz+NwPXMTk96UdH6cGNUklNQt++jvz3vPUzbmvKo=
+	t=1770768555; cv=none; b=d3hA99w170vwyBQAOYtQNjkQmwNTkEvwRg6LOHJF3Y+AUHwE0ZPJVFaBQd5eu7p2CWm01+qtadYPfG0/cbDw+jRh3RAPSoYh7qETqB7tmIpzcrxPYgDta6n3LQTGuANJmbPwMb5brpgk5RzkVgzHrTktxENJky9pxCdq1olcfNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770767340; c=relaxed/simple;
-	bh=m0wcRMgirYHHkIRrgdZXJEzICOnjjQQcHMFC5O5O7qM=;
+	s=arc-20240116; t=1770768555; c=relaxed/simple;
+	bh=VMRGazPTLTcwKF21VG5B6p+oJVF9pwEE/p215VYQItk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CoM/36pc1ibwty9Td9lltOm8pYp8P8bmxoiQNQgefxjcS9zbtWmku45i11Rc+5tpY/zdxNR5KFW8sZ+zf85H2b9lRXSRIuOT0d15Vy+ZHICN8xoLt83/Dxw1Ad2mJPSVvB9L5gKu/WAvZ7KLvu5OWl7eoJaS5cww+tp5xE7weA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mXpO4ooS; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=fS/pSWxqxTq0Rcql10JHyCWsoVjFA5HZvUGXLemZWGUYZQ7TgE9TAFJMkWRzx3ky4CXWT2vu59P1PkxNpGPTJpS7Zicxb6tuaP02ThVh1D0fD7Jx49w3Kwl+/WNqBagdWultyta3SPQp2AfcFUGFQTDIX2KfvGOL9j2eSf4GY3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VXLdUAYV; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2aaeafeadbcso32156435ad.1
-        for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 15:48:58 -0800 (PST)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-81f48cec0ccso5653241b3a.0
+        for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 16:09:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770767338; x=1771372138; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770768553; x=1771373353; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XlUmuX7/vbR7IsOkiKB9wOHjIuyQgf3rCm+NKZU32+U=;
-        b=mXpO4ooSb5olm031BSpgwhcuIorTBGm5J22DJ7qPbAZqtN54utqg4q5FvsYAu9p1wN
-         86a68mawyhpTQFivAjE7w+I7YWsN9BvfFmz6vRz1gz4hufp9eowsJKYDuojLbKoZYi3a
-         AgmMJyIN0/1lpLNqL3AT9sZobIqQBI/85bM0kOVUSpCnJxMOKvS6/S3DDuqpUcXNjSI2
-         dd1RDCW8tnt44B/oTxc7HLuu8n3pwlKdm2xeeak2Hy6CitwzUWaAAacsr1FD4GvzIrpG
-         Nolu48+p1sy7NrEWJwpTn3/iH50yZZkcUVan1VLzvgezswKlujqQ8qRGRaBusANRS70v
-         JDLg==
+        bh=w2fRs8crS9fOJGsOa5fG7r9GR4L1iAYavcsR08Hvs4w=;
+        b=VXLdUAYVU8goA2oW5Ame2za12nMJxhZarkHu+H6xRuPlixGr2YuNJgPrVMogJePNUA
+         lerQ8cD7RAq/8MafCrdf9p5cuNdnXXaa1jQaPxnlGVt09RB+nMODo7ya6CTbhdAmk+W9
+         5ViDMbvb7xazEjB+li45RmQIm8N5trqY3P/ytnTV+vBsLhxZCvSFqov0m/xsog0/uhPS
+         5m9NFHSPVX5hLjhvZh5WHF2PDcJJCE0P7Qm5a2v6JPaQK/pY7ftZN9xc9fTMlLIH0Akq
+         LRWLUIdjeJm1pwxHo6Scn8HVdWSeM+Dp1h84iu81LZHuIieFHg7T9cYPqdMatahVvpT1
+         aOUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770767338; x=1771372138;
+        d=1e100.net; s=20230601; t=1770768553; x=1771373353;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XlUmuX7/vbR7IsOkiKB9wOHjIuyQgf3rCm+NKZU32+U=;
-        b=xA3ohb2avpunvN0DkkVtWtrQNTVtszs0zEVBfwW3JWvF2vNelKu7xk8O5l6gYvDS9n
-         BTh8/9fTqnfrSWhx8ZbuPF3DCYFJvWSyEZ+asyBzwnAelrawWFxfr48zQ9OG/Anqduvr
-         Jfe9Y658gcTVgWVPoLcF6HYGLR5gdqdJP81p3R9Rqxy0nHtFWudiKWGOmhEfTsLut1YR
-         pDku4ZeRDC3lqKKABXfrlekbkvZLHCWvJumH8Dsl7wMvvyDuTurWBnqkd0cDeweZQjyv
-         pEhVUkysUy03fatAHC0Okaew1rIZrPnXDrzsYOlL38zN4WrC40+bOZ6XT/1LvbtKpcHF
-         +yiw==
-X-Forwarded-Encrypted: i=1; AJvYcCUc2AiyqK54ITRlX1BabDPyLTqH43BZDB9gehadXGYE8eBIiYIUnjRyxvaSeD2M2otBizc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIGaztmJ/nPOtF8CCs605a5cZPyHXcBCdfWj4ibKtl3JNezslO
-	P8ZsyFAuLow+86us6n48jtDiZhtt7Ffj0ILW4isV7CyvgQEMar7u9fEGC398/nYQaCIPlMQMZBh
-	uuHvUQA==
-X-Received: from plmj1.prod.google.com ([2002:a17:903:2fc1:b0:2a9:8200:498b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:98d:b0:29f:2b8a:d3d
- with SMTP id d9443c01a7336-2ab102f3d5cmr37645685ad.4.1770767338179; Tue, 10
- Feb 2026 15:48:58 -0800 (PST)
-Date: Tue, 10 Feb 2026 15:48:56 -0800
-In-Reply-To: <20260210200711.GCaYuP74dOknGNV1DT@fat_crate.local>
+        bh=w2fRs8crS9fOJGsOa5fG7r9GR4L1iAYavcsR08Hvs4w=;
+        b=qBaqrHbwJBBaTwZYVu4mOVk+Fryjl/1lpgZq7TLQ1/m+1oi5mnhHl2F4KBRR56cX1W
+         FtE4kIuDztVyn58NKAVSiz9lumNAivoDewXGxBgqjLmB8a1/6LxeaN3hHGgCUSmDPVTe
+         x9nuCdPVHeKN9lhPvo/X0R2yfinbnaYjLvGts1GCklIMpaf5AjwyYTj1oQ9uomqgU0jt
+         MrkrQE/1l+9nQH2GC2W2BvmZSmtRy7r5hP5cGtF85pMF6iZG0g6FVCNK+saIIAGx0xAt
+         kv8rQfjS/ffvENN24JySeRvtemDaVDqfD+O1Rosm/zUXzW1qraZdCtP+Z/HZoiAvdZ42
+         VSWw==
+X-Forwarded-Encrypted: i=1; AJvYcCUrOLoEeOZlsOWCp73qaNdI/YnEGSLPQJY/4NJWLPNSXOsW3aD/4E/n6sRd5IZUV82Qea4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMf8YpIU6EWrmgvLTv1jsBXiZ7ylS4UP14HGjazholaBhpWUez
+	At8i0ntQJ2+RuY8+uEn9zVG/n0zJFOkHy3DJzbmkLUAhLWscGkEeyWvNAEQj194gdJGR5mlkJXF
+	M/NlATg==
+X-Received: from pfn9.prod.google.com ([2002:a05:6a00:a209:b0:821:8690:e783])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:10c3:b0:81f:9a5b:e8fc
+ with SMTP id d2e1a72fcca58-8249fdce3a7mr39456b3a.54.1770768552951; Tue, 10
+ Feb 2026 16:09:12 -0800 (PST)
+Date: Tue, 10 Feb 2026 16:09:11 -0800
+In-Reply-To: <ck57mmdt5phh64cadoqxylw5q2b72ffmabmlzmpphaf27lbtxw@4kscovf6ahve>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <CALMp9eQmwsND7whnvVof1i=OsCdo6wcwBWyDRwS3Ud69WkKf-g@mail.gmail.com>
- <20260208211342.GBaYj8hhtYM-lYfq-X@fat_crate.local> <CALMp9eSVB=iRec2A0tmRzkTBa9zz4BVS8Lu79vUuRPrTawYFcQ@mail.gmail.com>
- <e19b9666-b224-4fbd-92c9-82c712916a07@suse.de> <aYn3_PhRvHPCJTo7@google.com>
- <20260209153243.GBaYn-G02QE86Fje7g@fat_crate.local> <aYoLcPkjJChCQM7E@google.com>
- <20260209174559.GDaYodVxWsiesiedLJ@fat_crate.local> <aYpNzX8KhnQTmzyH@google.com>
- <20260210200711.GCaYuP74dOknGNV1DT@fat_crate.local>
-Message-ID: <aYvD6IHpEgS0DZBT@google.com>
-Subject: Re: [PATCH] KVM: x86: synthesize TSA CPUID bits via SCATTERED_F()
+References: <20260210005449.3125133-1-yosry.ahmed@linux.dev>
+ <20260210005449.3125133-2-yosry.ahmed@linux.dev> <aYqOkvHs3L-AX-CG@google.com>
+ <4g25s35ty23lx2je4aknn6dg4ohviqhkbvvel4wkc4chhgp6af@kbqz3lnezo3j>
+ <aYuE8xQdE5pQrmUs@google.com> <ck57mmdt5phh64cadoqxylw5q2b72ffmabmlzmpphaf27lbtxw@4kscovf6ahve>
+Message-ID: <aYvIpwjsJ50Ns4ho@google.com>
+Subject: Re: [PATCH 1/4] KVM: nSVM: Sync next_rip to cached vmcb12 after VMRUN
+ of L2
 From: Sean Christopherson <seanjc@google.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: "Carlos =?utf-8?B?TMOzcGV6?=" <clopez@suse.de>, Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, 
-	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, 
-	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>, Babu Moger <bmoger@amd.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70813-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70814-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
@@ -113,172 +109,280 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AE69D1202D8
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CE4681203A9
 X-Rspamd-Action: no action
 
-On Tue, Feb 10, 2026, Borislav Petkov wrote:
-> On Mon, Feb 09, 2026 at 01:12:45PM -0800, Sean Christopherson wrote:
-> > On Mon, Feb 09, 2026, Borislav Petkov wrote:
-> > > On Mon, Feb 09, 2026 at 08:29:36AM -0800, Sean Christopherson wrote:
-> > > > Nope.  KVM cares about what KVM can virtualize/emulate, and about helping userspace
-> > > > accurately represent the virtual CPU that will be enumerated to the guest.
+On Tue, Feb 10, 2026, Yosry Ahmed wrote:
+> On Tue, Feb 10, 2026 at 11:20:19AM -0800, Sean Christopherson wrote:
+> > > > Actually, I take that back, I have no idea how this code works.  How does e.g.
+> > > > exit_info_1 not get clobbered on save/restore?
 > > > 
-> > > So why don't you key on that in those macros instead of how they're defined?
-> > > 
-> > > 	EXPOSE_TO_GUEST_F()
-> > > 
-> > > and then underneath we can figure out how to expose them.
+> > > I *think* KVM always sets the error_code and exit_info_* fields before
+> > > synthesizing a #VMEXIT to L1, usually right before calling
+> > > nested_svm_vmeit(), so no chance for save/restore in between.
 > > 
-> > Huh?  That's what the macros do, they describe KVM's handling of the associated
-> > feature.  SYNTHESIZED is a bit weird because it bleeds some kernel details into
-> > KVM, but ultimately it's still KVM decision as to whether or not "forced" features
-> > can be synthesized for the guest.
+> > Ugh, right, KVM generally doesn't recognize signals until after invoking the exit
+> > handler.  Actually, even that isn't the key, it's that this flaw only affects
+> > "in/out" fields, as you note above.  Heh, and even that probably isn't entirely
+> > precise, as it's really "in/out fields that KVM consumes while running L2 are
+> > buggy".  E.g. in this case, nested_vmcb02_prepare_control() pulls next_rip for
+> > vmcb02 from the cache.
+> > 
+> > 	if (guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS))
+> > 		vmcb02->control.next_rip    = svm->nested.ctl.next_rip;
+> > 	else if (boot_cpu_has(X86_FEATURE_NRIPS))
+> > 		vmcb02->control.next_rip    = vmcb12_rip;
 > 
-> My point is that you have to know *which* macro of all the available ones you
-> need to use, in order to expose the feature. This thread is a case-in-point
-> example about how it can get confusing. And it dudn't have to...
+> Hmm I thin a pure "out" field would be affected if it's consumed by KVM
+> later on, after save+restore is possible, right?
 
-Yes, it did have to.  These are the choices.  Whether they're in raw C code,
-macro hell, or a spreadsheet, the choices remain the same.
+True.
 
-> > > We could have a helper table which determines what each feature is and how it
-> > > should interact with raw host CPUID or something slicker.
+> Do you mean that it just happens that the currently affected fields are
+> "in/out" fields? Or is there a reason why pure "out" fields cannot be
+> affected? AFAICT, these fields are lost after save+restore.
+
+I was essentially assuming KVM wouldn't ever consume pure out fields from the
+cache.
+
+
+> > > > In other words, AFAICT, nested.ctl.int_ctl is special in that KVM needs it to be
+> > > > up-to-date at all times, *and* it needs to copied back to vmcb12 (or userspace).
 > > > 
-> > > >   F               : Features that must be present in boot_cpu_data and raw CPUID
-> > > >   SCATTERED_F     : Same as F(), but are scattered by the kernel
+> > > Hmm actually looking at nested.ctl.int_ctl, I don't think it's that special.
+> > > Most KVM usages are checking "in" bits, i.e. whether some features (e.g.
+> > > vGIF) are enabled or not.
+> > >
+> > > The "out" bits seem to only be consumed by svm_clear_vintr(), and I
+> > > think this can be worked around.
+> > 
+> > OMG that code makes my head hurt.  Isn't that code just this?
+> > 
+> > 	/*
+> > 	 * Drop int_ctl fields related to VINTR injection.  If L2 is active,
+> > 	 * restore the virtual IRQ flag and its vector from vmcb12 now that KVM
+> > 	 * is done usurping virtual IRQs for its own purposes.
+> > 	 */
+> > 	svm->vmcb01.ptr->control.int_ctl &= ~V_IRQ_INJECTION_BITS_MASK;
+> > 
+> > 	if (is_guest_mode(&svm->vcpu)) {
+> > 		svm->vmcb->control.int_ctl = (svm->vmcb->control.int_ctl & ~V_IRQ_MASK) |
+> > 					     (svm->nested.ctl.int_ctl & V_IRQ_MASK);
 > 
-> Right, so what happens if we unscatter a leaf?
+> Also V_INTR_PRIO_MASK, I think?
 
-The build will fail.  Explicitly because of this:
+Ugh, yes.  And I think V_IGN_TPR as well?  I can't tell if that's a bug or not.
+It looks like a bug.  AFAICT, svm_set_vintr() uses whatever V_IGN_TPR_MASK value
+happens to be in vmcb02.  I don't see how that can be desirable.
 
-	BUILD_BUG_ON(X86_FEATURE_##name >= MAX_CPU_FEATURES);	\
-
-and also because attempting to defined the CPUID_fn_idx_REG enum will collide
-with the existing enum in kvm_only_cpuid_leafs, and we'll go unscatter the KVM
-code.
-
-Even without those safeguards, everything would be totally fine, the "overhead"
-is negligible.  In other words, scattered leafs require a bit of extra code to
-handle correctly in KVM, whereas normal F() leaves Just Work.
-
-> And why does it matter to KVM if the baremetal feature is scattered or not?
-> KVM should only care whether the kernel has set it or not.
-
-Because KVM needs to query features in _guest_ CPUID, and so the bit position
-must match the architectural values.  KVM also cares if the feature is present
-in raw CPUID.
-
-E.g. X86_FEATURE_SGX1 is bit 8 in Linux-defined word 11.  But in CPUID, SGX1 is
-bit 0 in CPUID.0x12.0.EAX.  If KVM tried to query bit 8 in CPUID.0x12.0.EAX, it
-would read garbage.
-
-> > > >   X86_64_F        : Same as F(), but are restricted to 64-bit kernels
-> > > >   EMULATED_F      : Always supported; the feature is unconditionally emulated in software
+> But otherwise yeah I think that's what the function is doing
+> more-or-less.
 > 
-> And an emulated feature *can* be scattered or synthesized or whatever...
-
-Yep.
-
-> > > >   SYNTHESIZED_F   : Features that must be present in boot_cpu_data, but may or
-> > > >                     may not be in raw CPUID.  May also be scattered.
+> > 		svm->vmcb->control.int_vector = svm->nested.ctl.int_vector;
+> > 	} else {
+> > 		WARN_ON_ONCE(svm->vmcb != svm->vmcb01.ptr);
+> > 	}
+> > 
+> > 	svm_clr_intercept(svm, INTERCEPT_VINTR);
+> > 	vmcb_mark_dirty(svm->vmcb, VMCB_INTR);
+> > 
+> > > So maybe we don't really need to keep it up-to-date in the cache at all
+> > > times.
+> > 
+> > Yeah, IMO that approach is unnecessarily convoluted.  The actual logic isn't all
+> > that complex, all of the complexity comes from juggling state between the cache
+> > and vmcb02 just so that the cache can be authoritative.  Given that we failed
+> > miserably in actually making the cache authoritative, e.g. see the nested #VMEXIT
+> > flow, I think we should kill the entire concept and instead maintain an *exact*
 > 
-> So which one do I use here?
+> When you say *exact* snapshot, do you mean move all the sanitizing logic
+> recently introduced in __nested_copy_vmcb_control_to_cache() (by Kevin
+> and myself) to sanitize vmcb02 instead?
+
+Oh, no, not _that_ exact.  More "unchanged after emulated VMRUN"
+
+> That would be annoying. For example, for the intercepts, sanitizing
+> vmcb02 (but not vmcb12) means that we need to also add checks in the
+> exit path (i.e. in nested_svm_intercept() or even
+> vmcb12_is_intercept()), as vmcb12 could have illegal intercepts.
 > 
-> This is the confusion I'm taking about.
-
-For the TSA stuff?  SYNTHESIZED_F(), because KVM's ABI is to advertise support
-for the "features" even if they're not present in raw CPUID, so long as they're
-supported by the host kernel.
-
-> > > >   PASSTHROUGH_F   : Features that must be present in raw CPUID, but may or may
-> > > >                     not be present in boot_cpu_data
+> > snapshot of vmcb12's controls, and then make vmcb02 authoritative.  We'll still
+> > need the logic in nested_sync_control_from_vmcb02() to updated int_ctl on save
+> > or #VMEXIT if KVM is still intercepting VINTR for its own purposes, but at least
+> > the code will be contained.
 > 
-> Maybe there's a reason for it but why would the guest care if the feature is
-> present in raw CPUID or not? The hypervisor controls what the guest sees in
-> CPUID...
+> Yeah. We should leave it out of the vmcb12 cache though.
 
-The VMM controls what the guest sees, _KVM_ does not.
++1
 
-> > > >   ALIASED_1_EDX_F : Features in 0x8000_0001.EDX that are duplicates of identical 0x1.EDX features
-> > > >   VENDOR_F        : Features that are controlled by vendor code, often because
-> > > >                     they are guarded by a vendor specific module param.  Rules
-> > > >                     vary, but typically they are handled like basic F() features
-> > > >   RUNTIME_F       : Features that KVM dynamically sets/clears at runtime, but that
-> > > >                     are never adveristed to userspace.  E.g. OSXSAVE and OSPKE.
+> > Then to make it all but impossible to re-introduce this mess, do something like
+> > this so that someone would have to go way out of their way to try and modify the
+> > cache.
+> > 
+> > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> > index ebd7b36b1ceb..2de6305be9ce 100644
+> > --- a/arch/x86/kvm/svm/svm.h
+> > +++ b/arch/x86/kvm/svm/svm.h
+> > @@ -199,14 +199,13 @@ struct svm_nested_state {
+> >          * we cannot inject a nested vmexit yet.  */
+> >         bool nested_run_pending;
+> >  
+> > -       /* cache for control fields of the guest */
+> > -       struct vmcb_ctrl_area_cached ctl;
+> > -
+> >         /*
+> > -        * Note: this struct is not kept up-to-date while L2 runs; it is only
+> > -        * valid within nested_svm_vmrun.
+> > +        * An opaque, read-only cache of vmcb12 controls, used to query L1's
+> > +        * controls while running L2, e.g. to route intercepts appropriately.
+> > +        * All reads are routed through accessors to make it all but impossible
+> > +        * for KVM to clobber its snapshot of vmcb12.
+> >          */
+> > -       struct vmcb_save_area_cached save;
+> 
+> Is dropping the cached save area intentional?
+
+Yes, I think we should try to drop it.  Assuming the comment is correct and it
+really only 
+
+> We can drop it and make it a local vaiable in nested_svm_vmrun(), and
+> plumb it all the way down. But it could be too big for the stack.
+
+It's 48 bytes, there's no way that's too big.
+
+> Allocating it every time isn't nice either.
+
+> Do you mean to also make it opaque?
+
+I'd prefer to drop it.
+
+> > +       u8 __vmcb12_ctrl[sizeof(struct vmcb_ctrl_area_cached)];
+> 
+> We have a lot of accesses to svm->nested.ctl, so we'll need a lot of
+> clutter to cast the field in all of these places.
+> 
+> Maybe we add a read-only accessor that returns a pointer to a constant
+> struct?
+
+That's what I said :-D
+
+	* All reads are routed through accessors to make it all but impossible
+	* for KVM to clobber its snapshot of vmcb12.
+
+There might be a lot of helpers, but I bet it's less than nVMX has for vmcs12.
+
+> >         bool initialized;
+> > 
+> > > > Part of me wants to remove these two fields entirely:
+> > > > 
+> > > > 	/* cache for control fields of the guest */
+> > > > 	struct vmcb_ctrl_area_cached ctl;
+> > > > 
+> > > > 	/*
+> > > > 	 * Note: this struct is not kept up-to-date while L2 runs; it is only
+> > > > 	 * valid within nested_svm_vmrun.
+> > > > 	 */
+> > > > 	struct vmcb_save_area_cached save;
+> > > > 
+> > > > and instead use "full" caches only for the duration of nested_svm_vmrun().  Or
+> > > > hell, just copy the entire vmcb12 and throw the cached structures in the garbage.
+> > > > But that'll probably end in a game of whack-a-mole as things get moved back in.
 > > > 
-> 
-> Also, we're rewriting the whole CPUID handling on baremetal and someday the
-> CPUID table in the kernel will be the only thing you query - not the CPUID
-> insn.
-
-Perhaps.  But the only if the table provides both the kernel's configuration *and*
-raw CPUID, and is 100% comprehensive.  And even if that happens, it won't change
-anything about KVM's macros, except I guess remove the need for SCATTERED_F() if
-the tables are truly comprehensive.
-
-> Then those names above become wrong/obsolete.
-
-No, because the concepts won't change.  The code may look different, and KVM may
-need to #define a pile of things to do what it needs to do, but the semantics of
-how KVM supports various features isn't changing.
-
-> > > And for the time being, I'd love if this were somewhere in
-> > > arch/x86/kvm/cpuid.c so that it is clear how one should use those macros.
+> > > Yeah, KVM needs to keep some of the fields around :/
 > > 
-> > I'll a patch with the above and more guidance.
+> > For me, that's totally fine.  As above, the problem I see is that there is no
+> > single source of truth, i.e. that the authoritative state is spread across vmcb02
+> > and the cache.
 > > 
-> > > The end goal of having the user not care about which macro to use would be the
-> > > ultimate, super-duper thing tho.
+> > > > So rather than do something totally drastic, I think we should kill
+> > > > nested_copy_vmcb_cache_to_control() and replace it with a "save control" flow.
+> > > > And then have it share code as much code as possible with nested_svm_vmexit(),
+> > > > and fixup nested_svm_vmexit() to not pull from svm->nested.ctl unnecessarily.
+> > > > Which, again AFICT, is pretty much limited to int_ctl: either vmcb02 is
+> > > > authoritative, or KVM shouldn't be updating vmcb12, and so only the "save control"
+> > > > for KVM_GET_NESTED_STATE needs to copy from the cache to the migrated vmcb12.
+> > > 
+> > > I think this works if we draw a clear extinction between "in","out", and
+> > > "in/out" fields, which is not great because some fields (like int_ctl)
+> > > have different directions for different bits :/
+> > > 
+> > > But if we do draw that distinction, and have helpers that copy fields
+> > > based on direction, things become more intuitive:
+> > > 
+> > > During nested VMRUN, we use the "in" and "in/out" fields from cached
+> > > vmcb12 to construct vmcb02 through nested_vmcb02_prepare_control().
+> > > 
+> > > During save, we save "in" fields from the cached vmcb12, "out" and
+> > > "in/out" fields from vmcb02.
+> > > 
+> > > During restore, we use the "in" and "in/out" fields from the restored
+> > > payload to construct vmcb02 through nested_vmcb02_prepare_control(), AND
+> > > update the "out" fields as well from the payload.
 > > 
-> > And impossible, for all intents and purposes.  The user/contributor/developer
-> > needs to define KVM's handling semantics *somehwere*. 
+> > Why the last part?  If L2 is active, then the pure "out" fields are guaranteed
+> > to be written on nested #VMEXIT.  Anything else simply can't work.
 > 
-> I still don't get this: why does KVM need to know whether a X86_FEATURE is
-> scattered or synthesized or whatnot?
+> I think it just so happens that all pure "out" fields are consumed by
+> KVM before save+restore is possible, but it is possible for an "out"
+> field to be used by KVM at a later point, or copied from vmcb02 to
+> vmcb12 during nested #VMEXIT (e.g. if KVM exits to L1 directly after
+> save+restore, before running L2).
 
-See above regarding scattered.  As for synthesized, KVM is paranoid and so by
-default, requires features to be supported by the host kernel *and* present in
-raw CPUID in order to advertise support to the guest.  Whether or not the paranoia
-is justified is arguable, but in practice it costs KVM almost nothing, and at the
-very least, IMO it's very helpful to document KVM's exact expectations/rules.
+Ya.
 
-> > Sure, we could to that in a big array or something, but that's just
-> > a different way of dressing up the same pig.  All of this very much is an
-> > ugly pig, but it's the concepts and mechanics that are ugly and convoluted.
+> next_rip and int_state fall in this bucket, it just happens to also be
+> an "in" field.
 > 
-> Well, if we're redoing how feature flags and CPUID leafs etc are being handled
-> on baremetal, why not extend that handling so that KVM can put info there too,
-> about each feature and how it is going to be exposed to the guest instead of
-> doing a whole bucket of _F() macros?
-
-Because IMO, that would be a huge net negative.  I have zero desire to go lookup
-a table to figure out KVM's rules for supporting a given feature, and even less
-desire to have to route KVM-internal changes through a giant shared table.  I'm
-also skeptical that a table would provide as many safeguards as the macro magic,
-at least not without a lot more development.
-
-> > E.g. if we define a giant array or table, the contributor will need to map the
-> > feature to one of the above macros.
+> For example, if support for decode assists is added, there will be cases
+> where KVM just copies insn_bytes from vmcb02 to vmcb12 on nested
+> #VMEXIT. If insn_bytes is lost on save+restore, and KVM immediately
+> exits to L1 after restore, insn_bytes is lost.
 > 
-> We are on the way to a giant array/table anyway:
+> So we need to also save+restore pure "out" fields, which we do not do
+> today.
+
+Hmm, strictly speaking, no.  We'd be fixing a bug that doesn't exist, yet.  But
+the word yet...
+
+> > > During synthesized #VMEXIT, we save the "out" and "in/out" fields from
+> > > vmcb02 (shared part with save/restore).
+> > 
+> > Yeah, that all works.  We could also treat save() as an extension of #VMEXIT, but
+> > that could make KVM_GET_NESTED_STATE non-idempotent (which might already be the
+> > case for VMX?).  I.e. we could sync vmcb02 to vmcb12 (cache), and then copy that
+> > to userspace.
 > 
-> https://lore.kernel.org/r/20250905121515.192792-1-darwi@linutronix.de
-
-Using something like that for the core kernel makes a lot of sense.  But I don't
-see what would be gained by shoehorning KVM's ABI into that table.
-
-> > In other words, kvm_initialize_cpu_caps() _is_ the helper table.
+> I think this will require adding more fields to the cache, but wait, we
+> already have a lot of "out" fields there but I don't think they are
+> being used at all..
 > 
-> $ git grep kvm_initialize_cpu_caps
-> $
+> Anyway, this may make things simpler. Instead of pulling different
+> fields from either cached vmcb12 and vmcb02, we always combine them
+> first. I will keep that in mind.
 > 
-> I'm on current Linus/master.
+> > 
+> > > The save/restore changes would need a flag to avoid restoring garbage
+> > > from an older KVM.
+> > 
+> > I don't follow.  I was thinking we'd only change how KVM maintains authoritative
+> > state while runnign L2, i.e. not make any changes (other than fixes) to the
+> > serialized state for save/restore.
+> 
+> I thought we're not currently saving "out" fields at all, but
+> apparently we are, we just do not use them in svm_set_nested_state(). So
+> we probably do not need a flag. Even if some fields are not currently
+> copied, I assume KVM restoring garbage from an older KVM is no worse
+> than having uninitialized garbage :)
 
-Ah, sorry, it's kvm_set_cpu_caps() until this pull request:
+Heh, yep.
 
-https://lore.kernel.org/all/20260207041011.913471-5-seanjc@google.com
+> I think this will be annoying when new fields are added, like
+> insn_bytes. Perhaps at some point we move to just serializing the entire
+> combined vmcb02/vmcb12 control area and add a flag for that.
+
+If we do it now, can we avoid the flag?
 
