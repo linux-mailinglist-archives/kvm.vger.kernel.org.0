@@ -1,205 +1,185 @@
-Return-Path: <kvm+bounces-70844-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70845-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UKQCBLiAjGl9pwAAu9opvQ
-	(envelope-from <kvm+bounces-70844-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 14:14:32 +0100
+	id iNB4BpeFjGmfqAAAu9opvQ
+	(envelope-from <kvm+bounces-70845-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 14:35:19 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66FC9124ADB
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 14:14:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DFEB124CED
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 14:35:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2B7D13018D7D
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 13:13:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 634283034645
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 13:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03DA8322B6F;
-	Wed, 11 Feb 2026 13:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773DA27B34E;
+	Wed, 11 Feb 2026 13:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="IhQf8LnX"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE58D34EF06
-	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 13:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B4F1FDA61;
+	Wed, 11 Feb 2026 13:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770815590; cv=none; b=pGw96F/tdKeWXAVNiJo4opCv+vVGza58k8LoMVL/ljLfKwYZdeqE7SwKjkfjDsg2U9v9ADTDbK6S8F+KHn4Pziut6XYgUcEl1jFzN0sYw0Ubm4WuKsDQnzsct7nyWS+EY4HXDanMjaB8skyv+tghxj4h/O0LkGlCKvJNNhMTvNk=
+	t=1770816776; cv=none; b=A4p1He3otYJ+jpaqeBd4CAkvDE0+Rknbdwr7Ba2glO4yrRTpeCH53H5nHslcpcgXjW1y42jqyQ4h6OSJCqy8ulWVkpl88u5fllqyFwI91Cg2m7vH4jf+QqjkS4Qlg8xS3MzR0ImZmeCUgXRtCBOkS3pgMIamO71TD/R8OZjcBAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770815590; c=relaxed/simple;
-	bh=alrf6TfuhUPofETleLNrR3lGep1rMhDWTYKqFVhS+1w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hui1RVUJ0dmDANKm/qT4bXpDNToymw7UT/XWtnjfwZk9MidXu6yIqhGaByePZl2Szbi2DLdODSnspV1eoJznQpZC9HXGKhvHP8RtaXkvM3oFEKlommlxRX/UcwLzQKNxoCt+gz6aHIj+g+wNasVLWBOmfthQx+wf4ZwSidOzTZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 28167339;
-	Wed, 11 Feb 2026 05:13:02 -0800 (PST)
-Received: from orionap.fritz.box (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C885A3F63F;
-	Wed, 11 Feb 2026 05:13:06 -0800 (PST)
-From: Andre Przywara <andre.przywara@arm.com>
-To: Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc: Marc Zyngier <maz@kernel.org>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH kvmtool v6 6/6] arm64: Handle virtio endianness reset when running nested
-Date: Wed, 11 Feb 2026 13:12:49 +0000
-Message-ID: <20260211131249.399019-7-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260211131249.399019-1-andre.przywara@arm.com>
-References: <20260211131249.399019-1-andre.przywara@arm.com>
+	s=arc-20240116; t=1770816776; c=relaxed/simple;
+	bh=g/GetwdgXSD/xOBMKj8OrlB9rpaJVIJD4oSieh9mPtE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q+jfEyWdUG1/CaYt/WP92U5Rin59i/mUoefBr5F25S0evTK/B1mdtBc9aovVqOeQoEMtupGnRGY2nBiAyLRBUp0hw84LikesDbxpoVakA6OK4Na92UVrLasTi/taiq/GMNYF8EOdBVUyy+KNOyrVnLI7+6j+iNLjhT6AZQU6GEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=IhQf8LnX; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C6E7E40E036A;
+	Wed, 11 Feb 2026 13:32:51 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id ZRhpbI53fyIZ; Wed, 11 Feb 2026 13:32:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1770816767; bh=+3hvh3COznYSlONvJ1K2yVwHlJ+zq2d4iHs6m3j8Gzw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IhQf8LnXD6E5YwFHuBLwZF4FU5+xYpNv5zljDwkg4/iM7NoImBhFEoMnTReW4Jrya
+	 xmPdgsyA/b7OOLig4LMgWvz4NW0Jd9eNqQeAkR0hPhTW5mFRMCcL6GIrsQXc/XK1Vi
+	 mjxGL1iy5VuVJ/TKBTB32yMBk8ke9qmtt0nmuZc7Hb8KkPcjwWZ4lebXioJ0s0qDZd
+	 WmDjDxVOHSYrvVD+VsT62rkU//dBWSaE/lYouxrt7F66mAnCA05bp9n5yIj7RLFtyo
+	 DcOtkheX31niVpVbeUsLKFi6bYBxqlnKZEkXxZ3D75GwaUWhgppxoPHFbXF4m7qY4o
+	 jgADIlIJ7EvxF+mmtbNwL6PcnH/wLw1oWpRgbU4tU70OBwZQdwd5pj7vlj282FCdRB
+	 D+xy0rvVKGq4pKIWjWNrwGoPNgxOV8LklbVB4nAgNqQIXrpxxIejDapXdOQReNWQcU
+	 MFtUKMBOd9SkxpAKoClt9OJhIswlq8aESGeq1YLoGVy0WMNhaQErarRDjanKGbePJL
+	 5cC53p6vK87DnVrb0RlrcIHJuDbKXrOx2mvQRAIJ7YcWMMICR1Zidz08R0n8x4sPAZ
+	 Gk0PYvfMdEdQ9+A4xRJHkFdR/+E68cbTsj3mzdPtsP8AjcoU947xK3DSg41t7aV9h/
+	 QM2kuuzqTrdVsaovcuxHwxYs=
+Received: from zn.tnic (pd95306e3.dip0.t-ipconnect.de [217.83.6.227])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id A3F0040E0367;
+	Wed, 11 Feb 2026 13:32:35 +0000 (UTC)
+Date: Wed, 11 Feb 2026 14:32:26 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Carlos =?utf-8?B?TMOzcGV6?= <clopez@suse.de>,
+	Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <linux-kernel@vger.kernel.org>,
+	Babu Moger <bmoger@amd.com>
+Subject: Re: [PATCH] KVM: x86: synthesize TSA CPUID bits via SCATTERED_F()
+Message-ID: <20260211133226.GCaYyE6u_IMik5DY4m@fat_crate.local>
+References: <20260208211342.GBaYj8hhtYM-lYfq-X@fat_crate.local>
+ <CALMp9eSVB=iRec2A0tmRzkTBa9zz4BVS8Lu79vUuRPrTawYFcQ@mail.gmail.com>
+ <e19b9666-b224-4fbd-92c9-82c712916a07@suse.de>
+ <aYn3_PhRvHPCJTo7@google.com>
+ <20260209153243.GBaYn-G02QE86Fje7g@fat_crate.local>
+ <aYoLcPkjJChCQM7E@google.com>
+ <20260209174559.GDaYodVxWsiesiedLJ@fat_crate.local>
+ <aYpNzX8KhnQTmzyH@google.com>
+ <20260210200711.GCaYuP74dOknGNV1DT@fat_crate.local>
+ <aYvD6IHpEgS0DZBT@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aYvD6IHpEgS0DZBT@google.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.64 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[alien8.de,none];
+	R_DKIM_ALLOW(-0.20)[alien8.de:s=alien8];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70844-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andre.przywara@arm.com,kvm@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70845-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	R_DKIM_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bp@alien8.de,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[alien8.de:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arm.com:mid,arm.com:email,reg.id:url,sctlr_el1.ee:url]
-X-Rspamd-Queue-Id: 66FC9124ADB
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[alien8.de:dkim,fat_crate.local:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6DFEB124CED
 X-Rspamd-Action: no action
 
-From: Marc Zyngier <maz@kernel.org>
+On Tue, Feb 10, 2026 at 03:48:56PM -0800, Sean Christopherson wrote:
+> See above regarding scattered.  As for synthesized, KVM is paranoid and so by
+> default, requires features to be supported by the host kernel *and* present in
+> raw CPUID in order to advertise support to the guest.
 
-When running an EL2 guest, we need to make sure we don't sample
-SCTLR_EL1 to work out the virtio endianness, as this is likely
-to be a bit random.
+Yes, it will check for X86_FEATURE to be and then look at CPUID.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm64/include/kvm/kvm-cpu-arch.h |  5 ++--
- arm64/kvm-cpu.c                  | 47 +++++++++++++++++++++++++-------
- 2 files changed, 40 insertions(+), 12 deletions(-)
+> Because IMO, that would be a huge net negative.  I have zero desire to go lookup
+> a table to figure out KVM's rules for supporting a given feature, and even less
+> desire to have to route KVM-internal changes through a giant shared table.  I'm
+> also skeptical that a table would provide as many safeguards as the macro magic,
+> at least not without a lot more development.
 
-diff --git a/arm64/include/kvm/kvm-cpu-arch.h b/arm64/include/kvm/kvm-cpu-arch.h
-index 1af394a..85646ad 100644
---- a/arm64/include/kvm/kvm-cpu-arch.h
-+++ b/arm64/include/kvm/kvm-cpu-arch.h
-@@ -10,8 +10,9 @@
- #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
- #define ARM_CPU_ID		3, 0, 0, 0
- #define ARM_CPU_ID_MPIDR	5
--#define ARM_CPU_CTRL		3, 0, 1, 0
--#define ARM_CPU_CTRL_SCTLR_EL1	0
-+#define SYS_SCTLR_EL1		3, 4, 1, 0, 0
-+#define SYS_SCTLR_EL2		3, 4, 1, 0, 0
-+#define SYS_HCR_EL2		3, 4, 1, 1, 0
- 
- struct kvm_cpu {
- 	pthread_t	thread;
-diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
-index 5e4f3a7..35e1c63 100644
---- a/arm64/kvm-cpu.c
-+++ b/arm64/kvm-cpu.c
-@@ -12,6 +12,7 @@
- 
- #define SCTLR_EL1_E0E_MASK	(1 << 24)
- #define SCTLR_EL1_EE_MASK	(1 << 25)
-+#define HCR_EL2_TGE		(1 << 27)
- 
- static int debug_fd;
- 
-@@ -408,7 +409,8 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
- {
- 	struct kvm_one_reg reg;
- 	u64 psr;
--	u64 sctlr;
-+	u64 sctlr, bit;
-+	u64 hcr = 0;
- 
- 	/*
- 	 * Quoting the definition given by Peter Maydell:
-@@ -419,8 +421,9 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
- 	 * We first check for an AArch32 guest: its endianness can
- 	 * change when using SETEND, which affects the CPSR.E bit.
- 	 *
--	 * If we're AArch64, use SCTLR_EL1.E0E if access comes from
--	 * EL0, and SCTLR_EL1.EE if access comes from EL1.
-+	 * If we're AArch64, determine which SCTLR register to use,
-+	 * depending on NV being used or not. Then use either the E0E
-+	 * bit for EL0, or the EE bit for EL1/EL2.
- 	 */
- 	reg.id = ARM64_CORE_REG(regs.pstate);
- 	reg.addr = (u64)&psr;
-@@ -430,16 +433,40 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
- 	if (psr & PSR_MODE32_BIT)
- 		return (psr & COMPAT_PSR_E_BIT) ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
- 
--	reg.id = ARM64_SYS_REG(ARM_CPU_CTRL, ARM_CPU_CTRL_SCTLR_EL1);
-+	if (vcpu->kvm->cfg.arch.nested_virt) {
-+		reg.id = ARM64_SYS_REG(SYS_HCR_EL2);
-+		reg.addr = (u64)&hcr;
-+		if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+			die("KVM_GET_ONE_REG failed (HCR_EL2)");
-+	}
-+
-+	switch (psr & PSR_MODE_MASK) {
-+	case PSR_MODE_EL0t:
-+		if (hcr & HCR_EL2_TGE)
-+			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
-+		else
-+			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
-+		bit = SCTLR_EL1_E0E_MASK;
-+		break;
-+	case PSR_MODE_EL1t:
-+	case PSR_MODE_EL1h:
-+		reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
-+		bit = SCTLR_EL1_EE_MASK;
-+		break;
-+	case PSR_MODE_EL2t:
-+	case PSR_MODE_EL2h:
-+		reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
-+		bit = SCTLR_EL1_EE_MASK;
-+		break;
-+	default:
-+		die("What's that mode???\n");
-+	}
-+
- 	reg.addr = (u64)&sctlr;
- 	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
--		die("KVM_GET_ONE_REG failed (SCTLR_EL1)");
-+		die("KVM_GET_ONE_REG failed (SCTLR_ELx)");
- 
--	if ((psr & PSR_MODE_MASK) == PSR_MODE_EL0t)
--		sctlr &= SCTLR_EL1_E0E_MASK;
--	else
--		sctlr &= SCTLR_EL1_EE_MASK;
--	return sctlr ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
-+	return (sctlr & bit) ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
- }
- 
- void kvm_cpu__show_code(struct kvm_cpu *vcpu)
+Lemme cut to the chase because it seems to me like my point is not coming
+across:
+
+We're changing how CPUID is handled on baremetal. Consider how much trouble
+there was and is between how the baremetal kernel handles CPUID features and
+how KVM wants to handle them and how those should be independent but they
+aren't and if we change baremetal handling - i.e., unscatter a leaf - we break
+KVM, yadda yadda, and all the friction over the years.
+
+Now we have the chance to define that cleanly and also accomodate KVM's needs.
+
+As in, you add a CPUID flag in baremetal and then in the representation of
+that flag in our internal structures, there are KVM-specific attributes which
+are used by it to do that feature flag's representation to guests.
+
+The new scheme will get rid of the scattered crap as it is not needed anymore
+- we'll have the *whole* CPUID leaf hierarchy. Now wouldn't it be lovely to
+have a
+
+	.kvm_flags = EMULATED_F | X86_64_F ... RUNTIME_F
+
+which is per CPUID feature bit and which KVM code queries?
+
+SCATTERED_F, SYNTHESIZED_F, PASSTHROUGH_F become obsolete.
+
+No need for those macros, adding new CPUID feature flags would mean simply
+adding those .kvm_flags things which denote what KVM does with the feature.
+Not how it is defined internally.
+
+And then everything JustWorks(tm) naturally without having to deal with those
+macros.
+
+And you'd get rid of the KVM-only CPUID leafs too because everything will be
+in one central place.
+
+Now why wouldn't you want that wonderful and charming thing?!
+
+:-)
+
 -- 
-2.47.3
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
