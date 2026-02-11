@@ -1,251 +1,214 @@
-Return-Path: <kvm+bounces-70849-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70850-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4OnzN4+KjGmHqgAAu9opvQ
-	(envelope-from <kvm+bounces-70849-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 14:56:31 +0100
+	id eHssDX+NjGn5qwAAu9opvQ
+	(envelope-from <kvm+bounces-70850-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 15:09:03 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6554912500D
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 14:56:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D844125136
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 15:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0C469301E959
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 13:55:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1F06C301FA60
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 14:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D44C331235;
-	Wed, 11 Feb 2026 13:55:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 759482BD5A2;
+	Wed, 11 Feb 2026 14:08:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="VfQFmH1O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RDJXn7Q4"
 X-Original-To: kvm@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010008.outbound.protection.outlook.com [52.101.61.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A43244186;
-	Wed, 11 Feb 2026 13:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770818142; cv=fail; b=aNUla1c3ZSGnPR90zaI6nztNY5b97y+/gG4fTBzsZRVXIdJ+q8qy2JgGe/5ligknozGr1wVoIRbDbPJf9BeduHhqHg8yRcOS7W6X7hzNbRWHeN5kLbte+UChA8TBEfCMp0ioUEb/LOI4YuxnOsXKRcycrBn9v9MjkuvsPfldx0c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770818142; c=relaxed/simple;
-	bh=DBJKVaNvizl76RESdHDkKujbU53hQiiNsvMddljfI78=;
-	h=Message-ID:Date:Cc:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=a1A5CJI/7IvPOwyGtnURw8jgmc2ea9JIULEQMazkXer0KmV9H9puFON1Cno8H9RRrm+p6BEwPu9luAa0rwkm38UV+iFRIczgK+cGVuxb4KuMx3/OEGijVUuAgxb6pnoYqYcDWXq8qDd3chfO5OhQ7TPJNUPvmrMWCOfKFnOhho8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=citrix.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=VfQFmH1O; arc=fail smtp.client-ip=52.101.61.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=citrix.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OSzGV34ig9JQ0jOfFFWR8AyRxkLYasq6KfajF7WhpHASoRQ9VniFErAOWhp7v7498sgMA3YAK3UgYp7UvfrOpY/5TmGllxokUOibQkigv+xtC8cFUGiv/op5b9xSu+PJHCzy/rA3E69XW7IrzxqrE8WIE8FJJnqciy+qfjjfcimh1gJ2RbYSq44dXtH534QUppdgZnNHaGOo6CF82kKAZKSNxNbaiMIkQGS+mv4KPT8SJRklqScLLpIGUkSul05dYzqPxFndfIaf8H1gUmaknuE028JUOcjg4QEZ340Ljq8sPOSkv2GhH/vD7zW1oIU+hnrJMypQ+31xsOvKEnpSzw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GFE/VyLzaRZk58CL54Ep7h3C+X3F/lrAhGfoAYNAzWg=;
- b=pRL/7V4JqKfNoL0RoexWcXN3CYCd9HTq642iM6hnbbylwzH6uBORLO0oX6LC3TgC7GrxJvPCl4lrWenGJgKamvQa+c1mMJUfIv/dOne74TV+hgW+16wPg9T8HPGwkeQhLqRxJKsDcPbf83uzKuCuKKr0/niJ3ocYIqV2auCJxwTW6bGfsLLsoqLHV8WtnADme2qPeYq1vlds65QhbuoovAMqWO1liZ+GbYXQc7YnukXNG+vDRvI196o6wCBNoLSblYKpm4IE4SD8f1gN6RBPnOi+LiqjcyJWwZUbjo3N31FCH1vJy1Swo56lRJ+ShrfkNurOTPFDIEordLntGwgnnA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
- dkim=pass header.d=citrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=citrix.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GFE/VyLzaRZk58CL54Ep7h3C+X3F/lrAhGfoAYNAzWg=;
- b=VfQFmH1Oo9huXczCLKANlbLIrNrMYzLgsHTEYjeEyx5VYr8ZItOD39fo49h+pRKRGJGu3o6b9AB354Q0k1GP0j1SDQuJ7gNghCTGHhIc6CCu7nUk7ShiVN+WDYIkNB1ltBw0FhQzGg0QDZ/UIVkY1v/c42TKT+iLzsPB7aNYCGE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=citrix.com;
-Received: from CH8PR03MB8275.namprd03.prod.outlook.com (2603:10b6:610:2b9::7)
- by LV4PR03MB8236.namprd03.prod.outlook.com (2603:10b6:408:2e0::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.10; Wed, 11 Feb
- 2026 13:55:39 +0000
-Received: from CH8PR03MB8275.namprd03.prod.outlook.com
- ([fe80::a70d:dc32:bba8:ce37]) by CH8PR03MB8275.namprd03.prod.outlook.com
- ([fe80::a70d:dc32:bba8:ce37%6]) with mapi id 15.20.9611.008; Wed, 11 Feb 2026
- 13:55:39 +0000
-Message-ID: <5276256b-9669-46df-8fcd-b216f3d3e45b@citrix.com>
-Date: Wed, 11 Feb 2026 13:55:35 +0000
-User-Agent: Mozilla Thunderbird
-Cc: Andrew Cooper <andrew.cooper3@citrix.com>, ubizjak@gmail.com,
- bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@kernel.org,
- pbonzini@redhat.com, seanjc@google.com, tglx@kernel.org, x86@kernel.org
-Subject: Re: [PATCH 1/2] KVM: VMX: Drop obsolete branch hint prefixes from
- inline asm
-To: David Laight <david.laight.linux@gmail.com>
-References: <20260211102928.100944-1-ubizjak@gmail.com>
- <2af5e3a8-f520-40fd-96a5-28555c3e4a5e@citrix.com>
- <20260211134342.45b7e19e@pumpkin>
-Content-Language: en-GB
-From: Andrew Cooper <andrew.cooper3@citrix.com>
-In-Reply-To: <20260211134342.45b7e19e@pumpkin>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO4P123CA0646.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:296::15) To CH8PR03MB8275.namprd03.prod.outlook.com
- (2603:10b6:610:2b9::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A743127A927;
+	Wed, 11 Feb 2026 14:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770818892; cv=none; b=bKMRLI+adIeQUZHJ9Fyyf4HG3wDiFXX4f9rjCxO7r1w2ZuIV6Dcodio6OsvAoj/c7VVER1XW3kKseSEx6+LAKEiDbADCu2mapCo/zwI2wONbLEU7/icOWQnDEdZLHzQ64MwTYtRKRuS7bimpala1DOGlT3WdNGxNljPYM0wWqOc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770818892; c=relaxed/simple;
+	bh=eX+/ax3+MlCj6Nl0Lwxh/UZl2tU34lOsCu8RxQueZr0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OnZoI2dRtXuycEFkW7SmPiW6JjRi5ThVT/w8LCx+akfLWTJ+Jxxm2bDu6v/NtoYWaQ31W25Bw62WPntibkLLeb43Nhqmx4FkbOLcpZXyQrf8geeRH88qhqDe3J+2w7ZB+GtRoa/W8t9gylAmifi1cEZWbKTnT/grWQ6rIEmatN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RDJXn7Q4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39442C4CEF7;
+	Wed, 11 Feb 2026 14:08:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770818892;
+	bh=eX+/ax3+MlCj6Nl0Lwxh/UZl2tU34lOsCu8RxQueZr0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RDJXn7Q46ci9ke8jsN3uttNH1SlS4Q+zbsowN4Nr8d1zwSlrRK54IciYl96OSXhSl
+	 K42HKtnlj5tkkkB29E5IGdoE+CSESQZfJkNERQYL84A9FHIlvFHi7ebVDrKd22i2xy
+	 r1a990m91opQq+XoBdwaA1Ep4XonzWIVAvVwpFGEE7UamCBU/4JjrytMOMbQJL/6ka
+	 cGA1huvLxveDJZ7/f+Hnd72dTHvcqhO6O3OkJnELR5n3fFuHHylQZqzfYkJOKR1pBA
+	 wCXdCynDIGtrkJk1ZWCIzsmehYUixtP54Oz8Z7fzV9wu/G9k8np8AvZ4v9rDcaMkL1
+	 OAfuftNfBrwvw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vqAsz-0000000AMKg-3vAV;
+	Wed, 11 Feb 2026 14:08:10 +0000
+Date: Wed, 11 Feb 2026 14:08:09 +0000
+Message-ID: <86ms1fbcfq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvmtool v6 6/6] arm64: Handle virtio endianness reset when running nested
+In-Reply-To: <20260211131249.399019-7-andre.przywara@arm.com>
+References: <20260211131249.399019-1-andre.przywara@arm.com>
+	<20260211131249.399019-7-andre.przywara@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH8PR03MB8275:EE_|LV4PR03MB8236:EE_
-X-MS-Office365-Filtering-Correlation-Id: d175fc1e-a4ad-4637-588d-08de69753d0b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cytKK2JOc3JXb2doQXovRFhKWUtjelFRQ0h4Z1RJWUkvYy8rL0FDdXQ5akVG?=
- =?utf-8?B?Qm4xNkl1eDFNejVXdnJKY2pJc1ZUdTRUZG1ySVFpYzd0Y1N1cXFQQ1pVaUZJ?=
- =?utf-8?B?SXNCYjZ4Ym0vK1I3YTJmMjdGOTZFNEsza2ZKd2RIY0JmVHdXOXNXSXBwNisv?=
- =?utf-8?B?Z1pMUmhzMmJHMWpRQTZPY2pYOW9iWEpJVXdGZWN0YUpseXBMY25OVVZjSDNm?=
- =?utf-8?B?UUEyNlRoWFZvbzFyYU5Ua25YbjdpNTB4dld1ejBsU1hLY0diZHhLRUFxVzJV?=
- =?utf-8?B?Q3dSNytNUHJPVUd6dldxS292MHRzektiYUdlR015cEZrWkVFdVptSnZ5UEpF?=
- =?utf-8?B?L0Y4NDFCSUthaG5RSXNsU2l3UVVOUWoyZ2gwbEh3Z2JYdkRLS05MQWtORzkw?=
- =?utf-8?B?WnozNlJ1U2UwOFFrZGFNeFFyeUtNK1QrRktUZEx6UEx0QXloK1Z4TkQ1MXVQ?=
- =?utf-8?B?WHpPZFB5T2E0QlBhbWpacVUrTU5tNUVYNkhjWnQ5MHZVejVmdW1EM0JYNVpS?=
- =?utf-8?B?UUprNXJhclp5YlFEZWdNUlJMMTFuZ291VG9jeE9mOVRXZE8yNTBIRi9DMnRU?=
- =?utf-8?B?M2VDS3ZNOFF1OGJJZ3BSV203Ujdjcm9pNE9aWk9nZjNLd2xVeHRwMGVlNEJ3?=
- =?utf-8?B?ajZ6THZjTDNqTHhXUGtxMnlNdUZNVVNHd2J0amh5TkhCQjNpMk9DVjVETmhy?=
- =?utf-8?B?NzU5ZmdQU1ZLYzFKcjdudFNaeDdzYkhoNWtEamN2ZlhoTk1jKyszTlp3akkr?=
- =?utf-8?B?SmRyS1FWUUhBU1JrRjU4RWVrUFVnUjJYYjdPTFl4TGp2Y2hxWEJhM1JLdTBj?=
- =?utf-8?B?dFh3azBVazUyaWhLNUFKZC9IdTNlTVJtSHNYRS9lbkpYaWwrank3NHpaRXMx?=
- =?utf-8?B?dDJHZHR2MWQ3WHM0dmkyMGZBRTdwT0IySVc0VGM1ZUVnaXF5U1RURlYyUi9Y?=
- =?utf-8?B?cFdoOE1EL1NqMVBjQWswMmtZcy94L29pb3lVdGNoQ3grdWJQWlBJTGdwVmhJ?=
- =?utf-8?B?SWNBRFd4UUpTcGtiMXV6d2tyM1pyY0E3VUgxMU1qOU02a29vRFI4WDhrMUQ5?=
- =?utf-8?B?cTFmVERFeTg5cXk0SXZTMFNUSnY0Qy8rY3hTL0RlQjBVell5M2FWcGpZNzhT?=
- =?utf-8?B?dTNUTTlrOE1FYjNsOFZmbTVhVUV1RG5zYllrek83SGlENnJHY2J0RFg4YzBh?=
- =?utf-8?B?YkNpWXo1TEZWbEZnWkZodTJFT1RtQ0tJL2RPd01hZVVsYTNLQk82L2ViRFJ1?=
- =?utf-8?B?dFE1QlVBaVdwVHZ0K1NBYXc3MmlFaFV4WnhRVWFSdndySUR3LzV6MnZONjNx?=
- =?utf-8?B?SnY0SktnQS9NdjZPL3doRmYzTnpGb3kwOVM5b0NnQm4xMDJDUFVYN1IvMllE?=
- =?utf-8?B?Q2FnWWFXVXh0Z3RTMjBnSXFPdHNuUUVhK0hrZXdIMlZyQUNZS1lCbWVUWS9y?=
- =?utf-8?B?Wjl4QWswbURtcnJIQ0hhanRHM3RvYWhiK0FjMUFhU2JLN0VMNFA5UWNBK0JK?=
- =?utf-8?B?dzRiNlN0bklyMS9pbVlEdVBoWktSbEpNR1pRMExsc3lSdENHWDFmSzJBcWRx?=
- =?utf-8?B?SHRLQkdteXY5Mmg4VGVMSkhPMnpGM29yd0w3S1hVNm9IcUErcjMyMUhBcHJ3?=
- =?utf-8?B?dG5ML1h6Ly96czZjTFdDRkpUQVlxdlZRbHBNMWE4VXIrOThrU3kwTlpFbjl1?=
- =?utf-8?B?QUVXeXJ0d201K3BqejRkTVhtTjVaMXhwQjIwS0YrYjY3cm9QWnc5SlAwTGZp?=
- =?utf-8?B?a1BGd3RnUTNOS0Q2YmwzQlpwZWF2NnlHb0NqWHd5K1RjanlVMkZhS21RZXlT?=
- =?utf-8?B?YURkSVZ5Nk1uVWJLbEp6NjdZNFNZZmh5cW5EcFl6T295UFdadkR5RUFGTXFa?=
- =?utf-8?B?VmRJcVpiendRMmo5dmxBRDhDbTFsb0ljcjRvMzR3dnVEUGVtSUh4a2dTSWNl?=
- =?utf-8?B?UUVUY21PNTl1UGNQV1NpbjFtcmdzWkVHcVQ5bTA5a3dhNzVxdGlFcFdLYmNL?=
- =?utf-8?B?aUFLZFR5bERLaERjZXhvY3U0NzJkdURoZU9MUmhWalZqVGxlb2Y3Rk0yYkZy?=
- =?utf-8?B?aWdxSDJzeWpCZE5CMGdkVUp1UXBWMWM0N01jQ3Urb1pvb2FkaWRxcGw0cEZy?=
- =?utf-8?Q?0tH4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH8PR03MB8275.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZTZhOVNzWlM3ZUU2V3hKT0lNTU9XcGw3OWdweVZPUHdKdVdwMU40Zk5LY1Nl?=
- =?utf-8?B?WGVySVd5VmZsdTVGdFNIaXVvU0FOekF4dXA3VFlYV2FQZUF1VGkwNVRtTGw0?=
- =?utf-8?B?aXk5ZlBjcU0zUXFaRmFqT0owK1o4TThsUGFTbDNUdnc2VWJndkhHZVdiQ2ZS?=
- =?utf-8?B?c0NqNm04ZDdUdGpGK2JWVzdjVEZ6WTZrc1ZXaDUzcGpON1V3MmtDeEk0WWNu?=
- =?utf-8?B?dlJ1L2pWS1htcVpXY0hyUnAvSWdtNWx0M2RKbDk3SUwyenZNZk1CaVZDQ3hl?=
- =?utf-8?B?N1B0MlJndGEvY1d3SUZMVDkzVm1GbUNUTENLWkc2YUJxV2UwQnEranoyY3JK?=
- =?utf-8?B?aFd6MFVoSC80RjRGWW9ZR2ZNNm9jc0NFWmlYSTRSc01IczNSd28zZkc0R1BM?=
- =?utf-8?B?aDkyeitRSnpOL2lVK0pBRThvcjJNU3Bscmo2UXFIYkh6akJzNVJnOEZ1Umc0?=
- =?utf-8?B?dzBnMmh0QS82ZllBWWFyOTAwOVl4ZS9OUmJES053TVpXYUthaUhXSmdHM0d6?=
- =?utf-8?B?R00vT2M5LzUySkMzWStRV2g1RHh3NWc3RnlXS0Y3dmVhOVNTaWhrK0J6MHZJ?=
- =?utf-8?B?aG9DVEFsRXMwWDZtZE1raXlWL2xyRzNkVWJra3YzN1grK0VyNVJWc2NmNWEz?=
- =?utf-8?B?VCtlM1hJN2kzYXFiSFhsN2FqSjQ3UFIzaXRmRTY4Tnp2Q0tsL29lZkh1TnlW?=
- =?utf-8?B?UEs1RE1GdHpiRlZFOVJDQnQvdTBnaHlXanhLNDFZZkVQcWVOZzdOUHExUml5?=
- =?utf-8?B?UXptWW9kcU9NWEVkNkc4cEEvZUd2VHAzaGYyWmtpQjlLbUx0WVJTaXQzRW9o?=
- =?utf-8?B?Y3BZVkZnSkhJMTBvZldPN2ZPeTZEdlp1ZGIxT2N2aVdGcUx2TjRGSWRwakFy?=
- =?utf-8?B?MFV3V0EveVUzcWhOVW1HYVR4Rm8yMFB2bERPWTdYM05TR3V1U0I4eW5Vb0w1?=
- =?utf-8?B?YWs4bm10TFhnY05ZeEQyenJuRzk2OFhWcUpZWVJ1NFdyc2ZhNndzaVN2c0pN?=
- =?utf-8?B?VnBkYUU0bkxhWE52SkZOa012SE5vY08rVjdYYjBqdCtIbXBYL0Fnc1Z5NVJG?=
- =?utf-8?B?aXJpa1Y0czBoNTdUQ0ZiSFpxdEEzMGpGVEoyQkc5WlhQZ2t4V1JkOTFpY0NL?=
- =?utf-8?B?Y2V0SWhNd0xlNHZXTDFDcEZkeUxFZURFelgrbTBzM3J2ZnQrSWtKUHZMNEQr?=
- =?utf-8?B?SDh0UEhTUlY5eW1wMFE2UC9qc3U3YkNUdTZuN2NBVDVXa3BpWk54d0NsSklz?=
- =?utf-8?B?YmdCRDVJd29pYjVNZHFBcWkvUHNTUkxiQ1hGMTM0a1g4em1DUk1OSzZpSENN?=
- =?utf-8?B?aVUxS2Z4cTVPdTlXMmhrS1N1aVZ1SzdUTGNwOFdua0xTODd3VnhnL05GT281?=
- =?utf-8?B?Q3MxY1ZiOTRRTkl4Ylk4T1FWS3dZaTU2NllqRU9PYU51UFRyMnR4Zm04QTRS?=
- =?utf-8?B?UmpZS1pHNUZibEVRUGgraE9Fd0t0bnBlMVhJMHQ4UXdxallPbGZzY2Jad0JO?=
- =?utf-8?B?T3p4NEgvU0ZLazZ4ZWYzakJZUGJKenBDZmw0c1JNRk5EeFBLM2VNbncwVzgw?=
- =?utf-8?B?UHh2TE5WWFhSN2lvdUphQlNRK09KcHM0RzdIMGdCQjQzeGNyVW9mNDBIMHNG?=
- =?utf-8?B?REVPMEpyMXRVOG1GSWhNSXptU1IzVG9UNUoxcmw4dUZRbWVhdjR2d01RMEZj?=
- =?utf-8?B?ZStxQjVNZndrejc5cmhpclluMUpGKzhtMkFKMERvUnJiZjFOcXhHVGJ3RWYx?=
- =?utf-8?B?ajRNUVJQSVhEYzVLdC9seitOdmNia0JBMXRMbXg1Z216VXRkc2dXTWV4VmhI?=
- =?utf-8?B?R3hFbzRTMEFSaE4zeXl1YnFFcjgvSzB3YXhFRlJzNVJ1dEZVTjg0YTg4SG1v?=
- =?utf-8?B?VFllZjQxbXlXeFl5RWZlUW0wazhKN0ZKUjN5SS9Zc3p4UjYyQUtGQmZJcExN?=
- =?utf-8?B?dVZocmRvVUhIZEpKWitNZmlGeXBBekJQd0cvR0dXSFBlYktSaUpLRVVORzFu?=
- =?utf-8?B?dFBXTnIrRm1uaXJrNm9DRnBWMVI3VDFrOXVNWmYzamhZNWVCaU5pem5Db1FO?=
- =?utf-8?B?akRFMktXQ21KWmt3OFJhOCtRSURKTlBaUDM2RUlYVFM1WWtrYTVpaXRpZVND?=
- =?utf-8?B?Tjk0YWZaZnh5NnU0aURQOGR1Tyt3TzY5Ujc5bGlxcWdDRHgvdW5kWEFVQTBC?=
- =?utf-8?B?eldZUHBIcW5NOVhTVy90MnpqVFZwa3pJbzI2R3ZRQVhtYnJuZXZEdTcra0Zw?=
- =?utf-8?B?eGhibXFVdmVCdExCbDBiWlBIejJEa2JNUmxoTGM1UFE1VWI4Y3ZRaGhPMkUr?=
- =?utf-8?B?UEZpRnU5WW5MQmRjbURiVnJNcWFqVEIvMjJoNmJMNUlYZ0p3QTg0QT09?=
-X-OriginatorOrg: citrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d175fc1e-a4ad-4637-588d-08de69753d0b
-X-MS-Exchange-CrossTenant-AuthSource: CH8PR03MB8275.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2026 13:55:39.1117
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9iuNfwDVYbcyvkHiIy9f8TamcLiO0Pd6A+I2CJFccY4jjCZpkhyJi76NSGBGfrdL2U/FZ+LlKkYnKmIJro1ZSbHKLFxVjava/DEVjyg+iyE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV4PR03MB8236
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, Sascha.Bischoff@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[citrix.com,reject];
-	R_DKIM_ALLOW(-0.20)[citrix.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,arm.com,vger.kernel.org,lists.linux.dev];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70849-lists,kvm=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-70850-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[citrix.com:+];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew.cooper3@citrix.com,kvm@vger.kernel.org];
-	FREEMAIL_CC(0.00)[citrix.com,gmail.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org,kernel.org,redhat.com,google.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,citrix.com:mid,citrix.com:dkim,citrix.com:email]
-X-Rspamd-Queue-Id: 6554912500D
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[reg.id:url,arm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8D844125136
 X-Rspamd-Action: no action
 
-On 11/02/2026 1:43 pm, David Laight wrote:
-> On Wed, 11 Feb 2026 10:57:31 +0000
-> Andrew Cooper <andrew.cooper3@citrix.com> wrote:
->
->>> Remove explicit branch hint prefixes (.byte 0x2e / 0x3e) from VMX
->>> inline assembly sequences.
->>>
->>> These prefixes (CS/DS segment overrides used as branch hints on
->>> very old x86 CPUs) have been ignored by modern processors for a
->>> long time. Keeping them provides no measurable benefit and only
->>> enlarges the generated code.  
->> It's actually worse than this.
->>
->> The branch-taken hint has new meaning in Lion Cove cores and later,
->> along with a warning saying "performance penalty for misuse".
->>
->> i.e. "only insert this prefix after profiling".
-> Don't they really have much the same meaning as before?
+On Wed, 11 Feb 2026 13:12:49 +0000,
+Andre Przywara <andre.przywara@arm.com> wrote:
+> 
+> From: Marc Zyngier <maz@kernel.org>
+> 
+> When running an EL2 guest, we need to make sure we don't sample
+> SCTLR_EL1 to work out the virtio endianness, as this is likely
+> to be a bit random.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  arm64/include/kvm/kvm-cpu-arch.h |  5 ++--
+>  arm64/kvm-cpu.c                  | 47 +++++++++++++++++++++++++-------
+>  2 files changed, 40 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arm64/include/kvm/kvm-cpu-arch.h b/arm64/include/kvm/kvm-cpu-arch.h
+> index 1af394a..85646ad 100644
+> --- a/arm64/include/kvm/kvm-cpu-arch.h
+> +++ b/arm64/include/kvm/kvm-cpu-arch.h
+> @@ -10,8 +10,9 @@
+>  #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
+>  #define ARM_CPU_ID		3, 0, 0, 0
+>  #define ARM_CPU_ID_MPIDR	5
+> -#define ARM_CPU_CTRL		3, 0, 1, 0
+> -#define ARM_CPU_CTRL_SCTLR_EL1	0
+> +#define SYS_SCTLR_EL1		3, 4, 1, 0, 0
+> +#define SYS_SCTLR_EL2		3, 4, 1, 0, 0
 
-Architecturally yes, microarchitecturally very much not.
+Sascha pointed out this howler of a bug last time: SCTLR_EL1 and EL2
+have the same encoding here, which is obviously wrong.
 
-For a branch known to the predictor, there is no effect.  If a branch
-unknown to the predictor gets decoded, it triggers a frontend flush and
-resteer.
+This is definitely introducing a regression on EL1 guests.
 
-It is only useful for programs large enough to exceed the working set of
-the conditional predictor, and for which certain branches are known to
-be ~always taken.
+> +#define SYS_HCR_EL2		3, 4, 1, 1, 0
+>  
+>  struct kvm_cpu {
+>  	pthread_t	thread;
+> diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+> index 5e4f3a7..35e1c63 100644
+> --- a/arm64/kvm-cpu.c
+> +++ b/arm64/kvm-cpu.c
+> @@ -12,6 +12,7 @@
+>  
+>  #define SCTLR_EL1_E0E_MASK	(1 << 24)
+>  #define SCTLR_EL1_EE_MASK	(1 << 25)
+> +#define HCR_EL2_TGE		(1 << 27)
+>  
+>  static int debug_fd;
+>  
+> @@ -408,7 +409,8 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+>  {
+>  	struct kvm_one_reg reg;
+>  	u64 psr;
+> -	u64 sctlr;
+> +	u64 sctlr, bit;
+> +	u64 hcr = 0;
+>  
+>  	/*
+>  	 * Quoting the definition given by Peter Maydell:
+> @@ -419,8 +421,9 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+>  	 * We first check for an AArch32 guest: its endianness can
+>  	 * change when using SETEND, which affects the CPSR.E bit.
+>  	 *
+> -	 * If we're AArch64, use SCTLR_EL1.E0E if access comes from
+> -	 * EL0, and SCTLR_EL1.EE if access comes from EL1.
+> +	 * If we're AArch64, determine which SCTLR register to use,
+> +	 * depending on NV being used or not. Then use either the E0E
+> +	 * bit for EL0, or the EE bit for EL1/EL2.
+>  	 */
+>  	reg.id = ARM64_CORE_REG(regs.pstate);
+>  	reg.addr = (u64)&psr;
+> @@ -430,16 +433,40 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+>  	if (psr & PSR_MODE32_BIT)
+>  		return (psr & COMPAT_PSR_E_BIT) ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
+>  
+> -	reg.id = ARM64_SYS_REG(ARM_CPU_CTRL, ARM_CPU_CTRL_SCTLR_EL1);
+> +	if (vcpu->kvm->cfg.arch.nested_virt) {
+> +		reg.id = ARM64_SYS_REG(SYS_HCR_EL2);
+> +		reg.addr = (u64)&hcr;
+> +		if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+> +			die("KVM_GET_ONE_REG failed (HCR_EL2)");
+> +	}
+> +
+> +	switch (psr & PSR_MODE_MASK) {
+> +	case PSR_MODE_EL0t:
+> +		if (hcr & HCR_EL2_TGE)
+> +			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
+> +		else
+> +			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
+> +		bit = SCTLR_EL1_E0E_MASK;
+> +		break;
 
-Putting the prefix on a branch that isn't ~always taken is worse than
-not having the prefix in the first place, hence the warning.
+And this is also buggy, as I pointed out in my review of v5 -- I even
+provided a fix for it [1].
 
-~Andrew
+	M.
+
+[1] https://lore.kernel.org/all/86jyx8b9l2.wl-maz@kernel.org/
+
+-- 
+Without deviation from the norm, progress is not possible.
 
