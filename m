@@ -1,57 +1,62 @@
-Return-Path: <kvm+bounces-70878-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70873-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yDQjCK+ujGl/sAAAu9opvQ
-	(envelope-from <kvm+bounces-70878-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 17:30:39 +0100
+	id CA4uFnyujGl/sAAAu9opvQ
+	(envelope-from <kvm+bounces-70873-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 17:29:48 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA463126212
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 17:30:38 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71E351261E0
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 17:29:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 757413021C85
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 16:30:02 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 42C373013CB7
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 16:29:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B71F33FE35;
-	Wed, 11 Feb 2026 16:29:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7E233F8C2;
+	Wed, 11 Feb 2026 16:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mdQcro6/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Vh9Zeag0"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3BE344D8F
-	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 16:29:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C512D781F
+	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 16:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770827358; cv=none; b=EWFyv61xqRiBTjQQIFmo9N9rr5Tn/azRvoOArzfkbIFaaeK4B+KfmAZGA9juHldai8s2jrCT6npIxfTZ1NCdFUK+rKEX9gnVUNumIjTG2ilymC2kFwVZoxNMyyJV6DnlNNBCpsBYnWI09hLF/azLaPRAdp0I3EdDsoKLE0uoTqA=
+	t=1770827351; cv=none; b=ILuC1wyEE7frcGEVbmXXr101YFGw4HD06vPk3sGny8xhveMupVnGr69pOD5Bwzn+cSp74qWuXUGSR2vqms1HIkKIgqt5kP6cSJ/pgQzXeqEv7G9YeM1HlPl1mW18bxyJ9mAx+satdLpNYSsS9LptpLEyEWA8NuNrGgDi8Z9CUjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770827358; c=relaxed/simple;
-	bh=kVKmHbIUWsWckH1lyhe1p6lwahhwt3/i3vUSaLMphI4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pzLEPRNem1G6vmUAt/eQ0FGo2+drpuTLBvaTsTJH8ucnybbzb75q/UoU6zVD4AsSomoFFk5oPaETOPwNFJ0U4Rrys3glveVpdeCApCtK9mRt4FzlZ2nSRSiCGMi1871hkpHaw8teRFXzrKczUObclOY+PghRyQCnipRWjQNhsrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mdQcro6/; arc=none smtp.client-ip=91.218.175.170
+	s=arc-20240116; t=1770827351; c=relaxed/simple;
+	bh=DwNMt9sTxMJvPffKqssdDnCVH7eazxC3nEWkZRv8nHs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OC5qHas84Sk8mqhoPcBxRCY7DZu3uE9foGx9DlWXfQewblhts1rnNiMdq9Ami7vR2aHOY3fvpM20G5nJ9pV0r/ID8yOiDLW6cOSYoIn5KErqi2ZrfI/RQw6uXhHUNxxwn7b2bcKS20VXaCU+VM+dh1DDeRyLgCWp7JenzuIq5wE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Vh9Zeag0; arc=none smtp.client-ip=91.218.175.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770827345;
+	t=1770827347;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=x7RwaZyFvU4PSOAh/+ta0Ky6uzgBdS6yDaUtHjWcJeU=;
-	b=mdQcro6/Wsk6o21gcg8ycAtiHWChtOh5QIHljcUKqJFouFLkgzz2Cgvmkh0wMn8gtWXwN4
-	7RjfmjtlKOIAqrk4mIr0pz2cPdCBJ7ZiT/3/kvxjI4uw5UOvf530q04iZmpFHAxsMXSnQk
-	IA9YjRtZxPGUynqlpVcCR8ricmbBjDQ=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E0pfwtfuSAR+toNK8R5pgRmHFl05Ro/5VJ5HwjG4DKw=;
+	b=Vh9Zeag0eUvYHlAg65EfEGWdcAaCR6oDF+VhAkKkBOyWWS60RRx8kH//EPOCMjbqJ6/9LR
+	9eSCnEThzVMUH5/WDZn6fXmCAaMvZO1KB+Ib55HVaiFHpmuH2lprjRLh/513lRyjhNULL9
+	P5tt5Q3DaZDtUr8c+qMyunltnDKvTo4=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH v2 0/5] KVM: nSVM: Fix save/restore of NextRIP & interrupt shadow
-Date: Wed, 11 Feb 2026 16:28:37 +0000
-Message-ID: <20260211162842.454151-1-yosry.ahmed@linux.dev>
+	Yosry Ahmed <yosry.ahmed@linux.dev>,
+	stable@vger.kernel.org
+Subject: [PATCH v2 1/5] KVM: nSVM: Sync NextRIP to cached vmcb12 after VMRUN of L2
+Date: Wed, 11 Feb 2026 16:28:38 +0000
+Message-ID: <20260211162842.454151-2-yosry.ahmed@linux.dev>
+In-Reply-To: <20260211162842.454151-1-yosry.ahmed@linux.dev>
+References: <20260211162842.454151-1-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,68 +72,75 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70878-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70873-lists,kvm=lfdr.de];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_FIVE(0.00)[6];
 	FROM_NEQ_ENVFROM(0.00)[yosry.ahmed@linux.dev,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim]
-X-Rspamd-Queue-Id: BA463126212
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim,linux.dev:email]
+X-Rspamd-Queue-Id: 71E351261E0
 X-Rspamd-Action: no action
 
-NextRIP and interrupt shadow are both not sync'd correctly to the cached
-vmcb12 after VMRUN of L2. Sync the cached vmcb12 is the payload of
-nested state, these fields are not saved/restored correctly.
+After VMRUN in guest mode, nested_sync_control_from_vmcb02() syncs
+fields written by the CPU from vmcb02 to the cached vmcb12. This is
+because the cached vmcb12 is used as the authoritative copy of some of
+the controls, and is the payload when saving/restoring nested state.
 
-Sync both fields correctly, and extend state_test to check vGIF (already
-sync'd field) and next_rip. Checking the interrupt shadow would be
-tricky, as GUEST_SYNC() executes several instructions before exiting to
-L0, so the interrupt shadow will be consumed before the test can check
-for it. L2 could execute STI followed directly by in/out, but that would
-not handle transitioning between L2 and L2 correctly (see
-ucall_arch_do_ucall()).
+NextRIP is also written by the CPU (in some cases) after VMRUN, but is
+not sync'd to the cached vmcb12. As a result, it is corrupted after
+save/restore (replaced by the original value written by L1 on nested
+VMRUN). This could cause problems for both KVM (e.g. when injecting a
+soft IRQ) or L1 (e.g. when using NextRIP to advance RIP after emulating
+an instruction).
 
-I updated patch 1 to be a minimal fix without moving code around, but I
-kept the code movement in patch 3 as it leaves the code in better shape
-until a more significant rework/cleanup is done. It also leaves the
-FIXME in a more appropriate spot. If you feel strongly, feel free to
-drop patch 3, but I'd rather we keep it.
+Fix this by sync'ing NextRIP to the cache after VMRUN of L2, but only
+after completing interrupts (not in nested_sync_control_from_vmcb02()),
+as KVM may update NextRIP (e.g. when re-injecting a soft IRQ).
 
-v1 -> v2:
-- Split patch 1 into a minimal fix without code movement for stable, and
-  code movement patch (patch 3) [Sean].
-- Comments and changelog updates [Sean].
+Fixes: cc440cdad5b7 ("KVM: nSVM: implement KVM_GET_NESTED_STATE and KVM_SET_NESTED_STATE")
+CC: stable@vger.kernel.org
+Co-developed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+---
+ arch/x86/kvm/svm/svm.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-v1: https://lore.kernel.org/kvm/20260210005449.3125133-1-yosry.ahmed@linux.dev/
-
-Yosry Ahmed (5):
-  KVM: nSVM: Sync NextRIP to cached vmcb12 after VMRUN of L2
-  KVM: nSVM: Sync interrupt shadow to cached vmcb12 after VMRUN of L2
-  KVM: nSVM: Move sync'ing to vmcb12 cache after completing interrupts
-  KVM: selftests: Extend state_test to check vGIF
-  KVM: selftests: Extend state_test to check next_rip
-
- arch/x86/kvm/svm/nested.c                    | 11 ++++--
- arch/x86/kvm/svm/svm.c                       | 26 +++++++++------
- tools/testing/selftests/kvm/x86/state_test.c | 35 ++++++++++++++++++++
- 3 files changed, 59 insertions(+), 13 deletions(-)
-
-
-base-commit: e944fe2c09f405a2e2d147145c9b470084bc4c9a
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 5f0136dbdde6..1073a32a96fa 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4435,6 +4435,16 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
+ 
+ 	svm_complete_interrupts(vcpu);
+ 
++	/*
++	 * Update the cache after completing interrupts to get an accurate
++	 * NextRIP, e.g. when re-injecting a soft interrupt.
++	 *
++	 * FIXME: Rework svm_get_nested_state() to not pull data from the
++	 *        cache (except for maybe int_ctl).
++	 */
++	if (is_guest_mode(vcpu))
++		svm->nested.ctl.next_rip = svm->vmcb->control.next_rip;
++
+ 	return svm_exit_handlers_fastpath(vcpu);
+ }
+ 
 -- 
 2.53.0.239.g8d8fc8a987-goog
 
