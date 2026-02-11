@@ -1,131 +1,164 @@
-Return-Path: <kvm+bounces-70877-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70880-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6MwbKi6vjGl/sAAAu9opvQ
-	(envelope-from <kvm+bounces-70877-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 17:32:46 +0100
+	id QHxGEUiyjGlLsQAAu9opvQ
+	(envelope-from <kvm+bounces-70880-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 17:46:00 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2590112624F
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 17:32:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC32012649B
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 17:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 53966305DA0A
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 16:29:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 10CDA30210F4
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 16:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C08934404E;
-	Wed, 11 Feb 2026 16:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 672143469F8;
+	Wed, 11 Feb 2026 16:45:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o+xoKSVX"
+	dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b="eICYbdjl"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from mail.thorondor.fr (unknown [82.66.128.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172C7344D83
-	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 16:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5413C344DAA;
+	Wed, 11 Feb 2026 16:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.66.128.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770827357; cv=none; b=nUxlDia7xKZCQO45XA8uJa3JSs+S5nR8T704D+CQvS9xE2LipL/N0FEXivhImzC3T52pQhzpu9PmrQ/C5QOx4nkWOE8vg8Mu78BRgaMFi/5XIEoDfr50EGO0MUBqI41z8y3uB1rRP8/EoWCCoLXxgZM5fm8Fk43H+mOw2d+zpEQ=
+	t=1770828337; cv=none; b=OfR56lzL58Jv7VGCD74O8ATDQ/9eaGNR+xKhme+WefjqtVIvvSMOhwg1ybMzvU8lX3dEOK8C0V4I3SAbMDMkjGqSdmAjRsAmRYGrm5k9pxDPc6rs7Um4EauHRY18WvCeBmi+ozKLYDDOxxo9BditRCvqI7JEocFBSbIBcgJGv18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770827357; c=relaxed/simple;
-	bh=/sgsLkfbqIClvvV8rFZNiXHMdUoW7U52VNMIRQlnhjw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VX3n70ecfRxy1Pe1eeQHLcbGMR3HsJv7fTafbnZ1y2a8vuV2R2DyIPQNO7MP+aSyn+zN3D+y+0nuTv7YdRC9iV8CcFgOEJu86ZiZWvux4q4zwi6AcaGpna111qJyVoNUuiiOkiVViPeLwCLRMe8ADQSeIyAKEpns8YM/J1SORYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o+xoKSVX; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770827354;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1FICbsfpn2yI8rBPMCG8CPTHNhJDyAKHkEnxlfHtJ8g=;
-	b=o+xoKSVXF6Qw/oWMzkhV5+/1XrWWKis6fBHmVQNLdugwO5JEny1kwirFzCFwzaf9x7mCFY
-	ItVF6LAKi6lLZcrmQHToea1Wgo2ej9W8Gliy5JDI3rX6WNjxwmGoDiXsKDQFYBszyYma/X
-	4GAmm2JGhrmmGYxhC3uz9w4k7pUtLqM=
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH v2 5/5] KVM: selftests: Extend state_test to check next_rip
-Date: Wed, 11 Feb 2026 16:28:42 +0000
-Message-ID: <20260211162842.454151-6-yosry.ahmed@linux.dev>
-In-Reply-To: <20260211162842.454151-1-yosry.ahmed@linux.dev>
-References: <20260211162842.454151-1-yosry.ahmed@linux.dev>
+	s=arc-20240116; t=1770828337; c=relaxed/simple;
+	bh=idCVNzxeGorW16JtFn2b9Rbbcvhjhg05WWwYU68FgJ0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=FjXFS4BxbysPS0OlktWm+VsdHWxvDDFyQ7NZP5NDpAq2sjdy256i8+UU/pbj4Rx1V8AUHlfkBhkmXHdW1qVFQ27LO+eAPYz6EXj/zHz3sqVJa6r7LExZwmeNxGsGLkxsBOXbgYEn7WFhWCjvrwkdFoTCM9wB9oRdBuMlloFizTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr; spf=pass smtp.mailfrom=thorondor.fr; dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b=eICYbdjl; arc=none smtp.client-ip=82.66.128.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorondor.fr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=thorondor.fr; s=mail;
+	t=1770827862; bh=idCVNzxeGorW16JtFn2b9Rbbcvhjhg05WWwYU68FgJ0=;
+	h=Subject:From:To:Cc:References:In-Reply-To;
+	b=eICYbdjlej+ar6HewNVlINgnmlxsvFBBc2LKU7ZDJZQaHflpb2WrL26m1JDNbtUU+
+	 yvVamQgpFEyBdnpcVqR5/Rj4Ax5lErX8AyzxhJhXQDlL6tMrdNPmfYfw+ggjfAwsba
+	 TYqLPW2w19FCDkzPSuZ7jb0XkH4YzS/maVpT7nl7E6fft2f+ZVMPmFs08RHrefdP9e
+	 AG4itcCPamqpt3OFA+cjWIlHGrlFQZ0iaOuyM5G5hB0ZjkYUVqRzTfeNf2Pb5Pa1v2
+	 x0FQu/CKrFmPZuzxGBroyrVgl20LeQDfikBGY8caj4IsF65MFvCs0ZxpTPq/RUv34e
+	 F2As9KVKFHLKQ==
+Message-ID: <421a20ea-2788-493d-8f25-497880c04a7e@thorondor.fr>
+Date: Wed, 11 Feb 2026 17:37:41 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH v6 0/1] KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
+From: Thomas Courrege <thomas.courrege@thorondor.fr>
+To: ashish.kalra@amd.com, seanjc@google.com, thomas.lendacky@amd.com
+Cc: kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, x86@kernel.org
+References: <20260128194956.314678-1-thomas.courrege@thorondor.fr>
+ <4d286692-3e29-4e8d-b6d9-f04ceb748499@thorondor.fr>
+Content-Language: en-US
+In-Reply-To: <4d286692-3e29-4e8d-b6d9-f04ceb748499@thorondor.fr>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[thorondor.fr,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[thorondor.fr:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70877-lists,kvm=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[thorondor.fr:+];
 	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70880-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry.ahmed@linux.dev,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	TAGGED_RCPT(0.00)[kvm];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 2590112624F
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thomas.courrege@thorondor.fr,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,thorondor.fr:mid,thorondor.fr:dkim]
+X-Rspamd-Queue-Id: AC32012649B
 X-Rspamd-Action: no action
 
-Similar to vGIF, extend state_test to make sure that next_rip is saved
-correctly in nested state. GUEST_SYNC() in L2 causes IO emulation by
-KVM, which advances the RIP to the value of next_rip. Hence, if next_rip
-is saved correctly, its value should match the saved RIP value.
 
-Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
----
- tools/testing/selftests/kvm/x86/state_test.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/x86/state_test.c b/tools/testing/selftests/kvm/x86/state_test.c
-index 57c7546f3d7c..992a52504a4a 100644
---- a/tools/testing/selftests/kvm/x86/state_test.c
-+++ b/tools/testing/selftests/kvm/x86/state_test.c
-@@ -236,6 +236,17 @@ void svm_check_nested_state(int stage, struct kvm_x86_state *state)
- 		if (stage == 6)
- 			TEST_ASSERT_EQ(!!(vmcb->control.int_ctl & V_GIF_MASK), 0);
- 	}
-+
-+	if (kvm_cpu_has(X86_FEATURE_NRIPS)) {
-+		/*
-+		 * GUEST_SYNC() causes IO emulation in KVM, in which case the
-+		 * RIP is advanced before exiting to userspace. Hence, the RIP
-+		 * in the saved state should be the same as nRIP saved by the
-+		 * CPU in the VMCB.
-+		 */
-+		if (stage == 6)
-+			TEST_ASSERT_EQ(vmcb->control.next_rip, state->regs.rip);
-+	}
- }
- 
- void check_nested_state(int stage, struct kvm_x86_state *state)
--- 
-2.53.0.239.g8d8fc8a987-goog
+On 29-01-2026 11:35, Thomas Courrege wrote:
+>
+> -- 
+> Regards,
+> Thomas
+> On 28-01-2026 20:49, Thomas Courrege wrote:
+>> Overview
+>> --------
+>> The SEV-SNP Firmware ABI allows the hypervisor to request an
+>> attestation report via the SEV_CMD_SNP_HV_REPORT_REQ firmware command.
+> This allow KVM to expose more of AMD’s SEV‑SNP features.
+>
+> It also allow developers to easily request attestation.
+> It could maybe be use by some cloud provider to easily provide an
+> attestation report through their API, in case the Guest doesn't respond
+> fast enough or even to compare the reports.
+>> Testing
+>> -------
+>> For testing this via QEMU, please use the following tree:
+>>         https://github.com/Th0rOnDoR/qemu
+>>
+>> Patch History
+>> -------------
+>> v5 -> v6:
+>> Fix typos issues in documentation
+>>
+>> v4 -> v5:
+>> Set variables in reverse christmas tree order
+>> Fix and clean the rsp_size logic
+>>
+>> v3 -> v4:
+>> Add newline in documentation to avoid a warning
+>> Add base commit
+>>
+>> v2 -> v3:
+>> Add padding to structure, code format
+>> Write back the full MSG_REPORT_RSP structure
+>> Remove the memzero_explicit for the report
+>>
+>> v1 -> v2:
+>> Renaming, code format
+>> Zeroes the report before returning
+>>
+>>
+>> Any feedback is appreciated.
+>>
+>> Thanks,
+>> Thomas
+>>
+>>
+>> Thomas Courrege (1):
+>>   KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
+>>
+>>  .../virt/kvm/x86/amd-memory-encryption.rst    | 28 +++++++++
+>>  arch/x86/include/uapi/asm/kvm.h               |  9 +++
+>>  arch/x86/kvm/svm/sev.c                        | 63 +++++++++++++++++++
+>>  drivers/crypto/ccp/sev-dev.c                  |  1 +
+>>  include/linux/psp-sev.h                       | 31 +++++++++
+>>  5 files changed, 132 insertions(+)
+>>
+>>
+>> base-commit: e89f0e9a0a007e8c3afb8ecd739c0b3255422b00
+
+Gentle ping
+
+Regards,
+Thomas
 
 
