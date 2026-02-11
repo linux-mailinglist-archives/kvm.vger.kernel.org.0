@@ -1,59 +1,59 @@
-Return-Path: <kvm+bounces-70876-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70877-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IO4fJ/6ujGl/sAAAu9opvQ
-	(envelope-from <kvm+bounces-70876-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 17:31:58 +0100
+	id 6MwbKi6vjGl/sAAAu9opvQ
+	(envelope-from <kvm+bounces-70877-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 17:32:46 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2305B126247
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 17:31:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2590112624F
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 17:32:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 05F5B3090212
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 16:29:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 53966305DA0A
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 16:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FDD7344D84;
-	Wed, 11 Feb 2026 16:29:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C08934404E;
+	Wed, 11 Feb 2026 16:29:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ge4nM4iq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o+xoKSVX"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4910234402D
-	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 16:29:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172C7344D83
+	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 16:29:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770827355; cv=none; b=H/h/puQwpIBI0NH0iFkdEJualO4hqziCh1G/0Gjr3/qWYdFM77W7k81Bk7/pdp1c8XIbxG9/vzJrmFJHFKrMOfp6r252Dpgdyb9c71Bwdf+VxVT4XT21f9Cq3KFaUt5pCfsDjwqxMqdEAmv78ktvs3aeyDJdB4+ttHGWwR6juWo=
+	t=1770827357; cv=none; b=nUxlDia7xKZCQO45XA8uJa3JSs+S5nR8T704D+CQvS9xE2LipL/N0FEXivhImzC3T52pQhzpu9PmrQ/C5QOx4nkWOE8vg8Mu78BRgaMFi/5XIEoDfr50EGO0MUBqI41z8y3uB1rRP8/EoWCCoLXxgZM5fm8Fk43H+mOw2d+zpEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770827355; c=relaxed/simple;
-	bh=JQWwyvFcxCw9codsXvucZKYe/vNO0xvYDKNARMSJ61Y=;
+	s=arc-20240116; t=1770827357; c=relaxed/simple;
+	bh=/sgsLkfbqIClvvV8rFZNiXHMdUoW7U52VNMIRQlnhjw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aFk7272PUScnoe+UtgKvFR9XGtu2mfnOompEiBgf1hrEl4sFC104ywyd+J7sIekjO9TLl18MzpRm0VllFLMO6VHUIRrsovNIP2Fa6qhGZ+RxbU7WuWRMhaWzSlBMfesYO5Qsn7BGVhs3XK6RT3yCA8q/iSQRGDQdgNoxGsEbVuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ge4nM4iq; arc=none smtp.client-ip=91.218.175.174
+	 MIME-Version; b=VX3n70ecfRxy1Pe1eeQHLcbGMR3HsJv7fTafbnZ1y2a8vuV2R2DyIPQNO7MP+aSyn+zN3D+y+0nuTv7YdRC9iV8CcFgOEJu86ZiZWvux4q4zwi6AcaGpna111qJyVoNUuiiOkiVViPeLwCLRMe8ADQSeIyAKEpns8YM/J1SORYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o+xoKSVX; arc=none smtp.client-ip=91.218.175.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1770827352;
+	t=1770827354;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IAHA1BoR9Ww40qGSdofKCW6ZALBTizq0Cah0BSADaW4=;
-	b=Ge4nM4iqICA2l8ZV43Do6Ey+gRQjSyJutZYlR0G/WJHNwBDfkWMSvWiN+xZtMREl175h8H
-	0wTmZ2MLT0O2xXVKbGm24K53IgSptO8hWROXethlO6pgEJJAvojz86SYKFD3eWicvDIYFx
-	GktqIAVQF5tIzM8NP0OpQiJYZILxUiM=
+	bh=1FICbsfpn2yI8rBPMCG8CPTHNhJDyAKHkEnxlfHtJ8g=;
+	b=o+xoKSVXF6Qw/oWMzkhV5+/1XrWWKis6fBHmVQNLdugwO5JEny1kwirFzCFwzaf9x7mCFY
+	ItVF6LAKi6lLZcrmQHToea1Wgo2ej9W8Gliy5JDI3rX6WNjxwmGoDiXsKDQFYBszyYma/X
+	4GAmm2JGhrmmGYxhC3uz9w4k7pUtLqM=
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry.ahmed@linux.dev>
-Subject: [PATCH v2 4/5] KVM: selftests: Extend state_test to check vGIF
-Date: Wed, 11 Feb 2026 16:28:41 +0000
-Message-ID: <20260211162842.454151-5-yosry.ahmed@linux.dev>
+Subject: [PATCH v2 5/5] KVM: selftests: Extend state_test to check next_rip
+Date: Wed, 11 Feb 2026 16:28:42 +0000
+Message-ID: <20260211162842.454151-6-yosry.ahmed@linux.dev>
 In-Reply-To: <20260211162842.454151-1-yosry.ahmed@linux.dev>
 References: <20260211162842.454151-1-yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -75,7 +75,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70876-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70877-lists,kvm=lfdr.de];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
@@ -90,81 +90,41 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MISSING_XM_UA(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 2305B126247
+X-Rspamd-Queue-Id: 2590112624F
 X-Rspamd-Action: no action
 
-V_GIF_MASK is one of the fields written by the CPU after VMRUN, and
-sync'd by KVM from vmcb02 to cached vmcb12 after running L2. Part of the
-reason is to make sure V_GIF_MASK is saved/restored correctly, as the
-cached vmcb12 is the payload of nested state.
-
-Verify that V_GIF_MASK is saved/restored correctly in state_test by
-enabling vGIF in vmcb12, toggling GIF in L2 at different GUEST_SYNC()
-points, and verifying that V_GIF_MASK is correctly propagated to the
-nested state.
+Similar to vGIF, extend state_test to make sure that next_rip is saved
+correctly in nested state. GUEST_SYNC() in L2 causes IO emulation by
+KVM, which advances the RIP to the value of next_rip. Hence, if next_rip
+is saved correctly, its value should match the saved RIP value.
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 ---
- tools/testing/selftests/kvm/x86/state_test.c | 24 ++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ tools/testing/selftests/kvm/x86/state_test.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/x86/state_test.c b/tools/testing/selftests/kvm/x86/state_test.c
-index f2c7a1c297e3..57c7546f3d7c 100644
+index 57c7546f3d7c..992a52504a4a 100644
 --- a/tools/testing/selftests/kvm/x86/state_test.c
 +++ b/tools/testing/selftests/kvm/x86/state_test.c
-@@ -26,7 +26,9 @@ void svm_l2_guest_code(void)
- 	GUEST_SYNC(4);
- 	/* Exit to L1 */
- 	vmcall();
-+	clgi();
- 	GUEST_SYNC(6);
-+	stgi();
- 	/* Done, exit to L1 and never come back.  */
- 	vmcall();
- }
-@@ -41,6 +43,8 @@ static void svm_l1_guest_code(struct svm_test_data *svm)
- 	generic_svm_setup(svm, svm_l2_guest_code,
- 			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
- 
-+	vmcb->control.int_ctl |= (V_GIF_ENABLE_MASK | V_GIF_MASK);
+@@ -236,6 +236,17 @@ void svm_check_nested_state(int stage, struct kvm_x86_state *state)
+ 		if (stage == 6)
+ 			TEST_ASSERT_EQ(!!(vmcb->control.int_ctl & V_GIF_MASK), 0);
+ 	}
 +
- 	GUEST_SYNC(3);
- 	run_guest(vmcb, svm->vmcb_gpa);
- 	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_VMMCALL);
-@@ -222,6 +226,24 @@ static void __attribute__((__flatten__)) guest_code(void *arg)
- 	GUEST_DONE();
- }
- 
-+void svm_check_nested_state(int stage, struct kvm_x86_state *state)
-+{
-+	struct vmcb *vmcb = (struct vmcb *)state->nested.data.svm;
-+
-+	if (kvm_cpu_has(X86_FEATURE_VGIF)) {
-+		if (stage == 4)
-+			TEST_ASSERT_EQ(!!(vmcb->control.int_ctl & V_GIF_MASK), 1);
++	if (kvm_cpu_has(X86_FEATURE_NRIPS)) {
++		/*
++		 * GUEST_SYNC() causes IO emulation in KVM, in which case the
++		 * RIP is advanced before exiting to userspace. Hence, the RIP
++		 * in the saved state should be the same as nRIP saved by the
++		 * CPU in the VMCB.
++		 */
 +		if (stage == 6)
-+			TEST_ASSERT_EQ(!!(vmcb->control.int_ctl & V_GIF_MASK), 0);
++			TEST_ASSERT_EQ(vmcb->control.next_rip, state->regs.rip);
 +	}
-+}
-+
-+void check_nested_state(int stage, struct kvm_x86_state *state)
-+{
-+	if (kvm_has_cap(KVM_CAP_NESTED_STATE) && kvm_cpu_has(X86_FEATURE_SVM))
-+		svm_check_nested_state(stage, state);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	uint64_t *xstate_bv, saved_xstate_bv;
-@@ -278,6 +300,8 @@ int main(int argc, char *argv[])
+ }
  
- 		kvm_vm_release(vm);
- 
-+		check_nested_state(stage, state);
-+
- 		/* Restore state in a new VM.  */
- 		vcpu = vm_recreate_with_one_vcpu(vm);
- 		vcpu_load_state(vcpu, state);
+ void check_nested_state(int stage, struct kvm_x86_state *state)
 -- 
 2.53.0.239.g8d8fc8a987-goog
 
