@@ -1,248 +1,177 @@
-Return-Path: <kvm+bounces-70825-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70826-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +BSvG/IbjGnEgwAAu9opvQ
-	(envelope-from <kvm+bounces-70825-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 07:04:34 +0100
+	id 2HEWL2YejGn2hAAAu9opvQ
+	(envelope-from <kvm+bounces-70826-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 07:15:02 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F07C21218CD
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 07:04:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22EE812192B
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 07:15:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F08BC305F222
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 06:04:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 67BA33012CBA
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 06:14:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEC63451BD;
-	Wed, 11 Feb 2026 06:04:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A3234C9AD;
+	Wed, 11 Feb 2026 06:14:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xu5Mobm0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a3HC6cMA"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD771373;
-	Wed, 11 Feb 2026 06:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D070130F924
+	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 06:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770789861; cv=none; b=CUotEKFLWO+tJxcB9rmTUKaZSDLv/RRKEvA5yPhCDdRjcvOEHnxKJ6IFeNyoHlqFN+g/zw5ZlqOhJw21T6roHPWWdcrvb3qoHJWRUKPbqQox8lmevPubA+ftC/0w+0aiVJHc5KzNqHCGWMSSa0bhTyt83z7VOPhh1voTQRyuzu4=
+	t=1770790494; cv=none; b=BiXRgrqyhMjtkCyuIFpt2EZC8rv5bdvTgSdGFOmUuO6Iev5YP9uiPd789alm9l2QF7YF/7UNYvmEjlzE5hNCrg4zrOvIE2kHmpKXsNamJnukfE8md8+rkFEhUMIKQLwrVn6FppJTqVuM6vBVl7r4A1cGqQnfnRsD1oRbLjMvrWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770789861; c=relaxed/simple;
-	bh=1ba4HtqH6wJILWm4/0xJUBvvlpODk4MGkINVKN5zbxU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eJ/P/iMkhtcUDH3TN0mci1qiVStGOFwmOkwsyuSj8+hutK4MxMa3uqKreRuWBqSZ54fNc/hqrHZsS4NwjBMWauDf1uUCd8g4SbtffCf66a/r5CIbiACKZXpyWwdg3298cdOViGQ0zGstn4VuAlZSAxiT9MAg+VOSWuPFNi67pdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xu5Mobm0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB967C4CEF7;
-	Wed, 11 Feb 2026 06:04:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770789860;
-	bh=1ba4HtqH6wJILWm4/0xJUBvvlpODk4MGkINVKN5zbxU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Xu5Mobm0F8wyhieAmIGzh63x8lptqVNcvo43aLWfKj6Tzv+Zl/kKchoY9ZdsHpeY9
-	 7VY7AX4De2TIfQU33FMKPr6fbkei4k9WsONs2oo7VhZtr3CQp7M+FrWIMR0CcEV2Bw
-	 idpILaIQ8PtxB+tqtiZhDkYCY0OamXU/ZQC6DQvOWE0CgBDJ4sBAW/xcziwr/oevAp
-	 ATuo35V/KFJp1kLKUH/ym/DEQd7QymS16+vW/OsOhdX9h0EfVKeWyVrw07I45sDb7d
-	 0FXA6azSR3Rqcixdu+T53iaoPlH+4auPPf+s5B2tud/yLWQPikgXkLOxXx/3AwixPf
-	 Fpqc4cdK//yzQ==
-Date: Wed, 11 Feb 2026 08:04:09 +0200
-From: Mike Rapoport <rppt@kernel.org>
-To: "David Hildenbrand (Arm)" <david@kernel.org>
-Cc: Peter Xu <peterx@redhat.com>, linux-mm@kvack.org,
-	Andrea Arcangeli <aarcange@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Hugh Dickins <hughd@google.com>,
-	James Houghton <jthoughton@google.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Nikita Kalyazin <kalyazin@amazon.com>,
-	Oscar Salvador <osalvador@suse.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH RFC 00/17] mm, kvm: allow uffd suppot in guest_memfd
-Message-ID: <aYwb2XgRiFayzBXS@kernel.org>
-References: <20260127192936.1250096-1-rppt@kernel.org>
- <aYJg5lT9MG0BQFkG@x1.local>
- <0032ac8b-06ba-4f4b-ad66-f0195eea1c15@kernel.org>
+	s=arc-20240116; t=1770790494; c=relaxed/simple;
+	bh=rP5llVY+IJ2BiSdns8crbNzy366rp4QhMGd+dzV2WHQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rGCtSod4CbTZCmJljzrbfTCLVvdExZgoLfNv3zwwEX6uQOW+hLnhvP4kzFwkuZyvUq4D6UawAKDKUESxPX6fLaaaQAmi0JBrIEcoP1/ueUDaGHEo/aoaLz66tNvYPZtYhxu4iI1aiMUB1t/oP0yr4/rF65PVHBVaB+NSHUI4xm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a3HC6cMA; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770790493; x=1802326493;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=rP5llVY+IJ2BiSdns8crbNzy366rp4QhMGd+dzV2WHQ=;
+  b=a3HC6cMAabnYqWT53fG+zGd5ugbfZ2TkCsJr1ovOln9rZ3qT0fl25DOS
+   ZF1K2ZyjI9pb7ZEZG+5+vKOTzNDjTx1pztDgDurdmOrQx3u0SnwJmR9cF
+   RxK/PxGqjxXYJN7xXi7QXpPTtonS+GABKU2aUsp8ze6rR9CgYe+LdrcYa
+   zRzSJw8i6gNTggbLVnXhvCyX4F/wsoWtZooXmRb2qnsLB8vBD63nHjRIZ
+   QWU74kpPfoFm0PmgeBobpAINcLwy2yNMwPdJ5TlYgnFuZGHaaOMbY/cf9
+   ZeUFEI3qghqtcCq3S9Zfba0tYr/zjpNO++syB8m8SEARVnquYUYhg0pPT
+   Q==;
+X-CSE-ConnectionGUID: MLiHCcs4RYq+ZT/WHpma1A==
+X-CSE-MsgGUID: /WZDJ1vqQAqP97uYYppBhg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11697"; a="97387989"
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="97387989"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2026 22:14:52 -0800
+X-CSE-ConnectionGUID: 4GJdpKNRRdS4hQ6jszuq4g==
+X-CSE-MsgGUID: hN7ZDFQGQtuhhY1HequhuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="249784774"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.240.173]) ([10.124.240.173])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2026 22:14:50 -0800
+Message-ID: <7803017e-aefa-421a-92a1-3b5820beba53@intel.com>
+Date: Wed, 11 Feb 2026 14:14:46 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0032ac8b-06ba-4f4b-ad66-f0195eea1c15@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 01/11] target/i386: Disable unsupported BTS for guest
+To: Zide Chen <zide.chen@intel.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Zhao Liu <zhao1.liu@intel.com>, Peter Xu <peterx@redhat.com>,
+ Fabiano Rosas <farosas@suse.de>
+Cc: Dongli Zhang <dongli.zhang@oracle.com>,
+ Dapeng Mi <dapeng1.mi@linux.intel.com>
+References: <20260128231003.268981-1-zide.chen@intel.com>
+ <20260128231003.268981-2-zide.chen@intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20260128231003.268981-2-zide.chen@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70825-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rppt@kernel.org,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F07C21218CD
+	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xiaoyao.li@intel.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70826-lists,kvm=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+]
+X-Rspamd-Queue-Id: 22EE812192B
 X-Rspamd-Action: no action
 
-On Mon, Feb 09, 2026 at 04:35:47PM +0100, David Hildenbrand (Arm) wrote:
-> On 2/3/26 21:56, Peter Xu wrote:
->
-> > +static vm_fault_t fault_process_userfaultfd(struct vm_fault *vmf)
-> > +{
-> > +	struct vm_area_struct *vma = vmf->vma;
-> > +	struct inode *inode = file_inode(vma->vm_file);
-> > +	/*
-> > +	 * NOTE: we could double check this hook present when
-> > +	 * UFFDIO_REGISTER on MISSING or MINOR for a file driver.
-> > +	 */
-> > +	struct folio *folio =
-> > +	    vma->vm_ops->uffd_ops->get_folio_noalloc(inode, vmf->pgoff);
-> > +
-> > +	if (!IS_ERR_OR_NULL(folio)) {
-> > +		/*
-> > +		 * TODO: provide a flag for get_folio_noalloc() to avoid
-> > +		 * locking (or even the extra reference?)
-> > +		 */
-> > +		folio_unlock(folio);
-> > +		folio_put(folio);
-> > +		if (userfaultfd_minor(vma))
-> > +			return handle_userfault(vmf, VM_UFFD_MINOR);
-> > +	} else {
-> > +		return handle_userfault(vmf, VM_UFFD_MISSING);
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >   /*
-> >    * The mmap_lock must have been held on entry, and may have been
-> >    * released depending on flags and vma->vm_ops->fault() return value.
-> > @@ -5370,16 +5397,20 @@ static vm_fault_t __do_fault(struct vm_fault *vmf)
-> >   			return VM_FAULT_OOM;
-> >   	}
-> > +	/*
-> > +	 * If this is an userfaultfd trap, process it in advance before
-> > +	 * triggering the genuine fault handler.
-> > +	 */
-> > +	if (userfaultfd_missing(vma) || userfaultfd_minor(vma)) {
-> > +		ret = fault_process_userfaultfd(vmf);
-> > +		if (ret)
-> > +			return ret;
-> > +	}
-
-I agree this is neater than handling VM_FAULT_UFFD.
-I'd just move the checks for userfaultfd_minor() and userfaultfd_missing()
-inside fault_process_userfaultfd().
-
-> > +
-> >   	ret = vma->vm_ops->fault(vmf);
-> >   	if (unlikely(ret & (VM_FAULT_ERROR | VM_FAULT_NOPAGE | VM_FAULT_RETRY |
-> > -			    VM_FAULT_DONE_COW | VM_FAULT_UFFD_MINOR |
-> > -			    VM_FAULT_UFFD_MISSING))) {
-> > -		if (ret & VM_FAULT_UFFD_MINOR)
-> > -			return handle_userfault(vmf, VM_UFFD_MINOR);
-> > -		if (ret & VM_FAULT_UFFD_MISSING)
-> > -			return handle_userfault(vmf, VM_UFFD_MISSING);
-> > +			    VM_FAULT_DONE_COW)))
-> >   		return ret;
-> > -	}
-> >   	folio = page_folio(vmf->page);
-> >   	if (unlikely(PageHWPoison(vmf->page))) {
-> > diff --git a/mm/shmem.c b/mm/shmem.c
-> > index eafd7986fc2ec..5286f28b3e443 100644
-> > --- a/mm/shmem.c
-> > +++ b/mm/shmem.c
-> > @@ -2484,13 +2484,6 @@ static int shmem_get_folio_gfp(struct inode *inode, pgoff_t index,
-> >   	fault_mm = vma ? vma->vm_mm : NULL;
-> >   	folio = filemap_get_entry(inode->i_mapping, index);
-> > -	if (folio && vma && userfaultfd_minor(vma)) {
-> > -		if (!xa_is_value(folio))
-> > -			folio_put(folio);
-> > -		*fault_type = VM_FAULT_UFFD_MINOR;
-> > -		return 0;
-> > -	}
-> > -
-> >   	if (xa_is_value(folio)) {
-> >   		error = shmem_swapin_folio(inode, index, &folio,
-> >   					   sgp, gfp, vma, fault_type);
-> > @@ -2535,11 +2528,6 @@ static int shmem_get_folio_gfp(struct inode *inode, pgoff_t index,
-> >   	 * Fast cache lookup and swap lookup did not find it: allocate.
-> >   	 */
-> > -	if (vma && userfaultfd_missing(vma)) {
-> > -		*fault_type = VM_FAULT_UFFD_MISSING;
-> > -		return 0;
-> > -	}
-> > -
-> >   	/* Find hugepage orders that are allowed for anonymous shmem and tmpfs. */
-> >   	orders = shmem_allowable_huge_orders(inode, vma, index, write_end, false);
-> >   	if (orders > 0) {
-> > diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> > index 14cca057fc0ec..bd0de685f42f8 100644
-> > --- a/virt/kvm/guest_memfd.c
-> > +++ b/virt/kvm/guest_memfd.c
-> > @@ -421,26 +421,6 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
-> >   	folio = __filemap_get_folio(inode->i_mapping, vmf->pgoff,
-> >   				    FGP_LOCK | FGP_ACCESSED, 0);
-> > -	if (userfaultfd_armed(vmf->vma)) {
-> > -		/*
-> > -		 * If userfaultfd is registered in minor mode and a folio
-> > -		 * exists, return VM_FAULT_UFFD_MINOR to trigger the
-> > -		 * userfaultfd handler.
-> > -		 */
-> > -		if (userfaultfd_minor(vmf->vma) && !IS_ERR_OR_NULL(folio)) {
-> > -			ret = VM_FAULT_UFFD_MINOR;
-> > -			goto out_folio;
-> > -		}
-> > -
-> > -		/*
-> > -		 * Check if userfaultfd is registered in missing mode. If so,
-> > -		 * check if a folio exists in the page cache. If not, return
-> > -		 * VM_FAULT_UFFD_MISSING to trigger the userfaultfd handler.
-> > -		 */
-> > -		if (userfaultfd_missing(vmf->vma) && IS_ERR_OR_NULL(folio))
-> > -			return VM_FAULT_UFFD_MISSING;
-> > -	}
-> > -
-> >   	/* folio not in the pagecache, try to allocate */
-> >   	if (IS_ERR(folio))
-> >   		folio = __kvm_gmem_folio_alloc(inode, vmf->pgoff);
+On 1/29/2026 7:09 AM, Zide Chen wrote:
+> BTS (Branch Trace Store), enumerated by IA32_MISC_ENABLE.BTS_UNAVAILABLE
+> (bit 11), is deprecated and has been superseded by LBR and Intel PT.
 > 
-> That looks better in general. We should likely find a better/more consistent
-> name for fault_process_userfaultfd().
-
-__do_userfault()? :)
- 
-> -- 
-> Cheers,
+> KVM yields control of the above mentioned bit to userspace since KVM
+> commit 9fc222967a39 ("KVM: x86: Give host userspace full control of
+> MSR_IA32_MISC_ENABLES").
 > 
-> David
+> However, QEMU does not set this bit, which allows guests to write the
+> BTS and BTINT bits in IA32_DEBUGCTL.  Since KVM doesn't support BTS,
+> this may lead to unexpected MSR access errors.
+> 
+> Signed-off-by: Zide Chen <zide.chen@intel.com>
 
--- 
-Sincerely yours,
-Mike.
+Since the patch is handling BTS,
+
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+
+
+Besides, I'm curious about the (legacy) PEBS enable.
+
+Before KVM commit 9fc222967a39, BTS_UNAVAIL and PEBS_UNAVAIL in 
+MISC_ENABLES are maintained by KVM and userspace cannot change them. KVM 
+keeps MISC_ENABLES.PEBS_UNAVAIL set when
+
+   !(vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT)
+
+After KVM commit 9fc222967a39, it's userspace's responsibility to set 
+correct value for MSR_IA32_MISC_EANBLES. So, if PEBS is not exposed to 
+guest, QEMU should set MISC_ENABLE_PEBS_UNAVAIL. But I don't see such 
+logic in QEMU. (Maybe the later patch in this series will handle it, let 
+me keep reading.)
+
+> ---
+> V2:
+> - Address Dapeng's comments.
+> - Remove mention of VMState version_id from the commit message.
+> 
+>   target/i386/cpu.h | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 2bbc977d9088..f02812bfd19f 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -474,8 +474,11 @@ typedef enum X86Seg {
+>   
+>   #define MSR_IA32_MISC_ENABLE            0x1a0
+>   /* Indicates good rep/movs microcode on some processors: */
+> -#define MSR_IA32_MISC_ENABLE_DEFAULT    1
+> +#define MSR_IA32_MISC_ENABLE_FASTSTRING    (1ULL << 0)
+> +#define MSR_IA32_MISC_ENABLE_BTS_UNAVAIL   (1ULL << 11)
+>   #define MSR_IA32_MISC_ENABLE_MWAIT      (1ULL << 18)
+> +#define MSR_IA32_MISC_ENABLE_DEFAULT    (MSR_IA32_MISC_ENABLE_FASTSTRING     |\
+
+Nit, we usually add a space before "\"
+
+> +                                         MSR_IA32_MISC_ENABLE_BTS_UNAVAIL)
+>   
+>   #define MSR_MTRRphysBase(reg)           (0x200 + 2 * (reg))
+>   #define MSR_MTRRphysMask(reg)           (0x200 + 2 * (reg) + 1)
+
 
