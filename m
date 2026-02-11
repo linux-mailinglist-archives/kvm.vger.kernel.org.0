@@ -1,41 +1,41 @@
-Return-Path: <kvm+bounces-70839-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70840-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cOIsNXGAjGl9pwAAu9opvQ
-	(envelope-from <kvm+bounces-70839-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 14:13:21 +0100
+	id oByCJX2AjGl9pwAAu9opvQ
+	(envelope-from <kvm+bounces-70840-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 14:13:33 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D01C124AB3
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 14:13:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 10359124ABA
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 14:13:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 33129301D050
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 13:13:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 08B283024A74
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 13:13:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DC2034EF06;
-	Wed, 11 Feb 2026 13:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D3132D7C7;
+	Wed, 11 Feb 2026 13:13:03 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E6DD35EDCD
-	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 13:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C047036AB40
+	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 13:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770815580; cv=none; b=bE8uSYiaYhbaML9aHM9DWFlRDBmAIkTZF9vY568WmM4UI2kSYzMD/6bUJbLBxugnP1X+IPG999qPZFjJrSXStN1sICJD0vUtSGE5Tb6ZwTmyquOq1G7dfymkgF/x4uS2UgQUWT+GsKuKwqyXX9zaJ6ivIz7nE4J/PkTdIYEteog=
+	t=1770815582; cv=none; b=dNzKqL2fFsTao86nkR8+fT74jUJrlp/2F5yGW9qcT4fZrv33n8s2rbz22fiHJNTysxyUlV3vZUGSovIEzrdfZ7vq4qYhf5j7bhsDpCUW+Hfk5AW5Dy/ot8+hgYMrIYf6Od1AOoq8SejBDloL1NgbX/uHVn9qVqCA1URwbHxnlP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770815580; c=relaxed/simple;
-	bh=2ED7cAmH83SMkTI/78kvAC52c4xP/9XilTmeOSiXBi4=;
+	s=arc-20240116; t=1770815582; c=relaxed/simple;
+	bh=3skiQlsUicH2Zc4pT9oLT9Xw3X/ZaDRtZNxKy7cEhak=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t8FY6beqUGDdBgCkNMVbRCTQr1i/PEMJnmXu3gxKoTAY2TePQjtua3qI5pQq1jCUx97PWX86VRvxIKFBvjD8zJ7pOqAN6qlkYj+KRPBAB1Eyin+FqzjXIH0OvRw9yIwJpwMbgaWJpO6Boe1eNk86yG8lBPNyNqMzGPzSSinCoJo=
+	 MIME-Version; b=lhSbEj/LIG/D11QaI9falE3fPtxiyYks6nfBlzB3sqV5oBC4X+PZ4RcrLTeUVJu/qvGKse4rjoJLWTqXqvJuvNm0bP/AjFexOAhq7Nk2fbm2avr69vGrGkZpGCBmdrCPw+pAjT+ovLz8hyCrdoL1Dp2lOMo+WQdPCdd0719+GwQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D09E1497;
-	Wed, 11 Feb 2026 05:12:51 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF9CD339;
+	Wed, 11 Feb 2026 05:12:53 -0800 (PST)
 Received: from orionap.fritz.box (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7D0BE3F63F;
-	Wed, 11 Feb 2026 05:12:56 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8C1FB3F63F;
+	Wed, 11 Feb 2026 05:12:58 -0800 (PST)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Will Deacon <will@kernel.org>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>
@@ -44,9 +44,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH kvmtool v6 1/6] arm64: Initial nested virt support
-Date: Wed, 11 Feb 2026 13:12:44 +0000
-Message-ID: <20260211131249.399019-2-andre.przywara@arm.com>
+Subject: [PATCH kvmtool v6 2/6] arm64: nested: Add support for setting maintenance IRQ
+Date: Wed, 11 Feb 2026 13:12:45 +0000
+Message-ID: <20260211131249.399019-3-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260211131249.399019-1-andre.przywara@arm.com>
 References: <20260211131249.399019-1-andre.przywara@arm.com>
@@ -72,7 +72,7 @@ X-Spamd-Result: default: False [1.64 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70839-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70840-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -85,91 +85,129 @@ X-Spamd-Result: default: False [1.64 / 15.00];
 	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arm.com:mid,arm.com:email]
-X-Rspamd-Queue-Id: 3D01C124AB3
+X-Rspamd-Queue-Id: 10359124ABA
 X-Rspamd-Action: no action
 
-The ARMv8.3 architecture update includes support for nested
-virtualization. Allow the user to specify "--nested" to start a guest in
-(virtual) EL2 instead of EL1.
-This will also change the PSCI conduit from HVC to SMC in the device
-tree.
+Uses the new VGIC KVM device attribute to set the maintenance IRQ.
+This is fixed to use PPI 9, as a platform decision made by kvmtool,
+matching the SBSA recommendation.
+Use the opportunity to pass the kvm pointer to gic__generate_fdt_nodes(),
+as this simplifies the call and allows us access to the nested_virt
+config variable on the way.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arm64/fdt.c                         |  5 ++++-
- arm64/include/kvm/kvm-config-arch.h |  5 ++++-
- arm64/kvm-cpu.c                     | 12 +++++++++++-
- 3 files changed, 19 insertions(+), 3 deletions(-)
+ arm64/arm-cpu.c         |  2 +-
+ arm64/gic.c             | 29 +++++++++++++++++++++++++++--
+ arm64/include/kvm/gic.h |  2 +-
+ 3 files changed, 29 insertions(+), 4 deletions(-)
 
-diff --git a/arm64/fdt.c b/arm64/fdt.c
-index df77758..98f1dd9 100644
---- a/arm64/fdt.c
-+++ b/arm64/fdt.c
-@@ -205,7 +205,10 @@ static int setup_fdt(struct kvm *kvm)
- 		_FDT(fdt_property_string(fdt, "compatible", "arm,psci"));
- 		fns = &psci_0_1_fns;
- 	}
--	_FDT(fdt_property_string(fdt, "method", "hvc"));
-+	if (kvm->cfg.arch.nested_virt)
-+		_FDT(fdt_property_string(fdt, "method", "smc"));
-+	else
-+		_FDT(fdt_property_string(fdt, "method", "hvc"));
- 	_FDT(fdt_property_cell(fdt, "cpu_suspend", fns->cpu_suspend));
- 	_FDT(fdt_property_cell(fdt, "cpu_off", fns->cpu_off));
- 	_FDT(fdt_property_cell(fdt, "cpu_on", fns->cpu_on));
-diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-index ee031f0..a1dac28 100644
---- a/arm64/include/kvm/kvm-config-arch.h
-+++ b/arm64/include/kvm/kvm-config-arch.h
-@@ -10,6 +10,7 @@ struct kvm_config_arch {
- 	bool		aarch32_guest;
- 	bool		has_pmuv3;
- 	bool		mte_disabled;
-+	bool		nested_virt;
- 	u64		kaslr_seed;
- 	enum irqchip_type irqchip;
- 	u64		fw_addr;
-@@ -57,6 +58,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
- 		     "Type of interrupt controller to emulate in the guest",	\
- 		     irqchip_parser, NULL),					\
- 	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
--		"Address where firmware should be loaded"),
-+		"Address where firmware should be loaded"),			\
-+	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
-+		    "Start VCPUs in EL2 (for nested virt)"),
+diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
+index 69bb2cb..0843ac0 100644
+--- a/arm64/arm-cpu.c
++++ b/arm64/arm-cpu.c
+@@ -14,7 +14,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ {
+ 	int timer_interrupts[4] = {13, 14, 11, 10};
  
- #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
-diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
-index 94c08a4..42dc11d 100644
---- a/arm64/kvm-cpu.c
-+++ b/arm64/kvm-cpu.c
-@@ -71,6 +71,12 @@ static void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init
- 	/* Enable SVE if available */
- 	if (kvm__supports_extension(kvm, KVM_CAP_ARM_SVE))
- 		init->features[0] |= 1UL << KVM_ARM_VCPU_SVE;
-+
-+	if (kvm->cfg.arch.nested_virt) {
-+		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2))
-+			die("EL2 (nested virt) is not supported");
-+		init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2;
-+	}
+-	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
++	gic__generate_fdt_nodes(fdt, kvm);
+ 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
+ 	pmu__generate_fdt_nodes(fdt, kvm);
  }
+diff --git a/arm64/gic.c b/arm64/gic.c
+index b0d3a1a..b0be9e5 100644
+--- a/arm64/gic.c
++++ b/arm64/gic.c
+@@ -11,6 +11,8 @@
  
- static int vcpu_configure_sve(struct kvm_cpu *vcpu)
-@@ -313,7 +319,11 @@ static void reset_vcpu_aarch64(struct kvm_cpu *vcpu)
- 	reg.addr = (u64)&data;
+ #define IRQCHIP_GIC 0
  
- 	/* pstate = all interrupts masked */
--	data	= PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT | PSR_MODE_EL1h;
-+	data	= PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT;
-+	if (vcpu->kvm->cfg.arch.nested_virt)
-+		data |= PSR_MODE_EL2h;
-+	else
-+		data |= PSR_MODE_EL1h;
- 	reg.id	= ARM64_CORE_REG(regs.pstate);
- 	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
- 		die_perror("KVM_SET_ONE_REG failed (spsr[EL1])");
++#define GIC_MAINT_IRQ	9
++
+ static int gic_fd = -1;
+ static u64 gic_redists_base;
+ static u64 gic_redists_size;
+@@ -302,10 +304,15 @@ static int gic__init_gic(struct kvm *kvm)
+ 
+ 	int lines = irq__get_nr_allocated_lines();
+ 	u32 nr_irqs = ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
++	u32 maint_irq = GIC_PPI_IRQ_BASE + GIC_MAINT_IRQ;
+ 	struct kvm_device_attr nr_irqs_attr = {
+ 		.group	= KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
+ 		.addr	= (u64)(unsigned long)&nr_irqs,
+ 	};
++	struct kvm_device_attr maint_irq_attr = {
++		.group	= KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ,
++		.addr	= (u64)(unsigned long)&maint_irq,
++	};
+ 	struct kvm_device_attr vgic_init_attr = {
+ 		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
+ 		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
+@@ -325,6 +332,16 @@ static int gic__init_gic(struct kvm *kvm)
+ 			return ret;
+ 	}
+ 
++	if (kvm->cfg.arch.nested_virt) {
++		ret = ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &maint_irq_attr);
++		if (!ret)
++			ret = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &maint_irq_attr);
++		if (ret) {
++			pr_err("could not set maintenance IRQ\n");
++			return ret;
++		}
++	}
++
+ 	irq__routing_init(kvm);
+ 
+ 	if (!ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &vgic_init_attr)) {
+@@ -342,7 +359,7 @@ static int gic__init_gic(struct kvm *kvm)
+ }
+ late_init(gic__init_gic)
+ 
+-void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
++void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ {
+ 	const char *compatible, *msi_compatible = NULL;
+ 	u64 msi_prop[2];
+@@ -350,8 +367,12 @@ void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
+ 		cpu_to_fdt64(ARM_GIC_DIST_BASE), cpu_to_fdt64(ARM_GIC_DIST_SIZE),
+ 		0, 0,				/* to be filled */
+ 	};
++	u32 maint_irq[] = {
++		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI), cpu_to_fdt32(GIC_MAINT_IRQ),
++		cpu_to_fdt32(gic__get_fdt_irq_cpumask(kvm) | IRQ_TYPE_LEVEL_HIGH)
++	};
+ 
+-	switch (type) {
++	switch (kvm->cfg.arch.irqchip) {
+ 	case IRQCHIP_GICV2M:
+ 		msi_compatible = "arm,gic-v2m-frame";
+ 		/* fall-through */
+@@ -377,6 +398,10 @@ void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
+ 	_FDT(fdt_property_cell(fdt, "#interrupt-cells", GIC_FDT_IRQ_NUM_CELLS));
+ 	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
+ 	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
++	if (kvm->cfg.arch.nested_virt) {
++		_FDT(fdt_property(fdt, "interrupts", maint_irq,
++				  sizeof(maint_irq)));
++	}
+ 	_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_GIC));
+ 	_FDT(fdt_property_cell(fdt, "#address-cells", 2));
+ 	_FDT(fdt_property_cell(fdt, "#size-cells", 2));
+diff --git a/arm64/include/kvm/gic.h b/arm64/include/kvm/gic.h
+index ad8bcbf..8490cca 100644
+--- a/arm64/include/kvm/gic.h
++++ b/arm64/include/kvm/gic.h
+@@ -36,7 +36,7 @@ struct kvm;
+ int gic__alloc_irqnum(void);
+ int gic__create(struct kvm *kvm, enum irqchip_type type);
+ int gic__create_gicv2m_frame(struct kvm *kvm, u64 msi_frame_addr);
+-void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type);
++void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm);
+ u32 gic__get_fdt_irq_cpumask(struct kvm *kvm);
+ 
+ int gic__add_irqfd(struct kvm *kvm, unsigned int gsi, int trigger_fd,
 -- 
 2.47.3
 
