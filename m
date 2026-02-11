@@ -1,456 +1,198 @@
-Return-Path: <kvm+bounces-70892-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70893-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ECTfD8fcjGm3uAAAu9opvQ
-	(envelope-from <kvm+bounces-70892-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 20:47:19 +0100
+	id GDfCIBvgjGkSugAAu9opvQ
+	(envelope-from <kvm+bounces-70893-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 21:01:31 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93DD1127412
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 20:47:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 247451274F2
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 21:01:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1EEDD301AD3B
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 19:47:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 70306301FFBD
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 20:01:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336CC347BDB;
-	Wed, 11 Feb 2026 19:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E53356A12;
+	Wed, 11 Feb 2026 20:01:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A10Hlt//"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MDrx83Rt";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pbxeNqX1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09EF0242D83;
-	Wed, 11 Feb 2026 19:46:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770839221; cv=fail; b=pB1brl+DX+ZK/Zdj8Zhuxg3ZKW93KdEebLbiNDXn2t78KeBoaJKUifYkf7VqYFmeF+fYOztGTuz4+TqUvsqnPmKrdpwqx/SuIdKYZQB4IHiaHHHHKp0aBf00xnHA+LM+d4+miiPrruFsAkODw/rPGPuHYvxlKJthtlWM/yVejUE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770839221; c=relaxed/simple;
-	bh=ipYRkp5JB37DWQasLT+g8wc6Oei9c2K+GMTbNBS+cxs=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=GIVHnRFfN13L9062CeszjnyMz5+/ri0r2dXIG4myjamKP3wMRbvg9jQTUqYyhUSmfXjgg5ljyBtiHrgZM05e36ieFbH7fAkYQOygj5eGi/MwL6w3yYpuSCL9GVLGHmEvZDEmdPtDQ2LmzetLBySMKjqHcoiKrvnUNKsfbZJF3Xc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A10Hlt//; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770839219; x=1802375219;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=ipYRkp5JB37DWQasLT+g8wc6Oei9c2K+GMTbNBS+cxs=;
-  b=A10Hlt//S9+pfBKqqLE3/lsYr0iIcj/+5oKbXsnnLGuOXYxW5Spjdj/7
-   CEpl5+JI1jglJIfkHoeX998hDckQxxaPKtRrlDSRddgj3+4mNr4/B3qv2
-   bbi5dvuAr9MPm717bzp250y8wrvHet0vcDNzvGUL3ee9G/38t1Wl+kdXy
-   8xJQHHyDqSDW9/OLgq23b8ai2KjPbutuJAAI98qvGo2IM0UebsOHTTfnf
-   WdBt5NekrlzPEFH28XAPfjNZZTfpW0JPPnWEF4bwi6pnFmHuM77WyZtuL
-   jmZjExtLEoftRK0m9B/47RKF2PO/bBOmyxskNUe5p4a6mnagXuC8RBUqI
-   g==;
-X-CSE-ConnectionGUID: 3r0EG9WGS+2rdBqKyGB0eA==
-X-CSE-MsgGUID: EtLBcmocSYuEmTsHD3rFjw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11698"; a="83439587"
-X-IronPort-AV: E=Sophos;i="6.21,285,1763452800"; 
-   d="scan'208";a="83439587"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2026 11:46:58 -0800
-X-CSE-ConnectionGUID: 975eXlPkSLWEKhDhM5PFoQ==
-X-CSE-MsgGUID: lMjZGSjhQN67q8AQqmV4Pg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,285,1763452800"; 
-   d="scan'208";a="216867076"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2026 11:46:58 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Wed, 11 Feb 2026 11:46:57 -0800
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35 via Frontend Transport; Wed, 11 Feb 2026 11:46:57 -0800
-Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.65) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Wed, 11 Feb 2026 11:46:57 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tonZDBS45PVYQmRsTsaZikcLQtMOn/h/vBLYyrC/JbKZ0Jq1dkajl0p4lCMON1D/eQkG09ak5bJp66ScJUx4I0vbWwVOEYya9WPA74YMkh1t1O5b9WCkcUJrFqmqKCppz6VCRXDfKOrXB3rxyHcsomciaEhLhElDl74mlPW/w8dIr2JR4gt/4jWogtjdmjbsB/AKyb9W0Xgn7F7ahOGZwoConVo7G+xC1g+dBXkZRkebfhS1zgVbuLffxE12wFhGr7VfwCQnzAB5t7Dhc9h2lnKfzmVy1onwsa7Jagr+VqvIEYzgb9m/HC0C07nDlbOzTac9sGJE1XhLH5POVx0v5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0Jbshk8TpYGHx57ZOoORo9YWTh5nTqMtlP2UD7YQC18=;
- b=QTnE2o9B1rMlzVl0Bqcxrd33+dVS6Ahl+BijxHrbzAlK6IYM7GlCxFcqB43WFmAeVdaE+M/OC1MYriHeujTJER3JATG615ynsq4N5uQyIL4i4w5AL6gGbLGkNU5niYgqYqB4zm0nlypWsb/CFGxWAekg3DQrcPTT1mAWzUEEEL08oqjuDrjc+iIj+Kd+bC1BBLbGqDEqrHem5u4F8nyhrSGyiLn0Cy9S2H81wBSUOiSNSTtEnzVMzz1groODhyWoGIklICxAFgvN8idIG7kw7XRi/YWAznHQrUl8olyTR0v0z7ttlt1kLKBeN/9XmtFXoW4t/r+INcdpnTiVObk9Ug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB6077.namprd11.prod.outlook.com (2603:10b6:8:87::16) by
- DS0PR11MB7958.namprd11.prod.outlook.com (2603:10b6:8:f9::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9611.10; Wed, 11 Feb 2026 19:46:52 +0000
-Received: from DS7PR11MB6077.namprd11.prod.outlook.com
- ([fe80::5502:19f9:650b:99d1]) by DS7PR11MB6077.namprd11.prod.outlook.com
- ([fe80::5502:19f9:650b:99d1%7]) with mapi id 15.20.9611.008; Wed, 11 Feb 2026
- 19:46:52 +0000
-Date: Wed, 11 Feb 2026 11:46:46 -0800
-From: "Luck, Tony" <tony.luck@intel.com>
-To: Ben Horgan <ben.horgan@arm.com>
-CC: Reinette Chatre <reinette.chatre@intel.com>, "Moger, Babu"
-	<bmoger@amd.com>, "Moger, Babu" <Babu.Moger@amd.com>, Drew Fustini
-	<fustini@kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
-	"Dave.Martin@arm.com" <Dave.Martin@arm.com>, "james.morse@arm.com"
-	<james.morse@arm.com>, "tglx@kernel.org" <tglx@kernel.org>,
-	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
-	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "peterz@infradead.org"
-	<peterz@infradead.org>, "juri.lelli@redhat.com" <juri.lelli@redhat.com>,
-	"vincent.guittot@linaro.org" <vincent.guittot@linaro.org>,
-	"dietmar.eggemann@arm.com" <dietmar.eggemann@arm.com>, "rostedt@goodmis.org"
-	<rostedt@goodmis.org>, "bsegall@google.com" <bsegall@google.com>,
-	"mgorman@suse.de" <mgorman@suse.de>, "vschneid@redhat.com"
-	<vschneid@redhat.com>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "pawan.kumar.gupta@linux.intel.com"
-	<pawan.kumar.gupta@linux.intel.com>, "pmladek@suse.com" <pmladek@suse.com>,
-	"feng.tang@linux.alibaba.com" <feng.tang@linux.alibaba.com>,
-	"kees@kernel.org" <kees@kernel.org>, "arnd@arndb.de" <arnd@arndb.de>,
-	"fvdl@google.com" <fvdl@google.com>, "lirongqing@baidu.com"
-	<lirongqing@baidu.com>, "bhelgaas@google.com" <bhelgaas@google.com>,
-	"seanjc@google.com" <seanjc@google.com>, "xin@zytor.com" <xin@zytor.com>,
-	"Shukla, Manali" <Manali.Shukla@amd.com>, "dapeng1.mi@linux.intel.com"
-	<dapeng1.mi@linux.intel.com>, "chang.seok.bae@intel.com"
-	<chang.seok.bae@intel.com>, "Limonciello, Mario" <Mario.Limonciello@amd.com>,
-	"naveen@kernel.org" <naveen@kernel.org>, "elena.reshetova@intel.com"
-	<elena.reshetova@intel.com>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "peternewman@google.com"
-	<peternewman@google.com>, "eranian@google.com" <eranian@google.com>, "Shenoy,
- Gautham Ranjal" <gautham.shenoy@amd.com>
-Subject: Re: [RFC PATCH 13/19] x86/resctrl: Add PLZA state tracking and
- context switch handling
-Message-ID: <aYzcpuG0PfUaTdqt@agluck-desk3>
-References: <cover.1769029977.git.babu.moger@amd.com>
- <17c9c0c252dcfe707dffe5986e7c98cd121f7cef.1769029977.git.babu.moger@amd.com>
- <aXk8hRtv6ATEjW8A@agluck-desk3>
- <5ec19557-6a62-4158-af82-c70bac75226f@amd.com>
- <aXpDdUQHCnQyhcL3@agluck-desk3>
- <IA0PPF9A76BB3A655A28E9695C8AD1CC59F9591A@IA0PPF9A76BB3A6.namprd12.prod.outlook.com>
- <bbe80a9a-70f0-4cd1-bd6a-4a45212aa80b@amd.com>
- <7a4ea07d-88e6-4f0f-a3ce-4fd97388cec4@intel.com>
- <1f703c24-a4a9-416e-ae43-21d03f35f0be@intel.com>
- <aYyxAPdTFejzsE42@e134344.arm.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aYyxAPdTFejzsE42@e134344.arm.com>
-X-ClientProxiedBy: SJ0PR03CA0232.namprd03.prod.outlook.com
- (2603:10b6:a03:39f::27) To DS7PR11MB6077.namprd11.prod.outlook.com
- (2603:10b6:8:87::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2782D1F4E
+	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 20:01:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770840076; cv=none; b=Gy6VmopkRp3M6Pd3sygBCpC2Ro1s9Mruu4jLBthDW7W5NZd2ubwjEUkJ/STf+vA0eNngP9c4uriTZ/+iiJDzPJ4/7vxtlyDrQQlaE2Q0ACrrj3FQHZvcMnfN4VCnTdIlohAEc52HoJTh0SLbndQ8t8T2iVICOSjbdiFMHLZ214A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770840076; c=relaxed/simple;
+	bh=gbzTFzf1qwsOloZwMfBXvRhqudV/HFNb7Pt4vdjNQPw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d0gyAgNyVWS7VVDhk3xPmH7jHga8uU+/lyDWw4Fm4zpwqvHh0K9y/f6tE9Ecbirla4q04WJH5hxDDhjxBeYvChYJ538gKkNnlw+/y2KTijJ1ZTkMksO7ea+I4Vc8FxtmFEFhypr6O/VfMvtigNJrUw9NfAthK2rcIY7b7kLfWIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MDrx83Rt; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pbxeNqX1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770840074;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=unlAZpu0DMR9ibJFuP5Oyxh4e+3VDJDkStDVQDwwXng=;
+	b=MDrx83RtDHkuL4df5fdy5aAiBAMNwzxs3OdlAfoHfazW9pjKma8+lP6eNrHVgL0cVlOhh+
+	bp1IrG4tflYYQmKk7LEK2B3hgqzuZntuA3xepfRBHF9+Pq8PMYffRcKFBezeUksMTqhfL6
+	2kfm64sLI/QDhhQ7y4tR2PqySDDNoSQ=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-466-Ap1IlD8JNp2uqCMBmCiN2w-1; Wed, 11 Feb 2026 15:01:12 -0500
+X-MC-Unique: Ap1IlD8JNp2uqCMBmCiN2w-1
+X-Mimecast-MFC-AGG-ID: Ap1IlD8JNp2uqCMBmCiN2w_1770840071
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-894727de401so51872276d6.1
+        for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 12:01:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1770840071; x=1771444871; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=unlAZpu0DMR9ibJFuP5Oyxh4e+3VDJDkStDVQDwwXng=;
+        b=pbxeNqX1hoGg/ZAcgDD3OklffhD62DiYXOVyNCYZQdQSt8SNGdVUA1BRbRl/XYhyVL
+         9xwxDHB3gQZZ5aHgZbV9lvmEdzM4nvBbWYydpKIra8C2gHKKcv0mfySwNQx9KESvmRhk
+         eeTY1a4aDv9vT6tL6aR2/tol9E/gt9uCSo4RZzN9Gru79hhBSsZ6+7vNEYRuzn8EwFu7
+         4i5SqQAVswR4ILyyufbq3jRxflHUj9uTe1WxgWp78AWFBeQad+fLlYEayW83iW49BlO7
+         Vb43GDr702qXAPENOlu+dr/0iXCOm0CWZA9c+8v9JQcQoWeVnrRDR7H2BFcHL+QURCzM
+         BUGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770840071; x=1771444871;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=unlAZpu0DMR9ibJFuP5Oyxh4e+3VDJDkStDVQDwwXng=;
+        b=kBCzpB7q72kV8Fa3RXkT+JKedajbMtYkAI2Z6QnCqvxffv2KNWz7yPp+clz3f1Wfgx
+         jaB48Z2w6IWuweQifPA+IPir5OiBMUxh1c9ii5LwahyYjZV1ceEzVbPT9BVsBcLiWUhX
+         p8exTOx4nrZRQbhmecAzij5qaHjxQeS9NiHJUA80CZLvZ9xV7Q2NRg3BtlQZ9NTkBIo7
+         lC7QI7coyuVsyf/oro+l6yUwdrgM44hdQj1Xtq5JpzB/tPi8ZtX9BHObniUQ0PXMiV06
+         2ulZQK6ooGVHniX8Lv4iMPqTPT06jWtErV/lb1sSDy2emO9SAkiGJx1Sq6cWzJ+MXdxS
+         KADw==
+X-Forwarded-Encrypted: i=1; AJvYcCUxQRaXaOw7SdBvO0ojZ1V7TgJETUOij5wxe+mKgSrlUs+RXT0lRKWIJGWFUACIak/9xHw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxgv5i/xfpdhRAwDEZlXzl77mSMF49Ngqp/Khiyu1uQtwenTFfo
+	6IIdfSw8o+aHttn3xzHLvbEW/wySrLrtFw+4qlEU9otUeCzUtu5+v2+y0tDKbo9wRCx6uU+BPvw
+	1s0UUQVUeO57ZhJwglkUk6KcXg5acqNQVEzjSxhNxKtF+szONiJTOpA==
+X-Gm-Gg: AZuq6aJ3OrXLFDsiblpwBsQZidAg+rQQAJWlTglr8mW5dpxm6reReHh7Mh1cu9b9I2k
+	9t8GpPCPOYi5Z1iu4UL1a940HAdzRyPobLY6C3iyMvVP1RDed33pVeU92qx/spR939sWqlE1bgc
+	t8bYPYrBleKmFf8yd8HejLeSUYXFu8/wOQvQQn3QYOs1U4Q9UF+jddJ1iO2XHsUTanRYRz5igUq
+	4ufF9lqjH6ei+BYMPtY3Cdup7KXBFeTQrUxwtuufxVbohQ43NjWp5nsSvTe0EKsvGR9uSwoKLal
+	2S1eld4SFke0stfOm4L/UVlI8p1c6ylQRUUEwlp1NxZOoMN4NuEbGTDgc5M4RJEl46HCjm+PG7g
+	YOcR9gI1a6/0M4peygU2RZdbD6kuOqXuYq0+Ym1EH6h70IeGjebdCiNHYtlx9ZXJAnbT5hdj/SW
+	tOcvZbeA==
+X-Received: by 2002:ad4:5aa4:0:b0:894:71fe:89f4 with SMTP id 6a1803df08f44-89728d939c3mr2000416d6.11.1770840071460;
+        Wed, 11 Feb 2026 12:01:11 -0800 (PST)
+X-Received: by 2002:ad4:5aa4:0:b0:894:71fe:89f4 with SMTP id 6a1803df08f44-89728d939c3mr1999556d6.11.1770840070818;
+        Wed, 11 Feb 2026 12:01:10 -0800 (PST)
+Received: from x1.local (bras-vprn-aurron9134w-lp130-03-174-91-117-149.dsl.bell.ca. [174.91.117.149])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-506920071c4sm3288501cf.1.2026.02.11.12.01.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Feb 2026 12:01:10 -0800 (PST)
+Date: Wed, 11 Feb 2026 15:00:58 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	David Hildenbrand <david@redhat.com>,
+	Hugh Dickins <hughd@google.com>,
+	James Houghton <jthoughton@google.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Oscar Salvador <osalvador@suse.de>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC 10/17] shmem, userfaultfd: implement shmem uffd
+ operations using vm_uffd_ops
+Message-ID: <aYzf-hS4pUY9ulss@x1.local>
+References: <20260127192936.1250096-1-rppt@kernel.org>
+ <20260127192936.1250096-11-rppt@kernel.org>
+ <aYIzCuh8cjd09zrP@x1.local>
+ <aYhm_4difwN5XXxe@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB6077:EE_|DS0PR11MB7958:EE_
-X-MS-Office365-Filtering-Correlation-Id: b1d62691-1749-4921-c86b-08de69a64da4
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?YkZvU1B2SnBwY2hoNjEwQW9DTEQ5aThRWkgxSnVBdXpTbWRyc2VLWmUxb3JB?=
- =?utf-8?B?RHdOOEdTVlFvRldvSVNUNzJMTmZlUnJnaEV4aTJOUkYzbTBaL0FDRGVKR3R6?=
- =?utf-8?B?U2ptTlppbjlZWDVqUE9INFV4N1RSZWtDd0JmSE01ek9PZkJ4MldFNTdrVVp6?=
- =?utf-8?B?ZnlPeGpiNFE2d2xEY2ZmVnRzQjg0c3UvUzdjZU9lbGt6Q056TW1uTU93a00y?=
- =?utf-8?B?elFHR0lCZ0ZjdkVNU3pxYklKc2puaXo1UHNWRE9Ibks1U3FlWitpenNjYjcx?=
- =?utf-8?B?c25UQ2FmaVNBVVpkVlhaRUxXenplNDU2ZTMzMHBnc05MS0VKYWxtU013b0Zr?=
- =?utf-8?B?TDkrc3Rrc0NIbENIOEk0YkN1NHZqRWdST3l2WDdINHBFYWFlaUhZWk1Xd3M0?=
- =?utf-8?B?ZVNubTl0VnpwYXNJQ2g4ckhPZUpSUEVSaEVLQ2lmSTIvckZ0c3dBZUVpMmpB?=
- =?utf-8?B?TGNXbXpQcVlUakdNTDN0UGp0QVpPbDZZSTl6RHI3MEEyUjIweWpvVWl4cTZn?=
- =?utf-8?B?d1p5aUxQRmdyQUQ0MUVVMjIzYUx3ZlZac3Y5MEsvcllZTFlkNFdDMmJMUkhT?=
- =?utf-8?B?ZGpFVkpPWFhOYVY4TzViNEI5Y1dGS3hkR0hxZXc4VkJHa3d1OEV3cDVDcDNH?=
- =?utf-8?B?SkVUdW5zQmMzT2FiYXpKd3pzTmk5djYxd1ZVcWQ4dlBrNGYvVFF1aStreVNU?=
- =?utf-8?B?cnhwVVkyZkFBZE4xVnFmcHFyTW1HcFd6V05uSkppdXVMY29pMjZMcXh1WS9F?=
- =?utf-8?B?c05Dd3BrWVA3NHl4czNmVm4vTXpWYlJKNkl4S0owbmNFV2RLTGhkSXNpNWhi?=
- =?utf-8?B?WGxiSHNNWnkrSThubHA5NXltc1hUUjZtQ28yc2Q0NFJpdlhZdGRYV2ZPSnI5?=
- =?utf-8?B?bElIQmxXaHpvMldyYlRBc1RSUTZuN3FtaGRiV2djNU1pcGFYME5pRXhzYlAw?=
- =?utf-8?B?VkNPQTIwTENuOTBicjJ1UzZlRWZKVzYxQlM1Ym1sZ2gxNlBBaEsyRjhPbGZS?=
- =?utf-8?B?dmpENkhXUFpCb2YrSlpMTGZNRjB4UFlEVUZGZEhYZ3BwY0kzUmU1RUdzMCtE?=
- =?utf-8?B?ZjQyOENSK0RFbFlzZi80SGFnMjBHMklCZEhQZEw5V3YvWEJRNExVeTBtdzZR?=
- =?utf-8?B?RTdSSFN5cDlzbGhlNndRSWRDanRrNFA4Q0dYUHN4NHZwY2g3aEhrQ0Q1cTFy?=
- =?utf-8?B?bi9DTjJ3SWR4eUcwZUlicXhBOG1tczZzOVRRanErVVR1V3ZNbnBueTRramtH?=
- =?utf-8?B?VUJmakhJT0FzVnAzcXJGSmRheVdQMHJvcHlyNDA4VnJhTkZUaVZSNDJQNUtE?=
- =?utf-8?B?YkQxUVNwVFRpbUJQcktNR1ViaU1GNUYwdXAwQnJBZk5vUWU4aGU3ME9PWU55?=
- =?utf-8?B?NWZzOVByWlVqelQ0cDcvTlFDWnVxdC8rdVJyS01MY2dWWEsra2xyMHhNemU3?=
- =?utf-8?B?MGNxZlhHdVduYVZHcTFla1JEK1lsS2xsYTNmeUo1ZjBIVnI3YTFabFk2MWlm?=
- =?utf-8?B?U2g1U1k4R0V4TXFrMnkxTjJaYWxxLzBxU2tSbDRIa1F3MjdscE9ZK0VVSTNM?=
- =?utf-8?B?cDdZWkZRSG51K05VR01XNWlQcjBOcDI2RE02WEZIWDlSTmZ3b0ZtVDdTVWpq?=
- =?utf-8?B?ZjQ3OTVBYjNnekp1bUdBMHVOWTNGLy80eThiWE55R0RDdk9LaTZKUTY1c0E1?=
- =?utf-8?B?ZFhPbzVyUDdJU3NBbHd3aDlONVFHb1U3NTkyMmRtZWhsYjFtT2JIN0FBRDVp?=
- =?utf-8?B?eXZ5bzlLWkdQV3hxVjRUdU1DY2pXTnRqZ3c5TEtaMnZ6T0lranZSamtuS1JZ?=
- =?utf-8?B?ak8rcmRoOGF1KzNFZmRTZ3YxZ3dpOWZzMlpaa1JGTDdVZzJ3aitzRmhUQVNq?=
- =?utf-8?B?SWJTNW5tcGVPTk0zY3h4S0t4c3EvcUZ6YXJkcG1PMVQ4bkpYU2t3akpxOHp2?=
- =?utf-8?B?R2pRaVJGS3NtTFd1OXNWa0RLWW4rYWlqekpENVlQblBGYlNRbU1UZTd3Q0w5?=
- =?utf-8?B?ZUZJbkhIQTBTNFZ1UHMzcUtEbU96UWNsSzRWOEhSYmJjZlVXV2JuVDE1TTlh?=
- =?utf-8?Q?NI/2gb?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB6077.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SVhnRC9uNUJWR0p0NWY2cFE2eHo4WEpwRkt5NnZvYk9aZzZuQVhndmFMTnBk?=
- =?utf-8?B?N2dyRk9sSDIyd0ovSWZraDNlR0xZUHh3d1l0Ri9oK0RydElvdTVZNVlZRmVV?=
- =?utf-8?B?U1N4RXFCL0Y2Y1RVNmVyT3FLV042N1NLMGUwQnM5L091VW4rOWwyc1ZXQndy?=
- =?utf-8?B?YjdIOGFFak9PTHJRdmh2b2RKYUdodjVtYm8wRXhNRENTT29Sb0tJaW43SDA1?=
- =?utf-8?B?bHBzUEFiV3NEZ3pUemYzd1N3SFgzRDFCenlTZmpjdmNDNWpqb0pmM1RoS0E3?=
- =?utf-8?B?WktlRFNPbDdHTWRjWGpySndFWWZrOFB4M0x2VHVTVzZvaE83dFlHMFVRZGx5?=
- =?utf-8?B?eVAwdE0wUmhUeVRLUFFDNlZsb1RCanJkbFZFWUJ1dFhjWXFLNjIzRTBBelN4?=
- =?utf-8?B?SHFCMk9UODVZUWJPNkJYdmtyV1pWOFgxOU5zb2RLU1A0dkN3c3BqaEorcUpT?=
- =?utf-8?B?N2hHMGU0L0t2YUJlSmkwWDVSRmtMZWhLa3ZzKzVDTWpWOXZhekZ3a1F0S1BI?=
- =?utf-8?B?dmE5WUU4elY1a1NLU1BZWFpNRkVIbTRlUzNYSVhmMGVOSXR4Y05YSHAvUkRl?=
- =?utf-8?B?LzZRVkFPOXQyL1FOQW4vVHEycUU4bmVRbDNsaFFRVkgvVCt5VVZlUU5mTEZW?=
- =?utf-8?B?dzRObWozL1FOT3dGTng0QVYrTjF0WkNTNGp2OTdKd1J0Q2w2YWlkTjRtd00w?=
- =?utf-8?B?NVV3aVBPKzBJNHAwSDY2UGFxcEFON29Rc2xRZVBPMUtUVXYxNGNrbzA0T2hY?=
- =?utf-8?B?RFAxUkJ2eFNENUl1N3c3b2wvK3dXVExyMVZPSHRacWRKZ0diaDlDTDNDZU1n?=
- =?utf-8?B?R2ZQcXpQMmF6QjJkdzJYaXFWYVlWMXNEMSt2VjVCTFN6Y01tRnBkT2x1L1Yz?=
- =?utf-8?B?N1AzemF4VTB1bTluWkdKOVpVMVFLUWY3VkE4U2M3cmZqeHh1aVJqTVRPWlUv?=
- =?utf-8?B?UHBWZVZSNnlxeHM2Rm1BMkEvT2Q2NE4vam8vNENRb1Vod3J6dlFnZDgreTZx?=
- =?utf-8?B?cHhqYmt2SHBtbDc5ZFZLOHZVUHkyeEJjRjk5Q1JRM3JuZmtHUWFBRktyNzJz?=
- =?utf-8?B?VkZwb0Irby9WR3N6NzhWWUN1VjBscytzTzJ4N2ljekZDRGNoaFY4U000NFgz?=
- =?utf-8?B?dXlkcDBTN05mZEpZaDVQamtCSUNveXJYdHQzN0xyQmJXUmdJdGJ1Q0tIMjJ4?=
- =?utf-8?B?Z2NjYlpicGM0bzNpT2hkcGJwYVBxV2hWR2ladUxyS1JIUVhVTlpvVVdkbTVw?=
- =?utf-8?B?T2xzdUNxdlZsMllrRkszQklBYVRUSkhCZDZDY0o1bTVTS1BuSjBnd0RCQkxO?=
- =?utf-8?B?TlFRUFZvNWYxWUpTNC9zZEVZVzdPUXlOYmMvbElRRkZUS2ZQVlU5bWs0RFc3?=
- =?utf-8?B?aXZHWVFudGhJU0FLSjZlY25BZlorYlVtbTBZTEVFQmMvSGtlS2tiUmVrN3E3?=
- =?utf-8?B?MnJPd1N1dzBWSTFxcUZWRlpNMnV5ODlUQ2VTZWlOUnZDR2lXaWw1SkFuUnQr?=
- =?utf-8?B?eW9SaHhMZDJNeE5MWHRsNEFCc3daRWU4c1puanI4VGsxQTJnUkVyM1dpclQz?=
- =?utf-8?B?anFKKzZ3dThxMERHdkR4cy95N2FqUkR5b2tMUDFxbllMUXpFNjQ3TW9DbFJD?=
- =?utf-8?B?NmJ2MjZXZ29KT1ZkcVcvYUFSb2plU0haMnlCbER3RU5Gd2pHRXV6eThrL1NG?=
- =?utf-8?B?K2pOWmpmcWNreklCcmNjZ0tMV2RVOCtkTnVjNGZQSTFnckR3QVBQejhtWU03?=
- =?utf-8?B?UGg1azQyMVhsM2F5Y0g4ZEl4MnlXMzVoZDkxK2I2TlArL3RlNWxxV1pGeFN2?=
- =?utf-8?B?anBZOThnV211VFNsYXdlN0VaRWREZHczRTNtYmhDRlZtT2JMcWFzb3VSZmM2?=
- =?utf-8?B?NnhSZmFaZ0d1bXZ2OXl3RExnUWJad3lYcVBZQTVuaEEvRjlkcW8wcHJiR2Ux?=
- =?utf-8?B?SXBOQ2RVaHpYZHpYeWNDR1owODlma0Ywa0V1ODZPWnA2N1VNeHJMQnNDbXZT?=
- =?utf-8?B?QVZGZzJqSkRWRVZiN2VGSXNING9RcWZBVVkrMkUyUDl1QnAwczFOcVlGODBL?=
- =?utf-8?B?K0xZTnluejgzR281K2tGejZ5a1BuZHdXS0cyQmw0QTZpSmk3THZSVEF1WjVh?=
- =?utf-8?B?MUQ2Nmg1Y0tWaDV2NWFlTDBkRGJyYUt1WUdDV3B1aHRFNENwZXpJeXcrbVBZ?=
- =?utf-8?B?R0w2Mmc5MUdTekFOVFlvWHpFOTdxTXUramJpMU82WVI2L09mWTlYejg5dXR4?=
- =?utf-8?B?bnRrcHg2VzlaRjFVMlk3ZTcrWTlRNDdGOEZxL1RUVWNLYjVFblVaY1EycGJo?=
- =?utf-8?B?d3U2T1o2ZVUyQzU3YkpGWG9kZGNXSm1URlg1TS9hcnRId2dGaWVpZz09?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b1d62691-1749-4921-c86b-08de69a64da4
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB6077.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2026 19:46:52.3764
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dAmjEL2ama/QsqAd/FfScqXggvh8Nr/xdJa0uRqC/WlP2j359+ilNYw0lR7+xiFPkb2wTbICt1K01w5DpkYtIQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7958
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aYhm_4difwN5XXxe@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70892-lists,kvm=lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[46];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tony.luck@intel.com,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-70893-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 93DD1127412
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[peterx@redhat.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[x1.local:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 247451274F2
 X-Rspamd-Action: no action
 
-On Wed, Feb 11, 2026 at 04:40:32PM +0000, Ben Horgan wrote:
-> Hi,
-> 
-> Thanks for including me.
-> 
-> On Tue, Feb 10, 2026 at 10:04:48AM -0800, Reinette Chatre wrote:
-> > +Ben and Drew
+On Sun, Feb 08, 2026 at 12:35:43PM +0200, Mike Rapoport wrote:
+> > > +static void shmem_mfill_filemap_remove(struct folio *folio,
+> > > +				       struct vm_area_struct *vma)
+> > > +{
+> > > +	struct inode *inode = file_inode(vma->vm_file);
+> > > +
+> > > +	filemap_remove_folio(folio);
+> > > +	shmem_recalc_inode(inode, 0, 0);
+> > >  	folio_unlock(folio);
+> > > -	folio_put(folio);
+> > > -out_unacct_blocks:
+> > > -	shmem_inode_unacct_blocks(inode, 1);
 > > 
-> > On 2/10/26 8:17 AM, Reinette Chatre wrote:
-> > > Hi Babu,
-> > > 
-> > > On 1/28/26 9:44 AM, Moger, Babu wrote:
-> > >>
-> > >>
-> > >> On 1/28/2026 11:41 AM, Moger, Babu wrote:
-> > >>>> On Wed, Jan 28, 2026 at 10:01:39AM -0600, Moger, Babu wrote:
-> > >>>>> On 1/27/2026 4:30 PM, Luck, Tony wrote:
-> > >>>> Babu,
-> > >>>>
-> > >>>> I've read a bit more of the code now and I think I understand more.
-> > >>>>
-> > >>>> Some useful additions to your explanation.
-> > >>>>
-> > >>>> 1) Only one CTRL group can be marked as PLZA
-> > >>>
-> > >>> Yes. Correct.
-> > > 
-> > > Why limit it to one CTRL_MON group and why not support it for MON groups?
-> > > 
-> > > Limiting it to a single CTRL group seems restrictive in a few ways:
-> > > 1) It requires that the "PLZA" group has a dedicated CLOSID. This reduces the
-> > >    number of use cases that can be supported. Consider, for example, an existing
-> > >    "high priority" resource group and a "low priority" resource group. The user may
-> > >    just want to let the tasks in the "low priority" resource group run as "high priority"
-> > >    when in CPL0. This of course may depend on what resources are allocated, for example
-> > >    cache may need more care, but if, for example, user is only interested in memory
-> > >    bandwidth allocation this seems a reasonable use case?
-> > > 2) Similar to what Tony [1] mentioned this does not enable what the hardware is
-> > >    capable of in terms of number of different control groups/CLOSID that can be
-> > >    assigned to MSR_IA32_PQR_PLZA_ASSOC. Why limit PLZA to one CLOSID?
-> > > 3) The feature seems to support RMID in MSR_IA32_PQR_PLZA_ASSOC similar to
-> > >    MSR_IA32_PQR_ASSOC. With this, it should be possible for user space to, for
-> > >    example, create a resource group that contains tasks of interest and create
-> > >    a monitor group within it that monitors all tasks' bandwidth usage when in CPL0.
-> > >    This will give user space better insight into system behavior and from what I can
-> > >    tell is supported by the feature but not enabled?
-> > > 
-> > >>>
-> > >>>> 2) It can't be the root/default group
-> > >>>
-> > >>> This is something I added to keep the default group in a un-disturbed,
-> > > 
-> > > Why was this needed?
-> > > 
-> > >>>
-> > >>>> 3) It can't have sub monitor groups
-> > > 
-> > > Why not?
-> > > 
-> > >>>> 4) It can't be pseudo-locked
-> > >>>
-> > >>> Yes.
-> > >>>
-> > >>>>
-> > >>>> Would a potential use case involve putting *all* tasks into the PLZA group? That
-> > >>>> would avoid any additional context switch overhead as the PLZA MSR would never
-> > >>>> need to change.
-> > >>>
-> > >>> Yes. That can be one use case.
-> > >>>
-> > >>>>
-> > >>>> If that is the case, maybe for the PLZA group we should allow user to
-> > >>>> do:
-> > >>>>
-> > >>>> # echo '*' > tasks
-> > > 
-> > > Dedicating a resource group to "PLZA" seems restrictive while also adding many
-> > > complications since this designation makes resource group behave differently and
-> > > thus the files need to get extra "treatments" to handle this "PLZA" designation.
-> > > 
-> > > I am wondering if it will not be simpler to introduce just one new file, for example
-> > > "tasks_cpl0" in both CTRL_MON and MON groups. When user space writes a task ID to the
-> > > file it "enables" PLZA for this task and that group's CLOSID and RMID is the associated
-> > > task's "PLZA" CLOSID and RMID. This gives user space the flexibility to use the same
-> > > resource group to manage user space and kernel space allocations while also supporting
-> > > various monitoring use cases. This still supports the "dedicate a resource group to PLZA"
-> > > use case where user space can create a new resource group with certain allocations but the
-> > > "tasks" file will be empty and "tasks_cpl0" contains the tasks needing to run with
-> > > the resource group's allocations when in CPL0.
+> > This looks wrong, or maybe I miss somewhere we did the unacct_blocks()?
 > 
-> If there is a "tasks_cpl0"  then I'd expect a "cpus_cpl0" too.
-> 
-> > 
-> > It looks like MPAM has a few more capabilities here and the Arm levels are numbered differently
-> > with EL0 meaning user space. We should thus aim to keep things as generic as possible. For example,
-> > instead of CPL0 using something like "kernel" or ... ?
-> 
-> Yes, PLZA does open up more possibilities for MPAM usage.  I've talked to James
-> internally and here are a few thoughts.
-> 
-> If the user case is just that an option run all tasks with the same closid/rmid
-> (partid/pmg) configuration when they are running in the kernel then I'd favour a
-> mount option. The resctrl filesytem interface doesn't need to change and
-> userspace software doesn't need to change. This could either take away a
-> closid/rmid from userspace and dedicate it to the kernel or perhaps have a
-> policy to have the default group as the kernel group. If you use the default
-> configuration, at least for MPAM, the kernel may not be running at the highest
-> priority as a minimum bandwidth can be used to give a priority boost. (Once we
-> have a resctrl schema for this.)
+> This is handled by shmem_recalc_inode(inode, 0, 0).
 
-I'm a big fan of this use case. It's easy to understand why users would
-want this. It avoids the issue that syscalls, page-faults, and
-interrupts from a task with very limited resources will spend ages in
-the kernel. Users have complained about the priority inversions that
-this can cause.
+IIUC shmem_recalc_inode() only does the fixup of shmem_inode_info over
+possiblly changing inode->i_mapping->nrpages.  It's not for reverting the
+accounting in the failure paths here.
 
-It also has a simpler implementation. No changes to the context switch
-code. On x86 some simple method to steal a CLOSID and configure
-resources for that CLOSID.
-> 
-> It could be useful to have something a bit more featureful though. Is there a
+OTOH, we still need to maintain accounting for the rest things with
+correctly invoke shmem_inode_unacct_blocks().  One thing we can try is
+testing this series against either shmem quota support (since 2023, IIUC
+it's relevant to "quota" mount option), or max_blocks accountings (IIUC,
+"size" mount option), etc.  Any of those should reflect a difference if my
+understanding is correct.
 
-Many things have theoretical use cases. I'd like to hear from some
-resctrl users whether they will make use of these extra features.
+So IIUC we still need the unacct_blocks(), please kindly help double check.
 
-Babu's RFC allows for some tasks to be in the PLZA group while others
-will run in kernel mode with the same resources that are granted to
-the CTRL group they belong too.
+Thanks,
 
-Reinette asked[1] whether the PLZA mode should be extended to multiple
-CTRL groups and their child CTRL_MON groups for even greater
-flexibility.
+-- 
+Peter Xu
 
-[1] https://lore.kernel.org/all/7a4ea07d-88e6-4f0f-a3ce-4fd97388cec4@intel.com/
-
-> need for the two mappings, task->cpl0 config and task->cpl1 to be independent or
-> would as task->(cp0 config, cp1 config) be sufficient? It seems awkward that
-> it's not a single write to move a task. If a single mapping is sufficient, then
-> as single new file, kernel_group,per CTRL_MON group (maybe MON groups) as
-> suggested above but rather than a task that file could hold a path to the
-> CTRL_MON/MON group that provides the kernel configuraion for tasks running in
-> that group. So that this can be transparent to existing software an empty string
-> can mean use the current group's when in the kernel (as well as for
-> userspace). A slash, /, could be used to refer to the default group. This would
-> give something like the below under /sys/fs/resctrl.
-> 
-> .
-> ├── cpus
-> ├── tasks
-> ├── ctrl1
-> │   ├── cpus
-> │   ├── kernel_group -> mon_groups/mon1
-> │   └── tasks
-> ├── kernel_group -> ctrl1
-> └── mon_groups
->     └── mon1
->         ├── cpus
->         ├── kernel_group -> ctrl1
->         └── tasks
-> 
-> > 
-> > I have not read anything about the RISC-V side of this yet.
-> > 
-> > Reinette
-> > 
-> > > 
-> > > Reinette
-> > > 
-> > > [1] https://lore.kernel.org/lkml/aXpgragcLS2L8ROe@agluck-desk3/
-> > 
-> 
-> Thanks,
-> 
-> Ben
-
--Tony
 
