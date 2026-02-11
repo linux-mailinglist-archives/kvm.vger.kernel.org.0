@@ -1,294 +1,324 @@
-Return-Path: <kvm+bounces-70889-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70890-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OFKNC8DEjGmRswAAu9opvQ
-	(envelope-from <kvm+bounces-70889-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 19:04:48 +0100
+	id 2Ch6L0HajGlIuAAAu9opvQ
+	(envelope-from <kvm+bounces-70890-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 20:36:33 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B19AA126C8D
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 19:04:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3040112732F
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 20:36:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 857F230166CD
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 18:04:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C0AFE3029E6D
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 19:35:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF6F352C4E;
-	Wed, 11 Feb 2026 18:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967CA3542E7;
+	Wed, 11 Feb 2026 19:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3AaMguA/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="baG4KHJq";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="awuxn6O/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001AD33858B
-	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 18:04:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770833042; cv=pass; b=MU7ptjZs87tSzZxzANtwwq2v1rDxHSSM9X0LFoOPuU24k8qGtgw/ddwwB2Rkr8qJmWyCQilcLrRqfdhU6zowBl0jI6h9r13n0lgTQblr9RZA20KNor9LqJU9YhdUB0kYKvkze4jZ8Xl0d2B8AJ6ccbPl6ghKbfUp6S3v512Qesk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770833042; c=relaxed/simple;
-	bh=ouUJwrGWrh8wBc0E6tYplmMc/jbS7J02rXG96ihY1P4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OWJwNygdpitQf8R7ZIkIhWB728/81b0RENZDJ3OijQvVAGzEknnOisCNgt+Xd4+IjJkI3SbzH4iFiyS+QTTXkc4HDkk2MOiIihSjNOQR6v3DqIEH/sAVMB/OsBE34/F2qTS8to1BrjyiTeakxrQRf714OjikHvU/1lntc0fCivE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3AaMguA/; arc=pass smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-65a3a1740e7so413a12.0
-        for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 10:04:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770833039; cv=none;
-        d=google.com; s=arc-20240605;
-        b=FLask5i2E9CJbJFGHQzt1IyEMsxcj6DD/YtlViSy6CiHyWtUUjGX8iGqEIrlwrLQTj
-         Q7Z8tfzAhBDajbHeeKdqxn1D/ME0Da8bYuRPnYriPePwTH95MwdV93UXo30gqXdiLM/x
-         OM4oVs2oDXzQL4fxZ9rwDTKZ3j5lNRhqITANajb5/P9QgnDlHIwbF8qqnVGt8E7ZSGEr
-         taVZCCMSPl5wQeo8A9MIRfbf1Sfq+ptJh/C25eLhWj4hLGHMo0EAo2xzXkzioS0H0N4e
-         3tOZTtoEwsWqD7FphOE/Qc6CprVfAqk3JAP/Wi9KGslXoG/4dY3vnID5G7ejRs5rS3FM
-         QgMQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=FKlgXfWYb/Q3+FDpPTuMpP2koyA+/4Rt0aKVSAvYyco=;
-        fh=zKUW7sob/OJwavo6839D0YLu1sWqMKNjTEKhaxR5wPw=;
-        b=gXMn/vxSi/v6ZbDmAI8I9FJMmAZLpzk6sHXtlNj6I2UmJi69ecGWtOBnWTzxb8BCw7
-         EwcKtOL6g/56aCI30TiR1JBA5QFoXeTl5WSWiS35qQldExjS46NVmR9pVL+I9xCvzZ9Z
-         h50RzNjUEFWZ9mxusMepDKgt3FCo+hIghT/RKDkWrXlLoB4wvjrI6/FHHSCqDtqJWK6Z
-         W+2cmqdkWTUT281Zkj64AVncn7eulXedD7PqnQBGj8hP6FyTLdW7jFR2TuqfAdollSxz
-         5q/mn0eAsz6jWYit3K3O2k7cB0lkqNWZskkpNFByV+KSIQmjmM3vPZBPgX7uNdXN9tEd
-         6T7w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BD9352F92
+	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 19:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770838540; cv=none; b=eUcHF7L2YZjvmo6xKp+ZRWjbw8IUDYC+UgnAmRxJGBNqs91jCjwdPvetqpPEd3WeQNZs5FeItUZJJbkwYCft1LuW3s+BwswExVG9I+rmx9ttVaEhGf5GChWKLqqR2NOl1Qs0nm6OBNBx4eq54PFOgTehNEvUgBcFLKp2jofSLlY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770838540; c=relaxed/simple;
+	bh=kLqcLZsDQ9l50Dv8gTv/4rexnpIHIVZchPmWgXkcMhM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tk8BiTcDtIN97veYqeqkY6Vh5LS3uA4pOTeT8FBKFz0n+JoczZXnNA2fcT7H0nhXpOS1sX4NUWdudQEBK1RinzchapeJvq657YG5rcRDfGVMiPk5TDBl1r+41WMWgxOOYk2xW1eyfW1EzgI78CsJ3ssGu5lN9aZtBSH4sbGdvxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=baG4KHJq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=awuxn6O/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770838538;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MHfswB8BrOCWLJXsVwUk+XHyA8BLSR/huUJvBA9oUpg=;
+	b=baG4KHJqInD+sIF+F8t0TEtdyb5leB8tDvQ04fXgR8vMXhpBJMOJssxvE5wVKZanDW4cd4
+	ZuZfIpAG0visRLJDTUR1ewemqd04+EUx5DTp2rUZlsv+rW1MfrYbxvwc+S1bSglYY3hI7P
+	geBMa+inEvOTAGS8/0kghzqwelX94ls=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-578-dq1QU_USNyezca_JO2bZ-g-1; Wed, 11 Feb 2026 14:35:37 -0500
+X-MC-Unique: dq1QU_USNyezca_JO2bZ-g-1
+X-Mimecast-MFC-AGG-ID: dq1QU_USNyezca_JO2bZ-g_1770838536
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-89493622b50so38620726d6.1
+        for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 11:35:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770833039; x=1771437839; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FKlgXfWYb/Q3+FDpPTuMpP2koyA+/4Rt0aKVSAvYyco=;
-        b=3AaMguA/g9I/XNKBcnh06Swzeovz3CoU0UeXLYc0YH+DfD1FnxOaqrE6ymXx60BvPh
-         3YyJJdszK7+3pv0qs/8kPAkmG/JDUHCziR0xhAnFSoTCjlE3bVdvWmC505tLxJy6MEaZ
-         dLvT1shw8x3CC8ilBl0UO/ZBYHmbfovigoU80tMzuqYXrFJH5427MYVv6CXBKVq2I6UN
-         dO4YFl8G9cKrXxKPEPcYvQems/TZyw4Ja6NOFGWQ9ijGjoR5/L2HY+CdBjnt0mETzoFw
-         /6BYsjhmxvniV0TEmXKHgIdUUDH3yAZeiqsZRbe04/n2s3KO4V9mmKfYKroE/Di5x2zt
-         YPog==
+        d=redhat.com; s=google; t=1770838536; x=1771443336; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MHfswB8BrOCWLJXsVwUk+XHyA8BLSR/huUJvBA9oUpg=;
+        b=awuxn6O/CjPTmDjDvH92FtKXOGRayEYOkBFl9fiz7QpuJ7cO/XMCWcVk986cO5L0pU
+         F7EY/76ca4QwKcnqsFCzI+LrAY6QKNePLlJ84cCWWxQJrusVjpIlArW8moWPrHhvxiN9
+         7sVTvxpAxvCH+0IDv3G0tYJJq1L27n0qchcAXdkmG0C5u4wqyxMDzHCFgJcRvEp9al6Z
+         LsbNc8jerjKgmnMqH0pwB3PLz2k+H4D3HVIX4wMhVW9KXDxJQ98RwL4eF9j3HrzFgM22
+         bcGv2aqgvBvLeWDQZ5LGA3Y3ZaXblUPsuQUGqTVQLaXWscHpYTO3OANcrsB+Wz/ZoGxS
+         tseA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770833039; x=1771437839;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=FKlgXfWYb/Q3+FDpPTuMpP2koyA+/4Rt0aKVSAvYyco=;
-        b=oQX6VznVBZeIiA9PiCd6BDIducVBmbAdBwSKNlRC9NOl0virK9y5WshscV5+7Ifj/v
-         X1KRF5VAn4H3XvgBegoIvoIyiAmIIkE52bNORVyxkU72CBGoogCtLF3VmanaHJw1FlKW
-         kaWiX076qt3XojGHVbMiqEdypfCyH1bsjmU+NPLXleoHsDoYqTZzESNARJE5JXHHD0fk
-         AN7m5ne1AtpidcEdMmReX6lbHaUcsVVAp/l60/b+cKqSJ/REgsIjGpGcqpT92TQS8Car
-         eKgWCTHZck76oPM0t6ekuZD1Un7MIWh3jN6/48/XL83PlQaM0IMMfolo+Ps6xw9varOU
-         BUzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXxFlHubTVbFLc7GtjnJc1wgZLmcjsVTkJ0VCgxqhHhZOBUTLOfvlXDF7R7mrKVewcAyak=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+fscAHAbajRs2Wdzeno3cgDBxgchYhQZ2HB/7zYUpvqGSTzVk
-	boal+LPyCYHtBUCpR1quVWJn28VHbEcu02JZHJFylFm29oT1hhiu2715l4RrvtA8yRWtJH597zg
-	zU/qPkmGCa7w+7ZrJ4t8O53aTgX/XvT1GEgKxTsIj
-X-Gm-Gg: AZuq6aJQsvxukJWppT8/Dk/dhuqmH2bmzDgPwounuY5EuwyrAJDv9sECqqdSB5cW4YF
-	HM/KLnyUZvpxVG3vYneAhG6qoFT50qrt7RB1g75OqrGVhzzvN61cTpXJn33XXWx8QJhGpTyfBB2
-	RXPWW5gDEZWyWixY2B56vIM8ACzDB+/ZcEvj4dqzEZ2+7ozWPXqiBOZeo1rLERJnQQFd1jv+JJe
-	NInuDZm6vghloXYbWXRbMAnlktvUBXjsvKA1X8hal7oNt2nUkWtHgYXbHULPBc+lImR+O6gMPM4
-	RK1ChMI8TmRy60297Q==
-X-Received: by 2002:a05:6402:3092:b0:658:133d:8eb9 with SMTP id
- 4fb4d7f45d1cf-65b98a1ae2cmr165a12.2.1770833038931; Wed, 11 Feb 2026 10:03:58
- -0800 (PST)
+        d=1e100.net; s=20230601; t=1770838536; x=1771443336;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MHfswB8BrOCWLJXsVwUk+XHyA8BLSR/huUJvBA9oUpg=;
+        b=AcC5ueaFJFd6p5R0JZwJfXSfFoSBiLjhg9oNfIQ8Wa/bGBLSn50PPNzIihl0bgEZP+
+         a9ewHhYv8SEHcdt6byBfKzbjAbVogYbqSMmlEzZNsVWZR1/I/dNMb9cZ4n1jhG5LlpAF
+         KeIi8ljDkijWFcumrr2O0x4GbEf2nr8GjadyUKx5pqmSxjp1k3n6DJLn/l1whsi7SFWN
+         cY2JBGibj9R4xZ6q8a7WBCUFj9fYxu52O7QPsuMcqP7hlGSvztVp6gQmnBN1SXIqIe8W
+         Bq8rbUe8rPY+bDSarcinWh4QBSsFVVT9a+lDjOoks1E8K42z1ZPzx+IJKroKgrM3naJ5
+         3MTA==
+X-Forwarded-Encrypted: i=1; AJvYcCWUmJzIn29ioXTMndNOBco55e0yM8K2SQ3jepGgLiSzXfpm5/qGXsDnTIUZk30EyAvCycY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhrtW2QYjPc4iJNWXS/45wyJ2D5xSnlc/GmQNizCyp/NCgbC6F
+	wtcO4FnM+1mQrgDSfQJ4SMFxy0VpecnWqyRfkDf7WtXt2J/7u3EI0PXw/z3TpzpHwGj2jRjLJce
+	7h9VOxsqMPWJ7rZbwEV9ybTRO1BC3OU7ECnZ4xzpkrQTVu0i2dlPyCfuHaOIvlA==
+X-Gm-Gg: AZuq6aIjSusnGJfju89R9Rt8ktvqqelEbdqtVG4ZpGYdDAj7buFD14Ze0cZiP7lQYqo
+	tTiLT+KbbaijU71BdEJ1+9eK/UFXEx6aT4h9xM+txQReTjYxKRnWVdTKJcF2EU0gUlOEOIbQD0H
+	IWTTd1+9FdlDtAoXLaAlOFL9/tj9SqVen8x08Fy7KgE5brhy974Q5QvNj/AtZ+AWbIWFhNJfxn4
+	pkuCMYi2dmTvJmrrl3h0/isSom/qSBWkhDtumz88jamGFLphyxG/0ZdzlTYBSoS9gn/cJLTjr2C
+	3ts4peN8v++M/SL1xueMPeEqDgLH7xdA2QyK8AJQG1w/UnMTnNG7s8PVPuxzn8uLSjnru1AMotv
+	/loSK0wp5v+kRjQ==
+X-Received: by 2002:a05:6214:e66:b0:896:a692:caba with SMTP id 6a1803df08f44-89727899bdamr10537106d6.31.1770838536106;
+        Wed, 11 Feb 2026 11:35:36 -0800 (PST)
+X-Received: by 2002:a05:6214:e66:b0:896:a692:caba with SMTP id 6a1803df08f44-89727899bdamr10536576d6.31.1770838535519;
+        Wed, 11 Feb 2026 11:35:35 -0800 (PST)
+Received: from x1.local ([174.91.117.149])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8971cdb19b6sm22142416d6.40.2026.02.11.11.35.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Feb 2026 11:35:35 -0800 (PST)
+Date: Wed, 11 Feb 2026 14:35:23 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	David Hildenbrand <david@redhat.com>,
+	Hugh Dickins <hughd@google.com>,
+	James Houghton <jthoughton@google.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Oscar Salvador <osalvador@suse.de>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC 07/17] userfaultfd: introduce vm_uffd_ops
+Message-ID: <aYzZ-zBipYQ2OA_n@x1.local>
+References: <20260127192936.1250096-1-rppt@kernel.org>
+ <20260127192936.1250096-8-rppt@kernel.org>
+ <aYEY6PC0Qfu0m5gu@x1.local>
+ <aYhh2XzyFsJbohll@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260205231537.1278753-1-jmattson@google.com> <cjmbfd5uexxzqzfzzwpgbehpyv7iqz6du4wfvwqnrenwlaaujs@42fhftddlgyx>
-In-Reply-To: <cjmbfd5uexxzqzfzzwpgbehpyv7iqz6du4wfvwqnrenwlaaujs@42fhftddlgyx>
-From: Jim Mattson <jmattson@google.com>
-Date: Wed, 11 Feb 2026 10:03:46 -0800
-X-Gm-Features: AZwV_QhwWsyRzE_AT1EuQKews13sAf-cBD-yj_uaEohGNfmzM27uNdDvKwoioDI
-Message-ID: <CALMp9eT3NzQyeC4vgwF=82hUFGx6Zgp3NYWwAvMS5J7KCLFPcg@mail.gmail.com>
-Subject: Re: [PATCH v2] Introduce KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Josh Hilke <jrhilke@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aYhh2XzyFsJbohll@kernel.org>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
-	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70889-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[google.com:+]
-X-Rspamd-Queue-Id: B19AA126C8D
+	TAGGED_FROM(0.00)[bounces-70890-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[peterx@redhat.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,x1.local:mid]
+X-Rspamd-Queue-Id: 3040112732F
 X-Rspamd-Action: no action
 
-On Tue, Feb 10, 2026 at 1:14=E2=80=AFPM Yosry Ahmed <yosry.ahmed@linux.dev>=
- wrote:
->
-> On Thu, Feb 05, 2026 at 03:15:26PM -0800, Jim Mattson wrote:
-> > Add KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC to allow L1 to set FREEZE_IN_=
-SMM
-> > in vmcs12's GUEST_IA32_DEBUGCTL field, as permitted prior to
-> > commit 6b1dd26544d0 ("KVM: VMX: Preserve host's DEBUGCTLMSR_FREEZE_IN_S=
-MM
-> > while running the guest").  The quirk is enabled by default for backwar=
-ds
-> > compatibility; userspace can disable it via KVM_CAP_DISABLE_QUIRKS2 for
-> > consistency with the constraints on WRMSR(IA32_DEBUGCTL).
-> >
-> > Note that the quirk only bypasses the consistency check. The vmcs02 bit=
- is
-> > still owned by the host, and PMCs are not frozen during virtualized SMM=
-.
-> > In particular, if a host administrator decides that PMCs should not be
-> > frozen during physical SMM, then L1 has no say in the matter.
-> >
-> > Fixes: 095686e6fcb4 ("KVM: nVMX: Check vmcs12->guest_ia32_debugctl on n=
-ested VM-Enter")
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst  | 10 ++++++++++
-> >  arch/x86/include/asm/kvm_host.h |  3 ++-
-> >  arch/x86/include/uapi/asm/kvm.h |  1 +
-> >  arch/x86/kvm/vmx/nested.c       | 23 +++++++++++++++++++----
-> >  4 files changed, 32 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/ap=
-i.rst
-> > index d04b4bdd60c1..325e565ff99e 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -8482,6 +8482,16 @@ KVM_X86_QUIRK_IGNORE_GUEST_PAT      By default, =
-on Intel platforms, KVM ignores
-> >                                      guest software, for example if it =
-does not
-> >                                      expose a bochs graphics device (wh=
-ich is
-> >                                      known to have had a buggy driver).
-> > +
-> > +KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC
-> > +                                 By default, KVM relaxes the consisten=
-cy
-> > +                                 check for GUEST_IA32_DEBUGCTL in vmcb=
-12
->
-> vmcs12*
->
-> > +                                 to allow FREEZE_IN_SMM to be set.  Wh=
-en
-> > +                                 this quirk is disabled, KVM requires
-> > +                                 this bit to be cleared.  Note that th=
-e
-> > +                                 vmcs02 bit is still completely
-> > +                                 controlled by the host, regardless of
-> > +                                 the quirk setting.
-> >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D
-> >
-> >  7.32 KVM_CAP_MAX_VCPU_ID
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
-_host.h
-> > index ff07c45e3c73..1669d4797f0b 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -2485,7 +2485,8 @@ int memslot_rmap_alloc(struct kvm_memory_slot *sl=
-ot, unsigned long npages);
-> >        KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS |  \
-> >        KVM_X86_QUIRK_SLOT_ZAP_ALL |           \
-> >        KVM_X86_QUIRK_STUFF_FEATURE_MSRS |     \
-> > -      KVM_X86_QUIRK_IGNORE_GUEST_PAT)
-> > +      KVM_X86_QUIRK_IGNORE_GUEST_PAT |       \
-> > +      KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC)
-> >
-> >  #define KVM_X86_CONDITIONAL_QUIRKS           \
-> >       (KVM_X86_QUIRK_CD_NW_CLEARED |          \
-> > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/as=
-m/kvm.h
-> > index 846a63215ce1..76128958bbca 100644
-> > --- a/arch/x86/include/uapi/asm/kvm.h
-> > +++ b/arch/x86/include/uapi/asm/kvm.h
-> > @@ -476,6 +476,7 @@ struct kvm_sync_regs {
-> >  #define KVM_X86_QUIRK_SLOT_ZAP_ALL           (1 << 7)
-> >  #define KVM_X86_QUIRK_STUFF_FEATURE_MSRS     (1 << 8)
-> >  #define KVM_X86_QUIRK_IGNORE_GUEST_PAT               (1 << 9)
-> > +#define KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC        (1 << 10)
-> >
-> >  #define KVM_STATE_NESTED_FORMAT_VMX  0
-> >  #define KVM_STATE_NESTED_FORMAT_SVM  1
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 248635da6766..9bd29b9375fb 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -3300,10 +3300,25 @@ static int nested_vmx_check_guest_state(struct =
-kvm_vcpu *vcpu,
-> >       if (CC(vmcs12->guest_cr4 & X86_CR4_CET && !(vmcs12->guest_cr0 & X=
-86_CR0_WP)))
-> >               return -EINVAL;
-> >
-> > -     if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) &&
-> > -         (CC(!kvm_dr7_valid(vmcs12->guest_dr7)) ||
-> > -          CC(!vmx_is_valid_debugctl(vcpu, vmcs12->guest_ia32_debugctl,=
- false))))
-> > -             return -EINVAL;
-> > +     if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_DEBUG_CONTROLS) {
-> > +             u64 debugctl =3D vmcs12->guest_ia32_debugctl;
-> > +
-> > +             /*
-> > +              * FREEZE_IN_SMM is not virtualized, but allow L1 to set =
-it
-> > +              * in VMCB12's DEBUGCTL under a quirk for backwards
->
-> VMCS12's
->
-> > +              * compatibility.  Note that the quirk only relaxes the
-> > +              * consistency check. The vmcb02 bit is still under the
->
-> vmcs02
->
+On Sun, Feb 08, 2026 at 12:13:45PM +0200, Mike Rapoport wrote:
+> Hi Peter,
+> 
+> On Mon, Feb 02, 2026 at 04:36:40PM -0500, Peter Xu wrote:
+> > On Tue, Jan 27, 2026 at 09:29:26PM +0200, Mike Rapoport wrote:
+> > > From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
+> > > 
+> > > Current userfaultfd implementation works only with memory managed by
+> > > core MM: anonymous, shmem and hugetlb.
+> > > 
+> > > First, there is no fundamental reason to limit userfaultfd support only
+> > > to the core memory types and userfaults can be handled similarly to
+> > > regular page faults provided a VMA owner implements appropriate
+> > > callbacks.
+> > > 
+> > > Second, historically various code paths were conditioned on
+> > > vma_is_anonymous(), vma_is_shmem() and is_vm_hugetlb_page() and some of
+> > > these conditions can be expressed as operations implemented by a
+> > > particular memory type.
+> > > 
+> > > Introduce vm_uffd_ops extension to vm_operations_struct that will
+> > > delegate memory type specific operations to a VMA owner.
+> > > 
+> > > Operations for anonymous memory are handled internally in userfaultfd
+> > > using anon_uffd_ops that implicitly assigned to anonymous VMAs.
+> > > 
+> > > Start with a single operation, ->can_userfault() that will verify that a
+> > > VMA meets requirements for userfaultfd support at registration time.
+> > > 
+> > > Implement that method for anonymous, shmem and hugetlb and move relevant
+> > > parts of vma_can_userfault() into the new callbacks.
+> > > 
+> > > Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+> > > ---
+> > >  include/linux/mm.h            |  5 +++++
+> > >  include/linux/userfaultfd_k.h |  6 +++++
+> > >  mm/hugetlb.c                  | 21 ++++++++++++++++++
+> > >  mm/shmem.c                    | 23 ++++++++++++++++++++
+> > >  mm/userfaultfd.c              | 41 ++++++++++++++++++++++-------------
+> > >  5 files changed, 81 insertions(+), 15 deletions(-)
+> > > 
+> > > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > > index 15076261d0c2..3c2caff646c3 100644
+> > > --- a/include/linux/mm.h
+> > > +++ b/include/linux/mm.h
+> > > @@ -732,6 +732,8 @@ struct vm_fault {
+> > >  					 */
+> > >  };
+> > >  
+> > > +struct vm_uffd_ops;
+> > > +
+> > >  /*
+> > >   * These are the virtual MM functions - opening of an area, closing and
+> > >   * unmapping it (needed to keep files on disk up-to-date etc), pointer
+> > > @@ -817,6 +819,9 @@ struct vm_operations_struct {
+> > >  	struct page *(*find_normal_page)(struct vm_area_struct *vma,
+> > >  					 unsigned long addr);
+> > >  #endif /* CONFIG_FIND_NORMAL_PAGE */
+> > > +#ifdef CONFIG_USERFAULTFD
+> > > +	const struct vm_uffd_ops *uffd_ops;
+> > > +#endif
+> > >  };
+> > >  
+> > >  #ifdef CONFIG_NUMA_BALANCING
+> > > diff --git a/include/linux/userfaultfd_k.h b/include/linux/userfaultfd_k.h
+> > > index a49cf750e803..56e85ab166c7 100644
+> > > --- a/include/linux/userfaultfd_k.h
+> > > +++ b/include/linux/userfaultfd_k.h
+> > > @@ -80,6 +80,12 @@ struct userfaultfd_ctx {
+> > >  
+> > >  extern vm_fault_t handle_userfault(struct vm_fault *vmf, unsigned long reason);
+> > >  
+> > > +/* VMA userfaultfd operations */
+> > > +struct vm_uffd_ops {
+> > > +	/* Checks if a VMA can support userfaultfd */
+> > > +	bool (*can_userfault)(struct vm_area_struct *vma, vm_flags_t vm_flags);
+> > > +};
+> > > +
+> > >  /* A combined operation mode + behavior flags. */
+> > >  typedef unsigned int __bitwise uffd_flags_t;
+> > >  
+> > > diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+> > > index 51273baec9e5..909131910c43 100644
+> > > --- a/mm/hugetlb.c
+> > > +++ b/mm/hugetlb.c
+> > > @@ -4797,6 +4797,24 @@ static vm_fault_t hugetlb_vm_op_fault(struct vm_fault *vmf)
+> > >  	return 0;
+> > >  }
+> > >  
+> > > +#ifdef CONFIG_USERFAULTFD
+> > > +static bool hugetlb_can_userfault(struct vm_area_struct *vma,
+> > > +				  vm_flags_t vm_flags)
+> > > +{
+> > > +	/*
+> > > +	 * If user requested uffd-wp but not enabled pte markers for
+> > > +	 * uffd-wp, then hugetlb is not supported.
+> > > +	 */
+> > > +	if (!uffd_supports_wp_marker() && (vm_flags & VM_UFFD_WP))
+> > > +		return false;
+> > 
+> > IMHO we don't need to dup this for every vm_uffd_ops driver.  It might be
+> > unnecessary to even make driver be aware how pte marker plays the role
+> > here, because pte markers are needed for all page cache file systems
+> > anyway.  There should have no outliers.  Instead we can just let
+> > can_userfault() report whether the driver generically supports userfaultfd,
+> > leaving the detail checks for core mm.
+> > 
+> > I understand you wanted to also make anon to be a driver, so this line
+> > won't apply to anon.  However IMHO anon is special enough so we can still
+> > make this in the generic path.
+> 
+> Well, the idea is to drop all vma_is*() in can_userfault(). And maybe
+> eventually in entire mm/userfaultfd.c
+> 
+> If all page cache filesystems need this, something like this should work,
+> right?
+> 
+> 	if (!uffd_supports_wp_marker() && (vma->vm_flags & VM_SHARED) &&
+> 	    (vm_flags & VM_UFFD_WP))
+> 		return false;
 
-/facepalm
+Sorry for a late response.
 
-> > +              * control of the host. In particular, if a host
-> > +              * administrator decides to clear the bit, then L1 has no
-> > +              * say in the matter.
-> > +              */
-> > +             if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_VMCS12_F=
-REEZE_IN_SMM_CC))
-> > +                     debugctl &=3D ~DEBUGCTLMSR_FREEZE_IN_SMM;
-> > +
-> > +             if (CC(!kvm_dr7_valid(vmcs12->guest_dr7)) ||
-> > +                 CC(!vmx_is_valid_debugctl(vcpu, debugctl, false)))
-> > +                     return -EINVAL;
-> > +     }
-> >
-> >       if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PAT) &&
-> >           CC(!kvm_pat_valid(vmcs12->guest_ia32_pat)))
-> >
-> > base-commit: e944fe2c09f405a2e2d147145c9b470084bc4c9a
-> > --
-> > 2.53.0.rc2.204.g2597b5adb4-goog
-> >
->
+IIUC we can't check against VM_SHARED, because we need pte markers also for
+MAP_PRIVATE on file mappings.
+
+The need of pte markers come from the fact that the vma has a page cache
+backing it, rather than whether it's a shared or private mapping.  Consider
+if a file mapping vma + MAP_PRIVATE, if we wr-protect the vma with nothing
+populated, we want to still get notified whenever there's a write.
+
+So the original check should be good.
+
+I'm fine with most of the rest comments in this series I left and I'm OK if
+you prefer settle things down first.  For this one, I still want to see if
+we can move this to uffd core code.
+
+The whole point is I want to have zero info leaked about pte marker into
+module ops.
+
+For that, IMHO it'll be fine we use one vma_is_anonymous() is uffd core
+code once.
+
+Actually, I don't think uffd core can get rid of handling anon specially.
+With this series applied, mfill_atomic_pte_copy() will still need to
+hard-code anon processing on MAP_PRIVATE and I don't think it can go away..
+
+mfill_atomic_pte_copy():
+	if (!(state->vma->vm_flags & VM_SHARED))
+		ops = &anon_uffd_ops;
+
+IMHO using vma_is_anonymous() for one more time should be better than
+leaking pte marker whole concept to modules. So the driver should only
+report if the driver supports UFFD_WP in general.  It shouldn't care about
+anything the core mm would already do otherwise, including this one on
+"whether system config / arch has globally enabled pte markers" and the
+relation between that config and the WP feature impl details.
+
+Thanks,
+
+-- 
+Peter Xu
+
 
