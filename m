@@ -1,191 +1,142 @@
-Return-Path: <kvm+bounces-70816-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70817-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mFh3FdPPi2kbbgAAu9opvQ
-	(envelope-from <kvm+bounces-70816-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 01:39:47 +0100
+	id Y+lEGf3Pi2lBbgAAu9opvQ
+	(envelope-from <kvm+bounces-70817-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 01:40:29 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C799C12058F
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 01:39:46 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A69A120599
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 01:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 44E5D3069D67
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 00:39:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8208930186AC
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 00:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15E821B905;
-	Wed, 11 Feb 2026 00:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345EA219313;
+	Wed, 11 Feb 2026 00:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RJJ9kxfX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZJ120l/z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E481E1FE451
-	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 00:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60815C145;
+	Wed, 11 Feb 2026 00:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770770372; cv=none; b=c+2xjdnWTCz1fQQQVgOZgTE/fpht6mIXIl7U7rnoaBvoUf+KPFdKv24x3NWpG9h7M6XGEXPEkL+qiJeLAKobwCWkX3KvrUeFWG5GYc6arQKY6Oq28NHT6+EttwmcuA74/hrSU9TSmS/J5PdosQANQP3vKe1s5zPf/mzuZe0pumc=
+	t=1770770426; cv=none; b=Np7YR5+Mb2J+RABpYSi8h6EPybGFTTu82ZTBiXnsSeC3pWkub1vfGN6oAu3pcXm3uKP7+OfFW5KMZPtVEg1cfxWMo6UkB0f8VdVOf4hszK8rffJ0WIEV5EwvVPbnj59GadwHS+uUt6r1DXG2R+1gBKupjbiFy8m1kCMitdUZA9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770770372; c=relaxed/simple;
-	bh=s2U9S1u3VhkDUIygI3Zcx38PmHTM+Bthud/9UyO7iso=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aj/G2Xiu7qfvjFyNeh4QrAOH/txp924hqiYefacKrU5gXB7b1KY4/RqEgcVaIGaBjPKz/fN+xwWAsJK74FGYGu1mSMNm9ooJ3fLEK/HTs+tqPA3xtPvsDgC4RJNHLjD1iOERmIdHwu/orGK4McYl9rEHdEn1DnDVa/prCSx17h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RJJ9kxfX; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a8c273332cso150505965ad.1
-        for <kvm@vger.kernel.org>; Tue, 10 Feb 2026 16:39:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770770370; x=1771375170; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jlPZqqOFKtlyTJtQPaMC04tH30yMSKXkqW8o2Hw3yFU=;
-        b=RJJ9kxfXO9fkA5U61fR+/vx5DUlcQ7q5xty7uFUJvLoHKl+nYJCHUw7F0djAVLLoiQ
-         MIFVUrrWSiU30zAPKgdoVvfjc5y9IPMPIxnPnWhTagRmIBTzPFmWFcwEmTeGs3Nis/KH
-         dQ9wIy2Ul4HY/n+bAX8ujsMXcVK5SIS3iC8LZVuwClydOFqTG4sSLyS0sqvJ5UeUlf2+
-         z+nrO8IJ7HiFFDQsYw5AnN/3qEkH2r7MFaz1tVblXFAL+UmWcO2akrhYXd4INTy1Fpyh
-         FmXB4tDBDSCHMpKT8tuup8KbbqAV97qLURKG2sffuCvGRG9HdmPM+Mra5gilYpmOk1o2
-         SuJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770770370; x=1771375170;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jlPZqqOFKtlyTJtQPaMC04tH30yMSKXkqW8o2Hw3yFU=;
-        b=vqkotA1SqNY30CQH+vjOKv0j+XaAjbN0dJCQ8PkcqAzWCT9CSKVf2mLXsAcwrlwxlw
-         WkLAhzJnImLZsxW4ZNAJ4PpuuhWC4C3c5gSZZ18bJXB6CnkLbxiFi/BXkvKH8m7C3ONc
-         qsiTOFHco2/JF92poi74KJCshaKIRwzkqCtSAZM0ZD2SWGwuoahl/wOB9ewmjGtiZAXy
-         lQ1mYnwiJulCLWR1meMk9ejdxe1tflt8aoYBtV0/LLZK/c/ewESZcVLy649NcVI9fwUJ
-         sZalCECZ1L8IuUPlECqZ/n1DDdxHV1V+yBi+Hd38dfm2XZ4RtERuuVhmUJLZVWUlGtMZ
-         pPJA==
-X-Forwarded-Encrypted: i=1; AJvYcCUslKuqGmh2jZ/TKv/L6qLro0fiDda1hlS37vH0ks4Qd0KsoMJ7Lt8xtN00P4pQTRTBois=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7WcdWa9HeGgbahrVhRNidRciZgnem+HOy93FKbCrhSPw5uLgG
-	Ihm8Tvs8NnMXTorgs41bLT2hV3NIIul3rC/IstourguHntUUolSErqJ60unRKTaIMCNsTHVJysQ
-	NkJDiCw==
-X-Received: from plgo9.prod.google.com ([2002:a17:902:d4c9:b0:2a9:5e11:35e3])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:238b:b0:2aa:e7f3:fb05
- with SMTP id d9443c01a7336-2ab280e2dc9mr9332135ad.59.1770770370341; Tue, 10
- Feb 2026 16:39:30 -0800 (PST)
-Date: Tue, 10 Feb 2026 16:39:28 -0800
-In-Reply-To: <mxn6y6og34ejncnsvdapcoep4ewcnwnheszhwkp2undkqcu5zv@bpmseexuug5z>
+	s=arc-20240116; t=1770770426; c=relaxed/simple;
+	bh=YDyBWPm08onVp7slxg+PyGMsPp1MAexWPC++OxPk4+M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u45QHoDOTX+T9WdQkEd269oTYthsxCWqSefkHVjFYsjpp3/ovJdWnJS+xKVvKSMm338HpZ9UaM2mJ7GC+NMmawA2Fy1LcO14AW1ebtZv7T7votIUGbF2pcK/eE+QoL+YTexHGfV57lOz6gs2yhK6IL1epIo6zZaSGWr/knzrr54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZJ120l/z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51C05C116C6;
+	Wed, 11 Feb 2026 00:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770770426;
+	bh=YDyBWPm08onVp7slxg+PyGMsPp1MAexWPC++OxPk4+M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZJ120l/znObnboowjFJ5TRY7Uyua+I5gmOMjaZeqvH6bmV4CUndoxNcDAzoDgqj2H
+	 p94ccgkPgE1097G/y73+DqD92MeOGEj7wZ1F1TTxKd7F83SPCgttt5Q3/c9j5WjPa/
+	 8v23pgaXcN4rjzDWbj2fjX3p1X7BCvv4ynaih8eLDmyFGDxHzTtk4SJ1S1LkPAbZVV
+	 6DddDinC8Xft5o8qjB3eiVTgzXOZhV48/0AtsVi1+19Jo8ac6hHtROLT7f962nRr8e
+	 DuTBrrK2SMlC323VsuYNrE/xhJ8C/8dyI2bY92/dTf3MTv3Tyxo8+0gqleHAt4JaQq
+	 OZqieV3Np75cg==
+Date: Tue, 10 Feb 2026 16:40:23 -0800
+From: Drew Fustini <fustini@kernel.org>
+To: Reinette Chatre <reinette.chatre@intel.com>
+Cc: "Luck, Tony" <tony.luck@intel.com>, Babu Moger <babu.moger@amd.com>,
+	James Morse <james.morse@arm.com>,
+	Dave Martin <Dave.Martin@arm.com>, Ben Horgan <ben.horgan@arm.com>,
+	corbet@lwn.net, tglx@kernel.org, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	vschneid@redhat.com, akpm@linux-foundation.org,
+	pawan.kumar.gupta@linux.intel.com, pmladek@suse.com,
+	feng.tang@linux.alibaba.com, kees@kernel.org, arnd@arndb.de,
+	fvdl@google.com, lirongqing@baidu.com, bhelgaas@google.com,
+	seanjc@google.com, xin@zytor.com, manali.shukla@amd.com,
+	dapeng1.mi@linux.intel.com, chang.seok.bae@intel.com,
+	mario.limonciello@amd.com, naveen@kernel.org,
+	elena.reshetova@intel.com, thomas.lendacky@amd.com,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, peternewman@google.com, eranian@google.com,
+	gautham.shenoy@amd.com
+Subject: Re: [RFC PATCH 00/19] x86,fs/resctrl: Support for Global Bandwidth
+ Enforcement and Priviledge Level Zero Association
+Message-ID: <aYvP98xGoKPrDBCE@gen8>
+References: <cover.1769029977.git.babu.moger@amd.com>
+ <aYJTfc5g_qgn--eK@agluck-desk3>
+ <d2ccabb1-e1de-4767-a7b0-9d72982e52af@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260210005449.3125133-1-yosry.ahmed@linux.dev>
- <20260210005449.3125133-2-yosry.ahmed@linux.dev> <aYqOkvHs3L-AX-CG@google.com>
- <4g25s35ty23lx2je4aknn6dg4ohviqhkbvvel4wkc4chhgp6af@kbqz3lnezo3j>
- <aYuE8xQdE5pQrmUs@google.com> <ck57mmdt5phh64cadoqxylw5q2b72ffmabmlzmpphaf27lbtxw@4kscovf6ahve>
- <aYvIpwjsJ50Ns4ho@google.com> <mxn6y6og34ejncnsvdapcoep4ewcnwnheszhwkp2undkqcu5zv@bpmseexuug5z>
-Message-ID: <aYvPwH8JcRItaQRI@google.com>
-Subject: Re: [PATCH 1/4] KVM: nSVM: Sync next_rip to cached vmcb12 after VMRUN
- of L2
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d2ccabb1-e1de-4767-a7b0-9d72982e52af@intel.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70816-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70817-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[45];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[fustini@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C799C12058F
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2A69A120599
 X-Rspamd-Action: no action
 
-On Wed, Feb 11, 2026, Yosry Ahmed wrote:
-> > > We can drop it and make it a local vaiable in nested_svm_vmrun(), and
-> > > plumb it all the way down. But it could be too big for the stack.
+On Mon, Feb 09, 2026 at 04:27:47PM -0800, Reinette Chatre wrote:
+> Adding Ben
+> 
+> On 2/3/26 11:58 AM, Luck, Tony wrote:
+> > On Wed, Jan 21, 2026 at 03:12:38PM -0600, Babu Moger wrote:
+> >> Privilege Level Zero Association (PLZA) 
+> >>
+> >> Privilege Level Zero Association (PLZA) allows the hardware to
+> >> automatically associate execution in Privilege Level Zero (CPL=0) with a
+> >> specific COS (Class of Service) and/or RMID (Resource Monitoring
+> >> Identifier). The QoS feature set already has a mechanism to associate
+> >> execution on each logical processor with an RMID or COS. PLZA allows the
+> >> system to override this per-thread association for a thread that is
+> >> executing with CPL=0. 
 > > 
-> > It's 48 bytes, there's no way that's too big.
-> 
-> That's before my hardening series shoved everything in there. It's now
-> 256 bytes, which is not huge, but makes me nervous. Especially that it
-> may grow more in the future.
-> 
-> > > Allocating it every time isn't nice either.
+> > Adding Drew, and prodding Dave & James, for this discussion.
 > > 
-> > > Do you mean to also make it opaque?
-> > 
-> > I'd prefer to drop it.
-> 
-> Me too, but I am nervous about putting it on the stack.
+> > At LPC it was stated that both ARM and RISC-V already have support
+> > to run kernel code with different quality of service parameters from
+> > user code.
 
-256 bytes should be tolerable.  500+ is where things tend to get dicey.
+Sorry, for RISC-V, I should clarify that there is no hardware feature
+that changes the QoS identifier value when switching between kernel mode
+and user mode. This could be done in the kernel task switching code, but
+there is no implicit hardware operation.
 
-> > > > +       u8 __vmcb12_ctrl[sizeof(struct vmcb_ctrl_area_cached)];
-> > > 
-> > > We have a lot of accesses to svm->nested.ctl, so we'll need a lot of
-> > > clutter to cast the field in all of these places.
-> > > 
-> > > Maybe we add a read-only accessor that returns a pointer to a constant
-> > > struct?
-> > 
-> > That's what I said :-D
-> > 
-> > 	* All reads are routed through accessors to make it all but impossible
-> > 	* for KVM to clobber its snapshot of vmcb12.
-> > 
-> > There might be a lot of helpers, but I bet it's less than nVMX has for vmcs12.
-> 
-> Oh I meant instead of having a lot of helpers, have a single helper that
-> returns it as a pointer to const struct vmcb_ctrl_area_cached? Then all
-> current users just switch to the helper instead of directly using
-> svm->nested.ctl.
-> 
-> We can even name it sth more intuitive like svm_cached_vmcb12_control().
-
-That makes it to easy to do something like:
-
-
-	u32 *int_ctl = svm_cached_vmcb12_control(xxx).
-
-	*int_ctl |= xxx;
-
-Which is what I want to defend against.
-
-> > > I think this will be annoying when new fields are added, like
-> > > insn_bytes. Perhaps at some point we move to just serializing the entire
-> > > combined vmcb02/vmcb12 control area and add a flag for that.
-> > 
-> > If we do it now, can we avoid the flag?
-> 
-> I don't think so. Fields like insn_bytes are not currently serialized at
-> all. The moment we need them, we'll probably need to add a flag, at
-> which point serializing everything under the flag would probably be the
-> sane thing to do.
-> 
-> That being said, I don't really know how a KVM that uses insn_bytes
-> should handle restoring from an older KVM that doesn't serialize it :/
-> 
-> Problem for the future, I guess :)
-
-Oh, good point.  In that case, I think it makes sense to add the flag asap, so
-that _if_ it turns out that KVM needs to consume a field that isn't currently
-saved/restored, we'll at least have a better story for KVM's that save/restore
-everything.
+Thanks,
+Drew
 
