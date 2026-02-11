@@ -1,306 +1,328 @@
-Return-Path: <kvm+bounces-70859-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70860-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4AxqEsCgjGmPrgAAu9opvQ
-	(envelope-from <kvm+bounces-70859-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 16:31:12 +0100
+	id 8POpF4uhjGkkrwAAu9opvQ
+	(envelope-from <kvm+bounces-70860-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 16:34:35 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29E5F125AEE
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 16:31:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B35E4125B6E
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 16:34:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B0581300898F
-	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 15:31:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7FAD1301991C
+	for <lists+kvm@lfdr.de>; Wed, 11 Feb 2026 15:34:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB302FF176;
-	Wed, 11 Feb 2026 15:31:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2178130149E;
+	Wed, 11 Feb 2026 15:34:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DhANDHcR";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rZxNVcLY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="msU/eyCj"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892722FF65F
-	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 15:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A41B207A32
+	for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 15:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770823866; cv=none; b=Vp6zyo3dNznZBcV5NPpMaeIXv3u9vbbLruE5z5m5NhJnzX89C9s3+0ZH7WMHrbLy6eYLj+qrmkXmf+I+uuFq6kbdBLFSrnINoxVVlAeYwvp8zm40eDp9bN66g1EJjIviAFggO5bnEybeijOI5nunG855Z00hdDJmUDZFdkRBwWk=
+	t=1770824066; cv=none; b=kXe+SmcSjgx559+SMyvfvJaXGOkSR3tYF0eNA239ZFTz6gAHMQn8DiZ3HRywrqYZmKcxdCjTtBeBKFS/25Z8C9maOP0csbiWPWUXBNahxbOvZOI5t8X1i54vbmd9t02GAfmGp1cgZ9nwOaeBpRZ3AisyQsGWTZUYFxzIsJFxj4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770823866; c=relaxed/simple;
-	bh=OLUplhZRE4AQJfM2IG+CREOYzwKW/P8zAEDGcgUfHmA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p1brNJSxbAmvqfDGACr3be1GYBI6d1uYW7WxW7LcFuKWZZkk/B3mRzbXkgJRouPfqa4+Stv2TEKgNfJsMZbIeYqjfAhZKnUCUSIpqmznFA3RPMRzxu9Hi8pA0obTzDeY7fextL8/uMWC8AQxi/U81cR4KdMiCF5/i0RI2blIz6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DhANDHcR; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rZxNVcLY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770823864;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KgZLxYej2+Jm/2mAtMCoJI/wRP+Se5cFtNVR14mJ03o=;
-	b=DhANDHcRXKNAhk1zfPyKPsBAVJN+dj5Y1b2l+JLcy7wTmTr9tBFywwKzmLE+RwsReP3Vo+
-	+yJUrW51LAbujNfZgRQxIh1BFDgRsN2/jPK2R0zpKthPcx/pFJzfaBRct4bBJY9WD7ks0U
-	l+ngbRNG3nYvi99F10kbsq8B9WZr1uY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-499-NS6YsQrCO4y0dPSx50OPKQ-1; Wed, 11 Feb 2026 10:31:03 -0500
-X-MC-Unique: NS6YsQrCO4y0dPSx50OPKQ-1
-X-Mimecast-MFC-AGG-ID: NS6YsQrCO4y0dPSx50OPKQ_1770823862
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4801c1056c7so13181225e9.2
-        for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 07:31:03 -0800 (PST)
+	s=arc-20240116; t=1770824066; c=relaxed/simple;
+	bh=Y4BBXD4TqbsbTCp/hhnEWPoBXyVZSj4HcFNm9BuH0io=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=V7Ffb0ygKctiB6jrBQW1m+fH45GaDUFVGTkw4YGBvjF866hM6Zwvheb8NcFJRMIFW5xJJCSn2V82/q3yIZXy8uWy0tKhAyYliWMbo50ELM/GKAnLI3uMu02mx518mbqnikmEY+RwfEdYtRxvQzgj5VFIj+uh+Kpi+pOx6yPa848=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=msU/eyCj; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c67e92aad79so1330817a12.0
+        for <kvm@vger.kernel.org>; Wed, 11 Feb 2026 07:34:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770823862; x=1771428662; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KgZLxYej2+Jm/2mAtMCoJI/wRP+Se5cFtNVR14mJ03o=;
-        b=rZxNVcLY8PeTp5JZN8oHpHYQWoH8dCvM9rzDjbxqPLL/t30HMXZYfn6wU4vybPf9MI
-         i98fnUi03gjMFaiIQ479B5Z3inDkh70RnFdf1+IFCXcGDJy5T7REcty8KSso4Xo64CJR
-         1iNNGlttucjeuwWM5yJgctIY0ooFmeh9bOCSuq9bd4DHunUWxi85Bon2x6fNV5WzzgnI
-         +YeiIWJd7yHyqb29PSIlclMiom87GDfDe8Y7vcYhFMoBIQohAsRR60x71jRgWqV2CKBc
-         j65ssuAHFqlNQb/8g4m1ygOgPfnU0hgNjWF4mCc3ueM55rmZr+3IHH5EMqLn3BPzTQOZ
-         zmRw==
+        d=google.com; s=20230601; t=1770824063; x=1771428863; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4KEeCZROYJyn1dyhO5+lkxTzIro646ilaaeEHlML6XE=;
+        b=msU/eyCjbyxfNGSdIJwjxC2jzyi6cvsI/KDY3HX0nR1sCqg7kb4mYZ/Keqta+J8yV2
+         qKGZXViMU3X+JiLswSSzi4KvjIg6Wx2D1RY/kyFbLybn+zC5CBATl8x8HmrJ1w1+mxB5
+         1rzHr+QspoJSPcHPyFy1SkY1O0T7HGWDJRWy9wTiIDcd5RXXOLz3Z946WeXziwaTbsHB
+         JTEiVtKKJpy4a/jHxHhxKh0rQUPvdM7a/llpbBvVQPhlmKycRAXBFdYfiAs4QZ6XYwJR
+         WJsR3Gcr1sY3Ne0MJW3wGkcOAXzSzVA1wWz/weInQyJg6oFIGnGuU9gGT1Kc7dZxMwmn
+         mMDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770823862; x=1771428662;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KgZLxYej2+Jm/2mAtMCoJI/wRP+Se5cFtNVR14mJ03o=;
-        b=RMFz3juSud6T2cZpOLDEoEc//zEAcWQpWnFJ/9/cXRTKktQ1EQ/MECw6X0CCLDbo3z
-         HJEnbE8PMeM1Sn8aun+psa3j0Z6xBVWT+AAJ/Lciy//AB+4UQpny8V/T8a6LZgoeY8HL
-         E6cPTCKYPB9+hmjcKClFi15Kt6q63hXTPO5KE1hpCB7jDcjJRzQlPLV7ZhGUrETcIzRC
-         4AGZBLHCaG0FHqoCSBlZDbr8rG3bDR4Fr8fibOB2WZzQI+OplMQrxnUGaxe1/ywI2M8k
-         IC4nh2yvbkqSytyR4Y0arwUfffBE1s7qG+shmYnZR/I2yMYhibKak3rc28UXTovPMHps
-         EAJg==
-X-Forwarded-Encrypted: i=1; AJvYcCVWUXdGFQCLhIjqZPA9eqQqXw24DWfntiF06nXOwjAbsWhoKF2wcTwqCReHdzMzjcNAwG4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxgb5Xsmuw1mgScPal+DMC4TzShCBuD+HqBOxZMKjluoW2+Awzs
-	wj6Pft4q/GjoBzzOwqFwJLUaXico41vMajNCJ5hSAMTo0Q4GI6nbclmdliti1l8K2vbgjomjcTh
-	Zydcxcjpy6EMe+XKj3+f3FFqd70aRNYD9C/zfkSwFEEpCtJr8KGbLarlY1irkKw==
-X-Gm-Gg: AZuq6aLV9JL1Due0Vvu/YPZvz5/n7GJi6f9k4ZNwkwLdV4fB66gYTN7eKjip1L0U7LL
-	0+XWTfi8RJSxha6VbGB9ABDrcTQ9CkxmqRxh3A+Fa/ofmQIHVJGvjFm3Z8p+B7bxKe+6oTqJ4U+
-	Y7SfDMxIhSr+A8b+uXmYE5tIGFf4RLR1xeoB8Af7h+2TLxLExVY9mfdH2WX2MJybDOj/xmYO7Qc
-	3/9Zi5sc4tqaxqp9s74XDkMWpyLDxiw1sNfBDEwe8hzauISX6aFulcLdyUJl1vWR06lGOiqH8r9
-	Q+HHXoQinpvOi8wCam7mjQS+wsy3h37y0DLYqQiNKeUagyizwQA1ocZubNRhSV0d/k0vkyZJHCy
-	+Ra9K53INoCdO1mVRhe53XHnEaOH1vChsGD2NnpS1JbrfQ3QfpnFuZ4nJceJ0YgCsmeaoxMMlJt
-	b9UOQoVJfY
-X-Received: by 2002:a05:600c:c16d:b0:480:4a90:1b00 with SMTP id 5b1f17b1804b1-4832021605bmr226049995e9.20.1770823861892;
-        Wed, 11 Feb 2026 07:31:01 -0800 (PST)
-X-Received: by 2002:a05:600c:c16d:b0:480:4a90:1b00 with SMTP id 5b1f17b1804b1-4832021605bmr226049465e9.20.1770823861415;
-        Wed, 11 Feb 2026 07:31:01 -0800 (PST)
-Received: from rh.fritz.box (p200300f6af2d8700b4c2d356c3fafe63.dip0.t-ipconnect.de. [2003:f6:af2d:8700:b4c2:d356:c3fa:fe63])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43783d34657sm6448511f8f.6.2026.02.11.07.31.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Feb 2026 07:31:00 -0800 (PST)
-From: Sebastian Ott <sebott@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>
-Cc: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Sebastian Ott <sebott@redhat.com>
-Subject: [PATCH v5 2/2] target/arm/kvm: add kvm-psci-version vcpu property
-Date: Wed, 11 Feb 2026 16:30:32 +0100
-Message-ID: <20260211153032.19327-3-sebott@redhat.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260211153032.19327-1-sebott@redhat.com>
-References: <20260211153032.19327-1-sebott@redhat.com>
+        d=1e100.net; s=20230601; t=1770824063; x=1771428863;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4KEeCZROYJyn1dyhO5+lkxTzIro646ilaaeEHlML6XE=;
+        b=HNVGto9VmBHBGyD3K2arcNqvylbClaU797YpV0PL3vs/OIWLwJZRDlvj0Bxfh2KNo7
+         sr/RVvFct7y3dgV6hRBupEPI2vxH9xItMg1omdnEOTY623cVZJY+0wqIoVxDLdIYVQwK
+         r6SdaXdGE4KTAwmGIy7PwM98Np/xbkLSP/tPFcOmWHcAj0Yx9N3RKLcEIpsu5pn43JJ1
+         yEpAdiMb2PUz0kMWpUA+iR9IOB71oYOdSmtTF94FJ3eUFkgbpdk17j8llzt1dvEiXlW3
+         8T6MIU7amVx1I7qMdgr3KrqqY8WgSOR8o+IjZxOeg2Y+mt+/Vot8s1X9up5BcKr0ZerR
+         IIXg==
+X-Forwarded-Encrypted: i=1; AJvYcCX+7QE19nXPOYbMC5UH6q4btkCH1C4lgzCa83HNs8KrPZRfa+p8cXKFrtLiFTxt94Gnl/Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWqpj7YjywjwOi48ggOG3DW1WuHGhB8rFZ/UOW52nFGLeG4k8R
+	arORUB6CPc6f+U0LYWc/8itkYY0OzjPXJGMYXP/W+GVb7M3OqwsMyVEsUWkEqTAg1UVds/smBFL
+	0xDaLTA==
+X-Received: from pjyd14.prod.google.com ([2002:a17:90a:dfce:b0:34c:e69b:d74f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:d12f:b0:393:74ed:7de9
+ with SMTP id adf61e73a8af0-393acf885dbmr16306207637.3.1770824063511; Wed, 11
+ Feb 2026 07:34:23 -0800 (PST)
+Date: Wed, 11 Feb 2026 07:34:22 -0800
+In-Reply-To: <20260211120944.-eZhmdo7@linutronix.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20260209161527.31978-1-shaikhkamal2012@gmail.com> <20260211120944.-eZhmdo7@linutronix.de>
+Message-ID: <aYyhfvC_2s000P7H@google.com>
+Subject: Re: [PATCH] KVM: mmu_notifier: make mn_invalidate_lock non-sleeping
+ for non-blocking invalidations
+From: Sean Christopherson <seanjc@google.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: "shaikh.kamal" <shaikhkamal2012@gmail.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70859-lists,kvm=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-70860-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,lists.linux.dev];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sebott@redhat.com,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 29E5F125AEE
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B35E4125B6E
 X-Rspamd-Action: no action
 
-Provide a kvm specific vcpu property to override the default
-(as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
-by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+On Wed, Feb 11, 2026, Sebastian Andrzej Siewior wrote:
+> On 2026-02-09 21:45:27 [+0530], shaikh.kamal wrote:
+> > mmu_notifier_invalidate_range_start() may be invoked via
+> > mmu_notifier_invalidate_range_start_nonblock(), e.g. from oom_reaper(),
+> > where sleeping is explicitly forbidden.
+> > 
+> > KVM's mmu_notifier invalidate_range_start currently takes
+> > mn_invalidate_lock using spin_lock(). On PREEMPT_RT, spin_lock() maps
+> > to rt_mutex and may sleep, triggering:
+> > 
+> >   BUG: sleeping function called from invalid context
+> > 
+> > This violates the MMU notifier contract regardless of PREEMPT_RT;
 
-Note: in order to support PSCI v0.1 we need to drop vcpu
-initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
+I highly doubt that.  kvm.mmu_lock is also a spinlock, and KVM has been taking
+that in invalidate_range_start() since
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Sebastian Ott <sebott@redhat.com>
----
- docs/system/arm/cpu-features.rst | 11 ++++++
- target/arm/cpu.h                 |  6 +++
- target/arm/kvm.c                 | 65 +++++++++++++++++++++++++++++++-
- 3 files changed, 81 insertions(+), 1 deletion(-)
+  e930bffe95e1 ("KVM: Synchronize guest physical memory map to host virtual memory map")
 
-diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-index 37d5dfd15b..50b106f2eb 100644
---- a/docs/system/arm/cpu-features.rst
-+++ b/docs/system/arm/cpu-features.rst
-@@ -204,6 +204,17 @@ the list of KVM VCPU features and their descriptions.
-   the guest scheduler behavior and/or be exposed to the guest
-   userspace.
+which was a full decade before mmu_notifiers even added the blockable concept in
+
+  93065ac753e4 ("mm, oom: distinguish blockable mode for mmu notifiers")
+
+and even predate the current concept of a "raw" spinlock introduced by
+
+  c2f21ce2e312 ("locking: Implement new raw_spinlock")
+
+> > RT kernels merely make the issue deterministic.
+
+No, RT kernels change the rules, because suddenly a non-sleeping locking becomes
+sleepable.
+
+> > Fix by converting mn_invalidate_lock to a raw spinlock so that
+> > invalidate_range_start() remains non-sleeping while preserving the
+> > existing serialization between invalidate_range_start() and
+> > invalidate_range_end().
+
+This is insufficient.  To actually "fix" this in KVM mmu_lock would need to be
+turned into a raw lock on all KVM architectures.  I suspect the only reason there
+haven't been bug reports is because no one trips an OOM kill on VM while running
+with CONFIG_DEBUG_ATOMIC_SLEEP=y.
+
+That combination is required because since commit
+
+  8931a454aea0 ("KVM: Take mmu_lock when handling MMU notifier iff the hva hits a memslot")
+
+KVM only acquires mmu_lock if the to-be-invalidated range overlaps a memslot,
+i.e. affects memory that may be mapped into the guest.
+
+E.g. this hack to simulate a non-blockable invalidation
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 7015edce5bd8..7a35a83420ec 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -739,7 +739,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+                .handler        = kvm_mmu_unmap_gfn_range,
+                .on_lock        = kvm_mmu_invalidate_begin,
+                .flush_on_ret   = true,
+-               .may_block      = mmu_notifier_range_blockable(range),
++               .may_block      = false,//mmu_notifier_range_blockable(range),
+        };
  
-+``kvm-psci-version``
-+  Set the Power State Coordination Interface (PSCI) firmware ABI version
-+  that KVM provides to the guest. By default KVM will use the newest
-+  version that it knows about (which is PSCI v1.3 in Linux v6.13).
-+
-+  You only need to set this if you want to be able to migrate this
-+  VM to a host machine running an older kernel that does not
-+  recognize the PSCI version that this host's kernel defaults to.
-+
-+  Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3.
-+
- TCG VCPU Features
- =================
+        trace_kvm_unmap_hva_range(range->start, range->end);
+@@ -768,6 +768,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+         */
+        gfn_to_pfn_cache_invalidate_start(kvm, range->start, range->end);
  
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index e146f7e6c4..d3cfd444e8 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1036,6 +1036,12 @@ struct ArchCPU {
-     bool kvm_vtime_dirty;
-     uint64_t kvm_vtime;
++       non_block_start();
+        /*
+         * If one or more memslots were found and thus zapped, notify arch code
+         * that guest memory has been reclaimed.  This needs to be done *after*
+@@ -775,6 +776,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+         */
+        if (kvm_handle_hva_range(kvm, &hva_range).found_memslot)
+                kvm_arch_guest_memory_reclaimed(kvm);
++       non_block_end();
  
-+    /*
-+     * Intermediate value used during property parsing.
-+     * Once finalized, the value should be read from psci_version.
-+     */
-+    uint32_t kvm_prop_psci_version;
-+
-     /* KVM steal time */
-     OnOffAuto kvm_steal_time;
- 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index ded582e0da..6d13cb4f3c 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -485,6 +485,46 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
-     ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+        return 0;
  }
- 
-+typedef struct PSCIVersion {
-+    uint32_t number;
-+    const char *str;
-+} PSCIVersion;
-+
-+static const PSCIVersion psci_versions[] = {
-+    { QEMU_PSCI_VERSION_0_1, "0.1" },
-+    { QEMU_PSCI_VERSION_0_2, "0.2" },
-+    { QEMU_PSCI_VERSION_1_0, "1.0" },
-+    { QEMU_PSCI_VERSION_1_1, "1.1" },
-+    { QEMU_PSCI_VERSION_1_2, "1.2" },
-+    { QEMU_PSCI_VERSION_1_3, "1.3" },
-+};
-+
-+static char *kvm_get_psci_version(Object *obj, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+
-+    for (int i = 0; i < ARRAY_SIZE(psci_versions); i++) {
-+        if (psci_versions[i].number == cpu->psci_version)
-+            return g_strdup(psci_versions[i].str);
-+    }
-+
-+    return g_strdup_printf("Unknown PSCI-version: %x", cpu->psci_version);
-+}
-+
-+static void kvm_set_psci_version(Object *obj, const char *value, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+
-+    for (int i = 0; i < ARRAY_SIZE(psci_versions); i++) {
-+        if (!strcmp(value, psci_versions[i].str)) {
-+            cpu->kvm_prop_psci_version = psci_versions[i].number;
-+            return;
-+        }
-+    }
-+
-+    error_setg(errp, "Invalid PSCI version.");
-+}
-+
- /* KVM VCPU properties should be prefixed with "kvm-". */
- void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
- {
-@@ -506,6 +546,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
-                              kvm_steal_time_set);
-     object_property_set_description(obj, "kvm-steal-time",
-                                     "Set off to disable KVM steal time.");
-+
-+    object_property_add_str(obj, "kvm-psci-version", kvm_get_psci_version,
-+                            kvm_set_psci_version);
-+    object_property_set_description(obj, "kvm-psci-version",
-+                                    "Set PSCI version. "
-+                                    "Valid values are 0.1, 0.2, 1.0, 1.1, 1.2, 1.3");
- }
- 
- bool kvm_arm_pmu_supported(void)
-@@ -1976,7 +2022,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     if (cs->start_powered_off) {
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
-     }
--    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
-+    if (cpu->kvm_prop_psci_version != QEMU_PSCI_VERSION_0_1 &&
-+        kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
-+        /*
-+         * Versions >= v0.2 are backward compatible with v0.2
-+         * omit the feature flag for v0.1 .
-+         */
-         cpu->psci_version = QEMU_PSCI_VERSION_0_2;
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_PSCI_0_2;
-     }
-@@ -2015,6 +2066,18 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         }
-     }
- 
-+    if (cpu->kvm_prop_psci_version) {
-+        psciver = cpu->kvm_prop_psci_version;
-+        ret = kvm_set_one_reg(cs, KVM_REG_ARM_PSCI_VERSION, &psciver);
-+        if (ret) {
-+            error_report("KVM in this kernel does not support PSCI version %d.%d",
-+                         (int) PSCI_VERSION_MAJOR(psciver),
-+                         (int) PSCI_VERSION_MINOR(psciver));
-+            error_printf("Consider setting the kvm-psci-version property on the "
-+                         "migration source.\n");
-+            return ret;
-+        }
-+    }
-     /*
-      * KVM reports the exact PSCI version it is implementing via a
-      * special sysreg. If it is present, use its contents to determine
--- 
-2.52.0
 
+immediately triggers
+
+  BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:241
+  in_atomic(): 0, irqs_disabled(): 0, non_block: 1, pid: 4992, name: qemu
+  preempt_count: 0, expected: 0
+  RCU nest depth: 0, expected: 0
+  CPU: 6 UID: 1000 PID: 4992 Comm: qemu Not tainted 6.19.0-rc6-4d0917ffc392-x86_enter_mmio_stack_uaf_no_null-rt #1 PREEMPT_RT 
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x51/0x60
+   __might_resched+0x10e/0x160
+   rt_write_lock+0x49/0x310
+   kvm_mmu_notifier_invalidate_range_start+0x10b/0x390 [kvm]
+   __mmu_notifier_invalidate_range_start+0x9b/0x230
+   do_wp_page+0xce1/0xf30
+   __handle_mm_fault+0x380/0x3a0
+   handle_mm_fault+0xde/0x290
+   __get_user_pages+0x20d/0xbe0
+   get_user_pages_unlocked+0xf6/0x340
+   hva_to_pfn+0x295/0x420 [kvm]
+   __kvm_faultin_pfn+0x5d/0x90 [kvm]
+   kvm_mmu_faultin_pfn+0x31b/0x6e0 [kvm]
+   kvm_tdp_page_fault+0xb6/0x160 [kvm]
+   kvm_mmu_do_page_fault+0xee/0x1f0 [kvm]
+   kvm_mmu_page_fault+0x8d/0x600 [kvm]
+   vmx_handle_exit+0x18c/0x5a0 [kvm_intel]
+   kvm_arch_vcpu_ioctl_run+0xc70/0x1c90 [kvm]
+   kvm_vcpu_ioctl+0x2d7/0x9a0 [kvm]
+   __x64_sys_ioctl+0x8a/0xd0
+   do_syscall_64+0x5e/0x11b0
+   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+   </TASK>
+  kvm: emulating exchange as write
+
+
+It's not at all clear to me that switching mmu_lock to a raw lock would be a net
+positive for PREEMPT_RT.  OOM-killing a KVM guest in a PREEMPT_RT seems like a
+comically rare scenario.  Whereas contending mmu_lock in normal operation is
+relatively common (assuming there are even use cases for running VMs with a
+PREEMPT_RT host kernel).
+
+In fact, the only reason the splat happens is because mmu_notifiers somewhat
+artificially forces an atomic context via non_block_start() since commit
+
+  ba170f76b69d ("mm, notifier: Catch sleeping/blocking for !blockable")
+
+Given the massive amount of churn in KVM that would be required to fully eliminate
+the splat, and that it's not at all obvious that it would be a good change overall,
+at least for now:
+
+NAK
+
+I'm not fundamentally opposed to such a change, but there needs to be a _lot_
+more analysis and justification beyond "fix CONFIG_DEBUG_ATOMIC_SLEEP=y".
+
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 5fcd401a5897..7a9c33f01a37 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -747,9 +747,9 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+> >  	 *
+> >  	 * Pairs with the decrement in range_end().
+> >  	 */
+> > -	spin_lock(&kvm->mn_invalidate_lock);
+> > +	raw_spin_lock(&kvm->mn_invalidate_lock);
+> >  	kvm->mn_active_invalidate_count++;
+> > -	spin_unlock(&kvm->mn_invalidate_lock);
+> > +	raw_spin_unlock(&kvm->mn_invalidate_lock);
+> 
+> 	atomic_inc(mn_active_invalidate_count)
+> >  
+> >  	/*
+> >  	 * Invalidate pfn caches _before_ invalidating the secondary MMUs, i.e.
+> > @@ -817,11 +817,11 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
+> >  	kvm_handle_hva_range(kvm, &hva_range);
+> >  
+> >  	/* Pairs with the increment in range_start(). */
+> > -	spin_lock(&kvm->mn_invalidate_lock);
+> > +	raw_spin_lock(&kvm->mn_invalidate_lock);
+> >  	if (!WARN_ON_ONCE(!kvm->mn_active_invalidate_count))
+> >  		--kvm->mn_active_invalidate_count;
+> >  	wake = !kvm->mn_active_invalidate_count;
+> 
+> 	wake = atomic_dec_return_safe(mn_active_invalidate_count);
+> 	WARN_ON_ONCE(wake < 0);
+> 	wake = !wake;
+> 
+> > -	spin_unlock(&kvm->mn_invalidate_lock);
+> > +	raw_spin_unlock(&kvm->mn_invalidate_lock);
+> >  
+> >  	/*
+> >  	 * There can only be one waiter, since the wait happens under
+> > @@ -1129,7 +1129,7 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+> > @@ -1635,17 +1635,17 @@ static void kvm_swap_active_memslots(struct kvm *kvm, int as_id)
+> >  	 * progress, otherwise the locking in invalidate_range_start and
+> >  	 * invalidate_range_end will be unbalanced.
+> >  	 */
+> > -	spin_lock(&kvm->mn_invalidate_lock);
+> > +	raw_spin_lock(&kvm->mn_invalidate_lock);
+> >  	prepare_to_rcuwait(&kvm->mn_memslots_update_rcuwait);
+> >  	while (kvm->mn_active_invalidate_count) {
+> >  		set_current_state(TASK_UNINTERRUPTIBLE);
+> > -		spin_unlock(&kvm->mn_invalidate_lock);
+> > +		raw_spin_unlock(&kvm->mn_invalidate_lock);
+> >  		schedule();
+> 
+> And this I don't understand. The lock protects the rcuwait assignment
+> which would be needed if multiple waiters are possible. But this goes
+> away after the unlock and schedule() here. So these things could be
+> moved outside of the locked section which limits it only to the
+> mn_active_invalidate_count value.
+
+The implementation is essentially a deliberately unfair rwswem.  The "write" side
+in kvm_swap_active_memslots() subtly protect this code:
+
+  rcu_assign_pointer(kvm->memslots[as_id], slots);
+
+and the "read" side protects the kvm->memslot lookups in kvm_handle_hva_range().
+
+KVM optimizes its mmu_notifier invalidation path to only take action if the
+to-be-invalidated range overlaps one or more memslots, i.e. affects memory that
+be can be mapped into the guest.  The wrinkle with those optimizations is that
+KVM needs to prevent changes to the memslots between invalidation start() and end(),
+otherwise the accounting can become imbalanced, e.g. mmu_invalidate_in_progress
+will underflow or be left elevated and essentially hang the VM (among other bad
+things).
+
+So simply making mn_active_invalidate_count an atomic won't suffice, because KVM
+needs to block start() to ensure start()+end() see the exact same set of memslots.
 
