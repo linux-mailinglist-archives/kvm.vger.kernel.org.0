@@ -1,945 +1,585 @@
-Return-Path: <kvm+bounces-70899-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70900-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sNbMHwUbjWmkzAAAu9opvQ
-	(envelope-from <kvm+bounces-70899-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 01:12:53 +0100
+	id uLk6ME9OjWmn0wAAu9opvQ
+	(envelope-from <kvm+bounces-70900-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 04:51:43 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAA7F128728
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 01:12:52 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECAF612A3CD
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 04:51:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0BCAD3025C49
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 00:12:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 21F70300E18C
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 03:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6808DF50F;
-	Thu, 12 Feb 2026 00:12:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9026B22127E;
+	Thu, 12 Feb 2026 03:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="hNSo4xez"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nNj2huMU"
 X-Original-To: kvm@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2CDD4A21;
-	Thu, 12 Feb 2026 00:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770855166; cv=none; b=XZQGGg9ODxpS0g/MlAFIbIMpTx/czLIsFufGe95kvaJJLbPIJ0cNoOyqI3srGhnof4hw6Tyz40ca4SdwDmJvCklI4UKQcMrf4jYdhqrj6WrovzV2SlswfcpLBJgDcf87R5FGAh5s0fHKDOMyNGqCaOMly6QBmaT+t0H5PJ4uZAE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770855166; c=relaxed/simple;
-	bh=PSokEurgupwuMyRdMXzVRYxvFrD8cbgBjwugoUjvwsc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=YreKwMcTQlzLM7Eg1/asfVJdNWs+Xfs6yqKTabMIrqs+yqBDNbyENMB0AgGRU6cqJyzLXz3ekmOIVl9RSREvsuQn4L+NsvF+8yEWd1MkVQ4+CYFg38CM8UsF6kLNJwCsO2qHy8gRFoec8hMEYUiivqgfrQ9rJ+eiHgRwqklXjkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=hNSo4xez; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [192.168.70.77] (pd95c968e.dip0.t-ipconnect.de [217.92.150.142])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 61C0CRj1009646
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 12 Feb 2026 01:12:28 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1770855150;
-	bh=PSokEurgupwuMyRdMXzVRYxvFrD8cbgBjwugoUjvwsc=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To;
-	b=hNSo4xezibGAYalnWrBHqjm5FD6k7vYuSdeMCll1dtRWc6D868Bc7f2HVFcc2xOhm
-	 INadQnB49Zygz7jdBxd0W4MUAJ9aVGm3Kp8VLYatO8XjzeO+ObHhX7IFnJEnIc3HjU
-	 01KiHSDixtd89dH6G7gi7KinHhROVYjViBaRpfDM=
-Message-ID: <60157111-219d-4fb3-a01a-6df9a83eae7e@tu-dortmund.de>
-Date: Thu, 12 Feb 2026 01:12:27 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FBE150997;
+	Thu, 12 Feb 2026 03:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770868291; cv=fail; b=E/wztFB+Z+6/U898dnwE8iUtqm12BpxlN8VM3C16ZISUCtj3xy+PhKaKRVC6B8B7vit3LOGerPCxCFrljb4Ou30Yt191QjzdUGhE3F++WZxA58HEEH0GoPStoJm5A31l3jBYtmMLQuIDa34QmuZRf9yxe0o0cq2GAAGnBQxaayU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770868291; c=relaxed/simple;
+	bh=PGJMJQ1uoM3Of7WAUr9TPF9fGu3G1Uk1uQDkhW5dzyQ=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=b60BIYnZuSbyCgyY1rcTgqyS7bxGnQ/lPMkb727aqpEfpE5Sk1DP343mncaxijUFAg5Bx3nn/Y/higIhjMKq7uStDkmsV2wrMkH+AB/b3lQCtZWQgYRnfoW7s70KKV6wlrTrKVjJSK2MxAL17rd0jUXx64HK2AIYxOFeQh+xO9Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nNj2huMU; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770868290; x=1802404290;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=PGJMJQ1uoM3Of7WAUr9TPF9fGu3G1Uk1uQDkhW5dzyQ=;
+  b=nNj2huMUVm5Xa5DTmxq7X53Q0bd4v3Vqwspcmq3LHf6ibg38gIgBYBYe
+   G6OaxqTlG/13J7QiXmY8yluYqcoyEc0FMFJcRp2k300Y1kjr4CCqjDSST
+   dqxkbfT1r7gvq6b3Bnd5EkPDF+jYgLxMCMTN+7moXYMx4FpyCLL/DUdUZ
+   /UhwDAMz8TBZbIIj7tkFZ095nZcPLdJRYS+hkAyvb36nyp8vqRW6045VR
+   tpxIZGdWFmZKz8BmgDYsyFKuA/SDNAUJnG/kBCScyKIQ3QCagn+hzsftm
+   93RvgpMqrd2xPLTU49H5HvI+80XtxP60VEO+2JNWjDtQsey9y/3I6M+le
+   A==;
+X-CSE-ConnectionGUID: GP5H/IiAT1e3d4bVhYzSJQ==
+X-CSE-MsgGUID: 3tZfbcEwROu3Ss0W3kIszQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11698"; a="71936201"
+X-IronPort-AV: E=Sophos;i="6.21,286,1763452800"; 
+   d="scan'208";a="71936201"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2026 19:51:29 -0800
+X-CSE-ConnectionGUID: 6hHPwBDNQZyQHlJK6Icxaw==
+X-CSE-MsgGUID: AtQT/SCoQhqaK8miUvcOfw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,286,1763452800"; 
+   d="scan'208";a="250127992"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2026 19:51:29 -0800
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Wed, 11 Feb 2026 19:51:28 -0800
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35 via Frontend Transport; Wed, 11 Feb 2026 19:51:28 -0800
+Received: from CO1PR03CU002.outbound.protection.outlook.com (52.101.46.27) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Wed, 11 Feb 2026 19:51:28 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gcAJFAugqyA3WFsY50Dwznbx94UqaZnuZVq8FjNuMyH9X/184RgO0MHSHUWT768vkI0GxfyJ9OcaKEXhT0DZJpYPeM+z0K+3wPy/VQtVo3YKT/QYCDaSXEu483MsfVUmVFPrsuZgGrLPrTJAryS8F5getJ3q4zeEW6py/12v/KjE3Gr7AQJyHC0WlA88rYHju5eJZDjByU0qMTsOJDkU/gt7gYViM7QK0Xqx1rSh7i7XuGsnLK826S16zhcQwWIvngjG8jH2ybANCMGGFdMqriwgVg+T/QzMQfMCaIGHyt1fvFPmNpg/qQoxSIxAxVBOlPmg5pia7MKrMs4oOBFn2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/Y7g1B5UBssD0HJx82s0sv7KCXOuiqPSvJUTp5aXdeg=;
+ b=EwSljMmYJ9rS2h7MWcRiLyQjIgPahutHv4y4YPv4LcT5i8XzarOQdEQlYRTuRBijWMJeD2EKvE1bb2iWJsATIXXsEW4BxrE6c2zt/hPuKgoscwBetJUcBFJuHVVs4F7vKv9ve89g5L3dP9legjNKumxon+X+5zq2vn5QUf9R/F6D0dfWdsAp/6hag2Qw2RbYJ495oJ+RPmP5bcdFmbuGVZOR6IVqrl5Oqy+bkMvgLUVnQyhRlrdTtiSoovhfNh53rw+NkmYdu25uoBhFdqjkiHvjCFvYyuQtqebCZJUg/zFafs85AX4sugaj0V0kVUnmQzCzlGOhG6TED3Nqmc+Y3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SJ2PR11MB7573.namprd11.prod.outlook.com (2603:10b6:a03:4d2::10)
+ by BL3PR11MB6339.namprd11.prod.outlook.com (2603:10b6:208:3b3::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.11; Thu, 12 Feb
+ 2026 03:51:24 +0000
+Received: from SJ2PR11MB7573.namprd11.prod.outlook.com
+ ([fe80::bfe:4ce1:556:4a9d]) by SJ2PR11MB7573.namprd11.prod.outlook.com
+ ([fe80::bfe:4ce1:556:4a9d%6]) with mapi id 15.20.9587.017; Thu, 12 Feb 2026
+ 03:51:24 +0000
+Message-ID: <06a237bd-c370-4d3f-99de-124e8c50e711@intel.com>
+Date: Wed, 11 Feb 2026 19:51:17 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 01/19] x86,fs/resctrl: Add support for Global
+ Bandwidth Enforcement (GLBE)
+To: Babu Moger <babu.moger@amd.com>, "Moger, Babu" <bmoger@amd.com>,
+	<corbet@lwn.net>, <tony.luck@intel.com>, <Dave.Martin@arm.com>,
+	<james.morse@arm.com>, <tglx@kernel.org>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>
+CC: <x86@kernel.org>, <hpa@zytor.com>, <peterz@infradead.org>,
+	<juri.lelli@redhat.com>, <vincent.guittot@linaro.org>,
+	<dietmar.eggemann@arm.com>, <rostedt@goodmis.org>, <bsegall@google.com>,
+	<mgorman@suse.de>, <vschneid@redhat.com>, <akpm@linux-foundation.org>,
+	<pawan.kumar.gupta@linux.intel.com>, <pmladek@suse.com>,
+	<feng.tang@linux.alibaba.com>, <kees@kernel.org>, <arnd@arndb.de>,
+	<fvdl@google.com>, <lirongqing@baidu.com>, <bhelgaas@google.com>,
+	<seanjc@google.com>, <xin@zytor.com>, <manali.shukla@amd.com>,
+	<dapeng1.mi@linux.intel.com>, <chang.seok.bae@intel.com>,
+	<mario.limonciello@amd.com>, <naveen@kernel.org>,
+	<elena.reshetova@intel.com>, <thomas.lendacky@amd.com>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <peternewman@google.com>, <eranian@google.com>,
+	<gautham.shenoy@amd.com>
+References: <cover.1769029977.git.babu.moger@amd.com>
+ <aba70a013c12383d53104de0b19cfbf87690c0c3.1769029977.git.babu.moger@amd.com>
+ <eb4b7b12-7674-4a1e-925d-2cec8c3f43d2@intel.com>
+ <f0f2e3eb-0fdb-4498-9eb8-73111b1c5a84@amd.com>
+ <9b02dfc6-b97c-4695-b765-8cb34a617efb@intel.com>
+ <3a7c17c0-bb51-4aad-a705-d8d1853ea68a@amd.com>
+From: Reinette Chatre <reinette.chatre@intel.com>
+Content-Language: en-US
+In-Reply-To: <3a7c17c0-bb51-4aad-a705-d8d1853ea68a@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MW4PR03CA0332.namprd03.prod.outlook.com
+ (2603:10b6:303:dc::7) To SJ2PR11MB7573.namprd11.prod.outlook.com
+ (2603:10b6:a03:4d2::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
- netdev queue wakeup
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-To: Jason Wang <jasowang@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
-        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
- <CACGkMEsJKeEsH=G8H5RzMNHY4g3HNdciMDMhciShawh-9Xb9hg@mail.gmail.com>
- <bc1078e5-65fc-4de6-8475-517f626d8d96@tu-dortmund.de>
- <3a1d6232-efe4-4e79-a196-44794fdc0f33@tu-dortmund.de>
- <CACGkMEv71kn91FPAUrxJg=YB3+B0MRTgOidMPHjK7Qq0WEhGtw@mail.gmail.com>
- <260f48cd-caa1-4684-a235-8e1192722b3a@tu-dortmund.de>
- <CACGkMEsVMz+vS3KxykYBGXvyt3MZcstnYWUiYJZhLSMoHC5Smw@mail.gmail.com>
- <ba17ba38-9f61-4a10-b375-d0da805e6b73@tu-dortmund.de>
- <CACGkMEtnLw2b8iDysQzRbXxTj2xbgzKqEZUbhmZz9tXPLTE6Sw@mail.gmail.com>
- <0ebc00ba-35e7-4570-a44f-b0ae634f2316@tu-dortmund.de>
- <CACGkMEsJtE3RehWQ8BaDL2HdFPK=iW+ZaEAN1TekAMWwor5tjQ@mail.gmail.com>
- <197573a1-df52-4928-adb9-55a7a4f78839@tu-dortmund.de>
- <CACGkMEveEXky_rTrvRrfi7qix12GG91GfyqnwB6Tu-dnjqAm9A@mail.gmail.com>
- <0c776172-2f02-47fc-babf-2871adca42cb@tu-dortmund.de>
- <CACGkMEte=LwvkxPh-tesJHLVYQV1YZF4is1Yamokhkzaf5GOWw@mail.gmail.com>
- <205aa139-975d-4092-aa04-a2c570ae43a6@tu-dortmund.de>
-Content-Language: en-US
-In-Reply-To: <205aa139-975d-4092-aa04-a2c570ae43a6@tu-dortmund.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR11MB7573:EE_|BL3PR11MB6339:EE_
+X-MS-Office365-Filtering-Correlation-Id: fe20e843-dc43-4fcd-aa0a-08de69e9fe0e
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?MEZ5LzNlTENWcXBISkdzR0NyemxseHNsY2o0UEw4c1puV0NaQXVzSjZQTWMv?=
+ =?utf-8?B?U2tRRHpZYjlJVk5hZUp0N0paUmo0aDNmUjdTS2RNNjZORkIzYUxsaThEampB?=
+ =?utf-8?B?MUNoWUVnenVMU0hIRGZKSS9PTTNJSGpmSitLNnlZd0lmd3FiQkZMVTFQSmlT?=
+ =?utf-8?B?cUpPaFluUEJyN2txNEFDT2RWdlVRSlBUYWxxbWRUZU5ueHJKT0hYMHFvQWVh?=
+ =?utf-8?B?U2N6R0N2cDZ1Q2NiZE5UbWVPK3RrWThqMG9zMUtXNVEzZE5Uc25NZUJXSmNL?=
+ =?utf-8?B?MjB4WWVuOFNzcFRYT3BYekFFQzRkQm5QV1U0SGNJTWxrUWwxTnYrZkJBbE1F?=
+ =?utf-8?B?VlVPRVp1cHk5dDAvaWNNYWdya050RUpab3FYYkM1Nm5IcVVBaUFoSXFZMk0x?=
+ =?utf-8?B?VC9McG5jLzRXL1BJUE5PNUp4R3hBSWYxaCs1M0VCeWV1eDVqQlhMYzB5cXBm?=
+ =?utf-8?B?SzVZRlJUU0pQTndZMTE0cmFjOWU5aUowRFpXRm1mcHhaWEV5T1Y3cFErQzhK?=
+ =?utf-8?B?STQvN1BZc2lHb1RMODkvbzRLWXBQNWFQM3RQcVJvVWxoakNCTW15Mkl6eUlK?=
+ =?utf-8?B?K0Vrd05OTjFCN0pCUXdOdGhsdklNVnBnRFZWQ3E2RWI2MlJsVUhCZEU0bzY1?=
+ =?utf-8?B?N2NrVStvR2V1T1AvbW1DUXJJVkVYT3lwaWxRSWk5WitVQjhGZHNIZ1E4L2Fr?=
+ =?utf-8?B?dWlGTjJQcHFybmhBVWEvS3daWHpJVTNlbkRFYUxIRkdYaWsxQitUbnlMWXNw?=
+ =?utf-8?B?b3hveXlVcnNGeklQUlNCQWFXZHpYN29EN2JWTzNBUDNLaTdWVlUycURadzcw?=
+ =?utf-8?B?OTZVQzJCeTNkSEFqcFNNeGZnWVM1cmEzV25hNjJCQTkwc04ydVZkUXVGbmZC?=
+ =?utf-8?B?L3hHRnpvbzZMOVhCUm1hcXkvSGFYamkyME1Ka3NGalgyVVk3RWdHUW15RjFJ?=
+ =?utf-8?B?d09SMFgwRGg2eHVCREVMelJBeEhlMTNKNFM1RjNYaVVwRzdaZlQ3QkV5WFB2?=
+ =?utf-8?B?cjRTanBTb29KcTc2aHNIYm9pVm80L0pLRmR0V3d4R0dJT254NlBqZHl3L1l3?=
+ =?utf-8?B?R3locll6cUxRNzNPbkczSUw5Y2dhQ2lnNHZoWVJKd2JYd2hVWU5sRzQrWWg3?=
+ =?utf-8?B?OW94ejBvaitCVTdtbE9RMllSdnA1TitHa2dUbnBwVzIzNmJSdWxESFNvNUN2?=
+ =?utf-8?B?UjdPNDBpR0QyVkhwVkhXbUpTdEtRN21GZnVaVHlkdVFVQVlJdmdFVFNSVzJX?=
+ =?utf-8?B?RlQ0Y3RMQ0dUY3lkTkUxRnA0U1A3WGMvMGxhT1JzK3F1K0p3N21JSkt1bXFx?=
+ =?utf-8?B?bVZOZ3RXOURoODF1NWRqNjJLYmlKRlFNc2NtZGRjZCsvWG5CNHpGUjlpb0wy?=
+ =?utf-8?B?ckhtMWRhNmJKTWhQSnorS1R3T1ByWFd2ZURXelRzRWVqeVhCT2Q2OTBEZFIw?=
+ =?utf-8?B?OHJGOGVSNS9ydFI0RkR6OGhySDdYK0U4aWt0cjhqd1pjZ0tpbG9BYVpwR2lX?=
+ =?utf-8?B?Y3E3Y2E1UWFqcnNlRGd5OWZzbC84NDRYVWQvcHRIY3FuQ2ZGaHU1MWFWZWpZ?=
+ =?utf-8?B?Z1pqU0YwdWtRME9PbG1TRGdScXBBV1dreGUzUHBwRGpqMDEyZ2t4c0lzaE9s?=
+ =?utf-8?B?ZTdERWFjZVdqRHhwRnRqdWNHRk5HcWZPYU54YTVzNUJCc2loUVZnRGFvTmVv?=
+ =?utf-8?B?S0JsdmhUSW15RmdmZmx5ZnVmbE96NStMazRNRHZiUCtrci9wWlUyOG1UZHg2?=
+ =?utf-8?B?Y2dZMEtuUXdseUlYYTVJTHYwNmtOMmdYTFdFaWQvQUFpR2dYSVBQMUNKNDVE?=
+ =?utf-8?B?QnZJdEhvRktRRTNnY0JFWHZ5a0JyNTFFTjJGMWpwd1BkNFdjZFRvWWIzckht?=
+ =?utf-8?B?KzF5WlEzREdFYWNsY1ZlcWlhdkFsZkdrZDNUMHhnUUYrcGM3MU5XVjFQOUhV?=
+ =?utf-8?B?ZHpRL0EvZHRtY3hKY2VuZll6NGhXMStxZERvUEdzOFJ1ZEYxMmY2MFFjbGRZ?=
+ =?utf-8?B?V3VQaHV6Z1ZnNmVTQUZsU3lRdHA5WTJ0LzNKbnczbkw0M09KY2cwWkNVNlUz?=
+ =?utf-8?B?Y1lGSXB1OFNhNUlDWFdJN0lHWndWSVZTM3VYbktpaThoN285QitOanJZTTFj?=
+ =?utf-8?Q?5FL2j4QhNa9Tep/uarNSs1KZR?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB7573.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K1hqY1dieWpkQ091UUlEVEhSNmhzaEdrbWpiTDhENkM4RHN2bVMxUVJiSG95?=
+ =?utf-8?B?Y3hvVTBvMlZyZ1dLdDA2eGh3enRNeCtac3Yrb2ViRXV3RkpRcW1ZTzFHNFRL?=
+ =?utf-8?B?a0t5RFNuSkZOS1FLcTl0RU1nZnVzVjkwcFpJSHdCeWZLMC95bHI3SDNoeVhY?=
+ =?utf-8?B?QTlsbVI0eDlkUElzZU4xRWxpV1hLSGIxTVdNZ29NUCtBMnNwV0lwdFFrMkEx?=
+ =?utf-8?B?UnU4bHJVMVZPWG91dXZTbEVkOFJXc1BUR2lhV3BRaGtxMmNhSURZMUhja2Yv?=
+ =?utf-8?B?WkFJQTlSLzVoSzZ2MVR4QjRmL1JXbmM4NlhtaXhwY0tJZThLYkV3ZmlGOTNa?=
+ =?utf-8?B?ZkdZWW9SdUtLbm1DMDF6b0FjQks5cUJjY2FGSUdjVkx0dTg1VWxIdEpmK2Ja?=
+ =?utf-8?B?ZkQwekZRR2tSdVZWZm5QaUZqVFZrRlhidE10ZENnNkxpY0IxWE1aUVZLL1ZB?=
+ =?utf-8?B?eUN5dWNEKzEra3RDd09hOVB5WFRUbmdIZTJKVWU0N0RpMExoeUdKSW02cXU2?=
+ =?utf-8?B?L09MMjFaNDV3a0REaHpnOVBSZWFkT0Q4UHg1cWFUUjZLNUVsUWJkWlhoSXBU?=
+ =?utf-8?B?WlFZTjIvUmhXYUx4eUdtMG52Smc0dFBIZUxiUW1YVHF4N3loSGRpcWkyNkZl?=
+ =?utf-8?B?T3dBWFJRWlpCdVhONFRSYmF1RTBVeG50SG5DTlVhOEhCWHFZNXhWMWlmS0k1?=
+ =?utf-8?B?QUlpQ2VpbzB5a0xoRy81eS9BOXQrSkthNHZhRW5MZk1WelpBNzdpekowS3hn?=
+ =?utf-8?B?elB0M1VqUUJXZXd0Y0Q2SEZKZ2htd0FTczA0LzVYOTBGTDVoWU9ua0cxNVB4?=
+ =?utf-8?B?WXljMEFDME9FMzNIanM5YjlhSXVxM3R2eFA1S2drb2lSWW42eFZNRHNyZjJY?=
+ =?utf-8?B?TlFtZkRySWxsYWJJMXBLS3BXZk5TRm5qanVkbXlQcUkwLzd4dEpnUFJVcXQ0?=
+ =?utf-8?B?WEpoTitQU0hST1o2azQxS2V6L2l4dDc2RFBNQzJITG1tMGZiU2dvekM5b2N0?=
+ =?utf-8?B?aUlhaEN4NDhkbUYydXcrekoybmw2K21xSmlKVnh6UXZ2MWYzY3B2NzRMd0hp?=
+ =?utf-8?B?VThuNndydmRqLzFBVjUvSzVsSHRSamtiS3Zoci9BcVZsQmtEakhCUTJMVy9x?=
+ =?utf-8?B?SVFMc3dlU3lJZ3J5UXNDUDB4Rlg1UFp5VWdyK2hhakdoQXJCVExYNENHTGpO?=
+ =?utf-8?B?dEczY0FhNFhPV21GOGVjZWY3TkJ5b1VLbGJmaDdxcjh6NEFwZ2QwQ0VKc2ZY?=
+ =?utf-8?B?R3RSbjJLUFZSQTRtZityVWtONGVrWXhHVjRXN2FUVkJ4U2tFYjk1ZTFrZ2p6?=
+ =?utf-8?B?VmRjV1NJSUZSY1pzOUI3bXA3WHFObkV6QU5HRFp6SmhYc0MvTDFBVVFqRndF?=
+ =?utf-8?B?dHloMnd3dnIxMGJ6RUMva3NpaUkwRk5TZTFPRWNoQkE2MUVCU1E5YWsrYlBh?=
+ =?utf-8?B?TjFvMklwNG5vNTFlcUNrZ3JLK2Y1MUFRelY0aU1hTnpxQ1RtUnNMdXJPNi9v?=
+ =?utf-8?B?WXJES3ZLd2RBa1RtNUFpN1ZwU3RvWUZyTnFTVkU1QWpzcExuUEY5a0srVDFy?=
+ =?utf-8?B?WUo2Y3JocFg0UHNUSUNQNlpYU1l5MXFGM1AzZ1p6YUx3cHBaN1JSbWNKbTNs?=
+ =?utf-8?B?WjRyYWZSeFVFaHpMM1RqM2kwUWdzUHlIVlgrVlJyVDRSZkF4aGJINWczMWdF?=
+ =?utf-8?B?cEtHMlgrN2FGTjZna2VlUDMyaFBpdUlaUGpjVUFyQ2V1UlNzRXJIMk81ajFz?=
+ =?utf-8?B?M1UzeGM0YnRrUW9uNE15M2hoN1ZJSDNwL282alFpQVdoa0ZyaDZRUm1ENHBM?=
+ =?utf-8?B?TjY3dTk5K0czVjFJR1VLcUszNFJtbmF5cFRYTDM4ZjR4RTdwZTEweWVYbVov?=
+ =?utf-8?B?clI2MERPN1NGcWJlUTE1eFNKcTgvb29DME1BOVhlRGdhK0dpbkVHT1ZaN29i?=
+ =?utf-8?B?eEt0UnZWR3RTUGtiZDBqU3dQL0dvNTBXTWUxdUpMWTJwbFIvTWdyc2Jha05j?=
+ =?utf-8?B?U3lFSFNSdEN6b0xjSVVLNFo3Y09ZMHJiRkM5cWZCU3YxUFp0RFRWLzh0R0w0?=
+ =?utf-8?B?TUtVRjRDSUI1T08vZElReTNwYS96M0NoazNGN3ZoeVlSdFltSE9pczZxMXhq?=
+ =?utf-8?B?aU1WTVUwWFJFNWZFK3pSNHNRZlJRa3FING9WRVpTbW5tV1RrblY0cUo0eXpZ?=
+ =?utf-8?B?Z3B5TVdCSTA0TGJEdWVMbERUUDZ2Ly9PZWRicU9GUDNrN3dZWlNPZmdtZFJz?=
+ =?utf-8?B?OEFYZUhnOTE0dHIzd0J0MVE1UFl2VGVVMGJCU1lqejdMVlNYRGJGbnovT0dY?=
+ =?utf-8?B?UXc3UEJWWVY4dEtFMDFmcUVDTEFRWEFIYU9waFR3QkhtcHBXak01QUMwbDRZ?=
+ =?utf-8?Q?054k2OqwNZpzCquk=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe20e843-dc43-4fcd-aa0a-08de69e9fe0e
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB7573.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2026 03:51:24.5052
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cl2BjfTKZUUefBT1ZqD7GUIBYbvIX7A5MaZPuHnKQ1WEuB9pbT9zCDnJu6tJsOg2uewmPi5SJeNlV50reTlPh2tilKd8Ns2hXtpfsr27gvQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6339
+X-OriginatorOrg: intel.com
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70899-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[44];
+	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
-	DBL_PROHIBIT(0.00)[0.0.0.0:email];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm,netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,pktgen_sample02_multiqueue.sh:url,pktgen_sample03_burst_single_flow.sh:url]
-X-Rspamd-Queue-Id: CAA7F128728
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[reinette.chatre@intel.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70900-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[intel.com:+]
+X-Rspamd-Queue-Id: ECAF612A3CD
 X-Rspamd-Action: no action
 
-On 2/8/26 19:18, Simon Schippers wrote:
-> On 2/6/26 04:21, Jason Wang wrote:
->> On Fri, Feb 6, 2026 at 6:28 AM Simon Schippers
->> <simon.schippers@tu-dortmund.de> wrote:
->>>
->>> On 2/5/26 04:59, Jason Wang wrote:
->>>> On Wed, Feb 4, 2026 at 11:44 PM Simon Schippers
->>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>
->>>>> On 2/3/26 04:48, Jason Wang wrote:
->>>>>> On Mon, Feb 2, 2026 at 4:19 AM Simon Schippers
->>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>
->>>>>>> On 1/30/26 02:51, Jason Wang wrote:
->>>>>>>> On Thu, Jan 29, 2026 at 5:25 PM Simon Schippers
->>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>>
->>>>>>>>> On 1/29/26 02:14, Jason Wang wrote:
->>>>>>>>>> On Wed, Jan 28, 2026 at 3:54 PM Simon Schippers
->>>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>>>>
->>>>>>>>>>> On 1/28/26 08:03, Jason Wang wrote:
->>>>>>>>>>>> On Wed, Jan 28, 2026 at 12:48 AM Simon Schippers
->>>>>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>>>>>>
->>>>>>>>>>>>> On 1/23/26 10:54, Simon Schippers wrote:
->>>>>>>>>>>>>> On 1/23/26 04:05, Jason Wang wrote:
->>>>>>>>>>>>>>> On Thu, Jan 22, 2026 at 1:35 PM Jason Wang <jasowang@redhat.com> wrote:
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> On Wed, Jan 21, 2026 at 5:33 PM Simon Schippers
->>>>>>>>>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>> On 1/9/26 07:02, Jason Wang wrote:
->>>>>>>>>>>>>>>>>> On Thu, Jan 8, 2026 at 3:41 PM Simon Schippers
->>>>>>>>>>>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>> On 1/8/26 04:38, Jason Wang wrote:
->>>>>>>>>>>>>>>>>>>> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
->>>>>>>>>>>>>>>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>>>> Introduce {tun,tap}_ring_consume() helpers that wrap __ptr_ring_consume()
->>>>>>>>>>>>>>>>>>>>> and wake the corresponding netdev subqueue when consuming an entry frees
->>>>>>>>>>>>>>>>>>>>> space in the underlying ptr_ring.
->>>>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>>>> Stopping of the netdev queue when the ptr_ring is full will be introduced
->>>>>>>>>>>>>>>>>>>>> in an upcoming commit.
->>>>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>>>>>>>>>>>>>>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>>>>>>>>>>>>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>>>>>>>>>>>>>>>>>> ---
->>>>>>>>>>>>>>>>>>>>>  drivers/net/tap.c | 23 ++++++++++++++++++++++-
->>>>>>>>>>>>>>>>>>>>>  drivers/net/tun.c | 25 +++++++++++++++++++++++--
->>>>>>>>>>>>>>>>>>>>>  2 files changed, 45 insertions(+), 3 deletions(-)
->>>>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
->>>>>>>>>>>>>>>>>>>>> index 1197f245e873..2442cf7ac385 100644
->>>>>>>>>>>>>>>>>>>>> --- a/drivers/net/tap.c
->>>>>>>>>>>>>>>>>>>>> +++ b/drivers/net/tap.c
->>>>>>>>>>>>>>>>>>>>> @@ -753,6 +753,27 @@ static ssize_t tap_put_user(struct tap_queue *q,
->>>>>>>>>>>>>>>>>>>>>         return ret ? ret : total;
->>>>>>>>>>>>>>>>>>>>>  }
->>>>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>>>> +static void *tap_ring_consume(struct tap_queue *q)
->>>>>>>>>>>>>>>>>>>>> +{
->>>>>>>>>>>>>>>>>>>>> +       struct ptr_ring *ring = &q->ring;
->>>>>>>>>>>>>>>>>>>>> +       struct net_device *dev;
->>>>>>>>>>>>>>>>>>>>> +       void *ptr;
->>>>>>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>>>>>> +       spin_lock(&ring->consumer_lock);
->>>>>>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>>>>>> +       ptr = __ptr_ring_consume(ring);
->>>>>>>>>>>>>>>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
->>>>>>>>>>>>>>>>>>>>> +               rcu_read_lock();
->>>>>>>>>>>>>>>>>>>>> +               dev = rcu_dereference(q->tap)->dev;
->>>>>>>>>>>>>>>>>>>>> +               netif_wake_subqueue(dev, q->queue_index);
->>>>>>>>>>>>>>>>>>>>> +               rcu_read_unlock();
->>>>>>>>>>>>>>>>>>>>> +       }
->>>>>>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>>>>>> +       spin_unlock(&ring->consumer_lock);
->>>>>>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>>>>>> +       return ptr;
->>>>>>>>>>>>>>>>>>>>> +}
->>>>>>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>>>>>>  static ssize_t tap_do_read(struct tap_queue *q,
->>>>>>>>>>>>>>>>>>>>>                            struct iov_iter *to,
->>>>>>>>>>>>>>>>>>>>>                            int noblock, struct sk_buff *skb)
->>>>>>>>>>>>>>>>>>>>> @@ -774,7 +795,7 @@ static ssize_t tap_do_read(struct tap_queue *q,
->>>>>>>>>>>>>>>>>>>>>                                         TASK_INTERRUPTIBLE);
->>>>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>>>>                 /* Read frames from the queue */
->>>>>>>>>>>>>>>>>>>>> -               skb = ptr_ring_consume(&q->ring);
->>>>>>>>>>>>>>>>>>>>> +               skb = tap_ring_consume(q);
->>>>>>>>>>>>>>>>>>>>>                 if (skb)
->>>>>>>>>>>>>>>>>>>>>                         break;
->>>>>>>>>>>>>>>>>>>>>                 if (noblock) {
->>>>>>>>>>>>>>>>>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->>>>>>>>>>>>>>>>>>>>> index 8192740357a0..7148f9a844a4 100644
->>>>>>>>>>>>>>>>>>>>> --- a/drivers/net/tun.c
->>>>>>>>>>>>>>>>>>>>> +++ b/drivers/net/tun.c
->>>>>>>>>>>>>>>>>>>>> @@ -2113,13 +2113,34 @@ static ssize_t tun_put_user(struct tun_struct *tun,
->>>>>>>>>>>>>>>>>>>>>         return total;
->>>>>>>>>>>>>>>>>>>>>  }
->>>>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>>>> +static void *tun_ring_consume(struct tun_file *tfile)
->>>>>>>>>>>>>>>>>>>>> +{
->>>>>>>>>>>>>>>>>>>>> +       struct ptr_ring *ring = &tfile->tx_ring;
->>>>>>>>>>>>>>>>>>>>> +       struct net_device *dev;
->>>>>>>>>>>>>>>>>>>>> +       void *ptr;
->>>>>>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>>>>>> +       spin_lock(&ring->consumer_lock);
->>>>>>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>>>>>> +       ptr = __ptr_ring_consume(ring);
->>>>>>>>>>>>>>>>>>>>> +       if (unlikely(ptr && __ptr_ring_consume_created_space(ring, 1))) {
->>>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>>> I guess it's the "bug" I mentioned in the previous patch that leads to
->>>>>>>>>>>>>>>>>>>> the check of __ptr_ring_consume_created_space() here. If it's true,
->>>>>>>>>>>>>>>>>>>> another call to tweak the current API.
->>>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>>>> +               rcu_read_lock();
->>>>>>>>>>>>>>>>>>>>> +               dev = rcu_dereference(tfile->tun)->dev;
->>>>>>>>>>>>>>>>>>>>> +               netif_wake_subqueue(dev, tfile->queue_index);
->>>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>>> This would cause the producer TX_SOFTIRQ to run on the same cpu which
->>>>>>>>>>>>>>>>>>>> I'm not sure is what we want.
->>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>> What else would you suggest calling to wake the queue?
->>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>> I don't have a good method in my mind, just want to point out its implications.
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>> I have to admit I'm a bit stuck at this point, particularly with this
->>>>>>>>>>>>>>>>> aspect.
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>> What is the correct way to pass the producer CPU ID to the consumer?
->>>>>>>>>>>>>>>>> Would it make sense to store smp_processor_id() in the tfile inside
->>>>>>>>>>>>>>>>> tun_net_xmit(), or should it instead be stored in the skb (similar to the
->>>>>>>>>>>>>>>>> XDP bit)? In the latter case, my concern is that this information may
->>>>>>>>>>>>>>>>> already be significantly outdated by the time it is used.
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>> Based on that, my idea would be for the consumer to wake the producer by
->>>>>>>>>>>>>>>>> invoking a new function (e.g., tun_wake_queue()) on the producer CPU via
->>>>>>>>>>>>>>>>> smp_call_function_single().
->>>>>>>>>>>>>>>>> Is this a reasonable approach?
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> I'm not sure but it would introduce costs like IPI.
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>> More generally, would triggering TX_SOFTIRQ on the consumer CPU be
->>>>>>>>>>>>>>>>> considered a deal-breaker for the patch set?
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> It depends on whether or not it has effects on the performance.
->>>>>>>>>>>>>>>> Especially when vhost is pinned.
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> I meant we can benchmark to see the impact. For example, pin vhost to
->>>>>>>>>>>>>>> a specific CPU and the try to see the impact of the TX_SOFTIRQ.
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> Thanks
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> I ran benchmarks with vhost pinned to CPU 0 using taskset -p -c 0 ...
->>>>>>>>>>>>>> for both the stock and patched versions. The benchmarks were run with
->>>>>>>>>>>>>> the full patch series applied, since testing only patches 1-3 would not
->>>>>>>>>>>>>> be meaningful - the queue is never stopped in that case, so no
->>>>>>>>>>>>>> TX_SOFTIRQ is triggered.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> Compared to the non-pinned CPU benchmarks in the cover letter,
->>>>>>>>>>>>>> performance is lower for pktgen with a single thread but higher with
->>>>>>>>>>>>>> four threads. The results show no regression for the patched version,
->>>>>>>>>>>>>> with even slight performance improvements observed:
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> +-------------------------+-----------+----------------+
->>>>>>>>>>>>>> | pktgen benchmarks to    | Stock     | Patched with   |
->>>>>>>>>>>>>> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
->>>>>>>>>>>>>> | 100M packets            |           |                |
->>>>>>>>>>>>>> | vhost pinned to core 0  |           |                |
->>>>>>>>>>>>>> +-----------+-------------+-----------+----------------+
->>>>>>>>>>>>>> | TAP       | Transmitted | 452 Kpps  | 454 Kpps       |
->>>>>>>>>>>>>> |  +        +-------------+-----------+----------------+
->>>>>>>>>>>>>> | vhost-net | Lost        | 1154 Kpps | 0              |
->>>>>>>>>>>>>> +-----------+-------------+-----------+----------------+
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> +-------------------------+-----------+----------------+
->>>>>>>>>>>>>> | pktgen benchmarks to    | Stock     | Patched with   |
->>>>>>>>>>>>>> | Debian VM, i5 6300HQ,   |           | fq_codel qdisc |
->>>>>>>>>>>>>> | 100M packets            |           |                |
->>>>>>>>>>>>>> | vhost pinned to core 0  |           |                |
->>>>>>>>>>>>>> | *4 threads*             |           |                |
->>>>>>>>>>>>>> +-----------+-------------+-----------+----------------+
->>>>>>>>>>>>>> | TAP       | Transmitted | 71 Kpps   | 79 Kpps        |
->>>>>>>>>>>>>> |  +        +-------------+-----------+----------------+
->>>>>>>>>>>>>> | vhost-net | Lost        | 1527 Kpps | 0              |
->>>>>>>>>>>>>> +-----------+-------------+-----------+----------------+
->>>>>>>>>>>>
->>>>>>>>>>>> The PPS seems to be low. I'd suggest using testpmd (rxonly) mode in
->>>>>>>>>>>> the guest or an xdp program that did XDP_DROP in the guest.
->>>>>>>>>>>
->>>>>>>>>>> I forgot to mention that these PPS values are per thread.
->>>>>>>>>>> So overall we have 71 Kpps * 4 = 284 Kpps and 79 Kpps * 4 = 326 Kpps,
->>>>>>>>>>> respectively. For packet loss, that comes out to 1154 Kpps * 4 =
->>>>>>>>>>> 4616 Kpps and 0, respectively.
->>>>>>>>>>>
->>>>>>>>>>> Sorry about that!
->>>>>>>>>>>
->>>>>>>>>>> The pktgen benchmarks with a single thread look fine, right?
->>>>>>>>>>
->>>>>>>>>> Still looks very low. E.g I just have a run of pktgen (using
->>>>>>>>>> pktgen_sample03_burst_single_flow.sh) without a XDP_DROP in the guest,
->>>>>>>>>> I can get 1Mpps.
->>>>>>>>>
->>>>>>>>> Keep in mind that I am using an older CPU (i5-6300HQ). For the
->>>>>>>>> single-threaded tests I always used pktgen_sample01_simple.sh, and for
->>>>>>>>> the multi-threaded tests I always used pktgen_sample02_multiqueue.sh.
->>>>>>>>>
->>>>>>>>> Using pktgen_sample03_burst_single_flow.sh as you did fails for me (even
->>>>>>>>> though the same parameters work fine for sample01 and sample02):
->>>>>>>>>
->>>>>>>>> samples/pktgen/pktgen_sample03_burst_single_flow.sh -i tap0 -m
->>>>>>>>> 52:54:00:12:34:56 -d 10.0.0.2 -n 100000000
->>>>>>>>> /samples/pktgen/functions.sh: line 79: echo: write error: Operation not
->>>>>>>>> supported
->>>>>>>>> ERROR: Write error(1) occurred
->>>>>>>>> cmd: "burst 32 > /proc/net/pktgen/tap0@0"
->>>>>>>>>
->>>>>>>>> ...and I do not know what I am doing wrong, even after looking at
->>>>>>>>> Documentation/networking/pktgen.rst. Every burst size except 1 fails.
->>>>>>>>> Any clues?
->>>>>>>>
->>>>>>>> Please use -b 0, and I'm Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz.
->>>>>>>
->>>>>>> I tried using "-b 0", and while it worked, there was no noticeable
->>>>>>> performance improvement.
->>>>>>>
->>>>>>>>
->>>>>>>> Another thing I can think of is to disable
->>>>>>>>
->>>>>>>> 1) mitigations in both guest and host
->>>>>>>> 2) any kernel debug features in both host and guest
->>>>>>>
->>>>>>> I also rebuilt the kernel with everything disabled under
->>>>>>> "Kernel hacking", but that didn’t make any difference either.
->>>>>>>
->>>>>>> Because of this, I ran "pktgen_sample01_simple.sh" and
->>>>>>> "pktgen_sample02_multiqueue.sh" on my AMD Ryzen 5 5600X system. The
->>>>>>> results were about 374 Kpps with TAP and 1192 Kpps with TAP+vhost_net,
->>>>>>> with very similar performance between the stock and patched kernels.
->>>>>>>
->>>>>>> Personally, I think the low performance is to blame on the hardware.
->>>>>>
->>>>>> Let's double confirm this by:
->>>>>>
->>>>>> 1) make sure pktgen is using 100% CPU
->>>>>> 2) Perf doesn't show anything strange for pktgen thread
->>>>>>
->>>>>> Thanks
->>>>>>
->>>>>
->>>>> I ran pktgen using pktgen_sample01_simple.sh and, in parallel, started a
->>>>> 100 second perf stat measurement covering all kpktgend threads.
->>>>>
->>>>> Across all configurations, a single CPU was fully utilized.
->>>>>
->>>>> Apart from that, the patched variants show a higher branch frequency and
->>>>> a slightly increased number of context switches.
->>>>>
->>>>>
->>>>> The detailed results are provided below:
->>>>>
->>>>> Processor: Ryzen 5 5600X
->>>>>
->>>>> pktgen command:
->>>>> sudo perf stat samples/pktgen/pktgen_sample01_simple.sh -i tap0 -m
->>>>> 52:54:00:12:34:56 -d 10.0.0.2 -n 10000000000
->>>>>
->>>>> perf stat command:
->>>>> sudo perf stat --timeout 100000 -p $(pgrep kpktgend | tr '\n' ,) -o X.txt
->>>>>
->>>>>
->>>>> Results:
->>>>> Stock TAP:
->>>>>             46.997      context-switches                 #    467,2 cs/sec  cs_per_second
->>>>>                  0      cpu-migrations                   #      0,0 migrations/sec  migrations_per_second
->>>>>                  0      page-faults                      #      0,0 faults/sec  page_faults_per_second
->>>>>         100.587,69 msec task-clock                       #      1,0 CPUs  CPUs_utilized
->>>>>      8.491.586.483      branch-misses                    #     10,9 %  branch_miss_rate         (50,24%)
->>>>>     77.734.761.406      branches                         #    772,8 M/sec  branch_frequency     (66,85%)
->>>>>    382.420.291.585      cpu-cycles                       #      3,8 GHz  cycles_frequency       (66,85%)
->>>>>    377.612.185.141      instructions                     #      1,0 instructions  insn_per_cycle  (66,85%)
->>>>>     84.012.185.936      stalled-cycles-frontend          #     0,22 frontend_cycles_idle        (66,35%)
->>>>>
->>>>>      100,100414494 seconds time elapsed
->>>>>
->>>>>
->>>>> Stock TAP+vhost-net:
->>>>>             47.087      context-switches                 #    468,1 cs/sec  cs_per_second
->>>>>                  0      cpu-migrations                   #      0,0 migrations/sec  migrations_per_second
->>>>>                  0      page-faults                      #      0,0 faults/sec  page_faults_per_second
->>>>>         100.594,09 msec task-clock                       #      1,0 CPUs  CPUs_utilized
->>>>>      8.034.703.613      branch-misses                    #     11,1 %  branch_miss_rate         (50,24%)
->>>>>     72.477.989.922      branches                         #    720,5 M/sec  branch_frequency     (66,86%)
->>>>>    382.218.276.832      cpu-cycles                       #      3,8 GHz  cycles_frequency       (66,85%)
->>>>>    349.555.577.281      instructions                     #      0,9 instructions  insn_per_cycle  (66,85%)
->>>>>     83.917.644.262      stalled-cycles-frontend          #     0,22 frontend_cycles_idle        (66,35%)
->>>>>
->>>>>      100,100520402 seconds time elapsed
->>>>>
->>>>>
->>>>> Patched TAP:
->>>>>             47.862      context-switches                 #    475,8 cs/sec  cs_per_second
->>>>>                  0      cpu-migrations                   #      0,0 migrations/sec  migrations_per_second
->>>>>                  0      page-faults                      #      0,0 faults/sec  page_faults_per_second
->>>>>         100.589,30 msec task-clock                       #      1,0 CPUs  CPUs_utilized
->>>>>      9.337.258.794      branch-misses                    #      9,4 %  branch_miss_rate         (50,19%)
->>>>>     99.518.421.676      branches                         #    989,4 M/sec  branch_frequency     (66,85%)
->>>>>    382.508.244.894      cpu-cycles                       #      3,8 GHz  cycles_frequency       (66,85%)
->>>>>    312.582.270.975      instructions                     #      0,8 instructions  insn_per_cycle  (66,85%)
->>>>>     76.338.503.984      stalled-cycles-frontend          #     0,20 frontend_cycles_idle        (66,39%)
->>>>>
->>>>>      100,101262454 seconds time elapsed
->>>>>
->>>>>
->>>>> Patched TAP+vhost-net:
->>>>>             47.892      context-switches                 #    476,1 cs/sec  cs_per_second
->>>>>                  0      cpu-migrations                   #      0,0 migrations/sec  migrations_per_second
->>>>>                  0      page-faults                      #      0,0 faults/sec  page_faults_per_second
->>>>>         100.581,95 msec task-clock                       #      1,0 CPUs  CPUs_utilized
->>>>>      9.083.588.313      branch-misses                    #     10,1 %  branch_miss_rate         (50,28%)
->>>>>     90.300.124.712      branches                         #    897,8 M/sec  branch_frequency     (66,85%)
->>>>>    382.374.510.376      cpu-cycles                       #      3,8 GHz  cycles_frequency       (66,85%)
->>>>>    340.089.181.199      instructions                     #      0,9 instructions  insn_per_cycle  (66,85%)
->>>>>     78.151.408.955      stalled-cycles-frontend          #     0,20 frontend_cycles_idle        (66,31%)
->>>>>
->>>>>      100,101212911 seconds time elapsed
->>>>
->>>> Thanks for sharing. I have more questions:
->>>>
->>>> 1) The number of CPU and vCPUs
->>>
->>> qemu runs with a single core. And my host system is now a Ryzen 5 5600x
->>> with 6 cores, 12 threads.
->>> This is my command for TAP+vhost-net:
->>>
->>> sudo qemu-system-x86_64 -hda debian.qcow2
->>> -netdev tap,id=mynet0,ifname=tap0,script=no,downscript=no,vhost=on
->>> -device virtio-net-pci,netdev=mynet0 -m 1024 -enable-kvm
->>>
->>> For TAP only it is the same but without vhost=on.
->>>
->>>> 2) If you pin vhost or vCPU threads
->>>
->>> Not in the previous shown benchmark. I pinned vhost in other benchmarks
->>> but since there is only minor PPS difference I omitted for the sake of
->>> simplicity.
->>>
->>>> 3) what does perf top looks like or perf top -p $pid_of_vhost
->>>
->>> The perf reports for the pid_of_vhost from pktgen_sample01_simple.sh
->>> with TAP+vhost-net (not pinned, pktgen single queue, fq_codel) are shown
->>> below. I can not see a huge difference between stock and patched.
->>>
->>> Also I included perf reports from the pktgen_pids. I find them more
->>> intersting because tun_net_xmit shows less overhead for the patched.
->>> I assume that is due to the stopped netdev queue.
->>>
->>> I have now benchmarked pretty much all possible combinations (with a
->>> script) of TAP/TAP+vhost-net, single/multi-queue pktgen, vhost
->>> pinned/not pinned, with/without -b 0, fq_codel/noqueue... All of that
->>> with perf records..
->>> I could share them if you want but I feel this is getting out of hand.
->>>
->>>
->>> Stock:
->>> sudo perf record -p "$vhost_pid"
->>> ...
->>> # Overhead  Command          Shared Object               Symbol
->>> # ........  ...............  ..........................  ..........................................
->>> #
->>>      5.97%  vhost-4874       [kernel.kallsyms]           [k] _copy_to_iter
->>>      2.68%  vhost-4874       [kernel.kallsyms]           [k] tun_do_read
->>>      2.23%  vhost-4874       [kernel.kallsyms]           [k] native_write_msr
->>>      1.93%  vhost-4874       [kernel.kallsyms]           [k] __check_object_size
->>
->> Let's disable CONFIG_HARDENED_USERCOPY and retry.
->>
->>>      1.61%  vhost-4874       [kernel.kallsyms]           [k] __slab_free.isra.0
->>>      1.56%  vhost-4874       [kernel.kallsyms]           [k] __get_user_nocheck_2
->>>      1.54%  vhost-4874       [kernel.kallsyms]           [k] iov_iter_zero
->>>      1.45%  vhost-4874       [kernel.kallsyms]           [k] kmem_cache_free
->>>      1.43%  vhost-4874       [kernel.kallsyms]           [k] tun_recvmsg
->>>      1.24%  vhost-4874       [kernel.kallsyms]           [k] sk_skb_reason_drop
->>>      1.12%  vhost-4874       [kernel.kallsyms]           [k] srso_alias_safe_ret
->>>      1.07%  vhost-4874       [kernel.kallsyms]           [k] native_read_msr
->>>      0.76%  vhost-4874       [kernel.kallsyms]           [k] simple_copy_to_iter
->>>      0.75%  vhost-4874       [kernel.kallsyms]           [k] srso_alias_return_thunk
->>>      0.69%  vhost-4874       [vhost]                     [k] 0x0000000000002e70
->>>      0.59%  vhost-4874       [kernel.kallsyms]           [k] skb_release_data
->>>      0.59%  vhost-4874       [kernel.kallsyms]           [k] __skb_datagram_iter
->>>      0.53%  vhost-4874       [vhost]                     [k] 0x0000000000002e5f
->>>      0.51%  vhost-4874       [kernel.kallsyms]           [k] slab_update_freelist.isra.0
->>>      0.46%  vhost-4874       [kernel.kallsyms]           [k] kfree_skbmem
->>>      0.44%  vhost-4874       [kernel.kallsyms]           [k] skb_copy_datagram_iter
->>>      0.43%  vhost-4874       [kernel.kallsyms]           [k] skb_free_head
->>>      0.37%  qemu-system-x86  [unknown]                   [k] 0xffffffffba898b1b
->>>      0.35%  vhost-4874       [vhost]                     [k] 0x0000000000002e6b
->>>      0.33%  vhost-4874       [vhost_net]                 [k] 0x000000000000357d
->>>      0.28%  vhost-4874       [kernel.kallsyms]           [k] __check_heap_object
->>>      0.27%  vhost-4874       [vhost_net]                 [k] 0x00000000000035f3
->>>      0.26%  vhost-4874       [vhost_net]                 [k] 0x00000000000030f6
->>>      0.26%  vhost-4874       [kernel.kallsyms]           [k] __virt_addr_valid
->>>      0.24%  vhost-4874       [kernel.kallsyms]           [k] iov_iter_advance
->>>      0.22%  vhost-4874       [kernel.kallsyms]           [k] perf_event_update_userpage
->>>      0.22%  vhost-4874       [kernel.kallsyms]           [k] check_stack_object
->>>      0.19%  qemu-system-x86  [unknown]                   [k] 0xffffffffba2a68cd
->>>      0.19%  vhost-4874       [kernel.kallsyms]           [k] dequeue_entities
->>>      0.19%  vhost-4874       [vhost_net]                 [k] 0x0000000000003237
->>>      0.18%  vhost-4874       [vhost_net]                 [k] 0x0000000000003550
->>>      0.18%  vhost-4874       [kernel.kallsyms]           [k] x86_pmu_del
->>>      0.18%  vhost-4874       [vhost_net]                 [k] 0x00000000000034a0
->>>      0.17%  vhost-4874       [kernel.kallsyms]           [k] x86_pmu_disable_all
->>>      0.16%  vhost-4874       [vhost_net]                 [k] 0x0000000000003523
->>>      0.16%  vhost-4874       [kernel.kallsyms]           [k] amd_pmu_addr_offset
->>> ...
->>>
->>>
->>> sudo perf record -p "$kpktgend_pids":
->>> ...
->>> # Overhead  Command      Shared Object      Symbol
->>> # ........  ...........  .................  ...............................................
->>> #
->>>     10.98%  kpktgend_0   [kernel.kallsyms]  [k] tun_net_xmit
->>>     10.45%  kpktgend_0   [kernel.kallsyms]  [k] memset
->>>      8.40%  kpktgend_0   [kernel.kallsyms]  [k] __alloc_skb
->>>      6.31%  kpktgend_0   [kernel.kallsyms]  [k] kmem_cache_alloc_node_noprof
->>>      3.13%  kpktgend_0   [kernel.kallsyms]  [k] srso_alias_safe_ret
->>>      2.40%  kpktgend_0   [kernel.kallsyms]  [k] sk_skb_reason_drop
->>>      2.11%  kpktgend_0   [kernel.kallsyms]  [k] srso_alias_return_thunk
->>
->> This is a hint that SRSO migitaion is enabled.
->>
->> Have you disabled CPU_MITIGATIONS via either Kconfig or kernel command
->> line (mitigations = off) for both host and guest?
->>
->> Thanks
->>
-> 
-> Your both suggested changes really boosted the performance, especially
-> for TAP.
-> 
-> I disabled SRSO mitigation with spec_rstack_overflow=off and went from
-> "Mitigation: Safe RET" to "Vulnerable" on the host. The VM showed "Not
-> affected" but I applied spec_rstack_overflow=off anyway.
-> 
-> Here are some new benchmarks for pktgen_sample01_simple.sh:
-> (I also have other available and I can share them if you want.)
-> 
-> +-------------------------+-----------+----------------+
-> | pktgen benchmarks to    | Stock     | Patched with   |
-> | Debian VM, R5 5600X,    |           | fq_codel qdisc |
-> | 100M packets            |           |                |
-> | CPU not pinned          |           |                |
-> +-----------+-------------+-----------+----------------+
-> | TAP       | Transmitted | 1330 Kpps | 1033 Kpps      |
-> |           +-------------+-----------+----------------+
-> |           | Lost        | 3895 Kpps | 0              |
-> +-----------+-------------+-----------+----------------+
-> | TAP       | Transmitted | 1408 Kpps | 1420 Kpps      |
-> |  +        +-------------+-----------+----------------+
-> | vhost-net | Lost        | 3712 Kpps | 0              |
-> +-----------+-------------+-----------+----------------+
-> 
-> I do not understand why there is a regression for TAP but not for
-> TAP+vhost-net...
-> 
-> 
-> The perf report of pktgen and perf stat for TAP & TAP+vhost-net are
-> below. I also included perf reports & perf statsof vhost for
-> TAP+vhost-net.
-> 
-> =========================================================================
-> 
-> TAP stock:
-> perf report of pktgen:
-> 
-> # Overhead  Command      Shared Object      Symbol                                        
-> # ........  ...........  .................  ..............................................
-> #
->     22.39%  kpktgend_0   [kernel.kallsyms]  [k] memset
->     10.59%  kpktgend_0   [kernel.kallsyms]  [k] __alloc_skb
->      7.56%  kpktgend_0   [kernel.kallsyms]  [k] kmem_cache_alloc_node_noprof
->      5.74%  kpktgend_0   [kernel.kallsyms]  [k] tun_net_xmit
->      4.76%  kpktgend_0   [kernel.kallsyms]  [k] kmem_cache_free
->      3.23%  kpktgend_0   [kernel.kallsyms]  [k] chacha_permute
->      2.55%  kpktgend_0   [pktgen]           [k] 0x0000000000003255
->      2.49%  kpktgend_0   [pktgen]           [k] 0x000000000000324f
->      2.48%  kpktgend_0   [pktgen]           [k] 0x000000000000325d
->      2.44%  kpktgend_0   [kernel.kallsyms]  [k] get_random_u32
->      2.21%  kpktgend_0   [kernel.kallsyms]  [k] skb_put
->      1.46%  kpktgend_0   [kernel.kallsyms]  [k] sk_skb_reason_drop
->      1.36%  kpktgend_0   [kernel.kallsyms]  [k] ip_send_check
->      1.17%  kpktgend_0   [kernel.kallsyms]  [k] __local_bh_enable_ip
->      1.09%  kpktgend_0   [kernel.kallsyms]  [k] _raw_spin_lock
->      1.01%  kpktgend_0   [kernel.kallsyms]  [k] kmalloc_reserve
->      0.85%  kpktgend_0   [kernel.kallsyms]  [k] skb_release_data
->      0.83%  kpktgend_0   [kernel.kallsyms]  [k] __netdev_alloc_skb
->      0.71%  kpktgend_0   [pktgen]           [k] 0x000000000000324d
->      0.68%  kpktgend_0   [kernel.kallsyms]  [k] __rcu_read_unlock
->      0.64%  kpktgend_0   [kernel.kallsyms]  [k] skb_tx_error
->      0.59%  kpktgend_0   [kernel.kallsyms]  [k] __get_random_u32_below
->      0.58%  kpktgend_0   [kernel.kallsyms]  [k] sock_def_readable
->      0.51%  kpktgend_0   [pktgen]           [k] 0x000000000000422e
->      0.50%  kpktgend_0   [kernel.kallsyms]  [k] __rcu_read_lock
->      0.48%  kpktgend_0   [kernel.kallsyms]  [k] _get_random_bytes
->      0.46%  kpktgend_0   [pktgen]           [k] 0x0000000000004220
->      0.46%  kpktgend_0   [pktgen]           [k] 0x0000000000004229
->      0.45%  kpktgend_0   [kernel.kallsyms]  [k] skb_release_head_state
->      0.44%  kpktgend_0   [pktgen]           [k] 0x000000000000211d
-> ...
-> 
-> 
-> perf stat of pktgen:
->  Performance counter stats for process id '4740,4741,4742,4743,4744,4745,4746,4747,4748,4749,4750,4751,4752,4753,4754,4755,4756,4757,4758,4759,4760,4761,4762,4763,4764,4765,4766,4767,4768,4769,4770,4771,4772,4773,4774,4775,4776,4777,4778,4779,4780,4781,4782,4783,4784,4785,4786,4787':
-> 
->             35.436      context-switches                 #    469,7 cs/sec  cs_per_second     
->                  0      cpu-migrations                   #      0,0 migrations/sec  migrations_per_second
->                  0      page-faults                      #      0,0 faults/sec  page_faults_per_second
->          75.443,67 msec task-clock                       #      1,0 CPUs  CPUs_utilized       
->        548.187.113      branch-misses                    #      0,5 %  branch_miss_rate         (50,18%)
->    119.270.991.801      branches                         #   1580,9 M/sec  branch_frequency     (66,79%)
->    347.803.953.690      cpu-cycles                       #      4,6 GHz  cycles_frequency       (66,79%)
->    689.142.448.524      instructions                     #      2,0 instructions  insn_per_cycle  (66,79%)
->     11.063.715.152      stalled-cycles-frontend          #     0,03 frontend_cycles_idle        (66,43%)
-> 
->       75,698467362 seconds time elapsed
-> 
-> 
-> =========================================================================
-> 
-> TAP patched:
-> perf report of pktgen:
-> 
-> # Overhead  Command      Shared Object      Symbol                                        
-> # ........  ...........  .................  ..............................................
-> #
->     16.18%  kpktgend_0   [pktgen]           [k] 0x0000000000003255
->     16.11%  kpktgend_0   [pktgen]           [k] 0x000000000000324f
->     16.10%  kpktgend_0   [pktgen]           [k] 0x000000000000325d
->      4.78%  kpktgend_0   [kernel.kallsyms]  [k] memset
->      4.54%  kpktgend_0   [kernel.kallsyms]  [k] __local_bh_enable_ip
->      2.62%  kpktgend_0   [pktgen]           [k] 0x000000000000324d
->      2.42%  kpktgend_0   [kernel.kallsyms]  [k] __alloc_skb
->      1.89%  kpktgend_0   [kernel.kallsyms]  [k] kthread_should_stop
->      1.77%  kpktgend_0   [kernel.kallsyms]  [k] __rcu_read_unlock
->      1.66%  kpktgend_0   [kernel.kallsyms]  [k] kmem_cache_alloc_node_noprof
->      1.53%  kpktgend_0   [kernel.kallsyms]  [k] __rcu_read_lock
->      1.44%  kpktgend_0   [kernel.kallsyms]  [k] tun_net_xmit
->      1.42%  kpktgend_0   [kernel.kallsyms]  [k] __cond_resched
->      0.91%  kpktgend_0   [pktgen]           [k] 0x0000000000003877
->      0.91%  kpktgend_0   [pktgen]           [k] 0x0000000000003284
->      0.89%  kpktgend_0   [pktgen]           [k] 0x000000000000327f
->      0.75%  kpktgend_0   [kernel.kallsyms]  [k] chacha_permute
->      0.64%  kpktgend_0   [pktgen]           [k] 0x0000000000003061
->      0.61%  kpktgend_0   [kernel.kallsyms]  [k] get_random_u32
->      0.57%  kpktgend_0   [kernel.kallsyms]  [k] sock_def_readable
->      0.52%  kpktgend_0   [kernel.kallsyms]  [k] skb_put
->      0.48%  kpktgend_0   [pktgen]           [k] 0x000000000000326d
->      0.47%  kpktgend_0   [pktgen]           [k] 0x0000000000003265
->      0.47%  kpktgend_0   [pktgen]           [k] 0x0000000000003864
->      0.45%  kpktgend_0   [pktgen]           [k] 0x0000000000003008
->      0.35%  kpktgend_0   [pktgen]           [k] 0x000000000000449b
->      0.34%  kpktgend_0   [pktgen]           [k] 0x0000000000003242
->      0.32%  kpktgend_0   [pktgen]           [k] 0x00000000000030a6
->      0.32%  kpktgend_0   [pktgen]           [k] 0x000000000000308b
->      0.32%  kpktgend_0   [pktgen]           [k] 0x0000000000003869
->      0.31%  kpktgend_0   [pktgen]           [k] 0x00000000000030c2
-> ...
-> 
-> perf stat of pktgen:
-> 
->  Performance counter stats for process id '3257,3258,3259,3260,3261,3262,3263,3264,3265,3266,3267,3268,3269,3270,3271,3272,3273,3274,3275,3276,3277,3278,3279,3280,3281,3282,3283,3284,3285,3286,3287,3288,3289,3290,3291,3292,3293,3294,3295,3296,3297,3298,3299,3300,3301,3302,3303,3304':
-> 
->             45.545      context-switches                 #    468,9 cs/sec  cs_per_second     
->                  0      cpu-migrations                   #      0,0 migrations/sec  migrations_per_second
->                  0      page-faults                      #      0,0 faults/sec  page_faults_per_second
->          97.130,77 msec task-clock                       #      1,0 CPUs  CPUs_utilized       
->        237.212.098      branch-misses                    #      0,1 %  branch_miss_rate         (50,12%)
->    172.088.418.840      branches                         #   1771,7 M/sec  branch_frequency     (66,78%)
->    447.219.346.605      cpu-cycles                       #      4,6 GHz  cycles_frequency       (66,79%)
->    619.203.459.603      instructions                     #      1,4 instructions  insn_per_cycle  (66,79%)
->      5.821.044.711      stalled-cycles-frontend          #     0,01 frontend_cycles_idle        (66,48%)
-> 
->       97,353332168 seconds time elapsed
-> 
-> =========================================================================
-> 
-> TAP+vhost-net stock:
-> 
-> perf report of pktgen:
-> 
-> # Overhead  Command      Shared Object      Symbol                                        
-> # ........  ...........  .................  ..............................................
-> #
->     22.25%  kpktgend_0   [kernel.kallsyms]  [k] memset
->     10.73%  kpktgend_0   [kernel.kallsyms]  [k] __alloc_skb
->      7.69%  kpktgend_0   [kernel.kallsyms]  [k] kmem_cache_alloc_node_noprof
->      5.71%  kpktgend_0   [kernel.kallsyms]  [k] tun_net_xmit
->      4.66%  kpktgend_0   [kernel.kallsyms]  [k] kmem_cache_free
->      3.20%  kpktgend_0   [kernel.kallsyms]  [k] chacha_permute
->      2.50%  kpktgend_0   [pktgen]           [k] 0x000000000000325d
->      2.48%  kpktgend_0   [pktgen]           [k] 0x0000000000003255
->      2.45%  kpktgend_0   [pktgen]           [k] 0x000000000000324f
->      2.41%  kpktgend_0   [kernel.kallsyms]  [k] get_random_u32
->      2.22%  kpktgend_0   [kernel.kallsyms]  [k] skb_put
->      1.44%  kpktgend_0   [kernel.kallsyms]  [k] sk_skb_reason_drop
->      1.34%  kpktgend_0   [kernel.kallsyms]  [k] ip_send_check
->      1.22%  kpktgend_0   [kernel.kallsyms]  [k] __local_bh_enable_ip
->      1.06%  kpktgend_0   [kernel.kallsyms]  [k] _raw_spin_lock
->      1.04%  kpktgend_0   [kernel.kallsyms]  [k] kmalloc_reserve
->      0.85%  kpktgend_0   [kernel.kallsyms]  [k] skb_release_data
->      0.83%  kpktgend_0   [kernel.kallsyms]  [k] __netdev_alloc_skb
->      0.72%  kpktgend_0   [pktgen]           [k] 0x000000000000324d
->      0.70%  kpktgend_0   [kernel.kallsyms]  [k] __rcu_read_unlock
->      0.62%  kpktgend_0   [kernel.kallsyms]  [k] skb_tx_error
->      0.61%  kpktgend_0   [kernel.kallsyms]  [k] __get_random_u32_below
->      0.60%  kpktgend_0   [kernel.kallsyms]  [k] sock_def_readable
->      0.52%  kpktgend_0   [kernel.kallsyms]  [k] __rcu_read_lock
->      0.47%  kpktgend_0   [kernel.kallsyms]  [k] _get_random_bytes
->      0.47%  kpktgend_0   [pktgen]           [k] 0x000000000000422e
->      0.45%  kpktgend_0   [pktgen]           [k] 0x0000000000004229
->      0.44%  kpktgend_0   [pktgen]           [k] 0x0000000000004220
->      0.43%  kpktgend_0   [kernel.kallsyms]  [k] skb_release_head_state
->      0.42%  kpktgend_0   [kernel.kallsyms]  [k] netdev_core_stats_inc
->      0.42%  kpktgend_0   [pktgen]           [k] 0x0000000000002119
-> ...
-> 
-> perf stat of pktgen:
-> 
->  Performance counter stats for process id '4740,4741,4742,4743,4744,4745,4746,4747,4748,4749,4750,4751,4752,4753,4754,4755,4756,4757,4758,4759,4760,4761,4762,4763,4764,4765,4766,4767,4768,4769,4770,4771,4772,4773,4774,4775,4776,4777,4778,4779,4780,4781,4782,4783,4784,4785,4786,4787':
-> 
->             34.830      context-switches                 #    489,0 cs/sec  cs_per_second     
->                  0      cpu-migrations                   #      0,0 migrations/sec  migrations_per_second
->                  0      page-faults                      #      0,0 faults/sec  page_faults_per_second
->          71.224,77 msec task-clock                       #      1,0 CPUs  CPUs_utilized       
->        506.905.400      branch-misses                    #      0,5 %  branch_miss_rate         (50,15%)
->    110.207.563.428      branches                         #   1547,3 M/sec  branch_frequency     (66,78%)
->    324.745.594.771      cpu-cycles                       #      4,6 GHz  cycles_frequency       (66,77%)
->    635.181.893.816      instructions                     #      2,0 instructions  insn_per_cycle  (66,77%)
->     10.450.586.633      stalled-cycles-frontend          #     0,03 frontend_cycles_idle        (66,46%)
-> 
->       71,547831150 seconds time elapsed
-> 
-> 
-> perf report of vhost:
-> 
-> # Overhead  Command          Shared Object               Symbol                                          
-> # ........  ...............  ..........................  ................................................
-> #
->      8.66%  vhost-14592      [kernel.kallsyms]           [k] _copy_to_iter
->      2.76%  vhost-14592      [kernel.kallsyms]           [k] native_write_msr
->      2.57%  vhost-14592      [kernel.kallsyms]           [k] __get_user_nocheck_2
->      2.03%  vhost-14592      [kernel.kallsyms]           [k] iov_iter_zero
->      1.21%  vhost-14592      [kernel.kallsyms]           [k] native_read_msr
->      0.89%  vhost-14592      [kernel.kallsyms]           [k] kmem_cache_free
->      0.85%  vhost-14592      [kernel.kallsyms]           [k] __slab_free.isra.0
->      0.84%  vhost-14592      [vhost]                     [k] 0x0000000000002e3a
->      0.83%  vhost-14592      [kernel.kallsyms]           [k] tun_do_read
->      0.74%  vhost-14592      [kernel.kallsyms]           [k] tun_recvmsg
->      0.72%  vhost-14592      [kernel.kallsyms]           [k] slab_update_freelist.isra.0
->      0.49%  vhost-14592      [vhost]                     [k] 0x0000000000002e29
->      0.45%  vhost-14592      [vhost]                     [k] 0x0000000000002e35
->      0.43%  qemu-system-x86  [unknown]                   [k] 0xffffffffb5298b1b
->      0.26%  vhost-14592      [kernel.kallsyms]           [k] __skb_datagram_iter
->      0.24%  vhost-14592      [kernel.kallsyms]           [k] skb_release_data
->      0.24%  qemu-system-x86  [unknown]                   [k] 0xffffffffb4ca68cd
->      0.24%  vhost-14592      [kernel.kallsyms]           [k] iov_iter_advance
->      0.22%  qemu-system-x86  qemu-system-x86_64          [.] 0x00000000008eb79c
->      0.22%  qemu-system-x86  qemu-system-x86_64          [.] 0x00000000008eba58
->      0.14%  vhost-14592      [kernel.kallsyms]           [k] sk_skb_reason_drop
->      0.14%  vhost-14592      [kernel.kallsyms]           [k] amd_pmu_addr_offset
->      0.13%  qemu-system-x86  qemu-system-x86_64          [.] 0x00000000008eba54
->      0.13%  vhost-14592      [kernel.kallsyms]           [k] skb_free_head
->      0.12%  qemu-system-x86  qemu-system-x86_64          [.] 0x00000000008eba50
->      0.12%  vhost-14592      [kernel.kallsyms]           [k] skb_release_head_state
->      0.10%  qemu-system-x86  [kernel.kallsyms]           [k] native_write_msr
->      0.09%  vhost-14592      [kernel.kallsyms]           [k] event_sched_out
->      0.09%  vhost-14592      [kernel.kallsyms]           [k] x86_pmu_del
->      0.09%  qemu-system-x86  qemu-system-x86_64          [.] 0x00000000008eb798
->      0.09%  vhost-14592      [kernel.kallsyms]           [k] put_cpu_partial
-> ...
-> 
-> 
-> perf stat of vhost:
-> 
->  Performance counter stats for process id '14592':
-> 
->          1.576.207      context-switches                 #  15070,7 cs/sec  cs_per_second     
->                459      cpu-migrations                   #      4,4 migrations/sec  migrations_per_second
->                  2      page-faults                      #      0,0 faults/sec  page_faults_per_second
->         104.587,77 msec task-clock                       #      1,5 CPUs  CPUs_utilized       
->        401.899.188      branch-misses                    #      0,2 %  branch_miss_rate         (49,91%)
->    174.642.296.972      branches                         #   1669,8 M/sec  branch_frequency     (66,71%)
->    453.598.103.128      cpu-cycles                       #      4,3 GHz  cycles_frequency       (66,98%)
->    957.886.719.689      instructions                     #      2,1 instructions  insn_per_cycle  (66,77%)
->     11.834.633.090      stalled-cycles-frontend          #     0,03 frontend_cycles_idle        (66,54%)
-> 
->       71,561336447 seconds time elapsed
-> 
-> 
-> =========================================================================
-> 
-> TAP+vhost-net patched:
-> 
-> perf report of pktgen:
-> 
-> # Overhead  Command      Shared Object      Symbol                                        
-> # ........  ...........  .................  ..............................................
-> #
->     16.83%  kpktgend_0   [pktgen]           [k] 0x000000000000324f
->     16.81%  kpktgend_0   [pktgen]           [k] 0x0000000000003255
->     16.74%  kpktgend_0   [pktgen]           [k] 0x000000000000325d
->      5.96%  kpktgend_0   [kernel.kallsyms]  [k] memset
->      3.87%  kpktgend_0   [kernel.kallsyms]  [k] __local_bh_enable_ip
->      2.87%  kpktgend_0   [kernel.kallsyms]  [k] __alloc_skb
->      1.77%  kpktgend_0   [kernel.kallsyms]  [k] kmem_cache_alloc_node_noprof
->      1.72%  kpktgend_0   [pktgen]           [k] 0x000000000000324d
->      1.68%  kpktgend_0   [kernel.kallsyms]  [k] tun_net_xmit
->      1.63%  kpktgend_0   [kernel.kallsyms]  [k] __rcu_read_unlock
->      1.56%  kpktgend_0   [kernel.kallsyms]  [k] kthread_should_stop
->      1.41%  kpktgend_0   [kernel.kallsyms]  [k] __rcu_read_lock
->      1.19%  kpktgend_0   [kernel.kallsyms]  [k] __cond_resched
->      0.83%  kpktgend_0   [kernel.kallsyms]  [k] chacha_permute
->      0.79%  kpktgend_0   [pktgen]           [k] 0x000000000000327f
->      0.78%  kpktgend_0   [pktgen]           [k] 0x0000000000003284
->      0.77%  kpktgend_0   [pktgen]           [k] 0x0000000000003877
->      0.69%  kpktgend_0   [kernel.kallsyms]  [k] sock_def_readable
->      0.66%  kpktgend_0   [kernel.kallsyms]  [k] get_random_u32
->      0.56%  kpktgend_0   [kernel.kallsyms]  [k] skb_put
->      0.54%  kpktgend_0   [pktgen]           [k] 0x0000000000003061
->      0.41%  kpktgend_0   [pktgen]           [k] 0x0000000000003864
->      0.41%  kpktgend_0   [pktgen]           [k] 0x0000000000003265
->      0.40%  kpktgend_0   [pktgen]           [k] 0x0000000000003008
->      0.39%  kpktgend_0   [pktgen]           [k] 0x000000000000326d
->      0.37%  kpktgend_0   [kernel.kallsyms]  [k] ip_send_check
->      0.36%  kpktgend_0   [pktgen]           [k] 0x000000000000422e
->      0.32%  kpktgend_0   [pktgen]           [k] 0x0000000000004220
->      0.30%  kpktgend_0   [pktgen]           [k] 0x0000000000004229
->      0.29%  kpktgend_0   [kernel.kallsyms]  [k] kmalloc_reserve
->      0.28%  kpktgend_0   [kernel.kallsyms]  [k] _raw_spin_lock
-> ...
-> 
-> perf stat of pktgen:
-> 
->  Performance counter stats for process id '3257,3258,3259,3260,3261,3262,3263,3264,3265,3266,3267,3268,3269,3270,3271,3272,3273,3274,3275,3276,3277,3278,3279,3280,3281,3282,3283,3284,3285,3286,3287,3288,3289,3290,3291,3292,3293,3294,3295,3296,3297,3298,3299,3300,3301,3302,3303,3304':
-> 
->             34.525      context-switches                 #    489,1 cs/sec  cs_per_second     
->                  0      cpu-migrations                   #      0,0 migrations/sec  migrations_per_second
->                  0      page-faults                      #      0,0 faults/sec  page_faults_per_second
->          70.593,02 msec task-clock                       #      1,0 CPUs  CPUs_utilized       
->        225.587.357      branch-misses                    #      0,2 %  branch_miss_rate         (50,15%)
->    135.486.264.836      branches                         #   1919,3 M/sec  branch_frequency     (66,77%)
->    324.131.813.682      cpu-cycles                       #      4,6 GHz  cycles_frequency       (66,77%)
->    501.960.610.999      instructions                     #      1,5 instructions  insn_per_cycle  (66,77%)
->      2.689.294.657      stalled-cycles-frontend          #     0,01 frontend_cycles_idle        (66,46%)
-> 
->       70,928052784 seconds time elapsed
-> 
-> 
-> perf report of vhost:
-> 
-> # Overhead  Command          Shared Object               Symbol                                          
-> # ........  ...............  ..........................  ................................................
-> #
->      8.95%  vhost-12220      [kernel.kallsyms]           [k] _copy_to_iter
->      4.03%  vhost-12220      [kernel.kallsyms]           [k] native_write_msr
->      2.44%  vhost-12220      [kernel.kallsyms]           [k] __get_user_nocheck_2
->      2.12%  vhost-12220      [kernel.kallsyms]           [k] iov_iter_zero
->      1.74%  vhost-12220      [kernel.kallsyms]           [k] native_read_msr
->      0.92%  vhost-12220      [kernel.kallsyms]           [k] kmem_cache_free
->      0.87%  vhost-12220      [vhost]                     [k] 0x0000000000002e3a
->      0.86%  vhost-12220      [kernel.kallsyms]           [k] __slab_free.isra.0
->      0.82%  vhost-12220      [kernel.kallsyms]           [k] tun_recvmsg
->      0.82%  vhost-12220      [kernel.kallsyms]           [k] tun_do_read
->      0.73%  vhost-12220      [kernel.kallsyms]           [k] slab_update_freelist.isra.0
->      0.51%  vhost-12220      [vhost]                     [k] 0x0000000000002e29
->      0.47%  vhost-12220      [vhost]                     [k] 0x0000000000002e35
->      0.40%  qemu-system-x86  [unknown]                   [k] 0xffffffff97e98b1b
->      0.28%  vhost-12220      [kernel.kallsyms]           [k] __skb_datagram_iter
->      0.26%  qemu-system-x86  qemu-system-x86_64          [.] 0x00000000008eba58
->      0.24%  vhost-12220      [kernel.kallsyms]           [k] iov_iter_advance
->      0.22%  qemu-system-x86  [unknown]                   [k] 0xffffffff978a68cd
->      0.22%  vhost-12220      [kernel.kallsyms]           [k] skb_release_data
->      0.21%  vhost-12220      [kernel.kallsyms]           [k] amd_pmu_addr_offset
->      0.19%  vhost-12220      [kernel.kallsyms]           [k] tun_ring_consume_batched
->      0.18%  vhost-12220      [kernel.kallsyms]           [k] __rcu_read_unlock
->      0.14%  vhost-12220      [kernel.kallsyms]           [k] sk_skb_reason_drop
->      0.13%  qemu-system-x86  qemu-system-x86_64          [.] 0x00000000008eb79c
->      0.13%  vhost-12220      [kernel.kallsyms]           [k] skb_release_head_state
->      0.13%  qemu-system-x86  qemu-system-x86_64          [.] 0x00000000008eba54
->      0.13%  vhost-12220      [kernel.kallsyms]           [k] psi_group_change
->      0.13%  qemu-system-x86  qemu-system-x86_64          [.] 0x00000000008eba50
->      0.11%  vhost-12220      [kernel.kallsyms]           [k] skb_free_head
->      0.10%  vhost-12220      [kernel.kallsyms]           [k] __update_load_avg_cfs_rq
->      0.10%  vhost-12220      [kernel.kallsyms]           [k] update_load_avg
-> ...
-> 
-> 
-> perf stat of vhost:
-> 
->  Performance counter stats for process id '12220':
-> 
->          2.841.331      context-switches                 #  26120,3 cs/sec  cs_per_second     
->              1.902      cpu-migrations                   #     17,5 migrations/sec  migrations_per_second
->                  2      page-faults                      #      0,0 faults/sec  page_faults_per_second
->         108.778,75 msec task-clock                       #      1,5 CPUs  CPUs_utilized       
->        422.032.153      branch-misses                    #      0,2 %  branch_miss_rate         (49,95%)
->    177.051.281.496      branches                         #   1627,6 M/sec  branch_frequency     (66,59%)
->    458.977.136.165      cpu-cycles                       #      4,2 GHz  cycles_frequency       (66,47%)
->    968.869.747.208      instructions                     #      2,1 instructions  insn_per_cycle  (66,70%)
->     12.748.378.886      stalled-cycles-frontend          #     0,03 frontend_cycles_idle        (66,76%)
-> 
->       70,946778111 seconds time elapsed
-> 
+Hi Babu,
 
-Hi, what do you think?
+On 2/11/26 1:18 PM, Babu Moger wrote:
+> On 2/11/26 10:54, Reinette Chatre wrote:
+>> On 2/10/26 5:07 PM, Moger, Babu wrote:
+>>> On 2/9/2026 12:44 PM, Reinette Chatre wrote:
+>>>> On 1/21/26 1:12 PM, Babu Moger wrote:
+>>>>> On AMD systems, the existing MBA feature allows the user to set a bandwidth
+>>>>> limit for each QOS domain. However, multiple QOS domains share system
+>>>>> memory bandwidth as a resource. In order to ensure that system memory
+>>>>> bandwidth is not over-utilized, user must statically partition the
+>>>>> available system bandwidth between the active QOS domains. This typically
+>>>> How do you define "active" QoS Domain?
+>>> Some domains may not have any CPUs associated with that CLOSID. Active meant, I'm referring to domains that have CPUs assigned to the CLOSID.
+>> To confirm, is this then specific to assigning CPUs to resource groups via
+>> the cpus/cpus_list files? This refers to how a user needs to partition
+>> available bandwidth so I am still trying to understand the message here since
+>> users still need to do this even when CPUs are not assigned to resource
+>> groups.
+>>
+> It is not specific to CPU assignment. It applies to task assignment also.
+>  
+> For example:  We have 4 domains;
+> 
+> # cat schemata
+>   MB:0=8192;1=8192;2=8192;3=8192
+> 
+> If this group has the CPUs assigned to only first two domains. Then the group has only two active domains. Then we will only update the first two domains. The MB values in other domains does not matter.
 
-Thanks!
+I see, thank you. As I understand an "active QoS domain" is something only user
+space can designate. It may be possible for resctrl to get a sense of which QoS domains
+are "active" when only CPUs are assigned to a resource group but when it comes to task
+assignment it is user space that controls where tasks belonging to a group can be
+scheduled and thus which QoS domains are "active" or not. 
+
+> 
+> #echo "MB:0=8;1=8" > schemata
+> 
+> # cat schemata
+>   MB:0=8;1=8;2=8192;3=8192
+> 
+> The combined bandwidth can go up to 16(8+8) units. Each unit is 1/8 GB.
+> 
+> With GMBA, we can set the combined limit higher level and total bandwidth will not exceed GMBA limit.
+
+Thank you for the confirmation.
+
+> 
+>>>>> results in system memory being under-utilized since not all QOS domains are
+>>>>> using their full bandwidth Allocation.
+>>>>>
+>>>>> AMD PQoS Global Bandwidth Enforcement(GLBE) provides a mechanism
+>>>>> for software to specify bandwidth limits for groups of threads that span
+>>>>> multiple QoS Domains. This collection of QOS domains is referred to as GLBE
+>>>>> control domain. The GLBE ceiling sets a maximum limit on a memory bandwidth
+>>>>> in GLBE control domain. Bandwidth is shared by all threads in a Class of
+>>>>> Service(COS) across every QoS domain managed by the GLBE control domain.
+>>>> How does this bandwidth allocation limit impact existing MBA? For example, if a
+>>>> system has two domains (A and B) that user space separately sets MBA
+>>>> allocations for while also placing both domains within a "GLBE control domain"
+>>>> with a different allocation, does the individual MBA allocations still matter?
+>>> Yes. Both ceilings are enforced at their respective levels.
+>>> The MBA ceiling is applied at the QoS domain level.
+>>> The GLBE ceiling is applied at the GLBE control  domain level.
+>>> If the MBA ceiling exceeds the GLBE ceiling, the effective MBA limit will be capped by the GLBE ceiling.
+>> It sounds as though MBA and GMBA/GLBE operates within the same parameters wrt
+>> the limits but in examples in this series they have different limits. For example,
+>> in the documentation patch [1] there is this:
+>>
+>>   # cat schemata
+>>      GMB:0=2048;1=2048;2=2048;3=2048
+>>      MB:0=4096;1=4096;2=4096;3=4096
+>>      L3:0=ffff;1=ffff;2=ffff;3=ffff
+>>
+>> followed up with what it will look like in new generation [2]:
+>>
+>>     GMB:0=4096;1=4096;2=4096;3=4096
+>>      MB:0=8192;1=8192;2=8192;3=8192
+>>       L3:0=ffff;1=ffff;2=ffff;3=ffff
+>>
+>> In both examples the per-domain MB ceiling is higher than the global GMB ceiling. With
+>> above showing defaults and you state "If the MBA ceiling exceeds the GLBE ceiling,
+>> the effective MBA limit will be capped by the GLBE ceiling." - does this mean that
+>> MB ceiling can never be higher than GMB ceiling as shown in the examples?
+> 
+> That is correct.  There is one more information here.   The MB unit is in 1/8 GB and GMB unit is 1GB.  I have added that in documentation in patch 4.
+
+ah - right. I did not take the different units into account.
+
+> 
+> The GMB limit defaults to max value 4096 (bit 12 set) when the new group is created.  Meaning GMB limit does not apply by default.
+> 
+> When setting the limits, it should be set to same value in all the domains in GMB control domain.  Having different value in each domain results in unexpected behavior.
+> 
+>>
+>> Another question, when setting aside possible differences between MB and GMB.
+>>
+>> I am trying to understand how user may expect to interact with these interfaces ...
+>>
+>> Consider the starting state example as below where the MB and GMB ceilings are the
+>> same:
+>>
+>>    # cat schemata
+>>    GMB:0=2048;1=2048;2=2048;3=2048
+>>    MB:0=2048;1=2048;2=2048;3=2048
+>>
+>> Would something like below be accurate? Specifically, showing how the GMB limit impacts the
+>> MB limit:
+>>       # echo "GMB:0=8;2=8" > schemata
+>>    # cat schemata
+>>    GMB:0=8;1=2048;2=8;3=2048
+>>    MB:0=8;1=2048;2=8;3=2048
+> 
+> Yes. That is correct.  It will cap the MB setting to  8.   Note that we are talking about unit differences to make it simple.
+
+Thank you for confirming.
+
+> 
+> 
+>> ... and then when user space resets GMB the MB can reset like ...
+>>
+>>    # echo "GMB:0=2048;2=2048" > schemata
+>>    # cat schemata
+>>    GMB:0=2048;1=2048;2=2048;3=2048
+>>    MB:0=2048;1=2048;2=2048;3=2048
+>>
+>> if I understand correctly this will only apply if the MB limit was never set so
+>> another scenario may be to keep a previous MB setting after a GMB change:
+>>
+>>    # cat schemata
+>>    GMB:0=2048;1=2048;2=2048;3=2048
+>>    MB:0=8;1=2048;2=8;3=2048
+>>
+>>    # echo "GMB:0=8;2=8" > schemata
+>>    # cat schemata
+>>    GMB:0=8;1=2048;2=8;3=2048
+>>    MB:0=8;1=2048;2=8;3=2048
+>>
+>>    # echo "GMB:0=2048;2=2048" > schemata
+>>    # cat schemata
+>>    GMB:0=2048;1=2048;2=2048;3=2048
+>>    MB:0=8;1=2048;2=8;3=2048
+>>
+>> What would be most intuitive way for user to interact with the interfaces?
+> 
+> I see that you are trying to display the effective behaviors above.
+
+Indeed. My goal is to get an idea how user space may interact with the new interfaces and
+what would be a reasonable expectation from resctrl be during these interactions.
+
+> 
+> Please keep in mind that MB and GMB units differ. I recommend showing only the values the user has explicitly configured, rather than the effective settings, as displaying both may cause confusion.
+
+hmmm ... this may be subjective. Could you please elaborate how presenting the effective 
+settings may cause confusion?
+
+> 
+> We also need to track the previous settings so we can revert to the earlier value when needed. The best approach is to document this behavior clearly.
+
+Yes, this will require resctrl to maintain more state.
+
+Documenting behavior is an option but I think we should first consider if there are things
+resctrl can do to make the interface intuitive to use.
+
+>>>>>  From the description it sounds as though there is a new "memory bandwidth
+>>>> ceiling/limit" that seems to imply that MBA allocations are limited by
+>>>> GMBA allocations while the proposed user interface present them as independent.
+>>>>
+>>>> If there is indeed some dependency here ... while MBA and GMBA CLOSID are
+>>>> enumerated separately, under which scenario will GMBA and MBA support different
+>>>> CLOSID? As I mentioned in [1] from user space perspective "memory bandwidth"
+>>> I can see the following scenarios where MBA and GMBA can operate independently:
+>>> 1. If the GMBA limit is set to ‘unlimited’, then MBA functions as an independent CLOS.
+>>> 2. If the MBA limit is set to ‘unlimited’, then GMBA functions as an independent CLOS.
+>>> I hope this clarifies your question.
+>> No. When enumerating the features the number of CLOSID supported by each is
+>> enumerated separately. That means GMBA and MBA may support different number of CLOSID.
+>> My question is: "under which scenario will GMBA and MBA support different CLOSID?"
+> No. There is not such scenario.
+>>
+>> Because of a possible difference in number of CLOSIDs it seems the feature supports possible
+>> scenarios where some resource groups can support global AND per-domain limits while other
+>> resource groups can just support global or just support per-domain limits. Is this correct?
+> 
+> System can support up to 16 CLOSIDs. All of them support all the features LLC, MB, GMB, SMBA.   Yes. We have separate enumeration for  each feature.  Are you suggesting to change it ?
+
+It is not a concern to have different CLOSIDs between resources that are actually different,
+for example, having LLC or MB support different number of CLOSIDs. Having the possibility to
+allocate the *same* resource (memory bandwidth) with varying number of CLOSIDs does present a
+challenge though. Would it be possible to have a snippet in the spec that explicitly states
+that MB and GMB will always enumerate with the same number of CLOSIDs? 
+
+Please see below where I will try to support this request more clearly and you can decide if
+it is reasonable.
+  
+>>>> can be seen as a single "resource" that can be allocated differently based on
+>>>> the various schemata associated with that resource. This currently has a
+>>>> dependency on the various schemata supporting the same number of CLOSID which
+>>>> may be something that we can reconsider?
+>>> After reviewing the new proposal again, I’m still unsure how all the pieces will fit together. MBA and GMBA share the same scope and have inter-dependencies. Without the full implementation details, it’s difficult for me to provide meaningful feedback on new approach.
+>> The new approach is not final so please provide feedback to help improve it so
+>> that the features you are enabling can be supported well.
+> 
+> Yes, I am trying. I noticed that the proposal appears to affect how the schemata information is displayed(in info directory). It seems to introduce additional resource information. I don't see any harm in displaying it if it benefits certain architecture.
+
+It benefits all architectures.
+
+There are two parts to the current proposals.
+
+Part 1: Generic schema description
+I believe there is consensus on this approach. This is actually something that is long
+overdue and something like this would have been a great to have with the initial AMD
+enabling. With the generic schema description forming part of resctrl the user can learn
+from resctrl how to interact with the schemata file instead of relying on external information
+and documentation.
+
+For example, on an Intel system that uses percentage based proportional allocation for memory
+bandwidth the new resctrl files will display:
+info/MB/resource_schemata/MB/type:scalar linear
+info/MB/resource_schemata/MB/unit:all
+info/MB/resource_schemata/MB/scale:1
+info/MB/resource_schemata/MB/resolution:100
+info/MB/resource_schemata/MB/tolerance:0
+info/MB/resource_schemata/MB/max:100
+info/MB/resource_schemata/MB/min:10
+
+
+On an AMD system that uses absolute allocation with 1/8 GBps steps the files will display:
+info/MB/resource_schemata/MB/type:scalar linear
+info/MB/resource_schemata/MB/unit:GBps
+info/MB/resource_schemata/MB/scale:1
+info/MB/resource_schemata/MB/resolution:8
+info/MB/resource_schemata/MB/tolerance:0
+info/MB/resource_schemata/MB/max:2048
+info/MB/resource_schemata/MB/min:1
+
+Having such interface will be helpful today. Users do not need to first figure out
+whether they are on an AMD or Intel system, and then read the docs to learn the AMD units,
+before interacting with resctrl. resctrl will be the generic interface it intends to be.
+
+Part 2: Supporting multiple controls for a single resource
+This is a new feature on which there also appears to be consensus that is needed by MPAM and
+Intel RDT where it is possible to use different controls for the same resource. For example,
+there can be a minimum and maximum control associated with the memory bandwidth resource.
+
+For example, 
+info/
+ └─ MB/
+     └─ resource_schemata/
+         ├─ MB/
+         ├─ MB_MIN/
+         ├─ MB_MAX/
+         ┆
+
+
+Here is where the big question comes in for GLBE - is this actually a new resource
+for which resctrl needs to add interfaces to manage its allocation, or is it instead 
+an additional control associated with the existing memory bandwith resource?
+
+For me things are actually pointing to GLBE not being a new resource but instead being
+a new control for the existing memory bandwidth resource.
+
+I understand that for a PoC it is simplest to add support for GLBE as a new resource as is
+done in this series but when considering it as an actual unique resource does not seem
+appropriate since resctrl already has a "memory bandwidth" resource. User space expects
+to find all the resources that it can allocate in info/ - I do not think it is correct
+to have two separate directories/resources for memory bandwidth here.
+
+What if, instead, it looks something like:
+
+info/
+└── MB/
+    └── resource_schemata/
+        ├── GMB/
+        │   ├── max:4096
+        │   ├── min:1
+        │   ├── resolution:1
+        │   ├── scale:1
+        │   ├── tolerance:0
+        │   ├── type:scalar linear
+        │   └── unit:GBps
+        └── MB/
+            ├── max:8192
+            ├── min:1
+            ├── resolution:8
+            ├── scale:1
+            ├── tolerance:0
+            ├── type:scalar linear
+            └── unit:GBps
+
+With an interface like above GMB is just another control/schema used to allocate the
+existing memory bandwidth resource. With the planned files it is possible to express the
+different maximums and units used by the MB and GMB schema. Users no longer need to
+dig for the unit information in the docs, it is available in the interface.
+
+Doing something like this does depend on GLBE supporting the same number of CLOSIDs
+as MB, which seems to be how this will be implemented. If there is indeed a confirmation
+of this from AMD architecture then we can do something like this in resctrl.
+
+There is a "part 3" to the proposals that attempts to address the new requirement where
+some of the controls allocate at a different scope while also requiring monitoring at
+that new scope. After learning more about GLBE this does not seem relevant to GLBE but is
+something to return to for the "MPAM CPU-less" work. We could already prepare for this
+by adding the new "scope" schema property though. 
+
+
+Reinette
+
+> 
+> Thanks
+> 
+> Babu
+> 
+> 
+>>
+>> Reinette
+>>
+>> [1] https://lore.kernel.org/lkml/d58f70592a4ce89e744e7378e49d5a36be3fd05e.1769029977.git.babu.moger@amd.com/
+>> [2] https://lore.kernel.org/lkml/e0c79c53-489d-47bf-89b9-f1bb709316c6@amd.com/
+>>
+
 
