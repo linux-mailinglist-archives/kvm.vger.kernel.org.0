@@ -1,146 +1,148 @@
-Return-Path: <kvm+bounces-70931-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70932-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oEYhNK2XjWkt5AAAu9opvQ
-	(envelope-from <kvm+bounces-70931-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 10:04:45 +0100
+	id UAsdI3uYjWkt5AAAu9opvQ
+	(envelope-from <kvm+bounces-70932-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 10:08:11 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74EA812BB0A
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 10:04:45 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03DB012BBCF
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 10:08:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E5C45315A6E9
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 09:03:02 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 092B13020F33
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 09:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2F32DC781;
-	Thu, 12 Feb 2026 09:03:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A92B2DE6F5;
+	Thu, 12 Feb 2026 09:07:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BV/JlQFG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SRDzJd4y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195E52DE6FA
-	for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 09:02:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39575F50F;
+	Thu, 12 Feb 2026 09:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770886979; cv=none; b=uzOW1lL9XqczKBqS8LiCwsnbZG2JTqZieIDsKpqY8gUbvOUM7AUQtaHwq4V9ORAW37S53Iw21ZxEjaBbE1J7VenqpGu8I2yA+thq/goypvoGZPEUmCppootuAk+De6BypzaYpM0HZT1YZon+1Ml8uhlKCTD/MxRLilTAgLUR/gk=
+	t=1770887274; cv=none; b=USUufp7/MC0mE7gJ5Nj+jnDtC13KLPK7HkrS3PEibZnpoPS+2rb906iceoPSDKU7dR4+M3UWmHdJ7Rs8f2zFjK+ZCMCGAcg9sQ1254mLZspQsw7rHwNGLEDZyTDaMMt77SqhyIgmr4hTD2PDBYcvcpxADJw55QFlkY8UJcuVy9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770886979; c=relaxed/simple;
-	bh=i9Zhh3N6A4NdcyXc5VJPTx/rNWSpAt0ReEMQ1vjLMdw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=r16nS1sOyICocjMErM0RH9IHtHv2EkDSoKXySwKjmqeyukBj3J3LdxWyqJubDmcqx413ejAogA9eJZKUo//cW8P2xgOvXKQOnZ0UR7XUOk0KfFFFiep8bX6/QhP7uxKzU1MnIvsl8HKlDjfvkXDk7ljzhj+9eCrWPb59Cqb2yDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BV/JlQFG; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-48071615686so25099355e9.1
-        for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 01:02:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770886976; x=1771491776; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cyyYRiwc6FqhQlyFBFLg66ihDNCGyZfWrA54Edi64Eg=;
-        b=BV/JlQFGLwbTV2Q64RgI4T6vvV0qUCUMRyWEhZ1kfpojlN8cPE9aWObjegk2083bKd
-         lKR5vG+vONLNxyU0D5PjZB50KXoVfc9yH734Jx6/Yk7Tc9qCZwXyThyzcNSUqw08GIFc
-         RGgiFPLHwKQXQvMv3DYo12JIZ3bSDv66bC6DzQsarzGtfL+W8o7oUzyyHStDoiGpFsss
-         S4bJV2uhK4rpXJhKSy6zedw2KT8QzuHBm7vtG0qCFWKTGxmSAPk8qNHXWy+8n6iZOAcr
-         Ao17GM0LmUkesPAESYyz5bQay6oY/UcZt5s5os/USP34JH5E7FYn+zMXiEfUhNTi3XR6
-         ZDXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770886976; x=1771491776;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cyyYRiwc6FqhQlyFBFLg66ihDNCGyZfWrA54Edi64Eg=;
-        b=lvW3bHgCPmQZUApP54uyJfY6snEEuT457MO/y3LCszkTxv6xffeWmvSwevHAJboEnP
-         VSz5v/i5VvupRLMjXgxS9gcVEG95UCV+q48mOpzZOyBFNrj0dKEom+/DAJUlEN72ZVOO
-         OX2/QbPTp6kkXgGid/nY059pqwcvafAtVgbL+xqq1wSOFapy3JY4w25trRcE1DHIjTW2
-         lDTXAYXk4oyE3fLLP5hqTtb5TFaS7D8PNzEYFTZIgo/v18Lu4Y7BiQHIN8FvKAagVVU7
-         9yfytG06wCsKcUSUpd2uP8HkBWAGrJtkrAcizrE2zAKO2gZLHXvD1oM0NYaBPocy80GJ
-         NnUA==
-X-Gm-Message-State: AOJu0Yyt/0o6LDGCIgmFUF/hoBdefhuOl3c40zKk7tkZuNzeANpV5hqV
-	gctaujLF6axtHT45fYsul0n7tKebS0UGo7oQg+e5yOlW6nUTlkhGiGm0qQFhTwIRcfNTnn6wVkv
-	wEnCUaYsIYSo7lVM4Lpxg0ooCk4EYgOT1fw39p7SucrCuU8anOa1bEAmCpjMkBxsxpYE2DUkfyY
-	8N3If4xlRuwFWBHf6w0xAaL3Woe5w=
-X-Received: from wmqu17.prod.google.com ([2002:a05:600c:19d1:b0:483:29f4:26b8])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:608b:b0:47d:8479:78d5
- with SMTP id 5b1f17b1804b1-4836710a0afmr20458865e9.7.1770886976534; Thu, 12
- Feb 2026 01:02:56 -0800 (PST)
-Date: Thu, 12 Feb 2026 09:02:52 +0000
-In-Reply-To: <20260212090252.158689-1-tabba@google.com>
+	s=arc-20240116; t=1770887274; c=relaxed/simple;
+	bh=7X/ZE+464SFMrcWXG+fw9L92P1t1gtPIejSOE1mm8Sg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CRYqH6osKWZFuXlKUnqfxev2UCZyTQthLX7UK7YTtsqGd2Tqj2AEMx0ya7YCvyARL+3UHvUXbEUo4zK720XJ6qTwW/vHkf0+cy0jJBArRUnyh/yfVtlWu9NPZT/c9eJdQrqSh15Mk2C2lFdzYDLJO4nvgOmj2pHjoMJwLKInlsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SRDzJd4y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1428BC4CEF7;
+	Thu, 12 Feb 2026 09:07:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770887274;
+	bh=7X/ZE+464SFMrcWXG+fw9L92P1t1gtPIejSOE1mm8Sg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SRDzJd4y7pdwghuIRwEX+milR/vWqoeZRao4cczsY/oRSB7rXxGuJLbC8pO7iCSw4
+	 /1fHpKlD9QC8Pr36ty9iBxiTNpXaDNYp9kxfY175hoKc70tInFruadKyuacdByotDw
+	 giDuJK9Yv4AbMPDUN5IleiHk09y0vDFg4IFOf1Va0BfXrwqu9s3EcPhdfYle0DOYSg
+	 Po0zabmL17OlVZC5nq6r8y/4vDgWU5l1/ykpkYYbjQp+nF7oNrOcToyCcJwcrWAWRT
+	 TlUDUSJIbuvgS7XUw4PVNj+qOU1x9wo3jckCVZzmRgQeTQjpQnhNQht/dATAuEMT5X
+	 Wv6weRnqIFc7A==
+Received: from [185.219.108.64] (helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vqSfv-0000000AYzI-2Zos;
+	Thu, 12 Feb 2026 09:07:51 +0000
+Date: Thu, 12 Feb 2026 09:07:33 +0000
+Message-ID: <86ldgyba96.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Mingwei Zhang <mizhang@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-perf-users@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v6 09/19] KVM: arm64: Write fast path PMU register handlers
+In-Reply-To: <20260209221414.2169465-10-coltonlewis@google.com>
+References: <20260209221414.2169465-1-coltonlewis@google.com>
+	<20260209221414.2169465-10-coltonlewis@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260212090252.158689-1-tabba@google.com>
-X-Mailer: git-send-email 2.53.0.239.g8d8fc8a987-goog
-Message-ID: <20260212090252.158689-4-tabba@google.com>
-Subject: [PATCH v1 3/3] KVM: arm64: Remove redundant kern_hyp_va() in unpin_host_sve_state()
-From: Fuad Tabba <tabba@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, tabba@google.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, alexandru.elisei@arm.com, pbonzini@redhat.com, corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, mizhang@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-70931-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	TAGGED_FROM(0.00)[bounces-70932-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tabba@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 74EA812BB0A
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 03DB012BBCF
 X-Rspamd-Action: no action
 
-The `sve_state` pointer in `hyp_vcpu->vcpu.arch` is initialized as a
-hypervisor virtual address during vCPU initialization in
-`pkvm_vcpu_init_sve()`.
+On Mon, 09 Feb 2026 22:14:04 +0000,
+Colton Lewis <coltonlewis@google.com> wrote:
+> 
+> We may want a partitioned PMU but not have FEAT_FGT to untrap the
+> specific registers that would normally be untrapped. Add a handler for
+> those registers in the fast path so we can still get a performance
+> boost from partitioning.
+> 
+> The idea is to handle traps for all the PMU registers quickly by
+> writing directly to the hardware when possible instead of hooking into
+> the emulated vPMU as the standard handlers in sys_regs.c do.
 
-`unpin_host_sve_state()` calls `kern_hyp_va()` on this address. Since
-`kern_hyp_va()` is idempotent, it's not a bug. However, it is
-unnecessary and potentially confusing. Remove the redundant conversion.
+This seems extremely premature. My assumption is that PMU traps are
+rare, and that doing a full exit should be acceptable. Until you
+demonstrate the contrary, I don't want this sort of massive bloat in
+the most performance-critical path.
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/hyp/nvhe/pkvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+"Start walking before you try to run".
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 267854ed29c8..8b9e027ec86a 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -393,7 +393,7 @@ static void unpin_host_sve_state(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	if (!vcpu_has_feature(&hyp_vcpu->vcpu, KVM_ARM_VCPU_SVE))
- 		return;
- 
--	sve_state = kern_hyp_va(hyp_vcpu->vcpu.arch.sve_state);
-+	sve_state = hyp_vcpu->vcpu.arch.sve_state;
- 	hyp_unpin_shared_mem(sve_state,
- 			     sve_state + vcpu_sve_state_size(&hyp_vcpu->vcpu));
- }
+	M.
+
 -- 
-2.53.0.239.g8d8fc8a987-goog
-
+Without deviation from the norm, progress is not possible.
 
