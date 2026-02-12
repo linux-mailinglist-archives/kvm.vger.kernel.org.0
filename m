@@ -1,165 +1,201 @@
-Return-Path: <kvm+bounces-71002-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71003-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gN7xBJAVjmmZ/AAAu9opvQ
-	(envelope-from <kvm+bounces-71002-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 19:01:52 +0100
+	id GKZmDZwWjmmZ/AAAu9opvQ
+	(envelope-from <kvm+bounces-71003-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 19:06:20 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84886130206
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 19:01:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2A6E130272
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 19:06:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7077430AAED7
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 18:01:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0A7DB30A0C09
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 18:06:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE79C23E23C;
-	Thu, 12 Feb 2026 18:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8660C26CE23;
+	Thu, 12 Feb 2026 18:06:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YBQ1ngq9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OqUhuym5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277481DFF7;
-	Thu, 12 Feb 2026 18:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE1820299B
+	for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 18:06:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770919279; cv=none; b=hxQ5gINnuYokdWKzDNzFGRdxbUYZ1CMTzdJHzWZgQrsyAk7x/ONzfZo7qms1AzAVdFbtFywjw/wrNTWxcS5yHkVrM1iRhFhOqFT0bmJPJgHrXnpmfy1xOZ0+s0jUCJQrYQLJSiqsvsxvJ5BT/KmTeVkNvlgk2a/43U2JfxfSTaQ=
+	t=1770919565; cv=none; b=sCOOmEzZDrGtN+IuAiUzWQmJ7z5Vsu/OiwkY8rlWdnO+xmoyBttFbvVZSmq33rd++dzwWdfAOXOMUKVy9Vz4+rtCDVdl//2SSNFfW5gN5vBq8KTYmGqi154PH29wdIvgQRAfj2ip8wc7r01I4E7uEdfXvWo8V1RYpjaJW4/LqB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770919279; c=relaxed/simple;
-	bh=2VceDgzAcNAbcWMGe/daLfC3MZ2oRKR+bvMespEvaLQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OshmfXwZPpar5XSV8e8ZMMLRhKhx/kACFdJISnMVTIYSN6S9j0KG3ybmU7qWiRp8DHwkv+9PvDLB/3fPyO5BnAKk7O328E4O5jkIPziacDLelGCzEonvQpojGZ3N5FIYcL7d6afs7jBMdN4b2bJifWiVdUzrazs7MFXkwlVHK+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YBQ1ngq9; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770919277; x=1802455277;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2VceDgzAcNAbcWMGe/daLfC3MZ2oRKR+bvMespEvaLQ=;
-  b=YBQ1ngq9XNyBYLi3MLp/kxVxflAo3x2YXloHsL8JGY1DHHN5cbl+xE8a
-   pY7hQdy/39CAA1BQAM0gwuNOrmTOAyJ830tjuv2jnJqo5Q5pEYA9ZHN0R
-   8RGh10dOy7T1aNjiujyFzHrSpy1gkAYFpdHrCz+teDJnB4UKEQII9Fuc1
-   eP3+M1DUxAsbLbsENPlM2SFQeEvQzXwqaEjQz9IUw/Fc6LOWl2yGQWuHQ
-   5Gj8JJFWYT2AKTO5fjDMWiTxtaIKAJ8ZDcjsslyUicF5UbGOvdmWy5Pq0
-   NIn9E/XcpX62SMGH3QTvSTrSX8w2MKn7w+wzEg1H4JW9hkuhGLdAIyVug
-   Q==;
-X-CSE-ConnectionGUID: 1e98yIxNS5mPReDsGzzgNw==
-X-CSE-MsgGUID: 4DEj/gi6Sxal7bdCK8/lqg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11699"; a="72199053"
-X-IronPort-AV: E=Sophos;i="6.21,287,1763452800"; 
-   d="scan'208";a="72199053"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 10:01:17 -0800
-X-CSE-ConnectionGUID: rdinfRarRReea0eUHw6cmw==
-X-CSE-MsgGUID: qKrb+KCxSqmlemg5SrIz1w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,287,1763452800"; 
-   d="scan'208";a="235659425"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 12 Feb 2026 10:01:15 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vqb05-00000000sB6-1JRP;
-	Thu, 12 Feb 2026 18:01:13 +0000
-Date: Fri, 13 Feb 2026 02:00:48 +0800
-From: kernel test robot <lkp@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH 1/2] KVM: remove CONFIG_KVM_GENERIC_MMU_NOTIFIER
-Message-ID: <202602130100.UiJclptY-lkp@intel.com>
-References: <20260212105211.1555876-2-pbonzini@redhat.com>
+	s=arc-20240116; t=1770919565; c=relaxed/simple;
+	bh=/PhTShLKJnFrNnpl1K3iXkufMll13s2vVyT8kh98aS8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=RPVyO28Z1PzErAWEcA/ODfIJD+/xd/gBpCkGhPRBG/jmtNdGCsPn66BwN96MU/cYfScStGur43RVNpyFXtVP74OLOkAqfSmdymz8k1z+NyC6VK/C/VkXMDMT5oqs+rkFeazshsBnIGx1oL6/ipeAhjnQB88l6qXpUHiuV8Vxh4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OqUhuym5; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a7701b6353so1291195ad.3
+        for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 10:06:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770919564; x=1771524364; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZMIgyP3ebwffaPtNSS2oFUqMF8kt/CpMxALQFuPMxGE=;
+        b=OqUhuym5zhRiheoRS7rSSfbBXgJhgVLaETTbvIax4116n7glB3939k65vZZJtlAx0o
+         1792DO2BKTmbP9g6itWPGEAJSUBrGutIQV2BLGYBL6oiaWduLPHvQvkMF7Juc/1m2cwH
+         C4uSIczx1uWZwx0Bu1A4eYsBvIJWXKjc4TVkRxiZEavqnPuCA6/+FyPL0QUMXsQnFAnz
+         DaNSm5BDhTV7HDQvypXfurOMi4HDgp87eAxh1t0SBs67+jfG8KyTVhddXA4BVzABUB+t
+         65oNQQuddZ4dLivQkpSYKy4x5mHPGqjtuLsKZICfeOChJWc5GxIqq5k9SdaenOraUOdn
+         q+dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770919564; x=1771524364;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZMIgyP3ebwffaPtNSS2oFUqMF8kt/CpMxALQFuPMxGE=;
+        b=Ttv5TDGWQLABTZY2a69F0+R243yShD3AT2LYFyHtrOdu+PW4kuNtTvZXXKR0DZvBwk
+         p81qSWC9hIYi2RDRK912PvV0o/NocFp0R7JWn+vFBW8UlGKmk8ReQ9C/02K0AGDY6MCU
+         NEVTxnTw8e7qlzrF1lqQCgn431sQJBOHrt9EvxZDetWPHEx/j5Yc0oN0xB5XtJSRQN6o
+         HpGjyUkWh7Tf7E8hWYGDuWaE3boND2mN8JNDPt3QMahEAbsPA/iyLYUmckzE/jW+IFTe
+         HN8IKcEMhQBEOm2JrjYMszNHL2qdtR4t+utLO8zbhtPkDTEsS3XuXsK2He13hZXll+Wz
+         ZVmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVDMkzzUSYlTuRJR/7qZbC170NpvmojuoNsT52UwXuHbrezkeOKwczNNfuOWuEUZJOMymQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywg7VaASc/ThAzPFRYkvYkhWDey5f8kQOXJTuD7NMcaYsdPPJhz
+	NMiVtoniz0kJRqy9ubNrcvtkxYhcTrthzmcR+ZXKKkcIjY3az5m1hefseE4EIhUxMaFjU70W4vM
+	SXkpL0Q==
+X-Received: from plblq5.prod.google.com ([2002:a17:903:1445:b0:2aa:d708:7f2])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6300:67c8:b0:38f:86c0:449
+ with SMTP id adf61e73a8af0-3944880f8dfmr3589217637.49.1770919563816; Thu, 12
+ Feb 2026 10:06:03 -0800 (PST)
+Date: Thu, 12 Feb 2026 10:06:02 -0800
+In-Reply-To: <CAFULd4Yyc=smi+bsY3FPLVd_jZxuHFUYOkH4enPQ=Z=OLe-GOw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260212105211.1555876-2-pbonzini@redhat.com>
+Mime-Version: 1.0
+References: <20260212102854.15790-1-ubizjak@gmail.com> <0a1ad845-a15b-4901-a65c-2668580751ed@redhat.com>
+ <CAFULd4Yyc=smi+bsY3FPLVd_jZxuHFUYOkH4enPQ=Z=OLe-GOw@mail.gmail.com>
+Message-ID: <aY4WioQAkcmSpbq9@google.com>
+Subject: Re: [PATCH] KVM: x86: Fix incorrect memory constraint for FXSAVE in emulator
+From: Sean Christopherson <seanjc@google.com>
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@kernel.org>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71002-lists,kvm=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-71003-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,kvm@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[google.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,intel.com:mid,intel.com:dkim,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 84886130206
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D2A6E130272
 X-Rspamd-Action: no action
 
-Hi Paolo,
+On Thu, Feb 12, 2026, Uros Bizjak wrote:
+> On Thu, Feb 12, 2026 at 2:05=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.co=
+m> wrote:
+> >
+> > On 2/12/26 11:27, Uros Bizjak wrote:
+> > > The inline asm used to invoke FXSAVE in em_fxsave() and fxregs_fixup(=
+)
+> > > incorrectly specifies the memory operand as read-write ("+m"). FXSAVE
+> > > does not read from the destination operand; it only writes the curren=
+t
+> > > FPU state to memory.
+> > >
+> > > Using a read-write constraint is incorrect and misleading, as it tell=
+s
+> > > the compiler that the previous contents of the buffer are consumed by
+> > > the instruction. In both cases, the buffer passed to FXSAVE is
+> > > uninitialized, and marking it as read-write can therefore create a
+> > > false dependency on uninitialized memory.
+> > >
+> > > Fix the constraint to write-only ("=3Dm") to accurately describe the
+> > > instruction=E2=80=99s behavior and avoid implying that the buffer is =
+read.
+> >
+> > IIRC FXSAVE/FXRSTOR may (at least on some microarchitectures?) leave
+> > reserved fields untouched.
+> >
+> > Intel suggests writing zeros first, and then the "+m" constraint would
+> > be the right one because "=3Dm" would cause the memset to be dead.
+>=20
+> Please note that the struct is not initialized before fxsave, so if
+> "+m" is required, the struct should be initialized.
 
-kernel test robot noticed the following build errors:
+Regardless of CPU behavior with respect to reserved fields, I believe "+m" =
+is
+correct and "=3Dm" is wrong, strictly speaking.  The SDM very explicitly sa=
+ys:
 
-[auto build test ERROR on kvm/queue]
-[also build test ERROR on kvm/next kvms390/next next-20260212]
-[cannot apply to powerpc/topic/ppc-kvm kvmarm/next linus/master kvm/linux-next v6.19]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+  Bytes 464:511 are available to software use. The processor does not write=
+ to
+  bytes 464:511 of an FXSAVE area.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Paolo-Bonzini/KVM-remove-CONFIG_KVM_GENERIC_MMU_NOTIFIER/20260212-185546
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20260212105211.1555876-2-pbonzini%40redhat.com
-patch subject: [PATCH 1/2] KVM: remove CONFIG_KVM_GENERIC_MMU_NOTIFIER
-config: i386-buildonly-randconfig-002-20260212 (https://download.01.org/0day-ci/archive/20260213/202602130100.UiJclptY-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260213/202602130100.UiJclptY-lkp@intel.com/reproduce)
+I.e. the entirety of the struct isn't written by FXSAVE, and so using "=3Dm=
+" is
+technically wrong because those bytes are "read".  In practice, it shouldn'=
+t
+matter because fxstate_size() (correctly) truncates the size to a max of 46=
+4
+bytes, so that KVM-as-the-virutal-CPU honors the architecture and doesn't w=
+rite
+to the software-available fields.  I.e. those bytes should never truly be r=
+ead
+by software.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202602130100.UiJclptY-lkp@intel.com/
+Given that emulating FXSAVE/FXRSTOR can't possibly be hot paths, explicitly
+initializing the on-stack structs seems prudent, e.g.
 
-All errors (new ones prefixed by >>):
-
-   arch/x86/kvm/../../../virt/kvm/kvm_main.c: In function 'kvm_init_mmu_notifier':
->> arch/x86/kvm/../../../virt/kvm/kvm_main.c:900:16: error: implicit declaration of function 'mmu_notifier_register'; did you mean 'mmu_notifier_release'? [-Wimplicit-function-declaration]
-     900 |         return mmu_notifier_register(&kvm->mmu_notifier, current->mm);
-         |                ^~~~~~~~~~~~~~~~~~~~~
-         |                mmu_notifier_release
-   arch/x86/kvm/../../../virt/kvm/kvm_main.c: In function 'kvm_create_vm':
->> arch/x86/kvm/../../../virt/kvm/kvm_main.c:1220:17: error: implicit declaration of function 'mmu_notifier_unregister'; did you mean 'preempt_notifier_unregister'? [-Wimplicit-function-declaration]
-    1220 |                 mmu_notifier_unregister(&kvm->mmu_notifier, current->mm);
-         |                 ^~~~~~~~~~~~~~~~~~~~~~~
-         |                 preempt_notifier_unregister
-
-
-vim +900 arch/x86/kvm/../../../virt/kvm/kvm_main.c
-
-4c07b0a4b6df45 Avi Kivity 2009-12-20  896  
-4c07b0a4b6df45 Avi Kivity 2009-12-20  897  static int kvm_init_mmu_notifier(struct kvm *kvm)
-4c07b0a4b6df45 Avi Kivity 2009-12-20  898  {
-4c07b0a4b6df45 Avi Kivity 2009-12-20  899  	kvm->mmu_notifier.ops = &kvm_mmu_notifier_ops;
-4c07b0a4b6df45 Avi Kivity 2009-12-20 @900  	return mmu_notifier_register(&kvm->mmu_notifier, current->mm);
-4c07b0a4b6df45 Avi Kivity 2009-12-20  901  }
-4c07b0a4b6df45 Avi Kivity 2009-12-20  902  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index c8e292e9a24d..20ed588015f1 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -3708,7 +3708,7 @@ static inline size_t fxstate_size(struct x86_emulate_=
+ctxt *ctxt)
+  */
+ static int em_fxsave(struct x86_emulate_ctxt *ctxt)
+ {
+-       struct fxregs_state fx_state;
++       struct fxregs_state fx_state =3D {};
+        int rc;
+=20
+        rc =3D check_fxsr(ctxt);
+@@ -3738,7 +3738,7 @@ static int em_fxsave(struct x86_emulate_ctxt *ctxt)
+ static noinline int fxregs_fixup(struct fxregs_state *fx_state,
+                                 const size_t used_size)
+ {
+-       struct fxregs_state fx_tmp;
++       struct fxregs_state fx_tmp =3D {};
+        int rc;
+=20
+        rc =3D asm_safe("fxsave %[fx]", , [fx] "+m"(fx_tmp));
 
