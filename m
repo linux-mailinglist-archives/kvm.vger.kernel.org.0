@@ -1,280 +1,173 @@
-Return-Path: <kvm+bounces-70989-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70990-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IFzxD/bzjWlw8wAAu9opvQ
-	(envelope-from <kvm+bounces-70989-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 16:38:30 +0100
+	id MGmzIef4jWnz9wAAu9opvQ
+	(envelope-from <kvm+bounces-70990-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 16:59:35 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1D1212F0B8
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 16:38:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31A0512F28F
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 16:59:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 103783044A58
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:35:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AF9FD3068F25
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E0A2EA731;
-	Thu, 12 Feb 2026 15:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D2D3446C7;
+	Thu, 12 Feb 2026 15:59:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aWegDsBC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Nrvr+tun"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9420318BA2;
-	Thu, 12 Feb 2026 15:35:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811031E492D
+	for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 15:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770910547; cv=none; b=coH2RFAY+4OaYC+K/636ZsDj4sJG+/f3qPzP8uCqbUh9LgkTpoja7AmHprrhwkaEy4OdWlS3klVPUGAMUosJkz8JFLf7evOOtH9vZHJWG23filXxMvDN6GytsO2mwnFRy0bbc3HEpoQV+n5mbEZ4JgdiumwRqY6zXMnDzM7PZOs=
+	t=1770911955; cv=none; b=VMalsFVtQIo6k3Ntu+IN/dIit1CAw5CJpAjZYyjy3zytOkWcx+h7qZPnMa+lZpccDsyOqHYbDY47jPB8b9HR3p4n57yBN5pr7ToBGl4/rfF1fV6jMCD4oYVSeWWp+rRqWhQZPi7vTJUnsLoZmXViMkQBz0N7OEbd+XE3WgafcUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770910547; c=relaxed/simple;
-	bh=TO37eo+Xgib1YZz+3/bN23epC9tyuhnej0GE/4f9cu0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AjWwt2N/VHszRELSojuLu3kliH0CKM231qtFU0ztZ3L5cKUAyHexyHJLlmngakn+5IgukBi65ZhkdFAFLzE0jIB5ZfzZ9nF6n5x/xI0ta7l8Wn8jsCqSjn+ntm3AXDiL+9RbL253V0RyQSCOiHT3pryJIAFDmdeCVtxtkFKIWvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aWegDsBC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 431CCC4CEF7;
-	Thu, 12 Feb 2026 15:35:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770910546;
-	bh=TO37eo+Xgib1YZz+3/bN23epC9tyuhnej0GE/4f9cu0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aWegDsBCbtfgIg9OB2Xop0lxMZQZwqnfB0XxDQ1ueSB7JcgdPabiA42A0ID30+YaT
-	 P/XSETTC7Yp7LAHJn1mdglYBFHY8apMm7aJjIdTv62SFR8OMUfOdbzlnUy2wCzeZ9P
-	 qeitAMtlBa4Dpu0Pld90mQkZsNlQEPhZhE3NsjwBsGOYAXM1Z0jy/tUfs3Uiy7Yzmq
-	 jqUs5QcXBDMLhWVRmFhrg4r6U4qsQmae3wNfbwYcj9s5SjXNuawXvxLGiKOZVh9R7+
-	 QNiq30C+UJ87E8cP7FBFGdAK0wCpMBxagWggHp00At/4AMI4cabCeJx5GC2bp1sUNM
-	 KIvbaqBP5G1gQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vqYjH-0000000AeWS-3lg7;
-	Thu, 12 Feb 2026 15:35:43 +0000
-Date: Thu, 12 Feb 2026 15:35:43 +0000
-Message-ID: <86ikc2asa8.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v1 1/3] KVM: arm64: Hide S1POE from guests when not supported by the host
-In-Reply-To: <CA+EHjTz-JU2gDfziCY2SguK9=6gGSCL5TN_U_C7FiZ5i0JTZqQ@mail.gmail.com>
-References: <20260212090252.158689-1-tabba@google.com>
-	<20260212090252.158689-2-tabba@google.com>
-	<86jywib98e.wl-maz@kernel.org>
-	<CA+EHjTz-JU2gDfziCY2SguK9=6gGSCL5TN_U_C7FiZ5i0JTZqQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1770911955; c=relaxed/simple;
+	bh=g47u0imZn9BNpQzucP6/FBTNqKWSGq4IfKInL7XmKFY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PEn9bwkl8GCFApyAgSgKo9NXXLO1A9siUEFo8DX83bKaNCUlwwqNJhHdjMO6wyPZss759r0YF57jhFZVvTNUWMF1+gOioRpMkDDXgNUGHdcwMWkxlx5TGQiIGeabKwTleM6DLKSeTPiTkHWGPnHcF1tWdbsLP6/erTdd3JLxi4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Nrvr+tun; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c6e1e748213so1161604a12.2
+        for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 07:59:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770911953; x=1771516753; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ebvdQMfvne+biXGLzUXHdRXQhx8hybcRtFG+HEINLdI=;
+        b=Nrvr+tunGKlz/zqv9C5IAvgOkcnCOUijDeeRsyZ81Z5X/Sh8LxvOcAngg/s+O7omso
+         kMdvCcnCiDhsw6OdxEVzXrMe+6PFiIyoAVXwf4/0lybShgfG3aeieOVmNxtNraciIi69
+         25qBO0LDugIkkUeOyf7en7iJFTkgZaEnry1YCR0TkIHyLSnocsKB8DdpXdi+1YPb9bxa
+         azt6iS3srFB5Xz5Wl/ycrAm6FZ88PwTWCTvtgi7iP2kLr4skuc8wzEhe2fU0dD6tbk/+
+         VcR2LIVwQNLRrhRO5J3kQv/g8shliId6bZLKPmtCsdmNUuEqImOyHz6/nNKL4XDS/tVF
+         etrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770911953; x=1771516753;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ebvdQMfvne+biXGLzUXHdRXQhx8hybcRtFG+HEINLdI=;
+        b=j2aeumH++xiRzb/SisIZGPByaJKU2Zy0wYw48rQxNNnM9s5XxUG8NJHmiWFy1UCVUy
+         /MHgZYKQAdnvD3YZH1kxe67OrGcsVL9uV2WrtmjvcVnIK6lxwg3tqa4ervNonEN2BPEj
+         SjRMknRnTzL2lpQ+AtMw7buXot9u/RVo/GUSrmWfTvmgsgCRZqAbYXfTHjKIWnPGT5bB
+         QZ7po+8AJ68v0HuhOwB6ss7sWBPfUZOancAtGevbdg99/1zcQl6ZtL5O9sey0Gc0DWyN
+         WR/B8ByPHyrA2DctndqlEBUk0ilKSvx615TLWWM8H/2JYKhU5tYaedV7kfV9HdyY5ewN
+         yJBA==
+X-Forwarded-Encrypted: i=1; AJvYcCUoIHH7Vex8Uoc9ZIWBIe1Wr3beap2Oiwswpq0FSTZr2YNLN4h/sJZhkaCvqXG60DJe5G4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweFoBA9PaKmlT9FgAxyV8YAy+jPYqcoelkVJmSdrCFHHFRMPur
+	4HszhPzpT8+8tWW+7ciPh5UkzqE+ctmqEILYEJRIIKFtV5GOCz146CJLGSelBJHmXfiTG6/4Mn3
+	0yQm5oWsD6H780g==
+X-Received: from pgbdo14.prod.google.com ([2002:a05:6a02:e8e:b0:c62:b045:9c6])
+ (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a21:a343:b0:35d:d477:a7e9 with SMTP id adf61e73a8af0-3944cedbb53mr2197172637.35.1770911952726;
+ Thu, 12 Feb 2026 07:59:12 -0800 (PST)
+Date: Thu, 12 Feb 2026 07:58:48 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.239.g8d8fc8a987-goog
+Message-ID: <20260212155905.3448571-1-jmattson@google.com>
+Subject: [PATCH v4 0/8] KVM: x86: nSVM: Improve PAT virtualization
+From: Jim Mattson <jmattson@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[172.234.253.10:from];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70989-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-70990-lists,kvm=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: D1D1212F0B8
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 31A0512F28F
 X-Rspamd-Action: no action
 
-On Thu, 12 Feb 2026 09:41:22 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Thu, 12 Feb 2026 at 09:29, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > Hi Fuad,
-> >
-> > On Thu, 12 Feb 2026 09:02:50 +0000,
-> > Fuad Tabba <tabba@google.com> wrote:
-> > >
-> > > When CONFIG_ARM64_POE is disabled, KVM does not save/restore POR_EL1.
-> > > However, ID_AA64MMFR3_EL1 sanitisation currently exposes the feature to
-> > > guests whenever the hardware supports it, ignoring the host kernel
-> > > configuration.
-> >
-> > This is the umpteenth time we get caught by this. PAN was the latest
-> > instance until this one. Maybe an approach would be to have a default
-> > override when a config option is not enabled, so that KVM is
-> > consistent with the rest of the kernel?
-> 
-> I spoke to Will about this, and one thing he'll look into is whether
-> this value in `struct arm64_ftr_reg` can be made consistent with the
-> cpu configuration itself (in cpufeature.c itself) . This would avoid
-> the problem altogether if possible. The question is whether the kernel
-> needs to somehow know that a certain feature exists even if it's
-> disabled in the config...
-> 
-> If he thinks it's not doable at that level, I'll look into
-> alternatives to make it correct by construction.
+Currently, KVM's implementation of nested SVM treats the PAT MSR the same
+way whether or not nested NPT is enabled: L1 and L2 share a single
+PAT. However, the APM specifies that when nested NPT is enabled, the host
+(L1) and the guest (L2) should have independent PATs: hPAT for L1 and gPAT
+for L2. This patch series implements the architectural specification in
+KVM.
 
-What I currently have for that is rather ugly:
+Use the existing PAT MSR (vcpu->arch.pat) for hPAT. Add a new field,
+svm->nested.gpat, for gPAT. With nested NPT enabled, redirect guest
+accesses to the IA32_PAT MSR to gPAT. All other accesses, including
+userspace accesses via KVM_{GET,SET}_MSRS, continue to reference hPAT.  The
+special handling of userspace accesses ensures save/restore forward
+compatibility (i.e. resuming a new checkpoint on an older kernel). When an
+old kernel restores a checkpoint from a new kernel, the gPAT will be lost,
+and L2 will simply use L1's PAT, which is the existing behavior of the old
+kernel anyway.
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 72f39cecce93a..3bde0ad5ea972 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -971,6 +971,7 @@ struct arm64_ftr_reg *get_arm64_ftr_reg(u32 sys_id);
- extern struct arm64_ftr_override id_aa64mmfr0_override;
- extern struct arm64_ftr_override id_aa64mmfr1_override;
- extern struct arm64_ftr_override id_aa64mmfr2_override;
-+extern struct arm64_ftr_override id_aa64mmfr3_override;
- extern struct arm64_ftr_override id_aa64pfr0_override;
- extern struct arm64_ftr_override id_aa64pfr1_override;
- extern struct arm64_ftr_override id_aa64zfr0_override;
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 1a7eec542675b..32069da9651bf 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -778,6 +778,7 @@ static const struct arm64_ftr_bits ftr_raz[] = {
- struct arm64_ftr_override __read_mostly id_aa64mmfr0_override;
- struct arm64_ftr_override __read_mostly id_aa64mmfr1_override;
- struct arm64_ftr_override __read_mostly id_aa64mmfr2_override;
-+struct arm64_ftr_override __read_mostly id_aa64mmfr3_override;
- struct arm64_ftr_override __read_mostly id_aa64pfr0_override;
- struct arm64_ftr_override __read_mostly id_aa64pfr1_override;
- struct arm64_ftr_override __read_mostly id_aa64zfr0_override;
-@@ -850,7 +851,8 @@ static const struct __ftr_reg_entry {
- 			       &id_aa64mmfr1_override),
- 	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2,
- 			       &id_aa64mmfr2_override),
--	ARM64_FTR_REG(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3),
-+	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3,
-+			       &id_aa64mmfr3_override),
- 	ARM64_FTR_REG(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4),
- 
- 	/* Op1 = 0, CRn = 10, CRm = 4 */
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 85bc629270bd9..202e165a4680c 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -51,6 +51,7 @@ PI_EXPORT_SYM(id_aa64isar2_override);
- PI_EXPORT_SYM(id_aa64mmfr0_override);
- PI_EXPORT_SYM(id_aa64mmfr1_override);
- PI_EXPORT_SYM(id_aa64mmfr2_override);
-+PI_EXPORT_SYM(id_aa64mmfr3_override);
- PI_EXPORT_SYM(id_aa64pfr0_override);
- PI_EXPORT_SYM(id_aa64pfr1_override);
- PI_EXPORT_SYM(id_aa64smfr0_override);
-diff --git a/arch/arm64/kernel/pi/idreg-override.c b/arch/arm64/kernel/pi/idreg-override.c
-index e5ea280452c3b..b8dbe02e53171 100644
---- a/arch/arm64/kernel/pi/idreg-override.c
-+++ b/arch/arm64/kernel/pi/idreg-override.c
-@@ -24,10 +24,12 @@
- static u64 __boot_status __initdata;
- 
- typedef bool filter_t(u64 val);
-+typedef void cfg_override_t(struct arm64_ftr_override *);
- 
- struct ftr_set_desc {
- 	char 				name[FTR_DESC_NAME_LEN];
- 	PREL64(struct arm64_ftr_override, override);
-+	PREL64(cfg_override_t,		cfg_override);
- 	struct {
- 		char			name[FTR_DESC_FIELD_LEN];
- 		u8			shift;
-@@ -106,6 +108,22 @@ static const struct ftr_set_desc mmfr2 __prel64_initconst = {
- 	},
- };
- 
-+static void __init cfg_mmfr3_override(struct arm64_ftr_override *override)
-+{
-+#ifndef CONFIG_ARM64_POE
-+	override->mask |= ID_AA64MMFR3_EL1_S1POE_MASK;
-+#endif
-+}
-+
-+static const struct ftr_set_desc mmfr3 __prel64_initconst = {
-+	.name		= "id_aa64mmfr3",
-+	.override	= &id_aa64mmfr3_override,
-+	.cfg_override	= cfg_mmfr3_override,
-+	.fields		= {
-+		{}
-+	},
-+};
-+
- static bool __init pfr0_sve_filter(u64 val)
- {
- 	/*
-@@ -221,6 +239,7 @@ PREL64(const struct ftr_set_desc, reg) regs[] __prel64_initconst = {
- 	{ &mmfr0	},
- 	{ &mmfr1	},
- 	{ &mmfr2	},
-+	{ &mmfr3	},
- 	{ &pfr0 	},
- 	{ &pfr1 	},
- 	{ &isar1	},
-@@ -398,14 +417,19 @@ void __init init_feature_override(u64 boot_status, const void *fdt,
- {
- 	struct arm64_ftr_override *override;
- 	const struct ftr_set_desc *reg;
-+	cfg_override_t *cfg_override;
- 	int i;
- 
- 	for (i = 0; i < ARRAY_SIZE(regs); i++) {
- 		reg = prel64_pointer(regs[i].reg);
- 		override = prel64_pointer(reg->override);
-+		cfg_override = prel64_pointer(reg->cfg_override);
- 
- 		override->val  = 0;
- 		override->mask = 0;
-+
-+		if (cfg_override)
-+			cfg_override(override);
- 	}
- 
- 	__boot_status = boot_status;
+v1: https://lore.kernel.org/kvm/20260113003016.3511895-1-jmattson@google.com/
+v2: https://lore.kernel.org/kvm/20260115232154.3021475-1-jmattson@google.com/
+v3: https://lore.kernel.org/kvm/20260205214326.1029278-1-jmattson@google.com/
 
+  v3 -> v4:
+   * Rebase on top of Yosry's v5 "Nested SVM fixes, cleanups, and hardening"
+   * Rename the svm_set_vmcb_gpat() helper to vmcb_set_gpat() for
+     consistency with other VMCB helpers [Yosry].
+   * Cache g_pat within struct vmcb_save_area_cached (as
+     svm->nested.save.g_pat) instead of using a standalone field in
+     svm->nested [Sean].
+   * Update nested_vmcb_check_save() to optionally validate the cached
+     g_pat, depending on a new boolean argument [Yosry].
+   * Reduce indentation in nested_vmcb02_prepare_save() when setting the
+     guest PAT [Sean].
+    
 
-which works, but is not super friendly.
+Jim Mattson (8):
+  KVM: x86: nSVM: Clear VMCB_NPT clean bit when updating hPAT from guest
+    mode
+  KVM: x86: nSVM: Cache and validate vmcb12 g_pat
+  KVM: x86: nSVM: Set vmcb02.g_pat correctly for nested NPT
+  KVM: x86: nSVM: Redirect IA32_PAT accesses to either hPAT or gPAT
+  KVM: x86: nSVM: Save gPAT to vmcb12.g_pat on VMEXIT
+  KVM: x86: nSVM: Save/restore gPAT with KVM_{GET,SET}_NESTED_STATE
+  KVM: x86: nSVM: Handle restore of legacy nested state
+  KVM: selftests: nSVM: Add svm_nested_pat test
 
-Looking at the arm64_ftr_reg structure, this could work if
-FTR_VISIBLE_IF_IS_ENABLED() didn't simply put "HIDDEN" when the
-feature is not present, but forced things to be disabled
-altogether. The problem is that "HIDDEN" means not shown to userspace,
-and that we have plenty of HIDDEN features that must make it into KVM.
-
-I'll have a think.
-
-	M.
+ arch/x86/include/uapi/asm/kvm.h               |   5 +
+ arch/x86/kvm/svm/nested.c                     |  60 +++-
+ arch/x86/kvm/svm/svm.c                        |  40 ++-
+ arch/x86/kvm/svm/svm.h                        |  38 ++-
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/x86/svm_nested_pat_test.c   | 298 ++++++++++++++++++
+ 6 files changed, 413 insertions(+), 29 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/svm_nested_pat_test.c
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.53.0.239.g8d8fc8a987-goog
+
 
