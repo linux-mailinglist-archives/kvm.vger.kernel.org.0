@@ -1,208 +1,280 @@
-Return-Path: <kvm+bounces-70988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70989-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GDKcI+DxjWlw8wAAu9opvQ
-	(envelope-from <kvm+bounces-70988-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 16:29:36 +0100
+	id IFzxD/bzjWlw8wAAu9opvQ
+	(envelope-from <kvm+bounces-70989-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 16:38:30 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D81CB12EEFD
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 16:29:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1D1212F0B8
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 16:38:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4D2F5313B8CC
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:27:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 103783044A58
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9661EEA5F;
-	Thu, 12 Feb 2026 15:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E0A2EA731;
+	Thu, 12 Feb 2026 15:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="RscQ3NJ/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MGOkiXiB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aWegDsBC"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57099F4F1;
-	Thu, 12 Feb 2026 15:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9420318BA2;
+	Thu, 12 Feb 2026 15:35:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770910018; cv=none; b=d36Y+H0ii21bwUBo9AlXt8SA4JjPXm9KsIObMlwARjhmqquwKfcK1YIGjfkilqFH7/WF2ypFhO6PrLtPUrMEiLC86AdVVSitBrN5Y1vgNJ+qZaWEwf+INjLv5KpSp8CAU3u52HqfHxZ5GgM88u5GJ117ERxkwZrJYqomEBK/h24=
+	t=1770910547; cv=none; b=coH2RFAY+4OaYC+K/636ZsDj4sJG+/f3qPzP8uCqbUh9LgkTpoja7AmHprrhwkaEy4OdWlS3klVPUGAMUosJkz8JFLf7evOOtH9vZHJWG23filXxMvDN6GytsO2mwnFRy0bbc3HEpoQV+n5mbEZ4JgdiumwRqY6zXMnDzM7PZOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770910018; c=relaxed/simple;
-	bh=zo8EfRvL4ErM4vuWDCr9QM8yJQQnDfW6TzDH3cUDgZs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s+VmNJ4Rfchdd4C+fi3MGbhIiRcxhWS6ZICsQ4l4+qoosAOxxNSe57mOky/Lepor9hHlzXPNpQqvcLEtuSQS5lokXIeWTgSi7OmEbb7fKD0x3azfNUdW1J4eqwj+Q+TDdy4PMOnJVnpoUv5PFSRP5PypOJcbr5iwBCOhIbtL+eU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=RscQ3NJ/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MGOkiXiB; arc=none smtp.client-ip=202.12.124.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id F04517A012C;
-	Thu, 12 Feb 2026 10:26:53 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Thu, 12 Feb 2026 10:26:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1770910013;
-	 x=1770996413; bh=fGs6hFzdbPYEGWzAEwqMf/QHmFwxHFZ3J98kX4iykqU=; b=
-	RscQ3NJ/NSZyYBoxHEzXalqKlWDA8RDopHlXsCgcGEZnwsx0B73WP6TCcheRtnNG
-	YT1rn9zntXsrKGWXRUvPx9BsKrx9SwuF028xpccWP92gbQOe4DFtnGFu7cMkIdrP
-	6iwv5ID8YcR5E79qMjnK8h3dqEuLtd4gKbThQ3xGE838+uotJCHc56oLkS3nmxHE
-	jvcJooeXhBddWXorRqA1BGP90a5Q+ZtoxxgNAbfnHdMc+RomWdChVMyewn2/+Bi3
-	2cMtMie+3DeRmJYvzooA894HgOJOKJ0gI+dTlIZgGnM0pMll+YkvYSEFxljOWbcY
-	BKv1T0e6ZA914BK7mjtwIQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1770910013; x=
-	1770996413; bh=fGs6hFzdbPYEGWzAEwqMf/QHmFwxHFZ3J98kX4iykqU=; b=M
-	GOkiXiBIS3cLMVP3rPgrzitzMGRSST5oKrf6s1BJgbgdJlX27lLNjyDRiXHg4sEw
-	ASBAGW2XMgaiIR/753F3vgtzWpzAMI2/XnC0kQGLY42TseWROk2oSLRahVhEgZBo
-	sXiiE+7ZhIFkIcYNybF6Z5TiX8w8t7q/gKwu2pAlzjd4CsLcSRrhTv8rwvgcodDy
-	YWJP6Xd5+Wcskpdn1rc9Y5QyYkixvxEGPFDXwpXOts4qMqGKOpHftqSZDPrqcpxx
-	tKYpP/TeoEyA4vlHqrfjGoQrMUD9q+EePq2f5AMap1A6/9NCaCPkGV1vETyoq7Nx
-	8pNs8H9g4i0fmATEIBB0A==
-X-ME-Sender: <xms:PfGNaWcCELajyZzojmVKNYJI2bEUi4GR4STsN9bQiCkhkPdcVjRAKQ>
-    <xme:PfGNaULXFz4VrkJ2u4WthKEQ3KgKJzbA5SjzKE2QUYocQU5fZI9p9svduVIQ7C2B5
-    yG_rt-3FfrDLJC7DLrD_TmTJS_JkO8SifbjcjZo12f0q7iRNTj0AA>
-X-ME-Received: <xmr:PfGNaQAzIdH522q77e9nWA5IhPyyE4DoOvu-UEyEyvWtdyOAkIEFOlrkFG0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvtdehjedvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
-    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
-    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepvddtpdhmohguvgep
-    shhmthhpohhuthdprhgtphhtthhopehjuhhlihgrnhhrsehlihhnuhigrdhisghmrdgtoh
-    hmpdhrtghpthhtohepshgthhhnvghllhgvsehlihhnuhigrdhisghmrdgtohhmpdhrtghp
-    thhtohepfihinhhtvghrrgeslhhinhhugidrihgsmhdrtghomhdprhgtphhtthhopehtsh
-    eslhhinhhugidrihgsmhdrtghomhdprhgtphhtthhopehosggvrhhprghrsehlihhnuhig
-    rdhisghmrdgtohhmpdhrtghpthhtohepghgsrgihvghrsehlihhnuhigrdhisghmrdgtoh
-    hmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtghpthhtohephihishhhrghi
-    hhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepshhkohhlohhthhhumhhthhhosehnvh
-    hiughirgdrtghomh
-X-ME-Proxy: <xmx:PfGNadjH0FTgv0cvFaRyZ1qlmvf4KM2nrdnsSpF2aEiI-hbzE9BRKw>
-    <xmx:PfGNaaN5WQo1kTb9jrPplf1IcjuTjt2zBJIB_sMgnSWh-1Sr_J5CFA>
-    <xmx:PfGNaUZO7kbUOl2mC5RPcwaHzLW8_1dpTIeKgHF1w9xwlnqeKCNzkw>
-    <xmx:PfGNaf9dQ3q44LK_tYQAJ2rtd_HG63Avi10SfeJP7h56AhCvRfbBrg>
-    <xmx:PfGNadmCIw9vKifu5z8BULVpQ-hPNPMPXVjPwqEog-YB2MiMi-X4zlz4>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 12 Feb 2026 10:26:52 -0500 (EST)
-Date: Thu, 12 Feb 2026 08:26:50 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Julian Ruess <julianr@linux.ibm.com>
-Cc: schnelle@linux.ibm.com, wintera@linux.ibm.com, ts@linux.ibm.com,
- oberpar@linux.ibm.com, gbayer@linux.ibm.com, Jason Gunthorpe
- <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Shameer Kolothum
- <skolothumtho@nvidia.com>, Kevin Tian <kevin.tian@intel.com>,
- mjrosato@linux.ibm.com, alifm@linux.ibm.com, raspl@linux.ibm.com,
- hca@linux.ibm.com, agordeev@linux.ibm.com, gor@linux.ibm.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH 1/3] vfio/pci: Set VFIO_PCI_OFFSET_SHIFT to 48
-Message-ID: <20260212082650.5b233d0a@shazbot.org>
-In-Reply-To: <20260212-vfio_pci_ism-v1-1-333262ade074@linux.ibm.com>
-References: <20260212-vfio_pci_ism-v1-0-333262ade074@linux.ibm.com>
-	<20260212-vfio_pci_ism-v1-1-333262ade074@linux.ibm.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1770910547; c=relaxed/simple;
+	bh=TO37eo+Xgib1YZz+3/bN23epC9tyuhnej0GE/4f9cu0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AjWwt2N/VHszRELSojuLu3kliH0CKM231qtFU0ztZ3L5cKUAyHexyHJLlmngakn+5IgukBi65ZhkdFAFLzE0jIB5ZfzZ9nF6n5x/xI0ta7l8Wn8jsCqSjn+ntm3AXDiL+9RbL253V0RyQSCOiHT3pryJIAFDmdeCVtxtkFKIWvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aWegDsBC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 431CCC4CEF7;
+	Thu, 12 Feb 2026 15:35:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770910546;
+	bh=TO37eo+Xgib1YZz+3/bN23epC9tyuhnej0GE/4f9cu0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aWegDsBCbtfgIg9OB2Xop0lxMZQZwqnfB0XxDQ1ueSB7JcgdPabiA42A0ID30+YaT
+	 P/XSETTC7Yp7LAHJn1mdglYBFHY8apMm7aJjIdTv62SFR8OMUfOdbzlnUy2wCzeZ9P
+	 qeitAMtlBa4Dpu0Pld90mQkZsNlQEPhZhE3NsjwBsGOYAXM1Z0jy/tUfs3Uiy7Yzmq
+	 jqUs5QcXBDMLhWVRmFhrg4r6U4qsQmae3wNfbwYcj9s5SjXNuawXvxLGiKOZVh9R7+
+	 QNiq30C+UJ87E8cP7FBFGdAK0wCpMBxagWggHp00At/4AMI4cabCeJx5GC2bp1sUNM
+	 KIvbaqBP5G1gQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vqYjH-0000000AeWS-3lg7;
+	Thu, 12 Feb 2026 15:35:43 +0000
+Date: Thu, 12 Feb 2026 15:35:43 +0000
+Message-ID: <86ikc2asa8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1 1/3] KVM: arm64: Hide S1POE from guests when not supported by the host
+In-Reply-To: <CA+EHjTz-JU2gDfziCY2SguK9=6gGSCL5TN_U_C7FiZ5i0JTZqQ@mail.gmail.com>
+References: <20260212090252.158689-1-tabba@google.com>
+	<20260212090252.158689-2-tabba@google.com>
+	<86jywib98e.wl-maz@kernel.org>
+	<CA+EHjTz-JU2gDfziCY2SguK9=6gGSCL5TN_U_C7FiZ5i0JTZqQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm2,messagingengine.com:s=fm3];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70988-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	MIME_TRACE(0.00)[0:+];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[172.234.253.10:from];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
+	TAGGED_FROM(0.00)[bounces-70989-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shazbot.org:mid,shazbot.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D81CB12EEFD
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: D1D1212F0B8
 X-Rspamd-Action: no action
 
-On Thu, 12 Feb 2026 15:02:15 +0100
-Julian Ruess <julianr@linux.ibm.com> wrote:
+On Thu, 12 Feb 2026 09:41:22 +0000,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Thu, 12 Feb 2026 at 09:29, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Hi Fuad,
+> >
+> > On Thu, 12 Feb 2026 09:02:50 +0000,
+> > Fuad Tabba <tabba@google.com> wrote:
+> > >
+> > > When CONFIG_ARM64_POE is disabled, KVM does not save/restore POR_EL1.
+> > > However, ID_AA64MMFR3_EL1 sanitisation currently exposes the feature to
+> > > guests whenever the hardware supports it, ignoring the host kernel
+> > > configuration.
+> >
+> > This is the umpteenth time we get caught by this. PAN was the latest
+> > instance until this one. Maybe an approach would be to have a default
+> > override when a config option is not enabled, so that KVM is
+> > consistent with the rest of the kernel?
+> 
+> I spoke to Will about this, and one thing he'll look into is whether
+> this value in `struct arm64_ftr_reg` can be made consistent with the
+> cpu configuration itself (in cpufeature.c itself) . This would avoid
+> the problem altogether if possible. The question is whether the kernel
+> needs to somehow know that a certain feature exists even if it's
+> disabled in the config...
+> 
+> If he thinks it's not doable at that level, I'll look into
+> alternatives to make it correct by construction.
 
-> Extend VFIO_PCI_OFFSET_SHIFT to 48 to use the vfio-pci
-> VFIO_PCI_OFFSET_TO_INDEX() mechanism with the 256 TiB pseudo-BAR 0 of
-> the ISM device on s390. This bar is never mapped.
+What I currently have for that is rather ugly:
 
-Why does the entirety of vfio-pci need to adapt to the BAR requirements
-of this device?  There's a variant driver included here that implements
-its own read/write handlers and doesn't support mmap, so you're already
-halfway there to implement your own region offsets independent of the
-conventions of the rest of vfio-pci.  Thanks,
-
-Alex
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 72f39cecce93a..3bde0ad5ea972 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -971,6 +971,7 @@ struct arm64_ftr_reg *get_arm64_ftr_reg(u32 sys_id);
+ extern struct arm64_ftr_override id_aa64mmfr0_override;
+ extern struct arm64_ftr_override id_aa64mmfr1_override;
+ extern struct arm64_ftr_override id_aa64mmfr2_override;
++extern struct arm64_ftr_override id_aa64mmfr3_override;
+ extern struct arm64_ftr_override id_aa64pfr0_override;
+ extern struct arm64_ftr_override id_aa64pfr1_override;
+ extern struct arm64_ftr_override id_aa64zfr0_override;
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 1a7eec542675b..32069da9651bf 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -778,6 +778,7 @@ static const struct arm64_ftr_bits ftr_raz[] = {
+ struct arm64_ftr_override __read_mostly id_aa64mmfr0_override;
+ struct arm64_ftr_override __read_mostly id_aa64mmfr1_override;
+ struct arm64_ftr_override __read_mostly id_aa64mmfr2_override;
++struct arm64_ftr_override __read_mostly id_aa64mmfr3_override;
+ struct arm64_ftr_override __read_mostly id_aa64pfr0_override;
+ struct arm64_ftr_override __read_mostly id_aa64pfr1_override;
+ struct arm64_ftr_override __read_mostly id_aa64zfr0_override;
+@@ -850,7 +851,8 @@ static const struct __ftr_reg_entry {
+ 			       &id_aa64mmfr1_override),
+ 	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2,
+ 			       &id_aa64mmfr2_override),
+-	ARM64_FTR_REG(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3),
++	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3,
++			       &id_aa64mmfr3_override),
+ 	ARM64_FTR_REG(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4),
  
-> Acked-by: Alexandra Winter <wintera@linux.ibm.com>
-> Signed-off-by: Julian Ruess <julianr@linux.ibm.com>
-> ---
->  drivers/vfio/pci/vfio_pci_core.c | 4 ++--
->  include/linux/vfio_pci_core.h    | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 3a11e6f450f70105f17a3a621520c195d99e0671..3d70bf6668c7a69c4b46674195954d1ada662006 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1647,7 +1647,7 @@ static unsigned long vma_to_pfn(struct vm_area_struct *vma)
->  	u64 pgoff;
->  
->  	pgoff = vma->vm_pgoff &
-> -		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
-> +		((1UL << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
->  
->  	return (pci_resource_start(vdev->pdev, index) >> PAGE_SHIFT) + pgoff;
->  }
-> @@ -1751,7 +1751,7 @@ int vfio_pci_core_mmap(struct vfio_device *core_vdev, struct vm_area_struct *vma
->  	phys_len = PAGE_ALIGN(pci_resource_len(pdev, index));
->  	req_len = vma->vm_end - vma->vm_start;
->  	pgoff = vma->vm_pgoff &
-> -		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
-> +		((1UL << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
->  	req_start = pgoff << PAGE_SHIFT;
->  
->  	if (req_start + req_len > phys_len)
-> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-> index 1ac86896875cf5c9b5cc8ef25fae8bbd4394de05..12781707f086a330161990dc3579ec0d75887da8 100644
-> --- a/include/linux/vfio_pci_core.h
-> +++ b/include/linux/vfio_pci_core.h
-> @@ -20,7 +20,7 @@
->  #ifndef VFIO_PCI_CORE_H
->  #define VFIO_PCI_CORE_H
->  
-> -#define VFIO_PCI_OFFSET_SHIFT   40
-> +#define VFIO_PCI_OFFSET_SHIFT   48
->  #define VFIO_PCI_OFFSET_TO_INDEX(off)	(off >> VFIO_PCI_OFFSET_SHIFT)
->  #define VFIO_PCI_INDEX_TO_OFFSET(index)	((u64)(index) << VFIO_PCI_OFFSET_SHIFT)
->  #define VFIO_PCI_OFFSET_MASK	(((u64)(1) << VFIO_PCI_OFFSET_SHIFT) - 1)
-> 
+ 	/* Op1 = 0, CRn = 10, CRm = 4 */
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index 85bc629270bd9..202e165a4680c 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -51,6 +51,7 @@ PI_EXPORT_SYM(id_aa64isar2_override);
+ PI_EXPORT_SYM(id_aa64mmfr0_override);
+ PI_EXPORT_SYM(id_aa64mmfr1_override);
+ PI_EXPORT_SYM(id_aa64mmfr2_override);
++PI_EXPORT_SYM(id_aa64mmfr3_override);
+ PI_EXPORT_SYM(id_aa64pfr0_override);
+ PI_EXPORT_SYM(id_aa64pfr1_override);
+ PI_EXPORT_SYM(id_aa64smfr0_override);
+diff --git a/arch/arm64/kernel/pi/idreg-override.c b/arch/arm64/kernel/pi/idreg-override.c
+index e5ea280452c3b..b8dbe02e53171 100644
+--- a/arch/arm64/kernel/pi/idreg-override.c
++++ b/arch/arm64/kernel/pi/idreg-override.c
+@@ -24,10 +24,12 @@
+ static u64 __boot_status __initdata;
+ 
+ typedef bool filter_t(u64 val);
++typedef void cfg_override_t(struct arm64_ftr_override *);
+ 
+ struct ftr_set_desc {
+ 	char 				name[FTR_DESC_NAME_LEN];
+ 	PREL64(struct arm64_ftr_override, override);
++	PREL64(cfg_override_t,		cfg_override);
+ 	struct {
+ 		char			name[FTR_DESC_FIELD_LEN];
+ 		u8			shift;
+@@ -106,6 +108,22 @@ static const struct ftr_set_desc mmfr2 __prel64_initconst = {
+ 	},
+ };
+ 
++static void __init cfg_mmfr3_override(struct arm64_ftr_override *override)
++{
++#ifndef CONFIG_ARM64_POE
++	override->mask |= ID_AA64MMFR3_EL1_S1POE_MASK;
++#endif
++}
++
++static const struct ftr_set_desc mmfr3 __prel64_initconst = {
++	.name		= "id_aa64mmfr3",
++	.override	= &id_aa64mmfr3_override,
++	.cfg_override	= cfg_mmfr3_override,
++	.fields		= {
++		{}
++	},
++};
++
+ static bool __init pfr0_sve_filter(u64 val)
+ {
+ 	/*
+@@ -221,6 +239,7 @@ PREL64(const struct ftr_set_desc, reg) regs[] __prel64_initconst = {
+ 	{ &mmfr0	},
+ 	{ &mmfr1	},
+ 	{ &mmfr2	},
++	{ &mmfr3	},
+ 	{ &pfr0 	},
+ 	{ &pfr1 	},
+ 	{ &isar1	},
+@@ -398,14 +417,19 @@ void __init init_feature_override(u64 boot_status, const void *fdt,
+ {
+ 	struct arm64_ftr_override *override;
+ 	const struct ftr_set_desc *reg;
++	cfg_override_t *cfg_override;
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(regs); i++) {
+ 		reg = prel64_pointer(regs[i].reg);
+ 		override = prel64_pointer(reg->override);
++		cfg_override = prel64_pointer(reg->cfg_override);
+ 
+ 		override->val  = 0;
+ 		override->mask = 0;
++
++		if (cfg_override)
++			cfg_override(override);
+ 	}
+ 
+ 	__boot_status = boot_status;
 
+
+which works, but is not super friendly.
+
+Looking at the arm64_ftr_reg structure, this could work if
+FTR_VISIBLE_IF_IS_ENABLED() didn't simply put "HIDDEN" when the
+feature is not present, but forced things to be disabled
+altogether. The problem is that "HIDDEN" means not shown to userspace,
+and that we have plenty of HIDDEN features that must make it into KVM.
+
+I'll have a think.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
