@@ -1,180 +1,176 @@
-Return-Path: <kvm+bounces-70951-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70952-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8B2WLruyjWll6AAAu9opvQ
-	(envelope-from <kvm+bounces-70951-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 12:00:11 +0100
+	id 4Mq8BpbOjWn87AAAu9opvQ
+	(envelope-from <kvm+bounces-70952-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 13:59:02 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C9F412CC6D
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 12:00:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D06412DAE8
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 13:59:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B2469306B2D2
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 10:59:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 64F13307B7C1
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 12:57:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A4CC317709;
-	Thu, 12 Feb 2026 10:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82B34344036;
+	Thu, 12 Feb 2026 12:57:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fz2IVjqQ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ox+m0vZq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7727318BA2
-	for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 10:59:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770893992; cv=pass; b=SYNCABa8y8TbHsJ/Iz5z0J5GKaiweMPLOZVftC7Ar4Jom1W33pM/P3cBrcs2vB3wjjbHgonf35kaAfQJT9QAv2y49Jl2rwWPGi7JvZBwOrbWIi8dpdwNBunYP3KdfOOw0sx0h5z8hBlhdaGHTT2kxtAtmLrQYhCSwVCXNlMVv1c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770893992; c=relaxed/simple;
-	bh=YPpGn2d1qR+JIFpcscGES2bIhxc/uHptd1hk5dk6r6o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bF4Bvv5MXntqb83kLHl9tOZQwvxOkIwHvs2wdby8h2QiPrhLFS6+VUdKhakz53htRdPUuoCqeXHklhpU90S4ubjz20j9XXBaUU5XIcUjV3RzXqb4UvCjvxyWtFFCXNici3AWmFVd9zWVjrNR3xlmEhqO4oyU8Lz8cgoZy1bm03c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Fz2IVjqQ; arc=pass smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-7963a209b97so30925087b3.2
-        for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 02:59:50 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770893990; cv=none;
-        d=google.com; s=arc-20240605;
-        b=cvuNrXy8YR4xU50vTpMHvEyapCmHgnZ49ZJoLC11SWzcnvSMva7A5+EBI/XeqD/3DV
-         CYa4Pe6o1n9/fJlXUuOSFjGLn2XXDPLaZvg0Kuevi1rFc+TKbo1xb4WES+9/yfs6phgP
-         i+ry9+z5gQ6CrkfgPrRmkdwjJIG0cd9vbNNFGT/Yrjto/kZD9UWN/GNwW1onF7tRGIvN
-         MFr2Tnem0lqXESYuAvNUbyG3yXDUPGo9yUPPsO7Yib0r3Bdh7npZtpI8Sw53oIVZm1q8
-         yEQ3u8IuVYExT6AXKMilY2orWqmD9DFWEBng9ei4iqrWtY1427DSFlD2lUgNBrPX+6cu
-         pjfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=ZVrbCSZbccxq6FEVA4SqZs6DjR06QQJ13wdUUSd0D90=;
-        fh=SfAHqvSCw2DBFIn93jo/x89gnOls6jyQakudGRY/bxk=;
-        b=beart39586gcCLqsMUMDE+aVlT0D1fPb43BETxdorMCbvyUMemrWsN//6HdmNCysK4
-         FFnuwKzpbJpAsMpn7q1kTM1UMJ5ldI3+akAft4h2yN5lxSnPHRHuPYgyqTqugxqWC6kh
-         on5eQPWVGBByUaMn3OoR/m/NJpGtzNi6rDnCgSJkeeBC1m/ojqGieBMRXEVGNOj1oQUl
-         VVi8adg1mKVOdH+z6vudDkijs3ocCJDINljcpMWwOqPiETGcjAXlgGt0YfyoKEEy4sON
-         QMyqQutmvuR2prIaVpozw0rC/Dc0NHbkLmHoE2CuOxovQ2uA7htO9UFj5MBEZk4m2ilQ
-         NmFw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770893990; x=1771498790; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZVrbCSZbccxq6FEVA4SqZs6DjR06QQJ13wdUUSd0D90=;
-        b=Fz2IVjqQLgkGh/29KpRHFPBCXGPLJkJ+dxsQZwJn0wlv/GpdDTprnN6+gby2TwunMv
-         ppvJVLzieyr3uflTUk8UAPWWW1WI5l7BjIX386bnYfqX7VMAteXxVGjW3uON1zryK5MU
-         NMVX4jqT2e7bz2qPt34HkX0hsVHXuoH0YYrtC9103mf9/amNQscJ1oOlpnr+3UvQwkE3
-         mZQHO7Y9RN+badMkPVTx5sbqzXi6n27dzqA3WA9to7lS5KSVVdVEV+HtllKmPI88EUP0
-         TnRlLDq0RDwqHsMKrwP7MCAOKsCZotpc6ZxLLg4sllbqdwasisrBnASYv4Ia5YtsWp2z
-         S6fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770893990; x=1771498790;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZVrbCSZbccxq6FEVA4SqZs6DjR06QQJ13wdUUSd0D90=;
-        b=mNpM97xZhUDlZuGF3B1gdMqS2+PqibWPvBjQ/+t6sl4lYThmtJbhHMOsEtD22PYfRz
-         viiTpddltAh6GO+v9EQJmzD5aHfXchNOiKYMUVqdiAjGR7mpgwPhOi3n6W9yr2IGNc55
-         MShZvLO++SI7yUdKj7NxNDuj/bD8cM1yeG9hfwNjeAnUKyO6RvweWrSIjuzKW/UGiEgw
-         gV1exh9TL6+FWyw6iSS+0yD58+piZkiW+SBUwrxveZNtoMJEXHT6n+BhAxRU6OzOy22n
-         pqCRdHpADmP9vtIgLgZPToK4PMSotr2ebwIbnp5aoMcjoPCnhu/WHaNjFQOo03qiPl9p
-         7qOg==
-X-Forwarded-Encrypted: i=1; AJvYcCVdnKZCw4LW/CLwIRVWWbEUH7+wCrw1M9w1sXpqt+WUGoPBB6rF3bUYeWrc2v/Z7MLh+oc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXK0YZNub7pK1ZtfHAwarCZCYpuWvRmxPlQfaVwRlV2edR4GU+
-	ZMCAfYmex3hMda8pHOmPqJiZycjnNqVXFhX2AGb2loPqOLbTq954INrC4gbPBNTcTfM/VgGS1+7
-	W/zGvF/L0Yxln7+gzx3CtANx3ZCw+j9nO8TOGUbJTPA==
-X-Gm-Gg: AZuq6aImLm9KJ5+kx8SPrbWsEXmPQEiJ5Z2I1QbMIKF8a9946JfKi+Wtke60D9c+DJQ
-	UdZfLr9xzUW4RWkUFDwznKY2hiALyFAV/DHprG6odKNedIHohfAdcgLkEtkjXqvw7MtuT/S1JcC
-	RhbsjX74jgQxUWQabfEas8HWtMh24idFGohabqqRVlRFq/rT4xotlw1fN8N8XdGnfXEKKvvNwvn
-	K4sir/xU0b3IeD3Nxk6RNBojSTtV//HSuqXxVqdSZzMb3SZXVSIN3oQMLZxW0UCPZbRSYQAJ1Os
-	P7Zt+I0pma4rxfrSCDY8swsI7Q3TsxiAxaGfxqr7joL5HXajor6GZYTBWaHdCrDHunk=
-X-Received: by 2002:a05:690c:4882:b0:795:1e5b:f72 with SMTP id
- 00721157ae682-797931fa40fmr27576287b3.63.1770893989787; Thu, 12 Feb 2026
- 02:59:49 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A576914A91
+	for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 12:57:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770901059; cv=none; b=XJLcqDTYSraih1Ho+x1YRZpHFB55puT8NDDjKWmFOKLwI0Fu/iZ7pKg0MiDh0/4IcPNZKBT1HPcjSu4ISYy6OXEyy6LuzYQT/UMDOCuw8krfk/cPLiGtjYp5/2kb853W/EHDxwoKsqm9DkVOFnQf+ULQztRSYAuzg1wndaqr0Qo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770901059; c=relaxed/simple;
+	bh=vKuHTDMti6zpEL3rYV0DdCMF4N/d093St4ruRMzCJdc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=TerdaDPr4VClxl54XIuFjIeec30ZoAr3/A0IvDOg7iQZY56AbQ2SDdhPgRe9WKvMMm6nHgWsI65EvPD9WrIrsqsvfr4DC/ddswTE3zFqNXhS4aoKbaERy80j3ph0kXKACYOAcWpiunKmhZf6ItjebxuJIOuN7R3v/EhcAFTNZmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ox+m0vZq; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61C6R4cO247099;
+	Thu, 12 Feb 2026 12:57:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=vKuHTD
+	Mti6zpEL3rYV0DdCMF4N/d093St4ruRMzCJdc=; b=Ox+m0vZqgjH7hLbJJ6BE4N
+	hFQl0KGEA3XA5pVjuJ+OzopAZ7F5brH9AGklRWHOd0K3ZI/9PQr6o+5nAuu2h+uS
+	k4kRUW1KwmlHlBbrT1uHcP8Sx96UIOvNCJN2AZMWJB9MXf4zeQaBD7NifVBSbkSq
+	9iQ5am9TIFmGm9V1pGPkjv/JtjcYG+30EwQBXLCXLWW8UkYncvTM/zrEAmKQpxTZ
+	wJ6v832xbae42lVaryX58jkQ54ls5GFWrQz9Icm6teLA5d+l8K8ARHf9uf3aVgOO
+	ntO4GJ2xiKe99xOBKPIH4KIUfAv+UA7q9Wv2jotE9yRtkt/4x7VhPBSR7YomGEUg
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c696v3fhv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Feb 2026 12:57:29 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61CAFKHE001847;
+	Thu, 12 Feb 2026 12:57:28 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4c6je2a5xw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Feb 2026 12:57:28 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61CCvOYC51642872
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 12 Feb 2026 12:57:24 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 821CD20043;
+	Thu, 12 Feb 2026 12:57:24 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9F12B20040;
+	Thu, 12 Feb 2026 12:57:23 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.111.78.249])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 12 Feb 2026 12:57:23 +0000 (GMT)
+Message-ID: <210594e4dcac9d0adaa1a49c16af7b73075bc1b8.camel@linux.ibm.com>
+Subject: Re: [PATCH] s390x/kvm: Add ASTFLE facility 2 for nested
+ virtualization
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: Christoph Schlameuss <schlameuss@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger	
+ <borntraeger@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew
+ Rosato	 <mjrosato@linux.ibm.com>,
+        Richard Henderson
+ <richard.henderson@linaro.org>,
+        Ilya Leoshkevich	 <iii@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>, Thomas Huth	 <thuth@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Cornelia Huck	 <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Hendrik Brueckner	
+ <brueckner@linux.ibm.com>, qemu-s390x@nongnu.org,
+        kvm@vger.kernel.org
+Date: Thu, 12 Feb 2026 13:57:41 +0100
+In-Reply-To: <20260211-astfleie2-v1-1-cfa11f422fd8@linux.ibm.com>
+References: <20260211-astfleie2-v1-1-cfa11f422fd8@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260210201540.1405424-1-pierrick.bouvier@linaro.org> <93f8f250-7899-4528-b277-1ddd469c192c@linaro.org>
-In-Reply-To: <93f8f250-7899-4528-b277-1ddd469c192c@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Feb 2026 10:59:38 +0000
-X-Gm-Features: AZwV_QhUuW1l9Jivyr7kErjs0tzcoD9IRR_bK5Rkbo6Gtl-aCqdZBlAQHB1UJww
-Message-ID: <CAFEAcA9YUOxko51ziY3yAOaDfTCEAwqmXnifF=q_mkyotFHTcg@mail.gmail.com>
-Subject: Re: [PATCH v3 00/12] target/arm: single-binary
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Cc: qemu-devel@nongnu.org, anjo@rev.ng, 
-	Jim MacArthur <jim.macarthur@linaro.org>, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjEyMDA5NiBTYWx0ZWRfX/GSdhVx35i3w
+ YGpaOgwPS/OT7SWQJFZCqB3yklB04xGwPp18XrQG5V1lOVNT8/wWvJFva0SezKNKDbHJdXE4gAH
+ BywfNwQZ35KHDJrkiFhzsTSmUI1V54SJD0Dw12CnGk9I+580TowiBiYb3NfRi5XlM3CFp4KTnLs
+ gVUK8xguziuvbBBGQJNKFOJr11+IDlUqhee/QoFa8rKpCGFLxw7pCFxUefAZDQsy9PpW/vnW2fQ
+ L60ilzTLk/BDP68yCP6lBotzc+YfF3hyamr/8AgWMv7kr0EYH/mqaCRVXxsvBwGZ7K0/Y5UT6id
+ C6GIX0KUlSIucIyzTb/JOoalI1FXY6m+ALH+9i7KhW4sN2whV7A6c6HfiKGXV76+XIGOmnFzGwK
+ VQSQRaDnf7oj2TANhY3FDBBGewrhx2CmPjFnsZbsQEjkrWFOlN6FTj23ztEbL3KgZidkjMC3UW4
+ 5LJkr9rk95HGhVmA0sg==
+X-Proofpoint-ORIG-GUID: rwa0Ng6_72RHzpFKq1WMuEFNjSmLJMlY
+X-Proofpoint-GUID: rwa0Ng6_72RHzpFKq1WMuEFNjSmLJMlY
+X-Authority-Analysis: v=2.4 cv=O+Y0fR9W c=1 sm=1 tr=0 ts=698dce39 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8
+ a=jluB_lIlwI9kuYLZUVYA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-12_03,2026-02-12_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 priorityscore=1501 phishscore=0 adultscore=0
+ malwarescore=0 impostorscore=0 bulkscore=0 clxscore=1011 spamscore=0
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2602120096
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[11];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[peter.maydell@linaro.org,kvm@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.ibm.com:mid];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nsg@linux.ibm.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70951-lists,kvm=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linaro.org:email,linaro.org:dkim,target-arm.next:url];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[linaro.org:+]
-X-Rspamd-Queue-Id: 1C9F412CC6D
+	TAGGED_FROM(0.00)[bounces-70952-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[ibm.com:+]
+X-Rspamd-Queue-Id: 6D06412DAE8
 X-Rspamd-Action: no action
 
-On Tue, 10 Feb 2026 at 20:19, Pierrick Bouvier
-<pierrick.bouvier@linaro.org> wrote:
->
-> On 2/10/26 12:15 PM, Pierrick Bouvier wrote:
-> > This series continues cleaning target/arm, especially tcg folder.
-> >
-> > For now, it contains some cleanups in headers, and it splits helpers per
-> > category, thus removing several usage of TARGET_AARCH64.
-> > First version was simply splitting 32 vs 64-bit helpers, and Richard asked
-> > to split per sub category.
-> >
-> > v3
-> > --
-> >
-> > - translate.h: missing vaddr replacement
-> > - move tcg_use_softmmu to tcg/tcg-internal.h to avoid duplicating compilation
-> >    units between system and user builds.
-> > - eradicate TARGET_INSN_START_EXTRA_WORDS by calling tcg_gen_insn_start with
-> >    additional 0 parameters if needed.
-> >
-> > v2
-> > --
-> >
-> > - add missing kvm_enabled() in arm-qmp-cmds.c
-> > - didn't extract arm_wfi for tcg/psci.c. If that's a hard requirement, I can do
-> >    it in next version.
-> > - restricted scope of series to helper headers, so we can validate things one
-> >    step at a time. Series will keep on growing once all patches are reviewed.
-> > - translate.h: use vaddr where appropriate, as asked by Richard.
+On Wed, 2026-02-11 at 15:56 +0100, Christoph Schlameuss wrote:
+> Allow propagation of the ASTFLEIE2 feature bit.
+>=20
+> If the host does have the ASTFLE Interpretive Execution Facility 2 the
+> guest can enable the ASTFLE format 2 for its guests.
+>=20
+> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 
-> Patches 1-11 are reviewed and ready to be pulled.
+Reviewed-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-Looks like patch 12 has also now been reviewed, so I've applied
-the whole series to target-arm.next.
-
-thanks
--- PMM
+--=20
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Wolfgang Wendt
+Gesch=C3=A4ftsf=C3=BChrung: David Faller
+Sitz der Gesellschaft: Ehningen / Registergericht: Amtsgericht Stuttgart, H=
+RB 243294
 
