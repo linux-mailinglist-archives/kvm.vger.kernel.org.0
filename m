@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-70993-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70994-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6FmiL035jWnz9wAAu9opvQ
-	(envelope-from <kvm+bounces-70993-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 17:01:17 +0100
+	id oHuGOn/5jWnz9wAAu9opvQ
+	(envelope-from <kvm+bounces-70994-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 17:02:07 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3108512F2E2
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 17:01:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A29A12F2F2
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 17:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3446A3164B93
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:59:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A9F9331822AD
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B4C35D5E3;
-	Thu, 12 Feb 2026 15:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582A435D611;
+	Thu, 12 Feb 2026 15:59:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="taYhWl0V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fcdheKUJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8779532FA18
-	for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 15:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5484B35CBB7
+	for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 15:59:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770911958; cv=none; b=ifCoDGK4iIRVZtMEXPweYis4afoogZJ3MfE8OE82YMvDK8kC/oZzkOhwbNVWIuWJv+jcGgwj98W2PHv88uCwfSG7lfFA54oLShBxtbWR5wwhMNcP4Sg+egJacP1ZV356PQD8Hwgpuiem1HckGu/qWb4IrP/jm1ZQEoIhAT/uBi4=
+	t=1770911960; cv=none; b=DsghSkhn2t4hi7Dl2IzGzo2sgOsElrnRafoqXqWU6ktsIWIOGJEnAT4Kw26qEYhaII96eGVmIX6PWEvx6BVQsOKdDrF0c+IwruizdJ3DRKDE+5bnl620qb45goxv4vVB6xx5hcYYR6LTWjtq6GOoT8ZC6pCDEYq/pr1pCWp1fHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770911958; c=relaxed/simple;
-	bh=s4DygJeXL0KLLS5zyD1EU8BmPQvpE/qt7AMgOQ0hWEQ=;
+	s=arc-20240116; t=1770911960; c=relaxed/simple;
+	bh=4LHE5WLYNB6gyN85lIMig0mQ2kzlCE0cLPzqj3TDstc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LpBs45eR3NJDByka6i3/hLxG+ADec1y0LJ9yechH3Yk9HlgO4K7DINfMip8vmqTcINOcaEYME3BAjytbwtK814b2YgHqk9hq8RluC18HtUCrrP4H5raY00Vadg25kuFaSTQIt1ceStudLHgXxQrVsAzwebsOPGRm/Gg8k9e205I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=taYhWl0V; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=YMJCwwOH5tw4C2fgqOCcUPMfVpkuXUWZy1irDrTX3ctp6n3BkXVUw+erHPM39mylzE6bHOc0zLqjSZbS+duN0R3CFIuyQj1LShLyUrjpvGs0q2QnfgBDnMhxlRa5r+qZwug6ZH6tSEdMbxy/abYjSjPWtC+sx7FLHXn6CoBj2PA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fcdheKUJ; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a92a3f5de9so22262115ad.2
-        for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 07:59:17 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c61dee98720so4300907a12.0
+        for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 07:59:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770911957; x=1771516757; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1770911959; x=1771516759; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NXWGIZTswQvFKRAzrwUvmCg40y2DnJJnM3/XWRTJ8no=;
-        b=taYhWl0VakB0+GWUKmGV5DQjC/DmSRoYMX3fcdswEOWsXo85OAOOeEuzw9x1nx7lhV
-         z6QUtL2RtrTl5n1TbCjWO9juQn9hiLOLlUh7fE0eos6LYAxCkXy7dEBmjGG2o2kMADQi
-         iTaJxSI3GxCSyvSt+gWRR79luHr1yPitmZwidq+2KmF97naRUEFMVJMYsmQHk09QL+kY
-         dV2Eya9KLQiT7Et+pLS5R2L3tUZjdbJetRv3QKzhx+wwLXBRq2qPySCmFK+fNXv1jlzy
-         yA1eYGC45t8YkIHRjN1DOklxmQ/zbQHCWLDoWBQ4v27dAdcr88uBXI57N5ls1c00xZjG
-         IIEg==
+        bh=xlVjUD6X+DWJ5GX5AGAVyWl05TJtGeS8hkpBTgsS/Ys=;
+        b=fcdheKUJhL9Lap3mGGAKBOr+zq2hA39ls5F0YVRWa0MXSrdnvEI15eiQCi1r2Rnltt
+         X3XpzCdhNIxyYR4WpECd+AlYjqInVexoaJcH8KqFGWC+pAC4KMNdbCySB97iNwuCnIjf
+         6a6mMBzdKBsJyscUWEhaJGrOT5EZsqkxuyVTGKsqvxeVgJ+tYb7AsCYymNSxKPMgNLrO
+         2nzod//MxHomQnBTxphDr9v3uY5MA7tWVluTCuQGCh22k9/YuDwnVFceN4XRuWdJQJV3
+         EeNAX0jcQaUYHNM6zxYe8E3nc5ie9Q6AogrgF4KDzOo6G4BlI2TPH6A02N1ylzm4Wfdl
+         1gTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770911957; x=1771516757;
+        d=1e100.net; s=20230601; t=1770911959; x=1771516759;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NXWGIZTswQvFKRAzrwUvmCg40y2DnJJnM3/XWRTJ8no=;
-        b=QivDs4UIC1oLoQmxPI06mDFlYtYTvZ6YJ1o0BLoXEiIvc3Qpjy/gWYnRTBuB40MtnD
-         T/flg+DVdU8ZykL7f4/6bKOvq7CShciMZrKoBikDiUGQm0Smrcx9ozT/ncqjO4xkja3Z
-         1RLBr/zSu/1KnoTrfCAff5a964Ncx2kt9VziBK4fHxZPRMXQuQvFI2YiSKiYwlSs8Eci
-         nKBFNsyQhj4KytMEdShTnsBo8QxzwLQwSaISr7cTYKuRVsjZyfxTYHXYDw0QD2HcQIcn
-         Hxg5/IXT9tjX4e0O8U+TDnTN3BVVDSKuTOkHheMGuPLaflaN6GEZeJNx4kjNxl0bHM3n
-         uTOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVHqjfKzHRXLNDQc71kXXgvzaXLgNDWaanqtK1hL/wISXDLwcetHaVgy1ExRHurro76Ph8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6kDjgLka3nL4WJv49tB4iPCIwjhPQl3eNRnXUZzxqJuY8VFZh
-	d304aXiz2wMR5Ka0Mtce2Bf8RYIQtoS9qVo14lLsSK/lHcJHeB2xmq+77/Mlf2Z+NbuMNX+3Srt
-	/7Rh3jD4O47DwIA==
-X-Received: from plbje12.prod.google.com ([2002:a17:903:264c:b0:2ab:f1d:4446])
+        bh=xlVjUD6X+DWJ5GX5AGAVyWl05TJtGeS8hkpBTgsS/Ys=;
+        b=MQUru+CUe9CxfG43AkPl1J5NsrI7f2XEONWsMOOXygxuxI8bxVQToAcZad2dHak9cF
+         AU4Gw5MS3+Kn+SuPO9uTnxV/CtPmpTfLCOA+AJ6VxQu9+6Ttkze9fNAV/LwKVGDGIZDq
+         KORFDfkMd5QZ7QxOUfWy2JlJd2gl/lwHdb2YBfAaslcC4Ge57ESo77xUA7ONx7Tt8S2L
+         OgdLAIRl7Gbn3+DOj4fNO5Z7CBXk8XZhh8YBJbqjqdcxjIwqnz+7GWTEa+dJmG6cMs9W
+         lBgGi/BBvUnCn3KFwokqqnErPaZj2hJPKz8ur4axrQSi/+nYMjdc+gvWIQpEyD9V/A1U
+         Hf7g==
+X-Forwarded-Encrypted: i=1; AJvYcCXlo3BliSVLwKSYc1/8hxyz/RxfWWaXTst5gUrlTFbypn58oWYS04O6PBXy0QoTNMIjZPo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygmZ6TmX6t26b9sOyu/Qw2a5ZapW5BH8wlmUx0gVBvNjIpn4xM
+	TrYG2rL61WT7i962nVZrkoP00pURCPYlvnL/UJY4eWKfnAL6X+WsW5t99Z5MXKuahm6Gn85mviI
+	8WgaMDTFjHPEtwg==
+X-Received: from pgab127.prod.google.com ([2002:a63:3485:0:b0:c6e:2e0d:72cc])
  (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:d2d1:b0:2a9:602c:159 with SMTP id d9443c01a7336-2ab3b1a00c3mr29570985ad.19.1770911956923;
- Thu, 12 Feb 2026 07:59:16 -0800 (PST)
-Date: Thu, 12 Feb 2026 07:58:51 -0800
+ 2002:a05:6a20:7284:b0:392:e5eb:f0f with SMTP id adf61e73a8af0-3944897a82fmr3339452637.68.1770911958649;
+ Thu, 12 Feb 2026 07:59:18 -0800 (PST)
+Date: Thu, 12 Feb 2026 07:58:52 -0800
 In-Reply-To: <20260212155905.3448571-1-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260212155905.3448571-1-jmattson@google.com>
 X-Mailer: git-send-email 2.53.0.239.g8d8fc8a987-goog
-Message-ID: <20260212155905.3448571-4-jmattson@google.com>
-Subject: [PATCH v4 3/8] KVM: x86: nSVM: Set vmcb02.g_pat correctly for nested NPT
+Message-ID: <20260212155905.3448571-5-jmattson@google.com>
+Subject: [PATCH v4 4/8] KVM: x86: nSVM: Redirect IA32_PAT accesses to either
+ hPAT or gPAT
 From: Jim Mattson <jmattson@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
@@ -93,7 +94,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -104,61 +105,151 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-70993-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70994-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3108512F2E2
+X-Rspamd-Queue-Id: 6A29A12F2F2
 X-Rspamd-Action: no action
 
-When nested NPT is enabled in vmcb12, copy the (cached and validated)
-vmcb12 g_pat field to the guest PAT register. Under KVM, the guest PAT
-register lives in svm->nested.save.g_pat.
+When the vCPU is in guest mode with nested NPT enabled, guest accesses to
+IA32_PAT are redirected to the gPAT register, which is stored in
+svm->nested.save.g_pat.
 
-When NPT is enabled, but nested NPT is disabled, copy L1's IA32_PAT MSR to
-the vmcb02 g_pat field, since L2 shares the IA32_PAT MSR with L1.
+Non-guest accesses (e.g. from userspace) to IA32_PAT are always redirected
+to hPAT, which is stored in vcpu->arch.pat.
 
-When NPT is disabled, the g_pat field is ignored by hardware.
+This is architected behavior. It also makes it possible to restore a new
+checkpoint on an old kernel with reasonable semantics. After the restore,
+gPAT will be lost, and L2 will run on L1's PAT. Note that the old kernel
+would have always run L2 on L1's PAT.
+
+Add WARN_ON_ONCE to both svm_get_msr() and svm_set_msr() to flag any
+host-initiated accesses originating from KVM itself rather than userspace.
 
 Fixes: 15038e147247 ("KVM: SVM: obey guest PAT")
 Signed-off-by: Jim Mattson <jmattson@google.com>
 ---
- arch/x86/kvm/svm/nested.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/nested.c |  9 ---------
+ arch/x86/kvm/svm/svm.c    | 37 ++++++++++++++++++++++++++++++-------
+ arch/x86/kvm/svm/svm.h    | 17 ++++++++++++++++-
+ 3 files changed, 46 insertions(+), 17 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 91b35adb83f8..dc8275837120 100644
+index dc8275837120..69b577a4915c 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -724,9 +724,6 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm)
- 	struct vmcb *vmcb02 = svm->nested.vmcb02.ptr;
- 	struct kvm_vcpu *vcpu = &svm->vcpu;
+@@ -706,15 +706,6 @@ static int nested_svm_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
+ 	return 0;
+ }
  
--	nested_vmcb02_compute_g_pat(svm);
--	vmcb_mark_dirty(vmcb02, VMCB_NPT);
+-void nested_vmcb02_compute_g_pat(struct vcpu_svm *svm)
+-{
+-	if (!svm->nested.vmcb02.ptr)
+-		return;
 -
- 	/* Load the nested guest state */
- 	if (svm->nested.vmcb12_gpa != svm->nested.last_vmcb12_gpa) {
- 		new_vmcb12 = true;
-@@ -757,6 +754,13 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm)
- 		vmcb_mark_dirty(vmcb02, VMCB_CET);
+-	/* FIXME: merge g_pat from vmcb01 and vmcb12.  */
+-	vmcb_set_gpat(svm->nested.vmcb02.ptr, svm->vmcb01.ptr->save.g_pat);
+-}
+-
+ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm)
+ {
+ 	struct vmcb_ctrl_area_cached *control = &svm->nested.ctl;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 529cbac57814..205bf07896ad 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2837,6 +2837,21 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_AMD64_DE_CFG:
+ 		msr_info->data = svm->msr_decfg;
+ 		break;
++	case MSR_IA32_CR_PAT:
++		/*
++		 * When nested NPT is enabled, L2 has a separate PAT from
++		 * L1.  Guest accesses to IA32_PAT while running L2 target
++		 * L2's gPAT; host-initiated accesses always target L1's
++		 * hPAT for backward and forward KVM_GET_MSRS compatibility
++		 * with older kernels.
++		 */
++		WARN_ON_ONCE(msr_info->host_initiated && vcpu->wants_to_run);
++		if (!msr_info->host_initiated && is_guest_mode(vcpu) &&
++		    nested_npt_enabled(svm))
++			msr_info->data = svm->nested.save.g_pat;
++		else
++			msr_info->data = vcpu->arch.pat;
++		break;
+ 	default:
+ 		return kvm_get_msr_common(vcpu, msr_info);
  	}
+@@ -2920,13 +2935,21 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
  
-+	if (nested_npt_enabled(svm)) {
-+		if (unlikely(new_vmcb12 || vmcb12_is_dirty(control, VMCB_NPT)))
-+			vmcb_set_gpat(vmcb02, svm->nested.save.g_pat);
-+	} else if (npt_enabled) {
-+		vmcb_set_gpat(vmcb02, vcpu->arch.pat);
-+	}
+ 		break;
+ 	case MSR_IA32_CR_PAT:
+-		ret = kvm_set_msr_common(vcpu, msr);
+-		if (ret)
+-			break;
+-
+-		vmcb_set_gpat(svm->vmcb01.ptr, data);
+-		if (is_guest_mode(vcpu))
+-			nested_vmcb02_compute_g_pat(svm);
++		if (!kvm_pat_valid(data))
++			return 1;
++		/*
++		 * When nested NPT is enabled, L2 has a separate PAT from
++		 * L1.  Guest accesses to IA32_PAT while running L2 target
++		 * L2's gPAT; host-initiated accesses always target L1's
++		 * hPAT for backward and forward KVM_SET_MSRS compatibility
++		 * with older kernels.
++		 */
++		WARN_ON_ONCE(msr->host_initiated && vcpu->wants_to_run);
++		if (!msr->host_initiated && is_guest_mode(vcpu) &&
++		    nested_npt_enabled(svm))
++			svm_set_gpat(svm, data);
++		else
++			svm_set_hpat(svm, data);
+ 		break;
+ 	case MSR_IA32_SPEC_CTRL:
+ 		if (!msr->host_initiated &&
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index a49c48459e0b..88549705133f 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -607,6 +607,22 @@ static inline bool nested_npt_enabled(struct vcpu_svm *svm)
+ 	return svm->nested.ctl.misc_ctl & SVM_MISC_ENABLE_NP;
+ }
+ 
++static inline void svm_set_gpat(struct vcpu_svm *svm, u64 data)
++{
++	svm->nested.save.g_pat = data;
++	vmcb_set_gpat(svm->nested.vmcb02.ptr, data);
++}
 +
- 	kvm_set_rflags(vcpu, save->rflags | X86_EFLAGS_FIXED);
++static inline void svm_set_hpat(struct vcpu_svm *svm, u64 data)
++{
++	svm->vcpu.arch.pat = data;
++	if (npt_enabled) {
++		vmcb_set_gpat(svm->vmcb01.ptr, data);
++		if (is_guest_mode(&svm->vcpu) && !nested_npt_enabled(svm))
++			vmcb_set_gpat(svm->nested.vmcb02.ptr, data);
++	}
++}
++
+ static inline bool nested_vnmi_enabled(struct vcpu_svm *svm)
+ {
+ 	return guest_cpu_cap_has(&svm->vcpu, X86_FEATURE_VNMI) &&
+@@ -840,7 +856,6 @@ void nested_copy_vmcb_control_to_cache(struct vcpu_svm *svm,
+ void nested_copy_vmcb_save_to_cache(struct vcpu_svm *svm,
+ 				    struct vmcb_save_area *save);
+ void nested_sync_control_from_vmcb02(struct vcpu_svm *svm);
+-void nested_vmcb02_compute_g_pat(struct vcpu_svm *svm);
+ void svm_switch_vmcb(struct vcpu_svm *svm, struct kvm_vmcb_info *target_vmcb);
  
- 	svm_set_efer(vcpu, svm->nested.save.efer);
+ extern struct kvm_x86_nested_ops svm_nested_ops;
 -- 
 2.53.0.239.g8d8fc8a987-goog
 
