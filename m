@@ -1,183 +1,190 @@
-Return-Path: <kvm+bounces-70956-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70960-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qI/qMojdjWna8AAAu9opvQ
-	(envelope-from <kvm+bounces-70956-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:02:48 +0100
+	id 4OOKH2bfjWnE8AAAu9opvQ
+	(envelope-from <kvm+bounces-70960-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:10:46 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B50E12E10F
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:02:48 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C918C12E275
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:10:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 801473015D85
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 14:02:46 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 196BC303322C
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 14:10:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E2A346E5A;
-	Thu, 12 Feb 2026 14:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2460D35C1B8;
+	Thu, 12 Feb 2026 14:10:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JDm407du"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Sh1E5NJy";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="4GvtexwN";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Sh1E5NJy";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="4GvtexwN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7972A2C234A;
-	Thu, 12 Feb 2026 14:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC1335C1B7
+	for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 14:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770904962; cv=none; b=d7wf6DbhBCdK9f6HO+lqei/tjE4b1t6GuLGD/7CqfvZ0R10HjOWAjywCcMpUvxLsPAG84APf8h7HSch69v0rfLxqmV82OOEEPX+WMCvwvgHj9jRr/tzGE6CNZYVUO67NzGZ9UNLXb3/53dNoIRnwKnw1b7FVtpEA1OgMbKI6YDw=
+	t=1770905442; cv=none; b=r7vflkyIbCJAP697O35t8gYFGnh+gQVfo3oQeUaQuK8S3RQOPm+UEpBbewoOqffQBLfsB/6ZA4wU+7CnYQ3jl2BcpH7JvDEfA2GqIfbfYkVkdcU6CCoT2LEXr4KzYajK/RXcTtOAryFsI2dAZguDAWUzTgSQkOKvLVdka9Qj+6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770904962; c=relaxed/simple;
-	bh=iS+s19X3jjjts8Df2O63rWj3hlfZLHXYx/c7cTEzgEI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nQ0BmD+9UMxdBG8JSudd0lpPIS4qq51ZJnEJS12BEIobfLz5BLWggS0YP2TfQYZSCWt3dwgDTkIlQ5nKMZWndTfnNsXy8iMyzJqma+2tHHTmEJx6bXe+dfTuaS//SwDFFFewcIyXJeSkBoTsnZIJG3bkCDvC6u/+yCadPcZ6MCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=JDm407du; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61C741v5473751;
-	Thu, 12 Feb 2026 14:02:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=tmqPTD
-	XRn4fBwC657wa097v50m21rpJjL5kQW52yC6U=; b=JDm407du5dtyjZgys88DD2
-	N3eS18wKZhc86+U9mVpJOTq0LpxnVHnAWRjq5Rj7oqzSbXRikpbsloLl9uYi3/y1
-	and3Q9SVl4J/bYaA85gukYlV1Xs+HJkQTqknY5NDYBTmvyQCOpK4nrj7zOZmEb4I
-	IzMKErdCXc4tvAg3/JdUEfmtP/FhZFLsnjB0aEbeVUwgpITVLzLoHW1CUx6GIPb9
-	30DK0bQKc0KTMFOfp8/Huw5AnX2jfx1+V8NjOY3bt1pbFIViPNTjweNDEiNQJh3N
-	4LmMuL/RghdTT/0P/1K1nf9ZYG0/nNBMzhUS1FZtWwiABd+RojzXvms4B5OZjjZw
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c696x3qvx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Feb 2026 14:02:36 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61CCGKve008404;
-	Thu, 12 Feb 2026 14:02:35 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4c6g3yjrt3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Feb 2026 14:02:35 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61CE2VWp61669810
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 12 Feb 2026 14:02:31 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C533E20040;
-	Thu, 12 Feb 2026 14:02:31 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 79D4F2004B;
-	Thu, 12 Feb 2026 14:02:31 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 12 Feb 2026 14:02:31 +0000 (GMT)
-From: Julian Ruess <julianr@linux.ibm.com>
-Date: Thu, 12 Feb 2026 15:02:17 +0100
-Subject: [PATCH 3/3] MAINTAINERS: add VFIO ISM PCI DRIVER section
+	s=arc-20240116; t=1770905442; c=relaxed/simple;
+	bh=jDyKRBmt0G41/VH3KfVNBmriwhTGiamLDB//4wIkoz4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=C+OvFdhGZeVJAHrJNKWYyc6HXz96mmFU6SCUpsBqnIzbaElObukn5oxn/7+zjAL8v4Xs91edIfYamdIlaEcv9Yc2DE92NhS3kwudbPEOcQ+jSFvpJENxVR4rJbZMxn9XQhZwJHxJnTTGmQfdUBnyl67ICL8swtsXcItxAN35OBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Sh1E5NJy; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=4GvtexwN; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Sh1E5NJy; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=4GvtexwN; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 52B333E6DD;
+	Thu, 12 Feb 2026 14:10:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1770905439; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=/YrbUClmQVL1U5uh49SxY9lMMVv9VNYSFUFYMwRRmQA=;
+	b=Sh1E5NJyPsuCoJnfDS59MPtfBo+qDL5BZ8Ahy+W1Y1FFR3gpQDJhO7vRere+4IhvfE7SMh
+	LJShsWZSEe9a8qt/GHT19eOCd8h+4p4HEJZ8b7fiVb4l/wH4XuiYPMhcb2N8eLrm2kBFwm
+	hI+ANLPW0kMpsvO0DhKE50kiTDFxm6M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1770905439;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=/YrbUClmQVL1U5uh49SxY9lMMVv9VNYSFUFYMwRRmQA=;
+	b=4GvtexwNPsZ3e4rJ71vocCu2u5M6Z3E8fS6WgYAT8Yae8Da4QoJefjrTVUlXXH9W8ZAgqI
+	/lHKxdMCobN6IMCQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1770905439; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=/YrbUClmQVL1U5uh49SxY9lMMVv9VNYSFUFYMwRRmQA=;
+	b=Sh1E5NJyPsuCoJnfDS59MPtfBo+qDL5BZ8Ahy+W1Y1FFR3gpQDJhO7vRere+4IhvfE7SMh
+	LJShsWZSEe9a8qt/GHT19eOCd8h+4p4HEJZ8b7fiVb4l/wH4XuiYPMhcb2N8eLrm2kBFwm
+	hI+ANLPW0kMpsvO0DhKE50kiTDFxm6M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1770905439;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=/YrbUClmQVL1U5uh49SxY9lMMVv9VNYSFUFYMwRRmQA=;
+	b=4GvtexwNPsZ3e4rJ71vocCu2u5M6Z3E8fS6WgYAT8Yae8Da4QoJefjrTVUlXXH9W8ZAgqI
+	/lHKxdMCobN6IMCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7C5C13EA62;
+	Thu, 12 Feb 2026 14:10:38 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id gAuEG17fjWkSJAAAD6G6ig
+	(envelope-from <clopez@suse.de>); Thu, 12 Feb 2026 14:10:38 +0000
+From: =?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>
+To: kvm@vger.kernel.org,
+	seanjc@google.com,
+	pbonzini@redhat.com
+Cc: =?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+	linux-hardening@vger.kernel.org (open list:KERNEL HARDENING (not covered by other areas):Keyword:\b__counted_by(_le|_be)?\b)
+Subject: [PATCH] KVM: x86/pmu: annotate struct kvm_x86_pmu_event_filter with __counted_by()
+Date: Thu, 12 Feb 2026 15:05:56 +0100
+Message-ID: <20260212140556.3883030-2-clopez@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260212-vfio_pci_ism-v1-3-333262ade074@linux.ibm.com>
-References: <20260212-vfio_pci_ism-v1-0-333262ade074@linux.ibm.com>
-In-Reply-To: <20260212-vfio_pci_ism-v1-0-333262ade074@linux.ibm.com>
-To: schnelle@linux.ibm.com, wintera@linux.ibm.com, ts@linux.ibm.com,
-        oberpar@linux.ibm.com, gbayer@linux.ibm.com,
-        Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Shameer Kolothum <skolothumtho@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Cc: mjrosato@linux.ibm.com, alifm@linux.ibm.com, raspl@linux.ibm.com,
-        hca@linux.ibm.com, agordeev@linux.ibm.com, gor@linux.ibm.com,
-        julianr@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-pci@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=WZYBqkhX c=1 sm=1 tr=0 ts=698ddd7c cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8
- a=VwQbUJbxAAAA:8 a=Ikd4Dj_1AAAA:8 a=N04f8XHk16Uzgq2NRSwA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: vm_oryJQ4MZObU8Y1D8-iHXUu2E0M2me
-X-Proofpoint-ORIG-GUID: vm_oryJQ4MZObU8Y1D8-iHXUu2E0M2me
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjEyMDEwNCBTYWx0ZWRfX5hZKwaP5Pj6d
- 2Qr9xdvlifsUyoju/hVBjA0okCcJizyINBMyQoZ8mbvtLuPDp8C1mAtKPzwzfO1SMsMaIS4BOFE
- V/FOWUOyOQuXRa6fmSp1V5FfasFgfYghf8a7rAywMvKN4BtX9GatEAcaK5NZkyqLwu7aIoP3htT
- kFHEgLSxZ8+cQ+If3+CCk5zVD9gyKZMOf+83oDhMQKYX0Hp0zz9XEyIcIm+o2L5OZqH+iRkSHX0
- /tKd7FvZGdwe3ozg97envwZMbuFBOZtBsC0godOaeWULRWtE2CiyrEP+KulPyQOGDCjs+SBSpmW
- NXSf7IhwRZhae6WR8qPn9Z7+4dGxJ23Y0nw8eH6KxsIX5EGJidKeDCow5YEwVWwAvQFTudHS04O
- 3cGfhBS+E+JVE3iKVLQbP1vfN1uvcgknXOmtegQLZ7QynQqCPCmNmn2nGabsmr9WuT4ETzZrt4q
- y5Vk6dt5joLuutWqBkg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-12_04,2026-02-12_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 clxscore=1015 phishscore=0 bulkscore=0 adultscore=0
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 impostorscore=0
- malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2602120104
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -3.30
+X-Spam-Level: 
+X-Spam-Flag: NO
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	TAGGED_RCPT(0.00)[kvm];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[julianr@linux.ibm.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nvidia.com:email];
-	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70956-lists,kvm=lfdr.de];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 5B50E12E10F
+	TAGGED_FROM(0.00)[bounces-70960-lists,kvm=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[clopez@suse.de,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C918C12E275
 X-Rspamd-Action: no action
 
-ism_vfio_pci is a new kernel component that allows
-to use the ISM device from userspace. Add myself
-as a maintainer.
+struct kvm_x86_pmu_event_filter has a flexible array member, so annotate
+it with the field that describes the amount of entries in such array.
+Opportunistically replace the open-coded array size calculation with
+flex_array_size() when copying the array portion of the struct from
+userspace.
 
-Acked-by: Alexandra Winter <wintera@linux.ibm.com>
-Signed-off-by: Julian Ruess <julianr@linux.ibm.com>
+Signed-off-by: Carlos López <clopez@suse.de>
 ---
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/x86/include/asm/kvm_host.h | 2 +-
+ arch/x86/kvm/pmu.c              | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e087673237636268346979ddc270f8cf0905c722..e9d025ea396e71102463a50b2934827175356da2 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -27393,6 +27393,12 @@ L:	kvm@vger.kernel.org
- S:	Maintained
- F:	drivers/vfio/pci/hisilicon/
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index ff07c45e3c73..d9159b969bd9 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1261,7 +1261,7 @@ struct kvm_x86_pmu_event_filter {
+ 	__u32 nr_excludes;
+ 	__u64 *includes;
+ 	__u64 *excludes;
+-	__u64 events[];
++	__u64 events[] __counted_by(nevents);
+ };
  
-+VFIO ISM PCI DRIVER
-+M:	Julian Ruess <julianr@linux.ibm.com>
-+L:	kvm@vger.kernel.org
-+S:	Maintained
-+F:	drivers/vfio/pci/ism/
-+
- VFIO MEDIATED DEVICE DRIVERS
- M:	Kirti Wankhede <kwankhede@nvidia.com>
- L:	kvm@vger.kernel.org
+ enum kvm_apicv_inhibit {
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index bd6b785cf261..e218352e3423 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -1256,7 +1256,7 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+ 
+ 	r = -EFAULT;
+ 	if (copy_from_user(filter->events, user_filter->events,
+-			   sizeof(filter->events[0]) * filter->nevents))
++			   flex_array_size(filter, events, filter->nevents)))
+ 		goto cleanup;
+ 
+ 	r = prepare_filter_lists(filter);
 
+base-commit: e944fe2c09f405a2e2d147145c9b470084bc4c9a
 -- 
 2.51.0
 
