@@ -1,148 +1,196 @@
-Return-Path: <kvm+bounces-70932-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70933-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UAsdI3uYjWkt5AAAu9opvQ
-	(envelope-from <kvm+bounces-70932-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 10:08:11 +0100
+	id CNTFIX6cjWlT5QAAu9opvQ
+	(envelope-from <kvm+bounces-70933-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 10:25:18 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03DB012BBCF
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 10:08:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B5CF412BD71
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 10:25:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 092B13020F33
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 09:08:02 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6CE783014065
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 09:25:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A92B2DE6F5;
-	Thu, 12 Feb 2026 09:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DA8F2DF3DA;
+	Thu, 12 Feb 2026 09:25:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SRDzJd4y"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QbMQgdxy"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39575F50F;
-	Thu, 12 Feb 2026 09:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5035D23717F;
+	Thu, 12 Feb 2026 09:25:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770887274; cv=none; b=USUufp7/MC0mE7gJ5Nj+jnDtC13KLPK7HkrS3PEibZnpoPS+2rb906iceoPSDKU7dR4+M3UWmHdJ7Rs8f2zFjK+ZCMCGAcg9sQ1254mLZspQsw7rHwNGLEDZyTDaMMt77SqhyIgmr4hTD2PDBYcvcpxADJw55QFlkY8UJcuVy9k=
+	t=1770888312; cv=none; b=MeQmhx0dpytLaFOR47jTMYSRI43HzLGP+EL0OsGsS4QD7Cl9Oj/vlMHuJ8subEC8ddfCvFPsQPEHelIVTbNaGWO5CawoRdDI55mRFCfLQuojwp4aOhZrpJOhkgnAbbKbKCiPSj7j3VSB0D0FNhjeqUaU5TsYLLOt1x0SH35ZMg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770887274; c=relaxed/simple;
-	bh=7X/ZE+464SFMrcWXG+fw9L92P1t1gtPIejSOE1mm8Sg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CRYqH6osKWZFuXlKUnqfxev2UCZyTQthLX7UK7YTtsqGd2Tqj2AEMx0ya7YCvyARL+3UHvUXbEUo4zK720XJ6qTwW/vHkf0+cy0jJBArRUnyh/yfVtlWu9NPZT/c9eJdQrqSh15Mk2C2lFdzYDLJO4nvgOmj2pHjoMJwLKInlsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SRDzJd4y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1428BC4CEF7;
-	Thu, 12 Feb 2026 09:07:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770887274;
-	bh=7X/ZE+464SFMrcWXG+fw9L92P1t1gtPIejSOE1mm8Sg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SRDzJd4y7pdwghuIRwEX+milR/vWqoeZRao4cczsY/oRSB7rXxGuJLbC8pO7iCSw4
-	 /1fHpKlD9QC8Pr36ty9iBxiTNpXaDNYp9kxfY175hoKc70tInFruadKyuacdByotDw
-	 giDuJK9Yv4AbMPDUN5IleiHk09y0vDFg4IFOf1Va0BfXrwqu9s3EcPhdfYle0DOYSg
-	 Po0zabmL17OlVZC5nq6r8y/4vDgWU5l1/ykpkYYbjQp+nF7oNrOcToyCcJwcrWAWRT
-	 TlUDUSJIbuvgS7XUw4PVNj+qOU1x9wo3jckCVZzmRgQeTQjpQnhNQht/dATAuEMT5X
-	 Wv6weRnqIFc7A==
-Received: from [185.219.108.64] (helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vqSfv-0000000AYzI-2Zos;
-	Thu, 12 Feb 2026 09:07:51 +0000
-Date: Thu, 12 Feb 2026 09:07:33 +0000
-Message-ID: <86ldgyba96.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mingwei Zhang <mizhang@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v6 09/19] KVM: arm64: Write fast path PMU register handlers
-In-Reply-To: <20260209221414.2169465-10-coltonlewis@google.com>
-References: <20260209221414.2169465-1-coltonlewis@google.com>
-	<20260209221414.2169465-10-coltonlewis@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1770888312; c=relaxed/simple;
+	bh=BrGqZSomPd2cGkdUmMWcBpwMlLdo741geisUZbV4og4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ESphHg9LPmmXG/RLhk0K6+yNdQTzC2dAksiGa6vu7ySnPPVcRCDjfT/dM/qjdQv1C8LV9/Un4iUk6U4442NgwLYQMQ0xfTJBob33aA+LCNJwZ5ujAu2nNfQKf0sOT+yMeC8Z+hZ7L6wNO+0hWoN9UFDxZFvAWiS373Tk4q4JrHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QbMQgdxy; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61C5KfaK027884;
+	Thu, 12 Feb 2026 09:25:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=ofdNzYsQ0eTUk++pFWVmL5EeU+ZD
+	WS7PT3nnHr23HpM=; b=QbMQgdxyveLTepcbm49Doj4x8Jvlfi1cYCER7X6qplz4
+	4BVZmGM8k6p7z8J/YCmvY5lu0Qy8EoQ1gnplPUTMgIU65pg4fhVq9AxJsMjk64MK
+	57KXsLY2YmU8rkwplfOpqVuFIcTWV2iwgZ+9eyztQLmdbsW62N98KvfLGuPFeC82
+	1h5VLfhu9ofXtU6NRfD4KEWKrCYp18PJev5Pbp4V5VlGpS/TpQtq2uBBP6IxvNaF
+	VoXoG7CenIRNJyby8B7rDaUjrEDgQZacVxrTAqxXJopDBabBFVNycF6JBK9ZXv7/
+	bu6/oTYsG9AFbprI+YGOvoatGbEqZSTKERQSacHcCQ==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c696x2rw2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Feb 2026 09:25:09 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61C959js019277;
+	Thu, 12 Feb 2026 09:25:09 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4c6hxk9ksc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Feb 2026 09:25:08 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61C9P5tm51380664
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 12 Feb 2026 09:25:05 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 155992004B;
+	Thu, 12 Feb 2026 09:25:05 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5AC1D20043;
+	Thu, 12 Feb 2026 09:25:04 +0000 (GMT)
+Received: from [192.168.88.251] (unknown [9.111.23.205])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 12 Feb 2026 09:25:04 +0000 (GMT)
+From: Christoph Schlameuss <schlameuss@linux.ibm.com>
+Subject: [PATCH 0/4] KVM: s390: vsie: Implement ASTFLEIE facility 2
+Date: Thu, 12 Feb 2026 10:24:54 +0100
+Message-Id: <20260212-vsie-alter-stfle-fac-v1-0-d772be74a4da@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, alexandru.elisei@arm.com, pbonzini@redhat.com, corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, mizhang@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3NQQqFMAxF0a1IxgZsFVG3Ig6qphoQlaSIIt27/
+ X94Bve9F5SESaHLXhC6WPnYE0yewbS6fSHkORlsYevC2BYvZUK3BRLU4DdC7yYcy9k2Y1s1pqo
+ hpaeQ5/s/2w/JK2s45Pm9xBg/SUueOnUAAAA=
+X-Change-ID: 20260129-vsie-alter-stfle-fac-b3d28b948146
+To: linux-s390@vger.kernel.org
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Hendrik Brueckner <brueckner@linux.ibm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>, kvm@vger.kernel.org,
+        Christoph Schlameuss <schlameuss@linux.ibm.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1321;
+ i=schlameuss@linux.ibm.com; h=from:subject:message-id;
+ bh=BrGqZSomPd2cGkdUmMWcBpwMlLdo741geisUZbV4og4=;
+ b=owGbwMvMwCUmoqVx+bqN+mXG02pJDJm9c/LkavzFZj7L+dfo+OR95KRq5XiBsrTZ/u+2Xsx+w
+ LntX1tuRykLgxgXg6yYIku1uHVeVV/r0jkHLa/BzGFlAhnCwMUpABNx52X4n+FwgydlZxNj2Ie3
+ C95XGXtP9H9x5P7x/fkPd8++91G6ewcjQ//VxCqXr5GS78TzdzOz1O0vsOWcbMLal9P87Lrr1Xd
+ CTAA=
+X-Developer-Key: i=schlameuss@linux.ibm.com; a=openpgp;
+ fpr=0E34A68642574B2253AF4D31EEED6AB388551EC3
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=WZYBqkhX c=1 sm=1 tr=0 ts=698d9c75 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8
+ a=JTEGq0UErLZmNMgf6yQA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: MOfj5-ySv5pPyFy6mnXJzpLklkzIBb9o
+X-Proofpoint-ORIG-GUID: MOfj5-ySv5pPyFy6mnXJzpLklkzIBb9o
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjEyMDA2OCBTYWx0ZWRfX5SP6QmQPzs0F
+ jcf9kS6XSFDU9nS+AD4T8JSIo3iQqeE9uNONKyAt458NjWPdQBeSpIaVUZAK/FGuLw7gqDzYxfv
+ W+dSzZWR+ECTGNa+9hhp/fEQA0SQTF/LudYxF9HkhTCaWW/qqMJCgm33LB4Vh4yihU9GYw09m5G
+ T+PyAdFhWf5CIOkXKNn49rBvM388RbU65OnUyoq/PnnPUJkEyxokZZutat0l5x4Ve3pD45x6gSM
+ 2aGlrc7o1AaQ3mmD4GCMzLDMTqxHvC1Q9ZDes8+R0r5Nrf3yStyeiXWRFhzkoBS26EIep9K+YvH
+ 3KzOUMIHNwqQZhaBxRj69jIfPaGye6tNnyAtcV01bfDo4iM0Y7gqHbZAZp96ejfTcd4cbMJH12R
+ EH7opZrQCbSuclGeugggV3hEDJY2bkAZlmL5op+StSY6H42SCDMetedfxOsZeTr6NWUyX6xzVgv
+ JhIrGuZPMTE2OEOe2ZQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-12_02,2026-02-11_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 clxscore=1015 phishscore=0 bulkscore=0 adultscore=0
+ priorityscore=1501 lowpriorityscore=0 suspectscore=0 impostorscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2602120068
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TAGGED_FROM(0.00)[bounces-70932-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[11];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 03DB012BBCF
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[schlameuss@linux.ibm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70933-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[ibm.com:+]
+X-Rspamd-Queue-Id: B5CF412BD71
 X-Rspamd-Action: no action
 
-On Mon, 09 Feb 2026 22:14:04 +0000,
-Colton Lewis <coltonlewis@google.com> wrote:
-> 
-> We may want a partitioned PMU but not have FEAT_FGT to untrap the
-> specific registers that would normally be untrapped. Add a handler for
-> those registers in the fast path so we can still get a performance
-> boost from partitioning.
-> 
-> The idea is to handle traps for all the PMU registers quickly by
-> writing directly to the hardware when possible instead of hooking into
-> the emulated vPMU as the standard handlers in sys_regs.c do.
+Add support for STFLE format 2 in VSIE guests.
 
-This seems extremely premature. My assumption is that PMU traps are
-rare, and that doing a full exit should be acceptable. Until you
-demonstrate the contrary, I don't want this sort of massive bloat in
-the most performance-critical path.
+The change requires qemu support to set the ASTFLEIE2 feature bit.
+ASTFLEIE2 is available since IBM z16.
+To function G1 has to run this KVM code and G1 and G2 have to run QEMU
 
-"Start walking before you try to run".
+Tests are implemented in kvm-unit-tests and sent as a series to that
+list.
 
-	M.
+Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+---
+The series was originally developed by Nina and only rebased and
+slightly adjusted by me. It was not sent earlier since the accompanying
+kvm-unit-tests and qemu changes were not ready.
 
+---
+Nina Schoetterl-Glausch (4):
+      KVM: s390: Minor refactor of base/ext facility lists
+      s390/sclp: Detect ASTFLEIE 2 facility
+      KVM: s390: vsie: Refactor handle_stfle
+      KVM: s390: vsie: Implement ASTFLEIE facility 2
+
+ arch/s390/include/asm/sclp.h     |  1 +
+ arch/s390/include/uapi/asm/kvm.h |  1 +
+ arch/s390/kvm/kvm-s390.c         | 46 ++++++++++------------
+ arch/s390/kvm/vsie.c             | 84 +++++++++++++++++++++++++++++++---------
+ drivers/s390/char/sclp_early.c   |  4 +-
+ 5 files changed, 91 insertions(+), 45 deletions(-)
+---
+base-commit: 05f7e89ab9731565d8a62e3b5d1ec206485eeb0b
+change-id: 20260129-vsie-alter-stfle-fac-b3d28b948146
+
+Best regards,
 -- 
-Without deviation from the norm, progress is not possible.
+Christoph Schlameuss <schlameuss@linux.ibm.com>
+
 
