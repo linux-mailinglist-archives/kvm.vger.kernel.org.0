@@ -1,194 +1,184 @@
-Return-Path: <kvm+bounces-70941-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70942-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ODg9IF+mjWkJ5wAAu9opvQ
-	(envelope-from <kvm+bounces-70941-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 11:07:27 +0100
+	id GJK7MHWrjWkK5wAAu9opvQ
+	(envelope-from <kvm+bounces-70942-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 11:29:09 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1359012C41B
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 11:07:27 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4232912C7EE
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 11:29:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A78313053BFB
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 10:05:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 471C7303432D
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 10:29:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92B42D8387;
-	Thu, 12 Feb 2026 10:05:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D404A2E8DE5;
+	Thu, 12 Feb 2026 10:29:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PNjwlmdB";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VB0Djb2H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PXShR+sm"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02FEA770FE
-	for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 10:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770890740; cv=pass; b=kVHNPTzF4mFMmyVGRM8QuzZv79xi4rFPBiM6Wap6vZbCGr4pL7lpHIJwU5yg7xd694vr4cNE7BghQfZqpOyLaWGCm3Ll5/Tu3C8wIACbs/JNOJk0SR7gD5FqUamrjBywHEAt3vAjtXOkWnt1oJyiW42Uafdpl0Fs2/iLEALUDaA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770890740; c=relaxed/simple;
-	bh=Palnk57ns0jhkex/FuwqU16gNGoFQGjPHHww4SgSmY0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cidaRz+VCPmNG0XiaYVog+H1IHcB93SIUlIQbCezQVoGvd8w5e4kgrSG0Uvf0VUs7ksiZt73u5jKDNOn9wlGqVSCOcn6mUKY0sjvb3dum0f4pVzEJBXP12ENx3gSYGGb7uES8/lG2VxpdvjvihaE+PXylYPBk313PZJmnZUB878=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PNjwlmdB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VB0Djb2H; arc=pass smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770890737;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=evg6KQG7cR7Shh7gkq+/8mq53gSxY6rXD1fbSI+f62k=;
-	b=PNjwlmdBh7pWsyIKmT1KcEKQQV2oZsOt8STcYeH6CQwBu1/wvHpO/Db0pG93rWWEYsDBK7
-	4RHocOa8w/G6POxeqaiQXk7m6op7PAP1n7z/dGqn7WvjoPXuVZyTAWPkAIq46jhtVWDY4b
-	sX/dKwcjepFYXP3JUUr2HzzECBfeB5g=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-580-1GLPkFRVNWiUZ4UzAMZPeg-1; Thu, 12 Feb 2026 05:05:36 -0500
-X-MC-Unique: 1GLPkFRVNWiUZ4UzAMZPeg-1
-X-Mimecast-MFC-AGG-ID: 1GLPkFRVNWiUZ4UzAMZPeg_1770890735
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4801bceb317so31422815e9.1
-        for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 02:05:36 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770890735; cv=none;
-        d=google.com; s=arc-20240605;
-        b=EjmEqOIrpfDq43o4zk+Mquq3M4l0Z6nr2XHxRoS++9J0dLBn4WBxr8KbLcpOpQmh8k
-         PEywkyAi3WEhPN6LRHboNlM4RYZiPrt3HejXXuUgmrHggVuc2q9R6dJgXhbnh9Qejf64
-         Gn9ZTsp9NLZBL8h05x5bUyvL/kcARHfO88UVkh0B8DvaGiJ9QNm+O7EgguvP3q+uRB3Y
-         z+HTpViMws/LwYNKojHWEKh7s4E7xSbigBWSGRBKShlx8ljMajLB6qRZSwGGEy2UqMLe
-         dhmCk8SC5yCAvGU1sP6B5MWQKPYfASDTmAFvfepKDjwgdrWrGP3Dc5B9Ar6aSJNHr41w
-         6znA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=evg6KQG7cR7Shh7gkq+/8mq53gSxY6rXD1fbSI+f62k=;
-        fh=eFA0ojrjZMf4inzHQ6FwCnPuNxpg4hIgWlnOc0BaT9Q=;
-        b=jlih2oInJ1Xf4Msn+tXHGJqOIKR+0DGgJ1w4kwXbhnh7AHwqvZBgM4vnlJdkwBL6mr
-         yeUBu9ZhYyheEcfrx3totlPsNxTHGSywfwt7RFtuKYez2RJ+PZRnNGk14eM9+bBehkk7
-         i2q1QACCjnQByxMta1jDWygbzqwhHff/MudlAgtq4dLYFRHz9xPs4SpiLmFk3NDwwyir
-         pBbe7NPCdUTquBDbew/IcZO2HWBjwFjGIxMzsFgXuWdrjp3RoiL6pquOJp+UFTxq4WDs
-         cS6H6JwxDP1xqjVugu+BeD0S2Fuky8ugQjHUZ/2UqUQa4tsgRLB9GhBasPXE2M0v/K7m
-         Aktw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D702DE71B
+	for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 10:29:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770892146; cv=none; b=nm5T0jic962ZBFwU9CU8gQ4jnxS1v6Wpt87dOXcgAUQvuUfNbE3dqBpKoluMMiODeYGkUZ99C+a3I8LUToKovxjC1qw+7zyawYqEQ4IBUctVMvUXOc/Q1sEgXLhHuuCf9/owqpOuvcJzVaeVtecHZuWPjamgcuwaTrBXN3T150o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770892146; c=relaxed/simple;
+	bh=OJmNjBofLJOddVm/FKRMh+3l2G7M2Vx8ilcqxiy8HAo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XwWEj8uPd1OODN5FPcgtSh4t9woAaVZFDDpe6FPi5mfpY0quVD8LcpEwISQj4TB0faSl9NhbMMJD5oJLpKTF0WaygZ561Bp31T6XbSGP0eiVnYdDEAvrUznS7WVPxkVlx2OGSawJO/v9xFRH7KeH7Mz7Ja2l1TK2WqLd9nCnDrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PXShR+sm; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4833115090dso27200105e9.3
+        for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 02:29:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770890735; x=1771495535; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=evg6KQG7cR7Shh7gkq+/8mq53gSxY6rXD1fbSI+f62k=;
-        b=VB0Djb2HyG/2M37Ms7H7DcBJVTPVNocPpnYrsS0m9q4JhkRI4AoO5P3xVj73ps70Qr
-         GOUPTzlBtKVsp7nIoQdiTJea3BzxWhL9xWyHVWlXFNR0smSttjVTsRrfz/xFBvsOH5tQ
-         WmR0c2iv2nm2zn1cF8BXtmvcocuM4VXxfAJoAEe/IlNk8pMgRBQNIrrs1c1DoOXi79Fw
-         h41/SObkZRXWpKpz0EsImh3GYjoRNWm7oM1swvy3pyD05Lcm3TAMwdT2nSITvCZ3W7+O
-         64wkvThSY3QGSB0ESIaErnrUJdCbSJkLWFDjwqvnHGcLGXu7pfOlb/+aQU3UB8kqNMUU
-         ZHRA==
+        d=gmail.com; s=20230601; t=1770892143; x=1771496943; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4ukC8L7aMMcFiC9OBGhE3kC51+n1YuHXGUHKK89uyTY=;
+        b=PXShR+smA5bb5z6JWrNAca3rl2fF04eH/iN7kcVRZ74cfS3cXlbGjv0Glti6QlEXAb
+         yGXWfq9aJcUcck1WWY/ZL4fX1sGCobXWLLq5p7jjvLFlroHNn4hD9DRuXbzeyKoszZ3B
+         pAmYZv467dNV4L0e3JUxw6d5C9QxYWtW1KvNvY5k5Kxzb3mal02La/JmPoQkaS6otdVL
+         yzMH/W2x4bJykTIdn2ds72TK/bndi0Q0F+YwoFpufdBK5QKutN7zZ3mKTPpOIEpbNF6h
+         odhnF1ST6HqxlnFYIrBim/jVOgfwxmkikaubcuLqAM45HZNlmB8WARf8CT1ezt/Q3YGr
+         2A/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770890735; x=1771495535;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1770892143; x=1771496943;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=evg6KQG7cR7Shh7gkq+/8mq53gSxY6rXD1fbSI+f62k=;
-        b=PyGKl39DuLfysep5dHS9upKHBVo1VdjheptXuebcuegkom/y6cfaneGe6DIQuCn3fU
-         h7cn0eaFMcQfFttPN4rH9MvXseI9AKl9ln1eS6zqRUhD8ntHfHHEzFqrGnMMOTtnY2E9
-         IRr8BF0HTvDVpL2Tf78Kbsjfn9OHTC3iuVOIBMJbTrpVGlmJ2yrvz5XfqkabZmQWkS2q
-         /imlJS1gOGBiDG5ApMVjt+xyEsnoHGcTmt7uU0sBfLnaoz3XOUg3yimgE+bzxP7Hi/3R
-         I82UVaqU/8m55wJruyS/bwx8yIYjTh4TiWOjXh/ghvOcIXiHu4uRSA5xArpij1MJJ/98
-         aRTg==
-X-Forwarded-Encrypted: i=1; AJvYcCUslQQ/s14AWZtSaLNDYgeyKFOe6MrcZ15ugFlwRkhpGV9J8rUtRzOYvwtKzuvwQq+joiI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNkZ/URM31rO4+NPXlK9Kl36+xQiuS+RN2EddbZnpIhSoRz+XT
-	4hqQWtgxh8gQK9WvkqJQEfbKZ7aph6Fkmox8vqFHACA8A6yu8YPUF0WX9sQzMZIRGwozLctqJN7
-	YyPeY9Hcd78dg1EAMBhwqjqzhY3AEox5SJL77JlKftkhx2HYdZFncm3eU7d5NOKRxPsu54o6ke3
-	2xkLtd59F8h7D0Fk3JjupP2ouLm+0v
-X-Gm-Gg: AZuq6aLu73GHXH9Ir2xaYRgivVQZGdJMyLhOYqBcx8pWqqcWCXhCJQHQxzPC2Wb6OXS
-	D2Vt5efZxeqzyWfl5HgfvcF+tmPw8fI+ILSQn8lMBCO7VB45ma5AZlqc85lCzbLV8Qz2FFA/Htb
-	GOugEJ0z0IzguBjQLbfTZB7rP4AUJQZMzMh/ZsAzjjTB3YoKxt+s2m2wVrdfv403d1YMAAtD+dO
-	Fe6zMRQs6HgLT7cUoHY1/5h7y2/b49H2g+kZd8QjN1soYcLiu6FbpkJirOg2D5guxwT
-X-Received: by 2002:a05:600c:870e:b0:477:7c7d:d9b2 with SMTP id 5b1f17b1804b1-4836716c208mr20934135e9.32.1770890735309;
-        Thu, 12 Feb 2026 02:05:35 -0800 (PST)
-X-Received: by 2002:a05:600c:870e:b0:477:7c7d:d9b2 with SMTP id
- 5b1f17b1804b1-4836716c208mr20933705e9.32.1770890734867; Thu, 12 Feb 2026
- 02:05:34 -0800 (PST)
+        bh=4ukC8L7aMMcFiC9OBGhE3kC51+n1YuHXGUHKK89uyTY=;
+        b=qKeuK19jKNnYnK3svT93Po8AuuJSPkObig0u24378tpe3lYMmbRpeXz3046QszTH3A
+         lmiIF+mS8hyuR1Bpub0/R3PgTosMSTieCHaZ0mb1rgxXC4SZxxxUZE6l9L9aocKNKwQA
+         pIm94KPVlfQlClzf2uNOlIJZAarjViG5oThPQgNCLGnZNr2yJ6M5Ggaewv70CR91x1Mo
+         mVcL+wAy7awy66ax/+v6H3M1bDy6jjFtCG8ZlMiRPCr9RYXe9ncorpNCVy4NiAXW1G0A
+         OMZjWAu8UaKMDPzk9ZzMVWhY8eV2wczUYgNeaVXNYTeeVH2E+5dih+lRKZ50QsQbOqXl
+         jaEw==
+X-Gm-Message-State: AOJu0YyyxHQuCM1cTWj+nnfbeUrQMoa3xUzAAcNOLdgxbCyg2x7CGhtp
+	RMR12gjnLoJ5V1JDjgY5f9wikkn/zl0zBaVcJPdaIafMjurqVMY720IVRSwmZUXC
+X-Gm-Gg: AZuq6aLNo6/AVhLU2PRQ0VczopYsIG6NWgWw77Jjfvf6ID3wV4Hba2b+lOefz7K0jp/
+	fD/oai25pbAUgRpDUgQJgK4upMYjrJ33AfQMXreB6w3pe+MAzW59KzgW9Mey/w1nt/dALvR8Z99
+	Tv4L5PxK2eLj0yjSvumzzu7a3f0KL9+/C4maG+fc0cFunee+21Fk4tPjyETFSirPEJIybsU8Sep
+	TzNhvw/SDUrpDxJsaYLd9U1LPuSx9j/rkhjY1hfGAdJZS6KO9IK76nUNrb6v6shr1Vi1ASQ05Wp
+	1qWzr6D2oaxc2sMFPdpuUrWV+p9/qnPQ+vxOCQDn5H/TCQKLp1lATknYAvzOdvxzwBlpFvOq8+H
+	ZzZ0E76Z4Q0ED615bWPwp8OEuRwMevhBR91lWVLd0MYZFyhWno5Fsy3rLSrbRMgv/oVsD4WBWJ3
+	J6JOuTYfX67BASK/gXxs/BerZhougNy3kw1PfxQK9WH0axzperACK5a04=
+X-Received: by 2002:a05:600c:64c9:b0:477:76bf:e1fb with SMTP id 5b1f17b1804b1-48367113bfbmr27264285e9.16.1770892142588;
+        Thu, 12 Feb 2026 02:29:02 -0800 (PST)
+Received: from fedora ([193.77.86.199])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4834d5d77f9sm200650115e9.3.2026.02.12.02.29.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Feb 2026 02:29:02 -0800 (PST)
+From: Uros Bizjak <ubizjak@gmail.com>
+To: kvm@vger.kernel.org,
+	x86@kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Uros Bizjak <ubizjak@gmail.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@kernel.org>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH] KVM: x86: Fix incorrect memory constraint for FXSAVE in emulator
+Date: Thu, 12 Feb 2026 11:27:59 +0100
+Message-ID: <20260212102854.15790-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260212062522.99565-1-anisinha@redhat.com> <20260212062522.99565-18-anisinha@redhat.com>
- <CAE8KmOwa1M_F9Qfs-XXRhaJZx7jiwQDfwDk7U2shJi8SLa+y9Q@mail.gmail.com> <6C39045F-DF1E-4E9A-8ECB-AE24C766F002@redhat.com>
-In-Reply-To: <6C39045F-DF1E-4E9A-8ECB-AE24C766F002@redhat.com>
-From: Prasad Pandit <ppandit@redhat.com>
-Date: Thu, 12 Feb 2026 15:35:17 +0530
-X-Gm-Features: AZwV_QjL_URuAFSIF6IyyIsLh7ty4PiS5HnaLtdQKyX1AS6TAldCbnyOE3xJRbs
-Message-ID: <CAE8KmOxmw3nthEXDh2zQQEtKyeNN0mPnFRhzM1ZgCUCkZpTefg@mail.gmail.com>
-Subject: Re: [PATCH v4 17/31] i386/sev: add migration blockers only once
-To: Ani Sinha <anisinha@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, 
-	Zhao Liu <zhao1.liu@intel.com>, Gerd Hoffmann <kraxel@redhat.com>, kvm@vger.kernel.org, 
-	qemu-devel <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid];
 	TO_DN_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_CC(0.00)[gmail.com,google.com,redhat.com,kernel.org,alien8.de,linux.intel.com,zytor.com];
+	TAGGED_FROM(0.00)[bounces-70942-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ppandit@redhat.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-70941-lists,kvm=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+]
-X-Rspamd-Queue-Id: 1359012C41B
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ubizjak@gmail.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,alien8.de:email]
+X-Rspamd-Queue-Id: 4232912C7EE
 X-Rspamd-Action: no action
 
-On Thu, 12 Feb 2026 at 14:07, Ani Sinha <anisinha@redhat.com> wrote:
-> Maybe we could do something like this (I have not tested it) but perhaps outside the scope of this change set:
->
-> diff --git a/migration/migration.c b/migration/migration.c
-> index b103a82fc0..7d85821315 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1696,8 +1696,11 @@ static int add_blockers(Error **reasonp, unsigned modes, Error **errp)
->  {
->      for (MigMode mode = 0; mode < MIG_MODE__MAX; mode++) {
->          if (modes & BIT(mode)) {
-> -            migration_blockers[mode] = g_slist_prepend(migration_blockers[mode],
-> -                                                       *reasonp);
-> +            if (g_slist_index(migration_blockers[mode],
-> +                                 *reasonp) == -1) {
-> +                migration_blockers[mode] = g_slist_prepend(migration_blockers[mode],
-> +                                                           *reasonp);
-> +            }
->          }
->      }
->      return 0;
+The inline asm used to invoke FXSAVE in em_fxsave() and fxregs_fixup()
+incorrectly specifies the memory operand as read-write ("+m"). FXSAVE
+does not read from the destination operand; it only writes the current
+FPU state to memory.
 
-* Yes, and when g_slist_index() returns >= 0,  return -1 OR an
-indication that the blocker (address) already exists in the list. That
-way other such instances where the same blocker is added multiple
-times will be caught.
+Using a read-write constraint is incorrect and misleading, as it tells
+the compiler that the previous contents of the buffer are consumed by
+the instruction. In both cases, the buffer passed to FXSAVE is
+uninitialized, and marking it as read-write can therefore create a
+false dependency on uninitialized memory.
 
-* But let's make it a separate patch. Restrict current patch to
-removing add_clocker calls from sev_*_launch_finish() calls.
+Fix the constraint to write-only ("=m") to accurately describe the
+instruction’s behavior and avoid implying that the buffer is read.
 
-Thank you.
+No functional change intended.
+
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Gleixner <tglx@kernel.org>
+Cc: Ingo Molnar <mingo@kernel.org>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
 ---
-  - Prasad
+ arch/x86/kvm/emulate.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index c8e292e9a24d..d60094080e3f 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -3717,7 +3717,7 @@ static int em_fxsave(struct x86_emulate_ctxt *ctxt)
+ 
+ 	kvm_fpu_get();
+ 
+-	rc = asm_safe("fxsave %[fx]", , [fx] "+m"(fx_state));
++	rc = asm_safe("fxsave %[fx]", , [fx] "=m"(fx_state));
+ 
+ 	kvm_fpu_put();
+ 
+@@ -3741,7 +3741,7 @@ static noinline int fxregs_fixup(struct fxregs_state *fx_state,
+ 	struct fxregs_state fx_tmp;
+ 	int rc;
+ 
+-	rc = asm_safe("fxsave %[fx]", , [fx] "+m"(fx_tmp));
++	rc = asm_safe("fxsave %[fx]", , [fx] "=m"(fx_tmp));
+ 	memcpy((void *)fx_state + used_size, (void *)&fx_tmp + used_size,
+ 	       __fxstate_size(16) - used_size);
+ 
+-- 
+2.53.0
 
 
