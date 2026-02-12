@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-70976-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70977-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2BjdGG/mjWms8QAAu9opvQ
-	(envelope-from <kvm+bounces-70976-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:40:47 +0100
+	id mDXOBIfmjWms8QAAu9opvQ
+	(envelope-from <kvm+bounces-70977-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:41:11 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 772E312E579
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:40:46 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6E0A12E596
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:41:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AD27330860BC
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 14:37:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F0F343138FD2
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 14:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF508362142;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C555036213D;
 	Thu, 12 Feb 2026 14:36:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HDfUFUwx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J5UDf6M7"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830943612C5;
-	Thu, 12 Feb 2026 14:36:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1902B35DD0F;
+	Thu, 12 Feb 2026 14:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770906987; cv=none; b=U4PZQny1ViA2gwMuNQo6U/7JqSFOIGzETpVW4RwPM0bNzVEIdW6ds5RTTOdYJ2XqcMobS1rx/17Binr57GyPet8r19G31uMzphysx6zZPOy9z04jNdw11aXMTin6C64d1v11jFsmGKepWuKxy7hIpiwvLZKW1F8u4Q00gG097bc=
+	t=1770906987; cv=none; b=p+oyxwAItkGqr5NiMR4TUS5o7IrrkIDTq+w0wKNb4jFF68TTrcl9QSbkKoHuY0sBWTRnxJ5vpsc9gYjp6s+CLlZQFK9c9XgAInDMYcVNVLLaQst9gesjTJ4wyzAUxW+AX4XdVzAjvoGzzLm89scj//AjsjD1LLAiNWcK4swsIgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1770906987; c=relaxed/simple;
-	bh=BX7ygtZFvJPEzVUbeQoXbZUlUOeLCwsJsHrJjyMR/G4=;
+	bh=IfQzPX1cJba+4g91Qbi6v8rNBx4++Vy8ZWVsMap6Vm4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pi6QL/Slt+uAwOCjYm+KiZLTvghvu0xtaim0Ry8Me/cPwy6pkxQST89vh49j+H4wdcE0flXuu7/piGkipUxmNILo/LelYyir1+VR1f+FEAsgXBwysB/C5IW0OjzVfDKTHmh+13hOJ3GcWcc2EToDibhTFEM6EO2dZkp8yn0YUdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HDfUFUwx; arc=none smtp.client-ip=192.198.163.8
+	 MIME-Version; b=eO5U4oGbAYqlXGIDbAN5E9v7EXfWu+naHEHnFm6Mnwq+LtCwwGxuJYkOnPYZMn70VtyQd6Hzykvk1le+hNh0BF3v7MtS9vZyD5rONQNk7kD3BH8CPnzoyaLovyLuxQurOQHEoooqBgevNT9bi3xl1quiSxmrTb0We9IRdeV3/7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J5UDf6M7; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770906985; x=1802442985;
+  t=1770906986; x=1802442986;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=BX7ygtZFvJPEzVUbeQoXbZUlUOeLCwsJsHrJjyMR/G4=;
-  b=HDfUFUwxjX4VXKkIlsKSrmGAkTuasfdpZ2mn52PSjsyC95lGhKsZytTF
-   lPej87fgxdxl+QKTtMfac2lh23hXRBDdZwfHj5sT9vUpD7SVmU9/C1rdI
-   sGwrEAV/YRzqnfTamIobEfsqsyIYDgQgwvx5UAG3eJ1BIaVXAm4cC/jvh
-   L836Rh694uz/GeM/PJM1rApVhpfB33yQXc9EUoFCTG5sOrCeXu830oC2i
-   jcpWSKRlzbA/icMtF3IrjqpALNPFQHAskeOZ6wjKIllGOMOXxMQIRX+uE
-   zj1sepDXMuU0c24xe9JwfcMCEoEDI6V0u+zMyd8W6qNDIZgP30uG3KyHc
-   Q==;
-X-CSE-ConnectionGUID: Ck+74sccTNyMgj9jABq09g==
-X-CSE-MsgGUID: Eezp5IX3R/+3IwOtjFVduw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11699"; a="89662851"
+  bh=IfQzPX1cJba+4g91Qbi6v8rNBx4++Vy8ZWVsMap6Vm4=;
+  b=J5UDf6M7SRg9JDTt/6bWTWK0T4jS2Eu0inQTrYwE7aWt6HuOeIy+VB8O
+   sEpQqGVHW/bZUJ3gRsYHRsm+Qcdh/0JB2MMiH5uk6BybdrE2W65Ij3kA7
+   m4J+muMWJUy8avyEwvbowQ2mOmJWiC04zR9lMHuX8sp+PrtjtgC1nLVuc
+   bEwHP+BcKsI1kldaahlwlPaWbvQLiER4VEAAhHbR/fQE5dBKLR9G5jFdk
+   KCvDopvQ/5q7JTavvOHMfTZGfvzgSOlYqRZo312T3+6Uek3Sahbth/f53
+   q8Q9Rg7m9wJXmLkSF96gp7E9/tbPo9I6TYYPHkt8LfY0fEjqZbKoxBE7I
+   A==;
+X-CSE-ConnectionGUID: oQWPh4VzRIO0T6BNAF5T/Q==
+X-CSE-MsgGUID: X+earPNARyScizYdUnZziA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11699"; a="89662860"
 X-IronPort-AV: E=Sophos;i="6.21,286,1763452800"; 
-   d="scan'208";a="89662851"
+   d="scan'208";a="89662860"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 06:36:24 -0800
-X-CSE-ConnectionGUID: eoh/vWP7SXGN9Y1O7OXahA==
-X-CSE-MsgGUID: GtjqgFO6QYiGB/t6i1IDFw==
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 06:36:25 -0800
+X-CSE-ConnectionGUID: rTzU3R0URjK+k3EPQV3rDA==
+X-CSE-MsgGUID: 8JAweDGHRIa9GhudxWrKNg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,286,1763452800"; 
-   d="scan'208";a="211428270"
+   d="scan'208";a="211428276"
 Received: from 984fee019967.jf.intel.com ([10.23.153.244])
   by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 06:36:24 -0800
 From: Chao Gao <chao.gao@intel.com>
@@ -88,9 +88,9 @@ Cc: reinette.chatre@intel.com,
 	Ingo Molnar <mingo@redhat.com>,
 	Borislav Petkov <bp@alien8.de>,
 	"H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH v4 14/24] x86/virt/tdx: Reset software states during TDX Module shutdown
-Date: Thu, 12 Feb 2026 06:35:17 -0800
-Message-ID: <20260212143606.534586-15-chao.gao@intel.com>
+Subject: [PATCH v4 15/24] x86/virt/seamldr: Log TDX Module update failures
+Date: Thu, 12 Feb 2026 06:35:18 -0800
+Message-ID: <20260212143606.534586-16-chao.gao@intel.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260212143606.534586-1-chao.gao@intel.com>
 References: <20260212143606.534586-1-chao.gao@intel.com>
@@ -107,14 +107,14 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-70976-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-70977-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[26];
@@ -126,75 +126,64 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+]
-X-Rspamd-Queue-Id: 772E312E579
+X-Rspamd-Queue-Id: C6E0A12E596
 X-Rspamd-Action: no action
 
-The TDX module requires a one-time global initialization (TDH.SYS.INIT) and
-per-CPU initialization (TDH.SYS.LP.INIT) before use. These initializations
-are guarded by software flags to prevent repetition.
+Currently, there is no way to restore a TDX Module from shutdown state to
+running state. This means if errors occur after a successful module
+shutdown, they are unrecoverable since the old module is gone but the new
+module isn't installed. All subsequent SEAMCALLs to the TDX Module will
+fail, so TDs will be killed due to SEAMCALL failures.
 
-After TDX module updates, the new TDX module requires the same global and
-per-CPU initializations, but the existing software flags prevent
-re-initialization.
-
-Reset all software flags guarding the initialization flows to allow the
-global and per-CPU initializations to be triggered again after updates.
+Log a message to clarify that SEAMCALL errors are expected in this
+scenario. This ensures that after update failures, the first message in
+dmesg explains the situation rather than showing confusing call traces from
+various code paths.
 
 Signed-off-by: Chao Gao <chao.gao@intel.com>
 Reviewed-by: Tony Lindgren <tony.lindgren@linux.intel.com>
 ---
- arch/x86/virt/vmx/tdx/tdx.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+v4:
+ - Use pr_warn_once() instead of reinventing it [Yilun]
+v3:
+ - Rephrase the changelog to eliminate the confusing uses of 'i.e.' and 'e.g.'
+   [Dave/Yilun]
+---
+ arch/x86/virt/vmx/tdx/seamldr.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index f911c8c63800..a1193efc1156 100644
---- a/arch/x86/virt/vmx/tdx/tdx.c
-+++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -55,6 +55,8 @@ static struct tdmr_info_list tdx_tdmr_list;
- 
- static enum tdx_module_status_t tdx_module_status;
- static DEFINE_MUTEX(tdx_module_lock);
-+static bool sysinit_done;
-+static int sysinit_ret;
- 
- /* All TDX-usable memory regions.  Protected by mem_hotplug_lock. */
- static LIST_HEAD(tdx_memlist);
-@@ -70,8 +72,6 @@ static int try_init_module_global(void)
- {
- 	struct tdx_module_args args = {};
- 	static DEFINE_RAW_SPINLOCK(sysinit_lock);
--	static bool sysinit_done;
--	static int sysinit_ret;
- 
- 	lockdep_assert_irqs_disabled();
- 
-@@ -1179,6 +1179,7 @@ EXPORT_SYMBOL_FOR_KVM(tdx_enable);
- int tdx_module_shutdown(void)
- {
- 	struct tdx_module_args args = {};
-+	int ret, cpu;
- 
- 	/*
- 	 * Shut down the TDX Module and prepare handoff data for the next
-@@ -1188,7 +1189,17 @@ int tdx_module_shutdown(void)
- 	 * modules as new modules likely have higher handoff version.
- 	 */
- 	args.rcx = tdx_sysinfo.handoff.module_hv;
--	return seamcall_prerr(TDH_SYS_SHUTDOWN, &args);
-+	ret = seamcall_prerr(TDH_SYS_SHUTDOWN, &args);
-+	if (ret)
-+		return ret;
-+
-+	tdx_module_status = TDX_MODULE_UNINITIALIZED;
-+	sysinit_done = false;
-+	sysinit_ret = 0;
-+
-+	for_each_online_cpu(cpu)
-+		per_cpu(tdx_lp_initialized, cpu) = false;
-+	return 0;
+diff --git a/arch/x86/virt/vmx/tdx/seamldr.c b/arch/x86/virt/vmx/tdx/seamldr.c
+index c59cdd5b1fe4..4e0a98404c7f 100644
+--- a/arch/x86/virt/vmx/tdx/seamldr.c
++++ b/arch/x86/virt/vmx/tdx/seamldr.c
+@@ -223,6 +223,11 @@ static void ack_state(void)
+ 		set_target_state(tdp_data.state + 1);
  }
  
- static bool is_pamt_page(unsigned long phys)
++static void print_update_failure_message(void)
++{
++	pr_err_once("update failed, SEAMCALLs will report failure until TDs killed\n");
++}
++
+ /*
+  * See multi_cpu_stop() from where this multi-cpu state-machine was
+  * adopted, and the rationale for touch_nmi_watchdog()
+@@ -252,10 +257,13 @@ static int do_seamldr_install_module(void *params)
+ 				break;
+ 			}
+ 
+-			if (ret)
++			if (ret) {
+ 				atomic_inc(&tdp_data.failed);
+-			else
++				if (curstate > TDP_SHUTDOWN)
++					print_update_failure_message();
++			} else {
+ 				ack_state();
++			}
+ 		} else {
+ 			touch_nmi_watchdog();
+ 			rcu_momentary_eqs();
 -- 
 2.47.3
 
