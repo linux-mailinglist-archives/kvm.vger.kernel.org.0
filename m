@@ -1,213 +1,174 @@
-Return-Path: <kvm+bounces-70953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70954-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QEJgMT7QjWnw7QAAu9opvQ
-	(envelope-from <kvm+bounces-70953-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 14:06:06 +0100
+	id IOEUAzvYjWng7wAAu9opvQ
+	(envelope-from <kvm+bounces-70954-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 14:40:11 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E43412DB7E
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 14:06:06 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19C3F12DE38
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 14:40:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D2E1D303100B
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 13:06:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 54F5F3013DEE
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 13:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB5235B631;
-	Thu, 12 Feb 2026 13:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79EA35C182;
+	Thu, 12 Feb 2026 13:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CRSfO8oC";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="mwRf3Cc6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m79B6R6q"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA05A3EBF24
-	for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 13:05:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770901557; cv=none; b=FMjpz0BnhJqLZZYWdjWbkwcgRG3Jcnrz+Eu75+AUceQYA3KhIcYEqDKsxouUdyyhYuEZPkMWoNIM0sAHSrgGBaR6VZrLh2aikNIBoA6/dIHGyNHLv3Ajf0iSMzqXYwOxwJ0UHuA6i/KcEIMUYyjmT83bbSQn1kQh//+W8dNpDh0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770901557; c=relaxed/simple;
-	bh=fubshRHZOK3xcw1lnexFbYnDXHYBcCIwqojSGjudTdg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nBbGNRnjcC5pVDaqg8bJmTAOGCVdv+PoQ2ge0wu/lYwcn3SG0eyWqza6GCdg0sZW+R9iA8rFZZSq6DIwvxYHm3Bp6MQrBwL09xWszyojvdm5hwQ+QZXa7+WDT1hy4Yv2xU1sfSByhhEVUFMCdL+G+OYi6uwAUjupk+UR13El+80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CRSfO8oC; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=mwRf3Cc6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770901554;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fAwi/lFTFJWF8aYR9HamB7ruEzLXva1BZO763+SUKAI=;
-	b=CRSfO8oCiNA7tsrpUp8c83Zsgd4oRyFYrrb6emn14Rddw3UQ6ru+WyQtQcisPaAcaphXrH
-	iTTxSavHCWvPItyBgnnGcfeaAfQjX5CcvIBZ74ltBSL0XjbK6P22jpEAl/vGdWm9fwagJK
-	zDchiko3hfw0U1reLNS8gMZqvxaKoIY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-571-ARXEWuohNC-UpDNG7Fye6Q-1; Thu, 12 Feb 2026 08:05:53 -0500
-X-MC-Unique: ARXEWuohNC-UpDNG7Fye6Q-1
-X-Mimecast-MFC-AGG-ID: ARXEWuohNC-UpDNG7Fye6Q_1770901552
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4803e8b6007so28594035e9.0
-        for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 05:05:53 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6EC82C3256
+	for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 13:39:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770903600; cv=pass; b=lljrF39nwZxB7HrWvaGN/pEF8F/Ow1G4gZGSXEonKK2gW69F7LEirTF8Dl5Y2U/LiwjKVgJl0J3nro2p3PR+IL20HExxQSj6Jhq/TUS1vQa4rgbaJtFzR97RqpFhrGuTUasa9fT5tMBA2lFQOkgHXHLypvKT7drMalXlxGrWIVQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770903600; c=relaxed/simple;
+	bh=9m8jNJz+xkEuRnarQJnBRAM/+igZhD4KBk+Qsf+tgOk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lFRETZZ+oJfmKumVHKaorU3AYuGFUnXnm2VhuS44LG+69VCiAsYF4psrd1S/eXqIT+q54A2foFFqMUBW3iJQJKCVGMVjI/A4kyGSlSyQaCcyQevht/fgKmMJjo2YJel/4jphO1WaCmhO7X/OyAajciaSn1LoRclIyxO5qMXy4dA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m79B6R6q; arc=pass smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-38706b63929so14643811fa.3
+        for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 05:39:58 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770903597; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ZX4d3XYUE5zUnICj7OoKFDGCTmHQ8piFwFAhwGGjQwe6juwJfXgZZJCNYJWCS9mlKk
+         UGlP161xVQ8kOXOisfwvzOnHBPqEh3oVb8C4rxYgcqSIpLdxAnxHcjqsGhRcG+BM+wHr
+         ljZqOmLvjkjWIr43/42IM1netfsbMMSl0A3DhPkBI1RtEZLaK3mRFOifaBrMZtzUBjGm
+         uF6pbM5dy6js//ceImxRKyPNVLlhggolURP+D7RuIwsDZaJ57oZGq/5OqyywcG25b4+s
+         kvpZiwoZb2V3vX4MdQNm8pNHD+CyvA+p6HMXB521wuTQmwaF4H3dnxM8c/D/AK5oylKI
+         nwVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=9m8jNJz+xkEuRnarQJnBRAM/+igZhD4KBk+Qsf+tgOk=;
+        fh=DTdj6R744nmp0CRybysc2Khf+hJXTaMkJNE+Uf/7nPg=;
+        b=hgV5j0brX6NtJWCrSKv3sbyAISu3hDCzVk0UpryMWEqnAVQstzz3n080pBHxvSUDYE
+         MLqu8Z5gKWv9dE+sMyXeYv/hw0lbzs1gZDFeW6O6FaIz6KuIx+p4qcCVyoX9Sn8wN8Ij
+         q9v0XmmOqd8D5LCvSLJR2C2IGjou3DIzaBO97CdQwLEEZJ3LJ8rkRWA3Ek/28twVzOg8
+         EVHbT7j3DYSkCHWiMTJcSwQ7M8FNuAzRidzGHVU8Bv6aeexQeP7oPAXrAYUI/7ob3Lhv
+         nPEkq724mQSkxrzxfinh1x+NVWkvcZGopeh2wARw5Bz9xe779yaTs8Z7heV/ebTwrJZI
+         o4kg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1770901552; x=1771506352; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fAwi/lFTFJWF8aYR9HamB7ruEzLXva1BZO763+SUKAI=;
-        b=mwRf3Cc6iWRUG+N8VN114AYMDprcEVmzkdLBljH0nLfXPLlgLoRM9R8KqiVtM+NXSy
-         GASI8i5vbVZcprp7OSYKYdrabwb+izvESRs42C+QWjwDszgaWlx/r/WPBRaw8QwsEjbG
-         JJx9JGScmG9E8SAwzjdS9AZyrCosPYZdzwwTrq37S74NHdUwqNPB5C1hZ0we5ioFHHk+
-         JuqpvB3dNb5Dw7DHdFenPgQYHhaWbtWe9Xi+KOfwn8f7rIT5UAAlJIqquDEEALaLijVO
-         b7EaJo+twHvPOYuiEDesBL8PWtmIjcxvhJZxXKQ7sUF/DAH1/et5RbAjJJbx++uJQF1r
-         3rpg==
+        d=gmail.com; s=20230601; t=1770903597; x=1771508397; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9m8jNJz+xkEuRnarQJnBRAM/+igZhD4KBk+Qsf+tgOk=;
+        b=m79B6R6q3s5d7NOlABkWgo+m1gDfQz4CN5ogzqFOiiLJd+kCBA6KOOLFOuZvResS4K
+         GfWJhxPcKV1TF8F65Q4MlG+glJRcHzyi6zrNn8GAZz+byokMY3C9VdOVcL4rAXAVC4yV
+         cvAMfXVnJvYht1/MxsuirrFZN7++DLQpYOW365dwGzeLUnid5hZXVqQIK1cEmMtSe+qV
+         2qDtHh3moLpsaeh3w5Ge6JezklrhnWVqCeFLrJPRDWOPFHCqzVdvCIARveOG+zmzZ9ee
+         f6+mugCCsZRYCIx4XAliwd35mwoy5DBc8sr354FvJ7ZrTs5RLEMRzXMQWrdhaNJpJkZR
+         57Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770901552; x=1771506352;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fAwi/lFTFJWF8aYR9HamB7ruEzLXva1BZO763+SUKAI=;
-        b=odNR/58qHWGaELoQ9vbf0YAfSU5873N3nUyuGXwqjo+1MM2iMWSldEccr2Z2qLB4lQ
-         ugDuVPbBbb3hwXCiPHF7VPOWlquFifwUg2tH0nhAR/7+IrOt1GdNOeSpLwcP4kWWjU2I
-         3z8qClRs9UjmqtT+390jOn29SAHOoXEBR2pc99hSA1oGyk5XACy9zz7SS146qVTF6/OO
-         LRiKaj/o0Ri4d7wIwOZGaiiNrKYFQX2qFA1TYGJxa2QNBpQ4Xuy3u9bEpvs/ihlfIi1c
-         yVsgSEZPF4wcbQCWftlc+Yrr+86/aG2BT2HvDbxTQlMMVoA3mqM/B6VA+ubGAoZ6/sEh
-         Escg==
-X-Forwarded-Encrypted: i=1; AJvYcCUgT3uVWOrq+WvOF+Y7imoKp3FUl8T76ICxAD0TnrOGIe/KHIumrd3NIHHPT1IWLhPnjnI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPVgybxqQyCW56hn7veLYBFTfEmwrKZm4ALVQKeRIS42ffVtYq
-	XkbzZsjx/zfrMzMjx0HKdG2r6hB8T15ZYW6r6NpMFd3z+x0sxcvIvZ+UhMbYeBO74ZQpMdrrkGb
-	PoxPF0RKEwhdM9wxYRf3bxrqTPVRT84FOVC9VXceZGld/Tbp9jc6Mkg==
-X-Gm-Gg: AZuq6aKdQyRRcp4E0CCs34O1NKwJNQlWXveExW39Czyl6ldEtNGMnX9hLriwefzfQCx
-	eSS2QsrHQ0NCi7Xe0v6fGqNguU4Rdl//Q7qSBaJlA7fODo3gL0N+N/Glgmu7dF+gPh2EzKfrj3G
-	kD5TcxipE1Ad0Rz0jopLPrsL+Hm+dwm4/nCnqeIR+G3dT5Rwrn8VCQCvMRPJdqf9rmoAnPFDYh9
-	X7OYWUrMzy91SeuXgvdx9d+lTfW7L1dBET6pW8zu1ibmP332PNLd+IfP1A5tRJt2CqmXuiSo43r
-	7RJuQheKQQ0ijVqCiz8i318Xrcre+LApqqcwGryEgTu7fUlFRfvlJMq4B66vtcFWRlvpo7HNyhk
-	5AeFnfEjYhYdYxmZBTf0ePVOCU1vYKE167/vBjkiHobSIaNi85v5sehADGQWOIF/olw2jF17pk/
-	f1Fu/pboDLf1+oUJAYf1BV1/YQvT5cmQwSBa0iaOB9yNwS0zvn9FFgDWjWhQ==
-X-Received: by 2002:a05:600c:154a:b0:483:348a:d3f3 with SMTP id 5b1f17b1804b1-48367165b8emr29244085e9.18.1770901552252;
-        Thu, 12 Feb 2026 05:05:52 -0800 (PST)
-X-Received: by 2002:a05:600c:154a:b0:483:348a:d3f3 with SMTP id 5b1f17b1804b1-48367165b8emr29243495e9.18.1770901551816;
-        Thu, 12 Feb 2026 05:05:51 -0800 (PST)
-Received: from [10.60.241.123] (93-38-190-72.ip72.fastwebnet.it. [93.38.190.72])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4835a627c96sm68629315e9.2.2026.02.12.05.05.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Feb 2026 05:05:51 -0800 (PST)
-Message-ID: <0a1ad845-a15b-4901-a65c-2668580751ed@redhat.com>
-Date: Thu, 12 Feb 2026 14:05:44 +0100
+        d=1e100.net; s=20230601; t=1770903597; x=1771508397;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9m8jNJz+xkEuRnarQJnBRAM/+igZhD4KBk+Qsf+tgOk=;
+        b=c4vTWQty4t1E0P2bcTv/eQ+dtpeRRYmVuW9CBh+Z+y/WBfqesH2+zq16zr+wDg4TFS
+         5MR9Bk+BxgN80Zuf+Rd0EfidAPTN0qTubXV8NoIkchSSmG0k9ApI6Q/GU52Dfyun8tZG
+         c4OuEIbkQ6ydsTQD0vz2axJ+wNtRd9NF9gRWfHRmQaKleTh4/4S7FO05AKsnOqwNksnK
+         N2coNVApm4NNAZWwMbN8ry0wrrButUSiKqMvk8pRpltjrP887WbwZVqniCTEu1rMBzgZ
+         Bwbw3LsUXoBLRPmIfzlc6iZTd2nm+JTMF3pNKcPWt+JeuvAPcsV3TfAd40gCEOnj1qj2
+         TcbQ==
+X-Gm-Message-State: AOJu0Yw7R0+JWfJ7LFx+CuJvYHo0t1KhUJ+9JKVgOCzCPdCGPTb0aBWi
+	IaN1raxg3NqU4Eg3pLsPwYUgeECI57amanfgUYbLIVg3jy6BM9RNg1DkPqORq9HM76Ec1C2SWsO
+	/Ci+VcycxIzzqzOQJwpMhuYkwVw3HnWI=
+X-Gm-Gg: AZuq6aIboF1s3ou/2mAzxec6Q5wI81FplCTdga0hcQuc5IGzIuSVpybQxv8Qa32pBgI
+	NzU5HoaJlTFtI9UnWbk02SPcIdXRA36sXLeO4YdSkuWnlRuErFWf2r3R8y63p0ln2grcoy+23Jw
+	RLdw1hWD4nyuW8zeMyLlyemnyZu5sQNHu7v2Y15QZ8yfWTGyyym4MmYKAvRb34sLeqV2c1RKcFg
+	3tbaqKrggC0AgqkRZACYxyQRTeE5Dffobg1mtERxxvl8YxDem43ONgQ+2WxGFdoMNRFrp4+obb2
+	pERlitETrh6DKxxTHC4eoUmg7vyhRMyvzcl5V8Y064/CRr6tMQ==
+X-Received: by 2002:a05:651c:19a3:b0:385:9b50:91a8 with SMTP id
+ 38308e7fff4ca-38712ac804emr7148331fa.15.1770903596628; Thu, 12 Feb 2026
+ 05:39:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86: Fix incorrect memory constraint for FXSAVE in
- emulator
-To: Uros Bizjak <ubizjak@gmail.com>, kvm@vger.kernel.org, x86@kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Sean Christopherson <seanjc@google.com>, Thomas Gleixner
- <tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>
-References: <20260212102854.15790-1-ubizjak@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20260212102854.15790-1-ubizjak@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20260212102854.15790-1-ubizjak@gmail.com> <0a1ad845-a15b-4901-a65c-2668580751ed@redhat.com>
+In-Reply-To: <0a1ad845-a15b-4901-a65c-2668580751ed@redhat.com>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Thu, 12 Feb 2026 14:39:44 +0100
+X-Gm-Features: AZwV_Qjy-ilu912nCI1gZDdU5Pll4W01zr5AoDRZwYuYXy7GLqBk5vtD_wKCVus
+Message-ID: <CAFULd4Yyc=smi+bsY3FPLVd_jZxuHFUYOkH4enPQ=Z=OLe-GOw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Fix incorrect memory constraint for FXSAVE in emulator
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-70953-lists,kvm=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org,kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-70954-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pbonzini@redhat.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ubizjak@gmail.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,zytor.com:email]
-X-Rspamd-Queue-Id: 3E43412DB7E
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 19C3F12DE38
 X-Rspamd-Action: no action
 
-On 2/12/26 11:27, Uros Bizjak wrote:
-> The inline asm used to invoke FXSAVE in em_fxsave() and fxregs_fixup()
-> incorrectly specifies the memory operand as read-write ("+m"). FXSAVE
-> does not read from the destination operand; it only writes the current
-> FPU state to memory.
-> 
-> Using a read-write constraint is incorrect and misleading, as it tells
-> the compiler that the previous contents of the buffer are consumed by
-> the instruction. In both cases, the buffer passed to FXSAVE is
-> uninitialized, and marking it as read-write can therefore create a
-> false dependency on uninitialized memory.
-> 
-> Fix the constraint to write-only ("=m") to accurately describe the
-> instruction’s behavior and avoid implying that the buffer is read.
+On Thu, Feb 12, 2026 at 2:05=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com>=
+ wrote:
+>
+> On 2/12/26 11:27, Uros Bizjak wrote:
+> > The inline asm used to invoke FXSAVE in em_fxsave() and fxregs_fixup()
+> > incorrectly specifies the memory operand as read-write ("+m"). FXSAVE
+> > does not read from the destination operand; it only writes the current
+> > FPU state to memory.
+> >
+> > Using a read-write constraint is incorrect and misleading, as it tells
+> > the compiler that the previous contents of the buffer are consumed by
+> > the instruction. In both cases, the buffer passed to FXSAVE is
+> > uninitialized, and marking it as read-write can therefore create a
+> > false dependency on uninitialized memory.
+> >
+> > Fix the constraint to write-only ("=3Dm") to accurately describe the
+> > instruction=E2=80=99s behavior and avoid implying that the buffer is re=
+ad.
+>
+> IIRC FXSAVE/FXRSTOR may (at least on some microarchitectures?) leave
+> reserved fields untouched.
+>
+> Intel suggests writing zeros first, and then the "+m" constraint would
+> be the right one because "=3Dm" would cause the memset to be dead.
 
-IIRC FXSAVE/FXRSTOR may (at least on some microarchitectures?) leave 
-reserved fields untouched.
+Please note that the struct is not initialized before fxsave, so if
+"+m" is required, the struct should be initialized.
 
-Intel suggests writing zeros first, and then the "+m" constraint would 
-be the right one because "=m" would cause the memset to be dead.
-
-Paolo
-
-> No functional change intended.
-> 
-> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Thomas Gleixner <tglx@kernel.org>
-> Cc: Ingo Molnar <mingo@kernel.org>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> ---
->   arch/x86/kvm/emulate.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index c8e292e9a24d..d60094080e3f 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -3717,7 +3717,7 @@ static int em_fxsave(struct x86_emulate_ctxt *ctxt)
->   
->   	kvm_fpu_get();
->   
-> -	rc = asm_safe("fxsave %[fx]", , [fx] "+m"(fx_state));
-> +	rc = asm_safe("fxsave %[fx]", , [fx] "=m"(fx_state));
->   
->   	kvm_fpu_put();
->   
-> @@ -3741,7 +3741,7 @@ static noinline int fxregs_fixup(struct fxregs_state *fx_state,
->   	struct fxregs_state fx_tmp;
->   	int rc;
->   
-> -	rc = asm_safe("fxsave %[fx]", , [fx] "+m"(fx_tmp));
-> +	rc = asm_safe("fxsave %[fx]", , [fx] "=m"(fx_tmp));
->   	memcpy((void *)fx_state + used_size, (void *)&fx_tmp + used_size,
->   	       __fxstate_size(16) - used_size);
->   
-
+Uros.
 
