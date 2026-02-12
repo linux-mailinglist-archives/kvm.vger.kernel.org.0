@@ -1,459 +1,227 @@
-Return-Path: <kvm+bounces-70998-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-70999-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFmdLjP6jWnz9wAAu9opvQ
-	(envelope-from <kvm+bounces-70998-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 17:05:07 +0100
+	id AMx3JV79jWm0+AAAu9opvQ
+	(envelope-from <kvm+bounces-70999-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 17:18:38 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 551B212F36E
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 17:05:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF25412F44A
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 17:18:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F24C231EFD74
-	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 15:59:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CC909305B0B7
+	for <lists+kvm@lfdr.de>; Thu, 12 Feb 2026 16:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F74B35DD0B;
-	Thu, 12 Feb 2026 15:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB24830BF6A;
+	Thu, 12 Feb 2026 16:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z/nxesuX"
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="rqk7dTg8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010050.outbound.protection.outlook.com [52.101.56.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413A0353ED8
-	for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 15:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770911968; cv=none; b=XFIYtX1tDKrP0F7ih1bojZJr+lm4hRXHWetSxc5cDke5CWPKvwgec4IzDsofaU2b6VdKgOUh8TeDFhob0Ybxo7W8or2HYGIjgfEmxqAokF7nCXwEn/b+umz7OkChj+Ks4dG2SSxxnYGw91fncYsgiaLOkNXdBz8hIBgHZX0bafs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770911968; c=relaxed/simple;
-	bh=8+Zi2wIRqjuMkzWhWVrhTevqZDBmEn7YJS8dxkMRtyQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=USD1PGJDIYQEvjee7696do8vVAeI/HNcV5lJUir+t4SqY3PBCsUcCU5wuS9yCEeXO8osgjcW6OGrRj2dkOWyRWyX3xSILeWmmbzTELS4+YULzwvc4igKMuwHIZ7UzrJ6zPTVQHXtTtmdOeJ5Jl+6rxL7GVwCfpuC8UvQAJ0h8Rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z/nxesuX; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a8fc061ce1so209118985ad.0
-        for <kvm@vger.kernel.org>; Thu, 12 Feb 2026 07:59:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770911965; x=1771516765; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AUl3gjz1kKfg9Z4YCOJbzABwXZkXgt7AzcqRZ75wmRs=;
-        b=z/nxesuXV+SlJbagjGlkIrXOPS7Ggr8QzY3JRyiFwnzz85EQveY2H59cZzXhM878j4
-         gLQlMzul+MNnFVKfWK4vKGWyl/KBQaaW1UAkCz1DETC2X5eY83BMSTz/N6qqEvIzTwi6
-         tEgIe+eoVpC41G84tcHzsOa2YEn0W9ltZjQDEFiTG49DU28xVwRmRVB8xWcKAdnwp0o/
-         1G9+XIuSSt0yggEeEG9ragn0Dlo13yL2zmx2/Th8Nnmwo/hHx81F/y7lTvKI/j1AaQiZ
-         cHmZPTrzGMEIXs85htMxHPPYwSHWk4WaXhCujtQs2ZToaTWnt5MfPIw5oEkg8MkzFoZM
-         yglw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770911965; x=1771516765;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AUl3gjz1kKfg9Z4YCOJbzABwXZkXgt7AzcqRZ75wmRs=;
-        b=xU1tUR/koUk3emtd91GZJ1F9AxRfdEYqr6e3qIO/eU4/jXMwKy+2iFE4I7ZkO5gmqy
-         atLj/tE6tTu1TQjyjGAD+X8IhQiLgEQP2ywCQ4vv9Vdklv2O0dakiIcHRCKS0wL2qj2x
-         cmBXtWnov6sFtz/MTuTAepvqYJDInAzJ2gcwZ7vF3CgpH3Xld02iQriUhCF3/19fK8mt
-         xceR5dp6iVw0hO7gSDPdeGMYuaT6oqeQClOYCmNiwGHtF7QvAJesFgUV00PCHxLTPv4R
-         hVsadqBTkr1kGHgJd+SBj39R7jx+Ya6c+Y9QIuyG8xdKzxi/aA9v9nLiJwYa8eWP59Fm
-         s3kg==
-X-Forwarded-Encrypted: i=1; AJvYcCVOCgGpZLJSLgM0jNHUNZDFL6oOUReRYAQUllPPIILiF/XMVzMTyeK5WEB1WKs6JRHXq/Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YziiVu7WpCvsBDlCCe7YPzObodX2abKR4wXuPeM0GBpDvGuqYgd
-	BCbvC/S3JBa/ulxv9b+wWiUAiim/tiUxpBARwMG2KYWkKBkCVHoYlEBLb9zvQQopVft/pOaUf93
-	8RTH43H4AWp01GA==
-X-Received: from pleu16.prod.google.com ([2002:a17:903:41d0:b0:29f:2fcb:60c8])
- (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:2f0b:b0:2aa:d600:d03e with SMTP id d9443c01a7336-2ab398817f3mr36450955ad.18.1770911964630;
- Thu, 12 Feb 2026 07:59:24 -0800 (PST)
-Date: Thu, 12 Feb 2026 07:58:56 -0800
-In-Reply-To: <20260212155905.3448571-1-jmattson@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3DC954774;
+	Thu, 12 Feb 2026 16:18:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770913104; cv=fail; b=iNRs/L3tEyI/K3pxIyqV20E897Pb5g0YaPuabBIr/Vl7uF7u2f2pEybVRuGk6x2iA4JBSFyUvkhxmS4geMWFU925FmUh4KesNfvGocculNqvR0ZzH4e01AG2s0TSO1eK/0a3szpMr6yvMYkz/IjnnbVebzqeUDLSEsPBXhcH9og=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770913104; c=relaxed/simple;
+	bh=J4iOdsH2nUQjuC3CSBtBgCTcujwBIEgAYRwsgABCW2c=;
+	h=Message-ID:Date:Cc:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=rrnDMd7i8Sn5zzcHBLghhmxGpJETmDe9oELu6GgGzRbnV8K8IxeDUzYCz1BcM/juBChw2hnvLLQeOVWLg8B5jsxYw1l1ITYZbR56xzhQS7yUhN/MZTyL9kXLhwyTrRfP4YtuE6fCTsAzgabFQwV/D4NSXQCKVNJxJ2flOmBfRcE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=citrix.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=rqk7dTg8; arc=fail smtp.client-ip=52.101.56.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=citrix.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gMmEaOa2FBG4ZSCDYm6nlIoipCz9O4QSQvmkkyeRAmuVTXLHWK8aW8gZmY2GVRgHRNLHm0pDv8RTEIhKeYqE6MJVjPUWZZN3rbg9B1NkG+yeqG0taJMbRD0rXs2bxH3FGMvv2VUMVVU0ZMYRMNtwyxf6Bu71JJZGFruSYmp2jjpQBf28cTAfBYG0gqRtx8EzXjDGrc2brqUumG8dIfrEd7P91XrbBwwn6/UyBeXTsjY0qH8mZ++08xIrGgBJq7EfeCerEWZLRZ3dqVsqojwrBUDZUFIqorA9IVBnVg90neTJuc/P95hcx/bqc2S44ZaC51/62k3HWPWST8Mmm528Rw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J4iOdsH2nUQjuC3CSBtBgCTcujwBIEgAYRwsgABCW2c=;
+ b=o/450iKEqRUIIZtbPFQuNdmcdhVJH13zknj1YKcQHKO0sToXaJ4zMXhzWuXMfJn3Wbl82gPSiIvc+1n37UGaLduTORObLWghjINrl8nnrtfXlPSbqkNl6P8z8pWLpNRhAcOqQEd7qg9MpvqsQsSUAbH+PPuYD19pwI0tlDuFVNKxaDl3NzImkf4lG+Lt31srV6vko8SWi3BnKQSQ8LlvTv4w97BvO28kKkXSMxd2Dc6UPzlZothA8A4jWI23zbVlyUIiVHbIhWh1j7f6+h9LJBXboK+HI7guApEOO9Lp8K4z05u5s2ReZ/830dwAiSesQlCPaeqP41s2vLTl+8AMqw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
+ dkim=pass header.d=citrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=citrix.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J4iOdsH2nUQjuC3CSBtBgCTcujwBIEgAYRwsgABCW2c=;
+ b=rqk7dTg8lyfASXg7gEoDpiiOog5w35jGKFUzKEsq9sL2EkTnQ+Z0FqkXLUzV1dq31be2iwjfWTAQnXNLc+IngJLW6ZBbo3OItT6yom0v1fHRsdnQ8yeOitUtbcey12YkVtdWyj8zS+XmIh9nr94jPhGZI3q3FctmN5hM8qnD9zE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=citrix.com;
+Received: from CH8PR03MB8275.namprd03.prod.outlook.com (2603:10b6:610:2b9::7)
+ by CO1PR03MB5827.namprd03.prod.outlook.com (2603:10b6:303:9a::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.13; Thu, 12 Feb
+ 2026 16:18:18 +0000
+Received: from CH8PR03MB8275.namprd03.prod.outlook.com
+ ([fe80::a70d:dc32:bba8:ce37]) by CH8PR03MB8275.namprd03.prod.outlook.com
+ ([fe80::a70d:dc32:bba8:ce37%6]) with mapi id 15.20.9611.012; Thu, 12 Feb 2026
+ 16:18:18 +0000
+Message-ID: <03d63568-4c75-4600-9f7f-18e080cac169@citrix.com>
+Date: Thu, 12 Feb 2026 16:18:14 +0000
+User-Agent: Mozilla Thunderbird
+Cc: Andrew Cooper <andrew.cooper3@citrix.com>, bp@alien8.de,
+ dave.hansen@linux.intel.com, hpa@zytor.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, mingo@kernel.org, pbonzini@redhat.com,
+ seanjc@google.com, tglx@kernel.org, x86@kernel.org, ubizjak@gmail.com
+Subject: Re: [PATCH 1/2] KVM: VMX: Drop obsolete branch hint prefixes from
+ inline asm
+To: ludloff@gmail.com
+References: <CAKSQd8W3ijML2L6hPTR6+eFUh3bZXjrMjSsdbMaZrmpGTSFoOQ@mail.gmail.com>
+Content-Language: en-GB
+From: Andrew Cooper <andrew.cooper3@citrix.com>
+In-Reply-To: <CAKSQd8W3ijML2L6hPTR6+eFUh3bZXjrMjSsdbMaZrmpGTSFoOQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO6P123CA0035.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:2fe::8) To CH8PR03MB8275.namprd03.prod.outlook.com
+ (2603:10b6:610:2b9::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260212155905.3448571-1-jmattson@google.com>
-X-Mailer: git-send-email 2.53.0.239.g8d8fc8a987-goog
-Message-ID: <20260212155905.3448571-9-jmattson@google.com>
-Subject: [PATCH v4 8/8] KVM: selftests: nSVM: Add svm_nested_pat test
-From: Jim Mattson <jmattson@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH8PR03MB8275:EE_|CO1PR03MB5827:EE_
+X-MS-Office365-Filtering-Correlation-Id: 79fec8ff-cba0-4636-4bfa-08de6a525500
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?OGFSenNWMVhFMDFEQkRLbUNxc3QyY3FXRmY5R2xEMGpUdVp5cEFML0s1aVdr?=
+ =?utf-8?B?TkF2TXlDM1NPSk44S3BDSmkySmIvQ1JmRFJzb3krV1FUUVFKQ2xqTzNMYUJ6?=
+ =?utf-8?B?V2MyNTdvaXpyWHo5R0doMUl2SlF4QjdNaEtYeUZuTWpzL0NUdkt1cTgybmhU?=
+ =?utf-8?B?QXNEK0toWG5QNEQzaGthNWtsOWkyVzYrL1p3QWtPcGZDWVFOU0o4ajBRK0hm?=
+ =?utf-8?B?eW9FdGlCd3ZBVnVBV1JPSmJCNkRKYlJRRWJpYk0wUEkxNURtRlVOT3pjcmN1?=
+ =?utf-8?B?UjhOWFlzc2hqL1haUmhMTDZEdlNDbzA4YitoY0R0YkpMYXFHNUVrZWNRZjBq?=
+ =?utf-8?B?K3pWK3JTUUsrNTBYR01zYmdpaC9xR09HT0RINlNCYWtoVEt2aUVYNklsVlp3?=
+ =?utf-8?B?Sm9kMmJTY1E2NDdrUlhvOXRCSlFOSTFCMURjR2xkSTdYdkRXRGlSdFRzS1Fo?=
+ =?utf-8?B?SjJJS3BXWC8xOU1GVHlXV3krM2xQUTltbXlCdzhJQ3QvS1dxaWZ0V05FOUJ2?=
+ =?utf-8?B?RUdGcm1DeVBwSnA1Vi9QME1OeE50engyaHA2U3RsRzNWTnFpTmVZcHFhUGg0?=
+ =?utf-8?B?MXRxeUlaR1BrSUtZL1k4VHY4NnhJRnh6M01FQXphREJYcWFLWnFnNE1JWUsy?=
+ =?utf-8?B?R0N2VndvVWFiR09NYmtCZ0NZTlB2SWdKLzdEcm9ZelRRQURnUTh6cElOaUR1?=
+ =?utf-8?B?TmErYjBwU3Y4TEd1SmZBc3d4QjVTMHRNeHV0VW81NlluU1BsVFkyMWNxMjBj?=
+ =?utf-8?B?S1pITGUzemNpRWhGYWNxcUQyUzdJTWFiVUhBcFRjb1hwVTlva2xRbmdrUmp3?=
+ =?utf-8?B?OFduUmpRTHNFUU9GSmsvVVJrby9pWStUa3k1U1pMNUUzNkRpQ1RqSjd0Y0M3?=
+ =?utf-8?B?OFZ6MjVBNVZWNHhSdkxHNmNNbk5Mb1dFUUlZMnFzajQzTXlLa3JSU2xXbkxT?=
+ =?utf-8?B?d3BVdEFqSWFzZVVaYVZGU2sxSjVNLzA2VERsV3JzQ28xaVhqYUVIY2dwOStL?=
+ =?utf-8?B?THByclZuK1plTGVydHNBcVN6a1c0S2MybXc1alJhQjdHZTNuRzJLOCs0SkJK?=
+ =?utf-8?B?N0o3ZitCYnNxZzFuWXdiNTJxRUVNT0ZZMnZjZkNtY2hDSXZVY3hacVdFTE5D?=
+ =?utf-8?B?NFhoRmdpVGVEUmNQWkJhck9wR3NrMCtEMElPT3cvTTQ2QjgrN0hOcGpIejR3?=
+ =?utf-8?B?aE80TDdxa2xMQmZHMjJTSndUOGlwNDMrUCt1UFhUdUVJRzRoOG5ERGd4QWwv?=
+ =?utf-8?B?VzF6VEU3N0VpcHhqemVzWnd3Wmw4cE96MVpKVDdoT0xxOGVON2FZbDF1MmVw?=
+ =?utf-8?B?Q0hOTXM2UXhXd2dnVFJ5M3lMN3hRMWoxV0x6dFhWaVdYenlOdlpXRFRZaVRG?=
+ =?utf-8?B?LzdGalpjcFl2aS8rb0xpWWNWeTN1QmpRZDdqcUp1R09BQit5TURyamswQkgz?=
+ =?utf-8?B?Um5WNEFoMXZyMUUvczBwYkRsT2pIRnFUY2xENk54SlZDR2h4OGhjM05walJG?=
+ =?utf-8?B?dzV5NlZuZmZ5cUZraldVOU5UOURuSnhKOWFENkl4SHdTSm5aWFA1Z1hOMzBj?=
+ =?utf-8?B?WTcrbXBLSFR3S09NbmpEcXdPSEdDbHM2MGdubnJKNGh3ZWNabmpZblNrcE5t?=
+ =?utf-8?B?SzVGZ1A5VGRwZkdLQ3hYU3plRTQwU0ZvMTVmcFNpc0Z3ZG8wWW5iK1VpZlZJ?=
+ =?utf-8?B?SUhoQ0t3NUdYekRaci8veWhMdXNhakd3MGl2RVNROStBeVo4LzRIWU5ZL3pT?=
+ =?utf-8?B?WWdmTmUrejdBMkpkOTRjU0RMQzNTQ0JXVDRqV1JZYWVCVVNldEFqNm5Dd2l4?=
+ =?utf-8?B?MWl6ZFkxWFQvUXVlb0REZHBaWk1HWFBVRGROVVlNQVBlcC8xODAxOExGRFZG?=
+ =?utf-8?B?cVVXdTNqS1FrUHo1dE9ycU5MbWN2U2ZGVzIwUm91UU5QWEJEODFlc0l3amJi?=
+ =?utf-8?B?ZU9hZmJ4WTl4NmJyWU9vNno3dWJ3VVYwN3Z4TXpURGx3ZC9HWkl2bEZhUUN3?=
+ =?utf-8?B?dmtjWEY3dE5xVHAvalM1L0VNRE9jWFZLUmROMWV2U0l6YVlkVWN0Rk9Femlm?=
+ =?utf-8?B?S3hLZjFETGFpK2RUTzAyaWswNFhLby94bC9FMVBZckdCQjFlTWVHY2ExcVp2?=
+ =?utf-8?Q?XMns=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH8PR03MB8275.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VFAxZURqT1VOYllzWmVnMGwwRzRBeXJ2QzJZMDJLajc5c3dCWm5rbzRCb3N2?=
+ =?utf-8?B?K0tDVlVsaHhKV3VXbklTTW1lL1ZHSXZPVnJxbmJEd09TV0h2RzI3Yzlodngw?=
+ =?utf-8?B?WjByenM2RmpmRnI3U1NmeUpwZDBLd3hwZzF3cmJjUy9CU3VjNnJVb2pqc21Q?=
+ =?utf-8?B?eFlwL2JmQmF6TENmNXBSZHdVakpVRW44VFRSbzNHdzJDT0M5OTc2S0hnRE5L?=
+ =?utf-8?B?VG9wU2taZXZCL3FsRng5bVlPY0dibEhqOUxpRTdrTWw1c1JmTysrVUdWQlhU?=
+ =?utf-8?B?K2tISU9jY1BqK3I2NEJIcTUrTENwck5nVWZKb2hJeTM3bUloUnpMYlBVbVRZ?=
+ =?utf-8?B?SlVJelpreVNDZ1RJbEFkNGpNaExsS3M0MjZSZ2FvSkRyQVdrZlVodkVUMzhX?=
+ =?utf-8?B?Nm9yejQ2NFJZUU5QdGp5dkJpdEh5aitKTXZxN0hDMTZaajBEU1l1L09YdXhS?=
+ =?utf-8?B?UDBkVUVzNTBnSHZHbkZaN01vSFF4YlhMQ1g5a1VDUmFUZFFQdG5nRnRnL2d1?=
+ =?utf-8?B?Wkp5Tm1LU1BYRlY3TjAxblV5RjlCanpyT2JHZ3JKSnEyZGpNUE9OVUlqR04z?=
+ =?utf-8?B?dkxNRWhCL3Q3MktYQ3N3V0t2cjJnQTB2dkZsdnNMVlBrM3k2VGxSRTh0VUMw?=
+ =?utf-8?B?akhQWlRXQXpsTzQyUGR0ZUswajZlWjFDajdBWDhYT3BKdUhIQ2VmckpLdXJv?=
+ =?utf-8?B?ZXZHUldKVDl4eGt0c0RIQVg4UjJKWGc5RVlPQ1BPQkVDd2FBdWlXVHQ3b1dm?=
+ =?utf-8?B?dGdoK2syNmFwS1l5ODBpeEtXZlVDdVpVVXFHL3BxM2IzTEN3OHNZK3Rrems0?=
+ =?utf-8?B?bEV6UzlnL2NybXJ3Y2ZDT0gyaGNXUGwxSjdpOCtRU1duOU9UdnBmcnlWVzlZ?=
+ =?utf-8?B?RVlkUVVHRWRtOFVMekdvSXlOMWg3dkp0c0R3ZW5RN1hVSXlmVHIvL2xvVk1R?=
+ =?utf-8?B?VFYrazc3N2h3WElFc2o5N1h3T2R3aWZNb21uOGRyWGJoNTFJeVRBRzJTVXoy?=
+ =?utf-8?B?TEVoTFUzazkyU1dJemROUGFLTEJwS0ZrSDl0UUpYK21vYnlaUU05YUk4UWo0?=
+ =?utf-8?B?UWlJaks0MUhJTE92QzUwN0hSeTZrMUxXTGppNSt5WENEWFRVSkIxZjhiUGVa?=
+ =?utf-8?B?QWMxcVF5QUd3K1NCM2hNY3pSMHROQkVMQ2ZGaE5PTmRpUi9RZlBEWVlVd3o0?=
+ =?utf-8?B?R3VaN25rbTcvV2hoRHNscEk5c05mSy9vNmF5TFRBamYreXd6ZHhWU1EvV0Za?=
+ =?utf-8?B?OS8zRnhPN2FjNHBFMURqS1pqdEFtU2dPbWZuQXFCM2pGT240ZmxPc0FnZXpo?=
+ =?utf-8?B?dVQvNkowc0hqeE14RmZ2elF6T1lUVnRVZG5lbUErK1hsenBzMndseWtyTC9K?=
+ =?utf-8?B?NXMyaXY0bFZHQmI3NDRYbXpGUDNJY0hQSnFJZ3o0WW5CTlNDMXZnQnhHL1BG?=
+ =?utf-8?B?V2tkdms5cWY5cjV4RzR1SWlzajh5SjFKMXJVQUhQVmlRdkRsQ0luamZtVzFi?=
+ =?utf-8?B?SDh6MUVvOFpyT0xSV240cmVsMXF6VE5FVmhMQ3ZRWUhnT21mVzBxR2xWcnRi?=
+ =?utf-8?B?aEZLUnlhczRYNjN1S1pySk0wWVJlSnRVRnIvd1VIK1grNEpLLzkzMjhaV3ph?=
+ =?utf-8?B?NkpIZklsUWxJOHpaa2hweXBBQ1M4S2t2MzlXR3N3cTluQVk5NnQvcVowN0dv?=
+ =?utf-8?B?RWhLWFhyWUxFUzI0VGl6R1liSzBWaWVJNFJSN0VKdG4yblhEeDNaTDFKclht?=
+ =?utf-8?B?enJ2TnFyRzd6bXJMSnI1dmQwTEF0R3N0aWU3NTBsVmQ1MmYzZ2tVODU0SUgw?=
+ =?utf-8?B?Y1FsTHRrOVVnWG1nQUFIdmlrdmxQeXFiOGd2Vy90Z1JsSjg5UVdWUVdsTEFQ?=
+ =?utf-8?B?TGJ6N0RDWHhVNUFZZjlxUUhzMXZnamsrVUdqS3lRVFU5RE5TOVB3SVdkbE55?=
+ =?utf-8?B?VC8xcjBFOE9ka2tjaU5GRjl3VlpFUXZKc3Z2MCsrQmRCZmpuZ2tWMjkxNk43?=
+ =?utf-8?B?Q0tFTjRBWHZkOXp5YU10T3R0NkIxOFRlSy9UdlpjNENJVU93c0Y0cjRGMFN3?=
+ =?utf-8?B?dW9BUzFqYUFKRnRJLzlmTkVac2FQajAxeEpWd01tL1VYbGYrRGZRcmJKOTF3?=
+ =?utf-8?B?V1UwcUJ5Vlp0UUdlaEl3MTQzMkY1d1BHVjBBb0ZIR3JjaC9uWFJUNjFUUDB4?=
+ =?utf-8?B?aXJDU3dDOFJKQnZaY3UrTy9Cb0t1T2IvRkZQNzhFeExLTVpuRjdHNTJ3aEd5?=
+ =?utf-8?B?T3UxcFBxdXRMSiswN1F4bmdDZGlaT0dUR1Ywa3dzNmR3em9UWjB4L3E0Z0xn?=
+ =?utf-8?B?ZzVGbTAwVTM0eWVwTVB1Y0FNd3dsa24xSnZwaEdQbkVBWDluT0w4Z0krVmNZ?=
+ =?utf-8?Q?Nd1VHL3r9pk1JTAk=3D?=
+X-OriginatorOrg: citrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79fec8ff-cba0-4636-4bfa-08de6a525500
+X-MS-Exchange-CrossTenant-AuthSource: CH8PR03MB8275.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2026 16:18:18.1115
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SxnboqwxcTqx8D9IUFheXXR7ZTBJWzley+8tcv6Ls49bszLTRs+25o3J2zw5taGIYa1VMFrjykZnUs2998GF1jIool9j7gBF5OXnWNZVwE4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR03MB5827
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[citrix.com,reject];
+	R_DKIM_ALLOW(-0.20)[citrix.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-70999-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-70998-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[citrix.com,alien8.de,linux.intel.com,zytor.com,vger.kernel.org,kernel.org,redhat.com,google.com,gmail.com];
+	DKIM_TRACE(0.00)[citrix.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[andrew.cooper3@citrix.com,kvm@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 551B212F36E
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,citrix.com:mid,citrix.com:dkim]
+X-Rspamd-Queue-Id: EF25412F44A
 X-Rspamd-Action: no action
 
-Verify that KVM correctly virtualizes the host PAT MSR and the guest PAT
-register for nested SVM guests.
+On 12/02/2026 5:33 am, Christian Ludloff wrote:
+> Andrew Cooper wrote:
+>> The branch-taken hint has new meaning in Lion Cove cores and later,
+>> along with a warning saying "performance penalty for misuse".
+> Make that Redwood Cove. For details, see the
+> Intel ORM Vol1 #248966-050 Section 2.1.1.1.
 
-With nested NPT disabled:
- * L1 and L2 share the same PAT
- * The vmcb12.g_pat is ignored
+My apologies.  The ORM is the source of truth here, and I clearly mixed
+up the uarch.
 
-With nested NPT enabled:
- * An invalid g_pat in vmcb12 causes VMEXIT_INVALID
- * RDMSR(IA32_PAT) from L2 returns the value of the guest PAT register
- * WRMSR(IA32_PAT) from L2 is reflected in vmcb12's g_pat on VMEXIT
- * RDMSR(IA32_PAT) from L1 returns the value of the host PAT MSR
- * Save/restore with the vCPU in guest mode preserves both hPAT and gPAT
-
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/x86/svm_nested_pat_test.c   | 298 ++++++++++++++++++
- 2 files changed, 299 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/svm_nested_pat_test.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 7810f9db5f77..5554e40f73f8 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -110,6 +110,7 @@ TEST_GEN_PROGS_x86 += x86/state_test
- TEST_GEN_PROGS_x86 += x86/vmx_preemption_timer_test
- TEST_GEN_PROGS_x86 += x86/svm_vmcall_test
- TEST_GEN_PROGS_x86 += x86/svm_int_ctl_test
-+TEST_GEN_PROGS_x86 += x86/svm_nested_pat_test
- TEST_GEN_PROGS_x86 += x86/svm_nested_shutdown_test
- TEST_GEN_PROGS_x86 += x86/svm_nested_soft_inject_test
- TEST_GEN_PROGS_x86 += x86/svm_lbr_nested_state
-diff --git a/tools/testing/selftests/kvm/x86/svm_nested_pat_test.c b/tools/testing/selftests/kvm/x86/svm_nested_pat_test.c
-new file mode 100644
-index 000000000000..08c1428969b0
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/svm_nested_pat_test.c
-@@ -0,0 +1,298 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * KVM nested SVM PAT test
-+ *
-+ * Copyright (C) 2026, Google LLC.
-+ *
-+ * Test that KVM correctly virtualizes the PAT MSR and VMCB g_pat field
-+ * for nested SVM guests:
-+ *
-+ * o With nested NPT disabled:
-+ *     - L1 and L2 share the same PAT
-+ *     - The vmcb12.g_pat is ignored
-+ * o With nested NPT enabled:
-+ *     - Invalid g_pat in vmcb12 should cause VMEXIT_INVALID
-+ *     - L2 should see vmcb12.g_pat via RDMSR, not L1's PAT
-+ *     - L2's writes to PAT should be saved to vmcb12 on exit
-+ *     - L1's PAT should be restored after #VMEXIT from L2
-+ *     - State save/restore should preserve both L1's and L2's PAT values
-+ */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "svm_util.h"
-+
-+#define L2_GUEST_STACK_SIZE 256
-+
-+#define PAT_DEFAULT		0x0007040600070406ULL
-+#define L1_PAT_VALUE		0x0007040600070404ULL  /* Change PA0 to WT */
-+#define L2_VMCB12_PAT		0x0606060606060606ULL  /* All WB */
-+#define L2_PAT_MODIFIED		0x0606060606060604ULL  /* Change PA0 to WT */
-+#define INVALID_PAT_VALUE	0x0808080808080808ULL  /* 8 is reserved */
-+
-+/*
-+ * Shared state between L1 and L2 for verification.
-+ */
-+struct pat_test_data {
-+	uint64_t l2_pat_read;
-+	uint64_t l2_pat_after_write;
-+	uint64_t l1_pat_after_vmexit;
-+	uint64_t vmcb12_gpat_after_exit;
-+	bool l2_done;
-+};
-+
-+static struct pat_test_data *pat_data;
-+
-+static void l2_guest_code(void)
-+{
-+	pat_data->l2_pat_read = rdmsr(MSR_IA32_CR_PAT);
-+	wrmsr(MSR_IA32_CR_PAT, L2_PAT_MODIFIED);
-+	pat_data->l2_pat_after_write = rdmsr(MSR_IA32_CR_PAT);
-+	pat_data->l2_done = true;
-+	vmmcall();
-+}
-+
-+static void l2_guest_code_saverestoretest(void)
-+{
-+	pat_data->l2_pat_read = rdmsr(MSR_IA32_CR_PAT);
-+
-+	GUEST_SYNC(1);
-+	GUEST_ASSERT_EQ(rdmsr(MSR_IA32_CR_PAT), pat_data->l2_pat_read);
-+
-+	wrmsr(MSR_IA32_CR_PAT, L2_PAT_MODIFIED);
-+	pat_data->l2_pat_after_write = rdmsr(MSR_IA32_CR_PAT);
-+
-+	GUEST_SYNC(2);
-+	GUEST_ASSERT_EQ(rdmsr(MSR_IA32_CR_PAT), L2_PAT_MODIFIED);
-+
-+	pat_data->l2_done = true;
-+	vmmcall();
-+}
-+
-+static void l2_guest_code_multi_vmentry(void)
-+{
-+	pat_data->l2_pat_read = rdmsr(MSR_IA32_CR_PAT);
-+	wrmsr(MSR_IA32_CR_PAT, L2_PAT_MODIFIED);
-+	pat_data->l2_pat_after_write = rdmsr(MSR_IA32_CR_PAT);
-+	vmmcall();
-+
-+	pat_data->l2_pat_read = rdmsr(MSR_IA32_CR_PAT);
-+	pat_data->l2_done = true;
-+	vmmcall();
-+}
-+
-+static struct vmcb *l1_common_setup(struct svm_test_data *svm,
-+				    struct pat_test_data *data,
-+				    void *l2_guest_code,
-+				    void *l2_guest_stack)
-+{
-+	struct vmcb *vmcb = svm->vmcb;
-+
-+	pat_data = data;
-+
-+	wrmsr(MSR_IA32_CR_PAT, L1_PAT_VALUE);
-+	GUEST_ASSERT_EQ(rdmsr(MSR_IA32_CR_PAT), L1_PAT_VALUE);
-+
-+	generic_svm_setup(svm, l2_guest_code, l2_guest_stack);
-+
-+	vmcb->save.g_pat = L2_VMCB12_PAT;
-+	vmcb->control.intercept &= ~(1ULL << INTERCEPT_MSR_PROT);
-+
-+	return vmcb;
-+}
-+
-+static void l1_assert_l2_state(struct pat_test_data *data, uint64_t expected_pat_read)
-+{
-+	GUEST_ASSERT(data->l2_done);
-+	GUEST_ASSERT_EQ(data->l2_pat_read, expected_pat_read);
-+	GUEST_ASSERT_EQ(data->l2_pat_after_write, L2_PAT_MODIFIED);
-+}
-+
-+static void l1_svm_code_npt_disabled(struct svm_test_data *svm,
-+				     struct pat_test_data *data)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb;
-+
-+	vmcb = l1_common_setup(svm, data, l2_guest_code,
-+			       &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-+	l1_assert_l2_state(data, L1_PAT_VALUE);
-+
-+	data->l1_pat_after_vmexit = rdmsr(MSR_IA32_CR_PAT);
-+	GUEST_ASSERT_EQ(data->l1_pat_after_vmexit, L2_PAT_MODIFIED);
-+
-+	GUEST_DONE();
-+}
-+
-+static void l1_svm_code_invalid_gpat(struct svm_test_data *svm,
-+				     struct pat_test_data *data)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb;
-+
-+	vmcb = l1_common_setup(svm, data, l2_guest_code,
-+			       &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	vmcb->save.g_pat = INVALID_PAT_VALUE;
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_ERR);
-+	GUEST_ASSERT(!data->l2_done);
-+
-+	GUEST_DONE();
-+}
-+
-+static void l1_svm_code_npt_enabled(struct svm_test_data *svm,
-+				    struct pat_test_data *data)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb;
-+
-+	vmcb = l1_common_setup(svm, data, l2_guest_code,
-+			       &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-+	l1_assert_l2_state(data, L2_VMCB12_PAT);
-+
-+	data->vmcb12_gpat_after_exit = vmcb->save.g_pat;
-+	GUEST_ASSERT_EQ(data->vmcb12_gpat_after_exit, L2_PAT_MODIFIED);
-+
-+	data->l1_pat_after_vmexit = rdmsr(MSR_IA32_CR_PAT);
-+	GUEST_ASSERT_EQ(data->l1_pat_after_vmexit, L1_PAT_VALUE);
-+
-+	GUEST_DONE();
-+}
-+
-+static void l1_svm_code_saverestore(struct svm_test_data *svm,
-+				    struct pat_test_data *data)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb;
-+
-+	vmcb = l1_common_setup(svm, data, l2_guest_code_saverestoretest,
-+			       &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-+	GUEST_ASSERT(data->l2_done);
-+
-+	GUEST_ASSERT_EQ(rdmsr(MSR_IA32_CR_PAT), L1_PAT_VALUE);
-+	GUEST_ASSERT_EQ(vmcb->save.g_pat, L2_PAT_MODIFIED);
-+
-+	GUEST_DONE();
-+}
-+
-+static void l1_svm_code_multi_vmentry(struct svm_test_data *svm,
-+				      struct pat_test_data *data)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb;
-+
-+	vmcb = l1_common_setup(svm, data, l2_guest_code_multi_vmentry,
-+			       &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-+
-+	GUEST_ASSERT_EQ(data->l2_pat_after_write, L2_PAT_MODIFIED);
-+	GUEST_ASSERT_EQ(vmcb->save.g_pat, L2_PAT_MODIFIED);
-+	GUEST_ASSERT_EQ(rdmsr(MSR_IA32_CR_PAT), L1_PAT_VALUE);
-+
-+	vmcb->save.rip += 3;  /* vmmcall */
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	GUEST_ASSERT_EQ(vmcb->control.exit_code, SVM_EXIT_VMMCALL);
-+	GUEST_ASSERT(data->l2_done);
-+	GUEST_ASSERT_EQ(data->l2_pat_read, L2_PAT_MODIFIED);
-+	GUEST_ASSERT_EQ(rdmsr(MSR_IA32_CR_PAT), L1_PAT_VALUE);
-+
-+	GUEST_DONE();
-+}
-+
-+static void run_test(void *l1_code, const char *test_name, bool npt_enabled,
-+		     bool do_save_restore)
-+{
-+	struct pat_test_data *data_hva;
-+	vm_vaddr_t svm_gva, data_gva;
-+	struct kvm_x86_state *state;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	pr_info("Testing: %s\n", test_name);
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, l1_code);
-+	if (npt_enabled)
-+		vm_enable_npt(vm);
-+
-+	vcpu_alloc_svm(vm, &svm_gva);
-+
-+	data_gva = vm_vaddr_alloc_page(vm);
-+	data_hva = addr_gva2hva(vm, data_gva);
-+	memset(data_hva, 0, sizeof(*data_hva));
-+
-+	if (npt_enabled)
-+		tdp_identity_map_default_memslots(vm);
-+
-+	vcpu_args_set(vcpu, 2, svm_gva, data_gva);
-+
-+	for (;;) {
-+		vcpu_run(vcpu);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			if (do_save_restore) {
-+				pr_info("  Save/restore at sync point %ld\n",
-+					uc.args[1]);
-+				state = vcpu_save_state(vcpu);
-+				kvm_vm_release(vm);
-+				vcpu = vm_recreate_with_one_vcpu(vm);
-+				vcpu_load_state(vcpu, state);
-+				kvm_x86_state_cleanup(state);
-+			}
-+			break;
-+		case UCALL_DONE:
-+			pr_info("  PASSED\n");
-+			kvm_vm_free(vm);
-+			return;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_NPT));
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
-+
-+	run_test(l1_svm_code_npt_disabled, "nested NPT disabled", false, false);
-+
-+	run_test(l1_svm_code_invalid_gpat, "invalid g_pat", true, false);
-+
-+	run_test(l1_svm_code_npt_enabled, "nested NPT enabled", true, false);
-+
-+	run_test(l1_svm_code_saverestore, "save/restore", true, true);
-+
-+	run_test(l1_svm_code_multi_vmentry, "multiple entries", true, false);
-+
-+	return 0;
-+}
--- 
-2.53.0.239.g8d8fc8a987-goog
-
+~Andrew
 
