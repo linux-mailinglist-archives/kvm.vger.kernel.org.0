@@ -1,175 +1,147 @@
-Return-Path: <kvm+bounces-71037-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71038-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MLsRF8zcjmlZFgEAu9opvQ
-	(envelope-from <kvm+bounces-71037-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 09:11:56 +0100
+	id oCzaCGnrjmkCGAEAu9opvQ
+	(envelope-from <kvm+bounces-71038-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 10:14:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07C04133D39
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 09:11:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B24613453F
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 10:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5F6D830AAEEA
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 08:11:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C06033033508
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 09:14:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C13F531A57C;
-	Fri, 13 Feb 2026 08:11:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58167349AEA;
+	Fri, 13 Feb 2026 09:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mZxlezzd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HcNk/thk"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECDFD31985C;
-	Fri, 13 Feb 2026 08:11:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB61D330B27
+	for <kvm@vger.kernel.org>; Fri, 13 Feb 2026 09:14:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770970265; cv=none; b=OF9FY//o9/KonTZND/D1drg9WqADM7l4dRl/Jw2mE0W6UV5cy28EdAVyb36T2X2CmTLnFOENuY5kqOJGUAyZevV3/OPobmhOxqEb8q8CrgYItQWOPoEQjgH0E5mRuBoXDaIKy/B3n2gPHGVXr1+YD7vh5y2tZQBrTt0PhuQ7jUU=
+	t=1770974048; cv=none; b=FMgczfpesRp+hiGlbcv0iKQ9SvcIenS4Oq/MhAItv7sIZcDm9c77K7Jhohw9f1zYtznAQkPvLEAsyd90RDLPPmAAzjXIsO6pTiIkqenMX0txul3zmFohZ8H8u8RaTvnxWDfrTVG59UHB6C0W8vd6KlDCE1T0sfmVUEX/XJdcRiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770970265; c=relaxed/simple;
-	bh=ordfYWUZ3NZZnUjwMBrx0IEFVahF4xoRepQLRc515+I=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I9Z17Nfhdhwesao/k/IfWJHX4hHLcEmvFTdg+ptfOxap9WBJU2zOugjirElU+H25bXvAeF5ol+EGxAhj8JjpMIODNFmvDzzejUsCcydwvOIBEKVSa/IcFCetCTHNeLbJwO+JtRShFlRl1AeaPfdGj/nBm6X5Ow8bFisFfGkFJsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mZxlezzd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D42CC116C6;
-	Fri, 13 Feb 2026 08:11:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770970264;
-	bh=ordfYWUZ3NZZnUjwMBrx0IEFVahF4xoRepQLRc515+I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mZxlezzdNvjH1qxidU7XggLUEDoM/yxCPjvXxNzaIOeH0KjIQE/5lW4YU3ROt4Iep
-	 coZp9FKOS18HwqhltmhVnR/I9UZGq1d1JCklRjWG06sINuOo78HbXvpKBTOmfQKaRj
-	 eIjDXQ2oJhyMZqdJptSC4Y4u9YyBca084S3ZSzWFrtTdMxfR2B/qDhC1uuA2dXVQ9n
-	 n9DLmrIZW7SATj6MK/Oj8VFIrKD22ri1SXZY/se7YJNxuLAxjEQQFX8PHB4uB4VLpy
-	 REMfeXCdKsJx3Sf/DIgeJpUqz7/QsoFghkMcT6hpqqo7Yo1Eo8LmCodQxNDlQGH+rq
-	 pTf2EpwxVJD6g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vqoGT-0000000Ap2s-3Twx;
-	Fri, 13 Feb 2026 08:11:01 +0000
-Date: Fri, 13 Feb 2026 08:11:01 +0000
-Message-ID: <86h5rlawru.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org,
-	alexandru.elisei@arm.com,
-	pbonzini@redhat.com,
-	corbet@lwn.net,
-	linux@armlinux.org.uk,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	oliver.upton@linux.dev,
-	mizhang@google.com,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	mark.rutland@arm.com,
-	shuah@kernel.org,
-	gankulkarni@os.amperecomputing.com,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v6 00/19] ARM64 PMU Partitioning
-In-Reply-To: <gsnt8qcxhdpn.fsf@coltonlewis-kvm.c.googlers.com>
-References: <86v7g5asp4.wl-maz@kernel.org>
-	<gsnt8qcxhdpn.fsf@coltonlewis-kvm.c.googlers.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1770974048; c=relaxed/simple;
+	bh=PMa6YgrazO3G78nBzIeQZbhkPv0pBL3ypWbxUNNFUmY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=BkLLjDyHlVXJc/8t1YoSlaev88AHphnvq9A5OoS9Ncn0wWGseFXIr6L4IO9bE6hQ0OirQfqkp6pjyt8oxpa5AKwzAHWlfC/VxJatHTUZeDbD5p8vLYrzw9pes8Qb7irQ/jvhXVMhKULR8WCH8zbdcG1lCVaoP7UoQY8zI8/znF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HcNk/thk; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770974047; x=1802510047;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PMa6YgrazO3G78nBzIeQZbhkPv0pBL3ypWbxUNNFUmY=;
+  b=HcNk/thkBWcmxPiqtz0G5s7I+Z/G8yS0OCsqfh1mRhlq8EpDg0Ug/9oH
+   vU/vz2th3pTr6vtfxkUVsFZ0U/oTErcJKZwtjdiZ9yj83P7twQL2iI9rh
+   iATTiqnV4AbjoK8ggAF2aG4YLbMcKTTZ1ICIca6cqe4ZC+lQGjgYdJg0/
+   Xt5fJCCNRKuWh8j1KBiitlRQ1f0svrEhYdiMYxxuekwlHex1A2OKYpiht
+   xvGi8we/Wr3wEl0co3LpJGw2pAsx9IL9TKi/VEBTnpDD1Q8vW4x7s/aQK
+   7gp07Rp3zgXkEeWThW2/oT2znKOVsWpi6jkv+hl8TySdtVj0OXEm/bhOL
+   g==;
+X-CSE-ConnectionGUID: kl4eGaPDRPOrS2nSTfjoPw==
+X-CSE-MsgGUID: gSHt7zKHTbePhiKh9FIaBA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11699"; a="72051240"
+X-IronPort-AV: E=Sophos;i="6.21,288,1763452800"; 
+   d="scan'208";a="72051240"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2026 01:14:06 -0800
+X-CSE-ConnectionGUID: 1IQ8Tg52Snqp27jJZP5qpg==
+X-CSE-MsgGUID: ahoeqJcgTWqLDttINTUouw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,288,1763452800"; 
+   d="scan'208";a="242311423"
+Received: from dmr-suman.iind.intel.com ([10.49.14.197])
+  by fmviesa001.fm.intel.com with ESMTP; 13 Feb 2026 01:14:04 -0800
+From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+To: jgg@ziepe.ca,
+	yishaih@nvidia.com,
+	skolothumtho@nvidia.com,
+	kevin.tian@intel.com,
+	giovanni.cabiddu@intel.com,
+	alex@shazbot.org,
+	kvm@vger.kernel.org,
+	qat-linux@intel.com
+Subject: [PATCH] vfio/qat: extend Kconfig dependencies for 420xx and 6xxx devices
+Date: Fri, 13 Feb 2026 09:14:03 +0000
+Message-ID: <20260213091403.72338-1-suman.kumar.chakraborty@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, alexandru.elisei@arm.com, pbonzini@redhat.com, corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, mizhang@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[suman.kumar.chakraborty@intel.com,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-71038-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71037-lists,kvm=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+]
-X-Rspamd-Queue-Id: 07C04133D39
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email]
+X-Rspamd-Queue-Id: 9B24613453F
 X-Rspamd-Action: no action
 
-On Thu, 12 Feb 2026 21:08:36 +0000,
-Colton Lewis <coltonlewis@google.com> wrote:
-> 
-> Hey Marc, thanks for the review.
-> 
-> Marc Zyngier <maz@kernel.org> writes:
-> 
-> > On Mon, 09 Feb 2026 22:13:55 +0000,
-> > Colton Lewis <coltonlewis@google.com> wrote:
-> 
-> >> This series creates a new PMU scheme on ARM, a partitioned PMU that
-> >> allows reserving a subset of counters for more direct guest access,
-> >> significantly reducing overhead. More details, including performance
-> >> benchmarks, can be read in the v1 cover letter linked below.
-> 
-> >> An overview of what this series accomplishes was presented at KVM
-> >> Forum 2025. Slides [1] and video [2] are linked below.
-> 
-> >> IMPORTANT: This iteration does not yet implement the dynamic counter
-> >> reservation approach suggested by Will Deacon in January [3]. I am
-> >> working on it, but wanted to send this version first to keep momentum
-> >> going and ensure I've addressed all issues besides that.
-> 
-> > [...]
-> 
-> > As I have asked before, this is missing an example of how userspace is
-> > going to use this. Without it, it is impossible to correctly review
-> > this series.
-> 
-> > Please consider this as a blocker.
-> 
-> Understood. I remember you asking for a QEMU patch specifically.
+From: Vijay Sundar Selvamani <vijay.sundar.selvamani@intel.com>
 
-No. *any* VMM. QEMU, kvmtool, crosvm, firecrackpoter, whichever you want.
+Currently, the QAT VFIO PCI driver can only be configured when the 4xxx
+QAT driver (CRYPTO_DEV_QAT_4XXX) is enabled. This is too restrictive as
+the VFIO driver also supports VFs from the 420xx and 6xxx device
+families, which share a compatible migration interface.
 
-> I had hoped that the use in the selftest was sufficient to show how to
-> use the uAPI.
+Extends the Kconfig dependencies to allow configuration when any of the
+supported QAT device families (4xxx, 420xx, or 6xxx) are enabled.
 
-The selftests are absolutely pointless, like 99% of all selftests.
-They don't demonstrate how the userspace API works, now how
-configuring the PMU is ordered with the rest of the save/restore flow.
+Signed-off-by: Vijay Sundar Selvamani <vijay.sundar.selvamani@intel.com>
+Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ drivers/vfio/pci/qat/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> If not, I can send out an example QEMU patch to the QEMU ARM mailing
-> list.
+diff --git a/drivers/vfio/pci/qat/Kconfig b/drivers/vfio/pci/qat/Kconfig
+index bf52cfa4b595..83f037d7e9a4 100644
+--- a/drivers/vfio/pci/qat/Kconfig
++++ b/drivers/vfio/pci/qat/Kconfig
+@@ -2,7 +2,7 @@
+ config QAT_VFIO_PCI
+ 	tristate "VFIO support for QAT VF PCI devices"
+ 	select VFIO_PCI_CORE
+-	depends on CRYPTO_DEV_QAT_4XXX
++	depends on CRYPTO_DEV_QAT_4XXX || CRYPTO_DEV_QAT_420XX || CRYPTO_DEV_QAT_6XXX
+ 	help
+ 	  This provides migration support for Intel(R) QAT Virtual Function
+ 	  using the VFIO framework.
 
-Please do.
-
-	M.
-
+base-commit: b10c62483b324e60e45fb27d7fdc09c9198993d7
 -- 
-Without deviation from the norm, progress is not possible.
+2.52.0
+
 
