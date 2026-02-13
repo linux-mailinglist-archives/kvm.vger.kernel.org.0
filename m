@@ -1,112 +1,210 @@
-Return-Path: <kvm+bounces-71072-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71073-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GNDFSKHj2m7RQEAu9opvQ
-	(envelope-from <kvm+bounces-71072-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 21:18:42 +0100
+	id 8JF3KV6jj2mqSAEAu9opvQ
+	(envelope-from <kvm+bounces-71073-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 23:19:10 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0871395E1
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 21:18:41 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 252BC139C1A
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 23:19:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 42FB23035FAF
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 20:18:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 54A58302EA85
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 22:19:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E40A929ACFD;
-	Fri, 13 Feb 2026 20:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263FB30BF6B;
+	Fri, 13 Feb 2026 22:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nny2zp0M"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lp1JxfpW"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2084F298CAB;
-	Fri, 13 Feb 2026 20:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566E627F754
+	for <kvm@vger.kernel.org>; Fri, 13 Feb 2026 22:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771013888; cv=none; b=PP5JadUGlvUbROfC9bhkEeK7OraS3Wmt5ytVlU7vdkGY39XGGRFZWpxnlTOkTwlJDIZMkcQvHbkS8CFsdSSpYmdmsa96K+A7stIHTSj/6fiTDu53zUEoVs/p82xkYZcbtUPjj9UaG+X3Qdjw464G5QUZdedEZ9QIYJRl17sbcso=
+	t=1771021146; cv=none; b=ZLt59l3cDgjshQLnBaWR0MBUTvGkbEOVJX7JrCll+XttkPbaKUVfHHMal2F7X/TA3JUlcax43baU/b/DnFsRPUTYCogDePFEOOYd316rRH3cTZY29uiwsSS2lYjbB4H3aZN7lddVNqqM2XVm9kY8gytNMct96iMdQPl0+ZBMEu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771013888; c=relaxed/simple;
-	bh=JVCEqQ4r9lznf0yVZKSj9/BmMAYt8dK+jdf2rdU0BPw=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=plhaTCjMaFywHMHNG/nyJgFbDC9e1PdCDdQTi8MVPteeYLXn9iqo+f7GCQFS83CY8oI9iK/uUv8vibbQNk6OMDz5qv2EM9k8WtdN2tha9g+E26xXUsoNSK/88oWCmccjWdaxUd35RbPHcAmpiSNC8Tn+sRVcvUfjQdA//ENuO2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nny2zp0M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06F3EC116C6;
-	Fri, 13 Feb 2026 20:18:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771013888;
-	bh=JVCEqQ4r9lznf0yVZKSj9/BmMAYt8dK+jdf2rdU0BPw=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=Nny2zp0MZk2+rYa4l8baOm8JZ9lc/wZ/uXGG7XkQ200WExV8fBMuOrIxwCIVBLpSq
-	 y7wBB3VDBKfNbz6PzmvmCoAloYcTPwNwnsBH/Z5ycRd7uVtpSHNcaGkyGID6j7/MPh
-	 SovbwldQyR7M4nRXSkKnJk8cedC0vF6Lid9p92ASTlw/ugHXtDAGkvKbuxlHiIAtAf
-	 W7EyAKPVkrF/xJg6YnXDscMtoQ7wWX9NxeBunPvuEjAVtkLAupHPnGV5Q6gDjEYrIv
-	 Fj2DK8PXrkwfJ2rUVWSAC+nZANbOPwK2U3H8l0LMBFKJ9ILk2lW1zXzQ+dVYBpYh9P
-	 qrkcDPRtOGB9w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0B0DD3811A44;
-	Fri, 13 Feb 2026 20:18:03 +0000 (UTC)
-Subject: Re: [GIT PULL] KVM changes for Linux 7.0
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20260213162059.22230-1-pbonzini@redhat.com>
-References: <20260213162059.22230-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20260213162059.22230-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: b1195183ed42f1522fae3fe44ebee3af437aa000
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: cb5573868ea85ddbc74dd9a917acd1e434d21390
-Message-Id: <177101388166.2542361.11440877444393583528.pr-tracker-bot@kernel.org>
-Date: Fri, 13 Feb 2026 20:18:01 +0000
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+	s=arc-20240116; t=1771021146; c=relaxed/simple;
+	bh=4SfVeVyOopNUEYpALsPtH/J4tdgq8bQHBnqCt9tGo8k=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=l2HJonhdZpJh7Bp6YOhp20RTA3nISyNsti/YHbsvHmCGQgfCFj6QqKO3rcy9UEqWR5UeAIALTaZsUKpCXlYE8ZGtQvCHIZ6Yrmb0vIsd9GXlxMGBG9XgQ+24exFSE6PuQPDzVnLAhEdfVzFWDGVrL3fAM3WX2T9qAmo3+cUqDV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lp1JxfpW; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a9638b0422so9935605ad.3
+        for <kvm@vger.kernel.org>; Fri, 13 Feb 2026 14:19:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771021145; x=1771625945; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zjKURXqU+Zr0HcMfUxCtx2SVToxbcyc0zFBF1VQb9Ag=;
+        b=lp1JxfpWhfKo64z3xcrr73d7ItxzQ3cbS4g+iRbelY9/K5W/lqlEuLHKzRPoh1kwXC
+         m68lShZZqkRFoNhqg0eODPykfNVZhSZaRUac+U22U74avuLy9LwNpiLDMR5gkdfKeXuo
+         qBs0Eo1M7+7WNKiZbvCp9CTeBopKn7T9x+VYBMG8h79nuUoLZlKJk/zNR+3A7Ndfp7Ah
+         R5OzxMVpjhyUxozDLYOLJsEBoyeXzoa3dvP/SLKD2Ne9XdVjY/sWRPzPjiktI4f/Incn
+         1reJvTBad01CcKJeUMhfobFEiIA2YSz+FGj0mud9ZfDJHC11tTF9wXPriWPsZmQd+qiC
+         ez2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771021145; x=1771625945;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zjKURXqU+Zr0HcMfUxCtx2SVToxbcyc0zFBF1VQb9Ag=;
+        b=NYrXmx+3FE5zcN8nzHGHAz0UYb4B+EyT0cNThkR/29/DSOwnqotgKRr2PMpw9VPmyp
+         qSccD+5lZZjVuyjzsQOgw4FVrRc/3HBBi6hAk7K5sMigW4YE7fPLkDduzJB4ATgDMPZE
+         vl7G9LBLBNIFefYEhqpNz44knuGjw6pIZZMybLfxU+a4ypVqawLkLDCjbhL1wP5YexjW
+         cH4roN+5vNxF9sBqEuKjgfBcq1nv0La+UthaSmPjX09R/B9S8mLACAUNg7Kf9ck6MZT7
+         20yytoWkJRuP4iX7WxaonF7GSp4SQQbgbOPPmcXgXkMpjxjLY1u/KozQ4zLtdl7LKO9A
+         ZcaA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJl28VV5o9CU2rqgH8pHk9O3ViBwz9lFot+3eXqFdFrdfbBTNBHiQCbdMB3icH/AYJ52U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyN7lcKCutm/couzmRZzBt1/AYjj8EzOTojZaLnUZw6OwWXYrb
+	aqfEzwvQyQIw0JfGZGdDLJxIaUDmnaZH6djNfcNFLD/o1BOf6eealJHJkPYraJxddZdgnn9Z32D
+	VjNka1g==
+X-Received: from pjbsx13.prod.google.com ([2002:a17:90b:2ccd:b0:354:c63c:5ed6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1c2:b0:2a7:9ded:9b4a
+ with SMTP id d9443c01a7336-2ad174dcf04mr9334615ad.36.1771021144404; Fri, 13
+ Feb 2026 14:19:04 -0800 (PST)
+Date: Fri, 13 Feb 2026 14:19:02 -0800
+In-Reply-To: <CALMp9eR4ayj_gwsDQVH8pQvzqgEYVB6ExWp3aFgJXRWikLEikw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+References: <20260212155905.3448571-1-jmattson@google.com> <20260212155905.3448571-5-jmattson@google.com>
+ <gqj4y6awen5dfxy32lbskcxw6xdv4xiiouycyftjacndjinhvp@7p4dtgdh6tjw>
+ <aY9BPKhzgxo4UuHB@google.com> <CALMp9eR4ayj_gwsDQVH8pQvzqgEYVB6ExWp3aFgJXRWikLEikw@mail.gmail.com>
+Message-ID: <aY-jViitsLQm9B83@google.com>
+Subject: Re: [PATCH v4 4/8] KVM: x86: nSVM: Redirect IA32_PAT accesses to
+ either hPAT or gPAT
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71072-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71073-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pr-tracker-bot@kernel.org,kvm@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: ED0871395E1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 252BC139C1A
 X-Rspamd-Action: no action
 
-The pull request you sent on Fri, 13 Feb 2026 17:20:58 +0100:
+On Fri, Feb 13, 2026, Jim Mattson wrote:
+> On Fri, Feb 13, 2026 at 7:20=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> > > > +static inline void svm_set_hpat(struct vcpu_svm *svm, u64 data)
+> > > > +{
+> > > > +   svm->vcpu.arch.pat =3D data;
+> > > > +   if (npt_enabled) {
+> >
+> > Peeking at the future patches, if we make this:
+> >
+> >         if (!npt_enabled)
+> >                 return;
+> >
+> > then we can end up with this:
+> >
+> >         if (npt_enabled)
+> >                 return;
+> >
+> >         vmcb_set_gpat(svm->vmcb01.ptr, data);
+> >         if (is_guest_mode(&svm->vcpu) && !nested_npt_enabled(svm))
+> >                 vmcb_set_gpat(svm->nested.vmcb02.ptr, data);
+> >
+> >         if (svm->nested.legacy_gpat_semantics)
+> >                 svm_set_l2_pat(svm, data);
+> >
+> > Because legacy_gpat_semantics can only be true if npt_enabled is true. =
+ Without
+> > that guard, KVM _looks_ buggy because it's setting gpat in the VMCB eve=
+n when
+> > it shouldn't exist.
+> >
+> > Actually, calling svm_set_l2_pat() when !is_guest_mode() is wrong too, =
+no?  E.g.
+> > shouldn't we end up with this?
+>=20
+> Sigh. legacy_gpat_semantics is supposed to be set only when
+> is_guest_mode() and nested_npt_enabled(). I forgot about back-to-back
+> invocations of KVM_SET_NESTED_STATE. Are there other ways of leaving
+> guest mode or disabling nested NPT before the next KVM_RUN?
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+KVM_SET_VCPU_EVENTS will do it if userspace forces a change in SMM state:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/cb5573868ea85ddbc74dd9a917acd1e434d21390
+		if (!!(vcpu->arch.hflags & HF_SMM_MASK) !=3D events->smi.smm) {
+			kvm_leave_nested(vcpu);
+			kvm_smm_changed(vcpu, events->smi.smm);
+		}
 
-Thank you!
+I honestly wasn't even thinking of anything in particular, it just looked w=
+eird.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> > > > +           vmcb_set_gpat(svm->vmcb01.ptr, data);
+> > > > +           if (is_guest_mode(&svm->vcpu) && !nested_npt_enabled(sv=
+m))
+> > > > +                   vmcb_set_gpat(svm->nested.vmcb02.ptr, data);
+> > > > +   }
+> > > > +}
+> > >
+> > > Is it me, or is it a bit confusing that svm_set_gpat() sets L2's gPAT
+> > > not L1's, and svm_set_hpat() calls vmcb_set_gpat()?
+> >
+> > It's not just you.  I don't find it confusing per se, more that it's re=
+ally
+> > subtle.
+> >
+> > > "gpat" means different things in the context of the VMCB or otherwise=
+,
+> > > which kinda makes sense but is also not super clear. Maybe
+> > > svm_set_l1_gpat() and svm_set_l2_gpat() is more clear?
+> >
+> > I think just svm_set_l1_pat() and svm_set_l2_pat(), because gpat straig=
+ht up
+> > doesn't exist when NPT is disabled/unsupported.
+>=20
+> My intention was that "gpat" and "hpat" were from the perspective of the =
+vCPU.
+>=20
+> I dislike svm_set_l1_pat() and svm_set_l2_pat(). As you point out
+> above, there is no independent L2 PAT when nested NPT is disabled. I
+> think that's less obvious than the fact that there is no gPAT from the
+> vCPU's perspective. My preference is to follow the APM terminology
+> when possible. Making up our own terms just leads to confusion.
+
+How about svm_set_pat() and svm_get_gpat()?  Because hPAT doesn't exist whe=
+n NPT
+is unsupported/disabled, but KVM still needs to set the vCPU's emulated PAT=
+ value.
 
