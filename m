@@ -1,289 +1,256 @@
-Return-Path: <kvm+bounces-71058-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71059-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sPsiInRGj2kiPAEAu9opvQ
-	(envelope-from <kvm+bounces-71058-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 16:42:44 +0100
+	id IN0aEH1Gj2kiPAEAu9opvQ
+	(envelope-from <kvm+bounces-71059-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 16:42:53 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 325B5137A1B
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 16:42:44 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7166137A24
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 16:42:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5E423029E5C
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 15:42:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 42A1A300C307
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 15:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D16C36213E;
-	Fri, 13 Feb 2026 15:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FF33624B5;
+	Fri, 13 Feb 2026 15:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="FAWZLYG+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xKdTKfuP"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.197.217.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4EBD194A60;
-	Fri, 13 Feb 2026 15:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.197.217.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770997348; cv=none; b=AegiE+9fSZuH8O4L24SisLRcbLy24d52zsldE4c+Mt8IlhpHx0Wyhd+dSbdk7xZKukeaZpmOqt0xJt/cIwLYoGJ/IjagPob//7d4zXzzV4CijJY3bXvVnLWOqzdzLL2CdOO8gqV7Vyp4uPGgyQJVUlzgreCRVJk+V+SCwshKJtI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770997348; c=relaxed/simple;
-	bh=Qso2QQhen+sj//adele5UXO2wHVTsq7lLh6MPPrqVAo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=dcSLkbrNUtr2COUyom6xn7w6cRdhYs46YW2V6zu4I+32AsZNzjTF2uGDwwzoZeKyeOYV6lc826+zyaNMaz516iUtrRiET14Vr33s3N1CtBinaVUGlR+WJcYplUYhYjvXS2rW/dQY0j4IFUMOWdwZzK6Iy3ik6c/k0C5XMg/s6J4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=FAWZLYG+; arc=none smtp.client-ip=18.197.217.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B9135CBAE
+	for <kvm@vger.kernel.org>; Fri, 13 Feb 2026 15:42:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770997369; cv=pass; b=N8skzjuxkUw9s7/6Oh4CsaTpqQ5UTa4einWOe55cL+It1mkuJbSe9hDJ/QQen9KgK3JOw1MbWOafz/eKKYWVNVFSh8x23RAOyvCxuj3gICZb5q1BowBe50P76ve2pkNJAcfGpsCaK6eYhJuyiFWGklj8QgoFQCJZqbXodSUFi5Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770997369; c=relaxed/simple;
+	bh=yTciUytAK+hm8aYrDirHamJvdZ4HmQPGUu+cgm745nU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GHusBt3cQ/c257W1zQsCzXFFONZ7oJtjXv9rCXGS9pXb9NjyaZ7tUTb5+BpOt1fTL1++Tx4LUMWBASja2KVZKIaZ2zMhTKausLe39zViC2bgUcXQhQ+MjFfwV2Z1mvJgolxxH5AxyguHQtVGX6S17s3hDnfdB/3t2zKRVn2HbYY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xKdTKfuP; arc=pass smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-65a38c42037so9646a12.0
+        for <kvm@vger.kernel.org>; Fri, 13 Feb 2026 07:42:47 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770997366; cv=none;
+        d=google.com; s=arc-20240605;
+        b=dKQCu2Z6B/TVcArw6CUD+BXk0IbUUJuTdaQPc84SXezjXVljNKfQEQwUtu9QSYyj1G
+         pN3XXgSJ05GRb5sTW/649fPlo3AqUN3G3Qmgk/ZA4UD2flidRwrwo/tGEL2D+t3xJpsV
+         tDU0QGyQPI5sr8Hu1/15WX0ofd1FI7wC/YBRNddG3/lBqhThMIzVjNPn6mPZ/+NMug98
+         r3dwCwW+VNqTIhpjNjkhNjg4pNJP+6kbCzMQOz5kMNR+Sa416otXnwh9kXZzLw8hIPcc
+         j1LCwN0EDPdAPO4nl1hCeNGVHV9YNDBJkRoAlbivCtRSLvpmsEZIz4OjTnx9w901Upc3
+         eu5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=F6ij2Khc2FsAsz+xr+2WTDdi0WC0Pp/qGOQOsuaJCEw=;
+        fh=mIEdoZ688ox1Wz8udOgoI+y+VdPs7tWEcfENH94/XSA=;
+        b=C9/5FK1Jnkw+8l0mW2OZ1B/NChraNek9RePEDuY3RCnKAtV0GGnvuYPiR7hHS1HzW8
+         5V7URvkOWOctF5SoGlDi3rjGl5a4HSOgIOqSPwmkgYtMkB/22g/kiuzltLUgOx7rk/uH
+         5xzzcIry1MnXfZk9uhvK5ln11gs4LnnzsXXi0KNQzRIn2dQxw/ltNOXmB/2h6vKazX34
+         EYGedWt/6HftfrN6LikALC6nAl8nnH1Bds1JjwXD75Yl3SoyngF/qxTNhPI8Q1hX/45B
+         AdYzSadzpydrBD7qodyH8SFmVgmSnsYM76MMmlEHJoJUbaaPKD4nIjjCbFLMYEiFBcMK
+         OIWw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1770997347; x=1802533347;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=wc3wuiR4d5qR9HNFKkQBL/RhcLLo/Jro4GjXQoKeDOE=;
-  b=FAWZLYG+vUFk9X2PQqjclSNb3egTi30AxpE5W7tHIp512zRwmgozR5Jd
-   ghZdbDmMaxyVshy1V05JpXfsmXhY4zic/jAmHkSVKwmCAB7O1iZv0HPVw
-   6qNbI60/EgaL0WFr29Q8dwwjxMfV2/liJOml5Vge2vye8+S1Bi9xczboG
-   EOUPn7Husyqb4qyXReEWRKIgCF1UTtZ9euXwymRbb2kMc0F0uIr+ZatsW
-   hmX1XKAjnpYqm+uitf9Tozn8vYqQsVK75myu1CqvLfKC37lRP8Cs1l7X/
-   XkaolkJiETabXwx+EzuMcO2LY+PDyH3TpZeh9M/+YC6JXfDrFqe12AIzI
-   A==;
-X-CSE-ConnectionGUID: xBWKtWbURmCvJTHWq/NQzw==
-X-CSE-MsgGUID: v1IpJRI/Q9ms7OkLKHCw5g==
-X-IronPort-AV: E=Sophos;i="6.21,288,1763424000"; 
-   d="scan'208";a="9442917"
-Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
-  by internal-fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2026 15:42:22 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:18090]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.34.99:2525] with esmtp (Farcaster)
- id 66f259df-d113-42b5-9bad-4cdd94991272; Fri, 13 Feb 2026 15:42:22 +0000 (UTC)
-X-Farcaster-Flow-ID: 66f259df-d113-42b5-9bad-4cdd94991272
-Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Fri, 13 Feb 2026 15:42:21 +0000
-Received: from [192.168.1.242] (10.106.82.26) by EX19D005EUB003.ant.amazon.com
- (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35; Fri, 13 Feb 2026
- 15:42:21 +0000
-Message-ID: <a84ddba8-12da-489a-9dd1-ccdf7451a1ba@amazon.com>
-Date: Fri, 13 Feb 2026 15:42:16 +0000
+        d=google.com; s=20230601; t=1770997366; x=1771602166; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F6ij2Khc2FsAsz+xr+2WTDdi0WC0Pp/qGOQOsuaJCEw=;
+        b=xKdTKfuPWSdO0a6dr+GgarlKSaC/BjjZUVPFfnx02xQZOtTMYDpdSA1mI+LxZyW0AO
+         grkybGdSYQMprLiK7QlbZTxuyLifyOxdAkzpZ3F0izh5K2FV4YmmsA18nevzZVLO2at7
+         B077NqI7Za1f5bizp5wAPoa8xi1ayJ1Bo0+SPbwN9JOS2JVlX+BJ/hWUiXSXWUqd+8xN
+         TyxCYuYuVIfhEmRN/1AIWdkuaPMRvBk8dFzphp4ESNhGPT/LMDSK+kKJ7u9+/SyggGgV
+         tkT01BGGHWutAaO6cnNlqTgF9gGY/FeQ2yMd/CS5hoK6yKa2yAliaE5zPFWaERpmWxlL
+         MvUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770997366; x=1771602166;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=F6ij2Khc2FsAsz+xr+2WTDdi0WC0Pp/qGOQOsuaJCEw=;
+        b=S74zcD/PMKty+SRipZdhnLI166UYwNVIyUMWCvAZJ0un+YjdCK59uHXvK8fGyDjPlt
+         1W+iSZfGFHWELmUlsI7kU3CmzWJDwWLas84j8Oji6+x9HWdDdWVD1gXQwEAZvCS0exnA
+         lY5qowENdm+YNOgWn2HNOQrl8m3dQkavtKWggxf/vH+HdJP204ZE+qANSPNAXMhLiCNs
+         1bSD+p7HFFfZV4PmiiXphCSbaXR6AKIfOhdrNIwgoaNZyB6rrcWnL5Y1BH9TvKNRLEXh
+         UUc0MA9MyQv9G9/iJoBSoMCXrSFxrzK5l4JlHiKMvkvnyfGBhXShLCAWovvG7aWWxnPy
+         H6Fw==
+X-Forwarded-Encrypted: i=1; AJvYcCUsWrtLcnD8V32dYPdG2e9iwds4hkb//T8XoPtjtj7IEGZYC8vfXEpf4Zs3GhsWJC53x48=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGHHN6+RAozmYOJaC1Gukb0LQwH56kcV7kLjd67iI3JOIhkIKb
+	ZLCud4Lu5CzXYn0WF9aGbsuNTesjMwLuBifIUM4mQoNQNT8vw5CTS+iRo6omqD50P9SyZrgFDhM
+	PiAlM/fStF2D/LtUPaIp6ZNvZ8bU9L3BXypcleFFNtOu7NzNiDVT8gsK4
+X-Gm-Gg: AZuq6aJo374pj2SH8cc1FcAeOBn4TjbKkNd10JiU7q7J1phlx1IPSQqG/9cJbOWJBRm
+	0gd+5Nwh5EdHsCEPOfH0yWvGc3N4Coih8j2u95Je0MN3OsrQSUZbFZAgds1GqyRpT8pBaKoSaCT
+	dXxddkin5HgcydVqzwQ7GWSzpcaD1sOv7INc01YHZ7diumKieLLrI8ZZAwqWWkrsivljOi7H5bE
+	mxjbzUcX1uDVojMtaqLzkFMqeYfaahOlqYQ3aalG+xmTC9k0dRhwdQeOJI9HKxQFAFwZBTB07tS
+	Ogu8DTo1TUuWXqglYg==
+X-Received: by 2002:aa7:df8a:0:b0:658:102c:861c with SMTP id
+ 4fb4d7f45d1cf-65bb078c0f4mr25011a12.15.1770997365892; Fri, 13 Feb 2026
+ 07:42:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v4 4/4] KVM: Avoid synchronize_srcu() in
- kvm_io_bus_register_dev()
-To: Keir Fraser <keirf@google.com>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
-CC: Sean Christopherson <seanjc@google.com>, Eric Auger
-	<eric.auger@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier
-	<maz@kernel.org>, Will Deacon <will@kernel.org>, Paolo Bonzini
-	<pbonzini@redhat.com>, Li RongQing <lirongqing@baidu.com>
-References: <20250909100007.3136249-1-keirf@google.com>
- <20250909100007.3136249-5-keirf@google.com>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <20250909100007.3136249-5-keirf@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D009EUA002.ant.amazon.com (10.252.50.88) To
- EX19D005EUB003.ant.amazon.com (10.252.51.31)
+References: <20260212155905.3448571-1-jmattson@google.com> <20260212155905.3448571-5-jmattson@google.com>
+ <gqj4y6awen5dfxy32lbskcxw6xdv4xiiouycyftjacndjinhvp@7p4dtgdh6tjw> <aY9BPKhzgxo4UuHB@google.com>
+In-Reply-To: <aY9BPKhzgxo4UuHB@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Fri, 13 Feb 2026 07:42:33 -0800
+X-Gm-Features: AZwV_Qh8Zc-8b-6vcrm4uFHajKL5tBq0Tt20KrHYUCJPUVjtrEQVTeUjqt4aD1w
+Message-ID: <CALMp9eR4ayj_gwsDQVH8pQvzqgEYVB6ExWp3aFgJXRWikLEikw@mail.gmail.com>
+Subject: Re: [PATCH v4 4/8] KVM: x86: nSVM: Redirect IA32_PAT accesses to
+ either hPAT or gPAT
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-9.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[amazon.com:+];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71058-lists,kvm=lfdr.de];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	HAS_REPLYTO(0.00)[kalyazin@amazon.com];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kalyazin@amazon.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 325B5137A1B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71059-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[google.com:+]
+X-Rspamd-Queue-Id: D7166137A24
 X-Rspamd-Action: no action
 
+On Fri, Feb 13, 2026 at 7:20=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> Please trim your replies.  Scrolling through 100+ lines of quoted text to=
+ find
+> the ~12 lines of context that actually matter is annoying.
+>
+> On Fri, Feb 13, 2026, Yosry Ahmed wrote:
+> > On Thu, Feb 12, 2026 at 07:58:52AM -0800, Jim Mattson wrote:
+> > > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> > > index a49c48459e0b..88549705133f 100644
+> > > --- a/arch/x86/kvm/svm/svm.h
+> > > +++ b/arch/x86/kvm/svm/svm.h
+> > > @@ -607,6 +607,22 @@ static inline bool nested_npt_enabled(struct vcp=
+u_svm *svm)
+> > >     return svm->nested.ctl.misc_ctl & SVM_MISC_ENABLE_NP;
+> > >  }
+> > >
+> > > +static inline void svm_set_gpat(struct vcpu_svm *svm, u64 data)
+> > > +{
+> > > +   svm->nested.save.g_pat =3D data;
+> > > +   vmcb_set_gpat(svm->nested.vmcb02.ptr, data);
+> > > +}
+> > > +
+> > > +static inline void svm_set_hpat(struct vcpu_svm *svm, u64 data)
+> > > +{
+> > > +   svm->vcpu.arch.pat =3D data;
+> > > +   if (npt_enabled) {
+>
+> Peeking at the future patches, if we make this:
+>
+>         if (!npt_enabled)
+>                 return;
+>
+> then we can end up with this:
+>
+>         if (npt_enabled)
+>                 return;
+>
+>         vmcb_set_gpat(svm->vmcb01.ptr, data);
+>         if (is_guest_mode(&svm->vcpu) && !nested_npt_enabled(svm))
+>                 vmcb_set_gpat(svm->nested.vmcb02.ptr, data);
+>
+>         if (svm->nested.legacy_gpat_semantics)
+>                 svm_set_l2_pat(svm, data);
+>
+> Because legacy_gpat_semantics can only be true if npt_enabled is true.  W=
+ithout
+> that guard, KVM _looks_ buggy because it's setting gpat in the VMCB even =
+when
+> it shouldn't exist.
+>
+> Actually, calling svm_set_l2_pat() when !is_guest_mode() is wrong too, no=
+?  E.g.
+> shouldn't we end up with this?
 
+Sigh. legacy_gpat_semantics is supposed to be set only when
+is_guest_mode() and nested_npt_enabled(). I forgot about back-to-back
+invocations of KVM_SET_NESTED_STATE. Are there other ways of leaving
+guest mode or disabling nested NPT before the next KVM_RUN?
 
-On 09/09/2025 11:00, Keir Fraser wrote:
-> Device MMIO registration may happen quite frequently during VM boot,
-> and the SRCU synchronization each time has a measurable effect
-> on VM startup time. In our experiments it can account for around 25%
-> of a VM's startup time.
-> 
-> Replace the synchronization with a deferred free of the old kvm_io_bus
-> structure.
-
-
-Hi,
-
-We noticed that this change introduced a regression of ~20 ms to the 
-first KVM_CREATE_VCPU call of a VM, which is significant for our use case.
-
-Before the patch:
-45726 14:45:32.914330 ioctl(25, KVM_CREATE_VCPU, 0) = 28 <0.000137>
-45726 14:45:32.914533 ioctl(25, KVM_CREATE_VCPU, 1) = 30 <0.000046>
-
-After the patch:
-30295 14:47:08.057412 ioctl(25, KVM_CREATE_VCPU, 0) = 28 <0.025182>
-30295 14:47:08.082663 ioctl(25, KVM_CREATE_VCPU, 1) = 30 <0.000031>
-
-The reason, as I understand, it happens is call_srcu() called from 
-kvm_io_bus_register_dev() are adding callbacks to be called after a 
-normal GP, which is 10 ms with HZ=100.  The subsequent 
-synchronize_srcu_expedited() called from kvm_swap_active_memslots() 
-(from KVM_CREATE_VCPU) has to wait for the normal GP to complete before 
-making progress.  I don't fully understand why the delay is consistently 
-greater than 1 GP, but that's what we see across our testing scenarios.
-
-I verified that the problem is relaxed if the GP is reduced by 
-configuring HZ=1000.  In that case, the regression is in the order of 1 ms.
-
-It looks like in our case we don't benefit much from the intended 
-optimisation as the number of device MMIO registrations is limited and 
-and they don't cost us much (each takes at most 16 us, but most commonly 
-~6 us):
-
-      firecracker 68452 [054]  3053.183991: 
-kprobes:kvm_io_bus_register_dev: (ffffffffc0348390)
-      firecracker 68452 [054]  3053.184007: 
-kprobes:kvm_io_bus_register_dev__return: (ffffffffc0348390 <- 
-ffffffffc03aa190)
-      firecracker 68452 [054]  3053.184007: 
-kprobes:kvm_io_bus_register_dev: (ffffffffc0348390)
-      firecracker 68452 [054]  3053.184014: 
-kprobes:kvm_io_bus_register_dev__return: (ffffffffc0348390 <- 
-ffffffffc03aa1b9)
-      firecracker 68452 [054]  3053.184015: 
-kprobes:kvm_io_bus_register_dev: (ffffffffc0348390)
-      firecracker 68452 [054]  3053.184021: 
-kprobes:kvm_io_bus_register_dev__return: (ffffffffc0348390 <- 
-ffffffffc03aa1db)
-      firecracker 68452 [054]  3053.184028: 
-kprobes:kvm_io_bus_register_dev: (ffffffffc0348390)
-      firecracker 68452 [054]  3053.184034: 
-kprobes:kvm_io_bus_register_dev__return: (ffffffffc0348390 <- 
-ffffffffc03ac957)
-      firecracker 68452 [054]  3053.184093: 
-kprobes:kvm_io_bus_register_dev: (ffffffffc0348390)
-      firecracker 68452 [054]  3053.184099: 
-kprobes:kvm_io_bus_register_dev__return: (ffffffffc0348390 <- 
-ffffffffc03ab51a)
-      firecracker 68452 [054]  3053.184100: 
-kprobes:kvm_io_bus_register_dev: (ffffffffc0348390)
-      firecracker 68452 [054]  3053.184106: 
-kprobes:kvm_io_bus_register_dev__return: (ffffffffc0348390 <- 
-ffffffffc03ab549)
-      firecracker 68452 [054]  3053.193145: 
-kprobes:kvm_io_bus_register_dev: (ffffffffc0348390)
-      firecracker 68452 [054]  3053.193164: 
-kprobes:kvm_io_bus_register_dev__return: (ffffffffc0348390 <- 
-ffffffffc0348c9f)
-      firecracker 68452 [054]  3053.193165: 
-kprobes:kvm_io_bus_register_dev: (ffffffffc0348390)
-      firecracker 68452 [054]  3053.193171: 
-kprobes:kvm_io_bus_register_dev__return: (ffffffffc0348390 <- 
-ffffffffc0348c9f)
-
-Our env:
-  - 6.18
-  - Arch: the analysis above is from x86, but ARM regressed very similarly
-  - CONFIG_HZ=100
-  - VMM: Firecracker (https://github.com/firecracker-microvm/firecracker)
-
-
-I am not aware of way to make it fast for both use cases and would be 
-more than happy to hear about possible solutions.
-
-
-Thanks,
-Nikita
-
-> 
-> Tested-by: Li RongQing <lirongqing@baidu.com>
-> Signed-off-by: Keir Fraser <keirf@google.com>
-> ---
->   include/linux/kvm_host.h |  1 +
->   virt/kvm/kvm_main.c      | 11 +++++++++--
->   2 files changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index e7d6111cf254..103be35caf0d 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -206,6 +206,7 @@ struct kvm_io_range {
->   struct kvm_io_bus {
->   	int dev_count;
->   	int ioeventfd_count;
-> +	struct rcu_head rcu;
->   	struct kvm_io_range range[];
->   };
->   
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 870ad8ea93a7..bcef324ccbf2 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1320,6 +1320,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
->   		kvm_free_memslots(kvm, &kvm->__memslots[i][1]);
->   	}
->   	cleanup_srcu_struct(&kvm->irq_srcu);
-> +	srcu_barrier(&kvm->srcu);
->   	cleanup_srcu_struct(&kvm->srcu);
->   #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
->   	xa_destroy(&kvm->mem_attr_array);
-> @@ -5952,6 +5953,13 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
->   }
->   EXPORT_SYMBOL_GPL(kvm_io_bus_read);
->   
-> +static void __free_bus(struct rcu_head *rcu)
-> +{
-> +	struct kvm_io_bus *bus = container_of(rcu, struct kvm_io_bus, rcu);
-> +
-> +	kfree(bus);
-> +}
-> +
->   int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
->   			    int len, struct kvm_io_device *dev)
+>   static inline void svm_set_l1_pat(struct vcpu_svm *svm, u64 data)
 >   {
-> @@ -5990,8 +5998,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
->   	memcpy(new_bus->range + i + 1, bus->range + i,
->   		(bus->dev_count - i) * sizeof(struct kvm_io_range));
->   	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
-> -	synchronize_srcu_expedited(&kvm->srcu);
-> -	kfree(bus);
-> +	call_srcu(&kvm->srcu, &bus->rcu, __free_bus);
->   
->   	return 0;
+>         svm->vcpu.arch.pat =3D data;
+>
+>         if (npt_enabled)
+>                 return;
+>
+>         vmcb_set_gpat(svm->vmcb01.ptr, data);
+>
+>         if (is_guest_mode(&svm->vcpu)) {
+>                 if (svm->nested.legacy_gpat_semantics)
+>                         svm_set_l2_pat(svm, data);
+>                 else if (!nested_npt_enabled(svm))
+>                         vmcb_set_gpat(svm->nested.vmcb02.ptr, data);
+>         }
 >   }
+>
+>
+> > > +           vmcb_set_gpat(svm->vmcb01.ptr, data);
+> > > +           if (is_guest_mode(&svm->vcpu) && !nested_npt_enabled(svm)=
+)
+> > > +                   vmcb_set_gpat(svm->nested.vmcb02.ptr, data);
+> > > +   }
+> > > +}
+> >
+> > Is it me, or is it a bit confusing that svm_set_gpat() sets L2's gPAT
+> > not L1's, and svm_set_hpat() calls vmcb_set_gpat()?
+>
+> It's not just you.  I don't find it confusing per se, more that it's real=
+ly
+> subtle.
+>
+> > "gpat" means different things in the context of the VMCB or otherwise,
+> > which kinda makes sense but is also not super clear. Maybe
+> > svm_set_l1_gpat() and svm_set_l2_gpat() is more clear?
+>
+> I think just svm_set_l1_pat() and svm_set_l2_pat(), because gpat straight=
+ up
+> doesn't exist when NPT is disabled/unsupported.
 
+My intention was that "gpat" and "hpat" were from the perspective of the vC=
+PU.
+
+I dislike svm_set_l1_pat() and svm_set_l2_pat(). As you point out
+above, there is no independent L2 PAT when nested NPT is disabled. I
+think that's less obvious than the fact that there is no gPAT from the
+vCPU's perspective. My preference is to follow the APM terminology
+when possible. Making up our own terms just leads to confusion.
 
