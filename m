@@ -1,146 +1,144 @@
-Return-Path: <kvm+bounces-71051-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71052-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aHLYLqI3j2n2MgEAu9opvQ
-	(envelope-from <kvm+bounces-71051-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 15:39:30 +0100
+	id aOZUJaM8j2mtNgEAu9opvQ
+	(envelope-from <kvm+bounces-71052-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 16:00:51 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64CE5137226
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 15:39:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02EF3137602
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 16:00:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 995FD30C1B55
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 14:38:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C18CA3033F87
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 14:58:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28AF0361672;
-	Fri, 13 Feb 2026 14:38:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC373612C3;
+	Fri, 13 Feb 2026 14:58:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wd6NN6F2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BmWDoQfM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFC8361DC6
-	for <kvm@vger.kernel.org>; Fri, 13 Feb 2026 14:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9A11C5D44;
+	Fri, 13 Feb 2026 14:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770993507; cv=none; b=qic8lKzbe36RLPqMXZZg+O7PrXIApiYOmEGql4N9QtXL8oCrRni1Yww3NZN0U34LHuN/GkGPdwFVDmNEJWTtQGRy6iz9sy2HCKXnoCaYXpbVP2d/8V/va0MWoS/GHnFhbpK0PdNTBX8A7sl5DY+J3hxvft/Uv43Gg+4aozaAs3A=
+	t=1770994710; cv=none; b=mSrJjyfPpsICgSwpNKmUXsCcLWKHGacAtB16GONsDdnKtb4cwo+rfeoD08r0mVk9On62GTvS33kRPnSx+LAp1CtEtd26neCxymBBJbk/IuHVZ0E0ntIob8mACJqGaLLnUQI3sLtDRI5DhTJVEN+mGLgJd4Q3ehJORNrUDTo16F8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770993507; c=relaxed/simple;
-	bh=2Yh7aBShA6c8gQ4pY43dXnO0B18sPgc8K/vuxbeNWds=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=C3xezAi94I6zxTShEJzXKdBvvPtJRBYwSB827KzgxNMb0doIJHh8Pp+1iSA/lay1m6WLBEIH6qCIhhXXJ8QtitOEBFJI4ETPZnHtrqTiNWekopFabE1uCsd85LoDt7v9SblagbhebKk5p1QO02cOMtE6FJZfv2ogtMHS+Nc+poA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Wd6NN6F2; arc=none smtp.client-ip=209.85.221.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-4376e25bb4dso1227495f8f.0
-        for <kvm@vger.kernel.org>; Fri, 13 Feb 2026 06:38:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770993502; x=1771598302; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/UGGDvqnPusZ8w3DOSxM5/L8hUMj6ctAm+38uUc+sw8=;
-        b=Wd6NN6F209RSMeO7swfQng9oTXAtCivlOydw5ug7+YXPzPKODQ0dHHi1EB0Uv6oaSw
-         9eyhcqKIeiFl/q2uUM7gHfyYAvTNyOJb9SokQhAplYh+NmnlNvI5E8+6Wt7HEdA+1WTJ
-         qFyu5A/es/c5X+em8y9ESP3w9urv52SmSP+GlFUI3pDSpxquQRfBGeA8O48MyrhVKmKd
-         oSAfIC+GH+J8yN5B2Wh5dmaWvwabh65uXoApWd2pURL5i3f14feKy5oRfUq4kDnOlU78
-         R728oS+hpYdoOZpkUMsDmdHls45earbuHfYmJEosYOptTjj/cUgLxYuuFw0HOMvz3GkQ
-         0pgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770993502; x=1771598302;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/UGGDvqnPusZ8w3DOSxM5/L8hUMj6ctAm+38uUc+sw8=;
-        b=UQuTzSGiVQN+ocwM4FwedMo7DrscOZk+35mq2HZidPYK5gvVBGNRr4CTQqm0VcM9LE
-         xOIMWQ5EX1einuQikBXKmfkvRPciWrp5NgbzHqQtzDNr+1WPhToT3auHHI+TBsKNBmf8
-         GMh7jBPXgoXO7NAe3pxcwGbWxresA96LaltO0p9lY/A/dNUiRZg52RNMnLV+rCmlxbiD
-         H83utjAhGfq44+EKzn8Qv/3OrmphV8Vhd/TUifrW5ey5zwm9MFJonNt/sPltp2H4w15c
-         yxYiqyPsIr8kqyK0/UZ3vxz+U2CglYd6P5PzN2iKeuO4PTS5RccaZLu7syT7MRlPURu9
-         0gig==
-X-Gm-Message-State: AOJu0YyGAloNgFQeHTGuSDify5wDEriXYqkmQdKcWO44zVjLEgvNodhU
-	rp+lTtlKRMdGOpoByZ4pfx8CUJpnzQT7gWnGA1/r2H0VzaGlQhLJfdQ15qXtfwUVMtMWx6cVRzp
-	TCezUyVPJIq/Wi0LOYosXgdfEAZcVmC65mVGFLBnfVY5JP/1p9XYq00p2VuKaW8oKB5Ll1rcNHp
-	INi661SNlAf3Qqk7MeyBFSF4OhDgQ=
-X-Received: from wrqa11.prod.google.com ([2002:adf:f7cb:0:b0:437:72d9:7316])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:588d:0:b0:436:369f:39fa
- with SMTP id ffacd0b85a97d-43796af9ed9mr4847850f8f.44.1770993501337; Fri, 13
- Feb 2026 06:38:21 -0800 (PST)
-Date: Fri, 13 Feb 2026 14:38:15 +0000
+	s=arc-20240116; t=1770994710; c=relaxed/simple;
+	bh=a1VABnZngA4STd31yo3YpGNkB/nSTL3k7/EUbnDUuX4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZiZoAiLP/D9Y4A4w3oN1gZoXmyUEvmFbf21FBpaTImhqxGXmOcEtabRLJSNtD32IeAVDD4M6Tmyq5BsnfQ64ufdJCNv+/ZKS7WaG44a5WXfMIOgWsVGivSo52Bhhh3N3QDKrzM12pACz1w+L3sZ2NQ3i1aan09w1Isbn6y0Y+7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BmWDoQfM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0A7FC116C6;
+	Fri, 13 Feb 2026 14:58:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770994709;
+	bh=a1VABnZngA4STd31yo3YpGNkB/nSTL3k7/EUbnDUuX4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=BmWDoQfMXvwoMpDQnT0qo95sgLPwmcQFWK5jRYNRISQh/kuuKyAgtCXKMEOQTO3RG
+	 d5/UL4eSLVcXTxTntoO4Fhi9s4TQVUnv/muUK5AlRx+Em2LpJx8D8camQjQAkxO0H6
+	 MkxBGn6DpyoW343tdRFWLQB/KQ0uFnKq0x999ZX4H6hQN1y0j8FCkXRMZHj5wBVK5p
+	 jF5poC5wR8J3kAI2GCbbkMckPT7YzzbYkjN/lATW7DAs2gmAMdTQ9GaHbagnRD/qOP
+	 hKSumNH4pffUzhWIPG0us74MWcourR8Yt4HeYb+EQYWW998aDGyo8zvCuNmwkuRjlz
+	 QnTCvMQRRWfNA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vqucl-0000000AuM4-244w;
+	Fri, 13 Feb 2026 14:58:27 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Fuad Tabba <tabba@google.com>
+Cc: joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	stable@vger.kernel.org,
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH v2 0/4] KVM: arm64: Fix guest feature sanitization and pKVM state synchronization
+Date: Fri, 13 Feb 2026 14:58:24 +0000
+Message-ID: <177099469863.1792134.7316507430953466702.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260213143815.1732675-1-tabba@google.com>
+References: <20260213143815.1732675-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260213143815.1732675-1-tabba@google.com>
-X-Mailer: git-send-email 2.53.0.273.g2a3d683680-goog
-Message-ID: <20260213143815.1732675-5-tabba@google.com>
-Subject: [PATCH v2 4/4] KVM: arm64: Remove redundant kern_hyp_va() in unpin_host_sve_state()
-From: Fuad Tabba <tabba@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, tabba@google.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, stable@vger.kernel.org, oupton@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-71051-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-71052-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tabba@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 64CE5137226
+X-Rspamd-Queue-Id: 02EF3137602
 X-Rspamd-Action: no action
 
-The `sve_state` pointer in `hyp_vcpu->vcpu.arch` is initialized as a
-hypervisor virtual address during vCPU initialization in
-`pkvm_vcpu_init_sve()`.
+On Fri, 13 Feb 2026 14:38:11 +0000, Fuad Tabba wrote:
+> This series addresses state management and feature synchronization
+> vulnerabilities in both standard KVM and pKVM implementations on arm64.
+> The primary focus is ensuring that the hypervisor correctly handles
+> architectural extensions during context switches to prevent state
+> corruption.
+> 
+> Changes since v1 [1]:
+> - Moved optimising away S1POE handling when not supported by host to a
+>   separate patch.
+> - Fixed clearing, checking and setting KVM_ARCH_FLAG_ID_REGS_INITIALIZED
+> 
+> [...]
 
-`unpin_host_sve_state()` calls `kern_hyp_va()` on this address. Since
-`kern_hyp_va()` is idempotent, it's not a bug. However, it is
-unnecessary and potentially confusing. Remove the redundant conversion.
+Applied to fixes, thanks!
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/hyp/nvhe/pkvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+[1/4] KVM: arm64: Hide S1POE from guests when not supported by the host
+      commit: f66857bafd4f151c5cc6856e47be2e12c1721e43
+[2/4] KVM: arm64: Optimise away S1POE handling when not supported by host
+      commit: 9cb0468d0b335ccf769bd8e161cc96195e82d8b1
+[3/4] KVM: arm64: Fix ID register initialization for non-protected pKVM guests
+      commit: 7e7c2cf0024d89443a7af52e09e47b1fe634ab17
+[4/4] KVM: arm64: Remove redundant kern_hyp_va() in unpin_host_sve_state()
+      commit: 02471a78a052b631204aed051ab718e4d14ae687
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 59a010221818..389fa5f09c3d 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -392,7 +392,7 @@ static void unpin_host_sve_state(struct pkvm_hyp_vcpu *hyp_vcpu)
- 	if (!vcpu_has_feature(&hyp_vcpu->vcpu, KVM_ARM_VCPU_SVE))
- 		return;
- 
--	sve_state = kern_hyp_va(hyp_vcpu->vcpu.arch.sve_state);
-+	sve_state = hyp_vcpu->vcpu.arch.sve_state;
- 	hyp_unpin_shared_mem(sve_state,
- 			     sve_state + vcpu_sve_state_size(&hyp_vcpu->vcpu));
- }
+Cheers,
+
+	M.
 -- 
-2.53.0.273.g2a3d683680-goog
+Without deviation from the norm, progress is not possible.
+
 
 
