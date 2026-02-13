@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-71044-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71045-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJQZDJ//jmmOGwEAu9opvQ
-	(envelope-from <kvm+bounces-71044-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 11:40:31 +0100
+	id aIZZEpoHj2ltHQEAu9opvQ
+	(envelope-from <kvm+bounces-71045-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 12:14:34 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A7EB1352C6
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 11:40:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC9EF1359A5
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 12:14:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 98424305DA74
-	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 10:40:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 895BB3227F4F
+	for <lists+kvm@lfdr.de>; Fri, 13 Feb 2026 11:05:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA63352C2E;
-	Fri, 13 Feb 2026 10:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2964E354AE2;
+	Fri, 13 Feb 2026 11:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IpjTBKin"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KMh8b0qX"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC27212554;
-	Fri, 13 Feb 2026 10:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59476353EDB;
+	Fri, 13 Feb 2026 11:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770979210; cv=none; b=Eabg9Gk4XXudLOn+h50v8NQDkockKJghu2fjJErp5d4Ez5UOUYXE688Ub+aGp4XY/Qk5tImVPOqadFF0jT4jTXI5doz40z0uUX89ioXOiWNHrCtNV668bGa1If9TedQDyGEHzlXVFebM2XY2nk9JObSHzks3aiJOnplG6RweX3U=
+	t=1770980586; cv=none; b=r8LNljIN+xVrARtLnqsKC1KAGPIf+FGeBSnRMsgXILWAkmBOufI3ueVOk7/18v5YAcV7NT8MDhYSJB+hJHf+ZR5YhfdVdCnbu8JYaC7Eqi2ig4cculjQxMEwly36jj72O5tCbHMCi3nR0JwKUozyHZvnPPxfF8xVjd5+p8R7T2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770979210; c=relaxed/simple;
-	bh=Xqz6za0FavxiZ7fDMciG090joG/GKFc1LpHoJfcba0w=;
+	s=arc-20240116; t=1770980586; c=relaxed/simple;
+	bh=iM4yoFDfsz9ptDHd2dIQ4m/xGPnBFa7Wx99OdkLGUUs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vCctzmvGx+q7dryDHaOHw1AKup99umsbLZ5F7a8NfEyZvtqYh4e3HXBUuaYp0zUpHBTiTBKBLtVmSDzttAD9bAsSLmohYZG92Fy4eCm6l+h1wTDs0yFBDEMH7U4FsLyN+BiRtKhoolgUj0Xku0+If7UdLE2IpG6ipkl8I5jGK+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IpjTBKin; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA286C116C6;
-	Fri, 13 Feb 2026 10:40:09 +0000 (UTC)
+	 MIME-Version:Content-Type; b=NGBZir0D+h6thwRxG+6KaIcCpqMvNi5mHU16il5uKfRBeWk/WO2Iq9lH/g2Efldk2lGENcezg+sM6GWoX3PKheabknGfcihqDdIvP3jQ98QIMA+VT9hp3olSNQp+gfHDtoPPlOcnQ8IVOTGbl4qgdEoAHynKuRlrX8HNR3JJaII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KMh8b0qX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30E51C116C6;
+	Fri, 13 Feb 2026 11:03:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770979209;
-	bh=Xqz6za0FavxiZ7fDMciG090joG/GKFc1LpHoJfcba0w=;
+	s=k20201202; t=1770980586;
+	bh=iM4yoFDfsz9ptDHd2dIQ4m/xGPnBFa7Wx99OdkLGUUs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IpjTBKin7B81H+bwSfU+aUQh7ariYE9q67Gk6wzrek0HB0CLhpMF9utWlVFmsSg5a
-	 p+bKzkpCNCbcFFCmTJugmHeb3Gl1kKdW+sX0NiI19crR9kSoOCSN4pB/PRjEv8JWT0
-	 VEHYv3P882F97T0x78MSbCN4EjDymneEqWOW/Zx9/Sk0YU3qrH2aR9oRDW5lDiEdAn
-	 u1eeI6LO8Rtit1nX6T+lURFD2tJziUCldf1gs/GHFkGvRQsNOMRH7xp0UZf2pvZa6B
-	 qbbkDP03/zTHFBnCwK/Q8Ecatv9beYxm9kbFC1G3Fgm6LbZmZMP/krH6Lob9TVDWBT
-	 xMijghpMH5Fgw==
+	b=KMh8b0qXB4oYN3kle1w4+vgjR8gj0/jKRE+jwPyg4IAxxfBpODm834q2JfS0QR0uO
+	 AH8GyymTyfVF0NfWEtyxlkNN1Orex3zpCE8SKSb0X6uhzoPM+5lIKi2lfbvxEXkkBu
+	 czJ824HU3Jg6zDhbbsoWst8dbVT1LSmr+HFN0x2MS81lzczTa1h01bLJLTyYrkse2H
+	 kdshFrq+2ppzaTnAdN0/628+DxA+j5DQTlLp3UVpQGv9aHwcEDaxmW91tjHuJo3SHq
+	 FjJpX7TZ0yrGiGEQ5RCd5Xp9V9MQ7LVlN/pqiPR9441lYp/qDr2NwriXO4GqEa6cAb
+	 oD7u5a19Esx6A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vqqal-0000000Ar8t-1BHt;
-	Fri, 13 Feb 2026 10:40:07 +0000
-Date: Fri, 13 Feb 2026 10:40:06 +0000
-Message-ID: <86fr75apvd.wl-maz@kernel.org>
+	id 1vqqwx-0000000ArRO-2W0g;
+	Fri, 13 Feb 2026 11:03:03 +0000
+Date: Fri, 13 Feb 2026 11:03:03 +0000
+Message-ID: <86ecmoc3dk.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvm@vger.kernel.org,
@@ -64,14 +64,10 @@ Cc: kvm@vger.kernel.org,
 	catalin.marinas@arm.com,
 	will@kernel.org,
 	stable@vger.kernel.org
-Subject: Re: [PATCH v1 1/3] KVM: arm64: Hide S1POE from guests when not supported by the host
-In-Reply-To: <CA+EHjTwLcxB1e_FZsw_Semoj8tjMBUKZFM8+Vbo+64+=T4GN-Q@mail.gmail.com>
+Subject: Re: [PATCH v1 2/3] KVM: arm64: Fix ID register initialization for non-protected pKVM guests
+In-Reply-To: <20260212090252.158689-3-tabba@google.com>
 References: <20260212090252.158689-1-tabba@google.com>
-	<20260212090252.158689-2-tabba@google.com>
-	<86jywib98e.wl-maz@kernel.org>
-	<CA+EHjTz-JU2gDfziCY2SguK9=6gGSCL5TN_U_C7FiZ5i0JTZqQ@mail.gmail.com>
-	<86ikc2asa8.wl-maz@kernel.org>
-	<CA+EHjTwLcxB1e_FZsw_Semoj8tjMBUKZFM8+Vbo+64+=T4GN-Q@mail.gmail.com>
+	<20260212090252.158689-3-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -100,7 +96,7 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71044-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71045-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -112,34 +108,94 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8A7EB1352C6
+X-Rspamd-Queue-Id: CC9EF1359A5
 X-Rspamd-Action: no action
 
-On Thu, 12 Feb 2026 18:53:05 +0000,
+On Thu, 12 Feb 2026 09:02:51 +0000,
 Fuad Tabba <tabba@google.com> wrote:
+> 
+> In protected mode, the hypervisor maintains a separate instance of
+> the `kvm` structure for each VM. For non-protected VMs, this structure is
+> initialized from the host's `kvm` state.
+> 
+> Currently, `pkvm_init_features_from_host()` copies the
+> `KVM_ARCH_FLAG_ID_REGS_INITIALIZED` flag from the host without the
+> underlying `id_regs` data being initialized. This results in the
+> hypervisor seeing the flag as set while the ID registers remain zeroed.
+> 
+> Consequently, `kvm_has_feat()` checks at EL2 fail (return 0) for
+> non-protected VMs. This breaks logic that relies on feature detection,
+> such as `ctxt_has_tcrx()` for TCR2_EL1 support. As a result, certain
+> system registers (e.g., TCR2_EL1, PIR_EL1, POR_EL1) are not
+> saved/restored during the world switch, which could lead to state
+> corruption.
+> 
+> Fix this by explicitly copying the ID registers from the host `kvm` to
+> the hypervisor `kvm` for non-protected VMs during vCPU initialization,
+> since we trust the host with its non-protected guests' features. Also
+> ensure `KVM_ARCH_FLAG_ID_REGS_INITIALIZED` is cleared initially in
+> `pkvm_init_features_from_host` so that `vm_copy_id_regs` can properly
+> initialize them and set the flag once done.
+> 
+> Fixes: 41d6028e28bd ("KVM: arm64: Convert the SVE guest vcpu flag to a vm flag")
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c | 37 ++++++++++++++++++++++++++++++++--
+>  1 file changed, 35 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index 12b2acfbcfd1..267854ed29c8 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -344,6 +344,8 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
+>  
+>  	/* No restrictions for non-protected VMs. */
+>  	if (!kvm_vm_is_protected(kvm)) {
+> +		clear_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &host_arch_flags);
+> +
+>  		hyp_vm->kvm.arch.flags = host_arch_flags;
 
-> Ouch! Yeah, no easy solutions here. For now, as a fix to be able to
-> backport, would you like me to respin this without the change to
-> kvm_has_s1poe(), or with that change as a separate patch?
+Can't you just have
 
-I'll remove the hunk myself when applying the series, no need to
-resend (unless I find another issue in the rest of the series, but it
-looks good so far).
+  		hyp_vm->kvm.arch.flags &= ~BIT_ULL(KVM_ARCH_FLAG_ID_REGS_INITIALIZED);
 
-FWIW, I have an alternative set of hacks at [1], which appear to work,
-but we need to collectively convince ourselves that this is the
-correct thing to do (i.e. the required traps are always set,
-irrespective of the configuration).
+since there are no atomicity requirements here?
 
-This affects PAuth, SVE, MTE and S1POE. SME and GCS are not supported
-in KVM, and BTI has no additional state, so these shouldn't be
-affected.
+>  
+>  		bitmap_copy(kvm->arch.vcpu_features,
+> @@ -471,6 +473,36 @@ static int pkvm_vcpu_init_sve(struct pkvm_hyp_vcpu *hyp_vcpu, struct kvm_vcpu *h
+>  	return ret;
+>  }
+>  
+> +static int vm_copy_id_regs(struct pkvm_hyp_vcpu *hyp_vcpu)
+> +{
+> +	struct pkvm_hyp_vm *hyp_vm = pkvm_hyp_vcpu_to_hyp_vm(hyp_vcpu);
+> +	const struct kvm *host_kvm = hyp_vm->host_kvm;
+> +	struct kvm *kvm = &hyp_vm->kvm;
+> +
+> +	if (!test_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &host_kvm->arch.flags))
+> +		return -EINVAL;
+> +
+> +	if (test_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags))
+> +		return 0;
+> +
+> +	memcpy(kvm->arch.id_regs, host_kvm->arch.id_regs, sizeof(kvm->arch.id_regs));
+> +	set_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags);
+
+This looks a bit odd. Can you have another vcpu doing this in
+parallel? You seem to be holding vm_table_lock at this stage, so
+that's probably OK,  but I'd have expected something like:
+
+	if (test_and_set_bit(KVM_ARCH_FLAG_ID_REGS_INITIALIZED, &kvm->arch.flags))
+		return 0;
+
+	memcpy(kvm->arch.id_regs, host_kvm->arch.id_regs, sizeof(kvm->arch.id_regs));
+
+which makes the intent slightly clearer.
 
 Thanks,
 
 	M.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=arm64/ftr_config
 
 -- 
 Without deviation from the norm, progress is not possible.
