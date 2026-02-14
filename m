@@ -1,81 +1,85 @@
-Return-Path: <kvm+bounces-71080-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71081-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EFMKC3LPj2l7TwEAu9opvQ
-	(envelope-from <kvm+bounces-71080-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 14 Feb 2026 02:27:14 +0100
+	id sI2JBqDPj2l7TwEAu9opvQ
+	(envelope-from <kvm+bounces-71081-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 14 Feb 2026 02:28:00 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BACE913AA49
-	for <lists+kvm@lfdr.de>; Sat, 14 Feb 2026 02:27:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D99813AA5F
+	for <lists+kvm@lfdr.de>; Sat, 14 Feb 2026 02:27:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D4070301FC9B
-	for <lists+kvm@lfdr.de>; Sat, 14 Feb 2026 01:27:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 235453055CBE
+	for <lists+kvm@lfdr.de>; Sat, 14 Feb 2026 01:27:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74AC32868B2;
-	Sat, 14 Feb 2026 01:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A72298CAF;
+	Sat, 14 Feb 2026 01:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tHNvI8xR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gKzzSoaK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914EE1DE885
-	for <kvm@vger.kernel.org>; Sat, 14 Feb 2026 01:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31624285050
+	for <kvm@vger.kernel.org>; Sat, 14 Feb 2026 01:27:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771032427; cv=none; b=hUqQ8NB60zZes37YywOJyfAznLtZD1cML5QXHr9PZyn1uZTcs+kmMMCO+KrNckRQ/u8fnFiNt2dW/0VoKQ3TQKriThuMhgIE0JgWD9JGxajpundqdPf5e/VOyp88Q3FaD9YxO8NwavUqvF1CA353EMoCDYO5UnswToeasRAiKu4=
+	t=1771032429; cv=none; b=hM8rJKbfJR4W63KtEdcn/Z0QPr2H4YNXJhulVei/pdaOOwlkLSDo3Y90PrWdpWifgHGaX3SYPP6+/ZCYpkY9cUT1jvZX+IPGm8+5/H+etk9gcdbn7W0Y91vMEKuToAbFNbCt3x8dZ6sA+wTn1Z3+5e9AqQIBi/mlETCXN4wd9xM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771032427; c=relaxed/simple;
-	bh=2t5N3FXJK+jxONHHD2OiC/FqtJtqZpNApYEKRxh3Fw4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=UYLhIWHSmBPj8RaDjWXY52lVHkmxDU1avi/r1C6dG6tv+lBioAyl8C/Rdl57G/+AFwUZVf+ipInnsDEEJuzFbSd8gguCBoozkVFQwO9XZIOTiDwKPZTwW81fX+9tTlGDewBSN3VLuBoFXbVxkFvnTDfjjAtpRT3fSJJVDqTZON4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tHNvI8xR; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1771032429; c=relaxed/simple;
+	bh=4EUvtuubXDsq2YIfpcwadRuQgjt5GtaI9Om4D5BZP9I=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=KaY40eAJLFQGXRcV3yvamGE7U3ZFJ9PZbctD+AoN4sMObtgc1huJXeyq4yfUuwIyI7Cl11KER7EKxjwkE33tMjbHxLaJ1Ztj71lAnOQHLc1JX+/X86fxxe8xy+g0zGXnsIvRLzWlUdge+H/eqL2/TXufRAEOCszV+fe1yhmWAjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gKzzSoaK; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-824b2f0d404so3663333b3a.0
-        for <kvm@vger.kernel.org>; Fri, 13 Feb 2026 17:27:06 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-35658758045so1207827a91.3
+        for <kvm@vger.kernel.org>; Fri, 13 Feb 2026 17:27:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771032426; x=1771637226; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lKhpZhRObYUhkhowIAV7Tkup63qCI6eIK5L/iRnu7eE=;
-        b=tHNvI8xRnwleHV3i6s5dDYPmoS4UsWsJQQRg9RV9dsJLDOi62fYPANYg9h8zD48YMr
-         y4zgOtUU7sTsAuUolTlA+bylJqetxp1g9fKVLB26AFBITvlYU6N7dfB0k0SkY85FSAeB
-         lpU1QvveUi1ky8c0bEc0f3YgbJDekIYzhtOqQNMkp+sDgGRx/cPN4QmsJhCD2AWXL8it
-         y0U9akzIvL5gqVo6LvMal04dL/14d9W73KocAg4icHkwW+/vINdKDSE7l9Md46U/qJhr
-         JfhIlwxLZVIPkEXQdMl+em6rcqE85ryW8YRPDwZBnz9asrEwkoP/nHSmTgMy4AKE92FR
-         kzRQ==
+        d=google.com; s=20230601; t=1771032427; x=1771637227; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=W7MxKQiK0Ayh5SRrSHD6eYo36EclamwmJq0KYQ9dvh4=;
+        b=gKzzSoaKu3CK5x+WIOQlXsAY004mj7S0TcoHF3W4e7t61Z1pK2G38ouo9Wdto0DfE7
+         ux04nTFlASGw3lmZDUngUaV8wc0gsIL5KqqpLTU9FU1FsP5RfqQo5NGPaLqjA2BhOaMk
+         vvNrvjYdF0/A7Xl7qncHbdITQliJiQ/+1S5vg6Isys4Fj1Q2AKNHvlAYvT7oEna5PjsB
+         DC1YsgCZr6gIvJ2CqMnLkK4KjvhhGuJYqjNiAtIlq6/W/CY3fGWr/hhBhKiHjSfYhWNf
+         IL2FzFZQ24MjDlzMPuGItR4YrgZ5o45tv9BGlqYN2JIBiA2WUK5gdRIJRRIH58ZNUtg5
+         rceA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771032426; x=1771637226;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lKhpZhRObYUhkhowIAV7Tkup63qCI6eIK5L/iRnu7eE=;
-        b=wwW6HS1CGFVDobLAtjTb4dDygyOv85I5aFHC4pUljLhX0HFvtYa7O8lA/BpzzMp9gG
-         pxko1cqRSN3X+OhDxHQJP/cHfWihsTq/aMXt/cedWS2jItuCU10exVv290OwiUr2LUFj
-         Si6d85g/GJXyHl+UXoDXxt0AJBbs8tfoqyMAnCH+u9RdWofeFe27GAe9CSD0pVwW1dmJ
-         0kprk6cJCJbros7kXoWJ6qEAuMdaeIuhRtok/w1jKhhPDy1BtN/rDw7YRelYYgduX1G0
-         0RWFzz7H3jXyQnyo5vj+CWzUIkBe9P5upG93JduxXmiHxsZ4lBp1L+4Tb/48BIyvFyju
-         Tr2w==
-X-Forwarded-Encrypted: i=1; AJvYcCXPz8eKNWmuSWrvZQBl5rTozvD0mzHCiqS4m4wSaIl69TSpjXBj5UhL0384bCKq/YgYyBk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzhl1GUdceDFV/ZYbE5CzDjfB2X6JoMhB0hB8hs03Fr9bkbaUAH
-	3DoWQUJ54fmiTCIWeBS3HO1RtCkSt/8dyhubMycUXOwiwDkidbCpy8cCHPnQcFSvjqMZXjw+2li
-	pKMfFpw==
-X-Received: from pfbls2.prod.google.com ([2002:a05:6a00:7402:b0:7ee:f5f6:a02f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:138c:b0:81f:829d:6f77
- with SMTP id d2e1a72fcca58-824d965c356mr992803b3a.67.1771032425651; Fri, 13
- Feb 2026 17:27:05 -0800 (PST)
+        d=1e100.net; s=20230601; t=1771032427; x=1771637227;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W7MxKQiK0Ayh5SRrSHD6eYo36EclamwmJq0KYQ9dvh4=;
+        b=C1aTaIBT+ER1oqBajSJXfXFMXG9gKOIyy8+iPPrbK1n7+7yvwDbmJ/7Do3G92dEeUU
+         Y6BgFTSw1LgCCVFyUBad40icQJuXSv/EFTrWkQA+i8M8KFKYYzpwCA4NyCQettwZkGKj
+         RJX7rBvwKWt4uqZzq3P91/4EJoXwPQqd6Vy+fygxHFccJeZtO7uekWW6YI77l/q4YzdG
+         0NGtYvdm4nZZ0eGBGeI4irio3CQb6pPX11km4hddoNOLhnI/U+/V2PiWk1n34zNLoYYP
+         xhDlQV4cyTtHR0rdJetm1DVvkfMWvA6hd64Q3yq4IUmRGIJ6/Ws0oNdC+7ofeAm1pndt
+         6WrA==
+X-Forwarded-Encrypted: i=1; AJvYcCU3gP7chAhu9OHIwCaqy4VoYSlH69CeaMA8ey32kc95eFA91ZP1lNeqrlFSeh7CT9+mx9Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHFheEEDiLHTch19c2SImBjnpIjSeQKBWCFejWahUmPzeVm8Jd
+	MdmP5db8eRZTwiZGQYFsoWv9tnjvak/JrXm9iZ/rvqJWZFf0i7XiovvmSodsDf/ngbMC/mjD8EB
+	nAauvrQ==
+X-Received: from pjbfv20.prod.google.com ([2002:a17:90b:e94:b0:354:a52b:ba9d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c0c:b0:356:2eac:b649
+ with SMTP id 98e67ed59e1d1-358448265e8mr1145384a91.7.1771032427400; Fri, 13
+ Feb 2026 17:27:07 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 13 Feb 2026 17:26:46 -0800
+Date: Fri, 13 Feb 2026 17:26:47 -0800
+In-Reply-To: <20260214012702.2368778-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260214012702.2368778-1-seanjc@google.com>
 X-Mailer: git-send-email 2.53.0.310.g728cabbaf7-goog
-Message-ID: <20260214012702.2368778-1-seanjc@google.com>
-Subject: [PATCH v3 00/16] KVM: x86/tdx: Have TDX handle VMXON during bringup
+Message-ID: <20260214012702.2368778-2-seanjc@google.com>
+Subject: [PATCH v3 01/16] KVM: x86: Move kvm_rebooting to x86
 From: Sean Christopherson <seanjc@google.com>
 To: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
@@ -94,141 +98,167 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71080-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71081-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	HAS_REPLYTO(0.00)[seanjc@google.com];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[google.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: BACE913AA49
+X-Rspamd-Queue-Id: 7D99813AA5F
 X-Rspamd-Action: no action
 
-Assuming I didn't break anything between v2 and v3, I think this is ready to
-rip.  Given the scope of the KVM changes, and that they extend outside of x86,
-my preference is to take this through the KVM tree.  But a stable topic branch
-in tip would work too, though I think we'd want it sooner than later so that
-it can be used as a base. 
+Move kvm_rebooting, which is only read by x86, to KVM x86 so that it can
+be moved again to core x86 code.  Add a "shutdown" arch hook to facilate
+setting the flag in KVM x86, along with a pile of comments to provide more
+context around what KVM x86 is doing and why.
 
-Chao, I deliberately omitted your Tested-by, as I shuffled things around enough
-while splitting up the main patch that I'm not 100% positive I didn't regress
-anything relative to v2.
+Reviewed-by: Chao Gao <chao.gao@intel.com>
+Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c       | 22 ++++++++++++++++++++++
+ arch/x86/kvm/x86.h       |  1 +
+ include/linux/kvm_host.h |  8 +++++++-
+ virt/kvm/kvm_main.c      | 14 +++++++-------
+ 4 files changed, 37 insertions(+), 8 deletions(-)
 
-
-The idea here is to extract _only_ VMXON+VMXOFF and EFER.SVME toggling.  AFAIK
-there's no second user of SVM, i.e. no equivalent to TDX, but I wanted to keep
-things as symmetrical as possible.
-
-TDX isn't a hypervisor, and isn't trying to be a hypervisor. Specifically, TDX
-should _never_ have it's own VMCSes (that are visible to the host; the
-TDX-Module has it's own VMCSes to do SEAMCALL/SEAMRET), and so there is simply
-no reason to move that functionality out of KVM.
-
-With that out of the way, dealing with VMXON/VMXOFF and EFER.SVME is a fairly
-simple refcounting game.
-
-v3:
- - https://lore.kernel.org/all/20251206011054.494190-1-seanjc@google.com
- - Split up the move from KVM => virt into smaller patches. [Dan]
- - Collect reviews. [Dan, Chao, Dave]
- - Update sample dmesg output and hotplug angle in docs. [Chao]
- - Add comments in kvm_arch_shutdown() to try and explain the madness. [Dave]
- - Add a largely superfluous smp_wmb() in kvm_arch_shutdown() to provide a
-   convienent location for documenting the flow. [Dave]
- - Disable preemption in x86_virt_{get,put}_ref() so that changes in how
-   KVM and/or TDX use the APIs doesn't result in bugs. [Xu]
- - Add a patch to drop the bogus "IRQs must be disabled" rule in
-   tdx_cpu_enable().
- - Tag more TDX helpers as __init. [Chao]
- - Don't treat loading kvm-intel.ko with tdx=1 as fatal if the system doesn't
-   have a TDX-Module available. [Chao]
-
-v2:
- - Initialize the TDX-Module via subsys initcall instead of during
-   tdx_init(). [Rick]
- - Isolate the __init and __ro_after_init changes. [Rick]
- - Use ida_is_empty() instead of manually tracking HKID usage. [Dan]
- - Don't do weird things with the refcounts when virt_rebooting is
-   true. [Chao]
- - Drop unnecessary setting of virt_rebooting in KVM code. [Chao]
- - Rework things to have less X86_FEATURE_FOO code. [Rick]
- - Consolidate the CPU hotplug callbacks. [Chao]
-
-v1 (RFC):
- - https://lore.kernel.org/all/20251010220403.987927-1-seanjc@google.com
-
-Chao Gao (1):
-  x86/virt/tdx: KVM: Consolidate TDX CPU hotplug handling
-
-Sean Christopherson (15):
-  KVM: x86: Move kvm_rebooting to x86
-  KVM: VMX: Move architectural "vmcs" and "vmcs_hdr" structures to
-    public vmx.h
-  KVM: x86: Move "kvm_rebooting" to kernel as "virt_rebooting"
-  KVM: VMX: Unconditionally allocate root VMCSes during boot CPU bringup
-  x86/virt: Force-clear X86_FEATURE_VMX if configuring root VMCS fails
-  KVM: VMX: Move core VMXON enablement to kernel
-  KVM: SVM: Move core EFER.SVME enablement to kernel
-  KVM: x86: Move bulk of emergency virtualizaton logic to virt subsystem
-  x86/virt: Add refcounting of VMX/SVM usage to support multiple
-    in-kernel users
-  x86/virt/tdx: Drop the outdated requirement that TDX be enabled in IRQ
-    context
-  KVM: x86/tdx: Do VMXON and TDX-Module initialization during subsys
-    init
-  x86/virt/tdx: Tag a pile of functions as __init, and globals as
-    __ro_after_init
-  x86/virt/tdx: Use ida_is_empty() to detect if any TDs may be running
-  KVM: Bury kvm_{en,dis}able_virtualization() in kvm_main.c once more
-  KVM: TDX: Fold tdx_bringup() into tdx_hardware_setup()
-
- Documentation/arch/x86/tdx.rst              |  36 +-
- arch/x86/events/intel/pt.c                  |   1 -
- arch/x86/include/asm/kvm_host.h             |   3 +-
- arch/x86/include/asm/reboot.h               |  11 -
- arch/x86/include/asm/tdx.h                  |   4 -
- arch/x86/include/asm/virt.h                 |  26 ++
- arch/x86/include/asm/vmx.h                  |  11 +
- arch/x86/kernel/cpu/common.c                |   2 +
- arch/x86/kernel/crash.c                     |   3 +-
- arch/x86/kernel/reboot.c                    |  63 +---
- arch/x86/kernel/smp.c                       |   5 +-
- arch/x86/kvm/svm/svm.c                      |  34 +-
- arch/x86/kvm/svm/vmenter.S                  |  10 +-
- arch/x86/kvm/vmx/main.c                     |  19 +-
- arch/x86/kvm/vmx/tdx.c                      | 210 ++----------
- arch/x86/kvm/vmx/tdx.h                      |   8 +-
- arch/x86/kvm/vmx/vmcs.h                     |  11 -
- arch/x86/kvm/vmx/vmenter.S                  |   2 +-
- arch/x86/kvm/vmx/vmx.c                      | 138 +-------
- arch/x86/kvm/x86.c                          |  29 +-
- arch/x86/virt/Makefile                      |   2 +
- arch/x86/virt/hw.c                          | 359 ++++++++++++++++++++
- arch/x86/virt/vmx/tdx/tdx.c                 | 321 +++++++++--------
- arch/x86/virt/vmx/tdx/tdx.h                 |   8 -
- arch/x86/virt/vmx/tdx/tdx_global_metadata.c |  10 +-
- include/linux/kvm_host.h                    |  16 +-
- virt/kvm/kvm_main.c                         |  31 +-
- 27 files changed, 717 insertions(+), 656 deletions(-)
- create mode 100644 arch/x86/include/asm/virt.h
- create mode 100644 arch/x86/virt/hw.c
-
-
-base-commit: 183bb0ce8c77b0fd1fb25874112bc8751a461e49
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index db3f393192d9..77edc24f8309 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -700,6 +700,9 @@ static void drop_user_return_notifiers(void)
+ 		kvm_on_user_return(&msrs->urn);
+ }
+ 
++__visible bool kvm_rebooting;
++EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_rebooting);
++
+ /*
+  * Handle a fault on a hardware virtualization (VMX or SVM) instruction.
+  *
+@@ -13178,6 +13181,25 @@ int kvm_arch_enable_virtualization_cpu(void)
+ 	return 0;
+ }
+ 
++void kvm_arch_shutdown(void)
++{
++	/*
++	 * Set kvm_rebooting to indicate that KVM has asynchronously disabled
++	 * hardware virtualization, i.e. that errors and/or exceptions on SVM
++	 * and VMX instructions are expected and should be ignored.
++	 */
++	kvm_rebooting = true;
++
++	/*
++	 * Ensure kvm_rebooting is visible before IPIs are sent to other CPUs
++	 * to disable virtualization.  Effectively pairs with the reception of
++	 * the IPI (kvm_rebooting is read in task/exception context, but only
++	 * _needs_ to be read as %true after the IPI function callback disables
++	 * virtualization).
++	 */
++	smp_wmb();
++}
++
+ void kvm_arch_disable_virtualization_cpu(void)
+ {
+ 	kvm_x86_call(disable_virtualization_cpu)();
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 94d4f07aaaa0..b314649e5c02 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -54,6 +54,7 @@ struct kvm_host_values {
+ 	u64 arch_capabilities;
+ };
+ 
++extern bool kvm_rebooting;
+ void kvm_spurious_fault(void);
+ 
+ #define SIZE_OF_MEMSLOTS_HASHTABLE \
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 2c7d76262898..981b55c0a3a7 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1630,6 +1630,13 @@ static inline void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu) {}
+ #endif
+ 
+ #ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
++/*
++ * kvm_arch_shutdown() is invoked immediately prior to forcefully disabling
++ * hardware virtualization on all CPUs via IPI function calls (in preparation
++ * for shutdown or reboot), e.g. to allow arch code to prepare for disabling
++ * virtualization while KVM may be actively running vCPUs.
++ */
++void kvm_arch_shutdown(void);
+ /*
+  * kvm_arch_{enable,disable}_virtualization() are called on one CPU, under
+  * kvm_usage_lock, immediately after/before 0=>1 and 1=>0 transitions of
+@@ -2305,7 +2312,6 @@ static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
+ 
+ #ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
+ extern bool enable_virt_at_load;
+-extern bool kvm_rebooting;
+ #endif
+ 
+ extern unsigned int halt_poll_ns;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 571cf0d6ec01..e081e7244299 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -5593,13 +5593,15 @@ bool enable_virt_at_load = true;
+ module_param(enable_virt_at_load, bool, 0444);
+ EXPORT_SYMBOL_FOR_KVM_INTERNAL(enable_virt_at_load);
+ 
+-__visible bool kvm_rebooting;
+-EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_rebooting);
+-
+ static DEFINE_PER_CPU(bool, virtualization_enabled);
+ static DEFINE_MUTEX(kvm_usage_lock);
+ static int kvm_usage_count;
+ 
++__weak void kvm_arch_shutdown(void)
++{
++
++}
++
+ __weak void kvm_arch_enable_virtualization(void)
+ {
+ 
+@@ -5653,10 +5655,9 @@ static int kvm_offline_cpu(unsigned int cpu)
+ 
+ static void kvm_shutdown(void *data)
+ {
++	kvm_arch_shutdown();
++
+ 	/*
+-	 * Disable hardware virtualization and set kvm_rebooting to indicate
+-	 * that KVM has asynchronously disabled hardware virtualization, i.e.
+-	 * that relevant errors and exceptions aren't entirely unexpected.
+ 	 * Some flavors of hardware virtualization need to be disabled before
+ 	 * transferring control to firmware (to perform shutdown/reboot), e.g.
+ 	 * on x86, virtualization can block INIT interrupts, which are used by
+@@ -5665,7 +5666,6 @@ static void kvm_shutdown(void *data)
+ 	 * 100% comprehensive.
+ 	 */
+ 	pr_info("kvm: exiting hardware virtualization\n");
+-	kvm_rebooting = true;
+ 	on_each_cpu(kvm_disable_virtualization_cpu, NULL, 1);
+ }
+ 
 -- 
 2.53.0.310.g728cabbaf7-goog
 
