@@ -1,150 +1,220 @@
-Return-Path: <kvm+bounces-71107-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71109-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kCVRF6zSkWm+nAEAu9opvQ
-	(envelope-from <kvm+bounces-71107-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 15:05:32 +0100
+	id WLhqJXrgkWkxngEAu9opvQ
+	(envelope-from <kvm+bounces-71109-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 16:04:26 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA0D513ECBF
-	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 15:05:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEF6E13EEDB
+	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 16:04:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 62C33300E391
-	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 14:05:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EDE84301F982
+	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 15:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E232C0F90;
-	Sun, 15 Feb 2026 14:05:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D17728C2BF;
+	Sun, 15 Feb 2026 15:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="c+oH1kN8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cx2Xoyfl"
 X-Original-To: kvm@vger.kernel.org
-Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A463BB57
-	for <kvm@vger.kernel.org>; Sun, 15 Feb 2026 14:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E42522D4D3;
+	Sun, 15 Feb 2026 15:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771164324; cv=none; b=OW4ln187a6imKucy7L6GBWo/mDCRDb9A5nV7FhqGjyzBH8l3wp+L8KrnIys4DXT3W9bnNQuHujDnfCv+EKTFsB69yuTkSU1LizjTpOoibO1z4vT3CYZQHO1to36j5opf2IMlGPlqfLKrXtQeedonp1I5GToFzz858q0vQ8mZwGA=
+	t=1771167819; cv=none; b=QP9/7owSgp1X4YIrbUJ5rBn8jh9Jbz90/3Zj3MmnIbcOG2qdRXDVCZA26UIj51BfjCOBpmD/mOyrLsBcLVPt0xep/lieMokzZo2zQZcrwublJu0iwNZLtYGtGlYWF1Ha3LtSWnNL/yhf/0pa07M0cshNSdfVPjCecAuOQEgG1ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771164324; c=relaxed/simple;
-	bh=hLVvsKeUjZnDb76HkhGVoxi80fmId3IbV4m7ZHWk26U=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=qvTnW0ExbldzkLtVTMc571qw+6yAMY/myYpn2KZ9GUyHplTn11l1RENHbCrAlF7LagQ8Cv8m5iJjdIfKTy0eQClG8ehic+L5R79h/VK6A+Y4OJiElBHlFqPCNBKfBeuMn3HfYlazHBZs3+yclOWGyYsuw+mpO2Uq9pVrvV3dIHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=c+oH1kN8; arc=none smtp.client-ip=162.62.57.252
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1771164318; bh=Ffshtsjrk+BtxIoHPYvs2B6eiQy8uzdCk/yeV4L2RJI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=c+oH1kN8BrNhCISNjLvMXCLVJ7nO4LntNz4/l9XBusQisRHSKJSbm6SoFdCtB6biX
-	 v71UO6ilDegpprDfKdD/272llGd6Tr8ozylY5VJ4h6YT49MptDWsbrmSWP8VX9qs07
-	 q479TlVzWQYldqD1/YNm5solKyRzvpUO7VdCi5DQ=
-Received: from pve.sebastian ([118.250.2.92])
-	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
-	id 10481CF7; Sun, 15 Feb 2026 22:04:04 +0800
-X-QQ-mid: xmsmtpt1771164249tbfmnxbb3
-Message-ID: <tencent_EAB2053E04BF4C7F996CEC61331C23154007@qq.com>
-X-QQ-XMAILINFO: OK7NBzdNss/Rx1PACFRVKIp0y/xdEey6QAqj7mPA9iUsNgMyy6dUEoUyyAmjjQ
-	 oTNVzstiDLdI4Ccmud1AkeskPf3REGK55k0uDu4TlJXp9N909GLOi0ofQx/Yxkm2x0IZzfdOXuEy
-	 Sg9ynlnhVq1wZm+Bm8DW2JF9SEbATkYAKN9myGCFfP5kxEJ3iWWZFJtStfQ6EeWEok8Aaz5QfUfT
-	 6w2FsvWzK2Z1rQMnh4tCXCgHRS+OFVwMK1ygAvXxpg/R3shLxwZzA9KUu5z7bO6ZRmBbMwTWhG2z
-	 iPdEHpgSS8FnDU/9Ys+v0ZGI07SDhe7QdgPmU5Gq11Avxz+snVXBneIo1K3YIOsg4IvGQQQFXeYI
-	 RlcPL7psEroFty/iplL5ikUv67JJqD+pCxpDdrQq0cBMRVXk6HHkTbr8gi0lw6e6sNnDYWkhk4xJ
-	 LRusjReYjAHR4pUwQRQbIoe87WBsAsAD8GkFW4MNJYqZtCxP2M4TRwKNG5f4PvmpzNzXe2FhnFJa
-	 9fJBQq4jx4iszKhWmkiynnM0g20jVdchLAYQfglzf/29uznfzjYShuh4O90EsHM2w5sgY0UHD3ON
-	 xRZ/JnPkljTwSJ3YB/T91l0vA66AtKt7ArxKouxYS7XIX+yeUvndBe9QJ+QNedTbwL2RYLkRNQBD
-	 xwsxMMElHohd+TZpM3v3URog86mN4f5yZpJA2T/yqpBSyAnjeMnG74rn0sUMQJsRckcc9b8Y7OKU
-	 VZEHhIO3014O9ST4ictk/5hQyQgFGtj4j7bRHKbRJVL5UmqUkoD1LyMMUQHYqScL0//RH5XQEyfi
-	 pQAaD+FMitNwx/pZmaH9kn8zBt1qtuug5glZk9te1ZseA8IsRm9d5viwEApa6rA99XsLhu3sqKGy
-	 M3XEQMZcm2R2wYGxHstTHPbOsrXFYCAjzfhVQhxCSRG8xFnvhFgPzTQNr5tWN1WrZxasxQmpHV0F
-	 MRYj5C3Ful9PVnEOBZ/A+mtuYTb8BJ0ovhWOS4M+fyVWQVpFIDenF0UVSTM5fgoQawnTx15eMXPO
-	 XBjZnS8Z6THxPLr1sjg8ou34FaOlebrugbSYoBbOa3ciCMQDxm
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
-From: 76824143@qq.com
-To: pbonzini@redhat.com
-Cc: kvm@vger.kernel.org,
-	zhanghao <zhanghao1@kylinos.cn>
-Subject: [PATCH 3/3] KVM: x86: Use dynamic try count based on vCPU count
-Date: Sun, 15 Feb 2026 22:04:02 +0800
-X-OQ-MSGID: <20260215140402.24659-4-76824143@qq.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20260215140402.24659-1-76824143@qq.com>
-References: <20260215140402.24659-1-76824143@qq.com>
+	s=arc-20240116; t=1771167819; c=relaxed/simple;
+	bh=IiC1peG8g8mQra+e1gdqk8iHIl+MuKKrcRSX/qkzaDI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Pw6GksX95QCqluCKvnjDJIg213dsAITx91K62pPKmkBjDtMTII7Z/h4SRmnnKIa+LPCWo1GYUT26AxpGaYhS+ULY1tjG2wVn0181rH7w+sdBeJoaZ3spM0rc40sm43dXCR35sDU4L0UVpu1KbBBLp8V6GX5d+k+v6mQyWuOeXyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cx2Xoyfl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CD76C4AF0B;
+	Sun, 15 Feb 2026 15:03:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771167819;
+	bh=IiC1peG8g8mQra+e1gdqk8iHIl+MuKKrcRSX/qkzaDI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=cx2XoyflwCbfy/+wdaIHhyKvAhm8Ikd7XgVW3+6DvmUC6w5q6vsxoujo+n/I6mucb
+	 zNyxQQWphfaHXPjaG5+yTYhQpZJi1D/uekAr/Ak76S7uG46Ek4MSPBiRqc79qrezbx
+	 3MwR3P8vQw0jueLd/J1w3sPMy+Uvg0yp0OaNVi4Lez3QTz/WaZQ6JfLJB65030tBfC
+	 i6bNMHki0I/3MLgCBzSJgOq8KMSx1Oaeg61SZLdCDMiaBCJ89PgVjvc0m4mpVEOsOo
+	 1+uwis75YoQrH07BdQ4T+TbIeuV0R71Fz4tBJJxRXGah7LzFKFwGJrjjC4o+Uv8AeN
+	 QQNKQh6SYvY6A==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Longfang Liu <liulongfang@huawei.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Sasha Levin <sashal@kernel.org>,
+	kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.19-6.1] hisi_acc_vfio_pci: update status after RAS error
+Date: Sun, 15 Feb 2026 10:03:20 -0500
+Message-ID: <20260215150333.2150455-3-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260215150333.2150455-1-sashal@kernel.org>
+References: <20260215150333.2150455-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.19
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71109-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-71107-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_THREE(0.00)[3];
-	FREEMAIL_FROM(0.00)[qq.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[76824143@qq.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[qq.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,kvm@vger.kernel.org];
 	TAGGED_RCPT(0.00)[kvm];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,qq.com:mid,qq.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DA0D513ECBF
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+]
+X-Rspamd-Queue-Id: EEF6E13EEDB
 X-Rspamd-Action: no action
 
-From: zhanghao <zhanghao1@kylinos.cn>
+From: Longfang Liu <liulongfang@huawei.com>
 
-Replace the fixed try count (3) with a dynamic calculation based
-on the number of online vCPUs. This allows larger VMs to try more
-candidates before giving up, while keeping small VMs efficient.
+[ Upstream commit 8be14dd48dfee0df91e511acceb4beeb2461a083 ]
 
-Formula: clamp(ilog2(nr_vcpus + 1), 3, 10)
-- 4 vCPUs: try = 3
-- 64 vCPUs: try = 6
-- 256 vCPUs: try = 8
+After a RAS error occurs on the accelerator device, the accelerator
+device will be reset. The live migration state will be abnormal
+after reset, and the original state needs to be restored during
+the reset process.
+Therefore, reset processing needs to be performed in a live
+migration scenario.
 
-Signed-off-by: zhanghao <zhanghao1@kylinos.cn>
+Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+Link: https://lore.kernel.org/r/20260122020205.2884497-3-liulongfang@huawei.com
+Signed-off-by: Alex Williamson <alex@shazbot.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- virt/kvm/kvm_main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 663df3a121c8..7f83e434e39a 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3984,12 +3984,13 @@ bool __weak kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
- 
- void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+LLM Generated explanations, may be completely bogus:
+
+This confirms the critical finding.
+
+### 3. Bug Classification: Logic Error Causing Failed Reset After RAS
+Error
+
+The old condition was:
+```c
+if (hisi_acc_vdev->core_device.vdev.migration_flags !=
+VFIO_MIGRATION_STOP_COPY)
+    return;
+```
+
+But `migration_flags` is set to `VFIO_MIGRATION_STOP_COPY |
+VFIO_MIGRATION_PRE_COPY` (line 1590), which is `0x1 | 0x4 = 0x5`, not
+`0x1`.
+
+So the condition `migration_flags != VFIO_MIGRATION_STOP_COPY` evaluates
+to `0x5 != 0x1` = **TRUE**, causing the function to **always return
+early** and **never perform the reset**.
+
+This means:
+- After a RAS error, the device resets
+- The migration state becomes inconsistent
+- The `hisi_acc_vf_reset()` call that should restore state is **never
+  reached**
+- The device is left in a broken/inconsistent migration state
+
+The new condition `!mig_ops` correctly checks whether migration is
+supported (the pointer is non-NULL when migration ops are registered),
+which aligns with how the VFIO core itself checks for migration
+capability.
+
+### 4. Scope and Risk Assessment
+
+- **Change size**: 2 lines modified (one condition check)
+- **Files touched**: 1 file
+- **Risk**: Very low - the change is a simple condition check
+  improvement
+- **Scope**: Well-contained to the AER reset handler for HiSilicon
+  accelerator VFIO devices
+
+### 5. User Impact
+
+- **Who is affected**: Users of HiSilicon accelerators (SEC, HPRE, ZIP
+  engines) with live migration enabled, especially in
+  cloud/virtualization environments
+- **Severity**: After a RAS error during live migration, the device
+  state would not be properly restored, potentially causing:
+  - Failed live migrations
+  - Corrupted device state
+  - Guest VM malfunction after host-side RAS recovery
+
+### 6. Stability Indicators
+
+- Merged by Alex Williamson (VFIO subsystem maintainer)
+- The fix is obviously correct - the old check was demonstrably wrong
+  due to the exact equality comparison against a bitmask field that has
+  multiple bits set
+
+### 7. Dependency Check
+
+This change is self-contained. It doesn't depend on other commits. The
+`mig_ops` field has existed in `struct vfio_device` since the VFIO
+migration rework (which is present in recent stable kernels).
+
+### Conclusion
+
+This is a clear bug fix. The old condition had a logic error that caused
+the migration reset handler to be completely non-functional — it would
+**always** return early because `migration_flags` was set to `STOP_COPY
+| PRE_COPY` but was compared with exact equality to just `STOP_COPY`.
+The fix is minimal (2 lines), obviously correct, and addresses a real
+data integrity/reliability issue during RAS error recovery in live
+migration scenarios. The change was accepted by the VFIO maintainer.
+
+The only consideration is whether `mig_ops` exists in stable tree
+versions, but since it's part of the VFIO migration rework that preceded
+the addition of `PRE_COPY` support, it should be present in any kernel
+that has this driver with `PRE_COPY` capability.
+
+**YES**
+
+ drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+index 8ed00f6183622..1c0b960de93c6 100644
+--- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
++++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+@@ -1192,8 +1192,7 @@ static void hisi_acc_vf_pci_aer_reset_done(struct pci_dev *pdev)
  {
--	int nr_vcpus, start, i, idx, yielded;
-+	int nr_vcpus, start = 0, i, idx, yielded;
- 	struct kvm *kvm = me->kvm;
- 	struct kvm_vcpu *vcpu;
--	int try = 3;
-+	int try;
+ 	struct hisi_acc_vf_core_device *hisi_acc_vdev = hisi_acc_drvdata(pdev);
  
- 	nr_vcpus = atomic_read(&kvm->online_vcpus);
-+	try = clamp(ilog2(nr_vcpus + 1), 3, 10);
- 	if (nr_vcpus < 2)
+-	if (hisi_acc_vdev->core_device.vdev.migration_flags !=
+-				VFIO_MIGRATION_STOP_COPY)
++	if (!hisi_acc_vdev->core_device.vdev.mig_ops)
  		return;
  
+ 	mutex_lock(&hisi_acc_vdev->state_mutex);
 -- 
-2.39.2
+2.51.0
 
 
