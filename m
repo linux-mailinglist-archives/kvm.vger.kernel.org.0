@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-71113-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71107-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2FEFMGzhkWkxngEAu9opvQ
-	(envelope-from <kvm+bounces-71113-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 16:08:28 +0100
+	id kCVRF6zSkWm+nAEAu9opvQ
+	(envelope-from <kvm+bounces-71107-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 15:05:32 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2786613EF8B
-	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 16:08:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA0D513ECBF
+	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 15:05:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 07B5030028F4
-	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 15:08:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 62C33300E391
+	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 14:05:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491B222756A;
-	Sun, 15 Feb 2026 15:08:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E232C0F90;
+	Sun, 15 Feb 2026 14:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="CQCBsr2h"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="c+oH1kN8"
 X-Original-To: kvm@vger.kernel.org
-Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
+Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B36C1E5B7B
-	for <kvm@vger.kernel.org>; Sun, 15 Feb 2026 15:08:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A463BB57
+	for <kvm@vger.kernel.org>; Sun, 15 Feb 2026 14:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771168100; cv=none; b=q9s8CQBp7njImLHjWpR0Lj/3fYTNILZ/rMEuWth+y0o5FpWHMzJHs115tJI3gddMt85q9r/9cP8Q0FnNq3ldLhnUPo0sUnRnRNqhaXgcZhCK/T8c/rFOQ2wWhNGANDd87tv3udQi8ZRN3DNsiQljKMFBs8JQu2DhE1HE5YeHO2E=
+	t=1771164324; cv=none; b=OW4ln187a6imKucy7L6GBWo/mDCRDb9A5nV7FhqGjyzBH8l3wp+L8KrnIys4DXT3W9bnNQuHujDnfCv+EKTFsB69yuTkSU1LizjTpOoibO1z4vT3CYZQHO1to36j5opf2IMlGPlqfLKrXtQeedonp1I5GToFzz858q0vQ8mZwGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771168100; c=relaxed/simple;
-	bh=V08+o2yXur7pI17jTybJG/CqAlMqrlVHpgja2XEXPa8=;
+	s=arc-20240116; t=1771164324; c=relaxed/simple;
+	bh=hLVvsKeUjZnDb76HkhGVoxi80fmId3IbV4m7ZHWk26U=;
 	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=SKBAPb8DxAp/ttVbc5LSeY5JKCUOR8N1Vz3SZy1ehWkDhR4P0lhZx1aUsXsmpevoFQ8YVZ18xbj+2oSgblEmhRnDoCVjTVSCCEiAQV/iCMrZRe1CyPeFHyFkSpwVGzR51bHhAv0ARGXzptgPK4IkxxDLvn5w8ZfCdU3/Mp2okQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=CQCBsr2h; arc=none smtp.client-ip=162.62.58.211
+	 MIME-Version; b=qvTnW0ExbldzkLtVTMc571qw+6yAMY/myYpn2KZ9GUyHplTn11l1RENHbCrAlF7LagQ8Cv8m5iJjdIfKTy0eQClG8ehic+L5R79h/VK6A+Y4OJiElBHlFqPCNBKfBeuMn3HfYlazHBZs3+yclOWGyYsuw+mpO2Uq9pVrvV3dIHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=c+oH1kN8; arc=none smtp.client-ip=162.62.57.252
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1771168086; bh=bnsRtCdhJSZDx2jLt0N8Jhj0RomGtQGeG4Mj/IZEaWc=;
+	t=1771164318; bh=Ffshtsjrk+BtxIoHPYvs2B6eiQy8uzdCk/yeV4L2RJI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=CQCBsr2hyJ1hfKoAUMTFlKkTdMf4v+Gm3QeZLJ22RF3PykojaRzcqfW2B4+5B89Rc
-	 cPH14tYkxwYpIchgnJQYRfWtIGckgouvlJ1O9rSYPDgV740VPEitJJMt+Ovkl4c21L
-	 mPuyaOzQRDcRlLuLKk30J/eIN+V0HHUrr1ugQaMs=
+	b=c+oH1kN8BrNhCISNjLvMXCLVJ7nO4LntNz4/l9XBusQisRHSKJSbm6SoFdCtB6biX
+	 v71UO6ilDegpprDfKdD/272llGd6Tr8ozylY5VJ4h6YT49MptDWsbrmSWP8VX9qs07
+	 q479TlVzWQYldqD1/YNm5solKyRzvpUO7VdCi5DQ=
 Received: from pve.sebastian ([118.250.2.92])
 	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
 	id 10481CF7; Sun, 15 Feb 2026 22:04:04 +0800
-X-QQ-mid: xmsmtpt1771164248tkg82h8la
-Message-ID: <tencent_A1CC0E76805991513AA0C982068255A6A306@qq.com>
-X-QQ-XMAILINFO: MDbayGdXPuoeSKU2iL/mCI88NVWqz26dHwT9E54jNLo7h8WwVAeNmVkeTQ0YMD
-	 Z1aMig46FGSYV8PbRLecIwL8IeFdqOaEuyN7D6PHyOyWQWNPgXtuezs1LDfHkIlK+yDQ0SGKcO99
-	 AWdt41PxZ/o46vWSVret630gHUJkyZTgVASPk0LXtlF5smDa4iPcKnPUIHh3ZrW+kUl0eQcgKhji
-	 PZBFJlYPJ96S6NE+6w3WN4fJYepBHuXPWHABdyrrjkWME38gaRZbrAvXtfeGrmvA8vWLHlWZmIk+
-	 aXcXc5SSRAD4yInUlmTdfm2Vs2KclXprYJdTwIvhnx77CjqdnKC2KeBrSN3vdkjC88xE8ktcMvcC
-	 vyUop8Jbk3Tn5vCWysEDaZTBl/7XbRayfB2SYUo4HowfwA1x47xTYUaYC5XvwKClFJhjzzYwIvN5
-	 su3db+OLsYyBc0ukXJ7ObFX28WIighb1PMUFefGLEMtX3uJ4ne9XeBQC4r2mssAhBCzvOL/K7YZ8
-	 tKU74dW3iG2f8X/EfubyktHCtuKW1jWlRbnIdd72Fm5wRRgPUmzE0PvqnpRk0ePSHkIFGgGhAi3w
-	 W+DffBadFiC8We/s4VN2PCqJqCfxeF30yq63eMUktZvu9yXes9JKoWwCpgDn7icZ+d+57DsvTBJ8
-	 pizqB07BUbXqSY14hor7YxIeD2nYJh8ZVWgWeDaO+hjUCoqeasz81NCKI3j68Ax9OTAR/wFStHJO
-	 ntqXwJ0y4C6WCXZr3odIULpMlssS52E3OWiY4tQRqxtD+PIXB3w6JRbF/nZjthtguoEG6Tsf+70A
-	 kIJoRcBPhnn9tR9bIYRckBgSn2nPK+reV5QTFYrMKVmVJZtL/reAaDlBcYszh8LaCkMPMTfywbD7
-	 9xyz409mBefJAOCFsh5Ty3dsdyA6Q1A5CeumeZe1RNJdPuFGjeMTtJ+1iJXBNCJ8STOlYE7yONHY
-	 i+THJO+fpqHDqGQYExA4GkxH8QV2Tkv+OmaIf7eQ+0m2tw6mwPb/F1c+5v0EfDrlDecUIW5fXgBp
-	 s/LX16FrSE5r7m+Ugyxw/pjJWhbzUndEc1xFjGMw==
-X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+X-QQ-mid: xmsmtpt1771164249tbfmnxbb3
+Message-ID: <tencent_EAB2053E04BF4C7F996CEC61331C23154007@qq.com>
+X-QQ-XMAILINFO: OK7NBzdNss/Rx1PACFRVKIp0y/xdEey6QAqj7mPA9iUsNgMyy6dUEoUyyAmjjQ
+	 oTNVzstiDLdI4Ccmud1AkeskPf3REGK55k0uDu4TlJXp9N909GLOi0ofQx/Yxkm2x0IZzfdOXuEy
+	 Sg9ynlnhVq1wZm+Bm8DW2JF9SEbATkYAKN9myGCFfP5kxEJ3iWWZFJtStfQ6EeWEok8Aaz5QfUfT
+	 6w2FsvWzK2Z1rQMnh4tCXCgHRS+OFVwMK1ygAvXxpg/R3shLxwZzA9KUu5z7bO6ZRmBbMwTWhG2z
+	 iPdEHpgSS8FnDU/9Ys+v0ZGI07SDhe7QdgPmU5Gq11Avxz+snVXBneIo1K3YIOsg4IvGQQQFXeYI
+	 RlcPL7psEroFty/iplL5ikUv67JJqD+pCxpDdrQq0cBMRVXk6HHkTbr8gi0lw6e6sNnDYWkhk4xJ
+	 LRusjReYjAHR4pUwQRQbIoe87WBsAsAD8GkFW4MNJYqZtCxP2M4TRwKNG5f4PvmpzNzXe2FhnFJa
+	 9fJBQq4jx4iszKhWmkiynnM0g20jVdchLAYQfglzf/29uznfzjYShuh4O90EsHM2w5sgY0UHD3ON
+	 xRZ/JnPkljTwSJ3YB/T91l0vA66AtKt7ArxKouxYS7XIX+yeUvndBe9QJ+QNedTbwL2RYLkRNQBD
+	 xwsxMMElHohd+TZpM3v3URog86mN4f5yZpJA2T/yqpBSyAnjeMnG74rn0sUMQJsRckcc9b8Y7OKU
+	 VZEHhIO3014O9ST4ictk/5hQyQgFGtj4j7bRHKbRJVL5UmqUkoD1LyMMUQHYqScL0//RH5XQEyfi
+	 pQAaD+FMitNwx/pZmaH9kn8zBt1qtuug5glZk9te1ZseA8IsRm9d5viwEApa6rA99XsLhu3sqKGy
+	 M3XEQMZcm2R2wYGxHstTHPbOsrXFYCAjzfhVQhxCSRG8xFnvhFgPzTQNr5tWN1WrZxasxQmpHV0F
+	 MRYj5C3Ful9PVnEOBZ/A+mtuYTb8BJ0ovhWOS4M+fyVWQVpFIDenF0UVSTM5fgoQawnTx15eMXPO
+	 XBjZnS8Z6THxPLr1sjg8ou34FaOlebrugbSYoBbOa3ciCMQDxm
+X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
 From: 76824143@qq.com
 To: pbonzini@redhat.com
 Cc: kvm@vger.kernel.org,
 	zhanghao <zhanghao1@kylinos.cn>
-Subject: [PATCH 2/3] KVM: x86: Skip IN_GUEST_MODE vCPUs in kvm_vcpu_on_spin main loop
-Date: Sun, 15 Feb 2026 22:04:01 +0800
-X-OQ-MSGID: <20260215140402.24659-3-76824143@qq.com>
+Subject: [PATCH 3/3] KVM: x86: Use dynamic try count based on vCPU count
+Date: Sun, 15 Feb 2026 22:04:02 +0800
+X-OQ-MSGID: <20260215140402.24659-4-76824143@qq.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20260215140402.24659-1-76824143@qq.com>
 References: <20260215140402.24659-1-76824143@qq.com>
@@ -83,13 +83,13 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-71113-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71107-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -101,39 +101,48 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[76824143@qq.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[qq.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qq.com:mid,qq.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,kylinos.cn:email]
-X-Rspamd-Queue-Id: 2786613EF8B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,qq.com:mid,qq.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DA0D513ECBF
 X-Rspamd-Action: no action
 
 From: zhanghao <zhanghao1@kylinos.cn>
 
-Add a check in the kvm_vcpu_on_spin() main loop to skip vCPUs
-that are already running in guest mode.
+Replace the fixed try count (3) with a dynamic calculation based
+on the number of online vCPUs. This allows larger VMs to try more
+candidates before giving up, while keeping small VMs efficient.
 
-Reduces unnecessary yield_to() calls and VM exits.
+Formula: clamp(ilog2(nr_vcpus + 1), 3, 10)
+- 4 vCPUs: try = 3
+- 64 vCPUs: try = 6
+- 256 vCPUs: try = 8
 
 Signed-off-by: zhanghao <zhanghao1@kylinos.cn>
 ---
- virt/kvm/kvm_main.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ virt/kvm/kvm_main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 476ecdb18bdd..663df3a121c8 100644
+index 663df3a121c8..7f83e434e39a 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -4026,6 +4026,10 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
- 		vcpu = xa_load(&kvm->vcpu_array, idx);
- 		if (!READ_ONCE(vcpu->ready))
- 			continue;
-+
-+		if (READ_ONCE(vcpu->mode) == IN_GUEST_MODE)
-+			continue;
-+
- 		if (kvm_vcpu_is_blocking(vcpu) && !vcpu_dy_runnable(vcpu))
- 			continue;
+@@ -3984,12 +3984,13 @@ bool __weak kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
+ 
+ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+ {
+-	int nr_vcpus, start, i, idx, yielded;
++	int nr_vcpus, start = 0, i, idx, yielded;
+ 	struct kvm *kvm = me->kvm;
+ 	struct kvm_vcpu *vcpu;
+-	int try = 3;
++	int try;
+ 
+ 	nr_vcpus = atomic_read(&kvm->online_vcpus);
++	try = clamp(ilog2(nr_vcpus + 1), 3, 10);
+ 	if (nr_vcpus < 2)
+ 		return;
  
 -- 
 2.39.2
