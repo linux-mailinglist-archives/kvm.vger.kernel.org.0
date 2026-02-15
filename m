@@ -1,50 +1,50 @@
-Return-Path: <kvm+bounces-71114-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71115-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IBHoHToGkmnNpQEAu9opvQ
-	(envelope-from <kvm+bounces-71114-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 18:45:30 +0100
+	id sL+jI8AGkml+pgEAu9opvQ
+	(envelope-from <kvm+bounces-71115-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 18:47:44 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBCA313F48C
-	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 18:45:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52F3E13F4AD
+	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 18:47:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 125063016EC5
-	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 17:45:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4C9CE3006B35
+	for <lists+kvm@lfdr.de>; Sun, 15 Feb 2026 17:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB1C2F12A1;
-	Sun, 15 Feb 2026 17:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF9BC2F28FF;
+	Sun, 15 Feb 2026 17:47:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BG+JR1Dy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fbrYBjCS"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8148E281532;
-	Sun, 15 Feb 2026 17:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC43528C849;
+	Sun, 15 Feb 2026 17:47:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771177515; cv=none; b=py0o6qucLEHzt7tZ/5iergYRdY5fLBuypKqsA6LatZipsM1iZZ5VoWOdPdIYeTLGTxcHXrsQai9beRfSiRVA0OZH7RY3z6JDwo982UrIwLH3UT0kcPlGo21E0NkYzJpLpWk0NjHml1RTcJNJC4ma+kSHRjqif1wfHte24VAaamE=
+	t=1771177650; cv=none; b=L8uyD1fO87w+7Ja9yqp30fYEP2DAQU6UVjhYCF6SvO2ZDqQi+sBQCEfMH3G3plGtQVE0x79n94MJUg5XfWsLyTMu4p/emI86mN3UEmW/vaUU9jNQy7qGHdCfWpTj70AwJWf0FmHJgtlr1J48wsV2e7V+yPFBsvZt43dB2Fc/q54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771177515; c=relaxed/simple;
-	bh=8+vsibyilKDKEZUlnlJrlviFTSx+hiIe6MQ75WXS7Rk=;
+	s=arc-20240116; t=1771177650; c=relaxed/simple;
+	bh=WauyYvE1fxZu8CMoxtW1HF3J+YpjZ/sOClCwhExhX3w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pdHC6xNAgkUavojOajT8wEGVfL1Sad9zm4Mv3IgD6JgWb9dipzN5D3mEotc9m5a8Cp8WMkvheIei/8Xe4RpU33HDEljq/Vtr1G8Jxn8l/0PrrVzPukFfuNMSU62OBB/dWGLhVlAcja3F3QvcAcKIJmmhaScxlg+FdUJAduNTbWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BG+JR1Dy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7335BC4CEF7;
-	Sun, 15 Feb 2026 17:45:08 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=UpGoLwunmm5r1+Du0PSjbts8ERygv5ujTin7Zxu2w3xDZZ+QSuYn72IN0WDO9VxfpX3fLGz9sd6ogrZYCzcQumDl5AD0aNt+oJkZ42IIuiFKWUkJQO7aYSrmOvtjsBE2XiJcx4ZcwcuIs7WVbqWvQrdr+zc41S0i9m+m87+z6TI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fbrYBjCS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54B06C4CEF7;
+	Sun, 15 Feb 2026 17:47:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771177515;
-	bh=8+vsibyilKDKEZUlnlJrlviFTSx+hiIe6MQ75WXS7Rk=;
+	s=k20201202; t=1771177650;
+	bh=WauyYvE1fxZu8CMoxtW1HF3J+YpjZ/sOClCwhExhX3w=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BG+JR1Dyi5VqlUUTMQf5o+IiWg/T2f3iM50oVhUC5iCYomQGcsnmguUIxywRlub2p
-	 egB1quc0DK4f9M6/YLQTkMXWoMuBxZURAiXTZJqY4zFmhsg0k951pvj6wr8eH9F8wU
-	 AM5JBmF6GY00arsIj/PxFJgo7GvSr9q2JubVLEHPAeo7A8BtVruoSMUZ7BFkzRhuog
-	 Ex2bquQwk1LKEv9t0ST+8RVfYCe9ouxUlpG0FOs2qowxphlyDvx+mfSzVM+KgqcIxV
-	 mUUtlI+5N1rCjkyk4hN+zdv8vjrFDLhhO5ln9E5kcqJad0eDxPxQ4gCLobLT56qZZr
-	 ODkw7iWdblQ1w==
-Date: Sun, 15 Feb 2026 19:45:04 +0200
+	b=fbrYBjCS7QUw/rE+JE8LWK3tTpdARCB19ZpCOzFQFJYGvUsGOHm6o4hP+P7BDXHS6
+	 1Ra7umuePXGYH6F/+80Rm0n5TmkfK14mAyS9ntBXHkWecssXL0KP48r5LlHdNKCB/v
+	 Yikkfr4c84VgkViQbjDlEPjtnJr8q/+vckh4k7MX3co2ZRshjaZYmP5lR8kUhoF2lk
+	 XG9vwuHdbwOddDuJB7oSLZ4+XvlH5VSCO7CBJdBL+lBg3Wv8xOtfQ/eBwGNFheDjU/
+	 Eituud2nlH0GtfZ47cgpkILBkjYqEq3d7GDUZKTTTqcgd7VR2xlMlt0CBgwzA5r05Z
+	 SFgCDu9R+kG4Q==
+Date: Sun, 15 Feb 2026 19:47:19 +0200
 From: Mike Rapoport <rppt@kernel.org>
 To: Peter Xu <peterx@redhat.com>
 Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
@@ -65,14 +65,13 @@ Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
 	Suren Baghdasaryan <surenb@google.com>,
 	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH RFC 10/17] shmem, userfaultfd: implement shmem uffd
- operations using vm_uffd_ops
-Message-ID: <aZIGIH9--qOamaMe@kernel.org>
+Subject: Re: [PATCH RFC 07/17] userfaultfd: introduce vm_uffd_ops
+Message-ID: <aZIGp0F7uuS9qYVZ@kernel.org>
 References: <20260127192936.1250096-1-rppt@kernel.org>
- <20260127192936.1250096-11-rppt@kernel.org>
- <aYIzCuh8cjd09zrP@x1.local>
- <aYhm_4difwN5XXxe@kernel.org>
- <aYzf-hS4pUY9ulss@x1.local>
+ <20260127192936.1250096-8-rppt@kernel.org>
+ <aYEY6PC0Qfu0m5gu@x1.local>
+ <aYhh2XzyFsJbohll@kernel.org>
+ <aYzZ-zBipYQ2OA_n@x1.local>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,18 +80,18 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aYzf-hS4pUY9ulss@x1.local>
+In-Reply-To: <aYzZ-zBipYQ2OA_n@x1.local>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71114-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71115-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -107,52 +106,38 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CBCA313F48C
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 52F3E13F4AD
 X-Rspamd-Action: no action
 
-On Wed, Feb 11, 2026 at 03:00:58PM -0500, Peter Xu wrote:
-> On Sun, Feb 08, 2026 at 12:35:43PM +0200, Mike Rapoport wrote:
-> > > > +static void shmem_mfill_filemap_remove(struct folio *folio,
-> > > > +				       struct vm_area_struct *vma)
-> > > > +{
-> > > > +	struct inode *inode = file_inode(vma->vm_file);
-> > > > +
-> > > > +	filemap_remove_folio(folio);
-> > > > +	shmem_recalc_inode(inode, 0, 0);
-> > > >  	folio_unlock(folio);
-> > > > -	folio_put(folio);
-> > > > -out_unacct_blocks:
-> > > > -	shmem_inode_unacct_blocks(inode, 1);
+On Wed, Feb 11, 2026 at 02:35:23PM -0500, Peter Xu wrote:
+> On Sun, Feb 08, 2026 at 12:13:45PM +0200, Mike Rapoport wrote:
 > > > 
-> > > This looks wrong, or maybe I miss somewhere we did the unacct_blocks()?
+> > > I understand you wanted to also make anon to be a driver, so this line
+> > > won't apply to anon.  However IMHO anon is special enough so we can still
+> > > make this in the generic path.
 > > 
-> > This is handled by shmem_recalc_inode(inode, 0, 0).
+> > Well, the idea is to drop all vma_is*() in can_userfault(). And maybe
+> > eventually in entire mm/userfaultfd.c
+> > 
+> > If all page cache filesystems need this, something like this should work,
+> > right?
+> > 
+> > 	if (!uffd_supports_wp_marker() && (vma->vm_flags & VM_SHARED) &&
+> > 	    (vm_flags & VM_UFFD_WP))
+> > 		return false;
 > 
-> IIUC shmem_recalc_inode() only does the fixup of shmem_inode_info over
-> possiblly changing inode->i_mapping->nrpages.  It's not for reverting the
-> accounting in the failure paths here.
+> Sorry for a late response.
 > 
-> OTOH, we still need to maintain accounting for the rest things with
-> correctly invoke shmem_inode_unacct_blocks().  One thing we can try is
-> testing this series against either shmem quota support (since 2023, IIUC
-> it's relevant to "quota" mount option), or max_blocks accountings (IIUC,
-> "size" mount option), etc.  Any of those should reflect a difference if my
-> understanding is correct.
-> 
-> So IIUC we still need the unacct_blocks(), please kindly help double check.
+> IMHO using vma_is_anonymous() for one more time should be better than
+> leaking pte marker whole concept to modules. So the driver should only
+> report if the driver supports UFFD_WP in general.  It shouldn't care about
+> anything the core mm would already do otherwise, including this one on
+> "whether system config / arch has globally enabled pte markers" and the
+> relation between that config and the WP feature impl details.
 
-I followed shmem_get_folio_gfp() error handling, and unless I missed
-something we should have the same sequence with uffd.
-
-In shmem_mfill_filemap_add() we increment both i_mapping->nrpages and
-info->alloced in shmem_add_to_page_cache() and 
-shmem_recalc_inode(inode, 1, 0) respectively.
-
-Then in shmem_filemap_remove() the call to filemap_remove_folio()
-decrements i_mapping->nrpages and shmem_recalc_inode(inode, 0, 0) will see
-freed=1 and will call shmem_inode_unacct_blocks().
+I agree. Will move the check for the markers back into userfaultfd.c
  
 > Thanks,
 > 
