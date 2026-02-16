@@ -1,68 +1,72 @@
-Return-Path: <kvm+bounces-71129-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71130-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kNigMp1Pk2nA3QEAu9opvQ
-	(envelope-from <kvm+bounces-71129-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 18:10:53 +0100
+	id cB6gNcZZk2k73wEAu9opvQ
+	(envelope-from <kvm+bounces-71130-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 18:54:14 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 328DB1468C5
-	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 18:10:53 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C2A2146D24
+	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 18:54:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 069D03033AB8
-	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 17:10:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 81B773004CA9
+	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 17:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1672D6E62;
-	Mon, 16 Feb 2026 17:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC82E2EF64F;
+	Mon, 16 Feb 2026 17:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ODwx7o+G"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="OdhuiIOE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from fra-out-002.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-002.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.65.3.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA6A25A2DD;
-	Mon, 16 Feb 2026 17:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9D72773E5;
+	Mon, 16 Feb 2026 17:54:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.65.3.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771261819; cv=none; b=PmHEHjp8Lck/fj37scqMj/cFTZQsJ690HY3eOIjZcn7Ie2e8oDWWPUEmOKe8/ye4X2NWI1oYT2yiNiWQRxP05NO5nIH8a/chRHtlhUpXWuRzi0WpEQydSjLdvca6hRdGDPQhOPXlagYM/VVnvksgr1ksB8n2hyRHH65Ghqg4Tdk=
+	t=1771264444; cv=none; b=dZEkB3F0gBk8LIRQBE2zYqSzHPbdVJo6FeSuwVTjBwwXxn1ATz9mE436ZYBFFDG1J08Y9spJrYcLeA+eJu2Gbw52ugapOfxGjBJ9KYjhAtVCsGLMhSTjgKx6Rd0I8IT/bJHqCZAjA0tW9532T1ghoQe55+mDF0GO3BQxp2qZ4zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771261819; c=relaxed/simple;
-	bh=pjtaSxteYo4kDsypwM3PMDwT+PPkMmWSMijBa4iqp5c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UY3keg+v093cI6xE3LwNYsQ9cIKL3AVjCtiWC8IXWv2OpZgJ9C+XK5IxdgHeUm8tPkSsUPsLTCwMcoxy2z46B+uqYWrtB/BcWk2HpCRMw3P6zeR9ZvJnHdKlWmimW6PI4Wh1MiVsRgR8roiwfIsSMN5MhzORl/1STSklAb9It3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ODwx7o+G; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771261817; x=1802797817;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=pjtaSxteYo4kDsypwM3PMDwT+PPkMmWSMijBa4iqp5c=;
-  b=ODwx7o+GhO1agbWyi/dR70AsgdoF0HpQuTTxqaCAW1UM5X2OqtKtWwRK
-   qv1T5qfuT4SAQLak7IIOQgbwFCXKrdLXwav1ER4T06J+X/pZi+kAg/QVI
-   zTgmXR/HHBCiU4L+s9IdzjmQEanbf2QVaVmSmjsNkcFIphdoEEKqZ5q97
-   V9qI1hieoLADSXSJY9q+ELj8oAQAz3sVJeztxMPkfcvTrRdH7bb1hn8w4
-   8XibhBsQ3IDfLaFFoYdhXh7oLwgh6dK5m6/B2pp6/Gi1qjhyKZT6WfoRQ
-   WAghMBc2p4KtuC1UdRUBV9FCm27U2RD4NpAcp/ich4EJyt8i/SjYrCeqU
-   A==;
-X-CSE-ConnectionGUID: TA+JTFKnTQKRwxDjO2n9ng==
-X-CSE-MsgGUID: EvW5VvkPQL+I4qfXNmfxZw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11703"; a="94975296"
-X-IronPort-AV: E=Sophos;i="6.21,294,1763452800"; 
-   d="scan'208";a="94975296"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2026 09:10:17 -0800
-X-CSE-ConnectionGUID: QvFofH9ETA+BJDABLax6hA==
-X-CSE-MsgGUID: 7+v6bMo6TniUf959kO1p1A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,294,1763452800"; 
-   d="scan'208";a="212623084"
-Received: from spandruv-desk1.amr.corp.intel.com (HELO [10.125.109.113]) ([10.125.109.113])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2026 09:10:16 -0800
-Message-ID: <1bc0b798-9cef-4dfd-af06-7674b699af1b@intel.com>
-Date: Mon, 16 Feb 2026 09:10:15 -0800
+	s=arc-20240116; t=1771264444; c=relaxed/simple;
+	bh=/OPoQ4m9Bh4larLwHoYLzwbNQTh8Xp/G9qiorISC+cA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=IensaGwhdwTxhUysSSlic5VSfP6eDrJy8YRjQ15AryEGuP3nKMU60dqpgENWbJHdD2KhARrqZa0AKOJu3WUe0uMjuDo0NTedqVEE2mMljeOUQ7394FcJFL4vP/skkhhJak/Uq4e1H8oFwYjKC5vQrvgHaF5HUIyZsmCbj0wUqX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=OdhuiIOE; arc=none smtp.client-ip=3.65.3.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1771264442; x=1802800442;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=xRJr1BxUVy81vOLOHmZNuiLSIyY1c4pkA4AMT3x7FlM=;
+  b=OdhuiIOEaSX5zYawBzir+sIKUTx7JeOmzWHy8dnfnBX76KWOTDJe3v9P
+   UwYqoTlWIoUi/tY/z08G6UI46wiCLfAn13Xl4MZQ2aOY3Uo3guTSSFLo8
+   aWw5eNiC3uqWAQ4DxP3GnpAWBwUl4ger7QbcUN5V5/ihaE78KI/QezuHK
+   +JwVmlk9yEISnnyuYZ0YuX0bwhEVrVS0SiFCO1TkjMqwSdW8HBFpqQH2i
+   DNowitw6Z884Fs1JQfdXbn4rSz13dTb7x72QsYtP6lVe24ff1KW8j6bz7
+   7Z2LcbpAZAZsdlm1Y3HeBvM4fJ117LQUmEc2hPcKKE7Ne+2T7Ce3Tvlnh
+   g==;
+X-CSE-ConnectionGUID: efT7Zpy3QrulWZTje+jljA==
+X-CSE-MsgGUID: Hxc3CJ4RTZuc556KvQ3Bow==
+X-IronPort-AV: E=Sophos;i="6.21,294,1763424000"; 
+   d="scan'208";a="9539976"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-002.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2026 17:53:58 +0000
+Received: from EX19MTAEUB001.ant.amazon.com [54.240.197.234:7682]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.19.89:2525] with esmtp (Farcaster)
+ id 4dbc0cc7-432d-45ce-8078-fa45b54969a3; Mon, 16 Feb 2026 17:53:58 +0000 (UTC)
+X-Farcaster-Flow-ID: 4dbc0cc7-432d-45ce-8078-fa45b54969a3
+Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
+ EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Mon, 16 Feb 2026 17:53:55 +0000
+Received: from [192.168.2.117] (10.106.83.6) by EX19D005EUB003.ant.amazon.com
+ (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35; Mon, 16 Feb 2026
+ 17:53:55 +0000
+Message-ID: <dcbd7a58-c961-4510-ae48-ef7fd4f4d75c@amazon.com>
+Date: Mon, 16 Feb 2026 17:53:53 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,173 +74,316 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] x86/fred: Fix early boot failures on SEV-ES/SNP guests
-To: "Nikunj A. Dadhania" <nikunj@amd.com>, bp@alien8.de
-Cc: tglx@kernel.org, mingo@redhat.com, kvm@vger.kernel.org,
- dave.hansen@linux.intel.com, hpa@zytor.com, xin@zytor.com,
- seanjc@google.com, pbonzini@redhat.com, x86@kernel.org, jon.grimm@amd.com,
- stable@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
- linux-kernel@vger.kernel.org, sohil.mehta@intel.com,
- andrew.cooper3@citrix.com
-References: <20260205051030.1225975-1-nikunj@amd.com>
- <9c8c2d69-5434-4416-ba37-897ce00e2b11@intel.com>
- <02df7890-83c2-4047-8c88-46fbc6e0a892@intel.com>
- <103bc1df-4caf-430a-9c8b-fcee78b3dd1d@amd.com>
- <5cf9358a-a5c3-4d4b-b82f-16d69fa30f3e@amd.com>
- <317f7def-9ac7-41e1-8754-808cd08f88cb@amd.com>
-From: Dave Hansen <dave.hansen@intel.com>
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH v4 4/4] KVM: Avoid synchronize_srcu() in
+ kvm_io_bus_register_dev()
+To: Sean Christopherson <seanjc@google.com>
+CC: Keir Fraser <keirf@google.com>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Eric Auger
+	<eric.auger@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier
+	<maz@kernel.org>, Will Deacon <will@kernel.org>, Paolo Bonzini
+	<pbonzini@redhat.com>, Li RongQing <lirongqing@baidu.com>
+References: <20250909100007.3136249-1-keirf@google.com>
+ <20250909100007.3136249-5-keirf@google.com>
+ <a84ddba8-12da-489a-9dd1-ccdf7451a1ba@amazon.com>
+ <aY-x0OlJQEqInyNF@google.com>
 Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <317f7def-9ac7-41e1-8754-808cd08f88cb@amd.com>
-Content-Type: text/plain; charset=UTF-8
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <aY-x0OlJQEqInyNF@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D006EUA002.ant.amazon.com (10.252.50.65) To
+ EX19D005EUB003.ant.amazon.com (10.252.51.31)
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DKIM_TRACE(0.00)[amazon.com:+];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71129-lists,kvm=lfdr.de];
-	DKIM_TRACE(0.00)[intel.com:+]
-X-Rspamd-Queue-Id: 328DB1468C5
+	TAGGED_FROM(0.00)[bounces-71130-lists,kvm=lfdr.de];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
+	HAS_REPLYTO(0.00)[kalyazin@amazon.com];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kalyazin@amazon.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 0C2A2146D24
 X-Rspamd-Action: no action
 
-> CR pinning can prematurely enable features during secondary CPU bringup
-> before their supporting infrastructure is initialized. Specifically, when
-> FRED is enabled, cr4_init() sets CR4.FRED via the pinned mask early in
-> start_secondary(), long before cpu_init_fred_exceptions() configures the
-> required FRED MSRs. This creates a window where exceptions cannot be
-> properly handled.
 
-This is a collision of FRED, CR-pinning and SEV. Future me would
-appreciate having all that background in one place:
 
-	== CR Pinning Background ==
+On 13/02/2026 23:20, Sean Christopherson wrote:
+> On Fri, Feb 13, 2026, Nikita Kalyazin wrote:
+>>
+>>
+>> On 09/09/2025 11:00, Keir Fraser wrote:
+>>> Device MMIO registration may happen quite frequently during VM boot,
+>>> and the SRCU synchronization each time has a measurable effect
+>>> on VM startup time. In our experiments it can account for around 25%
+>>> of a VM's startup time.
+>>>
+>>> Replace the synchronization with a deferred free of the old kvm_io_bus
+>>> structure.
+>>
+>>
+>> Hi,
+>>
+>> We noticed that this change introduced a regression of ~20 ms to the first
+>> KVM_CREATE_VCPU call of a VM, which is significant for our use case.
+>>
+>> Before the patch:
+>> 45726 14:45:32.914330 ioctl(25, KVM_CREATE_VCPU, 0) = 28 <0.000137>
+>> 45726 14:45:32.914533 ioctl(25, KVM_CREATE_VCPU, 1) = 30 <0.000046>
+>>
+>> After the patch:
+>> 30295 14:47:08.057412 ioctl(25, KVM_CREATE_VCPU, 0) = 28 <0.025182>
+>> 30295 14:47:08.082663 ioctl(25, KVM_CREATE_VCPU, 1) = 30 <0.000031>
+>>
+>> The reason, as I understand, it happens is call_srcu() called from
+>> kvm_io_bus_register_dev() are adding callbacks to be called after a normal
+>> GP, which is 10 ms with HZ=100.  The subsequent synchronize_srcu_expedited()
+>> called from kvm_swap_active_memslots() (from KVM_CREATE_VCPU) has to wait
+>> for the normal GP to complete before making progress.  I don't fully
+>> understand why the delay is consistently greater than 1 GP, but that's what
+>> we see across our testing scenarios.
+>>
+>> I verified that the problem is relaxed if the GP is reduced by configuring
+>> HZ=1000.  In that case, the regression is in the order of 1 ms.
+>>
+>> It looks like in our case we don't benefit much from the intended
+>> optimisation as the number of device MMIO registrations is limited and and
+>> they don't cost us much (each takes at most 16 us, but most commonly ~6 us):
+> 
+> Maybe differences in platforms for arm64 vs x86?
 
-	Modern CPU hardening features like SMAP/SMEP are enabled by
-	flipping control register (CR) bits. Attackers find these
-	features inconvenient and often try to disable them.
+Tested on ARM, and indeed kvm_io_bus_register_dev are occurring after 
+KVM_CREATE_VCPU, and the patch produces a visible optimisation:
 
-	CR-pinning is a kernel hardening feature that detects when
-	security-sensitive control bits are flipped off, complains about
-	it, then turns them back on. The CR-pinning checks are performed
-	in the CR manipulation helpers.
+Without the patch (15-23 us per call):
 
-	X86_CR4_FRED controls FRED enabling and is pinned. There is a
-	single, system-wide static key that controls CR-pinning
-	behavior. The static key is enabled by the boot CPU after it has
-	established its CR configuration.
+      firecracker 19916 [033]   404.518430: 
+probe:kvm_vm_ioctl_create_vcpu: (ffff800080059b18)
+      firecracker 19916 [033]   404.518446: 
+probe:kvm_vm_ioctl_create_vcpu: (ffff800080059b18)
+      firecracker 19916 [033]   404.518462: 
+probe:kvm_io_bus_register_dev: (ffff80008005f0e8)
+      firecracker 19916 [032]   404.518495: 
+probe:kvm_io_bus_register_dev__return: (ffff80008005f0e8 <- 
+ffff8000800a198c)
+      firecracker 19916 [032]   404.518498: 
+probe:kvm_io_bus_register_dev: (ffff80008005f0e8)
+      firecracker 19916 [033]   404.518521: 
+probe:kvm_io_bus_register_dev__return: (ffff80008005f0e8 <- 
+ffff8000800a198c)
+      firecracker 19916 [033]   404.518524: 
+probe:kvm_io_bus_register_dev: (ffff80008005f0e8)
+      firecracker 19916 [032]   404.518539: 
+probe:kvm_io_bus_register_dev__return: (ffff80008005f0e8 <- 
+ffff8000800a6d2c)
+      firecracker 19916 [032]   404.526900: 
+probe:kvm_io_bus_register_dev: (ffff80008005f0e8)
+      firecracker 19916 [033]   404.526924: 
+probe:kvm_io_bus_register_dev__return: (ffff80008005f0e8 <- 
+ffff800080060168)
+      firecracker 19916 [033]   404.526926: 
+probe:kvm_io_bus_register_dev: (ffff80008005f0e8)
+      firecracker 19916 [032]   404.526941: 
+probe:kvm_io_bus_register_dev__return: (ffff80008005f0e8 <- 
+ffff800080060168)
+        fc_vcpu 0 19924 [035]   404.530829: 
+probe:kvm_io_bus_register_dev: (ffff80008005f0e8)
+        fc_vcpu 0 19924 [035]   404.530848: 
+probe:kvm_io_bus_register_dev__return: (ffff80008005f0e8 <- 
+ffff80008009f6b4)
 
-	The end result is that CR-pinning is not active while
-	initializing the boot CPU but it is active while bringing up
-	secondary CPUs.
+With the patch (1-6 us per call):
 
-	== FRED Background ==
+      firecracker 22806 [032]   427.687157: 
+probe:kvm_vm_ioctl_create_vcpu: (ffff800080059b38)
+      firecracker 22806 [032]   427.687174: 
+probe:kvm_vm_ioctl_create_vcpu: (ffff800080059b38)
+      firecracker 22806 [032]   427.687193: 
+probe:kvm_io_bus_register_dev: (ffff80008005f128)
+      firecracker 22806 [032]   427.687196: 
+probe:kvm_io_bus_register_dev__return: (ffff80008005f128 <- 
+ffff8000800a19cc)
+      firecracker 22806 [032]   427.687196: 
+probe:kvm_io_bus_register_dev: (ffff80008005f128)
+      firecracker 22806 [032]   427.687197: 
+probe:kvm_io_bus_register_dev__return: (ffff80008005f128 <- 
+ffff8000800a19cc)
+      firecracker 22806 [032]   427.687201: 
+probe:kvm_io_bus_register_dev: (ffff80008005f128)
+      firecracker 22806 [032]   427.687202: 
+probe:kvm_io_bus_register_dev__return: (ffff80008005f128 <- 
+ffff8000800a6d6c)
+      firecracker 22806 [029]   427.707660: 
+probe:kvm_io_bus_register_dev: (ffff80008005f128)
+      firecracker 22806 [029]   427.707666: 
+probe:kvm_io_bus_register_dev__return: (ffff80008005f128 <- 
+ffff8000800601a8)
+      firecracker 22806 [029]   427.707667: 
+probe:kvm_io_bus_register_dev: (ffff80008005f128)
+      firecracker 22806 [029]   427.707668: 
+probe:kvm_io_bus_register_dev__return: (ffff80008005f128 <- 
+ffff8000800601a8)
+        fc_vcpu 0 22829 [030]   427.711642: 
+probe:kvm_io_bus_register_dev: (ffff80008005f128)
+        fc_vcpu 0 22829 [030]   427.711645: 
+probe:kvm_io_bus_register_dev__return: (ffff80008005f128 <- 
+ffff80008009f6f4)
 
-	FRED is a new hardware entry/exit feature for the kernel. It is
-	not on by default and started out as Intel-only. AMD is just
-	adding support now.
 
-	FRED has MSRs for configuration and is enabled by the pinned
-	X86_CR4_FRED bit. It should not be enabled until after MSRs are
-	properly initialized.
+Also, it is the KVM_SET_USER_MEMORY_REGION (not KVM_CREATE_VCPU) that is 
+hit on ARM (but seems to be for the same reason):
 
-	== SEV Background ==
+45736 17:30:10.251430 ioctl(17, KVM_SET_USER_MEMORY_REGION, {slot=0, 
+flags=0, guest_phys_addr=0x80000000, memory_size=12884901888, 
+userspace_addr=0xfffcbedd6000}) = 0 <0.021021>
 
-	Some flavors of AMD SEV have special virtualization exceptions:
-	#VC. These exceptions happen in "weird" places like when
-	accessing MMIO, running CPUID or even accessing apparently
-	normal kernel memory.
+vs
 
-	Writes to the console can generate #VC.
+30694 17:33:01.128985 ioctl(17, KVM_SET_USER_MEMORY_REGION, {slot=0, 
+flags=0, guest_phys_addr=0x80000000, memory_size=12884901888, 
+userspace_addr=0xfffc91fc9000}) = 0 <0.000016>
 
-	== Problem ==
+> 
+>> I am not aware of way to make it fast for both use cases and would be more
+>> than happy to hear about possible solutions.
+> 
+> What if we key off of vCPUS being created?  The motivation for Keir's change was
+> to avoid stalling during VM boot, i.e. *after* initial VM creation.
 
-	CR-pinning implicitly enables FRED on secondary CPUs at a
-	different point than the boot CPU. This point is *before* the
-	CPU has done an explicit cr4_set_bits(X86_CR4_FRED) and before
-	the MSRs are initialized. This means that there is a window
-	where no exceptions can be handled.
+It doesn't work as is on x86 because the delay we're seeing occurs after 
+the created_cpus gets incremented so it doesn't allow to differentiate 
+the two cases (below is kvm_vm_ioctl_create_vcpu):
 
-	For SEV-ES/SNP and TDX guests, any console output during this
-	window triggers #VC or #VE exceptions that result in triple
-	faults because the exception handlers rely on FRED MSRs that
-	aren't yet configured.
+	kvm->created_vcpus++; // <===== incremented here
+	mutex_unlock(&kvm->lock);
 
-	== Fix ==
+	vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL_ACCOUNT);
+	if (!vcpu) {
+		r = -ENOMEM;
+		goto vcpu_decrement;
+	}
 
-	Defer CR-pinning enforcement during secondary CPU bringup. This
-	avoids any implicit CR changes during CPU bringup, ensuring that
-	FRED is not enabled before it is configured and able to handle a
-	 #VC.
+	BUILD_BUG_ON(sizeof(struct kvm_run) > PAGE_SIZE);
+	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+	if (!page) {
+		r = -ENOMEM;
+		goto vcpu_free;
+	}
+	vcpu->run = page_address(page);
 
-	This also aligns boot and secondary CPU bringup.
+	kvm_vcpu_init(vcpu, kvm, id);
 
-	Note: FRED is not on by default anywhere so this is not likely
-	to be causing many problems. The only reason this was noticed
-	was that AMD started to enable FRED and was turning it on.
+	r = kvm_arch_vcpu_create(vcpu); // <===== the delay is here
 
-With that, you can add:
 
-Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+firecracker   583 [001]   151.297145: 
+probe:synchronize_srcu_expedited: (ffffffff813e5cf0)
+     ffffffff813e5cf1 synchronize_srcu_expedited+0x1 ([kernel.kallsyms])
+     ffffffff81234986 kvm_swap_active_memslots+0x136 ([kernel.kallsyms])
+     ffffffff81236cdd kvm_set_memslot+0x1cd ([kernel.kallsyms])
+     ffffffff81237518 kvm_set_memory_region.part.0+0x478 ([kernel.kallsyms])
+     ffffffff81264dbc __x86_set_memory_region+0xec ([kernel.kallsyms])
+     ffffffff8127e2dc kvm_alloc_apic_access_page+0x5c ([kernel.kallsyms])
+     ffffffff812b9ed3 vmx_vcpu_create+0x193 ([kernel.kallsyms])
+     ffffffff8126788a kvm_arch_vcpu_create+0x1da ([kernel.kallsyms])
+     ffffffff8123c54c kvm_vm_ioctl+0x5fc ([kernel.kallsyms])
+     ffffffff8167b331 __x64_sys_ioctl+0x91 ([kernel.kallsyms])
+     ffffffff8251a89c do_syscall_64+0x4c ([kernel.kallsyms])
+     ffffffff8100012b entry_SYSCALL_64_after_hwframe+0x76 
+([kernel.kallsyms])
+               6512de ioctl+0x32 (/mnt/host/firecracker)
+                d99a7 std::rt::lang_start+0x37 (/mnt/host/firecracker)
+
+
+Also, given that it stumbles after the KVM_CREATE_VCPU on ARM (in 
+KVM_SET_USER_MEMORY_REGION), it doesn't look like a universal solution.
+
+
+> 
+> --
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Fri, 13 Feb 2026 15:15:01 -0800
+> Subject: [PATCH] KVM: Synchronize SRCU on I/O device registration if vCPUs
+>   haven't been created
+> 
+> TODO: Write a changelog if this works.
+> 
+> Fixes: 7d9a0273c459 ("KVM: Avoid synchronize_srcu() in kvm_io_bus_register_dev()")
+> Reported-by: Nikita Kalyazin <kalyazin@amazon.com>
+> Closes: https://lkml.kernel.org/r/a84ddba8-12da-489a-9dd1-ccdf7451a1ba%40amazon.com
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   virt/kvm/kvm_main.c | 25 ++++++++++++++++++++++++-
+>   1 file changed, 24 insertions(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 571cf0d6ec01..043b1c3574ab 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -6027,7 +6027,30 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+>          memcpy(new_bus->range + i + 1, bus->range + i,
+>                  (bus->dev_count - i) * sizeof(struct kvm_io_range));
+>          rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
+> -       call_srcu(&kvm->srcu, &bus->rcu, __free_bus);
+> +
+> +       /*
+> +        * To optimize VM creation *and* boot time, use different tactics for
+> +        * safely freeing the old bus based on where the VM is at in its
+> +        * lifecycle.  If vCPUs haven't yet been created, simply synchronize
+> +        * and free, as there are unlikely to be active SRCU readers; if not,
+> +        * defer freeing the bus via SRCU callback.
+> +        *
+> +        * If there are active SRCU readers, synchronizing will stall until the
+> +        * current grace period completes, which can meaningfully impact boot
+> +        * time for VMs that trigger a large number of registrations.
+> +        *
+> +        * If there aren't SRCU readers, using an SRCU callback can be a net
+> +        * negative due to starting a grace period of its own, which in turn
+> +        * can unnecessarily cause a future synchronization to stall.  E.g. if
+> +        * devices are registered before memslots are created, then creating
+> +        * the first memslot will have to wait for a superfluous grace period.
+> +        */
+> +       if (!READ_ONCE(kvm->created_vcpus)) {
+> +               synchronize_srcu_expedited(&kvm->srcu);
+> +               kfree(bus);
+> +       } else {
+> +               call_srcu(&kvm->srcu, &bus->rcu, __free_bus);
+> +       }
+> 
+>          return 0;
+>   }
+> 
+> base-commit: 183bb0ce8c77b0fd1fb25874112bc8751a461e49
+> --
 
 
