@@ -1,309 +1,229 @@
-Return-Path: <kvm+bounces-71126-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71127-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SCWCJAI7k2mV2gEAu9opvQ
-	(envelope-from <kvm+bounces-71126-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 16:42:58 +0100
+	id YKjZMdM9k2kg2wEAu9opvQ
+	(envelope-from <kvm+bounces-71127-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 16:54:59 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3619145BAD
-	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 16:42:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48B74145D2E
+	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 16:54:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0572B3034291
-	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 15:41:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 62424303428F
+	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 15:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15BDF328B56;
-	Mon, 16 Feb 2026 15:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB2D3321BE;
+	Mon, 16 Feb 2026 15:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O2+9IVzF"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01101D5CD1;
-	Mon, 16 Feb 2026 15:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771256480; cv=none; b=fxX8Mi4LLTebo6gT6iik7LVAOXO695Z5eWXT9pn412ZkVtHN0qugoLtU2WMx7OayRzYQB5QbvBaj6m0NYZz0z0gSFCy1NtBR4wS5oPEFiqmmQUtDVm2vmf/LyNqg7D+EM9Zr3YElVJt5vWc7gsDQU6x+NDTEFI8xcg1Px2QtAEg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771256480; c=relaxed/simple;
-	bh=5KhSdcSou1ZE1u/xUJA2YoZVJ7k/SAZ3rFQ6U4OxN28=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CIbkdpWwDdoHCbv11GzJkzLje/WTcmwQzXPYKiAqWywFbbAM4h+XvqR5efIZxmLZVTEAOraoNXm21RNukl6oNSnEFXs1ajFsZvO29tXN0vc4C3xXg+3XRowg2q8t+Zxgz9LlGchQKiEh8uP6lqo72MZAyPS3gCGcPlvMlJ4cELo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E0A8A1576;
-	Mon, 16 Feb 2026 07:41:11 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7C4D63F632;
-	Mon, 16 Feb 2026 07:41:11 -0800 (PST)
-Message-ID: <fd7e0779-7e29-461d-adb6-0568a81ec59e@arm.com>
-Date: Mon, 16 Feb 2026 15:41:09 +0000
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B45331237
+	for <kvm@vger.kernel.org>; Mon, 16 Feb 2026 15:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771257177; cv=pass; b=RSiMnik4PWzQM20ycvOnH5Zx7mNSMVCLsIl0yz9MWrtwGCQ738sUVfnYDhsTW8hoC0awehrtVu7QoIIM8iBzPmwJ1QtkMGD4pYAycHfP1o8+QzzZpAS2L6L9DP/1W0VSyiSzSZd9vzcfvZzSvTKOwX410vdoDp5/itFphHMk6tE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771257177; c=relaxed/simple;
+	bh=DVgZs0T8Bk7PTjBucWJPircNUuuYdnAroDO4LS4PT6Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e4JJOlwWZBiz8k8mTqbN6vTvOvgphEWJ7oUAAWYkYYuJYkLOSr4orV5mp9PYEXxUFV5wmSOvwAA9NuWCE4qFINo8YLOC86tW+8OVL4OUQmm9bV3lzKG8xdeaHHp/azy9/lCSe7x0FEtHo2Ns+TJPItk+6IVT16vJlivyWHKm8R0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=O2+9IVzF; arc=pass smtp.client-ip=74.125.224.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-64ad79df972so2900063d50.1
+        for <kvm@vger.kernel.org>; Mon, 16 Feb 2026 07:52:56 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771257175; cv=none;
+        d=google.com; s=arc-20240605;
+        b=bO4qqE2ICIwBQ8bf2dAPUw0YmBEEUVsWf0QFKX5c063i6cNinBduGHCCQmCW7lu8Px
+         CwuD2YOhB1SDFXpxvkYhA+WniQJpgw4BLTz9d5ObH3VnEgH9CsjhDfgfdazhPwbjn0QR
+         NAcre4i1LzsbJpaLOoOEgJUVuj2MzSIpx+c3O0X44pQMMbso98mOD1hW26+36eBPSpVq
+         D7m2/OT+wMYm7R2RDcrJj/hnggHpYvmparMS7rqaV0IUCNjS7zXVf6T0Mw7pslSQvuBe
+         pV/9znmnbvcNHyV0i2A96OCyo7zcw4hMJDRffBXcHwLq3MqS76abZcbdkjH6awUcGJcQ
+         QrjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=dP7OJCe4IFWPzF0ucWa9rG4RGTcEJ98iWAzWk9PebNw=;
+        fh=4ukGYD/7fJ58gqTQi9uy+UhyAimvVb0OmmKmfedgkvo=;
+        b=Y9nsyOZracgUvbEcX7+7SbSDBxPfq+flgtV/gNz65s79kCZ2P2+sjOwQk4ky2fZHb/
+         rhafy63AAjz/Mc4oOPipNHL/NpKGnqP383cqc3O0FfzMl8KkIhR4+Hewk02y88c0byir
+         g5Bgi0WqGdpkrH5Su/44LEvf4Vhx0lo+ZSsQtdxRj7S8Zt6fYQBERUDVYzxbnrMSEC+I
+         cP4OeX6NyWJTApxe3p9xrpJUBjTRQ7dMXxD2B0QSJOp/GR6xZKa03EtA6mkSBhTz2RrL
+         O6ZR7ILeqb5zuAAHIfGppoAYTnRLdWu8P0eixTdM2vOUHgrOJjsMsVvjjEloFBkBm+pt
+         RNkg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1771257175; x=1771861975; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=dP7OJCe4IFWPzF0ucWa9rG4RGTcEJ98iWAzWk9PebNw=;
+        b=O2+9IVzFq1nWFeKCq3Ri4SxxS83aJtL9kmCJRkcwnz+koWX4PHQC/dGZkCWyCKGX2o
+         aKPsMTFcHm05Ll6QKJ+2+/eTWdWZqHzvtChvnBAcfiK2CDw1yFHqr4CZWD2HyR/Jknjb
+         c2+ph3FPm1QVnXcJ87Kw6cOp+slbwWTVRGVOmrN8JHfDbIICm+S+QE4NNc3+/qcGYYk0
+         iitOZiZB3stH+K4qpnhfD5wB/FxNO4AQPRwYKQfK3xxfPi4V5s+cAlHi+AURrxaYeqMK
+         5rInWqgi7Kzkn6yRv5LqVufcCME8Pz8iaV1eOAfP7MkX0cX96cPxIETiUP16ABlVpAz3
+         7+Zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771257175; x=1771861975;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dP7OJCe4IFWPzF0ucWa9rG4RGTcEJ98iWAzWk9PebNw=;
+        b=W6mrnrXXDpg6WeU7jlD9mSqXRSx5xPE7xdk8XVxF6n+AlnddUUH2O6VPfTf/kvMrUR
+         /8PWu4A84B+WOV/GOytMolpV3KsTa7OhU/8honJN6F9r7e6ykzdNUuES2JtXF2F5nl1M
+         kuBvwWXE1PWY/K3iBWnRDPk+NG8nF/D0aSWIWWGcpf+QzZxBxa+sQiFJZ7A1jmbr7dCJ
+         kFIcsjnMHkAiOyrD9QJTgljCZHDj/+b3gxyI+CwQp60Q5mudJBTY3b6TfzL3RMhunLgE
+         HdjMRv/IIZwEsOBtbnAIRdrfzomin0WG8DVLvd1wnE9Tp48o4FT5IPJbOrUUa4Y7Eph9
+         Zwmg==
+X-Forwarded-Encrypted: i=1; AJvYcCXNg4ovLYQCpc9ESARaY9yXbCZdsqDerI1dzfK4ev4q26ypM/KPuQG6U+fsskZGGlf3vDQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy47E57inFPPIHvDgTug+92fgafgRmYgGQq/GpqiH+eQiulkYjV
+	/DfYZAeSqr1cDCKEkofjvsPxpaQTpjmqDTNJAH2U1tvm1GcnYnJUMgC7TIaFaY6jekJX0LhDbMU
+	noEgGFcEa15TwZOLm1SuIgDLBOFdran3i0hJnlX8j8A==
+X-Gm-Gg: AZuq6aJAXfd5HUsWjLU063/zwmv4FXomDzy9jgYj3DAdoV2SM+tMyt4iG7cxQb2o3iF
+	Ru6uN4yy3hz8HzNCo1JV7t27CBBu0FX6eAslQZVGDa8qduZITjkPhcGRFFfM2FM76zSnr5MJS2g
+	JFmltRMQHPjlwYwQ3WDfwQQC1itZ2J5DiVWkC2DYaOwloh0r32sQJsHW9MF+9YWNf+Wzq86vnDP
+	UeDw/P5lcnGPljP1491mAWZQw7wQHv9SJLKkzLlGQ4MBAwUAdGdK/suepceKXtFpn8kKYm2TRT8
+	1sBl/9CBDyxAWINElhtXyuEfvwpGdtM5tHArsT4bOsa2Mgn/Do0KnON2LpqYSVh/4HBpPrj+FJD
+	S9w==
+X-Received: by 2002:a05:690e:13c4:b0:64a:ee12:e7c3 with SMTP id
+ 956f58d0204a3-64c21b27b78mr6172226d50.49.1771257175307; Mon, 16 Feb 2026
+ 07:52:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 13/19] x86/resctrl: Add PLZA state tracking and
- context switch handling
-To: Reinette Chatre <reinette.chatre@intel.com>, "Moger, Babu"
- <bmoger@amd.com>, "Moger, Babu" <Babu.Moger@amd.com>,
- "Luck, Tony" <tony.luck@intel.com>
-Cc: "corbet@lwn.net" <corbet@lwn.net>,
- "Dave.Martin@arm.com" <Dave.Martin@arm.com>,
- "james.morse@arm.com" <james.morse@arm.com>,
- "tglx@kernel.org" <tglx@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
- "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "juri.lelli@redhat.com" <juri.lelli@redhat.com>,
- "vincent.guittot@linaro.org" <vincent.guittot@linaro.org>,
- "dietmar.eggemann@arm.com" <dietmar.eggemann@arm.com>,
- "rostedt@goodmis.org" <rostedt@goodmis.org>,
- "bsegall@google.com" <bsegall@google.com>, "mgorman@suse.de"
- <mgorman@suse.de>, "vschneid@redhat.com" <vschneid@redhat.com>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
- "pawan.kumar.gupta@linux.intel.com" <pawan.kumar.gupta@linux.intel.com>,
- "pmladek@suse.com" <pmladek@suse.com>,
- "feng.tang@linux.alibaba.com" <feng.tang@linux.alibaba.com>,
- "kees@kernel.org" <kees@kernel.org>, "arnd@arndb.de" <arnd@arndb.de>,
- "fvdl@google.com" <fvdl@google.com>,
- "lirongqing@baidu.com" <lirongqing@baidu.com>,
- "bhelgaas@google.com" <bhelgaas@google.com>,
- "seanjc@google.com" <seanjc@google.com>, "xin@zytor.com" <xin@zytor.com>,
- "Shukla, Manali" <Manali.Shukla@amd.com>,
- "dapeng1.mi@linux.intel.com" <dapeng1.mi@linux.intel.com>,
- "chang.seok.bae@intel.com" <chang.seok.bae@intel.com>,
- "Limonciello, Mario" <Mario.Limonciello@amd.com>,
- "naveen@kernel.org" <naveen@kernel.org>,
- "elena.reshetova@intel.com" <elena.reshetova@intel.com>,
- "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "peternewman@google.com" <peternewman@google.com>,
- "eranian@google.com" <eranian@google.com>,
- "Shenoy, Gautham Ranjal" <gautham.shenoy@amd.com>
-References: <cover.1769029977.git.babu.moger@amd.com>
- <17c9c0c252dcfe707dffe5986e7c98cd121f7cef.1769029977.git.babu.moger@amd.com>
- <aXk8hRtv6ATEjW8A@agluck-desk3>
- <5ec19557-6a62-4158-af82-c70bac75226f@amd.com>
- <aXpDdUQHCnQyhcL3@agluck-desk3>
- <IA0PPF9A76BB3A655A28E9695C8AD1CC59F9591A@IA0PPF9A76BB3A6.namprd12.prod.outlook.com>
- <bbe80a9a-70f0-4cd1-bd6a-4a45212aa80b@amd.com>
- <7a4ea07d-88e6-4f0f-a3ce-4fd97388cec4@intel.com>
- <abb049fa-3a3d-4601-9ae3-61eeb7fd8fcf@amd.com>
- <1a0a7306-f833-45a8-8f2b-c6d2e8b98ff5@intel.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <1a0a7306-f833-45a8-8f2b-c6d2e8b98ff5@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20260210201540.1405424-1-pierrick.bouvier@linaro.org>
+ <93f8f250-7899-4528-b277-1ddd469c192c@linaro.org> <CAFEAcA9YUOxko51ziY3yAOaDfTCEAwqmXnifF=q_mkyotFHTcg@mail.gmail.com>
+In-Reply-To: <CAFEAcA9YUOxko51ziY3yAOaDfTCEAwqmXnifF=q_mkyotFHTcg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Feb 2026 15:52:44 +0000
+X-Gm-Features: AZwV_Qhn_PA25doQjTID65lEcz5xT-1XaHevKcqNoTL7fZxazaWzkWciCHn6keY
+Message-ID: <CAFEAcA8XCSjjb2opkf2A5WZwCa5THNswOOUO=fpj7kUJEc79qQ@mail.gmail.com>
+Subject: Re: [PATCH v3 00/12] target/arm: single-binary
+To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Cc: qemu-devel@nongnu.org, anjo@rev.ng, 
+	Jim MacArthur <jim.macarthur@linaro.org>, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71126-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[45];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ben.horgan@arm.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arm.com:mid]
-X-Rspamd-Queue-Id: E3619145BAD
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[peter.maydell@linaro.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71127-lists,kvm=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:email,linaro.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,gitlab.com:url,target-arm.next:url,mail.gmail.com:mid];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[linaro.org:+]
+X-Rspamd-Queue-Id: 48B74145D2E
 X-Rspamd-Action: no action
 
-Hi Babu, Reinette,
+On Thu, 12 Feb 2026 at 10:59, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Tue, 10 Feb 2026 at 20:19, Pierrick Bouvier
+> <pierrick.bouvier@linaro.org> wrote:
+> >
+> > On 2/10/26 12:15 PM, Pierrick Bouvier wrote:
+> > > This series continues cleaning target/arm, especially tcg folder.
+> > >
+> > > For now, it contains some cleanups in headers, and it splits helpers per
+> > > category, thus removing several usage of TARGET_AARCH64.
+> > > First version was simply splitting 32 vs 64-bit helpers, and Richard asked
+> > > to split per sub category.
+> > >
+> > > v3
+> > > --
+> > >
+> > > - translate.h: missing vaddr replacement
+> > > - move tcg_use_softmmu to tcg/tcg-internal.h to avoid duplicating compilation
+> > >    units between system and user builds.
+> > > - eradicate TARGET_INSN_START_EXTRA_WORDS by calling tcg_gen_insn_start with
+> > >    additional 0 parameters if needed.
+> > >
+> > > v2
+> > > --
+> > >
+> > > - add missing kvm_enabled() in arm-qmp-cmds.c
+> > > - didn't extract arm_wfi for tcg/psci.c. If that's a hard requirement, I can do
+> > >    it in next version.
+> > > - restricted scope of series to helper headers, so we can validate things one
+> > >    step at a time. Series will keep on growing once all patches are reviewed.
+> > > - translate.h: use vaddr where appropriate, as asked by Richard.
+>
+> > Patches 1-11 are reviewed and ready to be pulled.
+>
+> Looks like patch 12 has also now been reviewed, so I've applied
+> the whole series to target-arm.next.
 
-On 2/14/26 00:10, Reinette Chatre wrote:
-> Hi Babu,
-> 
-> On 2/13/26 8:37 AM, Moger, Babu wrote:
->> Hi Reinette,
->>
->> On 2/10/2026 10:17 AM, Reinette Chatre wrote:
->>> Hi Babu,
->>>
->>> On 1/28/26 9:44 AM, Moger, Babu wrote:
->>>>
->>>>
->>>> On 1/28/2026 11:41 AM, Moger, Babu wrote:
->>>>>> On Wed, Jan 28, 2026 at 10:01:39AM -0600, Moger, Babu wrote:
->>>>>>> On 1/27/2026 4:30 PM, Luck, Tony wrote:
->>>>>> Babu,
->>>>>>
->>>>>> I've read a bit more of the code now and I think I understand more.
->>>>>>
->>>>>> Some useful additions to your explanation.
->>>>>>
->>>>>> 1) Only one CTRL group can be marked as PLZA
->>>>>
->>>>> Yes. Correct.
->>>
->>> Why limit it to one CTRL_MON group and why not support it for MON groups?
->>
->> There can be only one PLZA configuration in a system. The values in the MSR_IA32_PQR_PLZA_ASSOC register (RMID, RMID_EN, CLOSID, CLOSID_EN) must be identical across all logical processors. The only field that may differ is PLZA_EN.
+I meant to send this to the list, but accidentally sent it to
+Pierrick only:
 
-Does this have any effect on hypervisors?
+I just ran this (plus some other patches) through gitlab CI, and
+it fails to build on the kvm-only and xen-only jobs:
 
-> 
-> ah - this is a significant part that I missed. Since this is a per-CPU register it seems
+https://gitlab.com/pm215/qemu/-/jobs/13131658696
 
-I also missed that.
+In file included from /builds/pm215/qemu/include/exec/helper-gen.h.inc:9,
+                 from /builds/pm215/qemu/include/exec/helper-gen-common.h:11,
+                 from ../target/arm/helper.h:7,
+                 from ../target/arm/helper.c:13:
+/builds/pm215/qemu/include/tcg/tcg.h:35:10: fatal error: tcg-target.h:
+No such file or directory
+   35 | #include "tcg-target.h"
+      |          ^~~~~~~~~~~~~~
 
-> to have the ability for expanded use in the future where different CLOSID and RMID may be
-> written to it? Is PLZA leaving room for such future enhancement or does the spec contain
-> the text that state "The values in the MSR_IA32_PQR_PLZA_ASSOC register (RMID, RMID_EN,
-> CLOSID, CLOSID_EN) must be identical across all logical processors."? That is, "forever
-> and always"?
-> 
-> If I understand correctly MPAM could have different PARTID and PMG for kernel use so we
-> need to consider these different architectural behaviors.
 
-Yes, MPAM has a per-cpu register MPAM1_EL1.
+https://gitlab.com/pm215/qemu/-/jobs/13131658593
 
-> 
->> I was initially unsure which RMID should be used when PLZA is enabled on MON groups.
->>
->> After re-evaluating, enabling PLZA on MON groups is still feasible:
->>
->> 1. Only one group in the system can have PLZA enabled.
->> 2. If PLZA is enabled on CTRL_MON group then we cannot enable PLZA on MON group.
->> 3. If PLZA is enabled on the CTRL_MON group, then the CLOSID and RMID of the CTRL_MON group can be written.
->> 4. If PLZA is enabled on a MON group, then the CLOSID of the CTRL_MON group can be used, while the RMID of the MON group can be written.
+In file included from /builds/pm215/qemu/include/exec/helper-gen.h.inc:9,
+                 from /builds/pm215/qemu/include/exec/helper-gen-common.h:11,
+                 from ../target/arm/helper.h:7,
+                 from ../target/arm/debug_helper.c:11:
+/builds/pm215/qemu/include/tcg/tcg.h:35:10: fatal error: tcg-target.h:
+No such file or directory
+    35 | #include "tcg-target.h"
+       | ^~~~~~~~~~~~~~
 
-Given that CLOSID and RMID are fixed once in the PLZA configuration
-could this be simplified by just assuming they have the values of the
-default group, CLOSID=0 and RMID=0 and let the user base there
-configuration on that?
+I think the problem looks like it's in "move exec/helper-* plumbery to
+helper.h", which has put the "emit the TCG gen_helper_foo inline
+functions" into target/arm/helper.h, when they were previously
+handled by target/arm/tcg/translate.h and so only in source files
+that are part of the TCG translate-time code. helper.h only needs the
+prototypes of the helper functions themselves.
 
->>
->> I am thinking this approach should work.
->>
->>>
->>> Limiting it to a single CTRL group seems restrictive in a few ways:
->>> 1) It requires that the "PLZA" group has a dedicated CLOSID. This reduces the
->>>     number of use cases that can be supported. Consider, for example, an existing
->>>     "high priority" resource group and a "low priority" resource group. The user may
->>>     just want to let the tasks in the "low priority" resource group run as "high priority"
->>>     when in CPL0. This of course may depend on what resources are allocated, for example
->>>     cache may need more care, but if, for example, user is only interested in memory
->>>     bandwidth allocation this seems a reasonable use case?
->>> 2) Similar to what Tony [1] mentioned this does not enable what the hardware is
->>>     capable of in terms of number of different control groups/CLOSID that can be
->>>     assigned to MSR_IA32_PQR_PLZA_ASSOC. Why limit PLZA to one CLOSID?
->>> 3) The feature seems to support RMID in MSR_IA32_PQR_PLZA_ASSOC similar to
->>>     MSR_IA32_PQR_ASSOC. With this, it should be possible for user space to, for
->>>     example, create a resource group that contains tasks of interest and create
->>>     a monitor group within it that monitors all tasks' bandwidth usage when in CPL0.
->>>     This will give user space better insight into system behavior and from what I can
->>>     tell is supported by the feature but not enabled?
->>
->>
->> Yes, as long as PLZA is enabled on only one group in the entire system
->>
->>>
->>>>>
->>>>>> 2) It can't be the root/default group
->>>>>
->>>>> This is something I added to keep the default group in a un-disturbed,
->>>
->>> Why was this needed?
->>>
->>
->> With the new approach mentioned about we can enable in default group also.
->>
->>>>>
->>>>>> 3) It can't have sub monitor groups
->>>
->>> Why not?
->>
->> Ditto. With the new approach mentioned about we can enable in default group also.
->>
->>>
->>>>>> 4) It can't be pseudo-locked
->>>>>
->>>>> Yes.
->>>>>
->>>>>>
->>>>>> Would a potential use case involve putting *all* tasks into the PLZA group? That
->>>>>> would avoid any additional context switch overhead as the PLZA MSR would never
->>>>>> need to change.
->>>>>
->>>>> Yes. That can be one use case.
->>>>>
->>>>>>
->>>>>> If that is the case, maybe for the PLZA group we should allow user to
->>>>>> do:
->>>>>>
->>>>>> # echo '*' > tasks
->>>
->>> Dedicating a resource group to "PLZA" seems restrictive while also adding many
->>> complications since this designation makes resource group behave differently and
->>> thus the files need to get extra "treatments" to handle this "PLZA" designation.
->>>
->>> I am wondering if it will not be simpler to introduce just one new file, for example
->>> "tasks_cpl0" in both CTRL_MON and MON groups. When user space writes a task ID to the
->>> file it "enables" PLZA for this task and that group's CLOSID and RMID is the associated
->>> task's "PLZA" CLOSID and RMID. This gives user space the flexibility to use the same
->>> resource group to manage user space and kernel space allocations while also supporting
->>> various monitoring use cases. This still supports the "dedicate a resource group to PLZA"
->>> use case where user space can create a new resource group with certain allocations but the
->>> "tasks" file will be empty and "tasks_cpl0" contains the tasks needing to run with
->>> the resource group's allocations when in CPL0.
->>
->> Yes. We should be able do that. We need both tasks_cpl0 and cpus_cpl0.
->>
->> We need make sure only one group can configured in the system and not allow in other groups when it is already enabled.
-> 
-> As I understand this means that only one group can have content in its
-> tasks_cpl0/tasks_kernel file. There should not be any special handling for
-> the remaining files of the resource group since the resource group is not
-> dedicated to kernel work and can be used as a user space resource group also.
-> If user space wants to create a dedicated kernel resource group there can be
-> a new resource group with an empty tasks file.
-> 
-> hmmm ... but if user space writes a task ID to a tasks_cpl0/tasks_kernel file then
-> resctrl would need to create new syntax to remove that task ID.
-> 
-> Possibly MPAM can build on this by allowing user space to write to multiple
-> tasks_cpl0/tasks_kernel files? (and the next version of PLZA may too)
-> 
-> Reinette
-> 
-> 
->>
->> Thanks
->> Babu
->>
->>>
->>> Reinette
->>>
->>> [1] https://lore.kernel.org/lkml/aXpgragcLS2L8ROe@agluck-desk3/
->>>
->>
-> 
-> 
+Some of the other new helper-foo.h files look like they would
+also have this problem, except they happen to only be included
+from tcg files. For instance target/arm/helper-mve.h is only
+included from files in target/arm/tcg (so it maybe could be
+in target/arm/tcg itself).
 
-Thanks,
+I couldn't see an obvious easy fixup for this, so I'm afraid
+I've removed the series from target-arm.next.
 
-Ben
-
+thanks
+-- PMM
 
