@@ -1,201 +1,222 @@
-Return-Path: <kvm+bounces-71121-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71122-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sFWkCnkbk2mM1gEAu9opvQ
-	(envelope-from <kvm+bounces-71121-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 14:28:25 +0100
+	id 8EzlIyIck2mM1gEAu9opvQ
+	(envelope-from <kvm+bounces-71122-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 14:31:14 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B204A143CB7
-	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 14:28:24 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B546B143CE5
+	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 14:31:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D639F300AC90
-	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 13:28:18 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 92B113002D12
+	for <lists+kvm@lfdr.de>; Mon, 16 Feb 2026 13:31:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59C030EF88;
-	Mon, 16 Feb 2026 13:28:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA96286D53;
+	Mon, 16 Feb 2026 13:31:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="C67w/Z7q"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C+JYKjLd"
 X-Original-To: kvm@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8833090D4;
-	Mon, 16 Feb 2026 13:28:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771248487; cv=none; b=FDrGzbhhuBh4jOqnc/ILTDdIpj8VxEm9gJ1aSN7HZXhRtDRR9UyRsvdtzaK7dsfsbTkWaoNqc2u1vjJhgH5tusiM6hXopRdf5MRy/oC8qon6iN/ewcbUfKl+8waTJfEz7ZdTztTFKxC69+wixJT6UWUn0WDxEBQOEm3pRD3OSdc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771248487; c=relaxed/simple;
-	bh=Q9GxoeGeSHdPBrcOB/A8/Eud4D4QnZYsPLmlsC6CaP4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kJv00oEx8AukVs+ktKfzSDmCpafeR2woFcG/E1YM/WqJyLShE80UV+IJT60uPVD8aT5kwrrSGo4kr3P6sYSwK9xZXtkxG2eOQQhyeQHS+rgIIx3FEVGSjzAHRf0Uxkxp60rFSe/b2E4oSijB2pDc9McC3YaD838Y5GbMD8tDmzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=C67w/Z7q; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [192.168.178.143] (p5dc880d2.dip0.t-ipconnect.de [93.200.128.210])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 61GDRpGP020196
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 16 Feb 2026 14:27:52 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1771248474;
-	bh=Q9GxoeGeSHdPBrcOB/A8/Eud4D4QnZYsPLmlsC6CaP4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=C67w/Z7qMrbkC06uTiYSuP7lOPFQJHlSiWcmVkYQxlSaJw+kJYzE0R+FTXvuuPMh4
-	 ooBZw1Na0/BFVt3mGEh1d1C9yaJXCQjykXBbuJ/FrPgsiXK9T8mT/WsUNEN9ho6bKw
-	 I+ta05lMo0ykF/rECo7IifwDNanOol6gh42YCvlU=
-Message-ID: <4aeb991b-26e9-4a2e-81a2-85e3ecd6a8a5@tu-dortmund.de>
-Date: Mon, 16 Feb 2026 14:27:51 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453E41D95A3
+	for <kvm@vger.kernel.org>; Mon, 16 Feb 2026 13:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771248664; cv=pass; b=QHNqAQrk2RMcEsNzh4VoarwzvnQKfv7nHW97c9WFM2ioNgBNSS+50Rd+STsQCgO2JD6Js0y8aHBTzkzhe5GtgULkvAoGFdMUGBeiArZT3p6RGaXVONP6rFA0JkC9OEFWMsEouuxfMw9ImolkcImTGbO4TPy82cVoAwxxX7aCp2s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771248664; c=relaxed/simple;
+	bh=KYwDyE5sgL5bnvQDKuNcqwkPWVqjsboFUT0Et0w39IE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=haetiJEAMLzanQ0+2c3B4jbMJqKuaMSw8E5sQ7IXn3qj4UzlxGD7Wag31syvJv/E0W/lVrjWBhrCmSHyndlJxNi+eHE5MWU7I2rX6heLd6HReIhW8IjIOwXFaqunI9WzICmf6LDv0BUsPWdPL1CgVNk2yPAAo8LhNMLKB2xjk8g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=C+JYKjLd; arc=pass smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-79456d5ebf9so28151367b3.2
+        for <kvm@vger.kernel.org>; Mon, 16 Feb 2026 05:31:03 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771248662; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Efbuq/yX7yuGgK2mWYz2TLCKcoBkivmtOnAUCIVGhlWYjdG+yRyNnbWDjK5qaBm6X2
+         o6F38hPNedzTRvcn+mYukaGoKBrsDmWXD5q2eS4zs7GX5bYrE32t+7G7+4ZAJ0ijV/1r
+         U3/6/i/zUpR+Jf9xfr5J3AxWr3ZlZJC7nMzUktIt4GIGTi+ntd5nI6nxq0WdP5i6L0jr
+         7h2dBju54jJG9PpR+RK7ncq6wQnmFjc8nCOUZG67xUW0B3rC27LoOfLw7nDRNYnZCrt4
+         FWIR31GbI2Sw5sv34u2WGlIpwY+GLltlm5cmuoR7UXPHH9//hjzIr8A/l5YinBr1jPd+
+         hAYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=o3wOtoDZJ0p0jz0Xtoq03ZP4KLyE4lMLqKI4YU+J1SA=;
+        fh=DtH1uT6Kv9oi0A8Ef5RgNk1UngMf/DZrCB4LXtcKmz0=;
+        b=ks2reZJKd688Fim5sGSt96pMChk+24NUgaz8X9e0JLkGrJ98xtpz4i4Sn3Z6dmvbRf
+         R0L1TBHh8MbWy6Sp8BA8y9UyflCuBdl64qDVyBhWnpUm+CVHnjASJqvVTW9Vg+HJ2UCj
+         a8YspMNp7CxbCe1l9okGFih/M+QvJcwhaODQIsaMXAvZbbm+U5yX6oL+f8Lb9rylXNFh
+         7nNMU+Txf45qu5sPo+0ohQOwJ9Jv//UlMEf4aTmqjv2iHqKY407y3/mcyAOEO692l1F1
+         S6IAMWpv2boc5vkgcZnMeRZawZm5FMR492r87UHE+lcaV+mhQO5N60MMjLP7wvt7V7OV
+         GVkA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1771248662; x=1771853462; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=o3wOtoDZJ0p0jz0Xtoq03ZP4KLyE4lMLqKI4YU+J1SA=;
+        b=C+JYKjLdQ6RcUfRaIpBmanMH3afsqryT7C8S39/QASnkCLvd5IWPwnrhlN1mM3c+FJ
+         AX93JBrcFyiHfe72SYDVyOlYoMi0SeASqwAnE7WvMG2Hk33Doyl1uPAfAR0YEQZwdxTP
+         ixi+r/URqa251Cx8iEVtoZSmknMqmTRnAuHmCG+4ONuuVBNa+747UJb5O8yZpS7IRxwm
+         +XovX5Cv/gOyO98S3vvSRWo/jFDHRXoirS/nPwXsRoWZfAWmqLmqshfkeOkeRtsViN+J
+         9n3cC6vfBnCfpxwLJrDtvI49li12cqfAEltnDmyir6ieoYg4TAwK+M8OK9xQc930Z89Y
+         Ya+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771248662; x=1771853462;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o3wOtoDZJ0p0jz0Xtoq03ZP4KLyE4lMLqKI4YU+J1SA=;
+        b=lUIG9vwyR1UgxMJ2ZTR5cyx4UikX2brOrLW3GfLTcRWyVz8cLdFKMQH777QsYyatUN
+         NG2iC++gPTj8xnlYt29mf1YRTFAE+BJDa/9fz+NlOHrbzDoVBrcQbnmrV7GG17PZ5KbB
+         NEouO1ExsrRvWU7Xit7Jz67rzw8KSAVjMW9lJYJBc41oQekaaupxaq64kHWVfOuG5mmS
+         gg4ZWpvOp0GO3aiYiTc/WjTncNuXw7yWSdaSqWxFTl2InoPXTgGD84t+s/gFkErjMkYb
+         jiCy1YvDxx5UhwW9qYmFhqvJkh+6ckX7QgsG2d3H/acXvagcU3tGJabjrDoOnq0UuZ5S
+         qxwg==
+X-Forwarded-Encrypted: i=1; AJvYcCXJarR3v1qP7/Ofr4lVL/laz+8n+3Q/N0vAmh+rsZgHWTaNvfzDK/kdf/ucEce26UAVYDA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy40BrYuIVoxXjc16iYAkNTdbV0xUj1Y4A4teS7PqqMmztnFclm
+	DEFNtBUohotyw1jwLkSSHmxkW30Tt+HOTIAXCBcFQyeoaO8HzRGcqU5cvoqNpxklFZ8Tn9Q9ETZ
+	bYzk9hXH+BX3Hc1F4hNiO0fb3EHdGBC5TwXkJhvmhpA==
+X-Gm-Gg: AZuq6aItycecqYY7vUuxvKr1hyOObzUF2Oewc8XA4f1VUyv11fKcTpemfSibUKPYbJ1
+	BOLpPdAIOkOK1NxLet3txTJwds3VNaXlJdUZDUZhPtAORMB/pm2Ij2NXxDO+/0yObEpt2jIx2PW
+	FxYTLp4GWVBp2FpQEH1/sAPVwlhZdLSYas+FeJAoW5IE4vS7kGRGoa7yfrhJzeAZr1PhnW+wJVd
+	rTzC3vX2G4Szk1UQHPOB2tazsxxfFxqREUg2E12gHLAdwm84FGjLkUG2gWIPkqPBG/69uyhKthj
+	54xwLm/0XBZjnj1PQgIJXVOfk7/Mh3KkR6sO76M+sV+hobXn5abiumfAzy3+7CktI20yTT4TgBW
+	Mzw==
+X-Received: by 2002:a53:b20c:0:b0:64a:d720:f259 with SMTP id
+ 956f58d0204a3-64c21b80db0mr4529065d50.85.1771248662214; Mon, 16 Feb 2026
+ 05:31:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 3/9] tun/tap: add ptr_ring consume helper with
- netdev queue wakeup
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, willemdebruijn.kernel@gmail.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
-        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <CACGkMEsJtE3RehWQ8BaDL2HdFPK=iW+ZaEAN1TekAMWwor5tjQ@mail.gmail.com>
- <197573a1-df52-4928-adb9-55a7a4f78839@tu-dortmund.de>
- <CACGkMEveEXky_rTrvRrfi7qix12GG91GfyqnwB6Tu-dnjqAm9A@mail.gmail.com>
- <0c776172-2f02-47fc-babf-2871adca42cb@tu-dortmund.de>
- <CACGkMEte=LwvkxPh-tesJHLVYQV1YZF4is1Yamokhkzaf5GOWw@mail.gmail.com>
- <205aa139-975d-4092-aa04-a2c570ae43a6@tu-dortmund.de>
- <CACGkMEtRikexX=cJz8zmuvW7mcO7uCFdG7AoHQLOezrsb5nbgQ@mail.gmail.com>
- <59529fd2-2a08-4a89-a853-27198b76f842@tu-dortmund.de>
- <20260214131703-mutt-send-email-mst@kernel.org>
- <1ab166aa-8e9c-4742-a80a-c2fa806218db@tu-dortmund.de>
- <20260215053411-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <20260215053411-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251202160853.22560-1-sebott@redhat.com> <20251202160853.22560-3-sebott@redhat.com>
+ <CAFEAcA8oi1Xs2kv66dFV9NZore+Q2vHUsgMikveVdN1c+3SBJQ@mail.gmail.com>
+ <9b04a20f-b708-208d-1e4e-466ec30b7bb9@redhat.com> <CAFEAcA-A+zW=QFdCY7z==+Z=xXfhJvPeyHhbG_MpEmpkQfrmaw@mail.gmail.com>
+ <4e9470d5-ef3e-cf5c-4117-fb589d56323c@redhat.com>
+In-Reply-To: <4e9470d5-ef3e-cf5c-4117-fb589d56323c@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Feb 2026 13:30:51 +0000
+X-Gm-Features: AZwV_QhGoaC3Vnb64FdYsO_8xJx-bd5rBrEQJ8-6M3I7JiVPCm-6tAEOuq08bHQ
+Message-ID: <CAFEAcA8V9bjQUzUYAW7qj5fEn_f9xaPJAYpTRgvdaFq0cY3pRA@mail.gmail.com>
+Subject: Re: [PATCH v4 2/2] target/arm/kvm: add kvm-psci-version vcpu property
+To: Sebastian Ott <sebott@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org, 
+	qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71121-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FREEMAIL_CC(0.00)[redhat.com,gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[peter.maydell@linaro.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[tu-dortmund.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm,netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tu-dortmund.de:mid,tu-dortmund.de:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B204A143CB7
+	TAGGED_FROM(0.00)[bounces-71122-lists,kvm=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,linaro.org:dkim];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[linaro.org:+]
+X-Rspamd-Queue-Id: B546B143CE5
 X-Rspamd-Action: no action
 
-On 2/15/26 11:38, Michael S. Tsirkin wrote:
-> On Sat, Feb 14, 2026 at 08:51:53PM +0100, Simon Schippers wrote:
->> On 2/14/26 19:18, Michael S. Tsirkin wrote:
->>> On Sat, Feb 14, 2026 at 06:13:14PM +0100, Simon Schippers wrote:
->>>
->>> ...
->>>
->>>> Patched: Waking on __ptr_ring_produce_created_space() is too early. The
->>>>          stop/wake cycle occurs too frequently which slows down
->>>>          performance as can be seen for TAP.
->>>>
->>>> Wake on empty variant: Waking on __ptr_ring_empty() is (slightly) too
->>>>                        late. The consumer starves because the producer
->>>>                        first has to produce packets again. This slows
->>>>                        down performance aswell as can be seen for TAP
->>>> 		       and TAP+vhost-net (both down ~30-40Kpps).
->>>>
->>>> I think something inbetween should be used.
->>>> The wake should be done as late as possible to have as few
->>>> NET_TX_SOFTIRQs as possible but early enough that there are still
->>>> consumable packets remaining to not starve the consumer.
->>>>
->>>> However, I can not think of a proper way to implement this right now.
->>>>
->>>> Thanks!
->>>
->>> What is the difficulty?
->>
->> There is no way to tell how many entries are currently in the ring.
->>
->>>
->>> Your patches check __ptr_ring_consume_created_space(..., 1).
->>
->> Yes, and this returns if either 0 space or a batch size space was
->> created.
->> (In the current implementation it would be false or true, but as
->> discussed earlier this can be changed.)
->>
->>>
->>> How about __ptr_ring_consume_created_space(..., 8) then? 16?
->>>
->>
->> This would return how much space the last 8/16 consume operations
->> created. But in tap_ring_consume() we only consume a single entry.
->>
->> Maybe we could avoid __ptr_ring_consume_created_space with this:
->> 1. Wait for the queue to stop with netif_tx_queue_stopped()
->> 2. Then count the numbers of consumes we did after the queue stopped
->> 3. Wake the queue if count >= threshold with threshold >= ring->batch
->>
->> I would say that such a threshold could be something like ring->size/2.
-> 
-> 
-> To add to what i wrote, size/2 means:
-> leave half a ring for consumer, half a ring for producer.
-> 
-> If one of the two is more bursty, we might want a different
-> balance. Offhand, the kernel is less bursty and userspace is
-> more bursty.
-> 
-> So it's an interesting question but size/2 is a good start.
-> 
+On Wed, 11 Feb 2026 at 16:04, Sebastian Ott <sebott@redhat.com> wrote:
+>
+> On Wed, 11 Feb 2026, Peter Maydell wrote:
+> > On Wed, 11 Feb 2026 at 15:37, Sebastian Ott <sebott@redhat.com> wrote:
+> >>
+> >> Hi Peter,
+> >>
+> >> On Fri, 6 Feb 2026, Peter Maydell wrote:
+> >>> On Tue, 2 Dec 2025 at 16:09, Sebastian Ott <sebott@redhat.com> wrote:
+> >
+> >>>> +static char *kvm_get_psci_version(Object *obj, Error **errp)
+> >>>> +{
+> >>>> +    ARMCPU *cpu = ARM_CPU(obj);
+> >>>> +    const struct psci_version *ver;
+> >>>> +
+> >>>> +    for (ver = psci_versions; ver->number != -1; ver++) {
+> >> [...]
+> >>>> +        if (ver->number == cpu->psci_version)
+> >>>> +            return g_strdup(ver->str);
+> >>>> +    }
+> >>>> +
+> >>>> +    return g_strdup_printf("Unknown PSCI-version: %x", cpu->psci_version);
+> >>>
+> >>> Is this ever possible?
+> >>
+> >> Hm, not sure actually - what if there's a new kernel/qemu implementing
+> >> psci version 1.4 and then you migrate to a qemu that doesn't know about
+> >> 1.4?
+> >
+> > Oh, I see -- we're reporting back cpu->psci_version here, which
+> > indeed could be the value set by KVM. I misread and assumed
+> > this was just reading back the field that the setter sets,
+> > which is kvm_prop_psci_version (and which I think will only
+> > be set via the setter and so isn't ever a value the setter
+> > doesn't know about).
+> >
+> > That does flag up a bug in this patch, though: if I set
+> > a QOM property via the setter function and then read its
+> > value via the getter function I ought to get back what
+> > I just wrote.
+> >
+>
+> Meaning this should be something like below?
+>
+> static char *kvm_get_psci_version(Object *obj, Error **errp)
+> {
+>      ARMCPU *cpu = ARM_CPU(obj);
+>
+>      return g_strdup_printf("%d.%d",
+>         (int) PSCI_VERSION_MAJOR(cpu->kvm_prop_psci_version),
+>         (int) PSCI_VERSION_MINOR(cpu->kvm_prop_psci_version));
 
-I implemented this (I can post the implementation if you want)
-and I got:
-- 1216Kpps for TAP --> worse performance than stock (1293 Kpps) and
-  also worse performance than wake on empty (1248 Kpps)
-- 1408Kpps for TAP+vhost-net --> pretty much same performance as
-  stock (1411 Kpps)
+I guess we need to define what we want. Things we need:
 
-I also tried 7/8 for producer, 1/8 for consumer the results did not
-really get better: 
-- 1227Kpps for TAP --> worse performance than stock (1293 Kpps) and
-  also worse performance than wake on empty (1248 Kpps); better
-  performance than 1/2
-- 1350Kpps for TAP+vhost-net --> worse performance than everything
+ - user/QMP/etc setting a value and reading it back should
+   get back what they set
+ - QEMU needs to keep working on a new kernel that defines a
+   new PSCI version in the future
+ - user reading the default value and then writing it back
+   should succeed
 
+Things we might like:
+ - ideally the setter would fail if the user picks a version
+   KVM can't support, but I don't think we can conveniently
+   determine this, so "fail vcpu init" may be as good as we
+   can get without unnecessarily large amounts of effort
 
-So my theory of using something inbetween did not hold up here.
-Judging from my benchmarking the best solution would be to use:
-- Wake on empty for TAP --> 1248Kpps (1293 Kpps stock, 3% worse)
-- Wake on __ptr_ring_consume_created_space() for TAP+vhost-net
-  --> 1410Kpps (1411 Kpps stock, 0% worse)
+I think this probably adds up to:
+ - setter should accept any a.b value (for a,b fitting in [0,65535])
+ - getter can handle any value and turn it into a.b
+ - make sure that setting it to an invalid value gives a helpful
+   error on vcpu start
 
-This would also keep the implementation simple.
+Doing it this way, do we need a separate cpu->kvm_prop_psci_version,
+or could we directly read and write cpu_>psci_version ?
 
+thanks
+-- PMM
 
