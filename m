@@ -1,83 +1,83 @@
-Return-Path: <kvm+bounces-71158-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71159-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aHCjKUeLlGnTFQIAu9opvQ
-	(envelope-from <kvm+bounces-71158-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 16:37:43 +0100
+	id NYzJESCMlGn6FQIAu9opvQ
+	(envelope-from <kvm+bounces-71159-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 16:41:20 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21B8C14DA0D
-	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 16:37:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA2EF14DA77
+	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 16:41:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1B73D303C63A
-	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 15:37:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 05A3C301AB99
+	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 15:41:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A61D736C5BB;
-	Tue, 17 Feb 2026 15:37:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A813836C5AF;
+	Tue, 17 Feb 2026 15:41:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R+oT34JJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wQSduV3i"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8AD336C0C8
-	for <kvm@vger.kernel.org>; Tue, 17 Feb 2026 15:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4AEC36C586
+	for <kvm@vger.kernel.org>; Tue, 17 Feb 2026 15:41:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771342626; cv=none; b=owVNeSlHAmpWcx21OPMVIGMBpCsyisPvyO9gf5jHd9+MVy3D/nPd1ZIoX3POGG4nC0ZaTKnt8vh9JoAelzrm8+l38+5bsNy+YxDhxWg67f91PrOadpzMPPY773CjpgCKRnGovJgPQjZq+iMFHUi8vri5NQR9/e2lsL6wez+G39I=
+	t=1771342871; cv=none; b=ZVgCuqaTikeuxhDCMTgaN9kcsxrmAensjW/NTVnP6DqPSvwq6sQjJJ8wp87GNbN0PyNDvOrfiHw8dDW9db6TtTs5RzWkWKDwHxtjoIX49T6RwA/k8Ldi1Yu1fDMnz0i0+zP0LguGBuUrA74tukBqGzoe4o/c7IJXoGQ1mKOdQP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771342626; c=relaxed/simple;
-	bh=TphFOmg5HX47PxcNF0aXXEWkqBDunsNyhd0Q+qPBanw=;
+	s=arc-20240116; t=1771342871; c=relaxed/simple;
+	bh=YTanmRYEgpEHKRXP28nQ4qOeELASrBPVyUuhx8CtiBs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pzajXvBKcBj14usEFTKjmLv0uUqoL4uvYBWY2XYqc8VDUfYoadKbouXOkcuoi8yNk53YC0KrUFiw3xgVrAh0BBreJJm2OCmbujvMtvGPGxrppesQSasaP7BwP0bIaOGJEBm+8sxr//ur2O+QJqVj1jJz8DgLlJyE4q0RRrK88EY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R+oT34JJ; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=YTbSwsY0SWa5Ff82RoqBqKceZ7C6/0LGunq2jZV6r6Nya58tSJJPs47K365oHfJdbm6TOmfp+XXChtTQaoKSrgujYVERcRm2unsfRSLT0xSV4i2DUbKuJEmZDbbCX216lAuGzA5ps8l/faeNXaBvjJfyxe0JATD172A6y3VGa/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wQSduV3i; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-35449510446so4177684a91.0
-        for <kvm@vger.kernel.org>; Tue, 17 Feb 2026 07:37:05 -0800 (PST)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b6097ca315bso17738968a12.3
+        for <kvm@vger.kernel.org>; Tue, 17 Feb 2026 07:41:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771342625; x=1771947425; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771342870; x=1771947670; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WTxcxfGLHAARjNrp3hq8o4WxaX/qmkiZ+kEfmNnUDlY=;
-        b=R+oT34JJ8+26th6EN6YO/RzQry07+uSnZfEI3LqHol5B4zzrNVScqYOuLW0MwX4Njv
-         30xMQKsSFC0g+cZggH9xsDkFgMmMrzaFIqYQ7VOcYbIjC679eU1EBApuWVUkkY26z7zU
-         jXUQwgdl3vQpd+Io//Dhjw4Ud40PTmvPXZIdzveW8u+1HgcYOZgyAzxxFyv0gfkScub4
-         tSNhTGi64vYTuVpwAOU/lvW13KzIlye/91zyQXB/A3OCiFkdj1okps3tUVdU0NnwLUmC
-         Hsw+dAT7NXAbkR91EoTR2NOjk4zfverLyjhxLUUGv1NJtpUERblVt7vRQZGd66r3hJiA
-         VDYQ==
+        bh=bjU4x0MpvHQ651ct0W6WyJizCAzDQ5P6Z6Jf42LSxUU=;
+        b=wQSduV3iY/NEMcmMqGmhMbcNPkCQahje6QSWYcgH75wAfnOMHW/xnZ6+GHSOjpCyP6
+         w02TeM/fehEoQ0ZPXDdxWiK5IvJrAuGKwdlmEeNj9EbEGEN4EUWHIEKLANhzxEYn0CVM
+         j3CUymnE90nlQ+HIO0t0eyJbhxxe6h1thGQ5kuf9MRcGFjqwuDNR0Vvgqli0HERwRhyu
+         mQHjtKlJ+O1zlKyXk8xGMaZZxcV4LHkGEgfNq/dye9RxPN53G/l+gEhaMDeoCX08BYZn
+         /FeT6kFHc8HJT4Z/vot02UKaCilatv43vhug5+w9xmayHfXisj3AJrnHTxj5AzrcHBM4
+         PJYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771342625; x=1771947425;
+        d=1e100.net; s=20230601; t=1771342870; x=1771947670;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WTxcxfGLHAARjNrp3hq8o4WxaX/qmkiZ+kEfmNnUDlY=;
-        b=O89RyCmQto3SmNarP44+Z36lwSpscucr8q4oAVAt1B9Uz1i9hSlEqCIQvBziIHUOdJ
-         aaBeK8EMFvvI3xCbSN6vmjY6E/5012CL+IeVwJuFdiYL5UrVdsxQNCDzpNDzxwzUWPhZ
-         4H7Hlp1FbDApZI97n+CsBrkdIHXxGn2/cASe006L+Jyo9gTcZ40FLpOyP1CQcXAWospa
-         851jOhLCIRWcY9MDFs2ZKN+LW7qZDKY2FMzmtLCqBluzksCmY62rUrw2YLS/WwdpeXOZ
-         aedEDBqMPY/FEyVEdJ1TxpjKD+WR1wuv8xd0VSLy+5ViQCyfW65WhcRK/Ta5dNUMf4xv
-         wZAw==
-X-Forwarded-Encrypted: i=1; AJvYcCXKRu42Ao0lnKOL4PML/8xqp+D5CqgVp54An6zujn8yg1vmdkex9kRGAoo4pk1P9+AwmBk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4HfNeXfxX//9VpAdvrrdKtTobDpWlowZEkuDPTvz4rXWx0DNG
-	I41b+6lFZLP2HU2c/Pmm0LWFS0Pw3rbhntyIjbtkjY43xMRFdoskZgOfCVH17nd1uVmrhe28fKO
-	OBjK3Ig==
-X-Received: from pjbjz3.prod.google.com ([2002:a17:90b:14c3:b0:353:d0b3:8611])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d60c:b0:33b:bed8:891c
- with SMTP id 98e67ed59e1d1-356aad70cc4mr12681639a91.23.1771342624794; Tue, 17
- Feb 2026 07:37:04 -0800 (PST)
-Date: Tue, 17 Feb 2026 07:37:03 -0800
-In-Reply-To: <tencent_606610DBCF4CC9C810B0694110E12E135C05@qq.com>
+        bh=bjU4x0MpvHQ651ct0W6WyJizCAzDQ5P6Z6Jf42LSxUU=;
+        b=IXlVWyhcJXnBHM/ZtdbihS2D77UtKRYsNtq7UugFPqLbLvuIPJ8ZtB0aa2LhRmIC4I
+         pIMUOlHk6hzLyFvjnHh95pg4Y8s9kcUlX9+/yivtoEd0trPsbX4YgIQWrnSnQGc+zwpI
+         f9CBzgchcWO6mSGBnAkdR8EsyV0DCCn1uEn13nyqxcdTzwz9DZ/0Cql1PTDCzhysyhuz
+         eC23LO6FcE2bV3INgxRKBkOm2B8FJiDmdWMMaIgHyHxg29DKBB4ZTZ0QThZ1Rcfn7Ayu
+         2uPiOjP+FvsNpnZ2368WTD5nw05LoUycjRmipclJ9oAlPrIOh4eytz3vbdyCb6/OpslJ
+         MQeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX4bmr86map0Z9Qyuq1ByQFMHsAj6hUj2Gv0Tt8wp2U4FY8knQ2kj9e0aEpDzCXYZ4v0oE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz91mbMo0juvmjv+H2FyxwH5KjyUputeoHawMcQvCUZwyHdEjIz
+	Z4HnRZn04txvQXesbQFYVzI3ZvlDn3wjX3imx7OOgdlFgrz92nhwbSVVvJ6AF4H9B0QmXlLg0vD
+	soX1Weg==
+X-Received: from pgg23.prod.google.com ([2002:a05:6a02:4d97:b0:c6d:c1c4:8cf5])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:cf8d:b0:38e:9c64:bd39
+ with SMTP id adf61e73a8af0-394672ce209mr14662564637.44.1771342869976; Tue, 17
+ Feb 2026 07:41:09 -0800 (PST)
+Date: Tue, 17 Feb 2026 07:41:08 -0800
+In-Reply-To: <tencent_A1CC0E76805991513AA0C982068255A6A306@qq.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260215140402.24659-1-76824143@qq.com> <tencent_606610DBCF4CC9C810B0694110E12E135C05@qq.com>
-Message-ID: <aZSLHyMp7WQ_HxeD@google.com>
-Subject: Re: [PATCH 1/3] KVM: x86: Enhance kvm_vcpu_eligible_for_directed_yield
- to detect golden targets
+References: <20260215140402.24659-1-76824143@qq.com> <tencent_A1CC0E76805991513AA0C982068255A6A306@qq.com>
+Message-ID: <aZSMFPgRO6s_fUQO@google.com>
+Subject: Re: [PATCH 2/3] KVM: x86: Skip IN_GUEST_MODE vCPUs in
+ kvm_vcpu_on_spin main loop
 From: Sean Christopherson <seanjc@google.com>
 To: 76824143@qq.com
 Cc: pbonzini@redhat.com, kvm@vger.kernel.org, zhanghao <zhanghao1@kylinos.cn>
@@ -88,12 +88,12 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71158-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71159-lists,kvm=lfdr.de];
 	FREEMAIL_TO(0.00)[qq.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -106,48 +106,47 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,kylinos.cn:email,qq.com:email]
-X-Rspamd-Queue-Id: 21B8C14DA0D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qq.com:email]
+X-Rspamd-Queue-Id: AA2EF14DA77
 X-Rspamd-Action: no action
 
 On Sun, Feb 15, 2026, 76824143@qq.com wrote:
 > From: zhanghao <zhanghao1@kylinos.cn>
 > 
-> Detect "golden targets" - vCPUs that are preempted and ready.
-> These are ideal yield targets as they can be immediately scheduled.
+> Add a check in the kvm_vcpu_on_spin() main loop to skip vCPUs
+> that are already running in guest mode.
 > 
-> This check reduces unnecessary yield attempts to vCPUs that are
-> unlikely to benefit from directed yield.
+> Reduces unnecessary yield_to() calls and VM exits.
 > 
 > Signed-off-by: zhanghao <zhanghao1@kylinos.cn>
 > ---
->  virt/kvm/kvm_main.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  virt/kvm/kvm_main.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
 > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 61dca8d37abc..476ecdb18bdd 100644
+> index 476ecdb18bdd..663df3a121c8 100644
 > --- a/virt/kvm/kvm_main.c
 > +++ b/virt/kvm/kvm_main.c
-> @@ -3927,6 +3927,9 @@ static bool kvm_vcpu_eligible_for_directed_yield(struct kvm_vcpu *vcpu)
->  #ifdef CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT
->  	bool eligible;
->  
-> +	if (READ_ONCE(vcpu->preempted) && READ_ONCE(vcpu->mode) == IN_GUEST_MODE)
-
-This is nonsensical.  It should be impossible for a vCPU to be preempted while
-IN_GUEST_MODE is true.  Even if a host IRQ arrives while the guest is active,
-KVM should set vcpu->mode back to OUTSIDE_GUEST_MODE prior to servicing the IRQ.
-
-Even more confusing, the next patch explicitly rejects IN_GUEST_MODE vCPUs from
-kvm_vcpu_on_spin().
-
-> +		return true;
+> @@ -4026,6 +4026,10 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+>  		vcpu = xa_load(&kvm->vcpu_array, idx);
+>  		if (!READ_ONCE(vcpu->ready))
+>  			continue;
 > +
->  	eligible = !vcpu->spin_loop.in_spin_loop ||
->  		    vcpu->spin_loop.dy_eligible;
+> +		if (READ_ONCE(vcpu->mode) == IN_GUEST_MODE)
+> +			continue;
+
+This should generally not happen, as vcpu->ready should only be true when a vCPU
+is scheduled out.  Although it does look like there's a race in kvm_vcpu_wake_up()
+where vcpu->ready could be left %true, e.g. if the task was delyed or preempted
+after __kvm_vcpu_wake_up(), before the "WRITE_ONCE(vcpu->ready, true)".  Not sure
+how best to handle that scenario.
+
+> +
+>  		if (kvm_vcpu_is_blocking(vcpu) && !vcpu_dy_runnable(vcpu))
+>  			continue;
 >  
 > -- 
 > 2.39.2
