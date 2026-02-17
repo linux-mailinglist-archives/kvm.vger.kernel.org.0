@@ -1,260 +1,319 @@
-Return-Path: <kvm+bounces-71143-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71144-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GVNlDrLTk2kI9AEAu9opvQ
-	(envelope-from <kvm+bounces-71143-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 03:34:26 +0100
+	id GHRoFRzsk2ls9wEAu9opvQ
+	(envelope-from <kvm+bounces-71144-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 05:18:36 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99726148816
-	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 03:34:25 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 065EB148B29
+	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 05:18:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 40E763017261
-	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 02:34:24 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 99BF43007886
+	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 04:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1844F23D7F5;
-	Tue, 17 Feb 2026 02:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5142773E4;
+	Tue, 17 Feb 2026 04:18:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tour4Yee"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="AP+gJ4ar"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012041.outbound.protection.outlook.com [40.107.200.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242D717A30A
-	for <kvm@vger.kernel.org>; Tue, 17 Feb 2026 02:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771295662; cv=none; b=Xaek3yeRxNblu3wOe2JePQIVfablQQX+fXyTOI1SaM5tw8hiqnfnBIIlwSA2kdSszVESSBQ8Aquqma1DAQak3Ko4yMiLNPJGyWa2rOoX23IrR6wUt1/bkWOn6T8RsYVQe75DxYH8oC4KhDcHUFDpbtPjubZEr1wVxH2W/8bWdXc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771295662; c=relaxed/simple;
-	bh=fR0pXU0J+oaz2qGssuJqKA427+EjQUevzaMYat/Abaw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JY5VyCcOawYQ4Zyv928Zf0QyryJsFmX9BntR/xKNKCmkd4Fi4SDvc7mJS6vyCfODZNnBDFzV+avb4oFfwdnrkTr1zHfu8Ff91y0JRPr7wsJTgX+/VB/DPimvnWYI+rzkoCArlnvqX3NrTnNT2lEli5K+VXlGg8Hanp2rn/wfTMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tour4Yee; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-824a829f9bbso1861648b3a.0
-        for <kvm@vger.kernel.org>; Mon, 16 Feb 2026 18:34:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1771295660; x=1771900460; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XmXY1QviZxB2hKo7UR8Y0OZQaQwvQtFEtllw98Jpok0=;
-        b=tour4YeeAYktrDmSIjIDTojgwsPgrtWcNghf0q5WNHf4OkkvLRYzN6LQPsq/b5rAmV
-         b+zdpC2cZmprVL0HpAo4bamfC6cDks3MFhctMGu2XexRm/9st/0y1DOIN8I6N62rGbmT
-         p9jeBWym1ScWoeC0X1iLAsrHluSUKt3o8lH1OBdJtgbnfPr4NScyAx9z/u0caeAbogUb
-         7IGtBqQoFBiIkFGwG6erHZ5d0MyWgogWVMu67ND9AyTuNEym9WK0/87lBXKjn9K+7Clc
-         2o8/+5142dAV/8zuTbI6yuJFzBjamOtpFLUqQ666gVDZ5XTzz6MRnc7yKGwCBEQB3Jwy
-         lp2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771295660; x=1771900460;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XmXY1QviZxB2hKo7UR8Y0OZQaQwvQtFEtllw98Jpok0=;
-        b=g1ezTMd/1fWx+YJGew7SGQIhkdkCs1ujcmphDH8FACtorHVX2+75pwO7a71aEccg+Z
-         pWmqu9GS/YKtZ7yV16/wwroJjacwPLdq1iAdFtEOezxxzBdn4baOJ6rz02qWlanSkH6G
-         enMq5dftnmkulrGDzZddh2xQaA0ghAGhSikeolGcqubrGVWW1pGI2oqdGrCX0rlGRfMh
-         xuWAq6/1lhO9EKtBN7h0Oga/B6pxVo+MwBWvQuXT6Fnc7D2g3/PKUN8fp916KOjNkQIS
-         ZVwZ1xCTnS6t/XKCEs2M5jxqOdWOqNar0ieN49XMfRhEEnanv50uE5TtFv9Gp2cxMS6G
-         4Izg==
-X-Forwarded-Encrypted: i=1; AJvYcCW2KCycpMDEKbspryzZt+JF9n8RFXWGO2fX9q3DLhmEhd2bpc7MAp3EQyVntLl0jieN4xM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyxeB5N7WO7aSJ3cg1yjt7E16ikG9FPVl9XseCNDP8/1sABq+X
-	Y9P9yp72YRa9Dz87/c7T8D2CESVau6u+uZ1gORqWMGSSQN6chT8Hzl/fr3+unOKS+RY=
-X-Gm-Gg: AZuq6aIy4MfuAFcobr30FMBusl+Hx0S/nubZKFbrpcpoQGs39razht6dPp6JOeIHA/K
-	bTFaRFtCHSSilW1qFSBdiFQ4NYaO1Ek1ronXPVpAVHJTrWfLiKSvKRkWsbNAB6Bhg04A4SZlPlg
-	ZV84+m2t1Z4P6rxU0E1en9SRsYhjKaCT5zfJ1wGZ3ct3JKj36jc/If7iySVqVDwJ86ziKyFoxqK
-	wHw5BE5zjbUm2wLYR740m0IsF0x7eyp7dmlgTuF4bX31F4TFjmjqz+LzLiwFRBE1f1my6cVbIEs
-	4rWuowTBPa8B17rFUGrmokLFjzunNfKSLY9F03bRtYKKiZsKuzqUeZkUhwkeWm8VFPKIP4ED2MR
-	7b2A9LdNIlSKPzJoCb1FzMDAm1gdIBTHMGBvMedt7hXv9PBmqUupnd3ji+cPlw8VpyPqpNgx/X8
-	fo2IQGhn7N96WjhGbj3XDr9/ic454EbmLu5oIMuuHZEawC+3hmHPudut+FYpXCmrwDorjY
-X-Received: by 2002:a05:6a00:3e0c:b0:81f:41c8:765a with SMTP id d2e1a72fcca58-824c945491cmr12355955b3a.4.1771295660218;
-        Mon, 16 Feb 2026 18:34:20 -0800 (PST)
-Received: from [192.168.1.87] (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-824c6a2e936sm11334871b3a.6.2026.02.16.18.34.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Feb 2026 18:34:19 -0800 (PST)
-Message-ID: <ae364123-5b24-44cd-8330-9afde7e99ace@linaro.org>
-Date: Mon, 16 Feb 2026 18:34:20 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1D117ADE0;
+	Tue, 17 Feb 2026 04:18:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771301909; cv=fail; b=TwkCd4tFPfHQpImmbicRfyVSLlC6hC8SBwFLsm3lX6j1qhMYvmnKj2ZUUkZfsl7zL5CCTysAEE6Sm7jlXVDlD7HZpCZlD+8bjOIUsQH/SPvxZCs4OETUdN7pIvGJWBLnqXGXCActw5YMq3n/S9PhXi1y/qmvdatiV4DWLkDUkug=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771301909; c=relaxed/simple;
+	bh=om04pcpiHECoI22BfRh/dA9l6NDc532Iyd2sUDAjFYI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YmlVyALNU37gsT7wePxqQITnXykEkv3mbUvoVSlS8H2SH10sqqyKu4HC7XrIatmswRFPAV89Ei/WK2Mjnyg3i7AWoS4VC2G+zF9nL7EO6oAK9MOlmi0Y4RvYiblkdvXtqdgghHWXomzGVoGLlaDJMULpZGujFIWFaqwvzpALzLg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=AP+gJ4ar; arc=fail smtp.client-ip=40.107.200.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wqxGYlp9yqIgRsV01LD4X3dRsIRrn+OUpTRd+a7RPexMoKBOpTaC0iDPEDgTA1/ztMqEBfchqAs6iDWvcnFG+e8o/j1qRLFNioR53dyGeWkpnLu7V0PKCnSURhoJmUMyia+9jHeN0Z/3d328GFwhA8Am5ioWugzIsOac0DNmgz99biphkl8p4F3H95fBBhkIsYnK6WX5xzINJ/0A/+saUkPyn4b3ADq3pjJHcj60EEvSucHnm7S45tXL7WAjfsRO3Lt4UK5HbLZYHC1OwwOsNHMuva1L2xdbIllzk4xaqws1CyrGwX5ODB7ltPo2C3cLQhrfuzQuqLBMOhPVxh71tA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+gtyAoSgILkrzgFcHLqtFTPnV10o9evZOZcjee4pm4w=;
+ b=SlEdYa4NraoGDC1HGE4hk8TZf8MbOv1QJ7G6tck5EF0FCeQgrjI70nPr+wfcq4NYQ4zjs7AOfLsoRMxeK6mp77h8UYUmDI146jJ+y07xhAM6L3eJO2e91QYnbndsYUvZ6SCGSgUABg7MyX4PlOP98wVN6ad99kleSSTyqGbyzo6prkuOWyauSTlo2Fxs0GF1m6bALAbzr+12nymXAF7em0jUhMMBEBKDVEZoeXo7jtEJ7Qx7ueLcyL2B4l5tVjuKXcTtIedqD1IiC+3eOwGmJDleHuu8iFHItf7D9Nf3yzuIvOeFKr4xXpTDjMfzARvTxK5q8AGlMhAyJk8ba2/oXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+gtyAoSgILkrzgFcHLqtFTPnV10o9evZOZcjee4pm4w=;
+ b=AP+gJ4arAZgYmBIm7jW09QR1uuGJZklsnTSehxIFQMvN8ZRODJXoI4RYynjKDcDU5f9J0r1nknCrVafaU1pglmIQ/iYytkHrsVIx10Y5WhSflNx2Ch/90pVf89JZSYUbCYPXxgZ9kweN48jqGMaTRF28XfQ7+0FK6poluPOS2bg=
+Received: from PH7P221CA0030.NAMP221.PROD.OUTLOOK.COM (2603:10b6:510:32a::35)
+ by DS0PR12MB6632.namprd12.prod.outlook.com (2603:10b6:8:d0::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9611.16; Tue, 17 Feb 2026 04:18:21 +0000
+Received: from CY4PEPF0000EE39.namprd03.prod.outlook.com
+ (2603:10b6:510:32a:cafe::24) by PH7P221CA0030.outlook.office365.com
+ (2603:10b6:510:32a::35) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9611.16 via Frontend Transport; Tue,
+ 17 Feb 2026 04:18:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ CY4PEPF0000EE39.mail.protection.outlook.com (10.167.242.11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9632.12 via Frontend Transport; Tue, 17 Feb 2026 04:18:20 +0000
+Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 16 Feb
+ 2026 22:18:19 -0600
+Received: from amd.com (10.180.168.240) by satlexmb07.amd.com (10.181.42.216)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17 via Frontend
+ Transport; Mon, 16 Feb 2026 22:18:13 -0600
+Date: Tue, 17 Feb 2026 04:18:08 +0000
+From: Ankit Soni <Ankit.Soni@amd.com>
+To: Samiullah Khawaja <skhawaja@google.com>
+CC: David Woodhouse <dwmw2@infradead.org>, Lu Baolu
+	<baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>, Will Deacon
+	<will@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy
+	<robin.murphy@arm.com>, Kevin Tian <kevin.tian@intel.com>, Alex Williamson
+	<alex@shazbot.org>, Shuah Khan <shuah@kernel.org>, <iommu@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Saeed Mahameed
+	<saeedm@nvidia.com>, Adithya Jayachandran <ajayachandra@nvidia.com>, Parav
+ Pandit <parav@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, William Tu
+	<witu@nvidia.com>, Pratyush Yadav <pratyush@kernel.org>, Pasha Tatashin
+	<pasha.tatashin@soleen.com>, David Matlack <dmatlack@google.com>, Andrew
+ Morton <akpm@linux-foundation.org>, Chris Li <chrisl@kernel.org>, Pranjal
+ Shrivastava <praan@google.com>, Vipin Sharma <vipinsh@google.com>, YiFei Zhu
+	<zhuyifei@google.com>
+Subject: Re: [PATCH 13/14] vfio/pci: Preserve the iommufd state of the vfio
+ cdev
+Message-ID: <idfs4bm5tib5nfe7i6rrm7hxsvhybbidfxtxl4jx3pamkisdon@zaljkqd66cwq>
+References: <20260203220948.2176157-1-skhawaja@google.com>
+ <20260203220948.2176157-14-skhawaja@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/12] target/arm: single-binary
-Content-Language: en-US
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, anjo@rev.ng,
- Jim MacArthur <jim.macarthur@linaro.org>, kvm@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
- <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?=
- <philmd@linaro.org>, qemu-arm@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>
-References: <20260210201540.1405424-1-pierrick.bouvier@linaro.org>
- <93f8f250-7899-4528-b277-1ddd469c192c@linaro.org>
- <CAFEAcA9YUOxko51ziY3yAOaDfTCEAwqmXnifF=q_mkyotFHTcg@mail.gmail.com>
- <CAFEAcA8XCSjjb2opkf2A5WZwCa5THNswOOUO=fpj7kUJEc79qQ@mail.gmail.com>
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Autocrypt: addr=pierrick.bouvier@linaro.org; keydata=
- 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
- ZtfdHNZotF092MIH0IQC3poExQpV/WBYFAI=
-In-Reply-To: <CAFEAcA8XCSjjb2opkf2A5WZwCa5THNswOOUO=fpj7kUJEc79qQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260203220948.2176157-14-skhawaja@google.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE39:EE_|DS0PR12MB6632:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7f88a02f-404f-4ac1-edfc-08de6ddb9533
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|36860700013|82310400026|1800799024|7142099003|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SFY2c21mY01Zb0haclJ3d1RaL0w1QjFFRG9VdFRRNitCWHZqeWtrM3p3QWlX?=
+ =?utf-8?B?YmR0eWl0QlZLZG9hWWx2SnBWU2o1V0JFbnlNd0cyQXF0RkppMnRhM3Fka0o1?=
+ =?utf-8?B?TlJrS0N5NmxaeWs3MS9aZVJsWkVIV3JHdUQ0STZDRHZ1Rm9GMjdkRTBBZmVH?=
+ =?utf-8?B?bWNFTGk1OTE3ejBuUUJURUVTMVRWcXVtZVBRUWIyRGVCME5hY3V0KzZNWXBG?=
+ =?utf-8?B?TGZOWDZYb3ZDZ0dPem0yaUNBeGxuNjc5b3FQTWxTZ3BhWThaeW9HTXA5ZllL?=
+ =?utf-8?B?UG15cFVtVkU3MTV1SmZib2RrTk9nRmV6cmFhWTlEVFI4Q2w4WTBUcEpPdWZB?=
+ =?utf-8?B?VXlubzA4RHMrUlpLMEtQRG85Ry85ckFzTEhCbUJQZlMxMlpWY05rY1ZEV2Jt?=
+ =?utf-8?B?OFJLTlpGdGxSRnNnSU56V0NJUkM5RVA0eWNISFBuSm8rdThDMjNneEw2dmRQ?=
+ =?utf-8?B?R1E2d1ZTRFg3NGpFNHMrSDRYTXNxQUM2VTdPQUpxMjdQbXpNanVoVUM1TzYy?=
+ =?utf-8?B?S0hqck8vbUZPTDRXeWc4eWxGRVczR3lhKzBucll2SVZyd1l5M2JFNzc2OW1L?=
+ =?utf-8?B?aktlM1R1djJLa2NPWTBwSjJNbzVHb3FJbWJWeVNLYnlKUFExUXNBby9aZFRp?=
+ =?utf-8?B?aWkzaVVub0YzVi83VGxaZk44RW5pa296K0hLTFZRSHptKzhlL3JJdG9CTGVn?=
+ =?utf-8?B?UGdqS0d0dTE0cVVzM1o3UDFOZGdTemRCVTFjYzdEdUJuNnBEQXpZU3l2d2Y2?=
+ =?utf-8?B?NFBkeUg3SmFSd2ZLdWJWbkN0eUttZVV1d1Q1TTBkVnRoeVhrUnpJTEx6aHZp?=
+ =?utf-8?B?Y1FQSGhSQzZ6NTJLc2dqRDdwS0RONFhTODZvSVJ3Yy9GWkQzZENEU1BjVS81?=
+ =?utf-8?B?ZWRENWlRVUU5MEVRQi92cTdKQ2IveThXZU8xeVdYK3YvZ2dZb1hBbXhQd0Vu?=
+ =?utf-8?B?WEhBbTNlQVdLZnB4OGo1RVhOajBpcU5jZjZNUzNVbGVvSGduZ0dnaEkxNW5T?=
+ =?utf-8?B?Ym9oRmhYTFBVdmo0a1U1TVhNQ3RLT0N1eXIwaXM1bWhpSC9tUEtxRnFzTmMx?=
+ =?utf-8?B?aXJPaStjUVo5cUdqdFE5aXUrakQ0dS9BUUZRV3NiTkNzUGozNnd6SE5tSUth?=
+ =?utf-8?B?b20yRlNrVUk1RysyUE9DdEJNdklHU3lZbTRTRGw5NmRXYm5QbElpMXhYM3RI?=
+ =?utf-8?B?QUhHVUE0MjlnT2c2T2JBZ2FmQU1aTEFaNmxYRWRBTzYzVzJMTkNodnR2cnBn?=
+ =?utf-8?B?NVdXUHU0K29hSmpvMlpBOTdBREc3amYwd3B1TlVLb1Q1djNvd3VQZlM3d2ZC?=
+ =?utf-8?B?dS9TMk8rNEVkOWZVeloxQVd0U0RxSHNFL1FYMjF5eC81dHpjcW5McER6QUpi?=
+ =?utf-8?B?aTVuRWE1a3YrRjNtemtBNmhkSWRIQjllQWs2Zm5OT2FaQ0N5RWhXSVR0cUlx?=
+ =?utf-8?B?U09nZDBZVmltRTN2eVUwSnIyRzd3NWg3OFZacExwZHg0MUE0R1E1UER0WU5w?=
+ =?utf-8?B?NWhuVHR4cVpYWGc0TkJSelVENWhmbC9ZbUIvWU0vK3c4THV6U2RuVVhuUmZh?=
+ =?utf-8?B?VDY3SmRmcmN4YTFtMDlJeWwwa1ArN1gyc1pzUTBlemxBb0JZNjE4emZEcUFv?=
+ =?utf-8?B?Wkpyd1g3QXNEN0lBZmIvK0E3bDRuUi9nQUVJR29yOVRrRkwzalR2bm9maERn?=
+ =?utf-8?B?SEN6azBWNDMvS2lVN1l5N2lIVzZNcDViVUlvNTFOeDZxbUNhUjZkeHNnRnAw?=
+ =?utf-8?B?cTF5RG5HSFJZd285UE85SDRzcEIvVWIvUFhLc29YaGVaaUdqOFdGVnVpL3Bo?=
+ =?utf-8?B?NjlQN2Nra2c3ZDRSL1MwM1N0dGY1TkxXWUF6TWdjdW15dGxJa2xmYjJPeGZ6?=
+ =?utf-8?B?dE9ObThIZWVxSXFCY0JEQTFaa0NVaW1DaXljZm4vSTVZRG5wdmVPam0vanRl?=
+ =?utf-8?B?MlUxWUlFMnNUQW5BejhsSFZxM0UyZy8vaXBGb1RHSFhOMEh2TTI2MWMzZjc4?=
+ =?utf-8?B?L1EzMkFvc2FIN2pEbkNLczIzbTFoRUlGOGRqK3pmY3F3V2NLYXd2NEVVRVd4?=
+ =?utf-8?B?Q3hzeEJkWHdVM3EzR0VjNHpxOGpOVmpjUUFBN2lEdXlNbHFhSEwyOTEvMGlS?=
+ =?utf-8?B?M1crUlhXUHoyaHR6OEtFVVcwNWlqRzBUb3Y1ME1vRFd3SVJoOTBsY2k0V3VF?=
+ =?utf-8?B?U0cvQzUyQTVpbE1TNkNxd01WenNyWWFaR0xmSnMrY1dCS010bkRBdC8vZXRs?=
+ =?utf-8?B?d0p2WXVyV20rV05wVW1LWFlHRDR3PT0=?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(82310400026)(1800799024)(7142099003)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	2At8iGjJEexnxje3VL6N3gj3Gt48lrAYja3mnsc6RWhM9ZYCsnBRFSGgAxRDnp3CS31MW3IbrAovb8e+tgtFEW9tTrmI7TMUzEwuFFYSXaEqQ3euE7TZ7FaIppJFW36NCegAOcTJV81YIwL3rmRTyyu/GFYWYq9Z5uT9JUfYsJXlHigo6lk4Ordfepf71jIPJ3CL4/CLCdW9/vSd29vE5cnlOmrh134wEfBOs4HqCrxMnDcgH7eof++//iKPORkFXjUJCoME+KmgA50pWh9NlDw+FoNivoR6g/ZYn9Fdcha5GRvZO11wg6PWCtV4dfLdW9Egl2Jwo9FZg8QoFlO1C+l1p6WmdsGkVv2sK8JPTN8/X3yf0kTAQRNfVP+hihUDZDSjwFWbohPSBYAjMPLpYD14qHF6bgMBxCp4MyiyW5VLje5A9a2uGMajqolfOYF3
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2026 04:18:20.1162
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f88a02f-404f-4ac1-edfc-08de6ddb9533
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE39.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6632
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	TAGGED_FROM(0.00)[bounces-71143-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71144-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amd.com:dkim];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Ankit.Soni@amd.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pierrick.bouvier@linaro.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:mid,linaro.org:dkim,linaro.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 99726148816
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 065EB148B29
 X-Rspamd-Action: no action
 
-On 2/16/26 7:52 AM, Peter Maydell wrote:
-> On Thu, 12 Feb 2026 at 10:59, Peter Maydell <peter.maydell@linaro.org> wrote:
->>
->> On Tue, 10 Feb 2026 at 20:19, Pierrick Bouvier
->> <pierrick.bouvier@linaro.org> wrote:
->>>
->>> On 2/10/26 12:15 PM, Pierrick Bouvier wrote:
->>>> This series continues cleaning target/arm, especially tcg folder.
->>>>
->>>> For now, it contains some cleanups in headers, and it splits helpers per
->>>> category, thus removing several usage of TARGET_AARCH64.
->>>> First version was simply splitting 32 vs 64-bit helpers, and Richard asked
->>>> to split per sub category.
->>>>
->>>> v3
->>>> --
->>>>
->>>> - translate.h: missing vaddr replacement
->>>> - move tcg_use_softmmu to tcg/tcg-internal.h to avoid duplicating compilation
->>>>     units between system and user builds.
->>>> - eradicate TARGET_INSN_START_EXTRA_WORDS by calling tcg_gen_insn_start with
->>>>     additional 0 parameters if needed.
->>>>
->>>> v2
->>>> --
->>>>
->>>> - add missing kvm_enabled() in arm-qmp-cmds.c
->>>> - didn't extract arm_wfi for tcg/psci.c. If that's a hard requirement, I can do
->>>>     it in next version.
->>>> - restricted scope of series to helper headers, so we can validate things one
->>>>     step at a time. Series will keep on growing once all patches are reviewed.
->>>> - translate.h: use vaddr where appropriate, as asked by Richard.
->>
->>> Patches 1-11 are reviewed and ready to be pulled.
->>
->> Looks like patch 12 has also now been reviewed, so I've applied
->> the whole series to target-arm.next.
+On Tue, Feb 03, 2026 at 10:09:47PM +0000, Samiullah Khawaja wrote:
+> If the vfio cdev is attached to an iommufd, preserve the state of the
+> attached iommufd also. Basically preserve the iommu state of the device
+> and also the attached domain. The token returned by the preservation API
+> will be used to restore/rebind to the iommufd state after liveupdate.
 > 
-> I meant to send this to the list, but accidentally sent it to
-> Pierrick only:
+> Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_liveupdate.c | 28 +++++++++++++++++++++++++-
+>  include/linux/kho/abi/vfio_pci.h       | 10 +++++++++
+>  2 files changed, 37 insertions(+), 1 deletion(-)
 > 
-> I just ran this (plus some other patches) through gitlab CI, and
-> it fails to build on the kvm-only and xen-only jobs:
-> 
-> https://gitlab.com/pm215/qemu/-/jobs/13131658696
-> 
-> In file included from /builds/pm215/qemu/include/exec/helper-gen.h.inc:9,
->                   from /builds/pm215/qemu/include/exec/helper-gen-common.h:11,
->                   from ../target/arm/helper.h:7,
->                   from ../target/arm/helper.c:13:
-> /builds/pm215/qemu/include/tcg/tcg.h:35:10: fatal error: tcg-target.h:
-> No such file or directory
->     35 | #include "tcg-target.h"
->        |          ^~~~~~~~~~~~~~
-> 
-> 
-> https://gitlab.com/pm215/qemu/-/jobs/13131658593
-> 
-> In file included from /builds/pm215/qemu/include/exec/helper-gen.h.inc:9,
->                   from /builds/pm215/qemu/include/exec/helper-gen-common.h:11,
->                   from ../target/arm/helper.h:7,
->                   from ../target/arm/debug_helper.c:11:
-> /builds/pm215/qemu/include/tcg/tcg.h:35:10: fatal error: tcg-target.h:
-> No such file or directory
->      35 | #include "tcg-target.h"
->         | ^~~~~~~~~~~~~~
-> 
-> I think the problem looks like it's in "move exec/helper-* plumbery to
-> helper.h", which has put the "emit the TCG gen_helper_foo inline
-> functions" into target/arm/helper.h, when they were previously
-> handled by target/arm/tcg/translate.h and so only in source files
-> that are part of the TCG translate-time code. helper.h only needs the
-> prototypes of the helper functions themselves.
-> 
-> Some of the other new helper-foo.h files look like they would
-> also have this problem, except they happen to only be included
-> from tcg files. For instance target/arm/helper-mve.h is only
-> included from files in target/arm/tcg (so it maybe could be
-> in target/arm/tcg itself).
-> 
-> I couldn't see an obvious easy fixup for this, so I'm afraid
-> I've removed the series from target-arm.next.
-> 
-> thanks
-> -- PMM
+> diff --git a/drivers/vfio/pci/vfio_pci_liveupdate.c b/drivers/vfio/pci/vfio_pci_liveupdate.c
+> index c52d6bdb455f..af6fbfb7a65c 100644
+> --- a/drivers/vfio/pci/vfio_pci_liveupdate.c
+> +++ b/drivers/vfio/pci/vfio_pci_liveupdate.c
+> @@ -15,6 +15,7 @@
+>  #include <linux/liveupdate.h>
+>  #include <linux/errno.h>
+>  #include <linux/vfio.h>
+> +#include <linux/iommufd.h>
+>  
+>  #include "vfio_pci_priv.h"
+>  
+> @@ -39,6 +40,7 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
+>  	struct vfio_pci_core_device_ser *ser;
+>  	struct vfio_pci_core_device *vdev;
+>  	struct pci_dev *pdev;
+> +	u64 token = 0;
+>  
+>  	vdev = container_of(device, struct vfio_pci_core_device, vdev);
+>  	pdev = vdev->pdev;
+> @@ -49,15 +51,32 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
+>  	if (vfio_pci_is_intel_display(pdev))
+>  		return -EINVAL;
+>  
+> +#if CONFIG_IOMMU_LIVEUPDATE
+> +	/* If iommufd is attached, preserve the underlying domain */
+> +	if (device->iommufd_attached) {
+> +		int err = iommufd_device_preserve(args->session,
+> +						  device->iommufd_device,
+> +						  &token);
+> +		if (err < 0)
+> +			return err;
+> +	}
+> +#endif
+> +
+>  	ser = kho_alloc_preserve(sizeof(*ser));
+> -	if (IS_ERR(ser))
+> +	if (IS_ERR(ser)) {
+> +		if (device->iommufd_attached)
+> +			iommufd_device_unpreserve(args->session,
+> +						  device->iommufd_device, token);
+> +
 
-Thanks for reporting Peter, and trying to fix it. It's definitely not
-configurations I had under my radar.
+To use iommufd_device_preserve()/iommufd_device_unpreserve(),
+looks like the IOMMUFD namespace import is missing here —  MODULE_IMPORT_NS("IOMMUFD");
 
-Regards,
-Pierrick
+-Ankit
+
+>  		return PTR_ERR(ser);
+> +	}
+>  
+>  	pci_liveupdate_outgoing_preserve(pdev);
+>  
+>  	ser->bdf = pci_dev_id(pdev);
+>  	ser->domain = pci_domain_nr(pdev->bus);
+>  	ser->reset_works = vdev->reset_works;
+> +	ser->iommufd_ser.token = token;
+>  
+>  	args->serialized_data = virt_to_phys(ser);
+>  	return 0;
+> @@ -66,6 +85,13 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
+>  static void vfio_pci_liveupdate_unpreserve(struct liveupdate_file_op_args *args)
+>  {
+>  	struct vfio_device *device = vfio_device_from_file(args->file);
+> +	struct vfio_pci_core_device_ser *ser;
+> +
+> +	ser = phys_to_virt(args->serialized_data);
+> +	if (device->iommufd_attached)
+> +		iommufd_device_unpreserve(args->session,
+> +					  device->iommufd_device,
+> +					  ser->iommufd_ser.token);
+>  
+>  	pci_liveupdate_outgoing_unpreserve(to_pci_dev(device->dev));
+>  	kho_unpreserve_free(phys_to_virt(args->serialized_data));
+> diff --git a/include/linux/kho/abi/vfio_pci.h b/include/linux/kho/abi/vfio_pci.h
+> index 6c3d3c6dfc09..d01bd58711c2 100644
+> --- a/include/linux/kho/abi/vfio_pci.h
+> +++ b/include/linux/kho/abi/vfio_pci.h
+> @@ -28,6 +28,15 @@
+>  
+>  #define VFIO_PCI_LUO_FH_COMPATIBLE "vfio-pci-v1"
+>  
+> +/**
+> + * struct vfio_iommufd_ser - Serialized state of the attached iommufd.
+> + *
+> + * @token: The token of the bound iommufd state.
+> + */
+> +struct vfio_iommufd_ser {
+> +	u32 token;
+> +} __packed;
+> +
+>  /**
+>   * struct vfio_pci_core_device_ser - Serialized state of a single VFIO PCI
+>   * device.
+> @@ -40,6 +49,7 @@ struct vfio_pci_core_device_ser {
+>  	u16 bdf;
+>  	u16 domain;
+>  	u8 reset_works;
+> +	struct vfio_iommufd_ser iommufd_ser;
+>  } __packed;
+>  
+>  #endif /* _LINUX_LIVEUPDATE_ABI_VFIO_PCI_H */
+> -- 
+> 2.53.0.rc2.204.g2597b5adb4-goog
+> 
 
