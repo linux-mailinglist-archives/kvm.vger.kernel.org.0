@@ -1,241 +1,177 @@
-Return-Path: <kvm+bounces-71174-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71175-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eB+VBW68lGm4HQIAu9opvQ
-	(envelope-from <kvm+bounces-71174-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 20:07:26 +0100
+	id kCK0EZW+lGnHHQIAu9opvQ
+	(envelope-from <kvm+bounces-71175-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 20:16:37 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ECE114F74C
-	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 20:07:25 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0EF714F917
+	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 20:16:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BE699300692C
-	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 19:07:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 611FD300B447
+	for <lists+kvm@lfdr.de>; Tue, 17 Feb 2026 19:16:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B7F37473A;
-	Tue, 17 Feb 2026 19:07:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB232D2483;
+	Tue, 17 Feb 2026 19:16:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Jf+itQQ/"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="o/v2cGmD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 024D02BDC2A
-	for <kvm@vger.kernel.org>; Tue, 17 Feb 2026 19:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA302765C5;
+	Tue, 17 Feb 2026 19:16:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771355234; cv=none; b=vGN4HcbvM3TrXS4IWDq9KYXRaENiOFUlxzL4igtTC4EWj01Z6ZnznhOLrtU0esmkasJh8b8aVJCftipq7J5b20fonKI4MVz/lS3rLqT71fczv2eOR3UBVqbQpAwgRGLsSTlRYmNw4ZATs3MnLYUmy99+8mkIuOjG620YRcDYQI0=
+	t=1771355793; cv=none; b=W3gzEqlpdsmU15WPzjdPVjfuBSiIAXjIir0ESuWOODd3atXIRdqFFDrfV+qap3oMC891GQOfE9t5jwy1QoUqhm7WD4IQoVTM+dt7n/QWkvNFb2gS7GT6xinOVi4gI+Aecnrf0l2LUU1x+PpYsUBFgwk6zIXcIUFr8NEeo+XuTrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771355234; c=relaxed/simple;
-	bh=reGbZPMRQCC0kj1jFlDO98IpMMNB/uUPMXZwwwAFyPI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ynnp7TBI26XJ6dkJ+ismS0xiG6SDRO0ZG0gA93vvSnqv6IYODzLqQ3p5W3Va/OmxBSjLbnYelyqkSz4KpAoMV7UKvCn6TW7JDqA03HxGqACyQSmZfY3ECMvEJOVehrXc9CqKno9s9iFgqlC1025urbW8hiDK6TAcuqOLU1O7jQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Jf+itQQ/; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a943e214daso217355165ad.3
-        for <kvm@vger.kernel.org>; Tue, 17 Feb 2026 11:07:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771355232; x=1771960032; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4mGOCCVLTr299NsqFOYVBdQ9l7JaHEtHLFfNu9E/0HQ=;
-        b=Jf+itQQ/HQ27blig1/S2nOBoSDY+qFD/HrA7si2rpi90BLvoWXXMqH6Gj5e6Mqi45W
-         2TnHUc/PY32uGO9WKYGtvsGF8qdnAY9M4bHMoVHHbQDkZa2xi9Qwhu+uLACYqKZZf9vY
-         elKb/jHBFoYkEbR+Bx17RXGu/9xhPj3jc4A11/WqHEM2e61ED5vJj3O8cNOKWj74j2uQ
-         HJ2luaULLi6/829SWsZzFHhci8/CYzw2NsRFkJFCJNyM96ILJB3jCNXjH0pjqVAuomlm
-         +PEQaWr1a4fyqgSRZgWIWqA9lVchycQsB7NU7+PrWk21bRrkK9X27XqZzDSo27zr9i7A
-         sUGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771355232; x=1771960032;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4mGOCCVLTr299NsqFOYVBdQ9l7JaHEtHLFfNu9E/0HQ=;
-        b=vBo/NBXeRdHchXh17cHRprT8SzWMVJjIY5qps0hzFZuKR0YgFNjmWgCTNYXQV3bqw7
-         V9ZO5T3C3QK3xZRntSRspsDA3GQYzoZjz2hQHZ2yNoUIhwl24U1yGyJbE2JhoKFh84QF
-         X3iPeDPzIUkI6tHlRpEO7tiej6QKoLaGKrH8I3wcvsil6LXktevsARtcYgqjXwDXa1Qq
-         beywD7k0c7nwNHcAqYlPqs+/Nepuc6aDUgY5Dp6vYIEI07fbNgMIzPXaOr4PyLPPOntj
-         YoS7MNyH+qaiPSMbUEY920+k+pILqboJPi/Ore41zMrP7RitIYWAeHdJ8vtbq7d0/OWR
-         z/DQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWBOzXMGsNdPRKJNK903SeQlgn4o+IsQoF7Ba109oLUdtSVeyEkx6mGJslf7lI0NIf5ImI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxR/uLciMfme4gEFSkMjOf8sWxlFWxYp7g2Ur5sGHwzvgU9isAp
-	mtn623H+PzkGhy7Sob7FHZ+1z7vL0Vs7azVxyOE+l+s5wyh6/f4DoNuWs6emLuhHHYfvioR/6mE
-	WEv/JOQ==
-X-Received: from plbkp8.prod.google.com ([2002:a17:903:2808:b0:2a9:5b22:145a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:f84:b0:2aa:e574:c9f7
- with SMTP id d9443c01a7336-2ab4d0aed90mr146214705ad.57.1771355230961; Tue, 17
- Feb 2026 11:07:10 -0800 (PST)
-Date: Tue, 17 Feb 2026 11:07:09 -0800
-In-Reply-To: <dcbd7a58-c961-4510-ae48-ef7fd4f4d75c@amazon.com>
+	s=arc-20240116; t=1771355793; c=relaxed/simple;
+	bh=y+VH3Y0dwBmEaKN7EVetZJ4yiCkHIhzOvclU+fR9Yyc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SiF1NEBHFb9GZC9HgTxRlOTNuuA1QEp5Ab3t7iuN3wNGy2vEytYFMN4ptiVB2ibmET7ggiVZTSDICN1BKP6J70a5XQBqNvrG6w1qEHQ9Qrj2J+iGotBKsp4v8ALkjk/NhV49a2EVS0BeF1cjBAOz1AEour8XKm4hW8G9vzjJhnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=o/v2cGmD; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61HFF78t3013565;
+	Tue, 17 Feb 2026 19:15:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=VNMpq4qyh3WYGxKXlPxpMOOQOK3XVP
+	3jl0fTJEZhqqQ=; b=o/v2cGmDJBZclaH3Apz9H2Lc0UbZc9P/Nh3skMRUCeKyMA
+	BOUm60hRT4KlqWFKAcCtme6tHHCy5GbTN3WIhfteH4xhMleebCTcvHwlWNfL7ot7
+	815XqgrtpFscGVM+YpJR2984AxAF/7eWHJzMOvLmNoG0oKDr4/QszrE8VummC2VV
+	Ag9DWnF7rEQRVSK5TbdVWXCxPmIY3nKLpFwC56+lGkMjZOEezyJbecxbh28WjQJr
+	cMiaTXtSTxzyH4EKCqR0IxaDucrWebONz/4gSybT2a/s3Jq1Q/4PeKdB5BKv0Kjw
+	8MIriOmt9N6Jo9Nc7oOIJ347c9p12d7hvBFlkxcQ==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cajcqx0b1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Feb 2026 19:15:39 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61HJ3ll3030213;
+	Tue, 17 Feb 2026 19:15:38 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4ccb454hpm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 17 Feb 2026 19:15:37 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61HJFYib50921818
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 17 Feb 2026 19:15:34 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2514B2004B;
+	Tue, 17 Feb 2026 19:15:34 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 61F6B20043;
+	Tue, 17 Feb 2026 19:15:32 +0000 (GMT)
+Received: from osiris (unknown [9.111.13.3])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 17 Feb 2026 19:15:32 +0000 (GMT)
+Date: Tue, 17 Feb 2026 20:15:30 +0100
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: akpm@linux-foundation.org, willy@infradead.org, david@kernel.org,
+        ziy@nvidia.com, matthew.brost@intel.com, joshua.hahnjy@gmail.com,
+        rakie.kim@sk.com, byungchul@sk.com, gourry@gourry.net,
+        ying.huang@linux.alibaba.com, apopple@nvidia.com,
+        lorenzo.stoakes@oracle.com, baolin.wang@linux.alibaba.com,
+        Liam.Howlett@oracle.com, npache@redhat.com, ryan.roberts@arm.com,
+        dev.jain@arm.com, baohua@kernel.org, lance.yang@linux.dev,
+        vbabka@suse.cz, jannh@google.com, rppt@kernel.org, mhocko@suse.com,
+        pfalcato@suse.de, kees@kernel.org, maddy@linux.ibm.com,
+        npiggin@gmail.com, mpe@ellerman.id.au, chleroy@kernel.org,
+        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, gerald.schaefer@linux.ibm.com, linux-mm@kvack.org,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] mm: use vma_start_write_killable() in
+ process_vma_walk_lock()
+Message-ID: <20260217191530.13857Aae-hca@linux.ibm.com>
+References: <20260217163250.2326001-1-surenb@google.com>
+ <20260217163250.2326001-4-surenb@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250909100007.3136249-1-keirf@google.com> <20250909100007.3136249-5-keirf@google.com>
- <a84ddba8-12da-489a-9dd1-ccdf7451a1ba@amazon.com> <aY-x0OlJQEqInyNF@google.com>
- <dcbd7a58-c961-4510-ae48-ef7fd4f4d75c@amazon.com>
-Message-ID: <aZS8XXOW7vhMkNWQ@google.com>
-Subject: Re: [PATCH v4 4/4] KVM: Avoid synchronize_srcu() in kvm_io_bus_register_dev()
-From: Sean Christopherson <seanjc@google.com>
-To: Nikita Kalyazin <kalyazin@amazon.com>
-Cc: Keir Fraser <keirf@google.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Eric Auger <eric.auger@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Li RongQing <lirongqing@baidu.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260217163250.2326001-4-surenb@google.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-GUID: wcqAAen5QtOIh3Yd7KPIhfP50s2xWLqT
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjE3MDE1NiBTYWx0ZWRfX7oqGr8VrV/Xk
+ p0gIknVZDxQC2GBczDROOnBcM7o7b3pKMWShsmSu1vqb+BvlzcCZcclbforXI3g03Tg2w3NQXE0
+ iXFAV4kar5rcK/dTEoKjXtQ1YydA7DBAYYTXJQ6GINk1YIMDoUkt+7mkJ3MI51bmInQTTszK824
+ 8nC+0GeJPvCKNnOgiTfjClOWWPT+8Lpcfx5vc85/5OZTHkYR01ktJG/0YRg76aGx/X0wf04+agQ
+ 4kI4XL8Z0IXYl+rLKXIZzDCweR6PPYquimZJ7zKZHJhugW/R0Zxnub8iJh9jLTWzQmDmDx2stnO
+ COtshVSmyDhLJ6fSxUHaIBEZ1BEuSi+RgRGyBNoRxTvLU6HRcpoi/biPBkmqE8MvUghRu4fJIvr
+ xZJMzLYZujcCXK+JpPkNmjgX9+7+EQ1UvF4aYXnwqc/76xKkXQpx4u4s86e/o2ezBaAxgc9G67x
+ t92lhnQ8I8WJpFBDkPA==
+X-Authority-Analysis: v=2.4 cv=UPXQ3Sfy c=1 sm=1 tr=0 ts=6994be5b cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=1XWaLZrsAAAA:8
+ a=28GIsqCL1x42zXYMcZMA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: Atfp6M6HOZik-aY60bN0PvQ41cv5zLBo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-17_03,2026-02-16_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0 phishscore=0 impostorscore=0 adultscore=0
+ bulkscore=0 clxscore=1011 lowpriorityscore=0 priorityscore=1501 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602170156
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71174-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[42];
+	FREEMAIL_CC(0.00)[linux-foundation.org,infradead.org,kernel.org,nvidia.com,intel.com,gmail.com,sk.com,gourry.net,linux.alibaba.com,oracle.com,redhat.com,arm.com,linux.dev,suse.cz,google.com,suse.com,suse.de,linux.ibm.com,ellerman.id.au,kvack.org,lists.ozlabs.org,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-71175-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3ECE114F74C
+	FROM_NEQ_ENVFROM(0.00)[hca@linux.ibm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[kvm];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: F0EF714F917
 X-Rspamd-Action: no action
 
-On Mon, Feb 16, 2026, Nikita Kalyazin wrote:
-> On 13/02/2026 23:20, Sean Christopherson wrote:
-> > On Fri, Feb 13, 2026, Nikita Kalyazin wrote:
-> > > I am not aware of way to make it fast for both use cases and would be more
-> > > than happy to hear about possible solutions.
-> > 
-> > What if we key off of vCPUS being created?  The motivation for Keir's change was
-> > to avoid stalling during VM boot, i.e. *after* initial VM creation.
+On Tue, Feb 17, 2026 at 08:32:50AM -0800, Suren Baghdasaryan wrote:
+> Replace vma_start_write() with vma_start_write_killable() when
+> process_vma_walk_lock() is used with PGWALK_WRLOCK option.
+> Adjust its direct and indirect users to check for a possible error
+> and handle it.
 > 
-> It doesn't work as is on x86 because the delay we're seeing occurs after the
-> created_cpus gets incremented
+> Signed-off-by: Suren Baghdasaryan <surenb@google.com>
+> ---
+>  arch/s390/kvm/kvm-s390.c |  5 +++--
+>  arch/s390/mm/gmap.c      | 13 ++++++++++---
+>  fs/proc/task_mmu.c       |  7 ++++++-
+>  mm/pagewalk.c            | 20 ++++++++++++++------
+>  4 files changed, 33 insertions(+), 12 deletions(-)
 
-I don't follow, the suggestion was to key off created_vcpus in
-kvm_io_bus_register_dev(), not in kvm_swap_active_memslots().  I can totally
-imagine the patch not working, but the ordering in kvm_vm_ioctl_create_vcpu()
-should be largely irrelevant.
-
-Probably a moot point though.
-
-> so it doesn't allow to differentiate the two
-> cases (below is kvm_vm_ioctl_create_vcpu):
-> 
-> 	kvm->created_vcpus++; // <===== incremented here
-> 	mutex_unlock(&kvm->lock);
-> 
-> 	vcpu = kmem_cache_zalloc(kvm_vcpu_cache, GFP_KERNEL_ACCOUNT);
-> 	if (!vcpu) {
-> 		r = -ENOMEM;
-> 		goto vcpu_decrement;
-> 	}
-> 
-> 	BUILD_BUG_ON(sizeof(struct kvm_run) > PAGE_SIZE);
-> 	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> 	if (!page) {
-> 		r = -ENOMEM;
-> 		goto vcpu_free;
-> 	}
-> 	vcpu->run = page_address(page);
-> 
-> 	kvm_vcpu_init(vcpu, kvm, id);
-> 
-> 	r = kvm_arch_vcpu_create(vcpu); // <===== the delay is here
-> 
-> 
-> firecracker   583 [001]   151.297145: probe:synchronize_srcu_expedited:
-> (ffffffff813e5cf0)
->     ffffffff813e5cf1 synchronize_srcu_expedited+0x1 ([kernel.kallsyms])
->     ffffffff81234986 kvm_swap_active_memslots+0x136 ([kernel.kallsyms])
->     ffffffff81236cdd kvm_set_memslot+0x1cd ([kernel.kallsyms])
->     ffffffff81237518 kvm_set_memory_region.part.0+0x478 ([kernel.kallsyms])
->     ffffffff81264dbc __x86_set_memory_region+0xec ([kernel.kallsyms])
->     ffffffff8127e2dc kvm_alloc_apic_access_page+0x5c ([kernel.kallsyms])
->     ffffffff812b9ed3 vmx_vcpu_create+0x193 ([kernel.kallsyms])
->     ffffffff8126788a kvm_arch_vcpu_create+0x1da ([kernel.kallsyms])
->     ffffffff8123c54c kvm_vm_ioctl+0x5fc ([kernel.kallsyms])
->     ffffffff8167b331 __x64_sys_ioctl+0x91 ([kernel.kallsyms])
->     ffffffff8251a89c do_syscall_64+0x4c ([kernel.kallsyms])
->     ffffffff8100012b entry_SYSCALL_64_after_hwframe+0x76 ([kernel.kallsyms])
->               6512de ioctl+0x32 (/mnt/host/firecracker)
->                d99a7 std::rt::lang_start+0x37 (/mnt/host/firecracker)
-> 
-> Also, given that it stumbles after the KVM_CREATE_VCPU on ARM (in
-> KVM_SET_USER_MEMORY_REGION), it doesn't look like a universal solution.
-
-Hmm.  Under the hood, __synchronize_srcu() itself uses __call_srcu, so I _think_
-the only practical difference (aside from waiting, obviously) between call_srcu()
-and synchronize_srcu_expedited() with respect to "transferring" grace period
-latency is that using call_srcu() could start a normal, non-expedited grace period.
-
-IIUC, SRCU has best-effort logic to shift in-flight non-expedited grace periods
-to expedited mode, but if the normal grace period has already started the timer
-for the delayed invocation of process_srcu(), then SRCU will still wait for one
-jiffie, i.e. won't immediately queue the work.
-
-I have no idea if this is sane and/or acceptable, but before looping in Paul and
-others, can you try this to see if it helps?
-
-diff --git a/include/linux/srcu.h b/include/linux/srcu.h
-index 344ad51c8f6c..30437dc8d818 100644
---- a/include/linux/srcu.h
-+++ b/include/linux/srcu.h
-@@ -89,6 +89,8 @@ void __srcu_read_unlock(struct srcu_struct *ssp, int idx) __releases(ssp);
- 
- void call_srcu(struct srcu_struct *ssp, struct rcu_head *head,
-                void (*func)(struct rcu_head *head));
-+void call_srcu_expedited(struct srcu_struct *ssp, struct rcu_head *rhp,
-+                        rcu_callback_t func);
- void cleanup_srcu_struct(struct srcu_struct *ssp);
- void synchronize_srcu(struct srcu_struct *ssp);
- 
-diff --git a/kernel/rcu/srcutree.c b/kernel/rcu/srcutree.c
-index ea3f128de06f..03333b079092 100644
---- a/kernel/rcu/srcutree.c
-+++ b/kernel/rcu/srcutree.c
-@@ -1493,6 +1493,13 @@ void call_srcu(struct srcu_struct *ssp, struct rcu_head *rhp,
- }
- EXPORT_SYMBOL_GPL(call_srcu);
- 
-+void call_srcu_expedited(struct srcu_struct *ssp, struct rcu_head *rhp,
-+                        rcu_callback_t func)
-+{
-+       __call_srcu(ssp, rhp, func, rcu_gp_is_normal());
-+}
-+EXPORT_SYMBOL_GPL(call_srcu_expedited);
-+
- /*
-  * Helper function for synchronize_srcu() and synchronize_srcu_expedited().
-  */
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 737b74b15bb5..26215f98c98f 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -6036,7 +6036,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
-        memcpy(new_bus->range + i + 1, bus->range + i,
-                (bus->dev_count - i) * sizeof(struct kvm_io_range));
-        rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
--       call_srcu(&kvm->srcu, &bus->rcu, __free_bus);
-+       call_srcu_expedited(&kvm->srcu, &bus->rcu, __free_bus);
- 
-        return 0;
- }
+The s390 code modified with this patch does not exist upstream
+anymore. It has been replaced with Claudio's huge gmap rewrite.
 
