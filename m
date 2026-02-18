@@ -1,181 +1,224 @@
-Return-Path: <kvm+bounces-71278-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71279-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MK9VDNMylmktcAIAu9opvQ
-	(envelope-from <kvm+bounces-71278-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 22:44:51 +0100
+	id mJKMAnUzlmktcAIAu9opvQ
+	(envelope-from <kvm+bounces-71279-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 22:47:33 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EDF815A5D3
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 22:44:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E04B15A635
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 22:47:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 75BA130DC575
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 21:38:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 12A0F30398BD
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 21:46:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B3F12F4A15;
-	Wed, 18 Feb 2026 21:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2DF329376;
+	Wed, 18 Feb 2026 21:46:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IUTYd0GX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cI1I/25U";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qpOr8LHH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80B02F1FEF;
-	Wed, 18 Feb 2026 21:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C3C2FD66D
+	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 21:46:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771450664; cv=none; b=GZL9E3U23v2XJ+k/Aam/n0PQ9NVSAYr6jcuuTYB6yz2mVcMLJQRe/AdfXtNRXG64iBwJiyEEteFO+g99EVWFeIlF4NbZ+2HYw9PKTaDHci48OIPuZ5S0vgpu+W5q/fJ2gntnCxD2a6WopmNf3NctVnKCo/5uTM+4t/BT+S65qL0=
+	t=1771451180; cv=none; b=tnDudn6s+I5qzyJfeEuw6ZWGzBKn51w3sU8VwKhpjRU1jD8cuNj49WbzzKEnuE2NasFQsGtq23nJOSdKxTM7Ah0gBMJK8sQZzA01jOuy3XbIoZlGY0adY6NcKg/1e9PfkzugOJB4etjx/fB4BzKTMusv8NxObOSu3+qZVNrPY8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771450664; c=relaxed/simple;
-	bh=O4nzDH8oF28hvkW1GBVqLhm5voIXe6UWJWyCWV78F3A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cHPHYTUnbvKVaGFj0X2gNl3BYPlD9WwP55xy3PdL8wP5P1FdD80mCmT6cQN052g1rdOdexvOVfsQIbljfn9lmNm1ogc0S8gpqdlZit3kX3QLzHd1pNl1OP7f3td/hQpw2XgVdaahyH1058+WxASCtscoUEE9a98vkIwtGFmNgy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IUTYd0GX; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771450663; x=1802986663;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=O4nzDH8oF28hvkW1GBVqLhm5voIXe6UWJWyCWV78F3A=;
-  b=IUTYd0GX/xnCxw2zLaxCgeUlhCQPzYpMzwSWWWo25Q3A3ZrH4TKHyWzE
-   b9wofFukJp4IqxJna0G0r0kSIZo+DSyNDjWbtcFE4nR1tD6s7nAhACZzX
-   O8CIFs8waYBQKI1hLt1NGR/syoQPniG/1luYDhMjPfOx+I295i8HiNPla
-   HQQEXBNK9COE+AX8n55yK7SSGkX0Tm8rMRe+G4qkf/Ljf9C6EZhJsMkCn
-   2shdtVATv6iTuMEz73cgrW3lxtrILmaM3StK2OlFKLgxS69ojtWXqG3p2
-   3MAJcZeUJGboY/33VLmvDZ5+dR4s/gM9sGCkhJTBbR9xTCL5OfOFy/mV9
-   Q==;
-X-CSE-ConnectionGUID: Vzkn6gTrT4ulBYaEsd97Kw==
-X-CSE-MsgGUID: RN8Iu4wVTguLoPo7cyETxQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11705"; a="72424012"
-X-IronPort-AV: E=Sophos;i="6.21,299,1763452800"; 
-   d="scan'208";a="72424012"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 13:37:42 -0800
-X-CSE-ConnectionGUID: ev8BJpRoRwSOdOn8aQQejw==
-X-CSE-MsgGUID: YsfSvvBXTDe2HrZgGwKfFA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,299,1763452800"; 
-   d="scan'208";a="213407057"
-Received: from unknown (HELO [10.24.81.147]) ([10.24.81.147])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 13:37:43 -0800
-Message-ID: <e05a65a7-bf8e-420b-8a36-2d76e56b43b0@intel.com>
-Date: Wed, 18 Feb 2026 13:37:42 -0800
+	s=arc-20240116; t=1771451180; c=relaxed/simple;
+	bh=xmblt6armlTF8R46mNJYp4dI9Ge2TRJhwdNSQ517qBg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cu1ZU3lTDtO/fYjlqqLnog4mnP5oV8w4y6UCkUMjgxbfkfew2TlhfCsE55apBF8mO9KO3Af3mThtjKKPDIxMz5dnbbFgV+LaKfObsMXXDBEtsSgLYFO6k6A9kN3yO7c1leyxsqavEUBJ0Yao5meglh5Q3FyiVhEPtCEUpwet2dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cI1I/25U; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qpOr8LHH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1771451178;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L7/VoI5q20qGTQoXj49vRdypgNZ/BrCMYvuD6UKnpJI=;
+	b=cI1I/25U4ihis2C/hMR6fY2VLctxQpFVRUuOaAdzZW95obn6BPG3rTGtfvUl3wMM9OvfZa
+	anC9OpQ4YU0sVpEEcciULiY7jItzqttMeAk6dtrG1mcwGBFRjkcCZZ5Sy+R3ROC/4LeKJF
+	o9jCKOduAT1lHwNTA62V5j0zR32Yi/Q=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-550-YefR8dt2PtuUR9nvfhZ8fw-1; Wed, 18 Feb 2026 16:46:17 -0500
+X-MC-Unique: YefR8dt2PtuUR9nvfhZ8fw-1
+X-Mimecast-MFC-AGG-ID: YefR8dt2PtuUR9nvfhZ8fw_1771451176
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-506bfa0441aso31082901cf.3
+        for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 13:46:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1771451176; x=1772055976; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=L7/VoI5q20qGTQoXj49vRdypgNZ/BrCMYvuD6UKnpJI=;
+        b=qpOr8LHHK8sHR7IaDQQ/h/ai5uyQjBYdFe2eg5jqDHi2XzlV1tBedcr7f5fwlaK2W0
+         UoDCVkZ70PsOdUFeUBqM26eK73Vm7Bon2vH8VcN3gvESP0IfM9XXjalLqGMWxTdknqsH
+         6h3o7K+O0ONnevOrCSQcvwHpmRuwmyXz8hXV22mScpdwwXq8VKwpJNvukOsVdoc0uhS2
+         DF70HN1IznmxwkHscgUFNe4yXz3n6f09heL/s75U7ETp3rylHrHWvTTvJdhbLDa9nggd
+         3elUL7NvHLEA+n+Lt0GMCVFpbnYhWkMjDHN1Py2sZaLs9gwYuVgy9txKn/nu+/1gGqOM
+         gScQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771451176; x=1772055976;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=L7/VoI5q20qGTQoXj49vRdypgNZ/BrCMYvuD6UKnpJI=;
+        b=o0UAgWnshgxmdBy+86FQTBb5ANVVge+pjDaqIZA0Ak4ptFqF52nYiFMrGoc67A4CC0
+         hCtq1/J4nKSrGjFcWzhlaczfFbbeQNnagE5TzfQ5aA/FlMfAHT9Yt/rlREBjN0gOyeyr
+         eJWT8equzsTLpbJe50Q0kXO48Td4gClrkLGQcf53v9IWkEqwM8rhF6rsy8YiK/BIP+qD
+         8vpRXd4laOthv76wMbgwgGBwKocIM/2yy5zEMAUb8dM+XtIWqQdbJQTHsCEZ/5O9PjDO
+         JgLDepbQj+EISDtg7BlrW/wId7JHt4FkQXGs3omK72KnD9QYV2dMN8IMwr4kDPTpFdru
+         ZoBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUUg5kUMTjMD29eIGm11/HyH8oBM3cDhOC6I8XtWYW4YFxjwgyo4Odfm3iFibMOHRvoYvE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWZuxr+jCuPiQqs2+yKhTtLxfecJuI4DmR7iBVYvN6nbnvXZGK
+	m3dcuPjupoY/o05OiQolwWBIPvy4t31CGOqg9y6ZdnaqCHCFm9YT/KsvWAumHW8Opl+v99EOe+1
+	Y0p9oR2PIEeLz7C3QzgVMZQyNcQyNgkKCFTkC3E2J7YbjwWae/mHWxg==
+X-Gm-Gg: AZuq6aLV7gt9lSTnD4KyHEpszZV8H5cWjQRbqZ8Vq5x4EvZ5VTpI2nnD+6k4s3iPcJs
+	RNQanlPZs6iXCX1oY4yiWSU9cdODUmHKriYCf0b3a9mBFATQ0yV+5T2JFLDvOPNpYy+xtYeq55s
+	q9SF0SDVvy6bonAw/BTBLlSzGhRt6yCF4ztqCA0QANbhht/aWZIW6cd1OQmlL8uI+PHY8cDW/is
+	8sp7ZLO7ZXa5Wv60Hjt6X/eoGu/Cd7WHAGwzz3JxVfEMK1dbj9xKVPlhopAuZJAoD51s8/83eoF
+	rsbBNKGMzuweLfVSV5eGEsikpszRDCDsC0VI1+6WDfegvVXcXEg3ghEjzE1FlKw1I9r6E3u8+uU
+	RuCQ1n+uosTCxcA==
+X-Received: by 2002:a05:622a:190b:b0:4e8:b446:c01b with SMTP id d75a77b69052e-506b4020625mr201996531cf.61.1771451176354;
+        Wed, 18 Feb 2026 13:46:16 -0800 (PST)
+X-Received: by 2002:a05:622a:190b:b0:4e8:b446:c01b with SMTP id d75a77b69052e-506b4020625mr201996241cf.61.1771451175893;
+        Wed, 18 Feb 2026 13:46:15 -0800 (PST)
+Received: from x1.local ([174.91.117.149])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8971cdbf972sm195151676d6.44.2026.02.18.13.46.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Feb 2026 13:46:15 -0800 (PST)
+Date: Wed, 18 Feb 2026 16:45:50 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: linux-mm@kvack.org, Andrea Arcangeli <aarcange@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	David Hildenbrand <david@redhat.com>,
+	Hugh Dickins <hughd@google.com>,
+	James Houghton <jthoughton@google.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Oscar Salvador <osalvador@suse.de>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Vlastimil Babka <vbabka@suse.cz>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC 10/17] shmem, userfaultfd: implement shmem uffd
+ operations using vm_uffd_ops
+Message-ID: <aZYzDhi7mvgucP9V@x1.local>
+References: <20260127192936.1250096-1-rppt@kernel.org>
+ <20260127192936.1250096-11-rppt@kernel.org>
+ <aYIzCuh8cjd09zrP@x1.local>
+ <aYhm_4difwN5XXxe@kernel.org>
+ <aYzf-hS4pUY9ulss@x1.local>
+ <aZIGIH9--qOamaMe@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 09/16] x86/msr: Use the alternatives mechanism for
- WRMSR
-To: Sean Christopherson <seanjc@google.com>, Juergen Gross <jgross@suse.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
- llvm@lists.linux.dev, Xin Li <xin@zytor.com>, "H. Peter Anvin"
- <hpa@zytor.com>, Thomas Gleixner <tglx@kernel.org>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
-References: <20260218082133.400602-1-jgross@suse.com>
- <20260218082133.400602-10-jgross@suse.com> <aZYoUE7CmrLg3SVe@google.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <aZYoUE7CmrLg3SVe@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aZIGIH9--qOamaMe@kernel.org>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,lists.linux.dev,zytor.com,redhat.com,alien8.de,linux.intel.com,gmail.com,google.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71278-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71279-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[peterx@redhat.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[kvm,lkml];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 8EDF815A5D3
+X-Rspamd-Queue-Id: 7E04B15A635
 X-Rspamd-Action: no action
 
-On 2/18/26 13:00, Sean Christopherson wrote:
-> On Wed, Feb 18, 2026, Juergen Gross wrote:
->> When available use one of the non-serializing WRMSR variants (WRMSRNS
->> with or without an immediate operand specifying the MSR register) in
->> __wrmsrq().
-> Silently using a non-serializing version (or not) seems dangerous (not for KVM,
-> but for the kernel at-large), unless the rule is going to be that MSR writes need
-> to be treated as non-serializing by default.
+On Sun, Feb 15, 2026 at 07:45:04PM +0200, Mike Rapoport wrote:
+> On Wed, Feb 11, 2026 at 03:00:58PM -0500, Peter Xu wrote:
+> > On Sun, Feb 08, 2026 at 12:35:43PM +0200, Mike Rapoport wrote:
+> > > > > +static void shmem_mfill_filemap_remove(struct folio *folio,
+> > > > > +				       struct vm_area_struct *vma)
+> > > > > +{
+> > > > > +	struct inode *inode = file_inode(vma->vm_file);
+> > > > > +
+> > > > > +	filemap_remove_folio(folio);
+> > > > > +	shmem_recalc_inode(inode, 0, 0);
+> > > > >  	folio_unlock(folio);
+> > > > > -	folio_put(folio);
+> > > > > -out_unacct_blocks:
+> > > > > -	shmem_inode_unacct_blocks(inode, 1);
+> > > > 
+> > > > This looks wrong, or maybe I miss somewhere we did the unacct_blocks()?
+> > > 
+> > > This is handled by shmem_recalc_inode(inode, 0, 0).
+> > 
+> > IIUC shmem_recalc_inode() only does the fixup of shmem_inode_info over
+> > possiblly changing inode->i_mapping->nrpages.  It's not for reverting the
+> > accounting in the failure paths here.
+> > 
+> > OTOH, we still need to maintain accounting for the rest things with
+> > correctly invoke shmem_inode_unacct_blocks().  One thing we can try is
+> > testing this series against either shmem quota support (since 2023, IIUC
+> > it's relevant to "quota" mount option), or max_blocks accountings (IIUC,
+> > "size" mount option), etc.  Any of those should reflect a difference if my
+> > understanding is correct.
+> > 
+> > So IIUC we still need the unacct_blocks(), please kindly help double check.
+> 
+> I followed shmem_get_folio_gfp() error handling, and unless I missed
+> something we should have the same sequence with uffd.
+> 
+> In shmem_mfill_filemap_add() we increment both i_mapping->nrpages and
+> info->alloced in shmem_add_to_page_cache() and 
+> shmem_recalc_inode(inode, 1, 0) respectively.
+> 
+> Then in shmem_filemap_remove() the call to filemap_remove_folio()
+> decrements i_mapping->nrpages and shmem_recalc_inode(inode, 0, 0) will see
+> freed=1 and will call shmem_inode_unacct_blocks().
 
-Yeah, there's no way we can do this in general. It'll work for 99% of
-the MSRs on 99% of the systems for a long time. Then the one new system
-with WRMSRNS is going to have one hell of a heisenbug that'll take years
-off some poor schmuck's life.
+You're correct.  I guess I was misleaded by the comments above
+shmem_recalc_inode() when reading this part assuming it's only for the
+cases where nrpages changed behind the hood.. :)
 
-We should really encourage *new* code to use wrmsrns() when it can at
-least for annotation that it doesn't need serialization. But I don't
-think we should do anything to old, working code.
+I believe we need shmem_recalc_inode(inode, 0, 0) to make sure
+info->alloced is properly decremented, so shmem_inode_unacct_blocks()
+explicit calls will miss that otherwise due to the reordering of shmem
+accounting in this patch.
+
+It's slightly tricky on using these functions, I wonder if we want to
+mention them in the commit log, but I'm OK either way.
+
+Thanks for double checking!
+
+-- 
+Peter Xu
+
 
