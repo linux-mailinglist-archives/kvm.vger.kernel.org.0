@@ -1,111 +1,110 @@
-Return-Path: <kvm+bounces-71223-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71224-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qPQHGtSllWkQTAIAu9opvQ
-	(envelope-from <kvm+bounces-71223-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 12:43:16 +0100
+	id sBRkE92llWn4SwIAu9opvQ
+	(envelope-from <kvm+bounces-71224-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 12:43:25 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7101155F70
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 12:43:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A48DB155F7E
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 12:43:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3B2AC301DB80
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 11:42:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 385A83011BE7
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 11:43:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F143030DEAD;
-	Wed, 18 Feb 2026 11:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C4630DEAA;
+	Wed, 18 Feb 2026 11:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TPIrLBM/";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="TIGEIMYd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cnnm872S";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BIA2mk3v"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026802DCC1F
-	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 11:42:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3D82FFDD5
+	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 11:43:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771414977; cv=none; b=g7UjTJWlqt97KQe5n60S3suI9RNW0Tt4B2+rWZP7cQ5WBLVB7E+eo3sn5MtAc8EpBUNGJ7nLhVVHX3esN9jJBurTABusaRITEBxvCU4W96V0p/D9tXDcsSD7uXwTeWC0zfA6GsE585dqDpq+bUCEiaTjfArBc0B04P2daWMGS6I=
+	t=1771414986; cv=none; b=Dd6i09p8c+Fn266F9S5L4EUj63s0mt09C1ZBSIYrWZw8iDpF2HswwyPqPyPoLEyHQNOTC+qqlShS85XCP9gZDX5ql/b4LCngcbZbKQ+VXLHJubTvDj4n2ieemfLrCTYh4BloBeaXDjA/7YWa/+Dttf5Nf84rlDM7zKtPAWGDTzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771414977; c=relaxed/simple;
-	bh=VQs3X+IirTe7aXdM1voDtjvGyrOz3Ofo1DhUMefMY48=;
+	s=arc-20240116; t=1771414986; c=relaxed/simple;
+	bh=oELSwyTXYw+8KZm8yun1u/JNqIMCUhrtGc2xrlfVfWc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K5g8m6/6X08X9h+jjaRYdM+lRTQgnYjBEN0Ta6VAmo8vg3uL67c0H6+sG6D0e8Y/iINZGU34fVZe2KHhEhHpcrNaNahuwU9L6Me6rV8tM6goj8pM+p4qUWzErPQCVp4JMbTMoRMKkaevF22cCwe7OXfORdNeiv8f9VVgqd5C2Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TPIrLBM/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=TIGEIMYd; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=QOwIhlpyhkUmrPqPFZ3BUWLApxFwf8+fyrQ88t98lY7ZLcCnSywwRB2EoLtQEchAUQlpB0TA6GbMmVFeAJj1dBhJIu1HiyUvDNa81rdllqcAJH/9UwVcvB8JLhQh69rBW7cyTeRCuxjMmr8oP5MAJA9hmkajl4rDrDnz01HcvHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cnnm872S; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BIA2mk3v; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771414975;
+	s=mimecast20190719; t=1771414984;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=p3brC6j5MVPRsa373EQ1kn7FdyUiGI8z9lGD92Jf5HY=;
-	b=TPIrLBM/vr2j5L7BA8bWksieJJuudH+Qy6jfYh6srTCSSJTYlaQzNDhwwPjWqW37pBt6Of
-	zegUU+GJbD1dEWTgCAipmMp6RBw7dyqVIccTAbhzvZq0QNwbfuvZOv6Z1ifnZPzKAkiXy2
-	S6n3QQL02W1uOE7jnFMW+Gq/9u/+iC0=
+	bh=vfhdy46mQEUlcerqq6xzArv8NlC5Gx5+51xsaBuia6g=;
+	b=Cnnm872SjsAj2hQt+Y6DX3UU9I5432aGIuUVygOXFkR+Zlbm1aitZAxnzjBiyEZOMHSxyd
+	t808AFo2C8vWrF7N3tFs0+PUb6H3xqlFnmKXwDaq9bAfsVWdCoEN/brbxNIKKCIwTxPAFX
+	EUgqy7ueFkiFAYFDgP0N0DX3ZwLxbok=
 Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
  [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-562-qog37jE-P76rX9-AUC4SnA-1; Wed, 18 Feb 2026 06:42:53 -0500
-X-MC-Unique: qog37jE-P76rX9-AUC4SnA-1
-X-Mimecast-MFC-AGG-ID: qog37jE-P76rX9-AUC4SnA_1771414973
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2ab4de9580dso299178965ad.3
-        for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 03:42:53 -0800 (PST)
+ us-mta-624-_Fpx-7PIO_yAHkOk6xva5w-1; Wed, 18 Feb 2026 06:43:03 -0500
+X-MC-Unique: _Fpx-7PIO_yAHkOk6xva5w-1
+X-Mimecast-MFC-AGG-ID: _Fpx-7PIO_yAHkOk6xva5w_1771414982
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2aae146bab0so63746775ad.0
+        for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 03:43:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1771414973; x=1772019773; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1771414982; x=1772019782; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=p3brC6j5MVPRsa373EQ1kn7FdyUiGI8z9lGD92Jf5HY=;
-        b=TIGEIMYdvauTT/Ero0Giwv5PlZf//uN1MCVwjWUWBqUzuDJwb3ejzqtSW2exwJSrUt
-         gu0Jt/UDSmmSi9NIaSBBwN76+0LGPO6oLTvHsBA945PmH0SI74Xmzqe1akfGzOFFdGGi
-         xHW2JZ1jOFI2lKGSK0XiqMyzEixuVffTb4hBZWkHGeusFN+g8isunVQuEtF1+qJEvfhK
-         hjCYJwMF0BqRS1SsIdbuA7NJvr01OVkUA66AmJIi9ZbyM9bJZ0DeyBPqyoq4aAzOU4qP
-         UVfuzeTkDbIZXi0ANMiZDoN8EntcflttPBsWvyPB0xdaUbmi12iB87dJyrkuANAJH8mn
-         qwEw==
+        bh=vfhdy46mQEUlcerqq6xzArv8NlC5Gx5+51xsaBuia6g=;
+        b=BIA2mk3vM7y70X734Rt8Ag6+3MhjTBVUM4hZtPqWIIXNVnpJ2q9oApT5UkzxsXCjkp
+         3PxOLAya0oueQDcdMjfDrjz1ZzkGRnvb++nkuoqIlby0wB5FB203TNUz0lWLZ8IAFsqB
+         q/NuyuVB9mmf8tfCkC6A7GkaPevSrZetythR8kOIl2HFb3Qc9uSO/iUDTBp1MHuOKdyC
+         iPZD0QsvCOsxV3IBmVQk3E4U37YbZawyYtH+ElutH2U7Q/hD9RgG/addRI6AQUBBSZP/
+         BW1c+iSl4gNWtMNVB79z9eRzy/Uyyi5G4lUsHYpOsNk7DkIpErk8xn+eBc1oD1EJRepK
+         AY0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771414973; x=1772019773;
+        d=1e100.net; s=20230601; t=1771414982; x=1772019782;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=p3brC6j5MVPRsa373EQ1kn7FdyUiGI8z9lGD92Jf5HY=;
-        b=mlH54/8+tuWFYXquyC6t5SvnyIY/x1u90RFxHSVIiQhDxJZFrl5fw9UDLvUFxI7b64
-         a+m9ZssZLopAX6mOZtnnohxLWuK8rspzCrnwXpvjRdg1UY/CdJ5r4dQvVUsIAiS0ykK7
-         SY7AGzIw85M7KpxG9HSKuLnyuL/ftjuMc2GYz4OvdZtXVwpGfPE/ZkxK+xbstTwv7vtN
-         eURTB8gtSyEAJhI5Jksu0zwr5VWIn9IFehHDRYr2dtykjAGf1qH3cm33aiO1Odc+bvQu
-         ksTVBB0i9kJRQscmuJ2P16LQpyl3XtIGSuI1RbtSWBTzJE8c85SL3TRp0VQ/8Di+r6R8
-         /cJw==
-X-Forwarded-Encrypted: i=1; AJvYcCWy0A8bKkRC/dsIsZ6mLBinwtqtXVKbx3ElpQ6e/18F8oC8dpCkqlcWfYOK6P2fQbX0530=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKgO/HGn1jaAa49Bas25aiER75RRBmJEQGVkk4wb55A4r7QbZh
-	0Rl9lBgSmYq7Qpk2kvXhA0CtSrkkJXfwt1cxZdLuxgz4LwOJ/7wbDyq/j9R5PjywPeZ4xt+ZC+G
-	7+TTAphJ7dLchLF5fBINFns+/RfnBB8OOtNAbzljoLdXFtl6KckKF6g==
-X-Gm-Gg: AZuq6aJJ9v48b0O7wizeq//qdxZuyA2mXdHESpdcrWkjshMcbrGq7zE3xGPvebTmmJB
-	5Lvw3+7Nrn8FJUyYBcR4n8PSYaC0SOpyO+oMrDQGG3CWVUj8Dsj5lN3Fv0Vz+CQHdv1zlI55GwH
-	jMskUaKhcDl3zpGEq7T7EaJLgeRWEXset9Y46H3wPxbIfWPL/dkK1e51c5bChyX25rUNSDyurnX
-	Y9Yhd/HIODUXY4UL0bXzWpDiMakkV/IZ6ptgbX0ldV1ZTo2q6y9TI6F2f8kljj2sOTRMzzawnF3
-	K3ukF2Mhi2u40feArmOfVJOwm1hNo3NneinqVaFFTevsRc/j12J/zAkZZYksyY9BsEmI6VjdzmF
-	VfoXJauzzfbX+F+Nl3gL4GYJFL7XXlb8oJmyNIiZgVIQQz30WctZH
-X-Received: by 2002:a17:903:1b67:b0:2a0:c35c:572e with SMTP id d9443c01a7336-2ad17501af0mr153308265ad.30.1771414972858;
-        Wed, 18 Feb 2026 03:42:52 -0800 (PST)
-X-Received: by 2002:a17:903:1b67:b0:2a0:c35c:572e with SMTP id d9443c01a7336-2ad17501af0mr153308155ad.30.1771414972496;
-        Wed, 18 Feb 2026 03:42:52 -0800 (PST)
+        bh=vfhdy46mQEUlcerqq6xzArv8NlC5Gx5+51xsaBuia6g=;
+        b=iCexjmnshSFBq9laQLNeePpO9xZQhdPEMDyp+bf8T5NZbh7Yi5OgxDmkZ+sFgv/UQ1
+         bcrvUzHgQhcdKTRVXNf7WFkoVOEEQrHx21uhkrTEywaAIVyyxmqMAjP3Hvk0DhAnF2ZT
+         uiQb0tVFIRNDssVtThDqa59G74nQfO90NMeEb5Zw+x1JV7ZP7F5R7AXD5c2UalDWbB/j
+         BVCYKx54bKzg8hNT6oS2rtOf6mpBc5ScN+Ii5/cV/HyMzvuoUpWT4dczu5Rd+KAq7j0T
+         GhccS/dioaWa+RcCXfcofVjkqBMqXw372AqkMWBvfdsVtKe5en/JgERBQYCqaONfWFC2
+         Oc2w==
+X-Forwarded-Encrypted: i=1; AJvYcCVA7x2r6vXDQviqrrU1FOffKVqrzZmtIuGfb9I93fZ92O3R74ebCy2iRMjuY193TQRk9pM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOiylUOLwbiPVNV1TNhNpYQJqqKowF3MqKwvNU0/6eaUt9aItX
+	bC1eWqvkdI8HVuVIu/ANJMQUVSI8iQ7LfIMnx+g37IOQIvSDUG1vz9zlLQ3EBmTkrHI2hpsiKsR
+	3GkANdMqKPKziTm9F1TvYvvCt/SmAeZbTAVJXPHWSzoqs1DtDkWuCVQ==
+X-Gm-Gg: AZuq6aIuCMofEUiPCXuJnRUhIEhYf0XS8Ynxw19xjQq5CaSkUCQd1e68etz7EwHXKRS
+	dgSVRLpGEwZeyWde3HMB+RL3nSega2KYTR9HBHTCvbRNXFqHUM0/BV0BB1jPjw4gmM8PtIiIzZF
+	YE3BuBckIHI90872V4DNYKyP5MUZnmouYoyNNAzPsVJFuoF4R8lFSaKIykYy2tHFI+tpBB5YchI
+	EQFgUjrNOoXi/mXPDl1EaVbuoNtPq8qh94rwQpVP9oxwj1bzyz4wQZ1ha2hsorB1MsPzgrnkyiP
+	+tYaF2KysHxqibS3wTsukZRWsCLfv8UbJY+5e7p9b7q1wVzfFQURPhWHU1SvF9SJT4ukTNiSeZi
+	pWHG5cTWvpyR564+B5ilStTmpKgXCEdObf/Z2vXyf2/rt/fXBsI9M
+X-Received: by 2002:a17:902:d509:b0:29f:301a:f6cf with SMTP id d9443c01a7336-2ab505c056emr182651435ad.35.1771414981947;
+        Wed, 18 Feb 2026 03:43:01 -0800 (PST)
+X-Received: by 2002:a17:902:d509:b0:29f:301a:f6cf with SMTP id d9443c01a7336-2ab505c056emr182651275ad.35.1771414981518;
+        Wed, 18 Feb 2026 03:43:01 -0800 (PST)
 Received: from rhel9-box.lan ([117.99.83.54])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2ad1aaeab38sm127803425ad.82.2026.02.18.03.42.49
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2ad1aaeab38sm127803425ad.82.2026.02.18.03.42.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Feb 2026 03:42:52 -0800 (PST)
+        Wed, 18 Feb 2026 03:43:01 -0800 (PST)
 From: Ani Sinha <anisinha@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Cc: Ani Sinha <anisinha@redhat.com>,
-	kraxel@redhat.com,
+	Ani Sinha <anisinha@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>
+Cc: kraxel@redhat.com,
 	qemu-devel@nongnu.org,
 	kvm@vger.kernel.org
-Subject: [PATCH v5 02/34] accel/kvm: add confidential class member to indicate guest rebuild capability
-Date: Wed, 18 Feb 2026 17:11:55 +0530
-Message-ID: <20260218114233.266178-3-anisinha@redhat.com>
+Subject: [PATCH v5 05/34] accel/kvm: add changes required to support KVM VM file descriptor change
+Date: Wed, 18 Feb 2026 17:11:58 +0530
+Message-ID: <20260218114233.266178-6-anisinha@redhat.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20260218114233.266178-1-anisinha@redhat.com>
 References: <20260218114233.266178-1-anisinha@redhat.com>
@@ -120,147 +119,271 @@ X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71223-lists,kvm=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71224-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
 	FROM_NEQ_ENVFROM(0.00)[anisinha@redhat.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C7101155F70
+X-Rspamd-Queue-Id: A48DB155F7E
 X-Rspamd-Action: no action
 
-As a part of the confidential guest reset process, the existing encrypted guest
-state must be made mutable since it would be discarded after reset. A new
-encrypted and locked guest state must be established after the reset. To this
-end, a new boolean member per confidential guest support class
-(eg, tdx or sev-snp) is added that will indicate whether its possible to
-rebuild guest state:
-
-bool can_rebuild_guest_state;
-
-This is true if rebuilding guest state is possible, false otherwise.
-A KVM based confidential guest reset is only possible when
-the existing state is locked but its possible to rebuild guest state.
-Otherwise, the guest is not resettable.
+This change adds common kvm specific support to handle KVM VM file descriptor
+change. KVM VM file descriptor can change as a part of confidential guest reset
+mechanism. A new function api kvm_arch_on_vmfd_change() per
+architecture platform is added in order to implement architecture specific
+changes required to support it. A subsequent patch will add x86 specific
+implementation for kvm_arch_on_vmfd_change() as currently only x86 supports
+confidential guest reset.
 
 Signed-off-by: Ani Sinha <anisinha@redhat.com>
 ---
- include/system/confidential-guest-support.h | 20 ++++++++++++++++++++
- system/runstate.c                           |  6 +++---
- target/i386/kvm/tdx.c                       |  1 +
- target/i386/sev.c                           |  1 +
- 4 files changed, 25 insertions(+), 3 deletions(-)
+ MAINTAINERS            |  6 ++++
+ accel/kvm/kvm-all.c    | 80 ++++++++++++++++++++++++++++++++++++++++--
+ accel/kvm/trace-events |  1 +
+ include/system/kvm.h   |  3 ++
+ stubs/kvm.c            | 22 ++++++++++++
+ stubs/meson.build      |  1 +
+ target/i386/kvm/kvm.c  | 10 ++++++
+ 7 files changed, 120 insertions(+), 3 deletions(-)
+ create mode 100644 stubs/kvm.c
 
-diff --git a/include/system/confidential-guest-support.h b/include/system/confidential-guest-support.h
-index 0cc8b26e64..5dca717308 100644
---- a/include/system/confidential-guest-support.h
-+++ b/include/system/confidential-guest-support.h
-@@ -152,6 +152,11 @@ typedef struct ConfidentialGuestSupportClass {
-      */
-     int (*get_mem_map_entry)(int index, ConfidentialGuestMemoryMapEntry *entry,
-                              Error **errp);
-+
-+    /*
-+     * is it possible to rebuild the guest state?
-+     */
-+    bool can_rebuild_guest_state;
- } ConfidentialGuestSupportClass;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index d3aa6d6732..b0eb77c08f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -152,6 +152,12 @@ F: tools/i386/
+ F: tests/functional/i386/
+ F: tests/functional/x86_64/
  
- static inline int confidential_guest_kvm_init(ConfidentialGuestSupport *cgs,
-@@ -167,6 +172,21 @@ static inline int confidential_guest_kvm_init(ConfidentialGuestSupport *cgs,
++X86 VM file descriptor change on reset test
++M: Ani Sinha <anisinha@redhat.com>
++M: Paolo Bonzini <pbonzini@redhat.com>
++S: Maintained
++F: stubs/kvm.c
++
+ Guest CPU cores (TCG)
+ ---------------------
+ Overall TCG CPUs
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 0d8b0c4347..14729666a0 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2415,11 +2415,9 @@ void kvm_irqchip_set_qemuirq_gsi(KVMState *s, qemu_irq irq, int gsi)
+     g_hash_table_insert(s->gsimap, irq, GINT_TO_POINTER(gsi));
+ }
+ 
+-static void kvm_irqchip_create(KVMState *s)
++static void do_kvm_irqchip_create(KVMState *s)
+ {
+     int ret;
+-
+-    assert(s->kernel_irqchip_split != ON_OFF_AUTO_AUTO);
+     if (kvm_check_extension(s, KVM_CAP_IRQCHIP)) {
+         ;
+     } else if (kvm_check_extension(s, KVM_CAP_S390_IRQCHIP)) {
+@@ -2452,7 +2450,13 @@ static void kvm_irqchip_create(KVMState *s)
+         fprintf(stderr, "Create kernel irqchip failed: %s\n", strerror(-ret));
+         exit(1);
+     }
++}
+ 
++static void kvm_irqchip_create(KVMState *s)
++{
++    assert(s->kernel_irqchip_split != ON_OFF_AUTO_AUTO);
++
++    do_kvm_irqchip_create(s);
+     kvm_kernel_irqchip = true;
+     /* If we have an in-kernel IRQ chip then we must have asynchronous
+      * interrupt delivery (though the reverse is not necessarily true)
+@@ -2607,6 +2611,75 @@ static int kvm_setup_dirty_ring(KVMState *s)
      return 0;
  }
  
-+static inline bool
-+confidential_guest_can_rebuild_state(ConfidentialGuestSupport *cgs)
++static int kvm_reset_vmfd(MachineState *ms)
 +{
-+    ConfidentialGuestSupportClass *klass;
++    KVMState *s;
++    KVMMemoryListener *kml;
++    int ret = 0, type;
++    Error *err = NULL;
 +
-+    if (!cgs) {
-+        /* non-confidential guests */
-+        return true;
++    /*
++     * bail if the current architecture does not support VM file
++     * descriptor change.
++     */
++    if (!kvm_arch_supports_vmfd_change()) {
++        error_report("This target architecture does not support KVM VM "
++                     "file descriptor change.");
++        return -EOPNOTSUPP;
 +    }
 +
-+    klass = CONFIDENTIAL_GUEST_SUPPORT_GET_CLASS(cgs);
-+    return klass->can_rebuild_guest_state;
++    s = KVM_STATE(ms->accelerator);
++    kml = &s->memory_listener;
 +
++    memory_listener_unregister(&kml->listener);
++    memory_listener_unregister(&kvm_io_listener);
++
++    if (s->vmfd >= 0) {
++        close(s->vmfd);
++    }
++
++    type = find_kvm_machine_type(ms);
++    if (type < 0) {
++        return -EINVAL;
++    }
++
++    ret = do_kvm_create_vm(s, type);
++    if (ret < 0) {
++        return ret;
++    }
++
++    s->vmfd = ret;
++
++    kvm_setup_dirty_ring(s);
++
++    /* rebind memory to new vm fd */
++    ret = ram_block_rebind(&err);
++    if (ret < 0) {
++        return ret;
++    }
++    assert(!err);
++
++    ret = kvm_arch_on_vmfd_change(ms, s);
++    if (ret < 0) {
++        return ret;
++    }
++
++    if (s->kernel_irqchip_allowed) {
++        do_kvm_irqchip_create(s);
++    }
++
++    /* these can be only called after ram_block_rebind() */
++    memory_listener_register(&kml->listener, &address_space_memory);
++    memory_listener_register(&kvm_io_listener, &address_space_io);
++
++    /*
++     * kvm fd has changed. Commit the irq routes to KVM once more.
++     */
++    kvm_irqchip_commit_routes(s);
++    trace_kvm_reset_vmfd();
++    return ret;
 +}
 +
- static inline int confidential_guest_kvm_reset(ConfidentialGuestSupport *cgs,
-                                                Error **errp)
+ static int kvm_init(AccelState *as, MachineState *ms)
  {
-diff --git a/system/runstate.c b/system/runstate.c
-index d091a2bddd..13f32bed8c 100644
---- a/system/runstate.c
-+++ b/system/runstate.c
-@@ -57,6 +57,7 @@
- #include "system/reset.h"
- #include "system/runstate.h"
- #include "system/runstate-action.h"
-+#include "system/confidential-guest-support.h"
- #include "system/system.h"
- #include "system/tpm.h"
- #include "trace.h"
-@@ -543,8 +544,6 @@ void qemu_system_reset(ShutdownCause reason)
-      */
-     if (cpus_are_resettable()) {
-         cpu_synchronize_all_post_reset();
--    } else {
--        assert(runstate_check(RUN_STATE_PRELAUNCH));
-     }
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
+@@ -4015,6 +4088,7 @@ static void kvm_accel_class_init(ObjectClass *oc, const void *data)
+     AccelClass *ac = ACCEL_CLASS(oc);
+     ac->name = "KVM";
+     ac->init_machine = kvm_init;
++    ac->rebuild_guest = kvm_reset_vmfd;
+     ac->has_memory = kvm_accel_has_memory;
+     ac->allowed = &kvm_allowed;
+     ac->gdbstub_supported_sstep_flags = kvm_gdbstub_sstep_flags;
+diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
+index e43d18a869..e4beda0148 100644
+--- a/accel/kvm/trace-events
++++ b/accel/kvm/trace-events
+@@ -14,6 +14,7 @@ kvm_destroy_vcpu(int cpu_index, unsigned long arch_cpu_id) "index: %d id: %lu"
+ kvm_park_vcpu(int cpu_index, unsigned long arch_cpu_id) "index: %d id: %lu"
+ kvm_unpark_vcpu(unsigned long arch_cpu_id, const char *msg) "id: %lu %s"
+ kvm_irqchip_commit_routes(void) ""
++kvm_reset_vmfd(void) ""
+ kvm_irqchip_add_msi_route(char *name, int vector, int virq) "dev %s vector %d virq %d"
+ kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
+ kvm_irqchip_release_virq(int virq) "virq %d"
+diff --git a/include/system/kvm.h b/include/system/kvm.h
+index 8f9eecf044..5fc7251fd9 100644
+--- a/include/system/kvm.h
++++ b/include/system/kvm.h
+@@ -456,6 +456,9 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram_addr,
  
-     vm_set_suspended(false);
-@@ -697,7 +696,8 @@ void qemu_system_reset_request(ShutdownCause reason)
-     if (reboot_action == REBOOT_ACTION_SHUTDOWN &&
-         reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
-         shutdown_requested = reason;
--    } else if (!cpus_are_resettable()) {
-+    } else if (!cpus_are_resettable() &&
-+               !confidential_guest_can_rebuild_state(current_machine->cgs)) {
-         error_report("cpus are not resettable, terminating");
-         shutdown_requested = reason;
-     } else {
-diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
-index 0161985768..a3e81e1c0c 100644
---- a/target/i386/kvm/tdx.c
-+++ b/target/i386/kvm/tdx.c
-@@ -1543,6 +1543,7 @@ static void tdx_guest_class_init(ObjectClass *oc, const void *data)
-     X86ConfidentialGuestClass *x86_klass = X86_CONFIDENTIAL_GUEST_CLASS(oc);
+ #endif /* COMPILING_PER_TARGET */
  
-     klass->kvm_init = tdx_kvm_init;
-+    klass->can_rebuild_guest_state = true;
-     x86_klass->kvm_type = tdx_kvm_type;
-     x86_klass->cpu_instance_init = tdx_cpu_instance_init;
-     x86_klass->adjust_cpuid_features = tdx_adjust_cpuid_features;
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index acdcb9c4e6..66e38ca32e 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -2760,6 +2760,7 @@ sev_common_instance_init(Object *obj)
-     cgs->set_guest_state = cgs_set_guest_state;
-     cgs->get_mem_map_entry = cgs_get_mem_map_entry;
-     cgs->set_guest_policy = cgs_set_guest_policy;
-+    cgs->can_rebuild_guest_state = true;
++bool kvm_arch_supports_vmfd_change(void);
++int kvm_arch_on_vmfd_change(MachineState *ms, KVMState *s);
++
+ void kvm_cpu_synchronize_state(CPUState *cpu);
  
-     QTAILQ_INIT(&sev_common->launch_vmsa);
+ void kvm_init_cpu_signals(CPUState *cpu);
+diff --git a/stubs/kvm.c b/stubs/kvm.c
+new file mode 100644
+index 0000000000..2db61d89a7
+--- /dev/null
++++ b/stubs/kvm.c
+@@ -0,0 +1,22 @@
++/*
++ * kvm target arch specific stubs
++ *
++ * Copyright (c) 2026 Red Hat, Inc.
++ *
++ * Author:
++ *   Ani Sinha <anisinha@redhat.com>
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#include "qemu/osdep.h"
++#include "system/kvm.h"
++
++int kvm_arch_on_vmfd_change(MachineState *ms, KVMState *s)
++{
++    abort();
++}
++
++bool kvm_arch_supports_vmfd_change(void)
++{
++    return false;
++}
+diff --git a/stubs/meson.build b/stubs/meson.build
+index 8a07059500..6ae478bacc 100644
+--- a/stubs/meson.build
++++ b/stubs/meson.build
+@@ -74,6 +74,7 @@ if have_system
+   if igvm.found()
+     stub_ss.add(files('igvm.c'))
+   endif
++  stub_ss.add(files('kvm.c'))
+   stub_ss.add(files('target-get-monitor-def.c'))
+   stub_ss.add(files('target-monitor-defs.c'))
+   stub_ss.add(files('win32-kbd-hook.c'))
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 6d823a7991..a4e18734b1 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -3389,6 +3389,16 @@ static int kvm_vm_enable_energy_msrs(KVMState *s)
+     return 0;
  }
+ 
++int kvm_arch_on_vmfd_change(MachineState *ms, KVMState *s)
++{
++    abort();
++}
++
++bool kvm_arch_supports_vmfd_change(void)
++{
++    return false;
++}
++
+ int kvm_arch_init(MachineState *ms, KVMState *s)
+ {
+     int ret;
 -- 
 2.42.0
 
