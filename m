@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-71291-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71290-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gI5GAKFHlmmCdQIAu9opvQ
-	(envelope-from <kvm+bounces-71291-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 00:13:37 +0100
+	id 0EufMAlHlmmCdQIAu9opvQ
+	(envelope-from <kvm+bounces-71290-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 00:11:05 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4693A15AD5F
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 00:13:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DA5815AD22
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 00:11:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 660A130A0121
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 23:10:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5E720305BBA3
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 23:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9BB33B6F5;
-	Wed, 18 Feb 2026 23:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1CE33B6DA;
+	Wed, 18 Feb 2026 23:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FPB5h3Ne"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CRoEgNIU"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E8533A9F4
-	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 23:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F26DD33AD87
+	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 23:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771456218; cv=none; b=uCBZXcuTcmGvMc2wi5lJhhzuW22CxrO/NyfrnxUmDBwOSdSfE60x/JdTQmLAxYpottHqYuxAyX6XybzLnrooQq5jdi7Y3L05CXfRkVAyunJ5Z7IdIQEQuDznT1PKd+MQDMzAceX0C+VtS7mczD03Q57MC8OaqGbDyZhCNSSOA0o=
+	t=1771456218; cv=none; b=f2RS8XNrj81VSWw/sUMArj7ilfxobiIIoTBVsllYGLs+jTW+oJizsd22O+sQ5KTSN8beEuGtPM2u+7ny1Y+4eYj5weieTV8NVX6GP1CM4ooDByJv90ojgf7NsD39kKhKA4XVS/e6cIoikWdOGt4pUGBOA6RwusHqC/WG1HwGPEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1771456218; c=relaxed/simple;
-	bh=6FyplMM1/1R9SGHEATi52jcFIHbZhtgrlM8MlbeHBx0=;
+	bh=SGgvqiKaZL5fy2IkUdFKlk/TZFrV5osOdE55bpdVgKE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FtQ4MA+MhNxqBKRlUtcLd3yXXIeZhbxuuYy6DrgjOu1VmYHevEtBgUZwSh6ezaMo390/prSVgqDb7sCHjmjdvHOm6PYf6Ogcwq/eVLnB5/x4RecFMLq916tgAQ1PYFXCfDIOVg+bTB5We9ZSLcgFSPxzLS4vJlz63ihR/g4qm14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FPB5h3Ne; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=qKSXkxS0ePOJ2NjySLboSBk+56iHVpsG5fvOwwKTbus5doqTzZWsYz/eIL1ebKfQTR/LS4JL1ITONIV5RvJvVRl3zly6qivmgK/S2/AeUtXnn1FoM+ltrOEw9ol4wStvF5DBcvu/ObQXAGrRux+9obMVp6TPHUYRoXl28e6BOVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CRoEgNIU; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-354c0234c1fso255465a91.2
-        for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 15:10:11 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35449510446so238709a91.0
+        for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 15:10:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771456211; x=1772061011; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771456213; x=1772061013; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=CwBzC8ApcuV0uoozPZcU/zrvhWxwiR2ykbpvaueWHXY=;
-        b=FPB5h3Ne1Wu3a58F+GMnDsHUPKHA0LHBfe5X9pbcl0K6mNNoqe+c8lCeoxrvdo3gx2
-         MiKOsoKJksbqsuNnfgJn/W+BLPsfVdGjdhPtIlIMeqB82zXDnLljyuRFstdKrobP2tfL
-         vp67Gw4NuU09Pevjrf+yAYP9yAH7NcGH2rpeOMLIiSPatpkof+mMXN2bwK6wQn53EuKq
-         IOPmbmvNqJLAmEUdl00eN9p6ZrxxdE6jcVz+uyh7kQ1ywimr2HPBJ+RIeOdIJq/mZG+H
-         Zs3/C67qP3L/4YXlxR43w97LvAk0iBb98RzBsSduhnuQIyWBgEdjNoOpOrGIeP5V5hWt
-         uwoA==
+        bh=sPuks5BJ8BXEbVY+ZQQ2OY9oHJAsuNn824AR4ziLnKk=;
+        b=CRoEgNIU7UU3Gq/lBekzviYXCjo16LZESkMPzzIPRBesCQff1CJ/jBVs1yf0HULCX1
+         Pjx/2bCkPmcuYZU+wiABCJJbVwgGwRCltAz9zsZjs3G/TiDmu3MzM5amDnx0V8uymk5D
+         C/FEtqKPcbXyw0HPbz4NMzqzYDSJBL/qdAEYUdeaqKEPebbpw75oJRbTRpP3/a9B47mH
+         x/YLyAcIC4sjThuDy1HWCvWS5yx9MVUzqbHCzHqiSrdjknWVnORQfrjm/CdTBg0uZnuJ
+         dWOlrfDU8jowNmGr2R4670UQYvTPoBciSN94hKr6fK0s6wjpUV3lD0MUzVWWEdg+yZ3d
+         i7Xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771456211; x=1772061011;
+        d=1e100.net; s=20230601; t=1771456213; x=1772061013;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=CwBzC8ApcuV0uoozPZcU/zrvhWxwiR2ykbpvaueWHXY=;
-        b=WIdAbLGODhOOSgQkJkPQX4PRmwcHpkf12iADiclSW3XNOu7ytVLoE9sM3hQjexgSBr
-         BEdRKYY5w9Uq4sjwDjrPlviA1BN1rwtf0Yf8CG9/MMVC46+OLrdIKmesG4naw+3n0Z2q
-         2osAcsHSKZ4+mT9rnPUvNjbXymCGs35QN2rGpgKajdCRttiE/EsxqDjgXRsx4DlGpk5Q
-         Hk9aqzquzPcYTYxgFbSlXMJ6mFpOxbguQMTEeHMO8awePafRsMcvgrNMCag7sfP1g++p
-         Vsnxn1ybQbmaIaw/Mxkg5lA4sEG9wpj5Fo1di7yiJJYYFdMfCujQSjjTxQ9aK9+2LYy+
-         lQUg==
-X-Gm-Message-State: AOJu0YwmguWRi6mIfEKNpXtLA7srnwffS1TsdOIX+bRmQitmHXDsS+1I
-	KpOquF3ORCOJfW9JaUXOd/Bg3Go5yYK6ot2hloWTHgKOcHNxo1IkGBVzYIB/ZyMb1NfxVfG64q8
-	Oqjin9w==
-X-Received: from pjph2.prod.google.com ([2002:a17:90a:9c02:b0:351:c17:c7b9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3cd:b0:356:3ba2:1233
- with SMTP id 98e67ed59e1d1-35844f9bf1dmr8741212a91.22.1771456210724; Wed, 18
- Feb 2026 15:10:10 -0800 (PST)
+        bh=sPuks5BJ8BXEbVY+ZQQ2OY9oHJAsuNn824AR4ziLnKk=;
+        b=TSzkgqDsOvd0bVwQrpSLA50mce9szhq5+zZxVaeMDoSxwtnZL0nGCB+v7GjZZEMj+p
+         SBW+MA+5vk8upvEQuUc5LvNE3lJrQ3hiEpgRIHYc83axUhwMHsOKWrkkDJZSwZoDAp7k
+         74N/CAcrlRzaRsbI6w1nNTynAuXzWTypi/AXT+0FIEsSxO9W4XsLtNLWTNqGEUBCvJGa
+         Sk3ACKKnZQ+cjqQVp1esu25G8dASkiBHN7FLjDFHS2ueE5VCswvzjlgC0q6nElY2nFkQ
+         jPoZEKuiyQRvsDVR75wvXwMMxjniC5GEin28+rx9ddzfMa2EOmnrYzsW8vBcMiwq5KnK
+         bLNA==
+X-Gm-Message-State: AOJu0YweByl7zu2m4056x1zaHvGb6FjRhPzrtzM+FyxFTYXs6NLnZFBC
+	XSTRSNG9ycg7y+hw9ZWlX6+rYqJ89diWxVN2qcnIgAHgLf49CXrcDD+mmU/4egRpEvr73H+zst3
+	nqj8FBw==
+X-Received: from pjbnw3.prod.google.com ([2002:a17:90b:2543:b0:356:1dfc:2560])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:33c3:b0:34e:630c:616c
+ with SMTP id 98e67ed59e1d1-358891cba4cmr2470562a91.31.1771456212515; Wed, 18
+ Feb 2026 15:10:12 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 18 Feb 2026 15:09:55 -0800
+Date: Wed, 18 Feb 2026 15:09:56 -0800
 In-Reply-To: <20260218230958.2877682-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -77,8 +77,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260218230958.2877682-1-seanjc@google.com>
 X-Mailer: git-send-email 2.53.0.345.g96ddfc5eaa-goog
-Message-ID: <20260218230958.2877682-6-seanjc@google.com>
-Subject: [PATCH v2 5/8] KVM: nSVM: Use intuitive local variables in nested_vmcb02_recalc_intercepts()
+Message-ID: <20260218230958.2877682-7-seanjc@google.com>
+Subject: [PATCH v2 6/8] KVM: nSVM: Use vmcb12_is_intercept() in nested_sync_control_from_vmcb02()
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -91,18 +91,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71291-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71290-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -113,112 +113,34 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_FIVE(0.00)[5];
 	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: 4693A15AD5F
+X-Rspamd-Queue-Id: 7DA5815AD22
 X-Rspamd-Action: no action
 
-Now that nested_vmcb02_recalc_intercepts() is explicitly scoped to deal
-with *only* recalculating vmcb02 intercepts, rename its local variables to
-use more intuivite names.  The current "c", "h", and "g" local variables,
-for the current VMCB, vmcb01, and (cached) vmcb12 respectively, are short
-and sweet, but don't do much to help unfamiliar readers understand what
-the code is doing.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
 
-Use vmcb12_ctrl/vmcb01/vmcb02/vmcb12_ctrl in lieu of c/h/g to make it clear
-the function is updating intercepts in vmcb02 based on the intercepts in
-vmcb01 and (cached) vmcb12.
-
-Opportunistically change the existing WARN_ON to a WARN_ON_ONCE so that a
-KVM bug doesn't unintentionally DoS the host.
+Use vmcb12_is_intercept() instead of open-coding the intercept check.
 
 No functional change intended.
 
 Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-[sean: use WARN_ON_ONCE, keep local vmcb12 cache as vmcb12_ctrl]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/nested.c | 35 ++++++++++++++++-------------------
- 1 file changed, 16 insertions(+), 19 deletions(-)
+ arch/x86/kvm/svm/nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index e8512de5aef7..bda2d6d613c9 100644
+index bda2d6d613c9..bbb8dfc9979b 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -124,23 +124,20 @@ static bool nested_vmcb_needs_vls_intercept(struct vcpu_svm *svm)
- 
- void nested_vmcb02_recalc_intercepts(struct vcpu_svm *svm)
- {
--	struct vmcb_control_area *c, *h;
--	struct vmcb_ctrl_area_cached *g;
-+	struct vmcb_ctrl_area_cached *vmcb12_ctrl = &svm->nested.ctl;
-+	struct vmcb *vmcb02 = svm->nested.vmcb02.ptr;
-+	struct vmcb *vmcb01 = svm->vmcb01.ptr;
- 	unsigned int i;
- 
--	if (WARN_ON_ONCE(svm->vmcb != svm->nested.vmcb02.ptr))
-+	if (WARN_ON_ONCE(svm->vmcb != vmcb02))
- 		return;
- 
--	vmcb_mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
--
--	c = &svm->vmcb->control;
--	h = &svm->vmcb01.ptr->control;
--	g = &svm->nested.ctl;
-+	vmcb_mark_dirty(vmcb02, VMCB_INTERCEPTS);
- 
- 	for (i = 0; i < MAX_INTERCEPT; i++)
--		c->intercepts[i] = h->intercepts[i];
-+		vmcb02->control.intercepts[i] = vmcb01->control.intercepts[i];
- 
--	if (g->int_ctl & V_INTR_MASKING_MASK) {
-+	if (vmcb12_ctrl->int_ctl & V_INTR_MASKING_MASK) {
- 		/*
- 		 * If L2 is active and V_INTR_MASKING is enabled in vmcb12,
- 		 * disable intercept of CR8 writes as L2's CR8 does not affect
-@@ -151,9 +148,9 @@ void nested_vmcb02_recalc_intercepts(struct vcpu_svm *svm)
- 		 * the effective RFLAGS.IF for L1 interrupts will never be set
- 		 * while L2 is running (L2's RFLAGS.IF doesn't affect L1 IRQs).
- 		 */
--		vmcb_clr_intercept(c, INTERCEPT_CR8_WRITE);
--		if (!(svm->vmcb01.ptr->save.rflags & X86_EFLAGS_IF))
--			vmcb_clr_intercept(c, INTERCEPT_VINTR);
-+		vmcb_clr_intercept(&vmcb02->control, INTERCEPT_CR8_WRITE);
-+		if (!(vmcb01->save.rflags & X86_EFLAGS_IF))
-+			vmcb_clr_intercept(&vmcb02->control, INTERCEPT_VINTR);
- 	}
- 
- 	/*
-@@ -161,14 +158,14 @@ void nested_vmcb02_recalc_intercepts(struct vcpu_svm *svm)
- 	 * flush feature is enabled.
+@@ -530,7 +530,7 @@ void nested_sync_control_from_vmcb02(struct vcpu_svm *svm)
+ 	 * int_ctl (because it was never recognized while L2 was running).
  	 */
- 	if (!nested_svm_l2_tlb_flush_enabled(&svm->vcpu))
--		vmcb_clr_intercept(c, INTERCEPT_VMMCALL);
-+		vmcb_clr_intercept(&vmcb02->control, INTERCEPT_VMMCALL);
+ 	if (svm_is_intercept(svm, INTERCEPT_VINTR) &&
+-	    !test_bit(INTERCEPT_VINTR, (unsigned long *)svm->nested.ctl.intercepts))
++	    !vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_VINTR))
+ 		mask &= ~V_IRQ_MASK;
  
- 	for (i = 0; i < MAX_INTERCEPT; i++)
--		c->intercepts[i] |= g->intercepts[i];
-+		vmcb02->control.intercepts[i] |= vmcb12_ctrl->intercepts[i];
- 
- 	/* If SMI is not intercepted, ignore guest SMI intercept as well  */
- 	if (!intercept_smi)
--		vmcb_clr_intercept(c, INTERCEPT_SMI);
-+		vmcb_clr_intercept(&vmcb02->control, INTERCEPT_SMI);
- 
- 	if (nested_vmcb_needs_vls_intercept(svm)) {
- 		/*
-@@ -176,10 +173,10 @@ void nested_vmcb02_recalc_intercepts(struct vcpu_svm *svm)
- 		 * we must intercept these instructions to correctly
- 		 * emulate them in case L1 doesn't intercept them.
- 		 */
--		vmcb_set_intercept(c, INTERCEPT_VMLOAD);
--		vmcb_set_intercept(c, INTERCEPT_VMSAVE);
-+		vmcb_set_intercept(&vmcb02->control, INTERCEPT_VMLOAD);
-+		vmcb_set_intercept(&vmcb02->control, INTERCEPT_VMSAVE);
- 	} else {
--		WARN_ON(!(c->virt_ext & VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK));
-+		WARN_ON_ONCE(!(vmcb02->control.virt_ext & VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK));
- 	}
- }
- 
+ 	if (nested_vgif_enabled(svm))
 -- 
 2.53.0.345.g96ddfc5eaa-goog
 
