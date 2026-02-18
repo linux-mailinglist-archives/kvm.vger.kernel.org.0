@@ -1,106 +1,89 @@
-Return-Path: <kvm+bounces-71273-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71274-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WIzwAswplmnUbgIAu9opvQ
-	(envelope-from <kvm+bounces-71273-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 22:06:20 +0100
+	id oM03N14qlmkRbwIAu9opvQ
+	(envelope-from <kvm+bounces-71274-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 22:08:46 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75034159C6B
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 22:06:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46CB7159C7C
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 22:08:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D58ED303277C
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 21:06:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DFA743041785
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 21:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDD93491C4;
-	Wed, 18 Feb 2026 21:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519DE34A789;
+	Wed, 18 Feb 2026 21:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i+hwrXFy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cPYwEcoe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A873385AA
-	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 21:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A80321445
+	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 21:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771448770; cv=none; b=M2wzcHQB9PCeVFBK62N79Jn7zN/9rMFanwv3lfk0BiuCkPFxRkrQlxGA+ODO593cKsV5nB7wYjx1KzWT6RUyoXLuwm+q1FC5cIzo5iSDX4R28t47s/4wF5Cnal+jF72S4tOn8RQ4Ui4ApF6Yl8bNcGS4eFsR0gnPnlEZcsT2GYY=
+	t=1771448905; cv=none; b=Lf9fjbJvkRfLKjqi+wJndb3QkWFUv9FPT9/ykzQSlBbAy4hICTOqdT7MMmwfWaWlDXuzqjmpUyKkGfQZE/f2J+epbMf352s/FQDewIjb6BRQF+B9HjZ9D5jjev1ob+1vDnMyajhj1WAdpzlwz2WomaDvJeuKONjEB/0vTk2y4I0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771448770; c=relaxed/simple;
-	bh=hZ+rjhElxgLGmkoWnG0q2kPevdexQ7E+7PhYwWYUAmQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gBhoPVsH5++tILsYaIZjyQ3O6vz1LismdCiMqdKKX1eewY7hLSng4AKlx7Run7FjGqs7miwNNEtWzRDClxkAZKAIFZ6mS5NTFIfq48APo91Bu6OJoFWlrlX4scpJCEm590ukMQ9wivR3TlRCEGP5F2jJriEoyVBiz+fo7DimWkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i+hwrXFy; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1771448905; c=relaxed/simple;
+	bh=yLwfb23qneQ17+KcyrsMlq4Ia8MemXqZ860cY5RxEnI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sajxqjSm4TvXcmNvu/9qXs+b0UBk7NgwYMk30+EusG3l7H8Qfvu0LsULQp43tSqVcfB3kcAqb9FtWwpGsvmfGMcE+0DPT4I3yc+v2sui0a5wUtZ+N0bndgfzhl4xYErLisc3aSA+4fZUaJ7eHKO8XVmM7/scwkQ/y9+nCa6r9HY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cPYwEcoe; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3562692068aso1089099a91.1
-        for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 13:06:09 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a77040ede0so2005085ad.2
+        for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 13:08:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771448769; x=1772053569; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ccWJDzJ7m4S4l+nz4VuzRpZZrXnjyW9kyBaNIifc8MY=;
-        b=i+hwrXFy7K9Dma6gqq3vKwNIP1genuzLTn9lSNY3FuhlGgOslftjvFVXSdl8OUQDdw
-         OWZgpnnT/6sxexGtpgrzZK+8lITGHj/KDdWj881OD3mDKKFIu2ZWxOWScvhLQQywW4n8
-         xcN6w575Srh5+Mev2XzQIc8uLhZPJxkplqO6wEI2VQqKo55VFiJHQe8buyl7b4qqUYsz
-         cViDaB/qFiyT+sRlf54u/SsTlP/mhPk+w7ldEByb+697iacYknb0mPG9iEDTLA2Aze53
-         WaGjZHf8mOuUFw9c8a0spmAP7HYLwfrgcaD7gy/4ey/TaQt82ASx1W9dZn9GbxF9uoR4
-         7/fw==
+        d=google.com; s=20230601; t=1771448903; x=1772053703; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yMfKcLi903KmsmaeWQNJHAt3zeCXijek5HgaZQMpTfU=;
+        b=cPYwEcoefNxdokILXJdEluXf3UtcecUsYqTp4M9oAElUbFkql2VA/1PDWqO7nN5YxJ
+         mO3spxpa8wyI4UNTiM5a5kzYRFrss8SWAfkZpaFaNHxZeSEXZ3kbG7na5IeZRreOmfhH
+         +5Z0SsWdytBc70tO5ZWGNQh5a64b8VcqF5SZr7oDi/hvkBW99fRQ6atUw4j6goYQd1BK
+         Tp+sywEz2K+XijHnqnjYa7HrdwI5trGGby033sdC04LcqggFsjyvLzPcnKSeKfvXfnQd
+         KXrUyy+Im0WhXJ7h2SWsYdaF3Wa7RSdnWU525S2smGYGVfFbW2QpSKm/+BLhlbnIgqhG
+         Bc5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771448769; x=1772053569;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ccWJDzJ7m4S4l+nz4VuzRpZZrXnjyW9kyBaNIifc8MY=;
-        b=TC6qc84waz5UddASQS5jJhOcA2oMTTalYucqpWi8BDBSziNPL2F5QwHURp4tlJrR03
-         bce51lZaRg/fQaEuzBvBLJg2ZqJv3GySJBFbeQR+8KqwqKmJ2NPrF+wq/ws7gEWFYvk5
-         JrkLIdEs1iL/ol6/8VlAwVA3TdY5LulyDc0OvlzTxGXE2KiIfFaOGrQ5UzGjFNk6AvY2
-         Mqd/HJWnYS/Iw6JJDosaseIwXD6OclawF27xzrWoBZvMa3NGNRFdUWsUpqHrT/ADxrT+
-         j2BdrPZq+FPmZjaNSrptTg5mTBnmr2b5OKe+qnB3BDfMcMPp2eBGDsjJd15YQOl67DuL
-         1Bjg==
-X-Forwarded-Encrypted: i=1; AJvYcCUChoLlrFD+bkclhRduYIyHz9Q2LsSm0oAHQ954ND0EtL+/ceIihSAyMO5D+s2NA4lUnUs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMaN8tIiO+avQc3qjKUrn5jRIz/3l/FmNbaBjLxHwXJ5wUXCZq
-	clkZCbgEwEncLWl0UX/OwPdHKQZHvBYZXB2qjqCJ69Wh4320ySFsgtsR8aeTRleHMZoJTe+M7nu
-	/YWxhFw==
-X-Received: from pjbne18.prod.google.com ([2002:a17:90b:3752:b0:356:1da4:5dd1])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5584:b0:34a:c671:50df
- with SMTP id 98e67ed59e1d1-35888d58b61mr2639291a91.17.1771448768639; Wed, 18
- Feb 2026 13:06:08 -0800 (PST)
-Date: Wed, 18 Feb 2026 13:06:07 -0800
-In-Reply-To: <CALzav=fN4FpZsfzwbdLeNSj4nx4OpRkwHvKiZNVgP8S-zsUvJA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1771448903; x=1772053703;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yMfKcLi903KmsmaeWQNJHAt3zeCXijek5HgaZQMpTfU=;
+        b=c7fJF3ETvUmK67mdsZumW0UfRBxFyhfOeb1ToxvWgSk7f4IDkcW4jFaDcQ8bQCrwpe
+         2HtxQbZKmE4teDsmX9l8FryF/REEWDqshqYek0YP9AB+TqLq8uhp0HoBNFtEd5q3fgbS
+         9A0ZBvYRoR/n/vF5w8EwAUUHr4JB6KrcI6afYd+2yqu7yvj5eGt0PnYUzwV8VxEk4qYT
+         7vaUQLVbjBGBY31F8pjZL2n29/h6A5AtdCVrcqbCdpu4s6tKWh3uH+XM32flSzbHrBsD
+         iHU+PUKyPxQGVxtM+sM8rj4G9vtJmfzQgobi3MfqKpLbWFCM3K4XYMZqApBmz7ySA5mo
+         m4IA==
+X-Gm-Message-State: AOJu0YwAu0c2uW4lPSdB3/+q4ZAOqCb3Jykxfz4kKexhE+9pd6Su/XTt
+	v3b+iHk+SpPylZnzhdM+K4U6OTFlVV4s8leGh/+mRsg89ipfm0ZREMmkph9Gox3tFz4p2J+sZCa
+	PSVci5g==
+X-Received: from plim13.prod.google.com ([2002:a17:903:3b4d:b0:2a0:d5bf:714e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:384f:b0:2a0:a33f:3049
+ with SMTP id d9443c01a7336-2ad50e75799mr28433235ad.4.1771448903199; Wed, 18
+ Feb 2026 13:08:23 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Wed, 18 Feb 2026 13:08:20 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250501183304.2433192-1-dmatlack@google.com> <aBPhs39MJz-rt_Ob@google.com>
- <CALzav=eqv0Fh9pzaBgjZ-fehwFbD4YscoLQz0=o0TKQT_zLTwQ@mail.gmail.com>
- <aRZ9SQ_G2lsmXtur@google.com> <CALzav=fN4FpZsfzwbdLeNSj4nx4OpRkwHvKiZNVgP8S-zsUvJA@mail.gmail.com>
-Message-ID: <aZYpv6O15YMlGkzT@google.com>
-Subject: Re: [PATCH 00/10] KVM: selftests: Convert to kernel-style types
+X-Mailer: git-send-email 2.53.0.345.g96ddfc5eaa-goog
+Message-ID: <20260218210820.2828896-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86/mmu: Don't zero-allocate page table used for
+ splitting a hugepage
 From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, Eric Auger <eric.auger@redhat.com>, 
-	James Houghton <jthoughton@google.com>, Colin Ian King <colin.i.king@gmail.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Kai Huang <kai.huang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
@@ -109,59 +92,57 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71273-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,kernel.org,linux.dev,arm.com,huawei.com,brainfault.org,atishpatra.org,sifive.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,linux.ibm.com,ventanamicro.com,intel.com,google.com,gmail.com,vger.kernel.org,lists.infradead.org,lists.linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[28];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71274-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	HAS_REPLYTO(0.00)[seanjc@google.com];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 75034159C6B
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[6];
+	REPLYTO_EQ_FROM(0.00)[]
+X-Rspamd-Queue-Id: 46CB7159C7C
 X-Rspamd-Action: no action
 
-On Wed, Dec 03, 2025, David Matlack wrote:
-> On Thu, Nov 13, 2025 at 4:52=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> > My slowness is largely because I'm not sure how to land/approach this. =
- I'm 100%
-> > in favor of the renames, it's the timing and coordination I'm unsure of=
-.
-> >
-> > In hindsight, it probably would have best to squeeze it into 6.18, so a=
-t least
-> > the most recent LTS wouldn't generate conflicts all over the place.  Th=
-e next
-> > best option would probably be to spin a new version, bribe Paolo to app=
-ly it at
-> > the end of the next merge window, and tag the whole thing for stable@ (=
-maybe
-> > limited to 6.18+?) to minimize downstream pain.
->=20
-> With LPC coming up I won't have cycles to post a new version before
-> the 6.19 merge window closes.
->=20
-> I'm tempted to say let's just wait for the next LTS release and merge
-> it in then. This is low priorit, so I'm fine with waiting.
+When splitting hugepages in the TDP MMU, don't zero the new page table on
+allocation since tdp_mmu_split_huge_page() is guaranteed to write every
+entry and thus every byte.
 
-I ran this by Paolo in last week's PUCK, and he's in favor of the renames (=
-or at
-least, is a-ok with us doing it).  If you can prep a new version in the nex=
-t week
-or so, we can get it applied for 7.1 shortly after the merge window closes.
+Unless someone peeks at the memory between allocating the page table and
+writing the child SPTEs, no functional change intended.
 
-We don't send all that many selftests patches to LTS kernels, so IMO it's n=
-ot
-worth waiting for the next LTS to come around.
+Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Kai Huang <kai.huang@intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 9c26038f6b77..7b1102d26f9c 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1507,7 +1507,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(void)
+ 	if (!sp)
+ 		return NULL;
+ 
+-	sp->spt = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
++	sp->spt = (void *)__get_free_page(GFP_KERNEL_ACCOUNT);
+ 	if (!sp->spt) {
+ 		kmem_cache_free(mmu_page_header_cache, sp);
+ 		return NULL;
+
+base-commit: 183bb0ce8c77b0fd1fb25874112bc8751a461e49
+-- 
+2.53.0.345.g96ddfc5eaa-goog
+
 
