@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-71286-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71287-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kAuFFhBHlmmCdQIAu9opvQ
-	(envelope-from <kvm+bounces-71286-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 00:11:12 +0100
+	id QGDCCyVHlmmCdQIAu9opvQ
+	(envelope-from <kvm+bounces-71287-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 00:11:33 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF00215AD29
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 00:11:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8855115AD38
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 00:11:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 579053066BD8
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 23:10:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7E6A1306FE04
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 23:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79D833AD96;
-	Wed, 18 Feb 2026 23:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3CA733ADB5;
+	Wed, 18 Feb 2026 23:10:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hR22eUF+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="336Wmtce"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7DBA33A9F2
-	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 23:10:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0067133AD89
+	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 23:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771456207; cv=none; b=MwKaOffPmjlhcF1SYbkDwlOPQHoHxHBxiyaEnmcK2DbYFpYrees130+YLpjJGnR+rFaDLIlikXF/h919w4KY32tIHVQtpDR/Ir4gLj62P/i4RLOnkL0JPg0DSJM/VZlW1lHNVe0j4rk1+EaZsXwM0A9F74oCFUDf7LlKQ8cydgY=
+	t=1771456209; cv=none; b=WLLcaU72AGDQHk5VbxsKRlELTq48x26W3sSkw48hjSaIOsDIHaVmmEkLMCRRGodsgnngfwoWBnf2+qXKqagEED6+JCShzbsdyXEztI6ISr4jA0kP9QOC3Cmh+pZux64ph+AEKR5rf8acWPOcY0URp+qnzdrEZpVJ3jlZX+u7tBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771456207; c=relaxed/simple;
-	bh=tM8BjxTRUaM9RBki5MGlHN9TGhISx29jk5LkEA8/YTc=;
+	s=arc-20240116; t=1771456209; c=relaxed/simple;
+	bh=3DZZd8lu8WIKxAiwbtA8KRS5+FC7VWHgRRfIAwjLnpc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=X1uUPy/QeYQjLaY+5h5VhmHIFzGRJaswOWUfvTMFQl8lcdpiHRAcmrEam7SNRH5GceeqHfzvpVKbq/bmUR3qb/CRKDULLcCJWadUfYT7Z4ZKWrzmNx8/TB1KDm6YPfQOZe/dIZJdr/EUQAEmG6491ya2McAAtrkfrGeu4gjL2Jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hR22eUF+; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=NWte2ICvtaftTDZS4D3jzq5v9+gJ8ZBJci1iIvJMHaz1FVqPUDLwCAdZ3qykRfFdFM7r9Ta4h5V+qLjaaqPGFVtGyVfu1BYYvyxUuB1W2cs6tj1TzC34GTSmpOeuEX+bD4YSJSVpuSbGLO9OwvlSUEadd/kBB9BORR+JUsFw7QQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=336Wmtce; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a7b7f04a11so16163005ad.3
-        for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 15:10:05 -0800 (PST)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c6de06e6c08so154618a12.3
+        for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 15:10:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771456205; x=1772061005; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771456207; x=1772061007; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=BUA1fpDExNjo2szFuuW5OFhmaYWnSXBuESu8pBSWCgY=;
-        b=hR22eUF+8g7QtEJBq7VOsz2TXrp+uV5NPHAoKQt4yQj0syvVNug4hhD79rFkdzUmHb
-         UHP5mvr/jRus8TS2kls8fzii7+PvcPJvr07rowqlVx1Q5PAK0h12tcv6KY/MrrB7fDVw
-         48el9qr5wjJ/UrGKkChvbH7SJuCcNaOVZpL22kammEcR0Qjc+zlcJQsQEweGhSwc2D80
-         59IiRwFWImQvOUOZqTA3ZL6hSF7nICOmUw8mZPcVEsAfXrxIpr8cE9bNkgP8ci6p+EN0
-         xCm3v90ITH6OVFTeW/sPg9293+2v1gF6+MN/i0xdEDGupHfV0hm/jdh5Xxcq8NdfoGXr
-         APOA==
+        bh=6Kw8QE5cNoJCuppqB1Y2qVSbKI4zWPrm2R6k+VHt6KA=;
+        b=336WmtceiQQXxpZepvZWrVXMVL2uqI2pMJ2tqq7yrYghLBqJrpNLlFqwD5SYPRoQY6
+         D5qG3q/LAllpIekTonQ1F8NN0AgLuzOqVgPdvsEFQ3Rr874IxQiP7aujmb/WNjNzoJiq
+         wMz7nIdAPoh3ym8fIeLD54PkeDw0zqE4gVODC02k5SwW/6OAVHp1PeUoxp0fDMgyePQq
+         tqJsGp4sQfBx9oAA1NxDHBEwd5LBxKjNxqKgKQr8G8Sv/DJ6Gjtp5Aa8xSZqU8uPVGgW
+         8Le8XuanOwYMnXZgzSYx0s0g1R8RxoXO2VJdNcCf5lJ82ZdYIDTDUk71auZhNdiggaoV
+         h6YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771456205; x=1772061005;
+        d=1e100.net; s=20230601; t=1771456207; x=1772061007;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BUA1fpDExNjo2szFuuW5OFhmaYWnSXBuESu8pBSWCgY=;
-        b=Ws8Qr3PRFaRb9ArVRqcSQ4Xqsz6FEVaFi/WzusbXN2wsfq5iJRQKT2daIkgzjOJvBJ
-         gUXxpAgoMNWrFZgo2oktz/O/oJclsBsrT+uJ+99PYWnEgLDpPiL21elVacfx29bh9npe
-         Tg/5H2w54QGnztT4sSWePLJVYfVilnFw++R0tP3X9297k050MZQaxyqmeO1bpr21ehQZ
-         IdmUM0/0xTt0mzUXAh4010RobrMfiQa2X1soAjETr4tjQnxBpU11eL0I65z9cE7anudu
-         k6RVsHhTwnmiM1FLmvgN8tH1Uk619y2gCts0/b4CqfIHQRBUXh3WqyZOWa3RH+e5q6u6
-         OACA==
-X-Gm-Message-State: AOJu0Yywu664UX4lJY/C6+poXdPSZWz4Pq2LU3jiVjEp0T9/7P+tYkQA
-	mrpYTCqIXHNCsHhMERQvJwcLB1udCuoORcDTJ5YTazrVB3NuHVqBAHgeh1lukItI0VW2tGLQl0Y
-	28+nTlg==
-X-Received: from plbbb9.prod.google.com ([2002:a17:902:bc89:b0:2a8:fb03:a261])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f68d:b0:2aa:e6fa:2f6c
- with SMTP id d9443c01a7336-2ad50ebcee5mr32304845ad.24.1771456205026; Wed, 18
- Feb 2026 15:10:05 -0800 (PST)
+        bh=6Kw8QE5cNoJCuppqB1Y2qVSbKI4zWPrm2R6k+VHt6KA=;
+        b=iD+WRsS6N9QskEwElUnh7GpUONg1B78xy6paRyCPwRx7BsxTJGu/hMbhgSSONkaWHk
+         7JY68QWaIsp2CbPI6D+k3maq4f+OjAcpnXJBWNEhBb00QHG2k86Xg6A8kVcVCDNZlYSS
+         JXbRgnRZKTcL932Ih5lywYuOLfZaoLy0NHzuW1sWif6QCZ74LfHCAWe8r60dlH8u7VxJ
+         iKuQkEC/uAANyobLn5QpzZ1yve98ob3zNT1HyBukA9CVE9CquduR9dFY7uf0FOV2BJc1
+         IGZukQ4btBgegUDmjzj00z+dX0INH0SOsnPojSwvQ1SESj36Qo1e1LNUtEz2jzx8bQ5n
+         zowA==
+X-Gm-Message-State: AOJu0Yy6jsF7ZLRFnywtX0u90AXoGYZPQiATXBSef9eHMxPmInqGqa4v
+	+WveTpSP/Fp5kqrx/pcqCyEfNjrq+Qo/OBnx3nCrWGy1nT0JYvN5ScQEfx81LszCgoCuTcbJH57
+	fMMVfSQ==
+X-Received: from pgaq67.prod.google.com ([2002:a63:4346:0:b0:c6e:8f1b:392a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3941:b0:38e:8842:6683
+ with SMTP id adf61e73a8af0-394fc13aa71mr3169591637.5.1771456206901; Wed, 18
+ Feb 2026 15:10:06 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 18 Feb 2026 15:09:52 -0800
+Date: Wed, 18 Feb 2026 15:09:53 -0800
 In-Reply-To: <20260218230958.2877682-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -77,9 +77,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260218230958.2877682-1-seanjc@google.com>
 X-Mailer: git-send-email 2.53.0.345.g96ddfc5eaa-goog
-Message-ID: <20260218230958.2877682-3-seanjc@google.com>
-Subject: [PATCH v2 2/8] KVM: SVM: Separate recalc_intercepts() into nested vs.
- non-nested parts
+Message-ID: <20260218230958.2877682-4-seanjc@google.com>
+Subject: [PATCH v2 3/8] KVM: nSVM: WARN and abort vmcb02 intercepts recalc if
+ vmcb02 isn't active
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -97,7 +97,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71286-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71287-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -114,168 +114,41 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_FIVE(0.00)[5];
 	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: AF00215AD29
+X-Rspamd-Queue-Id: 8855115AD38
 X-Rspamd-Action: no action
 
-Extract the non-nested aspects of recalc_intercepts() into a separate
-helper, svm_mark_intercepts_dirty(), to make it clear that the call isn't
-*just* recalculating (vmcb02's) intercepts, and to not bury non-nested
-code in nested.c.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
 
-As suggested by Yosry, opportunistically prepend "nested_vmbc02_" to
-recalc_intercepts() so that it's obvious the function specifically deals
-with recomputing intercepts for L2.
+WARN and bail early from nested_vmcb02_recalc_intercepts() if vmcb02 isn't
+the active/current VMCB, as recalculating intercepts for vmcb01 using logic
+intended for merging vmcb12 and vmcb01 intercepts can yield unexpected and
+unwanted results.
 
-No functional change intended.
+In addition to hardening against general bugs, this will provide additional
+safeguards "if" nested_vmcb02_recalc_intercepts() is invoked directly from
+nested_vmcb02_prepare_control().
 
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>
+Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+[sean: split to separate patch, bail early on "failure"]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/nested.c |  9 ++-------
- arch/x86/kvm/svm/sev.c    |  2 +-
- arch/x86/kvm/svm/svm.c    |  4 ++--
- arch/x86/kvm/svm/svm.h    | 26 ++++++++++++++++++++------
- 4 files changed, 25 insertions(+), 16 deletions(-)
+ arch/x86/kvm/svm/nested.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 66701106a51b..48b60dd6e7a3 100644
+index 48b60dd6e7a3..793f5d2eed3a 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -122,17 +122,12 @@ static bool nested_vmcb_needs_vls_intercept(struct vcpu_svm *svm)
- 	return false;
- }
- 
--void recalc_intercepts(struct vcpu_svm *svm)
-+void nested_vmcb02_recalc_intercepts(struct vcpu_svm *svm)
- {
- 	struct vmcb_control_area *c, *h;
+@@ -128,6 +128,9 @@ void nested_vmcb02_recalc_intercepts(struct vcpu_svm *svm)
  	struct vmcb_ctrl_area_cached *g;
  	unsigned int i;
  
--	vmcb_mark_dirty(svm->vmcb01.ptr, VMCB_INTERCEPTS);
--
--	if (!is_guest_mode(&svm->vcpu))
--		return;
--
++	if (WARN_ON_ONCE(svm->vmcb != svm->nested.vmcb02.ptr))
++		return;
++
  	vmcb_mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
  
  	c = &svm->vmcb->control;
-@@ -918,7 +913,7 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
- 	 * Merge guest and host intercepts - must be called with vcpu in
- 	 * guest-mode to take effect.
- 	 */
--	recalc_intercepts(svm);
-+	svm_mark_intercepts_dirty(svm);
- }
- 
- static void nested_svm_copy_common_state(struct vmcb *from_vmcb, struct vmcb *to_vmcb)
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index ea515cf41168..03b6dc75a6e8 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -4639,7 +4639,7 @@ static void sev_es_init_vmcb(struct vcpu_svm *svm, bool init_event)
- 	if (!sev_vcpu_has_debug_swap(svm)) {
- 		vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_READ);
- 		vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_WRITE);
--		recalc_intercepts(svm);
-+		svm_mark_intercepts_dirty(svm);
- 	} else {
- 		/*
- 		 * Disable #DB intercept iff DebugSwap is enabled.  KVM doesn't
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 8f8bc863e214..9e76bf1671da 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -635,7 +635,7 @@ static void set_dr_intercepts(struct vcpu_svm *svm)
- 	vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_READ);
- 	vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_WRITE);
- 
--	recalc_intercepts(svm);
-+	svm_mark_intercepts_dirty(svm);
- }
- 
- static void clr_dr_intercepts(struct vcpu_svm *svm)
-@@ -644,7 +644,7 @@ static void clr_dr_intercepts(struct vcpu_svm *svm)
- 
- 	vmcb->control.intercepts[INTERCEPT_DR] = 0;
- 
--	recalc_intercepts(svm);
-+	svm_mark_intercepts_dirty(svm);
- }
- 
- static bool msr_write_intercepted(struct kvm_vcpu *vcpu, u32 msr)
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index ebd7b36b1ceb..92a1691dc7be 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -357,8 +357,6 @@ struct svm_cpu_data {
- 
- DECLARE_PER_CPU(struct svm_cpu_data, svm_data);
- 
--void recalc_intercepts(struct vcpu_svm *svm);
--
- static __always_inline struct kvm_svm *to_kvm_svm(struct kvm *kvm)
- {
- 	return container_of(kvm, struct kvm_svm, kvm);
-@@ -486,6 +484,22 @@ static inline bool vmcb12_is_intercept(struct vmcb_ctrl_area_cached *control, u3
- 	return __vmcb_is_intercept((unsigned long *)&control->intercepts, bit);
- }
- 
-+void nested_vmcb02_recalc_intercepts(struct vcpu_svm *svm);
-+
-+static inline void svm_mark_intercepts_dirty(struct vcpu_svm *svm)
-+{
-+	vmcb_mark_dirty(svm->vmcb01.ptr, VMCB_INTERCEPTS);
-+
-+	/*
-+	 * If L2 is active, recalculate the intercepts for vmcb02 to account
-+	 * for the changes made to vmcb01.  All intercept configuration is done
-+	 * for vmcb01 and then propagated to vmcb02 to combine KVM's intercepts
-+	 * with L1's intercepts (from the vmcb12 snapshot).
-+	 */
-+	if (is_guest_mode(&svm->vcpu))
-+		nested_vmcb02_recalc_intercepts(svm);
-+}
-+
- static inline void set_exception_intercept(struct vcpu_svm *svm, u32 bit)
- {
- 	struct vmcb *vmcb = svm->vmcb01.ptr;
-@@ -493,7 +507,7 @@ static inline void set_exception_intercept(struct vcpu_svm *svm, u32 bit)
- 	WARN_ON_ONCE(bit >= 32);
- 	vmcb_set_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
- 
--	recalc_intercepts(svm);
-+	svm_mark_intercepts_dirty(svm);
- }
- 
- static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
-@@ -503,7 +517,7 @@ static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
- 	WARN_ON_ONCE(bit >= 32);
- 	vmcb_clr_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
- 
--	recalc_intercepts(svm);
-+	svm_mark_intercepts_dirty(svm);
- }
- 
- static inline void svm_set_intercept(struct vcpu_svm *svm, int bit)
-@@ -512,7 +526,7 @@ static inline void svm_set_intercept(struct vcpu_svm *svm, int bit)
- 
- 	vmcb_set_intercept(&vmcb->control, bit);
- 
--	recalc_intercepts(svm);
-+	svm_mark_intercepts_dirty(svm);
- }
- 
- static inline void svm_clr_intercept(struct vcpu_svm *svm, int bit)
-@@ -521,7 +535,7 @@ static inline void svm_clr_intercept(struct vcpu_svm *svm, int bit)
- 
- 	vmcb_clr_intercept(&vmcb->control, bit);
- 
--	recalc_intercepts(svm);
-+	svm_mark_intercepts_dirty(svm);
- }
- 
- static inline bool svm_is_intercept(struct vcpu_svm *svm, int bit)
 -- 
 2.53.0.345.g96ddfc5eaa-goog
 
