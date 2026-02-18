@@ -1,176 +1,246 @@
-Return-Path: <kvm+bounces-71269-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71271-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0KyGLqwklmn0bAIAu9opvQ
-	(envelope-from <kvm+bounces-71269-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 21:44:28 +0100
+	id 6PSSHLwnlmnxbQIAu9opvQ
+	(envelope-from <kvm+bounces-71271-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 21:57:32 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21268159810
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 21:44:28 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3166159A9B
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 21:57:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3532D3036610
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 20:44:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 600A53014A28
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 20:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B189334889C;
-	Wed, 18 Feb 2026 20:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A748349B1F;
+	Wed, 18 Feb 2026 20:56:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YltjmhhD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m2hSGXQJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB78E2DC77F
-	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 20:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 732DB349B0B
+	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 20:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771447448; cv=none; b=cD+LcqT7Cts5UDgtWrrcLWsVET2Esp6X3nbwZZ5774lPoGyKM2IaKJCuQSeX3CXmcvqFbk65hR2w/+7RHylbyDO2CoKstl8OsrZwIo+Rw27ADZ7hxxyaQL8K8rL1D8QMRnIsBKN7EchLR/ipNq6oqsi+wo2lspZCII1zg/7ucsk=
+	t=1771448188; cv=none; b=qjXOA7VgcP5T2KjpLXd+j2J5j7zd66M3n+Ylxo45JqLylcav6sSLcmCvOZrfLbn766BTAeoSKwjeDzKDifeudpMqErai73mLlvnqDKDHM7C60TZRe0Bna1ulePjsUTX4/hP7TbOZomhqojVE4EPAFkw+JUQfkavKXOF1anMd+Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771447448; c=relaxed/simple;
-	bh=OfPlPP2zSZfILIK52UYFTfJpu+yw235cbdO1LC+N4lU=;
+	s=arc-20240116; t=1771448188; c=relaxed/simple;
+	bh=az8pKqGTqLPKEg70OjYkXanOeX00kgot4vjebxI5Rd0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=g9UsRYbweNteEaSjD1/zInn5m6riM9ykhoThrOmaXYSsKccuieoznuab+LnY0mFo2XCn+C0/kKzDgvluwsuZVL5FdtzaWR7oZrqurdIYblnWLkNV/cnaVsVTdyQ469bLct8eoDUCZPwQBN0ABl3VyNH4JwBWmMMj+akxi3pcftM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YltjmhhD; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=uz3V4xwRsdBASaPiEeZxAkkcYym/w5jpsAaxADV95i9pvYydtelhzmUkmTOgUuryKly7nGRtI11PEmvOCcXEh64eidZrJajbAeUXcw5GUw1vDbKdDXC691iwTC51+r52JPNchObP6QH+494nwBGLk6vYqa8/HO++3gJDMvhZWoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m2hSGXQJ; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-354c65f69edso219251a91.0
-        for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 12:44:06 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-354c7febaefso733513a91.3
+        for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 12:56:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771447446; x=1772052246; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771448187; x=1772052987; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=e92WtgjrZM3jvS8ZXOfcSH8+2aFwCmET7jJHlALYuqA=;
-        b=YltjmhhDiCF4FWZa+NnR7ANfJxZQp0rzje4TonTNKalcKucCOIuSlQ0W/4XE73KhUi
-         Wi/qeXb8s5ixAbQwIW8FwA3NuMJHdrocE1/Z7hi/H1rQFjmt8laEtnzQVyFmU05c06TW
-         o4kbtIqsY0QKulRscV1XyMc/MVL4fpxTtHkQlalb12K7ZJHpxNppQkMJTlRmMWeEhE7r
-         rC/rlIMfFUo105GFRpFvPtv+whOVgp8aLO+7zGUy+XBLyKD+vffi1uHyAAMYd4N/ykSB
-         35m5lYy1NY8Q2EWLj+xANg1uaPCBotNV/l+H0dPwMMqyUuh71wYlnYZZcMkXaZGSYRhu
-         4VVw==
+        bh=Gre4sWSuNgzzkfFkiG0uuZShlGPNxvNAn5AYWvywWnE=;
+        b=m2hSGXQJAlWbaUHKBljsoI8geiuHAv/HbSleOzF1KSGwv8+2HDC5213DKovJXr0bjI
+         PM2XXLGc36moABtRJS04JGuV8mObZ4am2fhZ1wq+mFzRIwW9VfzC50BrEBb810OVOQ+r
+         0PgbMxsciyHJVXEIUL7DboLv7upKETDj3NHqop6WDwLCUyxrBefnuLLkSbpUSsfa2JqV
+         9NgBFJ054kFVcAhH2/pB2T2SjJEGi+R8U+uDVRq50kqY+dLjUjyjNYgTmLABPJwx0bCm
+         brA7WgABuBjTxe2j0XUJq0JSYJawoA16bXzT6RFjWkq0hh5NtasYuohtH1OdX7gTgci5
+         +HGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771447446; x=1772052246;
+        d=1e100.net; s=20230601; t=1771448187; x=1772052987;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e92WtgjrZM3jvS8ZXOfcSH8+2aFwCmET7jJHlALYuqA=;
-        b=gWNCeoEm8tHRmOdka96FC1lPFp7o64PNCdskkls3TClOp5i1o/UM51FJx0OhqsbwZc
-         1j8kLnqfi47QrALvFmOHOyp9n4FWd9FnlwncuYCRkG6sepTj20k8yP0n2kny2DOCQ7+s
-         zKabw6hQehjZyfAlggrZOri+c1unOr3Z5yWdb5NMcU6JfVgu9of8tFDKzVTsdxXPSsox
-         qQw7lRc3kX5vDN7cvbG8RRkGORuHI69Q5bKlyqm9P4cW+V+58cEl8kel1EPmgp330Q5e
-         v5goX4ef64jLvzjVKHnmnOERsQZtbqqSbbFl+VhEwlhKRkFI9iiwvknrisefPTJXcyAD
-         Qk6Q==
-X-Gm-Message-State: AOJu0Yz7kuHV/CHQshxibPkce+BtuVMtKbgsl+Wp4wFLPrJnbdCuuMII
-	d1OBng53Cy84ncO/PnlJugNUX6yi/Bb7Ergj4r+KpRChMMGGyk/y9roZ57ESXwpqq3DgfECfNSg
-	ilUUgHQ==
-X-Received: from pjbsk10.prod.google.com ([2002:a17:90b:2dca:b0:354:c082:9b8d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3dcc:b0:354:b2f6:b4e4
- with SMTP id 98e67ed59e1d1-35888ebf8fcmr2084877a91.0.1771447445927; Wed, 18
- Feb 2026 12:44:05 -0800 (PST)
-Date: Wed, 18 Feb 2026 12:44:04 -0800
-In-Reply-To: <20260113003153.3344500-11-chengkev@google.com>
+        bh=Gre4sWSuNgzzkfFkiG0uuZShlGPNxvNAn5AYWvywWnE=;
+        b=po0RkdNYsemi/v+GArI/WFFHICK9A5MyJKO/u5Jn0U3fUlaDsWLt5lmzBtBdBg8CSm
+         vWOMl7p2DWuZ1rpstH/JCmUxM+UK5fpbV/3jpnBQF1fjxhXehYvPP59ZxItUX2m+GE34
+         dlgnMwqZsGAinHhsB3etV5vRGaBOh5jwWf9fwnrBzf7D0x9nt9F8mWx+AJZhGX5gHK1K
+         oU9OGRPD4j8XZCwpWeXszXFGAcB+8Ln61co4u4xRBnFQmhIukD2pTO97MhiPrrtJc2fq
+         RCtCXrfMx5Y5mq/mOwNgxzvkC6L08IkSwdedzc4Z7U2N+gawHJwdYO7nQeJuM5zexgiK
+         oBhA==
+X-Forwarded-Encrypted: i=1; AJvYcCX32WrIHc5davz5tPDixVq0+6iCesye+pvzPteRvxWt0vCnMcX1UcPemeGo/x+fw3XaJMA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwButUghCjAFESLQp6sqG6KmVex1IDp7V/NAZDqgTvAlk7MzuSV
+	xMYtzePws6aicUWSERuE9AguAE76URz5MuoB56iZWHggb4djNpA6zK4P9BrGLFBjF+8mZlSts1K
+	1KowgrA==
+X-Received: from pjzb12.prod.google.com ([2002:a17:90a:e38c:b0:353:454:939c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5704:b0:356:4c1f:98d4
+ with SMTP id 98e67ed59e1d1-358890dda32mr2710883a91.13.1771448186543; Wed, 18
+ Feb 2026 12:56:26 -0800 (PST)
+Date: Wed, 18 Feb 2026 12:56:25 -0800
+In-Reply-To: <aYuC87rMLlBYIZRc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260113003153.3344500-1-chengkev@google.com> <20260113003153.3344500-11-chengkev@google.com>
-Message-ID: <aZYklHat_pun9ure@google.com>
-Subject: Re: [kvm-unit-tests PATCH V2 10/10] x86/svm: Add test for #UD when EFER.SVME=0
+References: <67a2f20537354628bcb835586a7c6255@huawei.com> <aYuC87rMLlBYIZRc@google.com>
+Message-ID: <aZYneb7Dvuu-HQsP@google.com>
+Subject: Re: Re: [BUG REPORT] USE_AFTER_FREE in complete_emulated_mmio found
+ by KASAN/Syzkaller fuzz test (v5.10.0)
 From: Sean Christopherson <seanjc@google.com>
-To: Kevin Cheng <chengkev@google.com>
-Cc: kvm@vger.kernel.org, yosryahmed@google.com, andrew.jones@linux.dev, 
-	thuth@redhat.com, pbonzini@redhat.com
+To: Zhangjiaji <zhangjiaji1@huawei.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wangqinxiao (Tom)" <wangqinxiao@huawei.com>, 
+	zhangyashu <zhangyashu2@h-partners.com>, "wangyanan (Y)" <wangyanan55@huawei.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71269-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71271-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 21268159810
+	TAGGED_RCPT(0.00)[kvm];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,huawei.com:email]
+X-Rspamd-Queue-Id: A3166159A9B
 X-Rspamd-Action: no action
 
-On Tue, Jan 13, 2026, Kevin Cheng wrote:
-> +static void svm_ud_test_handler(struct ex_regs *regs)
-> +{
-> +	ud_fired = true;
-> +	regs->rip += 3;
-> +}
-> +
-> +static void svm_ud_test(void)
-> +{
-> +	u64 efer = rdmsr(MSR_EFER);
-> +
-> +	handle_exception(UD_VECTOR, svm_ud_test_handler);
-> +	wrmsr(MSR_EFER, efer & ~EFER_SVME);
-> +
-> +	insn_invlpga();
-
-Eh, just add proper helpers, or open code the asm.  And definitely use asm_safe()
-instead of wiring up a dedicated #UD handler.  Ha!  And past me even proactively
-waged war on copy+paste exception handling.
-
-Untested, but something like this should work.
-
-	asm_safe_report_ex("invlpga %rax, %ecx", "a"(0), "c"(0));
-	asm_safe_report_ex("vmrun %rax", "a"(0));
-	asm_safe_report_ex("vmsave %rax", "a"(0));
-	asm_safe_report_ex("vmload %rax", "a"(0));
-
-> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-> index 118e7cdd0286d..ad447e5f82f9f 100644
-> --- a/x86/unittests.cfg
-> +++ b/x86/unittests.cfg
-> @@ -253,11 +253,19 @@ arch = x86_64
->  [svm]
->  file = svm.flat
->  smp = 2
-> -test_args = "-pause_filter_test -svm_intr_intercept_mix_smi -svm_insn_intercept_test -svm_pf_exception_test -svm_pf_exception_forced_emulation_test -svm_pf_inv_asid_test -svm_pf_inv_tlb_ctl_test -svm_event_injection"
-> +test_args = "-pause_filter_test -svm_intr_intercept_mix_smi -svm_insn_intercept_test -svm_pf_exception_test -svm_pf_exception_forced_emulation_test -svm_pf_inv_asid_test -svm_pf_inv_tlb_ctl_test -svm_event_injection -svm_ud_test"
->  qemu_params = -cpu max,+svm -m 4g
->  arch = x86_64
->  groups = svm
->  
-> +# Disable SKINIT and SVML to test STGI #UD when EFER.SVME=0
-> +[svm_ud_test]
-> +file = svm.flat
-> +test_args = svm_ud_test
-> +qemu_params = -cpu max,-skinit,-svm-lock,+svm -m 4g
-
-KVM doesn't support SKINIT or SVM-LOCK, carving out a separate config just to
-disable things that aren't supported is pointless.  If QEMU TCG gets false
-failures due to its default model emulating the interactions with SKINIT and/or
-SVM-LOCK, then I'd prefer to account for that in the test, not in the config. 
-
-> +arch = x86_64
-> +groups = svm
-> +
->  [svm_event_injection]
->  file = svm.flat
->  test_args = svm_event_injection
-> -- 
-> 2.52.0.457.g6b5491de43-goog
+On Tue, Feb 10, 2026, Sean Christopherson wrote:
+> On Tue, Feb 10, 2026, Zhangjiaji wrote:
+> > > I think there's a not-completely-awful solution buried in this gigantic cesspool.
+> > > The only time KVM uses on-stack variables is for qword or smaller accesses, i.e.
+> > > 8 bytes in size or less.  For larger fragments, e.g. AVX to/from MMIO, the target
+> > > value will always be an operand in the emulator context.  And so rather than
+> > > disallow stack variables, for "small" fragments, we can rework the handling to
+> > > copy the value to/from each fragment on-demand instead of stashing a pointer to
+> > > the value.
+> > 
+> > Since we can store the frag->val in struct kvm_mmio_fragment,
+> > why not just point frag->data to it? This Way we can save a lot code about
+> > (frag->data == NULL).
 > 
+> It's not quite that simple, because we need to handle reads as well.
+> 
+> > Though this patch will block any read-into-stack calls, we can add a special path
+> > in function emulator_read_write handling feasible read-into-stack calls -- the
+> > target is released just after emulator_read_write returns.
+> > 
+> > ---
+> >  arch/x86/kvm/x86.c       | 9 ++++++++-
+> >  include/linux/kvm_host.h | 3 ++-
+> >  2 files changed, 10 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 72d37c8930ad..12d53d441a39 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -8197,7 +8197,14 @@ static int emulator_read_write_onepage(unsigned long addr, void *val,
+> >  	WARN_ON(vcpu->mmio_nr_fragments >= KVM_MAX_MMIO_FRAGMENTS);
+> >  	frag = &vcpu->mmio_fragments[vcpu->mmio_nr_fragments++];
+> >  	frag->gpa = gpa;
+> > -	frag->data = val;
+> > +	if (bytes > 8u || ! write) {
+> > +		if (WARN_ON_ONCE(object_is_on_stack(val)))
+> 
+> This is user-triggerable, e.g. em_popa(), em_pop_sreg(), emulate_iret_real(),
+> em_ret_near_imm(), em_ret_far(), and em_ret().
+
+*sigh*
+
+And I was wrong.  I finally sat down to write some comments for all of this, and
+realized that reads _never_ pass an on-stack @val to emulator_read_write_onepage(),
+because read_emulated() always buffers reads through ctxt->mem_read.
+
+So not only is my fancy, complex code unnecessary, it's actively broken.  If a
+read splits a page boundary, and the first page is NOT emulated MMIO, trying to
+fulfill the read on-demand falls apart because the @val points at the start of
+the operand (technically its cache "entry").  I'm sure that's a solvable problem,
+but I don't see any point in manufacturing a problem in the first place.
+
+I need to write a changelog, but as Yashu suggested, the fix can more simply be:
+
+--
+From: Sean Christopherson <seanjc@google.com>
+Date: Tue, 10 Feb 2026 09:45:37 -0800
+Subject: [PATCH 01/14] KVM: x86: Use scratch field in MMIO fragment to hold
+ small write values
+
+Fixes: f78146b0f923 ("KVM: Fix page-crossing MMIO")
+Suggested-by: Yashu Zhang <zhangjiaji1@huawei.com>
+Reported-by: Yashu Zhang <zhangjiaji1@huawei.com>
+Closes: https://lore.kernel.org/all/369eaaa2b3c1425c85e8477066391bc7@huawei.com
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c       | 14 +++++++++++++-
+ include/linux/kvm_host.h |  3 ++-
+ 2 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index db3f393192d9..ff3a6f86973f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8226,7 +8226,13 @@ static int emulator_read_write_onepage(unsigned long addr, void *val,
+ 	WARN_ON(vcpu->mmio_nr_fragments >= KVM_MAX_MMIO_FRAGMENTS);
+ 	frag = &vcpu->mmio_fragments[vcpu->mmio_nr_fragments++];
+ 	frag->gpa = gpa;
+-	frag->data = val;
++	if (write && bytes <= 8u) {
++		frag->val = 0;
++		frag->data = &frag->val;
++		memcpy(&frag->val, val, bytes);
++	} else {
++		frag->data = val;
++	}
+ 	frag->len = bytes;
+ 	return X86EMUL_CONTINUE;
+ }
+@@ -8241,6 +8247,9 @@ static int emulator_read_write(struct x86_emulate_ctxt *ctxt,
+ 	gpa_t gpa;
+ 	int rc;
+ 
++	if (WARN_ON_ONCE((bytes > 8u || !ops->write) && object_is_on_stack(val)))
++		return X86EMUL_UNHANDLEABLE;
++
+ 	if (ops->read_write_prepare &&
+ 		  ops->read_write_prepare(vcpu, val, bytes))
+ 		return X86EMUL_CONTINUE;
+@@ -11847,6 +11856,9 @@ static int complete_emulated_mmio(struct kvm_vcpu *vcpu)
+ 		frag++;
+ 		vcpu->mmio_cur_fragment++;
+ 	} else {
++		if (WARN_ON_ONCE(frag->data == &frag->val))
++			return -EIO;
++
+ 		/* Go forward to the next mmio piece. */
+ 		frag->data += len;
+ 		frag->gpa += len;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 2c7d76262898..0bb2a34fb93d 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -320,7 +320,8 @@ static inline bool kvm_vcpu_can_poll(ktime_t cur, ktime_t stop)
+ struct kvm_mmio_fragment {
+ 	gpa_t gpa;
+ 	void *data;
+-	unsigned len;
++	u64 val;
++	unsigned int len;
+ };
+ 
+ struct kvm_vcpu {
+
+base-commit: 183bb0ce8c77b0fd1fb25874112bc8751a461e49
+--
 
