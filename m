@@ -1,188 +1,247 @@
-Return-Path: <kvm+bounces-71300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71301-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4FHYHZ1NlmmbdgIAu9opvQ
-	(envelope-from <kvm+bounces-71300-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 00:39:09 +0100
+	id uIZBEf9NlmmbdgIAu9opvQ
+	(envelope-from <kvm+bounces-71301-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 00:40:47 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38D9C15AF6A
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 00:39:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2B7015AF97
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 00:40:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 28401302D5B9
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 23:38:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1A37C302D96A
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 23:40:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BEB33B6E4;
-	Wed, 18 Feb 2026 23:38:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4813433B6E7;
+	Wed, 18 Feb 2026 23:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mYomzGD3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zVMXu7KH"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C996D274B46
-	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 23:38:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771457931; cv=none; b=i47CMkepQfoaNZApU3Zl8qcvrIv5KSblIzjq0t40w2fG0aHAeCiCHiZD0fCiVcHI0WwmR0hUwCf+/OD9/fYdIJFXfUntYw07eFUICmn0uR+LvfuodWSTwuNNC04+ZQwitCafaxK/RWRyCIXJxEzQ1nVPpwtkWHnZ7k7gCY2+/Is=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771457931; c=relaxed/simple;
-	bh=50SceVm2r/nfcZPtOR22YkTlSRdJH8JKgH5+ZzYLT+U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EZWNddjTOVumWPq9Wu0TBJRid8A3i+6049HdP79bELHJwxQhCi9Ti3aLn6IoplOxGMIdJM+eIvWPqlkuHnWKqeMFzbHYb7h0KnqesnbzjcWSj+AVNHqaAEb125XwWZLrIlkIiXnAOhTTpcF8myoLnfX/PfTNzZYM7YbUXYM+o9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mYomzGD3; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 18 Feb 2026 23:38:29 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1771457918;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aB47qdJUfFz/bYwqiLHfc4rPx+GXTiXFB0r1/9GB7Sg=;
-	b=mYomzGD3eHlZDeN5Di2dFnlW1WReHySungLIsE8r6RfeN9DmDvEV5DZqfGZEqRh8m0r68d
-	Qj3qSHqy9DIZ5shxRxPD7OhIIUc8MvMD+78YqvCcyeH2/xeudfnKjWu6zNFWDekFYTs4C0
-	WO8E4260H5o7wzqG4nUaWI2VknDH9Jo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [RFC PATCH 1/5] KVM: nSVM: Do not use L2's RIP for vmcb02's
- NextRIP after first L2 VMRUN
-Message-ID: <4dtoocl34c3fxpg6k2bouv7epj2pb6bbuhogyha6evbxgu3gpy@zhdyzj2ordj2>
-References: <20260212230751.1871720-1-yosry.ahmed@linux.dev>
- <20260212230751.1871720-2-yosry.ahmed@linux.dev>
- <aZZJxDVK4ekHxaLb@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7699B33ADA4
+	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 23:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771458038; cv=pass; b=Wuy3TcG3hdcFLxfSxihkmwi7Wxqnr8DJAG8+cIVkaWt80ifircMSeRvdTln9E77K2Lc+TbcbtCSbTQNU+lFPzJjeQFvhH6LlwGUvVMs0onSGAj3qL4tQ/5tj3WRL5076MNU4J0e/6o6EWGhrkRh5LR9DJ/DCDCVfr0fboIZJUIA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771458038; c=relaxed/simple;
+	bh=JCYIyYfQkXj6y+2FydgfZ0XMji9ZHAOjYEUYt5DGHJw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=ZM+8flvJZNTGO6Qa2tWE52a1ixxXNujHgJaigZ9QlXR16E7UEWIz2fG/eOIM0tfPSk2Vmm8oh7P596uBZmkQOpfyh0M6+Vn9V9Lu9Mj9UaYzg35Xvo1VjET8uIdiPB9OvKbC4k7fIQQ/dgSs77pCShthDzCOrvuoOGhO40CE+HA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zVMXu7KH; arc=pass smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-505d3baf1a7so88031cf.1
+        for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 15:40:36 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771458035; cv=none;
+        d=google.com; s=arc-20240605;
+        b=MGuYk/DpUdEbsKyLk0miijrGN99pqC06AZUUm+xMiGBCAg6yA5Nl6NneK5Unc7YMZG
+         1VD91tCxSPph3lWH3M9UjnBP+UrKyjUyiRVtZUn7S7HtsN/lCXaRwzujdpfl+yhXRjsH
+         ++BzyovCvg/E3gUgUbrikroCqe6mLvSa8w5UUyzOw2AvUB6YhrsodTx76cfNVzQoVru1
+         C+GBYNMjXIIaUleI6ihdeUTWKpbPaRMxofIb92vid5YZRzSx4kGCdqq+oUOZQXl/eOtx
+         1Zv6nlX2RyXYEaHvU/1lhUdBeJAWu6TEk2ssi1gWcHeI9Bsbq2B7FSVWJhaDEX2ps1+7
+         snFA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=xjxPiN30X7H58ROVHwhzf4/X04sTDdl8fl/0yuhsL/4=;
+        fh=Y/ITJD2B9sYaXrLbrUEmCq/nS1FRW1948xP2WNSX7Do=;
+        b=VYdyvMZVt+3nN6JK33QGMbgjPraDb3ZDnJb/QKB4fiVTGbo25KXMb1CMaRmeegPEeH
+         PNSjixiilmuAEIOUu9KWxPHUGnhWFlDkRWP+/XIjJOFn3zYAWWNxgSRZ++IDWU6iDsHk
+         ojR0RnXXVIAicyxKQr/EZqkcYBH3pBKRQgdMtb0/7xujA8N7WBOVnjeoAIKuGKzw1mCa
+         epXL3GHN1OwK3URhVaCARBIlNwpan26XjZLyhP1xYEUyjq0odCmT2TNjqNZ7rQYIml6M
+         VXwgwvuFByzxAqtHDws0cY2mq3mZRml3qIXH1n/EqSu40p75QqEKD/WC0D+5pHn9O/4Z
+         TlQQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771458035; x=1772062835; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xjxPiN30X7H58ROVHwhzf4/X04sTDdl8fl/0yuhsL/4=;
+        b=zVMXu7KHpfOUkepe4q8ggIvfeLArGHjvU4jVku5YBg1hWHhGVJaUl+2ifQAjdSoWYc
+         igEaqjMl2E3Lgt58ji10Pgr2f7Vwv7OAjPhOqoEZp7qvs0PusD5GrOeG8Winv/3hLrER
+         7cwwgf/kC1K0YZ+UwTLSgw9h/8BOzWQKHpux7XaJJD9b82Y4PEFXDR/Rr3jIVVgU3/a3
+         z218YeIZ3q58w5hU2ICwHkaRuleUDM5w5mX1PegHPESs7GIGPlj9OmYSLvjFiG4vjy72
+         t9ITOCANNOSH+mFVPtlVkOCzOWl7nj4U7oQv5aRkM/KUod4EG3F/8A9NgN2Pu32UKaQx
+         2tTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771458035; x=1772062835;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=xjxPiN30X7H58ROVHwhzf4/X04sTDdl8fl/0yuhsL/4=;
+        b=gE3i4clypubU62xmXm2cmX3Nw/KRKmlK3vviaxQwFC39qSs0FZ8tgnSyHtCeWGbWI7
+         D4puJAMlSmUgAMIM1M6QRV/M0zIoudo+T3xRFygq/teCcmG6icSLZNdeDBgROg/G+Ksd
+         +nq1Hxt3lNya1hlrDZ2pbg3OncHdozRGShD5TQ9A3FncCw7Em4q27U+hW2Vz0Uhb2a0Q
+         5Niac5IY/7pNzBFon5Yw0a5o9NAc5f4dFPBM8IZgJ1sHB8AFY39N2hwRkzQmgSUQG2nb
+         ARDM+rlLwx0UZe/xXnRUqdTFktUkYwWZrLAr8sVxqGBZQKhOaEdqnvaLMNHQoxQ917RY
+         n/sA==
+X-Forwarded-Encrypted: i=1; AJvYcCXazpH19sMoMqBF/Uw+zitHA7WPLk2vHm5LEu0XwyVg+xRJbRH42lbZrTBBsaGt1vhBsmc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuRTa7XiXV/lbNLQLPOVI+bzdXCgTMOUujDJmgwASv5tiYDGA1
+	EHkCbR9+xSto+2p4mwapBqTug+KC+Jh+rU/PkCb1yfhte8tfPV9g9Dm35Zk0Zrl+2Oj7UPhNlSH
+	J4Q9ez2zJd/k+cbWAwynVw7dYp1cqsoUPihCXjtQu
+X-Gm-Gg: AZuq6aIMRUTLGiI5tfruA/imu/BZ0MvcHXraqKWiOnSa7Oywi1z9Y9sleG3ID29q3Qf
+	ijZNIVZhiMteXliajeNr5PlZNXNiI07WklgcBZeWgG7dU8vlt4iIfrgSPu+HinS50DviNteQDon
+	9ei2uepyRgZ2wbsZevXrcaqRP6ex3fLGelccepERBpbFcf/YKz0dqER4ycFUFMb811w8BrtPlj4
+	70eiX2W+59YpUPCDDLcosmVhaVRMORWu+10+To4oR3yDm5CdW4yvrToDLZbAj8Tx0tead3Aa72L
+	yPrK4g==
+X-Received: by 2002:a05:622a:1a8d:b0:506:1f23:e22c with SMTP id
+ d75a77b69052e-506f1dbd1b1mr2143471cf.6.1771458034886; Wed, 18 Feb 2026
+ 15:40:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aZZJxDVK4ekHxaLb@google.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20260217163250.2326001-1-surenb@google.com> <20260217163250.2326001-3-surenb@google.com>
+ <dtdfrko7uqif6flc4mefnlar7wnmrbyswfu7bvb2ar24gkeejo@ypzhmyklbeh7>
+ <CAJuCfpGViU4dDaLtPR8U0C+=FXO=1TuU-hT3fypNQO3LGOjbcA@mail.gmail.com> <lfnqadtmpkxjhsne3nto6bpourjv3nxw26y2a5kovump3beld7@c2pdvgxxj3ar>
+In-Reply-To: <lfnqadtmpkxjhsne3nto6bpourjv3nxw26y2a5kovump3beld7@c2pdvgxxj3ar>
+From: Suren Baghdasaryan <surenb@google.com>
+Date: Wed, 18 Feb 2026 15:40:23 -0800
+X-Gm-Features: AaiRm53lCb3-A9mP4T-Ip4RZ_UT27OIlQVbKAc0RvblZzhy-3EiGT7cqg8sX1Wc
+Message-ID: <CAJuCfpFr-MvDAo5wur0gGX-AMCd2kP=pBYOemwAP=G3UUVP4vQ@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] mm: replace vma_start_write() with vma_start_write_killable()
+To: "Liam R. Howlett" <Liam.Howlett@oracle.com>, Suren Baghdasaryan <surenb@google.com>, 
+	akpm@linux-foundation.org, willy@infradead.org, david@kernel.org, 
+	ziy@nvidia.com, matthew.brost@intel.com, joshua.hahnjy@gmail.com, 
+	rakie.kim@sk.com, byungchul@sk.com, gourry@gourry.net, 
+	ying.huang@linux.alibaba.com, apopple@nvidia.com, lorenzo.stoakes@oracle.com, 
+	baolin.wang@linux.alibaba.com, npache@redhat.com, ryan.roberts@arm.com, 
+	dev.jain@arm.com, baohua@kernel.org, lance.yang@linux.dev, vbabka@suse.cz, 
+	jannh@google.com, rppt@kernel.org, mhocko@suse.com, pfalcato@suse.de, 
+	kees@kernel.org, maddy@linux.ibm.com, npiggin@gmail.com, mpe@ellerman.id.au, 
+	chleroy@kernel.org, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
+	imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com, 
+	agordeev@linux.ibm.com, svens@linux.ibm.com, gerald.schaefer@linux.ibm.com, 
+	linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, 
+	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-71301-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71300-lists,kvm=lfdr.de];
+	FREEMAIL_TO(0.00)[oracle.com,google.com,linux-foundation.org,infradead.org,kernel.org,nvidia.com,intel.com,gmail.com,sk.com,gourry.net,linux.alibaba.com,redhat.com,arm.com,linux.dev,suse.cz,suse.com,suse.de,linux.ibm.com,ellerman.id.au,kvack.org,lists.ozlabs.org,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[44];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry.ahmed@linux.dev,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[surenb@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5]
-X-Rspamd-Queue-Id: 38D9C15AF6A
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: B2B7015AF97
 X-Rspamd-Action: no action
 
-On Wed, Feb 18, 2026 at 03:22:44PM -0800, Sean Christopherson wrote:
-> On Thu, Feb 12, 2026, Yosry Ahmed wrote:
-> > For guests with NRIPS disabled, L1 does not provide NextRIP when running
-> > an L2 with an injected soft interrupt, instead it advances L2's RIP
-> > before running it. KVM uses L2's RIP as the NextRIP in vmcb02 to emulate
-> 
-> Should "L2's RIP" be "vmcb12's RIP"?  The "L2's RIP" terminology gets really
-> confusing in the next paragraph, as NextRIP _is_ L2's (Next)RIP.  Hmm, or maybe
-> "current RIP"?  I.e. "current RIP" vs. "NextRIP"?
+On Wed, Feb 18, 2026 at 8:46=E2=80=AFAM Liam R. Howlett <Liam.Howlett@oracl=
+e.com> wrote:
+>
+> * Suren Baghdasaryan <surenb@google.com> [260217 16:03]:
+> > On Tue, Feb 17, 2026 at 11:19=E2=80=AFAM Liam R. Howlett
+> > <Liam.Howlett@oracle.com> wrote:
+> > >
+> > > * Suren Baghdasaryan <surenb@google.com> [260217 11:33]:
+> > > > Now that we have vma_start_write_killable() we can replace most of =
+the
+> > > > vma_start_write() calls with it, improving reaction time to the kil=
+l
+> > > > signal.
+> > > >
+> > > > There are several places which are left untouched by this patch:
+> > > >
+> > > > 1. free_pgtables() because function should free page tables even if=
+ a
+> > > > fatal signal is pending.
+> > > >
+> > > > 2. process_vma_walk_lock(), which requires changes in its callers a=
+nd
+> > > > will be handled in the next patch.
+> > > >
+> > > > 3. userfaultd code, where some paths calling vma_start_write() can
+> > > > handle EINTR and some can't without a deeper code refactoring.
+> > > >
+> > > > 4. vm_flags_{set|mod|clear} require refactoring that involves movin=
+g
+> > > > vma_start_write() out of these functions and replacing it with
+> > > > vma_assert_write_locked(), then callers of these functions should
+> > > > lock the vma themselves using vma_start_write_killable() whenever
+> > > > possible.
+> > > >
+> > > > Suggested-by: Matthew Wilcox <willy@infradead.org>
+> > > > Signed-off-by: Suren Baghdasaryan <surenb@google.com>
+> > > > Reviewed-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com> # powerpc
+> > > > ---
+> > > >  arch/powerpc/kvm/book3s_hv_uvmem.c |  5 +-
+> > > >  include/linux/mempolicy.h          |  5 +-
+> > > >  mm/khugepaged.c                    |  5 +-
+> > > >  mm/madvise.c                       |  4 +-
+> > > >  mm/memory.c                        |  2 +
+> > > >  mm/mempolicy.c                     | 23 ++++++--
+> > > >  mm/mlock.c                         | 20 +++++--
+> > > >  mm/mprotect.c                      |  4 +-
+> > > >  mm/mremap.c                        |  4 +-
+> > > >  mm/vma.c                           | 93 +++++++++++++++++++++-----=
+----
+> > > >  mm/vma_exec.c                      |  6 +-
+> > > >  11 files changed, 123 insertions(+), 48 deletions(-)
+> > > >
+>
+> ...
+>
+> > >
+> > >
+> > > ...
+> > >
+> > > > @@ -3089,7 +3120,7 @@ int expand_upwards(struct vm_area_struct *vma=
+, unsigned long address)
+> > >
+> > > Good luck testing this one.
+> >
+> > Yeah... Any suggestions for tests I should use?
+>
+> I think you have to either isolate it or boot parisc.
+>
+> To boot parisc, you can use the debian hppa image [1].  The file is a
+> zip file which can be decompressed to a qcow2, initrd, and kernel.  You
+> can boot with qemu-system-hppa (debian has this in qemu-system-misc
+> package), there is a readme that has a boot line as well.
+>
+> Building can be done using the cross-compiler tools for hppa [2] and the
+> make command with CROSS_COMPILE=3D<path>/bin/hppa64-linux-
 
-I intentionally avoided mentioning vmcb12, because after save/restore
-the RIP value we pass into nested_vmcb02_prepare_control() is no longer
-what's in vmcb12. I can go with "current RIP".
+Ah, I thought you were referring to the difficulty of finding specific
+tests to verify this change but these instructions are helpful too.
+Thanks!
 
-> 
-> > a CPU without NRIPS.
-> > 
-> > However, after L2 runs the first time, NextRIP will be updated by the
-> > CPU and/or KVM, and L2's RIP is no longer the correct value to use in
-> > vmcb02. Hence, after save/restore, do not use L2's RIP if a nested run
-> > is not pending (i.e. L2 has run at least once), use the NextRIP value.
-> 
-> Too many negatives in this last sentence, it can just be (I think):
-> 
->   Hence, after save/restore, use the current RIP if and only if a nested
->   run is pending, otherwise use NextRIP.
 
-Looks good.
-
-> 
-> > Fixes: cc440cdad5b7 ("KVM: nSVM: implement KVM_GET_NESTED_STATE and KVM_SET_NESTED_STATE")
-> > CC: stable@vger.kernel.org
-> > Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > ---
-> >  arch/x86/kvm/svm/nested.c | 16 ++++++++++------
-> >  1 file changed, 10 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index de90b104a0dd..eebbe00714e3 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -844,14 +844,18 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
-> >  	vmcb02->control.event_inj_err       = svm->nested.ctl.event_inj_err;
-> >  
-> >  	/*
-> > -	 * next_rip is consumed on VMRUN as the return address pushed on the
-> > +	 * NextRIP is consumed on VMRUN as the return address pushed on the
-> >  	 * stack for injected soft exceptions/interrupts.  If nrips is exposed
-> > -	 * to L1, take it verbatim from vmcb12.  If nrips is supported in
-> > -	 * hardware but not exposed to L1, stuff the actual L2 RIP to emulate
-> > -	 * what a nrips=0 CPU would do (L1 is responsible for advancing RIP
-> > -	 * prior to injecting the event).
-> > +	 * to L1, take it verbatim from vmcb12.
-> > +	 *
-> > +	 * If nrips is supported in hardware but not exposed to L1, stuff the
-> > +	 * actual L2 RIP to emulate what a nrips=0 CPU would do (L1 is
-> > +	 * responsible for advancing RIP prior to injecting the event). This is
-> > +	 * only the case for the first L2 run after VMRUN. After that (e.g.
-> > +	 * during save/restore), NextRIP is updated by the CPU and/or KVM, and
-> > +	 * the value of the L2 RIP from vmcb12 should not be used.
-> >  	 */
-> > -	if (guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS))
-> > +	if (guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS) || !svm->nested.nested_run_pending)
-> 
-> This is technically wrong since KVM doesn't require NRIPS.  Maybe this?
-
-I hallucinated that making nested depend on nrips was merge, i.e. this
-patch: https://lore.kernel.org/kvm/f0302382cf45d7a9527b4aebbfe694bbcfa7aff5.1651440202.git.maciej.szmigiero@oracle.com/.
-
-> 
-> 	if (boot_cpu_has(X86_FEATURE_NRIPS)) {
-
-I wonder if that's necessary, but I cannot find anything in the APM
-about whether the CPU ignores NextRIP if it's not supported. It doesn't
-even mention how to use it when injecting soft IRQs, only that it is
-needed to properly inject then. Sigh.
-
-> 		if (guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS) ||
-> 		    !svm->nested.nested_run_pending)
-> 			vmcb02->control.next_rip    = svm->nested.ctl.next_rip;
-> 		else
-> 			vmcb02->control.next_rip    = vmcb12_rip;
-> 	}
-> 	
-> 
-> >  		vmcb02->control.next_rip    = svm->nested.ctl.next_rip;
-> >  	else if (boot_cpu_has(X86_FEATURE_NRIPS))
-> >  		vmcb02->control.next_rip    = vmcb12_rip;
-> > -- 
-> > 2.53.0.273.g2a3d683680-goog
-> > 
+>
+> Cheers,
+> Liam
+>
+> [1]. https://people.debian.org/~gio/dqib/
+> [2]. https://cdn.kernel.org/pub/tools/crosstool/files/bin/x86_64/15.2.0/
+>
+>
 
