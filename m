@@ -1,398 +1,444 @@
-Return-Path: <kvm+bounces-71216-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71217-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oEBqKFV3lWl8RwIAu9opvQ
-	(envelope-from <kvm+bounces-71216-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 09:24:53 +0100
+	id iGY0N/WHlWnqSAIAu9opvQ
+	(envelope-from <kvm+bounces-71217-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 10:35:49 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BBB515400F
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 09:24:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41C10154C25
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 10:35:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A29623095F68
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 08:22:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7E60F301187A
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 09:35:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C201131D38B;
-	Wed, 18 Feb 2026 08:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="m2c+YmlB";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="m2c+YmlB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D56433CEAF;
+	Wed, 18 Feb 2026 09:35:38 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AEBA31A57B
-	for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 08:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 639A525B1CB;
+	Wed, 18 Feb 2026 09:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771402950; cv=none; b=q+20zHYeDWaTfh4SxNV7JU29dvhuzcnQvilFIooACV/0486cNiFaQ3x1gTCuJooBZ7kqO3+hBM40t06u0HCuZhXcEOn/9n+XgaNS0faQjP3U+lGZydCNPQEIt0QsLyRknHdovGS/QSf0lcfmNo25dyEFfom1+P9VUR5MyqgbiS0=
+	t=1771407337; cv=none; b=Zx5KGEfTr3X6xVBrzGc32T6AjBak/PJje4kM2oaEJMX7jEY2U9ObER/l3FJGFep6aJfEG5ZaJpZ6na09Nsr7lBiX73KB2cVncF7UZOHJExIN2av6ppdvglP8QVrFL3xzFWmzLDXSL/sWGFrR4hVe8uXTeq0OadxitSa/5rsFHUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771402950; c=relaxed/simple;
-	bh=tipT+x+rzefZm0v6MGWOlLJXq7aNBBX+PV3YXyihiyk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I6zWf+Qw6dHHjaQ912FqjoCBXE9DxhnDYmWVJj3+HgJd8F7Z/38NX8RUmTnvZFxdBn2y7G+b6qSHqMlzeCGz4RER/mJtOwEm9aDzHVOJaA6TZwChBh9VNfsqZWwJW+Lq1u5Q41DwpbGHhCoiYq8R1zt5BSBdpW2eJBQeWGR9Ly8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=m2c+YmlB; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=m2c+YmlB; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id C08155BCC1;
-	Wed, 18 Feb 2026 08:22:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1771402946; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5n3VBEp5XW54gxR7TQ9eIqPv5CmnPOTbBO3+6ULmth4=;
-	b=m2c+YmlBIvdMzgR4lO5qjDXP3E+pBiM68LAPt+DiXPw1kx3dHf8mFGKQkszUgRrCdEePTu
-	KAAMjOmmcAQVC4rHplVFgKKVH0DUP5K0A8+/AUy48MdJsTEKg7wN4AEHe1ec6oRelYU7rs
-	S5gWViRIDfSSvnHL4ApHYv8JoEJpYf8=
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1771402946; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5n3VBEp5XW54gxR7TQ9eIqPv5CmnPOTbBO3+6ULmth4=;
-	b=m2c+YmlBIvdMzgR4lO5qjDXP3E+pBiM68LAPt+DiXPw1kx3dHf8mFGKQkszUgRrCdEePTu
-	KAAMjOmmcAQVC4rHplVFgKKVH0DUP5K0A8+/AUy48MdJsTEKg7wN4AEHe1ec6oRelYU7rs
-	S5gWViRIDfSSvnHL4ApHYv8JoEJpYf8=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 576243EA65;
-	Wed, 18 Feb 2026 08:22:26 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id WCovFMJ2lWmSHgAAD6G6ig
-	(envelope-from <jgross@suse.com>); Wed, 18 Feb 2026 08:22:26 +0000
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	kvm@vger.kernel.org,
-	llvm@lists.linux.dev
-Cc: Juergen Gross <jgross@suse.com>,
-	Xin Li <xin@zytor.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>
-Subject: [PATCH v3 09/16] x86/msr: Use the alternatives mechanism for WRMSR
-Date: Wed, 18 Feb 2026 09:21:26 +0100
-Message-ID: <20260218082133.400602-10-jgross@suse.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260218082133.400602-1-jgross@suse.com>
-References: <20260218082133.400602-1-jgross@suse.com>
+	s=arc-20240116; t=1771407337; c=relaxed/simple;
+	bh=skintGXkdxIGoNLBet6IdAti6A/CqAhPs+KLWpbLka0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RntieAIRTvxC8B8+aIzDYOHp8IZJgw20Zk1/sWdI1/xwfKMMGnYmXKLX9wTiGTP/YCTDFF1bKcLhKCUUEbKO+Itjnzg1XAfGZeyW64QX7HASvKUmd3BrrD6ayJnibuZZhNUMQKzjPWKu1AmfL3KZNPg4JTGIL11wONI+PpyUKJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6224F1477;
+	Wed, 18 Feb 2026 01:35:29 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C4C453F7F5;
+	Wed, 18 Feb 2026 01:35:28 -0800 (PST)
+Message-ID: <845587f3-4c27-46d9-83f8-6b38ccc54183@arm.com>
+Date: Wed, 18 Feb 2026 09:35:27 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 13/19] x86/resctrl: Add PLZA state tracking and
+ context switch handling
+To: Stephane Eranian <eranian@google.com>
+Cc: "Moger, Babu" <bmoger@amd.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, "Moger, Babu"
+ <Babu.Moger@amd.com>, "Luck, Tony" <tony.luck@intel.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "Dave.Martin@arm.com"
+ <Dave.Martin@arm.com>, "james.morse@arm.com" <james.morse@arm.com>,
+ "tglx@kernel.org" <tglx@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
+ "bp@alien8.de" <bp@alien8.de>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "juri.lelli@redhat.com" <juri.lelli@redhat.com>,
+ "vincent.guittot@linaro.org" <vincent.guittot@linaro.org>,
+ "dietmar.eggemann@arm.com" <dietmar.eggemann@arm.com>,
+ "rostedt@goodmis.org" <rostedt@goodmis.org>,
+ "bsegall@google.com" <bsegall@google.com>, "mgorman@suse.de"
+ <mgorman@suse.de>, "vschneid@redhat.com" <vschneid@redhat.com>,
+ "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+ "pawan.kumar.gupta@linux.intel.com" <pawan.kumar.gupta@linux.intel.com>,
+ "pmladek@suse.com" <pmladek@suse.com>,
+ "feng.tang@linux.alibaba.com" <feng.tang@linux.alibaba.com>,
+ "kees@kernel.org" <kees@kernel.org>, "arnd@arndb.de" <arnd@arndb.de>,
+ "fvdl@google.com" <fvdl@google.com>,
+ "lirongqing@baidu.com" <lirongqing@baidu.com>,
+ "bhelgaas@google.com" <bhelgaas@google.com>,
+ "seanjc@google.com" <seanjc@google.com>, "xin@zytor.com" <xin@zytor.com>,
+ "Shukla, Manali" <Manali.Shukla@amd.com>,
+ "dapeng1.mi@linux.intel.com" <dapeng1.mi@linux.intel.com>,
+ "chang.seok.bae@intel.com" <chang.seok.bae@intel.com>,
+ "Limonciello, Mario" <Mario.Limonciello@amd.com>,
+ "naveen@kernel.org" <naveen@kernel.org>,
+ "elena.reshetova@intel.com" <elena.reshetova@intel.com>,
+ "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "peternewman@google.com" <peternewman@google.com>,
+ "Shenoy, Gautham Ranjal" <gautham.shenoy@amd.com>
+References: <cover.1769029977.git.babu.moger@amd.com>
+ <17c9c0c252dcfe707dffe5986e7c98cd121f7cef.1769029977.git.babu.moger@amd.com>
+ <aXk8hRtv6ATEjW8A@agluck-desk3>
+ <5ec19557-6a62-4158-af82-c70bac75226f@amd.com>
+ <aXpDdUQHCnQyhcL3@agluck-desk3>
+ <IA0PPF9A76BB3A655A28E9695C8AD1CC59F9591A@IA0PPF9A76BB3A6.namprd12.prod.outlook.com>
+ <bbe80a9a-70f0-4cd1-bd6a-4a45212aa80b@amd.com>
+ <7a4ea07d-88e6-4f0f-a3ce-4fd97388cec4@intel.com>
+ <abb049fa-3a3d-4601-9ae3-61eeb7fd8fcf@amd.com>
+ <1a0a7306-f833-45a8-8f2b-c6d2e8b98ff5@intel.com>
+ <fd7e0779-7e29-461d-adb6-0568a81ec59e@arm.com>
+ <fbaa21b3-d010-4b89-8e87-f13d3f176ea3@amd.com>
+ <951b9a1f-a9d7-4834-b6b8-61417e984f2f@arm.com>
+ <CABPqkBSq=cgn-am4qorA_VN0vsbpbfDePSi7gubicpROB1=djw@mail.gmail.com>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <CABPqkBSq=cgn-am4qorA_VN0vsbpbfDePSi7gubicpROB1=djw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -5.30
-X-Spam-Level: 
-X-Spam-Flag: NO
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[suse.com,zytor.com,kernel.org,redhat.com,alien8.de,linux.intel.com,google.com,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-71216-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-71217-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[45];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgross@suse.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[suse.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[ben.horgan@arm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm,lkml];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 4BBB515400F
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:mid,arm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 41C10154C25
 X-Rspamd-Action: no action
 
-When available use one of the non-serializing WRMSR variants (WRMSRNS
-with or without an immediate operand specifying the MSR register) in
-__wrmsrq().
+Hi Stephane,
 
-For the safe/unsafe variants make __wrmsrq() to be a common base
-function instead of duplicating the ALTERNATIVE*() macros. This
-requires to let native_wrmsr() use native_wrmsrq() instead of
-__wrmsrq(). While changing this, convert native_wrmsr() into an inline
-function.
+On 2/18/26 06:22, Stephane Eranian wrote:
+> On Tue, Feb 17, 2026 at 7:56 AM Ben Horgan <ben.horgan@arm.com> wrote:
+>>
+>> Hi Babu,
+>>
+>> On 2/16/26 22:52, Moger, Babu wrote:
+>>> Hi Ben,
+>>>
+>>> On 2/16/2026 9:41 AM, Ben Horgan wrote:
+>>>> Hi Babu, Reinette,
+>>>>
+>>>> On 2/14/26 00:10, Reinette Chatre wrote:
+>>>>> Hi Babu,
+>>>>>
+>>>>> On 2/13/26 8:37 AM, Moger, Babu wrote:
+>>>>>> Hi Reinette,
+>>>>>>
+>>>>>> On 2/10/2026 10:17 AM, Reinette Chatre wrote:
+>>>>>>> Hi Babu,
+>>>>>>>
+>>>>>>> On 1/28/26 9:44 AM, Moger, Babu wrote:
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> On 1/28/2026 11:41 AM, Moger, Babu wrote:
+>>>>>>>>>> On Wed, Jan 28, 2026 at 10:01:39AM -0600, Moger, Babu wrote:
+>>>>>>>>>>> On 1/27/2026 4:30 PM, Luck, Tony wrote:
+>>>>>>>>>> Babu,
+>>>>>>>>>>
+>>>>>>>>>> I've read a bit more of the code now and I think I understand more.
+>>>>>>>>>>
+>>>>>>>>>> Some useful additions to your explanation.
+>>>>>>>>>>
+>>>>>>>>>> 1) Only one CTRL group can be marked as PLZA
+>>>>>>>>>
+>>>>>>>>> Yes. Correct.
+>>>>>>>
+>>>>>>> Why limit it to one CTRL_MON group and why not support it for MON
+>>>>>>> groups?
+>>>>>>
+>>>>>> There can be only one PLZA configuration in a system. The values in
+>>>>>> the MSR_IA32_PQR_PLZA_ASSOC register (RMID, RMID_EN, CLOSID,
+>>>>>> CLOSID_EN) must be identical across all logical processors. The only
+>>>>>> field that may differ is PLZA_EN.
+>>>>
+>>>> Does this have any effect on hypervisors?
+>>>
+>>> Because hypervisor runs at CPL0, there could be some use case. I have
+>>> not completely understood that part.
+>>>
+>>>>
+>>>>>
+>>>>> ah - this is a significant part that I missed. Since this is a per-
+>>>>> CPU register it seems
+>>>>
+>>>> I also missed that.
+>>>>
+>>>>> to have the ability for expanded use in the future where different
+>>>>> CLOSID and RMID may be
+>>>>> written to it? Is PLZA leaving room for such future enhancement or
+>>>>> does the spec contain
+>>>>> the text that state "The values in the MSR_IA32_PQR_PLZA_ASSOC
+>>>>> register (RMID, RMID_EN,
+>>>>> CLOSID, CLOSID_EN) must be identical across all logical processors."?
+>>>>> That is, "forever
+>>>>> and always"?
+>>>>>
+>>>>> If I understand correctly MPAM could have different PARTID and PMG
+>>>>> for kernel use so we
+>>>>> need to consider these different architectural behaviors.
+>>>>
+>>>> Yes, MPAM has a per-cpu register MPAM1_EL1.
+>>>>
+>>>
+>>> oh ok.
+>>>
+>>>>>
+>>>>>> I was initially unsure which RMID should be used when PLZA is
+>>>>>> enabled on MON groups.
+>>>>>>
+>>>>>> After re-evaluating, enabling PLZA on MON groups is still feasible:
+>>>>>>
+>>>>>> 1. Only one group in the system can have PLZA enabled.
+>>>>>> 2. If PLZA is enabled on CTRL_MON group then we cannot enable PLZA
+>>>>>> on MON group.
+>>>>>> 3. If PLZA is enabled on the CTRL_MON group, then the CLOSID and
+>>>>>> RMID of the CTRL_MON group can be written.
+>>>>>> 4. If PLZA is enabled on a MON group, then the CLOSID of the
+>>>>>> CTRL_MON group can be used, while the RMID of the MON group can be
+>>>>>> written.
+>>>>
+>>>> Given that CLOSID and RMID are fixed once in the PLZA configuration
+>>>> could this be simplified by just assuming they have the values of the
+>>>> default group, CLOSID=0 and RMID=0 and let the user base there
+>>>> configuration on that?
+>>>>
+>>>
+>>> I didn't understand this question. There are 16 CLOSIDs and 1024 RMIDs.
+>>> We can use any one of these to enable PLZA.  It is not fixed in that sense.
+>>
+>> Sorry, I wasn't clear. What I'm trying to understand is what you gain by
+>> this flexibility. Given that the values CLOSID and the RMID are just
+>> identifiers within the hardware and have only the meaning they are given
+>> by the grouping and controls/monitors set up by resctrl (or any other
+>> software interface) would you lose anything by just saying the PLZA
+>> group has CLOSID=0 and RMID=0. Is there value in changing the PLZA
+>> CLOSID and RMID or can the same effect happen by just changing the
+>> resctrl configuration?
+>>
+> Not quite.
+> When you enter the kernel, you want to run unthrottled to avoid
+> priority inversion situations.
+> But at the same time, you still want to be able to monitor the
+> bandwidth for your thread or job, i..e, keep the same
+> RMID you have in user space.
 
-Replace the only call of wsrmsrns() with the now equivalent call to
-native_wrmsrq() and remove wsrmsrns().
+Thanks for sharing your usecase.
 
-The paravirt case will be handled later.
+> 
+> The kernel is by construction shared by all threads running in the
+> system. It should run unrestricted or with the
+> bandwidth allocated to the highest priority tasks.
+> 
+> PLZA should not change the RMID at all.
 
-Originally-by: Xin Li (Intel) <xin@zytor.com>
-Signed-off-by: Juergen Gross <jgross@suse.com>
----
-V2:
-- new patch, partially taken from "[RFC PATCH v2 21/34] x86/msr: Utilize
-  the alternatives mechanism to write MSR" by Xin Li.
----
- arch/x86/include/asm/fred.h |   2 +-
- arch/x86/include/asm/msr.h  | 144 +++++++++++++++++++++++++++---------
- arch/x86/kvm/vmx/vmx.c      |   2 +-
- 3 files changed, 111 insertions(+), 37 deletions(-)
+Would the above with RMID_EN=0 give you this usecase?
 
-diff --git a/arch/x86/include/asm/fred.h b/arch/x86/include/asm/fred.h
-index 2bb65677c079..71fc0c6e4e32 100644
---- a/arch/x86/include/asm/fred.h
-+++ b/arch/x86/include/asm/fred.h
-@@ -101,7 +101,7 @@ static __always_inline void fred_update_rsp0(void)
- 	unsigned long rsp0 = (unsigned long) task_stack_page(current) + THREAD_SIZE;
- 
- 	if (cpu_feature_enabled(X86_FEATURE_FRED) && (__this_cpu_read(fred_rsp0) != rsp0)) {
--		wrmsrns(MSR_IA32_FRED_RSP0, rsp0);
-+		native_wrmsrq(MSR_IA32_FRED_RSP0, rsp0);
- 		__this_cpu_write(fred_rsp0, rsp0);
- 	}
- }
-diff --git a/arch/x86/include/asm/msr.h b/arch/x86/include/asm/msr.h
-index 71f41af11591..ba11c3375cbd 100644
---- a/arch/x86/include/asm/msr.h
-+++ b/arch/x86/include/asm/msr.h
-@@ -7,11 +7,11 @@
- #ifndef __ASSEMBLER__
- 
- #include <asm/asm.h>
--#include <asm/errno.h>
- #include <asm/cpumask.h>
- #include <uapi/asm/msr.h>
- #include <asm/shared/msr.h>
- 
-+#include <linux/errno.h>
- #include <linux/types.h>
- #include <linux/percpu.h>
- 
-@@ -56,6 +56,36 @@ static inline void do_trace_read_msr(u32 msr, u64 val, int failed) {}
- static inline void do_trace_rdpmc(u32 msr, u64 val, int failed) {}
- #endif
- 
-+/* The GNU Assembler (Gas) with Binutils 2.40 adds WRMSRNS support */
-+#if defined(CONFIG_AS_IS_GNU) && CONFIG_AS_VERSION >= 24000
-+#define ASM_WRMSRNS		"wrmsrns\n\t"
-+#else
-+#define ASM_WRMSRNS		_ASM_BYTES(0x0f,0x01,0xc6)
-+#endif
-+
-+/* The GNU Assembler (Gas) with Binutils 2.41 adds the .insn directive support */
-+#if defined(CONFIG_AS_IS_GNU) && CONFIG_AS_VERSION >= 24100
-+#define ASM_WRMSRNS_IMM			\
-+	" .insn VEX.128.F3.M7.W0 0xf6 /0, %[val], %[msr]%{:u32}\n\t"
-+#else
-+/*
-+ * Note, clang also doesn't support the .insn directive.
-+ *
-+ * The register operand is encoded as %rax because all uses of the immediate
-+ * form MSR access instructions reference %rax as the register operand.
-+ */
-+#define ASM_WRMSRNS_IMM			\
-+	" .byte 0xc4,0xe7,0x7a,0xf6,0xc0; .long %c[msr]"
-+#endif
-+
-+#define PREPARE_RDX_FOR_WRMSR		\
-+	"mov %%rax, %%rdx\n\t"		\
-+	"shr $0x20, %%rdx\n\t"
-+
-+#define PREPARE_RCX_RDX_FOR_WRMSR	\
-+	"mov %[msr], %%ecx\n\t"		\
-+	PREPARE_RDX_FOR_WRMSR
-+
- /*
-  * __rdmsr() and __wrmsr() are the two primitives which are the bare minimum MSR
-  * accessors and should not have any tracing or other functionality piggybacking
-@@ -75,12 +105,76 @@ static __always_inline u64 __rdmsr(u32 msr)
- 	return EAX_EDX_VAL(val, low, high);
- }
- 
--static __always_inline void __wrmsrq(u32 msr, u64 val)
-+static __always_inline bool __wrmsrq_variable(u32 msr, u64 val, int type)
- {
--	asm volatile("1: wrmsr\n"
--		     "2:\n"
--		     _ASM_EXTABLE_TYPE(1b, 2b, EX_TYPE_WRMSR)
--		     : : "c" (msr), "a" ((u32)val), "d" ((u32)(val >> 32)) : "memory");
-+#ifdef CONFIG_X86_64
-+	BUILD_BUG_ON(__builtin_constant_p(msr));
-+#endif
-+
-+	/*
-+	 * WRMSR is 2 bytes.  WRMSRNS is 3 bytes.  Pad WRMSR with a redundant
-+	 * DS prefix to avoid a trailing NOP.
-+	 */
-+	asm_inline volatile goto(
-+		"1:\n"
-+		ALTERNATIVE("ds wrmsr",
-+			    ASM_WRMSRNS,
-+			    X86_FEATURE_WRMSRNS)
-+		_ASM_EXTABLE_TYPE(1b, %l[badmsr], %c[type])
-+
-+		:
-+		: "c" (msr), "a" ((u32)val), "d" ((u32)(val >> 32)), [type] "i" (type)
-+		: "memory"
-+		: badmsr);
-+
-+	return false;
-+
-+badmsr:
-+	return true;
-+}
-+
-+#ifdef CONFIG_X86_64
-+/*
-+ * Non-serializing WRMSR or its immediate form, when available.
-+ *
-+ * Otherwise, it falls back to a serializing WRMSR.
-+ */
-+static __always_inline bool __wrmsrq_constant(u32 msr, u64 val, int type)
-+{
-+	BUILD_BUG_ON(!__builtin_constant_p(msr));
-+
-+	asm_inline volatile goto(
-+		"1:\n"
-+		ALTERNATIVE_2(PREPARE_RCX_RDX_FOR_WRMSR
-+			      "2: ds wrmsr",
-+			      PREPARE_RCX_RDX_FOR_WRMSR
-+			      ASM_WRMSRNS,
-+			      X86_FEATURE_WRMSRNS,
-+			      ASM_WRMSRNS_IMM,
-+			      X86_FEATURE_MSR_IMM)
-+		_ASM_EXTABLE_TYPE(1b, %l[badmsr], %c[type])	/* For WRMSRNS immediate */
-+		_ASM_EXTABLE_TYPE(2b, %l[badmsr], %c[type])	/* For WRMSR(NS) */
-+
-+		:
-+		: [val] "a" (val), [msr] "i" (msr), [type] "i" (type)
-+		: "memory", "ecx", "rdx"
-+		: badmsr);
-+
-+	return false;
-+
-+badmsr:
-+	return true;
-+}
-+#endif
-+
-+static __always_inline bool __wrmsrq(u32 msr, u64 val, int type)
-+{
-+#ifdef CONFIG_X86_64
-+	if (__builtin_constant_p(msr))
-+		return __wrmsrq_constant(msr, val, type);
-+#endif
-+
-+	return __wrmsrq_variable(msr, val, type);
- }
- 
- #define native_rdmsr(msr, val1, val2)			\
-@@ -95,11 +189,15 @@ static __always_inline u64 native_rdmsrq(u32 msr)
- 	return __rdmsr(msr);
- }
- 
--#define native_wrmsr(msr, low, high)			\
--	__wrmsrq((msr), (u64)(high) << 32 | (low))
-+static __always_inline void native_wrmsrq(u32 msr, u64 val)
-+{
-+	__wrmsrq(msr, val, EX_TYPE_WRMSR);
-+}
- 
--#define native_wrmsrq(msr, val)				\
--	__wrmsrq((msr), (val))
-+static __always_inline void native_wrmsr(u32 msr, u32 low, u32 high)
-+{
-+	native_wrmsrq(msr, (u64)high << 32 | low);
-+}
- 
- static inline u64 native_read_msr(u32 msr)
- {
-@@ -131,15 +229,7 @@ static inline void notrace native_write_msr(u32 msr, u64 val)
- /* Can be uninlined because referenced by paravirt */
- static inline int notrace native_write_msr_safe(u32 msr, u64 val)
- {
--	int err;
--
--	asm volatile("1: wrmsr ; xor %[err],%[err]\n"
--		     "2:\n\t"
--		     _ASM_EXTABLE_TYPE_REG(1b, 2b, EX_TYPE_WRMSR_SAFE, %[err])
--		     : [err] "=a" (err)
--		     : "c" (msr), "0" ((u32)val), "d" ((u32)(val >> 32))
--		     : "memory");
--	return err;
-+	return __wrmsrq(msr, val, EX_TYPE_WRMSR_SAFE) ? -EIO : 0;
- }
- 
- extern int rdmsr_safe_regs(u32 regs[8]);
-@@ -158,7 +248,6 @@ static inline u64 native_read_pmc(int counter)
- #ifdef CONFIG_PARAVIRT_XXL
- #include <asm/paravirt.h>
- #else
--#include <linux/errno.h>
- static __always_inline u64 read_msr(u32 msr)
- {
- 	return native_read_msr(msr);
-@@ -250,21 +339,6 @@ static inline int wrmsrq_safe(u32 msr, u64 val)
- 	return err;
- }
- 
--/* Instruction opcode for WRMSRNS supported in binutils >= 2.40 */
--#define ASM_WRMSRNS _ASM_BYTES(0x0f,0x01,0xc6)
--
--/* Non-serializing WRMSR, when available.  Falls back to a serializing WRMSR. */
--static __always_inline void wrmsrns(u32 msr, u64 val)
--{
--	/*
--	 * WRMSR is 2 bytes.  WRMSRNS is 3 bytes.  Pad WRMSR with a redundant
--	 * DS prefix to avoid a trailing NOP.
--	 */
--	asm volatile("1: " ALTERNATIVE("ds wrmsr", ASM_WRMSRNS, X86_FEATURE_WRMSRNS)
--		     "2: " _ASM_EXTABLE_TYPE(1b, 2b, EX_TYPE_WRMSR)
--		     : : "c" (msr), "a" ((u32)val), "d" ((u32)(val >> 32)));
--}
--
- static inline void wrmsr(u32 msr, u32 low, u32 high)
- {
- 	wrmsrq(msr, (u64)high << 32 | low);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 3799cbbb4577..e29a2ac24669 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1473,7 +1473,7 @@ static void vmx_write_guest_host_msr(struct vcpu_vmx *vmx, u32 msr, u64 data,
- {
- 	preempt_disable();
- 	if (vmx->vt.guest_state_loaded)
--		wrmsrns(msr, data);
-+		native_wrmsrq(msr, data);
- 	preempt_enable();
- 	*cache = data;
- }
--- 
-2.53.0
+Unfortunately, this isn't possible when rmid/pmg is scoped to
+closid/partid as is the case in MPAM, i.e. the monitors require a match
+on the pair (closid, partid). Hence, I think we need to support the case
+where both RMID and CLOSID change.
+
+> 
+> You could obtain the same effect by changing the quote for each CLOSID
+> entering the kernel. But that would likely be more expensive
+> and you would have to do this for every possible entry and exit point
+> (restore on exit).
+> 
+> 
+> 
+>> I was also wondering if using the default group this way would mean that
+>> you wouldn't need to reserve the group for only kernel use.
+>>
+>>>
+>>>
+>>>>>>
+>>>>>> I am thinking this approach should work.
+>>>>>>
+>>>>>>>
+>>>>>>> Limiting it to a single CTRL group seems restrictive in a few ways:
+>>>>>>> 1) It requires that the "PLZA" group has a dedicated CLOSID. This
+>>>>>>> reduces the
+>>>>>>>      number of use cases that can be supported. Consider, for
+>>>>>>> example, an existing
+>>>>>>>      "high priority" resource group and a "low priority" resource
+>>>>>>> group. The user may
+>>>>>>>      just want to let the tasks in the "low priority" resource
+>>>>>>> group run as "high priority"
+>>>>>>>      when in CPL0. This of course may depend on what resources are
+>>>>>>> allocated, for example
+>>>>>>>      cache may need more care, but if, for example, user is only
+>>>>>>> interested in memory
+>>>>>>>      bandwidth allocation this seems a reasonable use case?
+>>>>>>> 2) Similar to what Tony [1] mentioned this does not enable what the
+>>>>>>> hardware is
+>>>>>>>      capable of in terms of number of different control groups/
+>>>>>>> CLOSID that can be
+>>>>>>>      assigned to MSR_IA32_PQR_PLZA_ASSOC. Why limit PLZA to one
+>>>>>>> CLOSID?
+>>>>>>> 3) The feature seems to support RMID in MSR_IA32_PQR_PLZA_ASSOC
+>>>>>>> similar to
+>>>>>>>      MSR_IA32_PQR_ASSOC. With this, it should be possible for user
+>>>>>>> space to, for
+>>>>>>>      example, create a resource group that contains tasks of
+>>>>>>> interest and create
+>>>>>>>      a monitor group within it that monitors all tasks' bandwidth
+>>>>>>> usage when in CPL0.
+>>>>>>>      This will give user space better insight into system behavior
+>>>>>>> and from what I can
+>>>>>>>      tell is supported by the feature but not enabled?
+>>>>>>
+>>>>>>
+>>>>>> Yes, as long as PLZA is enabled on only one group in the entire system
+>>>>>>
+>>>>>>>
+>>>>>>>>>
+>>>>>>>>>> 2) It can't be the root/default group
+>>>>>>>>>
+>>>>>>>>> This is something I added to keep the default group in a un-
+>>>>>>>>> disturbed,
+>>>>>>>
+>>>>>>> Why was this needed?
+>>>>>>>
+>>>>>>
+>>>>>> With the new approach mentioned about we can enable in default group
+>>>>>> also.
+>>>>>>
+>>>>>>>>>
+>>>>>>>>>> 3) It can't have sub monitor groups
+>>>>>>>
+>>>>>>> Why not?
+>>>>>>
+>>>>>> Ditto. With the new approach mentioned about we can enable in
+>>>>>> default group also.
+>>>>>>
+>>>>>>>
+>>>>>>>>>> 4) It can't be pseudo-locked
+>>>>>>>>>
+>>>>>>>>> Yes.
+>>>>>>>>>
+>>>>>>>>>>
+>>>>>>>>>> Would a potential use case involve putting *all* tasks into the
+>>>>>>>>>> PLZA group? That
+>>>>>>>>>> would avoid any additional context switch overhead as the PLZA
+>>>>>>>>>> MSR would never
+>>>>>>>>>> need to change.
+>>>>>>>>>
+>>>>>>>>> Yes. That can be one use case.
+>>>>>>>>>
+>>>>>>>>>>
+>>>>>>>>>> If that is the case, maybe for the PLZA group we should allow
+>>>>>>>>>> user to
+>>>>>>>>>> do:
+>>>>>>>>>>
+>>>>>>>>>> # echo '*' > tasks
+>>>>>>>
+>>>>>>> Dedicating a resource group to "PLZA" seems restrictive while also
+>>>>>>> adding many
+>>>>>>> complications since this designation makes resource group behave
+>>>>>>> differently and
+>>>>>>> thus the files need to get extra "treatments" to handle this "PLZA"
+>>>>>>> designation.
+>>>>>>>
+>>>>>>> I am wondering if it will not be simpler to introduce just one new
+>>>>>>> file, for example
+>>>>>>> "tasks_cpl0" in both CTRL_MON and MON groups. When user space
+>>>>>>> writes a task ID to the
+>>>>>>> file it "enables" PLZA for this task and that group's CLOSID and
+>>>>>>> RMID is the associated
+>>>>>>> task's "PLZA" CLOSID and RMID. This gives user space the
+>>>>>>> flexibility to use the same
+>>>>>>> resource group to manage user space and kernel space allocations
+>>>>>>> while also supporting
+>>>>>>> various monitoring use cases. This still supports the "dedicate a
+>>>>>>> resource group to PLZA"
+>>>>>>> use case where user space can create a new resource group with
+>>>>>>> certain allocations but the
+>>>>>>> "tasks" file will be empty and "tasks_cpl0" contains the tasks
+>>>>>>> needing to run with
+>>>>>>> the resource group's allocations when in CPL0.
+>>>>>>
+>>>>>> Yes. We should be able do that. We need both tasks_cpl0 and cpus_cpl0.
+>>>>>>
+>>>>>> We need make sure only one group can configured in the system and
+>>>>>> not allow in other groups when it is already enabled.
+>>>>>
+>>>>> As I understand this means that only one group can have content in its
+>>>>> tasks_cpl0/tasks_kernel file. There should not be any special
+>>>>> handling for
+>>>>> the remaining files of the resource group since the resource group is
+>>>>> not
+>>>>> dedicated to kernel work and can be used as a user space resource
+>>>>> group also.
+>>>>> If user space wants to create a dedicated kernel resource group there
+>>>>> can be
+>>>>> a new resource group with an empty tasks file.
+>>>>>
+>>>>> hmmm ... but if user space writes a task ID to a tasks_cpl0/
+>>>>> tasks_kernel file then
+>>>>> resctrl would need to create new syntax to remove that task ID.
+>>>>>
+>>>>> Possibly MPAM can build on this by allowing user space to write to
+>>>>> multiple
+>>>>> tasks_cpl0/tasks_kernel files? (and the next version of PLZA may too)
+>>>>>
+>>>>> Reinette
+>>>>>
+>>>>>
+>>>>>>
+>>>>>> Thanks
+>>>>>> Babu
+>>>>>>
+>>>>>>>
+>>>>>>> Reinette
+>>>>>>>
+>>>>>>> [1] https://lore.kernel.org/lkml/aXpgragcLS2L8ROe@agluck-desk3/
+>>>>>>>
+>>>>>>
+>>>>>
+>>>>>
+>>>>
+>>>> Thanks,
+>>>>
+>>>> Ben
+>>>>
+>>>>
+>>>
+>>
+>> Thanks,
+>>
+>> Ben
+>>
+
+Thanks,
+
+Ben
 
 
