@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-71249-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71250-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6PYxOjPVlWnFVAIAu9opvQ
-	(envelope-from <kvm+bounces-71249-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 16:05:23 +0100
+	id 2NnjI1fWlWlLVQIAu9opvQ
+	(envelope-from <kvm+bounces-71250-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 16:10:15 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 930E0157438
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 16:05:23 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39EC91574FA
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 16:10:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DD2043044162
-	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 15:04:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E30A83006838
+	for <lists+kvm@lfdr.de>; Wed, 18 Feb 2026 15:10:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD7A340A41;
-	Wed, 18 Feb 2026 15:03:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1F9340DAB;
+	Wed, 18 Feb 2026 15:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TwhJ7RM+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TmhLN9CN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EF42FBE05;
-	Wed, 18 Feb 2026 15:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A80433A9EF;
+	Wed, 18 Feb 2026 15:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771427039; cv=none; b=X1aQCkOhZf7JNehqupAXNusplLwlfnU6QMKkB50hSp7XFhnB7fnbTpyXVqx20qSwHAlWBA1+acnKPvzhLNhJXBYLVKYpaNw9e0qe9QMNtSuaOkLvIRQX7sb3DKN7PwmHAhyxfBzI+jwLdyRuFDDZISq4/rQ2aZPK6TFpEeyesGI=
+	t=1771427405; cv=none; b=ZbEb4UE5SUOGlUvRA2pBHbxDSZHTyu5xY/PY0v80Uky8T3HsNO5aPwGqunFBuPOV4FSpOHa+fJDELn8UN7ithS0OjUM6gkb2K0IplcvjwA8G55CzK0khqKutzbeUAEooZ971RAbUuRW+NrPuiASPG94ErUc8YBoJ/EPcMdt86JE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771427039; c=relaxed/simple;
-	bh=K1c524pLimFdculvJiQ+Fn1yVIfWiKktNS938mv4qDM=;
+	s=arc-20240116; t=1771427405; c=relaxed/simple;
+	bh=7pqQdTZ3QEb247ab4pYk1dyzMNKbtrE6Bbcar8kOk0E=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q3zIQrUzteUylIjnLi266WyCWrhVGFSkbOSHjrauvG7lGYFS9u13xPBiTkJFm+Lm5FE/mTCw04H2J1OUdDlR8t240WVPg2HSvdBadLC6nxxQmCUcjhDPlAQa9ToceDPrugo6WDpfUxcMnAWZhnzvjl4mfc3S+9mIDzNFMfaWPkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TwhJ7RM+; arc=none smtp.client-ip=192.198.163.14
+	 In-Reply-To:Content-Type; b=YRkjcbFQIS8IjZTNWaU+mTnGmThETaAjUEF0Qm+Zkr/DPdoEhvPVudbIN2STO+xnthqeR59uXEg3vLLC8J+S5CW45NEd3cbUp5ckuybchclQNLoE8MWMrnpO/qtQQpRofwNIxSFhYrxnwmqXeH0kMPaQpwBFIureFqmSrYDo/P8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TmhLN9CN; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771427038; x=1802963038;
+  t=1771427403; x=1802963403;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=K1c524pLimFdculvJiQ+Fn1yVIfWiKktNS938mv4qDM=;
-  b=TwhJ7RM+Gy7ujl7xV8QA5pf+IPkPvwI924nkhrhZpjmCc2q+Pv0IM4T0
-   49JFZOa2gqp+A8VQ9HK04w3uVPd7JnTXUpKuZxcdDyZKwj69EXTgIPsdN
-   v/UI5D979sw17NuIuaZ0Hnj3kEhZS6fJAzh4rfCkHTThpDIOjTJEHNsmv
-   DvX9xpMnY2HBAh4RhIDJDPEt9ZcMW2YvT9E9dveKgiuagIHyvweU0wRgQ
-   nALU6GE7dZlXi+O7bD4BwLGKx1/kCPBPIKFOg/12h9bBJdf7vHpcoUhxA
-   ZXWPOzsY73wqCwaeQ6z7Qpj+r33ZZfvYkTNTM+PbBGHW8ABfrjkkJgNKn
+  bh=7pqQdTZ3QEb247ab4pYk1dyzMNKbtrE6Bbcar8kOk0E=;
+  b=TmhLN9CNUevYNlW/NUXqOSQZ/wEY2vdLvrziJopLmQwavZzMAR9Sl2Wm
+   a6hX2mAFxaQ9AXIagp7a/uqRSbKkYqVN7tKtcWRsffWNdhOGR0ezcQrpm
+   pQbdJThvT3Lp2fZgLLUfbUM1qtDC3w0zDd7tBgK+7hdMFCKD17OIVcTAV
+   fRdqrM+7by2BccM3MVknTE3jwsExPkasjgnIxatV0l86MKBLsc7itgkKc
+   8fs7MHVZtzuigGPlscBy7zj5x5X2zrrub2xb/6RELHgFK3oHiLqyFGfBg
+   vHekGz9FUFzL+3cDYHysiikm0HM1Z2Mh/ykBg8q+dzly2qWdg5gHdMMaB
    Q==;
-X-CSE-ConnectionGUID: d4NVG7h9RmqPyGS4+hITMw==
-X-CSE-MsgGUID: 7QDH5IEGSUefySF3IBRZLg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11705"; a="72570146"
+X-CSE-ConnectionGUID: eqm/rzYURriyhG55nKMv2g==
+X-CSE-MsgGUID: d+it529BRSC9T/PCSM8kYw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11705"; a="71522385"
 X-IronPort-AV: E=Sophos;i="6.21,298,1763452800"; 
-   d="scan'208";a="72570146"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 07:03:58 -0800
-X-CSE-ConnectionGUID: XZ2CyFN4S4CjAiyQIYyMgw==
-X-CSE-MsgGUID: rxXf9NurTe2/p7O9SA7sQw==
+   d="scan'208";a="71522385"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 07:10:03 -0800
+X-CSE-ConnectionGUID: BMNUTj49SVCMW2khj3uZlw==
+X-CSE-MsgGUID: Nonb+fh2S+qu9FMmWVyaug==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,298,1763452800"; 
-   d="scan'208";a="213296938"
+   d="scan'208";a="219213306"
 Received: from rchatre-mobl4.amr.corp.intel.com (HELO [10.125.109.189]) ([10.125.109.189])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 07:03:56 -0800
-Message-ID: <31b42ba3-dd0c-42e7-ad1e-800c5cd2bcf8@intel.com>
-Date: Wed, 18 Feb 2026 07:03:56 -0800
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Feb 2026 07:10:02 -0800
+Message-ID: <5b7bd345-8ee8-4614-883c-573344ed2824@intel.com>
+Date: Wed, 18 Feb 2026 07:10:01 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/6] Add RMPOPT support.
+Subject: Re: [PATCH 5/6] x86/sev: Use configfs to re-enable RMP optimizations.
 To: "Kalra, Ashish" <ashish.kalra@amd.com>, tglx@kernel.org,
  mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
  hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
@@ -84,8 +84,9 @@ Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
  darwi@linutronix.de, linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
 References: <cover.1771321114.git.ashish.kalra@amd.com>
- <9c77e206-442d-4891-bb29-295bc8bffe20@intel.com>
- <65986f9e-59e8-4f1c-aaa7-1edf45af24d8@amd.com>
+ <88ddc178dcab3d27d6296e471218f13a4826f4a8.1771321114.git.ashish.kalra@amd.com>
+ <21250a3e-536c-4348-bf4c-a7356a13939b@intel.com>
+ <e72165ed-c65d-4d21-bff6-9981b46311cf@amd.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -131,7 +132,7 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <65986f9e-59e8-4f1c-aaa7-1edf45af24d8@amd.com>
+In-Reply-To: <e72165ed-c65d-4d21-bff6-9981b46311cf@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
@@ -139,48 +140,38 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[34];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71249-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71250-lists,kvm=lfdr.de];
 	DKIM_TRACE(0.00)[intel.com:+]
-X-Rspamd-Queue-Id: 930E0157438
+X-Rspamd-Queue-Id: 39EC91574FA
 X-Rspamd-Action: no action
 
-On 2/17/26 20:12, Kalra, Ashish wrote:
->> That's not awful.
->>
->> To be honest, though, I think this is misdesigned. Shouldn't the CPU
->> *boot* in a state where it is optimized? Why should software have to
->> tell it that coming out of reset, there is no SEV-SNP memory?
-> When the CPU boots, the RMP checks are not done and therefore the CPU
-> is booting in a state where it is optimized.
-> 
-> The RMP checks are not enabled till SEV-SNP is enabled and SNP is enabled
-> during kernel boot (as part of iommu_snp_enable() -> snp_rmptable_init()).
-> 
-> Once SNP is enabled as part of kernel boot, hypervisor and non-SNP guests are
-> subject to RMP checks on writes to provide integrity of SEV-SNP guest memory.
-> 
-> Therefore, we need to enable these RMP optimizations after SNP has been 
-> enabled to indicate which 1GB regions of memory are known to not contain any
-> SEV-SNP guest memory.
+On 2/17/26 19:34, Kalra, Ashish wrote:
+...
+> As currently, i.e, as part of this patch series, there is no
+> mechanism to re-issue RMPOPT automatically as part of SNP guest
+> cleanup, therefore this support exists to doing it manually at
+> runtime via configfs.
+I think you need a mechanism that re-enable RMP optimizations
+automatically for this feature to go upstream. It's just dead code
+otherwise, and we don't merge dead code.
 
-They are known not to contain any SEV-SNP guest memory at the moment
-snp_rmptable_init() finishes, no?
+A configfs hack doesn't really count.
 
