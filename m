@@ -1,43 +1,43 @@
-Return-Path: <kvm+bounces-71360-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71361-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAT1KI5Jl2m2wQIAu9opvQ
-	(envelope-from <kvm+bounces-71360-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 18:34:06 +0100
+	id yLpGNkZMl2m2wQIAu9opvQ
+	(envelope-from <kvm+bounces-71361-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 18:45:42 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EC6C16141E
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 18:34:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2330B1615FD
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 18:45:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 09C523047502
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 17:33:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DE088300D0F8
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 17:45:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D1DB34FF44;
-	Thu, 19 Feb 2026 17:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44FFD352937;
+	Thu, 19 Feb 2026 17:45:33 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCFF5286891;
-	Thu, 19 Feb 2026 17:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698E034107C;
+	Thu, 19 Feb 2026 17:45:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771522409; cv=none; b=tmkMjLS5xl90HRV92vZJuvJbU1p0uiUD7Hny10gxw4Qc7TwuZSpPSMypWu1EFPGQIdI+2QS7gRQ06F8vfiCi/zkROmJ6CCYmk4xeH27fWXIFUQccrdT5YsC3QJWe+ZIo8jWENT00oyEPeIuGphZwf0Ewwb9dB8wzkWZrSL4ci8k=
+	t=1771523132; cv=none; b=HHebVUcgHGQbFPAWVoAwe1Wtz4H+Z7TUiZmoztVnsuUMXhQCHo/CYsEgdi/bOCRq0oXwkhO9E0qWDGM6ZlTVFEYAjYAVOohcuC4mnEuMpCNwDw5qBUj8T+iDYtjboLB00Gqg35blRk5ata9HwD8Yrl+QA7bbXCizE/lr68+iiI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771522409; c=relaxed/simple;
-	bh=YBfqhAyJBBi8jQ5+S2gpiyWB9sQOFUWNV2K7dd7lm3I=;
+	s=arc-20240116; t=1771523132; c=relaxed/simple;
+	bh=TcREXtd47681GeYHFy4Ld1mK6K6MB7MwjdrQu79ZA9I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uQA6ROT/UmWgbjHDeZqRAG+BDclypDz8+In+oxYSq+KPBqhp51ot1JdjgR7waJ+dKq7lgYxU3QsLbQ2RjISu/qr69FhULeXLJghEHm5TEGtGru/VLZSmh5rLoTIZ55A37bZT7vBEMo5JFMNZmRCxfXJdrKKRb97kzOQNBYfEwak=
+	 In-Reply-To:Content-Type; b=fAy4WnW1NMtMpESiEId1R2jszIz5bduVC8fULMaSkswYPIxa8fxMR6v22oZt30xpUZ8YHUENuuv7wJyqcDoHXkpQ88WdNIH3ZXS1ZK9xUmSsUR8jEIHRZmjVCkmfq4rA9EhJCUIjwG0Yf0p2DssD3gOw8LowiS0f01cUZSeHlhE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 79EC5339;
-	Thu, 19 Feb 2026 09:33:20 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 138E1339;
+	Thu, 19 Feb 2026 09:45:24 -0800 (PST)
 Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA58F3F7D8;
-	Thu, 19 Feb 2026 09:33:19 -0800 (PST)
-Message-ID: <feaa16a5-765c-4c24-9e0b-c1f4ef87a66f@arm.com>
-Date: Thu, 19 Feb 2026 17:33:18 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 73B1F3F7D8;
+	Thu, 19 Feb 2026 09:45:23 -0800 (PST)
+Message-ID: <51ef05be-a70c-4109-9d6f-6e8ca56b6133@arm.com>
+Date: Thu, 19 Feb 2026 17:45:21 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,8 +86,7 @@ Cc: "Moger, Babu" <bmoger@amd.com>, "Moger, Babu" <Babu.Moger@amd.com>,
  "peternewman@google.com" <peternewman@google.com>,
  "eranian@google.com" <eranian@google.com>,
  "Shenoy, Gautham Ranjal" <gautham.shenoy@amd.com>
-References: <aYyxAPdTFejzsE42@e134344.arm.com>
- <679dcd01-05e5-476a-91dd-6d1d08637b3e@intel.com>
+References: <679dcd01-05e5-476a-91dd-6d1d08637b3e@intel.com>
  <aY3bvKeOcZ9yG686@e134344.arm.com>
  <2b2d0168-307a-40c3-98fa-54902482e861@intel.com>
  <aZM1OY7FALkPWmh6@e134344.arm.com>
@@ -96,24 +95,24 @@ References: <aYyxAPdTFejzsE42@e134344.arm.com>
  <2416004a-5626-491d-819c-c470abbe0dd0@intel.com>
  <aZTxJTWzfQGRqg-R@agluck-desk3>
  <65c279fd-0e89-4a6a-b217-3184bd570e23@intel.com>
- <aZXsihgl0B-o1DI6@agluck-desk3>
+ <aZXsihgl0B-o1DI6@agluck-desk3> <aZdCWCTDa777gfC9@agluck-desk3>
 From: Ben Horgan <ben.horgan@arm.com>
 Content-Language: en-US
-In-Reply-To: <aZXsihgl0B-o1DI6@agluck-desk3>
+In-Reply-To: <aZdCWCTDa777gfC9@agluck-desk3>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71360-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71361-lists,kvm=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[46];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -126,175 +125,55 @@ X-Spamd-Result: default: False [-1.36 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.965];
+	NEURAL_HAM(-0.00)[-0.967];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1EC6C16141E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,arm.com:mid]
+X-Rspamd-Queue-Id: 2330B1615FD
 X-Rspamd-Action: no action
 
 Hi Tony,
 
-On 2/18/26 16:44, Luck, Tony wrote:
-> On Tue, Feb 17, 2026 at 03:55:44PM -0800, Reinette Chatre wrote:
->> Hi Tony,
+On 2/19/26 17:03, Luck, Tony wrote:
+>> Likely real implementation:
 >>
->> On 2/17/26 2:52 PM, Luck, Tony wrote:
->>> On Tue, Feb 17, 2026 at 02:37:49PM -0800, Reinette Chatre wrote:
->>>> Hi Tony,
->>>>
->>>> On 2/17/26 1:44 PM, Luck, Tony wrote:
->>>>>>>>> I'm not sure if this would happen in the real world or not.
->>>>>>>>
->>>>>>>> Ack. I would like to echo Tony's request for feedback from resctrl users
->>>>>>>>  https://lore.kernel.org/lkml/aYzcpuG0PfUaTdqt@agluck-desk3/
->>>>>>>
->>>>>>> Indeed. This is all getting a bit complicated.
->>>>>>>
->>>>>>
->>>>>> ack
->>>>>
->>>>> We have several proposals so far:
->>>>>
->>>>> 1) Ben's suggestion to use the default group (either with a Babu-style
->>>>> "plza" file just in that group, or a configuration file under "info/").
->>>>>
->>>>> This is easily the simplest for implementation, but has no flexibility.
->>>>> Also requires users to move all the non-critical workloads out to other
->>>>> CTRL_MON groups. Doesn't steal a CLOSID/RMID.
->>>>>
->>>>> 2) My thoughts are for a separate group that is only used to configure
->>>>> the schemata. This does allocate a dedicated CLOSID/RMID pair. Those
->>>>> are used for all tasks when in kernel mode.
->>>>>
->>>>> No context switch overhead. Has some flexibility.
->>>>>
->>>>> 3) Babu's RFC patch. Designates an existing CTRL_MON group as the one
->>>>> that defines kernel CLOSID/RMID. Tasks and CPUs can be assigned to this
->>>>> group in addition to belonging to another group than defines schemata
->>>>> resources when running in non-kernel mode.
->>>>> Tasks aren't required to be in the kernel group, in which case they
->>>>> keep the same CLOSID in both user and kernel mode. When used in this
->>>>> way there will be context switch overhead when changing between tasks
->>>>> with different kernel CLOSID/RMID.
->>>>>
->>>>> 4) Even more complex scenarios with more than one user configurable
->>>>> kernel group to give more options on resources available in the kernel.
->>>>>
->>>>>
->>>>> I had a quick pass as coding my option "2". My UI to designate the
->>>>> group to use for kernel mode is to reserve the name "kernel_group"
->>>>> when making CTRL_MON groups. Some tweaks to avoid creating the
->>>>> "tasks", "cpus", and "cpus_list" files (which might be done more
->>>>> elegantly), and "mon_groups" directory in this group.
->>>>
->>>> Should the decision of whether context switch overhead is acceptable
->>>> not be left up to the user? 
->>>
->>> When someone comes up with a convincing use case to support one set of
->>> kernel resources when interrupting task A, and a different set of
->>> resources when interrupting task B, we should certainly listen.
->>
->> Absolutely. Someone can come up with such use case at any time tough. This
->> could be, and as has happened with some other resctrl interfaces, likely will be
->> after this feature has been supported for a few kernel versions. What timeline
->> should we give which users to share their use cases with us? Even if we do hear
->> from some users will that guarantee that no such use case will arise in the
->> future? Such predictions of usage are difficult for me and I thus find it simpler
->> to think of flexible ways to enable the features that we know the hardware supports.
->>
->> This does not mean that a full featured solution needs to be implemented from day 1.
->> If folks believe there are "no valid use cases" today resctrl still needs to prepare for
->> how it can grow to support full hardware capability and hardware designs in the
->> future.
->>
->> Also, please also consider not just resources for kernel work but also monitoring for
->> kernel work. I do think, for example, a reasonable use case may be to determine
->> how much memory bandwidth the kernel uses on behalf of certain tasks.
->>  
->>>> I assume that, just like what is currently done for x86's MSR_IA32_PQR_ASSOC,
->>>> the needed registers will only be updated if there is a new CLOSID/RMID needed
->>>> for kernel space.
->>>
->>> Babu's RFC does this.
->>
->> Right.
->>
->>>
->>>>                   Are you suggesting that just this checking itself is too
->>>> expensive to justify giving user space more flexibility by fully enabling what
->>>> the hardware supports? If resctrl does draw such a line to not enable what
->>>> hardware supports it should be well justified.
->>>
->>> The check is likley light weight (as long as the variables to be
->>> compared reside in the same cache lines as the exisitng CLOSID
->>> and RMID checks). So if there is a use case for different resources
->>> when in kernel mode, then taking this path will be fine.
->>
->> Why limit this to knowing about a use case? As I understand this feature can be
->> supported in a flexible way without introducing additional context switch overhead
->> if the user prefers to use just one allocation for all kernel work. By being
->> configurable and allowing resctrl to support more use cases in the future resctrl
->> does not paint itself into a corner. This allows resctrl to grow support so that
->> the user can use all capabilities of the hardware with understanding that it will
->> increase context switch time.
->>
->> Reinette
+>> Sub-components of each of the ideas above are encoded as a bitmask that
+>> is written to plza_mode. There is a file in the info/ directory listing
+>> which bits are supported on the current system (e.g. the "keep the same
+>> RMID" mode may be impractical on ARM, so it would not be listed as an
+>> option.)
 > 
-> How about this idea for extensibility.
 > 
-> Rename Babu's "plza" file to "plza_mode". Instead of just being an
-> on/off switch, it may accept multiple possible requests.
+> In x86 terms where control and monitor functions are independent we
+> have:
+> 
+> Control:
+> 1) Use default (CLOSID==0) for kernel
+> 2) Allocate just one CLOSID for kernel
+> 3) Allocate many CLOSIDs for kernel
+> 
+> Monitor:
+> 1) Do not monitor kernel separately from user
+> 2) Use default (RMID==0) for kernel
+> 3) Allocate one RMID for kernel
+> 4) Allocate many RMIDs for kernel
+> 
+> What options are possible on ARM & RISC-V?
 
-If we're making global configuration choices then I think it should be
-visible in a global location. It doesn't seem good to have to check all
-CTRL_MON group.
+For ARM (MPAM) we have the same flexibility that we have for userspace
+as the kernel. At EL0 (userspace) the configuration of parid/pmg is in
+SYS_MPAM0_EL1 and in EL1 (kernel) it's in SYS_MPAM1_EL1. These are both
+per-cpu system registers and control the partid and pmg the cpu adds to
+its requests at the particular exception level (EL).
 
-> 
-> Humorous version:
-> 
-> # echo "babu" > plza_mode
-> 
-> This results in behavior of Babu's RFC. The CLOSID and RMID assigned to
-> the CTRL_MON group are used when in kernel mode, but only for tasks that
-> have their task-id written to the "tasks" file or for tasks in the
-> default group in the "cpus" or "cpus_list" files are used to assign
-> CPUs to this group.
-> 
-> # echo "tony" > plza_mode
-> 
-> All tasks run with the CLOSID/RMID for this group. The "tasks", "cpus" and
-> "cpus_list" files and the "mon_groups" directory are removed.
-> 
-> # echo "ben" > plza_mode"
-> 
-> Only usable in the top-level default CTRL_MON directory. CLOSID=0/RMID=0
-> are used for all tasks in kernel mode.
-> 
-> # echo "stephane" > plza_mode
-> 
-> The RMID for this group is freed. All tasks run in kernel mode with the
-> CLOSID for this group, but use same RMID for both user and kernel.
-> In addition to files removed in "tony" mode, the mon_data directory is
-> removed.
+Of the above we can do all the control, 1,2,3 and all the monitor except
+1, so  2,3,4. With the caveat that if more than one partid/closid is
+used for the kernel then at least that number of pmg/monitors are used.
+This is as the monitors are not independent (as you say), i.e. a monitor
+is identified by the pair (partid, pmg).
 
-For these option with a single group set as plza we could have a global
-option and then just a plza marker.
-
-> 
-> # echo "some-future-name" > plza_mode
-> 
-> Somebody has a new use case. Resctrl can be extended by allowing some
-> new mode.
->
-> > Likely real implementation:
-> 
-> Sub-components of each of the ideas above are encoded as a bitmask that
-> is written to plza_mode. There is a file in the info/ directory listing
-> which bits are supported on the current system (e.g. the "keep the same
-> RMID" mode may be impractical on ARM, so it would not be listed as an
-> option.)
 > 
 > -Tony
+
 
 Thanks,
 
