@@ -1,303 +1,265 @@
-Return-Path: <kvm+bounces-71324-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71325-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kI7ENcmLlmkBhQIAu9opvQ
-	(envelope-from <kvm+bounces-71324-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 05:04:25 +0100
+	id BdKfHAKjlmk7iQIAu9opvQ
+	(envelope-from <kvm+bounces-71325-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 06:43:30 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5572A15BF83
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 05:04:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9C7215C27B
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 06:43:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BDF0D302F3B9
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 04:04:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6FCD93017F83
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 05:43:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C4A284686;
-	Thu, 19 Feb 2026 04:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32BAB2C11CB;
+	Thu, 19 Feb 2026 05:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AZZxvJUA"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NcFro5gr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012026.outbound.protection.outlook.com [40.93.195.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057CF1990C7
-	for <kvm@vger.kernel.org>; Thu, 19 Feb 2026 04:04:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771473845; cv=none; b=jiRlsKDd8qhXzuzXElS2Ndax1UxgSRqtayuiOwdcCKKNga8ZpkDEzXGhPZOiujkBoso3Ve7mZBkkYi8U/fR+Nap56eFcLfDtbgb8dMEsWPllcR9feEDoGN/U+QKidmDJOK1pgZ1tqOlt//D+xb2EKv3GUxeHMIFEx9e9lV14Cyg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771473845; c=relaxed/simple;
-	bh=SEtG62KIJC4Wik5hbe3A5iKnhkJYIjZpe04jj8y5cn0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hgiL1W+MnE4vq7DdLxSTiBfqt/Gqgmp5Tt7bk5ADaxOo1XUgYFnbokf3VORvnsZ8LBJbbT9zgou10Fh3hD+hE8+wnlEBoTdV0kh7tIrKRBvJiOqup9JLNFcxS659cTTrV/Qa2rJYXLWZZl9rgMN57UI8dLi/CjfSTdMWbSlcY+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=AZZxvJUA; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-c6e23cb81f4so177828a12.2
-        for <kvm@vger.kernel.org>; Wed, 18 Feb 2026 20:04:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1771473843; x=1772078643; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=z6kkriOPPX7wozUY6lAwXjbju2wlsIeCzFSPVO/lBjI=;
-        b=AZZxvJUA4kvDFC/IU8fHsV3juHlHyHYXGtrl0s/Di9VoFi6a+Kv1eDIeD8YWnhXy+9
-         BI5+ncQPYjgGHstDHP07ByDMpGJZVkHvx3ZAxbumeCFQFoZM+tdtZxbmTv53E/+owpSD
-         NRU9nB3ZgNjfBv4IyVDCAFhXL9R2xQ6cUhAZGEf5ygHo7giV27AKF/yKR8clkl1KQcPR
-         dnMK3JyiHSYPBT4EHlOqFzBN5nKOe4sqeNwc+4f4wZ+FVvzglB0QHBqMIpn5hGs9EaJA
-         BwSEBGcpMEUEOQbE9jiD6REvaTPfGtqTnsb+Ik0p6qWDU9tscGBhKQ3hrWjPl6TogXFx
-         E3mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771473843; x=1772078643;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z6kkriOPPX7wozUY6lAwXjbju2wlsIeCzFSPVO/lBjI=;
-        b=qIicPBU595lnNar0RxgweM7h7T16GU7Zz19GocUBAQ1p6Agl2Xf04gp/03oGY3V6wz
-         AALueUNFXZ5Vd2XBXOXrZ8vohppeuW98UEXV20mcMM30xXDGzUnQjOpCHmWH/y1qop0m
-         m7Ivv1OQyZQL60Yl3yhOnr+F7Kz+Do8EyxTYHzq9guf/VoQwrlps8sd9rAjGEH0nluOE
-         OACXpcwAV7XBljyHyyseDIZhbGiPgb58dCzD4URXiEN+AQvtyS9VxhvZlgBmH/HUbv6w
-         DL9klXmdx/9x2OHz+DGGD5ZLIs0k3aDcn/O51sMYKGB12xxlTDShx26WFMFAS5NJsg1R
-         mM9g==
-X-Forwarded-Encrypted: i=1; AJvYcCW9uueD7lY/twK77oNTdtvuUQR0PfQpJh1nu5nHr8+a/LkIjWL11el4tgDrOVHAy0IGvxU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzt/ZdoAZEBHXqMzwqSpiSL8xk4BMyalYbpwzXioRtnY2BU20ZS
-	cD7et1baFTOEPzXjcXBJG0caxz0Y0xDSxNI2fEnKJ/daLNT7b/uEiH2/TYFrB1/go+E=
-X-Gm-Gg: AZuq6aJMbRzY7K9EvxgJQM6i8tsuF+DWmV2RTTIrIGWoLiNA5S5aYKMv0X61ApIVjzV
-	HgUKPBUwzAUwz+fi+nlQOGUWcgaeWeoeRq3/vFelHk4I1aPq6eCYhcxATOBKWzaQ3NHH0VSiXqb
-	CWlpzXKG1U8eyiQj8tRO59aKsAo8cyTfQp042loUBpbfZe0Jff2FLzlaAuUz+A6fECd5byLV+/S
-	/hU8hQofnhcMAJk0ktccjkDuXQF7G27gL5BmhK583c3tIA/Mv82lHPhPNS00386eTxWoKizbarD
-	Jp81cIlg4oJ6xTFk8LA5Uo0HlZLXWgb7nzw6P+HgTkzbw4Dp7wE8Fbct7jeC4ByZYix7VtmARls
-	IFfBqf8pnQTa6Ld8AA/slifnX5Ybz5TAzHeCE78VwX/IQGVLdCKeAH2i0Eearljk7daGSgUB7Iq
-	017Z8wGiOVf4P6X9Obbg6DLc2ZLMgfQ9iUdlvH3+xTK+E7iVw4ZEAcb1+O8NDb75NwLD7w
-X-Received: by 2002:a17:903:2d1:b0:2ab:2733:bc25 with SMTP id d9443c01a7336-2ab505529cfmr178492955ad.14.1771473843257;
-        Wed, 18 Feb 2026 20:04:03 -0800 (PST)
-Received: from [192.168.1.87] (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ad1a713e8bsm205972075ad.28.2026.02.18.20.04.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Feb 2026 20:04:02 -0800 (PST)
-Message-ID: <fb5e8d63-270a-4df0-8646-b16435054302@linaro.org>
-Date: Wed, 18 Feb 2026 20:04:02 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9442765C4
+	for <kvm@vger.kernel.org>; Thu, 19 Feb 2026 05:43:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.26
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771479806; cv=fail; b=cK3eTzy041jRBjg+RJLDq9ZBTCeb8LWbMVt1LdTOqxtGKerK3eZpqUOhxcvHp50UDXDuDE4ARaoUqd0XxzBugMuuBr1zCewuzjMNMvzwkV/tgtoLuk+SsKQn8FQ4PfGGSaK9QOEBopL+zCB73lFAe9XvBGCcM1oudK03NMD68K4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771479806; c=relaxed/simple;
+	bh=ye0UAgKckjaH1JqwBRzt81kKTde93gM3hVq6C2p/HDw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KFBBJ0Uou7oYgnyhSklp9H1rwoRImFKmDjllapLXE7mRk+UCLBmAHhW2Etza4AhaO2YSV8CfD4Bq4XCXdPlMacOpau5yYqw8n5d0k62BCIkcoH3FKstiEH/1Hx/sn66YsbuvBddCywv6+3fuMehn2TfBLw3Uxn0fV01Vqf5jjA8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NcFro5gr; arc=fail smtp.client-ip=40.93.195.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AqqybtsqqCbkluDLXewRsIJixwVjp29tRqCY3YKcaLCX69gXiEYLMlZmSyzkmBeXZTa3CNQJxneeOaLr+MsHzbP8EOLsCCs04UfGma0BAjPbjBg+Am38/aqAvpKJdeQh/8LRWUCzTcqScSgTrkj2bXQac0Il0fCPluiIgZz2D2hvo/MAwugx0aOLEVW5B2EQopldHQepQTK65Wn4MmZO7cyeJzcKiv6i+NA+YRbF0+LxqaqnapGOnGEpJOmri571DUEvTzDHz8iJe8x4LB3bg6Xh+w6faOhf08HYBJwTy/zquW14cwOJCf1K07Hb18BHaLC6WLfUtcZr1z7c/HN3Ww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZO7V09rGEZ56SC7jbRN64geoWmPhP4S2erwQLV5cj0c=;
+ b=O6rfWHuvG9g+tUiDMyY4iMm8MCzKfVairC07Uh5B5hZ/OrKuFaUH8YZ1NN359YfDTHMttm51zQB9SuG0iAaO0wq83W3jBjYpUOcNK/cN1lOrpwFfGyjcUTdeDzoNLKZYzBloLx91UtZUaDICqio3Q8F7hPGBYDmtNAcdR9AdO9E3Y0rzCx0fjtKDqO9DSlkQsp9FRFqQAmsLXkKfc4TUh9Bx57OR98IETcMFVjhzKX21B/ea5Zv3vleUIKqkCG+Y7RkACy6kVVhcpLysVpUFOEuGJREi30q3hutBUDzqVEo/Fh5aarupmP23YbSZFB3TRQHBxMXfTf16LK7oJkcbHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=nongnu.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZO7V09rGEZ56SC7jbRN64geoWmPhP4S2erwQLV5cj0c=;
+ b=NcFro5grGNysw9ay2PugmRHay4AXDcpGdJDqTHCieN3Rz87M2946zL+rHHim3WPhhZh1e48byohYh8KzhFUl55vepX4JoDxugGJ/L/Oy2tObqBpvoLW5vQI5UtbHmvAby/aIN604DqiZ/PhdlWxJQDrGgCV5hf31m48lHcmoV1s=
+Received: from SJ0PR13CA0109.namprd13.prod.outlook.com (2603:10b6:a03:2c5::24)
+ by SJ5PPF6785369A4.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::997) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.16; Thu, 19 Feb
+ 2026 05:43:18 +0000
+Received: from SJ1PEPF00001CDF.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c5:cafe::e3) by SJ0PR13CA0109.outlook.office365.com
+ (2603:10b6:a03:2c5::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.14 via Frontend Transport; Thu,
+ 19 Feb 2026 05:43:17 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SJ1PEPF00001CDF.mail.protection.outlook.com (10.167.242.7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9632.12 via Frontend Transport; Thu, 19 Feb 2026 05:43:18 +0000
+Received: from brahmaputra.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 18 Feb
+ 2026 23:43:14 -0600
+From: Manali Shukla <manali.shukla@amd.com>
+To: <qemu-devel@nongnu.org>
+CC: Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <eduardo@habkost.net>,
+	<kvm@vger.kernel.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	"Marcelo Tosatti" <mtosatti@redhat.com>, "Michael S . Tsirkin"
+	<mst@redhat.com>, "Paolo Bonzini" <pbonzini@redhat.com>, Sean Christopherson
+	<seanjc@google.com>, Richard Henderson <richard.henderson@linaro.org>, Naveen
+ N Rao <naveen@kernel.org>, Nikunj Dadhaniya <nikunj@amd.com>,
+	<manali.shukla@amd.com>
+Subject: [PATCH v1 0/8] i386/kvm: Add support for extended APIC register space
+Date: Thu, 19 Feb 2026 05:41:59 +0000
+Message-ID: <20260219054207.471303-1-manali.shukla@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/12] target/arm: single-binary
-To: qemu-devel@nongnu.org
-Cc: anjo@rev.ng, Jim MacArthur <jim.macarthur@linaro.org>,
- kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>
-References: <20260210201540.1405424-1-pierrick.bouvier@linaro.org>
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Content-Language: en-US
-Autocrypt: addr=pierrick.bouvier@linaro.org; keydata=
- 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
- ZtfdHNZotF092MIH0IQC3poExQpV/WBYFAI=
-In-Reply-To: <20260210201540.1405424-1-pierrick.bouvier@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CDF:EE_|SJ5PPF6785369A4:EE_
+X-MS-Office365-Filtering-Correlation-Id: 266b0791-e7de-4f75-5c9c-08de6f79c8ea
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|7416014|1800799024|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?X2Vj3YNWcq1AArrLIXO6L6PJBJaRjGnftMdowfN6p7DHl+cK1nAD2tw1jcBS?=
+ =?us-ascii?Q?UMdSiIRxP6mFm2APCt/qin5RyWMzcVOQ3sqbZCsi/FaapvNglCc/MQMsoS7E?=
+ =?us-ascii?Q?FKv8IeGMz8IF/9EG42vHZGhQhhZ3f5e+dcqGAcBlqwMIwvFWpSaGLhWbwgdR?=
+ =?us-ascii?Q?5j5Y7YckWafQTnfx9pYutQ5PiL5PMgZpT+MjHBfjIVorZvV1CRnc7Mgn6Qxb?=
+ =?us-ascii?Q?+F+eNOll6VnNF7gT5CZkm3nzo9+xllP58FMtMq3GAfTKaUObDIWF9P6v0uNl?=
+ =?us-ascii?Q?9XeF0vucg6TWLY0+ERAKdtRml0hePizDkenbVBLEGQ/PQNnNPN9FZw0mlJb/?=
+ =?us-ascii?Q?xUdvuoAjc4eXyswNjdeudYOKT9phWzE4A5Zi7IWCpU6FbkJYtt/Zf3K50O1z?=
+ =?us-ascii?Q?zEvYwziNH02jmKiKxDvhRzvTMzdbFnMIHFGnU7X2+jvhgxsf1IbJG95yc4Sa?=
+ =?us-ascii?Q?dQ4U2c4iWN8qs3bEvcWH0tXv6t41G4LNREWhkgf4lKczxf+KdjmXAK/Z1GfB?=
+ =?us-ascii?Q?tcRut0i+ryRT+G6iycbUQnqfrU+a/ptj9nvn8h5aNxF7XRYWKilcoISpM9WM?=
+ =?us-ascii?Q?hTINTO17nOfQxSm05W5IfeMDpmMMoCEe5bHamRmotEhcS8Q/ye86e3Kd2A7H?=
+ =?us-ascii?Q?QloRwXQR6XZPM+1haVE+0JgxfneOw8U8KZnqWkJEzCkIvd9Y8eHBcAI9c/4n?=
+ =?us-ascii?Q?F+u9EaYlqQKRXE36YS/BaVlNC8hMoy14dl67Z58fMjEKOo9syG8Khb0RvheG?=
+ =?us-ascii?Q?G9ezF2WOTy9KTZhnr9YnndvXRQHkHuD1jPU83iaWXTSRjNWp8PH4R7iNrkrD?=
+ =?us-ascii?Q?bfzcbDoOisEm1kM3kT5MV47hOd65vzScRaEtmvQTdltYOTZENhhJ44+9/z0B?=
+ =?us-ascii?Q?OhepTEls/LfHjbFyeYCaIxcH/yDkwD73eS/hBH/Xx97tL4lSUBYnOVEe6TL1?=
+ =?us-ascii?Q?PI6PhBn0veNaFUNdohCzk1mhsYX44+eun1aenTahX3at/F6SECz6Y13t8hhQ?=
+ =?us-ascii?Q?7RORY+3IAEkG/GBYiZ6cwXPBNVzBFOkHjaVluR3/YiDFmb9LPhz1kdu6bLtu?=
+ =?us-ascii?Q?K3rTd/myqTrUgTJb6xEVKClNqSFRaKJr4XlZzXOyDHJHbOaMHaIJJcvwMmnm?=
+ =?us-ascii?Q?oTq6ZCuOk5NItLRI/Zo3QWc9+sSAZbsrF3JbgbjK4Rpm83rYZUoMw8lKQG1N?=
+ =?us-ascii?Q?jl+F0jwDBvuidRjmJhVhqJdrxujSemoVNoi3SFDobPZNswA2LV5FJOqwEMPT?=
+ =?us-ascii?Q?mjtKMFCKAyvThiwY8VhoaYO/JWzIWoAH0W4Tcay5+k3Zq9LjuwfYrwcwGF/a?=
+ =?us-ascii?Q?ObBbhfbbTmJJJZASwmaL3qcARXpMILFpZ+rN0NDLypIYz38I8T9HJ8Jh8spn?=
+ =?us-ascii?Q?eMicfFlf1CO8QgWPMmo9nvXHA6ePkss8OyXJ8i8Vns6YdN7XTJfakvc7Hliq?=
+ =?us-ascii?Q?dTNZqBzQ1RzGs6rXk7PeW45kM7r9KCfJaAXRjDL86aHRxEGhn/Vm2/xrTRJE?=
+ =?us-ascii?Q?sRB84tHbBXBhx1jjY0dk+IOeZPLyxesTDOTvKMMId4KHxNwOTCFWYvym5PpH?=
+ =?us-ascii?Q?1viWXRw3T/O68oDSF86CjF1Gw+M/Eu0iL5Qr/NA4iKDts2JuXl69YZkF6EJY?=
+ =?us-ascii?Q?HCufs/e4MleMrsFPdaqe5VCvwjA9Gg1IU3gbwVtggr/yMYGfM5jJpCfi5f7U?=
+ =?us-ascii?Q?AoOdLA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(7416014)(1800799024)(13003099007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	pha97ftEORhMlciaIgqGAJ5b7v3x49oYBTbkc56HEfKLVDhlBzl7BiXOr4YhV4+TWKcGkXMzZ0u3r+oBfCgkuazdH4mGexSgH7CIjRKH0TAppoB/+FMC1iZJqRnDmOyxdjYIp61ehDdH0UvEiawXbUnZfEO8JRhhDKTCCg0c7gdURie/cF/dY9FiSgpjxYTFQZEUB1pWIOH+1RrKY48+e0Xx5S4sh+5YcyLoDC9+L281kcAwOfUbPcNChrK3ON6nKqjAe/07vB7QBF4AZunu6M3upe411aOxpXvnTmuDfiyZ2KpNvw1cTpm9HrVzM/rQQyWTs0yfDRPOMbsSBPmxURzwYLcDIjEdF+K+FuxZnNnFuV6UpWkt64SaCzEVghfQO4nBLAp5CA5uRe+DffXf9yySHiv0LPs1+NP85yauLtVGzo+D4e3LncIpifnTuzJM
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2026 05:43:18.5059
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 266b0791-e7de-4f75-5c9c-08de6f79c8ea
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CDF.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF6785369A4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71324-lists,kvm=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,habkost.net,vger.kernel.org,gmail.com,google.com,linaro.org,kernel.org,amd.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
+	TAGGED_FROM(0.00)[bounces-71325-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pierrick.bouvier@linaro.org,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[manali.shukla@amd.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,update-linux-headers.sh:url];
+	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linaro.org:mid,linaro.org:dkim]
-X-Rspamd-Queue-Id: 5572A15BF83
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: C9C7215C27B
 X-Rspamd-Action: no action
 
-On 2/10/26 12:15 PM, Pierrick Bouvier wrote:
-> This series continues cleaning target/arm, especially tcg folder.
-> 
-> For now, it contains some cleanups in headers, and it splits helpers per
-> category, thus removing several usage of TARGET_AARCH64.
-> First version was simply splitting 32 vs 64-bit helpers, and Richard asked
-> to split per sub category.
-> 
-> v3
-> --
-> 
-> - translate.h: missing vaddr replacement
-> - move tcg_use_softmmu to tcg/tcg-internal.h to avoid duplicating compilation
->    units between system and user builds.
-> - eradicate TARGET_INSN_START_EXTRA_WORDS by calling tcg_gen_insn_start with
->    additional 0 parameters if needed.
-> 
-> v2
-> --
-> 
-> - add missing kvm_enabled() in arm-qmp-cmds.c
-> - didn't extract arm_wfi for tcg/psci.c. If that's a hard requirement, I can do
->    it in next version.
-> - restricted scope of series to helper headers, so we can validate things one
->    step at a time. Series will keep on growing once all patches are reviewed.
-> - translate.h: use vaddr where appropriate, as asked by Richard.
-> 
-> Pierrick Bouvier (12):
->    target/arm: extract helper-mve.h from helper.h
->    target/arm: extract helper-a64.h from helper.h
->    target/arm: extract helper-sve.h from helper.h
->    target/arm: extract helper-sme.h from helper.h
->    tcg: move tcg_use_softmmu to tcg/tcg-internal.h
->    target/arm: move exec/helper-* plumbery to helper.h
->    target/arm/tcg/psci.c: make compilation unit common
->    target/arm/tcg/cpu-v7m.c: make compilation unit common
->    target/arm/tcg/vec_helper.c: make compilation unit common
->    target/arm/tcg/translate.h: replace target_ulong with vaddr
->    target/arm/tcg/translate.h: replace target_long with int64_t
->    include/tcg/tcg-op.h: eradicate TARGET_INSN_START_EXTRA_WORDS
-> 
->   include/tcg/tcg-op-common.h                   |   8 +
->   include/tcg/tcg-op.h                          |  29 ---
->   include/tcg/tcg.h                             |   6 -
->   target/alpha/cpu-param.h                      |   2 -
->   target/arm/cpu-param.h                        |   7 -
->   target/arm/helper-a64.h                       |  14 ++
->   target/arm/helper-mve.h                       |  14 ++
->   target/arm/helper-sme.h                       |  14 ++
->   target/arm/helper-sve.h                       |  14 ++
->   target/arm/helper.h                           |  17 +-
->   .../tcg/{helper-a64.h => helper-a64-defs.h}   |   0
->   target/arm/tcg/{helper.h => helper-defs.h}    |   0
->   .../tcg/{helper-mve.h => helper-mve-defs.h}   |   0
->   .../tcg/{helper-sme.h => helper-sme-defs.h}   |   0
->   .../tcg/{helper-sve.h => helper-sve-defs.h}   |   0
->   target/arm/tcg/translate-a32.h                |   2 +-
->   target/arm/tcg/translate.h                    |  22 +-
->   target/arm/tcg/vec_internal.h                 |  49 ++++
->   target/avr/cpu-param.h                        |   2 -
->   target/hexagon/cpu-param.h                    |   2 -
->   target/hppa/cpu-param.h                       |   2 -
->   target/i386/cpu-param.h                       |   2 -
->   target/loongarch/cpu-param.h                  |   2 -
->   target/m68k/cpu-param.h                       |   2 -
->   target/microblaze/cpu-param.h                 |   2 -
->   target/mips/cpu-param.h                       |   2 -
->   target/or1k/cpu-param.h                       |   2 -
->   target/ppc/cpu-param.h                        |   2 -
->   target/riscv/cpu-param.h                      |   7 -
->   target/rx/cpu-param.h                         |   2 -
->   target/s390x/cpu-param.h                      |   2 -
->   target/sh4/cpu-param.h                        |   2 -
->   target/sparc/cpu-param.h                      |   2 -
->   target/tricore/cpu-param.h                    |   2 -
->   target/xtensa/cpu-param.h                     |   2 -
->   tcg/tcg-internal.h                            |   6 +
->   target/alpha/translate.c                      |   4 +-
->   target/arm/debug_helper.c                     |   4 +-
->   target/arm/helper.c                           |   5 +-
->   target/arm/tcg/arith_helper.c                 |   4 +-
->   target/arm/tcg/crypto_helper.c                |   4 +-
->   target/arm/tcg/gengvec64.c                    |   3 +-
->   target/arm/tcg/helper-a64.c                   |   6 +-
->   target/arm/tcg/hflags.c                       |   4 +-
->   target/arm/tcg/m_helper.c                     |   2 +-
->   target/arm/tcg/mte_helper.c                   |   3 +-
->   target/arm/tcg/mve_helper.c                   |   6 +-
->   target/arm/tcg/neon_helper.c                  |   4 +-
->   target/arm/tcg/op_helper.c                    |   2 +-
->   target/arm/tcg/pauth_helper.c                 |   3 +-
->   target/arm/tcg/psci.c                         |   4 +-
->   target/arm/tcg/sme_helper.c                   |   5 +-
->   target/arm/tcg/sve_helper.c                   |   6 +-
->   target/arm/tcg/tlb_helper.c                   |   4 +-
->   target/arm/tcg/translate-a64.c                |   3 +
->   target/arm/tcg/translate-mve.c                |   1 +
->   target/arm/tcg/translate-sme.c                |   3 +
->   target/arm/tcg/translate-sve.c                |   3 +
->   target/arm/tcg/translate.c                    |  25 +-
->   target/arm/tcg/vec_helper.c                   | 224 ++----------------
->   target/arm/tcg/vec_helper64.c                 | 142 +++++++++++
->   target/arm/tcg/vfp_helper.c                   |   4 +-
->   target/avr/translate.c                        |   2 +-
->   target/hexagon/translate.c                    |   2 +-
->   target/i386/tcg/translate.c                   |   2 +-
->   target/loongarch/tcg/translate.c              |   2 +-
->   target/m68k/translate.c                       |   2 +-
->   target/microblaze/translate.c                 |   2 +-
->   target/or1k/translate.c                       |   2 +-
->   target/ppc/translate.c                        |   2 +-
->   target/rx/translate.c                         |   2 +-
->   target/sh4/translate.c                        |   4 +-
->   target/sparc/translate.c                      |   2 +-
->   target/tricore/translate.c                    |   2 +-
->   target/xtensa/translate.c                     |   2 +-
->   tcg/tcg.c                                     |   4 -
->   target/arm/tcg/meson.build                    |  11 +-
->   77 files changed, 383 insertions(+), 381 deletions(-)
->   create mode 100644 target/arm/helper-a64.h
->   create mode 100644 target/arm/helper-mve.h
->   create mode 100644 target/arm/helper-sme.h
->   create mode 100644 target/arm/helper-sve.h
->   rename target/arm/tcg/{helper-a64.h => helper-a64-defs.h} (100%)
->   rename target/arm/tcg/{helper.h => helper-defs.h} (100%)
->   rename target/arm/tcg/{helper-mve.h => helper-mve-defs.h} (100%)
->   rename target/arm/tcg/{helper-sme.h => helper-sme-defs.h} (100%)
->   rename target/arm/tcg/{helper-sve.h => helper-sve-defs.h} (100%)
->   create mode 100644 target/arm/tcg/vec_helper64.c
-> 
+Add support for KVM_CAP_LAPIC2, which enables the full 4KB APIC register
+page instead of the legacy 1KB register space. The capability uses a bitmask
+design to support different APIC extensions:
 
-v4 fixing {kvm,xen}-only builds was sent:
-https://lore.kernel.org/qemu-devel/20260219040150.2098396-1-pierrick.bouvier@linaro.org/
+  - KVM_LAPIC2_DEFAULT: Basic 4KB APIC page support
+  - KVM_LAPIC2_AMD_DEFAULT: AMD extended LVT registers within the 4KB page
 
-Regards,
-Pierrick
+The base capability (KVM_LAPIC2_DEFAULT) provides the foundation for
+exposing the full APIC register space.
+
+AMD processors with the ExtApicSpace feature (CPUID 8000_0001h.ECX[3])
+further extend LAPIC space with additional LVT registers starting at offset
+0x400. These extended LVT registers provide additional interrupt vectors
+for AMD-specific features like Instruction Based Sampling (IBS).
+
+This series implements:
+
+1. Refactoring of existing APIC state functions to use generic pointers,
+   allowing them to work with both 1KB and 4KB APIC register spaces.
+
+2. Infrastructure to detect extended APIC support via arch_has_extapic()
+   and track negotiated capabilities.
+
+3. Extension of APICCommonState to store AMD extended APIC register state
+   (efeat, ectrl, extlvt array) with dynamic allocation based on the
+   number of extended LVT entries.
+
+4. Capability negotiation during vCPU pre-creation:
+   - Always request KVM_LAPIC2_DEFAULT for 4KB APIC page
+   - Additionally request KVM_LAPIC2_AMD_DEFAULT if CPU has ExtApicSpace
+   - Enable the intersection of KVM and QEMU capabilities
+
+5. New KVM_GET/SET_LAPIC2 ioctls operating on struct kvm_lapic_state2
+   (4KB) instead of struct kvm_lapic_state (1KB), with automatic
+   fallback to legacy ioctls for compatibility.
+
+6. New subsection of the vmstate (vmstate_apic_extended) of apic_common
+   module is added to make migration of extended APIC registers deterministic.
+
+This series depends on the corresponding KVM patches:
+  https://lore.kernel.org/kvm/20260204074452.55453-1-manali.shukla@amd.com/
+
+Patch 8 contains temporary UAPI definitions for testing and should NOT
+be merged. These definitions will be imported via update-linux-headers.sh
+once the kernel patches are merged.
+
+Testing:
+  - Verified extended APIC state synchronization on AMD hardware with
+    ExtApicSpace support
+  - Confirmed fallback to legacy APIC ioctls on older KVM versions
+  - Validated VM migration compatibility
+  - Ran migration tests from Qemu to make sure there are no regressions due to
+    the changes done.
+
+Repo : https://github.com/qemu/qemu.git
+branch : v10.1.0
+base commit : f8b2f64e23
+
+Manali Shukla (8):
+  i386/kvm: Refactor APIC state functions to use generic register
+    pointer
+  i386/kvm: Pass APICCommonState directly to kvm_get_apic_state()
+  i386/apic: Add extended APIC helper functions
+  i386/kvm: Add extended APIC state to APICCommonState
+  i386/kvm: Add extended LAPIC capability negotiation
+  i386/kvm: Add KVM_GET/SET_LAPIC2 support for extended APIC state
+  apic_common: migrate extended APIC fields
+  DO NOT MERGE: Temporary EXTAPIC UAPI definitions
+
+ hw/i386/kvm/apic.c              | 123 +++++++++++++++++++++++++-------
+ hw/intc/apic_common.c           |  21 ++++++
+ include/hw/i386/apic_internal.h |  11 +++
+ linux-headers/asm-x86/kvm.h     |   7 ++
+ linux-headers/linux/kvm.h       |   7 ++
+ target/i386/kvm/kvm.c           |  88 ++++++++++++++++++++++-
+ target/i386/kvm/kvm_i386.h      |   7 +-
+ 7 files changed, 233 insertions(+), 31 deletions(-)
+
+-- 
+2.43.0
+
 
