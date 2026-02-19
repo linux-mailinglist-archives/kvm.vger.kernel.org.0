@@ -1,296 +1,260 @@
-Return-Path: <kvm+bounces-71344-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71345-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Mj/N4LmlmkuqwIAu9opvQ
-	(envelope-from <kvm+bounces-71344-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:31:30 +0100
+	id UNiMMYnnlmmNqwIAu9opvQ
+	(envelope-from <kvm+bounces-71345-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:35:53 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47DB515DCC1
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:31:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F5AB15DD71
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:35:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CF616301AF42
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 10:31:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E80AA303745A
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 10:35:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 514F4329C7B;
-	Thu, 19 Feb 2026 10:31:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C9F533710F;
+	Thu, 19 Feb 2026 10:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a8rlNmhH";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="sZbdISIF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OnG8/tQg";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="oQV4QSAi"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A2172634
-	for <kvm@vger.kernel.org>; Thu, 19 Feb 2026 10:31:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2D62F39A7
+	for <kvm@vger.kernel.org>; Thu, 19 Feb 2026 10:35:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771497082; cv=none; b=ZluziJ9fJE6S9r047CaXg8KH8NuCnunOclmQOFp2+X59lM9SwvQU0wORmasBniLuO96nrwWlTsJsKUURlTGT1AV9kUdCfFF8cF3LvPrnJBMHrJK+Oe9/UNgCW34wn+uaQ4zfxRrH0VKO1qRrdotzf/bCLcgPNHtMtiTFegfnUSc=
+	t=1771497328; cv=none; b=uzSHHFpCasooR9ilED3hiA2fEpTNw4XXgu3eRbu8pTmqhICuWVSNXWJ6uWpZDx0oeJ7r2sJKudCBdCTP6g9x3Fr7zczGZwzH9yZ3yWjXy06uwIp1ozInFcu28N0aWj3M2Y7QBs1EXIPRNj7QuHUwXkphzT+UUpZ/In4uchs8KOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771497082; c=relaxed/simple;
-	bh=fvHHqqBjkECPXcooImIOYCgGKhVCIfhccwvW3L2T/Ec=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=YRMAzWeQU9op3iF/D3DH4jqOHN7t+Wrv4J9MkvZfsbqPKXbZC4/gNz6MOr6YWOPuAV2MxJ+chKjY+JqmntuSncAx/18Mpr+FLJWzUF3aYkEknEs83E7nI2Hrhyey5VREc9WKzzZNhc3/2PQ+A4D6zDN4GdTeQvmknZJIji8X+FM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a8rlNmhH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=sZbdISIF; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1771497328; c=relaxed/simple;
+	bh=JzgTJfCZThD8ADnrrzOcTouopRq3PU+mfSlCjHNTIqg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ueT5vjad0i6Drvd2WS917GJ/oIh5UIRpmGBOcsO++Zabrd42boTPRur8H2SkQlg1Trhka/HBdioZTbkVFBcJ1aH+FUQoyWZcA7aAh2empw/299VzXPXJR8fAAob8TYRfQnCed3vnh0ByRpwdhHbDW6OQDtKHn3AHgk3Ji32fFoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OnG8/tQg; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=oQV4QSAi; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771497080;
+	s=mimecast20190719; t=1771497326;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LyQNA8MfxC+gdRaJejrXp5+qJYC1z7cZ1QgL2HRqhmA=;
-	b=a8rlNmhH6epL/5YdrPiWJnlZZG03pCBk9McpUxZfc6g8Lasj3UJqaB2Z6ZuzNqb5RsQhKz
-	ctQHMC4scPzFM2yzeNpjB2shPfD/SXa5lodbqXFe71wBGRTSB/u/TYJpc+DFSy824HGNS5
-	SmykSw5inTsQuj5ed/mtg/u4VVVnKAg=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=3F3zYoVrT9qjM5rAq+b6pbd+/hnAt//GBzSEVJjvXTQ=;
+	b=OnG8/tQggtNY3Lr8AVEqC7zh+Z9YSUah4pY0sWAoRIIuSTRkvgs6IF4gZ0p/eAp0HPkIJl
+	AylTvKx/xPsLLPhd6v+kEDs83ueNQjuD48QiNLTnnCJ5RsSp1alM34hMg5nOA4tXb9SQ5D
+	xXCtUegkUnaM24GQp9g9qfKoIwXmhYk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-711--KDcmFmtOI2p-mKN1TtZOQ-1; Thu, 19 Feb 2026 05:31:18 -0500
-X-MC-Unique: -KDcmFmtOI2p-mKN1TtZOQ-1
-X-Mimecast-MFC-AGG-ID: -KDcmFmtOI2p-mKN1TtZOQ_1771497077
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2aad6045810so7954145ad.3
-        for <kvm@vger.kernel.org>; Thu, 19 Feb 2026 02:31:18 -0800 (PST)
+ us-mta-318-RyNX1KEvOHqvCep9ptaxjw-1; Thu, 19 Feb 2026 05:35:24 -0500
+X-MC-Unique: RyNX1KEvOHqvCep9ptaxjw-1
+X-Mimecast-MFC-AGG-ID: RyNX1KEvOHqvCep9ptaxjw_1771497324
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4836abfc742so5248985e9.0
+        for <kvm@vger.kernel.org>; Thu, 19 Feb 2026 02:35:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1771497077; x=1772101877; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LyQNA8MfxC+gdRaJejrXp5+qJYC1z7cZ1QgL2HRqhmA=;
-        b=sZbdISIFA2jWmRvao0ZJ4iYucrVeuftZI6GmvI1WIOZRCmvZgXqVs1kgMb0f7Nj2sM
-         JS56OdYddgBuyd3kuWEOWaCFx0rGGb2r1WYYOCKxv9xX2tH1HHnTkP8oh3Xj+qTSc0kq
-         jiAlc4ymNnmjYfstPTxgRGDhd2DHOoPsYeRC+TYktFA0b5NnCJxwOxm34qBf9nJfgDlA
-         X38w1pk/HsKADrOeQ4d1y52z+BbvT/y3nn38UWiFVGWdtnYfZ1Bn2S11kmdQ3SSbpe5M
-         Fl0SKM6uqqwdxILkdQ/ZOU137t4P649+W/gKfQ4zTJu+kXlTpAgcMrAvjUzLlpm00pfE
-         J9dw==
+        d=redhat.com; s=google; t=1771497323; x=1772102123; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3F3zYoVrT9qjM5rAq+b6pbd+/hnAt//GBzSEVJjvXTQ=;
+        b=oQV4QSAim8zkAt72BCdWOW/0atkiHhZffjQCtYsgFklc3kS/jwjCiz8u1e7HRW5oTk
+         Wuv9hWwMByh8Msm3JXH3PJoq9LT/SkPDTNWr08vO4/QUVKyZ5Ef6pWjWLG/SGaar/x0S
+         yUNvU0yGNfcEd+sd6IyJwSqnz1lnRE+oqlWP6drNX6iy52JR/THCXp86qo9MMdqmR6HB
+         9aHAbROjJoIxgfIgUhjHChfivheG1D8prFps4MwahKkkiCI/8DqBkdyJIr8ifNVepgJ1
+         EM2rgXoUInohlTguN+Y9HTXjJenj7LRm0Sntz03CRG3ZDhlzaJNpzgqhSrzTdYLCWCgQ
+         vZYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771497077; x=1772101877;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LyQNA8MfxC+gdRaJejrXp5+qJYC1z7cZ1QgL2HRqhmA=;
-        b=JIby0V9vVZC/5nQIKnAz0D2ewN1lo5PSfTvOznpdqU5HHobF1Az+Tq4uOpuT7cGnnd
-         2BO6B7T2BMVOcQHDK+3AGZtqiP7zK0i8X80bNRkkC1s2q0NmonhSL7lLCPh/ngww04EH
-         YLhu6+sd7sJpAuRfDp5w7Evf4pE493EOJaFYDFzBjxfHVhHXPJH2xKzw56PfH2wfOxjC
-         TG5PHCW4LhOkfD+W+yGegDGJkDWKLVIFfgpdhCoef7HSanPJDmwc1J66JaA4ut/VqW3v
-         2U8ax8fKHqgHjbo4sYfrXvUA5Fs2ycs6AYclRJOOSsLNQatog8MZs3ccaZs9GvhWmGxW
-         rvsg==
-X-Forwarded-Encrypted: i=1; AJvYcCWFXeoBeba7PhagadQAAgOSfmUUe9Xu5b4Q3CsxvJf68Hsdh31Vp0Pj910i8LSrZSb9njk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxWkyu3AWpLGOI8VulxJD+1MJ4SaJ/g4UUbuRp+Ozd8Q2WwhBV
-	6MSXnUzePEAwELyoFH6Qm61kMGJXKaZzeC+oJbHOwCr918VWiXYppTGVrZcTErqeYzZN2EQ1nEA
-	5ZK65QiihsorAmsQ/DLBBUzPp9xjINOBT4TKjcsXzMhNj+CLNOAfq9A==
-X-Gm-Gg: AZuq6aJX1m+zKVo/4FFLPkgPPnb8cEBN9TWRfHVTs0o1shvhFvLhvYE2FMwnboend4E
-	Yo7oea6kuDtENmv0XiIhAeR7TSA89jqZhrnBxNgpXv3PoBAIWd+tZSmG4VR7jtwVUKzITfq21FV
-	wLY9k7UZAIe43NR2Wyfl8+jm+GYe8kUrGUIG/Hk5pxcEL6pGVYT7q/xbukYPB9HYG6ur5F5PT5E
-	1W20JygV1x5Uf/XTWyaW5xOJTOFUZZmDunvLbMkJtrpEnIMcUYzbtH2UmZtAPVTJ2JcKq0bgmP1
-	EujVLkczrc0tY4YX6EbRNNLWWfbII2Pc+Z2197jNA/1CF4yCYw+BtkPkXVDxEWS/Lwc38itWROw
-	2hzqQd7uxMZhzOtS6MZCfpCcxx56GGzOJK5i78/cYWaILx3Cm3f30KumCKBt7qiW8T3c=
-X-Received: by 2002:a17:903:2a85:b0:2aa:e3f7:a945 with SMTP id d9443c01a7336-2ad50fb5db7mr45393435ad.49.1771497077484;
-        Thu, 19 Feb 2026 02:31:17 -0800 (PST)
-X-Received: by 2002:a17:903:2a85:b0:2aa:e3f7:a945 with SMTP id d9443c01a7336-2ad50fb5db7mr45393105ad.49.1771497077034;
-        Thu, 19 Feb 2026 02:31:17 -0800 (PST)
-Received: from smtpclient.apple ([117.99.83.54])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ad1aaeab38sm157285875ad.82.2026.02.19.02.31.14
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 19 Feb 2026 02:31:16 -0800 (PST)
-Content-Type: text/plain;
-	charset=utf-8
+        d=1e100.net; s=20230601; t=1771497323; x=1772102123;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3F3zYoVrT9qjM5rAq+b6pbd+/hnAt//GBzSEVJjvXTQ=;
+        b=ob4S+1S0BwEuFRgLKhsLNW58pgesqHEVi1m+J2PZbGdrIFFVedYh4PkecN8o5F1B+G
+         XujIFXkefsdKry0HED9tI0TxjyxhmkxezPd0gW0l4Yyp9i/KIEIf2xkniLSisLZpK+o8
+         SOHQ1DCo3RGAafWbUbaUqcbyb/7gyC/e3tILa13u+dmDILKs+Cs8OrE4lE/W69GYLPx6
+         jOcikycp8nqrhB9wsaonbzDzqVhikEQT3mgF0+d+oeHYYbrULzlNH4SImo74YooV36Cg
+         h8lSwEZNYX574mJmJxmnRZOKZeTjvCalsVfDOi6OrGj1dI7sLl8dVfqRY1fIcVFzQxEV
+         QnMA==
+X-Forwarded-Encrypted: i=1; AJvYcCXcnUmRjHTiFoLSUdLiUswX5FuseUsCvNBRryyQbaSMEpCT/+JDB8nfeKgRGzaVYqC7XSw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSZ95vvd2TuyuvCG+bJEuiIzp58QYat/NlhoR4YhNcVxiCVUGp
+	QtYnEI+KhT+f46CJT7q+3ez2vae285Q3hI1IVcX8GPQtfMfVBYRcBQex2MmVV8GLzrBZ3T7e9PW
+	wPgGnBTjRgupAfEft8vOO4pV2quKoirsCtKkC/IQDn1pYcFEJpN1qUg==
+X-Gm-Gg: AZuq6aKJilJgOtJ5+TerR8WMoEFjEsMS5jI8IRPYRc2pZks9ABm6vRIRwVBGaPZDvC7
+	gKWAwlQOj2WO/R3XhFMzKwTQdeLbF1H3OuJrajndJB/LNPsD6bmGEx1xQyoNiFPAkIFQvUIJ7LO
+	xNunFFY+4Z20ELmmAROyBhC+6oBbGMOcwE69UlaIN+/vAmmzJjklK8j4ViG2paEiijlkIy0wlFf
+	YajH9M6Ez75iHUMiZT5Mkecha/3PffQvRQCPeoDtk/nUaLbJ4T3JUmqgp265p8hStITobfDcDBc
+	xmmVPKmcqWQ/NpdXbe0VZWoFHBiLZBcD1S7yr7p3YFuBWHxt6ili4xZ4Q/WjFubTtRl8KVzasbN
+	pJ2lhTyvIU70PM9w4qh+Ybi/HiDJfGrAdMaq5Vul2zkHH1W3fwLRnUdumXrGWn0efciyLTg8=
+X-Received: by 2002:a05:600c:4eca:b0:483:6d4a:7e6d with SMTP id 5b1f17b1804b1-48379be60camr248733835e9.30.1771497323436;
+        Thu, 19 Feb 2026 02:35:23 -0800 (PST)
+X-Received: by 2002:a05:600c:4eca:b0:483:6d4a:7e6d with SMTP id 5b1f17b1804b1-48379be60camr248733415e9.30.1771497322976;
+        Thu, 19 Feb 2026 02:35:22 -0800 (PST)
+Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4839f96967bsm19658265e9.3.2026.02.19.02.35.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Feb 2026 02:35:21 -0800 (PST)
+Date: Thu, 19 Feb 2026 11:35:19 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Bobby Eshleman <bobbyeshleman@meta.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net v2 1/3] selftests/vsock: change tests to respect
+ write-once child ns mode
+Message-ID: <aZbNwPMSd6ridmBn@sgarzare-redhat>
+References: <20260218-vsock-ns-write-once-v2-0-19e4c50d509a@meta.com>
+ <20260218-vsock-ns-write-once-v2-1-19e4c50d509a@meta.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.4\))
-Subject: Re: [PATCH v5 27/34] kvm/xen-emu: re-initialize capabilities during
- confidential guest reset
-From: Ani Sinha <anisinha@redhat.com>
-In-Reply-To: <3b4b7b7b-7fcd-46ce-bdcb-cd1a30cf5276@xen.org>
-Date: Thu, 19 Feb 2026 16:01:02 +0530
-Cc: David Woodhouse <dwmw2@infradead.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- kvm@vger.kernel.org,
- qemu-devel <qemu-devel@nongnu.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <793B549F-F866-4BF5-ABAF-A0537BA8713B@redhat.com>
-References: <20260218114233.266178-1-anisinha@redhat.com>
- <20260218114233.266178-28-anisinha@redhat.com>
- <3b4b7b7b-7fcd-46ce-bdcb-cd1a30cf5276@xen.org>
-To: Paul Durrant <xadimgnik@gmail.com>
-X-Mailer: Apple Mail (2.3826.700.81.1.4)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260218-vsock-ns-write-once-v2-1-19e4c50d509a@meta.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FREEMAIL_TO(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71344-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-71345-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anisinha@redhat.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 47DB515DCC1
+	TAGGED_RCPT(0.00)[kvm];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:email]
+X-Rspamd-Queue-Id: 1F5AB15DD71
 X-Rspamd-Action: no action
 
+On Wed, Feb 18, 2026 at 10:10:36AM -0800, Bobby Eshleman wrote:
+>From: Bobby Eshleman <bobbyeshleman@meta.com>
+>
+>The child_ns_mode sysctl parameter becomes write-once in a future patch
+>in this series, which breaks existing tests. This patch updates the
+>tests to respect this new policy. No additional tests are added.
+>
+>Add "global-parent" and "local-parent" namespaces as intermediaries to
+>spawn namespaces in the given modes. This avoids the need to change
+>"child_ns_mode" in the init_ns. nsenter must be used because ip netns
+>unshares the mount namespace so nested "ip netns add" breaks exec calls
+>from the init ns. Adds nsenter to the deps check.
+>
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>---
+> tools/testing/selftests/vsock/vmtest.sh | 35 +++++++++++++++------------------
+> 1 file changed, 16 insertions(+), 19 deletions(-)
 
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-> On 19 Feb 2026, at 3:09=E2=80=AFPM, Paul Durrant <xadimgnik@gmail.com> =
-wrote:
->=20
-> On 18/02/2026 11:42, Ani Sinha wrote:
->> On confidential guests KVM virtual machine file descriptor changes as =
-a
->> part of the guest reset process. Xen capabilities needs to be =
-re-initialized in
->> KVM against the new file descriptor.
->> Signed-off-by: Ani Sinha <anisinha@redhat.com>
->> ---
->>  target/i386/kvm/xen-emu.c | 50 =
-+++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 48 insertions(+), 2 deletions(-)
->> diff --git a/target/i386/kvm/xen-emu.c b/target/i386/kvm/xen-emu.c
->> index 52de019834..69527145eb 100644
->> --- a/target/i386/kvm/xen-emu.c
->> +++ b/target/i386/kvm/xen-emu.c
->> @@ -44,9 +44,12 @@
->>    #include "xen-compat.h"
->>  +NotifierWithReturn xen_vmfd_change_notifier;
->> +static bool hyperv_enabled;
->>  static void xen_vcpu_singleshot_timer_event(void *opaque);
->>  static void xen_vcpu_periodic_timer_event(void *opaque);
->>  static int vcpuop_stop_singleshot_timer(CPUState *cs);
->> +static int do_initialize_xen_caps(KVMState *s, uint32_t =
-hypercall_msr);
->>    #ifdef TARGET_X86_64
->>  #define hypercall_compat32(longmode) (!(longmode))
->> @@ -54,6 +57,30 @@ static int vcpuop_stop_singleshot_timer(CPUState =
-*cs);
->>  #define hypercall_compat32(longmode) (false)
->>  #endif
->>  +static int xen_handle_vmfd_change(NotifierWithReturn *n,
->> +                                  void *data, Error** errp)
->> +{
->> +    int ret;
->> +
->> +    /* we are not interested in pre vmfd change notification */
->> +    if (((VmfdChangeNotifier *)data)->pre) {
->> +        return 0;
->> +    }
->> +
->> +    ret =3D do_initialize_xen_caps(kvm_state, XEN_HYPERCALL_MSR);
->> +    if (ret < 0) {
->> +        return ret;
->> +    }
->> +
->> +    if (hyperv_enabled) {
->> +        ret =3D do_initialize_xen_caps(kvm_state, =
-XEN_HYPERCALL_MSR_HYPERV);
->> +        if (ret < 0) {
->> +            return ret;
->> +        }
->> +    }
->> +    return 0;
->=20
-> This seems odd. Why use the hyperv_enabled boolean, rather than simply =
-the msr value, since when hyperv_enabled is set you will be calling =
-do_initialize_xen_caps() twice.
-
-I am not sure of enabling capabilities for Xen. I assumed we need to =
-call kvm_xen_init() twice, once normally with XEN_HYPERCALL_MSR and if =
-hyper is enabled, again with XEN_HYPERCALL_MSR_HYPERV. Is that not the =
-case? Is it one or the other but not both? It seems kvm_arch_init() =
-calls kvm_xen_init() once with XEN_HYPERCALL_MSR and another time =
-vcpu_arch_init() calls it again if hyperv is enabled with =
-XEN_HYPERCALL_MSR_HYPERV .
-
->=20
->> +}
->> +
->>  static bool kvm_gva_to_gpa(CPUState *cs, uint64_t gva, uint64_t =
-*gpa,
->>                             size_t *len, bool is_write)
->>  {
->> @@ -111,15 +138,16 @@ static inline int kvm_copy_to_gva(CPUState *cs, =
-uint64_t gva, void *buf,
->>      return kvm_gva_rw(cs, gva, buf, sz, true);
->>  }
->>  -int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
->> +static int do_initialize_xen_caps(KVMState *s, uint32_t =
-hypercall_msr)
->>  {
->> +    int xen_caps, ret;
->>      const int required_caps =3D KVM_XEN_HVM_CONFIG_HYPERCALL_MSR |
->>          KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL | =
-KVM_XEN_HVM_CONFIG_SHARED_INFO;
->> +
->=20
-> Gratuitous whitespace change.
->=20
->>      struct kvm_xen_hvm_config cfg =3D {
->>          .msr =3D hypercall_msr,
->>          .flags =3D KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL,
->>      };
->> -    int xen_caps, ret;
->>        xen_caps =3D kvm_check_extension(s, KVM_CAP_XEN_HVM);
->>      if (required_caps & ~xen_caps) {
->> @@ -143,6 +171,21 @@ int kvm_xen_init(KVMState *s, uint32_t =
-hypercall_msr)
->>                       strerror(-ret));
->>          return ret;
->>      }
->> +    return xen_caps;
->> +}
->> +
->> +int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
->> +{
->> +    int xen_caps;
->> +
->> +    xen_caps =3D do_initialize_xen_caps(s, hypercall_msr);
->> +    if (xen_caps < 0) {
->> +        return xen_caps;
->> +    }
->> +
->=20
-> Clearly here the code would be simpler here if you just saved the =
-value of hypercall_msr which you have used in the call above.
->=20
->> +    if (!hyperv_enabled && (hypercall_msr =3D=3D =
-XEN_HYPERCALL_MSR_HYPERV)) {
->> +        hyperv_enabled =3D true;
->> +    }
->>        /* If called a second time, don't repeat the rest of the =
-setup. */
->>      if (s->xen_caps) {
->> @@ -185,6 +228,9 @@ int kvm_xen_init(KVMState *s, uint32_t =
-hypercall_msr)
->>      xen_primary_console_reset();
->>      xen_xenstore_reset();
->>  +    xen_vmfd_change_notifier.notify =3D xen_handle_vmfd_change;
->> +    kvm_vmfd_add_change_notifier(&xen_vmfd_change_notifier);
->> +
->>      return 0;
->>  }
-
+>
+>diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+>index dc8dbe74a6d0..e1e78b295e41 100755
+>--- a/tools/testing/selftests/vsock/vmtest.sh
+>+++ b/tools/testing/selftests/vsock/vmtest.sh
+>@@ -210,16 +210,17 @@ check_result() {
+> }
+>
+> add_namespaces() {
+>-	local orig_mode
+>-	orig_mode=$(cat /proc/sys/net/vsock/child_ns_mode)
+>+	ip netns add "global-parent" 2>/dev/null
+>+	echo "global" | ip netns exec "global-parent" \
+>+		tee /proc/sys/net/vsock/child_ns_mode &>/dev/null
+>+	ip netns add "local-parent" 2>/dev/null
+>+	echo "local" | ip netns exec "local-parent" \
+>+		tee /proc/sys/net/vsock/child_ns_mode &>/dev/null
+>
+>-	for mode in "${NS_MODES[@]}"; do
+>-		echo "${mode}" > /proc/sys/net/vsock/child_ns_mode
+>-		ip netns add "${mode}0" 2>/dev/null
+>-		ip netns add "${mode}1" 2>/dev/null
+>-	done
+>-
+>-	echo "${orig_mode}" > /proc/sys/net/vsock/child_ns_mode
+>+	nsenter --net=/var/run/netns/global-parent ip netns add "global0" 2>/dev/null
+>+	nsenter --net=/var/run/netns/global-parent ip netns add "global1" 2>/dev/null
+>+	nsenter --net=/var/run/netns/local-parent ip netns add "local0" 2>/dev/null
+>+	nsenter --net=/var/run/netns/local-parent ip netns add "local1" 2>/dev/null
+> }
+>
+> init_namespaces() {
+>@@ -237,6 +238,8 @@ del_namespaces() {
+> 		log_host "removed ns ${mode}0"
+> 		log_host "removed ns ${mode}1"
+> 	done
+>+	ip netns del "global-parent" &>/dev/null
+>+	ip netns del "local-parent" &>/dev/null
+> }
+>
+> vm_ssh() {
+>@@ -287,7 +290,7 @@ check_args() {
+> }
+>
+> check_deps() {
+>-	for dep in vng ${QEMU} busybox pkill ssh ss socat; do
+>+	for dep in vng ${QEMU} busybox pkill ssh ss socat nsenter; do
+> 		if [[ ! -x $(command -v "${dep}") ]]; then
+> 			echo -e "skip:    dependency ${dep} not found!\n"
+> 			exit "${KSFT_SKIP}"
+>@@ -1231,12 +1234,8 @@ test_ns_local_same_cid_ok() {
+> }
+>
+> test_ns_host_vsock_child_ns_mode_ok() {
+>-	local orig_mode
+>-	local rc
+>-
+>-	orig_mode=$(cat /proc/sys/net/vsock/child_ns_mode)
+>+	local rc="${KSFT_PASS}"
+>
+>-	rc="${KSFT_PASS}"
+> 	for mode in "${NS_MODES[@]}"; do
+> 		local ns="${mode}0"
+>
+>@@ -1246,15 +1245,13 @@ test_ns_host_vsock_child_ns_mode_ok() {
+> 			continue
+> 		fi
+>
+>-		if ! echo "${mode}" > /proc/sys/net/vsock/child_ns_mode; then
+>-			log_host "child_ns_mode should be writable to ${mode}"
+>+		if ! echo "${mode}" | ip netns exec "${ns}" \
+>+			tee /proc/sys/net/vsock/child_ns_mode &>/dev/null; then
+> 			rc="${KSFT_FAIL}"
+> 			continue
+> 		fi
+> 	done
+>
+>-	echo "${orig_mode}" > /proc/sys/net/vsock/child_ns_mode
+>-
+> 	return "${rc}"
+> }
+>
+>
+>-- 
+>2.47.3
+>
 
 
