@@ -1,220 +1,260 @@
-Return-Path: <kvm+bounces-71347-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71348-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qDCGLSrolmmNqwIAu9opvQ
-	(envelope-from <kvm+bounces-71347-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:38:34 +0100
+	id MAgCG8/plmn4qwIAu9opvQ
+	(envelope-from <kvm+bounces-71348-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:45:35 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 384A915DE8B
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:38:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7AAF15DF45
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:45:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E8FE302D51C
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 10:36:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA797301B73C
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 10:45:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2432B337107;
-	Thu, 19 Feb 2026 10:36:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7B029994B;
+	Thu, 19 Feb 2026 10:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IMvTI7vh";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qIsEgonr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a3TVLUNm"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4306E30F94E
-	for <kvm@vger.kernel.org>; Thu, 19 Feb 2026 10:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E2B63CB
+	for <kvm@vger.kernel.org>; Thu, 19 Feb 2026 10:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771497409; cv=none; b=BRT90z1m4peEhvGSUhz1kORTubft5Iw3bSHywK35WE5RW4FXVGWh36boI0Satpja5feqeTIAI6IEuc4HpBEx0EXthkkGn9lT+Mz94aXGuhxp+3cA1pEMH683D6ouikN4EmvevykK/HtlaU3831soGUFyk2HFiMDzTQZRgvOAiaE=
+	t=1771497927; cv=none; b=WscdbhrxwBBvFmgi9hNpeN7wvwtOLWOmX5J6JhubFO2Eu1pgfubDnXUEkUi28MOHehyyOG6HLYHDv7emzpe/FnC0luHjbnp5wTtCPH80uDdhy5MO0SRz/v0vF+L82BSTFhzUGm96GYIloVlbBYguJmac2TWexTHJVwLUHo0k/SA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771497409; c=relaxed/simple;
-	bh=oqw0KlNKIPYnEI20309wgxqKSge7eobGKUbr1LdjuGY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MPTBxFAtxZtqIdOBBve6RmkYGH3uGQmVjUh4SObvA1orsg1wiPNmKk/5vseOgftavHzqiRyhTd6VsmmwTkV0pugqak4ioGp6tvbX29mSz0ZXwEpcq4UQGJZkMtyE3/hZPtOGTPS5aMeFS/zeASGZt0KTb4OWO0UyTTe+OKoC244=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IMvTI7vh; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qIsEgonr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771497406;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0HuCXThfRUEeEl7yH4RijL3+g7m+evVIDET2wFtyGPA=;
-	b=IMvTI7vhk3vuRkMM2kkV41ium5VGv7PT9IoyOLKQfO/Eu8PZ5TdwKuDhseOAlr5k5vvo12
-	b1/S3HPV55lD4FePO7TyemdOfj4e8w2Y1lh3/O1oE2Zxw0PoCyKtTEzgcH7w49ej97W6oF
-	WOjlcHbTBcQNG0DsJ2XQeW5Kr6iENdE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-354-tBsvzH_gMwGImeXGupdKZw-1; Thu, 19 Feb 2026 05:36:45 -0500
-X-MC-Unique: tBsvzH_gMwGImeXGupdKZw-1
-X-Mimecast-MFC-AGG-ID: tBsvzH_gMwGImeXGupdKZw_1771497404
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-48378df3469so8101685e9.1
-        for <kvm@vger.kernel.org>; Thu, 19 Feb 2026 02:36:44 -0800 (PST)
+	s=arc-20240116; t=1771497927; c=relaxed/simple;
+	bh=096tnhc2fzRLQq0rIuOt2turMCkyDUEG4Odzb/XJvNo=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=WAVDuejEV/cKsqDeKq5TruYu/QHZdS447zsjYA8iT8Mh/O3IUJ0kUre8OQWHgFNL4B9wmheh3DbK1gacjosyTsrVUUFLMzMeg2ilF1+VDxMcKn2BcRKnjSrBU4CbwUYa1X+M+XwEOx/LVMrMv8p6aWRNjysHUHgMKw/kuVa1YXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a3TVLUNm; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b8f97c626aaso106029266b.2
+        for <kvm@vger.kernel.org>; Thu, 19 Feb 2026 02:45:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1771497404; x=1772102204; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0HuCXThfRUEeEl7yH4RijL3+g7m+evVIDET2wFtyGPA=;
-        b=qIsEgonrPfvZJWqC1SF7flDp7dYt/nEHIjpY99Jbl9Yo4ZoBYfcrfBxW98RFMYJStX
-         OhWdWkrrmR7WZe1IoL+EnvtqZyDTl5catuoBvtFPloxY/FDnMEW4aySa9FLP3I+23f6w
-         AQVPSUQZcFHfTcJurL3NXkg5ArIZZt22k7TQ/WeBEreojzEvkvBTguymSNbQOBciACG0
-         IuVknXHwPhcfjTQegTSKy6f7mp3eMYtKk2puiPpfKWRr1jhAdat/JTLt+3zgvTlsH9vs
-         uw9UGWpTEBDOLfX/KaVNCH9rWBOuI6o22LJpmnBKjXJoBwHlfuO0lzW/fF0yksVGrL+L
-         P/gQ==
+        d=gmail.com; s=20230601; t=1771497924; x=1772102724; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=QeTdzGAJRlToFPZ2jrpBRauFpaCxe61uQC+bv+dMi6E=;
+        b=a3TVLUNmyhy4lpQ5PtaIWqys5DY82zaUQ5IJe6r0qYG6ESz6r5L2uZBynsFeid77sv
+         779pblsws326+wr7VDEauEchPtwBiXPCIELOXsdmadlM/HIH9edSZTHvw/AYSfVwAPof
+         dDuy7+WllORccAgtlVrktyqwcKCN0PvXI2q4bxwksxdaxG/67g/Ar2aUyCQCXa81keo+
+         CjRFETT/ORhJClxHpobaql7dDj4sYYtOX07yib1TeJwT1GGm270kXmpp3pCpdVFmyAy2
+         iPoCpNSShmpLfPdqHwQjQbHsKxN10ortN7CPJd8kgM6ZefyZQym/9V3LAOv/KsZz/CTB
+         h3kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771497404; x=1772102204;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0HuCXThfRUEeEl7yH4RijL3+g7m+evVIDET2wFtyGPA=;
-        b=PJsYT+SWa0s001av31puLPFMscmnpTjDTm3/vWr3A14JdNYZXz3kC78KHHejOmcT80
-         vxUkl2Tult3sb7UCVC+bA/Pgb3ObD1j3M/uBkOqt2azh/A0MdpDH1KQqOLcV6jIMlxbo
-         7YvOjjVleumP/TUJaTYOTK7fyK/4RhZoVK57RtM1AHrjXlixFVAhgUGg+CXOOsjLQ7EB
-         AzqjNeZYHmhmc0Po7mEu6FBiHq0UcCkdLT+sK/BfCjw6m8brw+Dav0JCnLXsRRz46W7e
-         0a4J7VJJKjFakbaLiQbswx2j3o7peeQJpc0VG1+3++iKTH0f0WlyK3JxOan0L4eZGncG
-         UnLg==
-X-Forwarded-Encrypted: i=1; AJvYcCWfIoWPJMVSPwuQYFwXRlrk3Z6qVDMBJMlZZiHWNrMBTKZvEQjRHS73Q9oNISSL7nIoDkU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXyKEIVSPVIt0A6VIbO0ZCjhGkFgAAh1U1VpOl8YJTIFEy6NGD
-	VAOD+BP/TrZDS5PPNvxqrql0dO7DEz7bzPETUcop0ZqcJxvT3l+mz5g6Lcw3bpNreq0hpFYNy0V
-	2DkMOfbAXttVAnJeHUpQrGnlyBCJuIXEQglvVxndGeHoHpse2hG14Ew==
-X-Gm-Gg: AZuq6aIsokqSUqujs+IH2vuf99lCLN1anK2izFZz2MnxFs34c+3zJ+nw5uG41aObscT
-	LabaMtlQYlGtIq2PIIPEulZqxUifWdaaEb1gq6brqKf2dv/aAP/byGZPpr8etJcJNpzv7JVQS2p
-	VeDjnhfbODs1R1bO2NnvlrWioS2bbkT9ijS8iFaNvCcWcqfp47AdShGIJ46Q7ralmDWB8ap35Wa
-	xzKjP1Eu9Z4E2LNjbJSMLabuovLJigKTq3JWWz9ILnriKuGQsw3YmN06Zbi8vo6xOcaWcZY6TJx
-	z9VzJyJQKmAkNCHncLbbN/QWX5DqpP7eakZR1Dwyz2lmKRbo8wwFeK7994ZtBCXT5003iBo65lP
-	l4W3X6uDRYPjfHhFfcqLx3w5j5ZxSj72jjJTMCgefiK93v/FTSbwG4HQI2XG04pSikuLixU8=
-X-Received: by 2002:a05:600c:214b:b0:47e:e051:79ee with SMTP id 5b1f17b1804b1-4839fe90522mr18467535e9.3.1771497403793;
-        Thu, 19 Feb 2026 02:36:43 -0800 (PST)
-X-Received: by 2002:a05:600c:214b:b0:47e:e051:79ee with SMTP id 5b1f17b1804b1-4839fe90522mr18467255e9.3.1771497403315;
-        Thu, 19 Feb 2026 02:36:43 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4839f99067dsm17354955e9.29.2026.02.19.02.36.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Feb 2026 02:36:42 -0800 (PST)
-Date: Thu, 19 Feb 2026 11:36:40 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Bobby Eshleman <bobbyeshleman@meta.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH net v2 3/3] vsock: document write-once behavior of the
- child_ns_mode sysctl
-Message-ID: <aZbN8fXtCkhItSV8@sgarzare-redhat>
-References: <20260218-vsock-ns-write-once-v2-0-19e4c50d509a@meta.com>
- <20260218-vsock-ns-write-once-v2-3-19e4c50d509a@meta.com>
+        d=1e100.net; s=20230601; t=1771497924; x=1772102724;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QeTdzGAJRlToFPZ2jrpBRauFpaCxe61uQC+bv+dMi6E=;
+        b=OfRyqp7qQgn4nul8GMBiZpVp8aPu/3pJrcdYV6/+C3Tdaz8iSJeK9kPxvX9jO9rXr9
+         B62cDsMCqWo/7JarnTmoe+XbI+mY95R5QiqOyDcc/IZVCrex/7xgC36jgiposjTKNqRZ
+         8LMBydq7vMSFBwbmaudW5zQyQm98GJe+HjnDczywwSws8iEDWNj2QvKCkVAP8ffCfFKq
+         qDQ9HxAcfz3CSG8LJ9Iw4kMjKOww0yvsVjI8kNB9bQ6dkrGGPcCLpnp9tn4MoHJMHYb+
+         TWTesUgGmQDmor7Zfq5Sf8+pQ3wmTZ3DMoXtd4ygk+B8WUPVnyg+p10LUympvlxPgley
+         xtdA==
+X-Forwarded-Encrypted: i=1; AJvYcCX0e7zJ3DXIyS9iQq5vZ6U0y/ij31hc81dlRiTM+UDvPQ7rVGqW9V1uSCP1375AqdmBVBo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWVHuyMByeLhVxjOZC/nzLuQFYpf6MKSIAk0ASx4HSVXofFVdd
+	M0tnsb2lvOa0c79hl/atsecUXsd96HU7NFKgYxbker8k3XXzucNE0FWg
+X-Gm-Gg: AZuq6aLTqeVUFQV/A554/NyMtMGLSUMRanbLma/eSMCzv6xxvkq4b+9AzRWuwNBLZLo
+	ll7tr5tfHrC2c9R5qJF2AWEipEqEcqBPps/rNIKFcipyjZce7FMUMl+QlQRWT98TgkZDnA0k1RE
+	Ct9ncIT74nPagdkQDkjP/tkklmFHyIhgLoG+8SX55ZF2jFVUAn9R3iDwwhkBMgfzbs8fs5jGqF1
+	vCfpMFghe0qfzkOe55Pm2/BWyU3NMftzhYzt8kLf+tq2gEOzh6tHeJTMJIdY77u+xB+IzEJ9luF
+	cmFrOv4uZ8WKbUtxqCPTeEQHt6XoU1iN852Fj/aQm8OcueyT5iT2/tbbIzD//QRYMHLWRFnP8xA
+	3OhUcjTrIaJk8sAMPZUcXBb32wDutkrJLcYcnqvpWIWh5g4BwCLDYttrFJdU9lgCoSqOd9hKLwU
+	WC15ZxyRDkcSz5PjsZXJRzCM/aKNEn
+X-Received: by 2002:a17:907:3e20:b0:b8f:abff:9ce7 with SMTP id a640c23a62f3a-b904dc6918bmr158508666b.32.1771497924100;
+        Thu, 19 Feb 2026 02:45:24 -0800 (PST)
+Received: from [10.24.66.212] ([15.248.2.24])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8fc735d69esm551810766b.6.2026.02.19.02.45.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Feb 2026 02:45:23 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <bb43a79b-9ca9-49c4-ae88-f71991c97a58@xen.org>
+Date: Thu, 19 Feb 2026 10:45:22 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260218-vsock-ns-write-once-v2-3-19e4c50d509a@meta.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 27/34] kvm/xen-emu: re-initialize capabilities during
+ confidential guest reset
+To: Ani Sinha <anisinha@redhat.com>, Paul Durrant <xadimgnik@gmail.com>
+Cc: David Woodhouse <dwmw2@infradead.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, kvm@vger.kernel.org,
+ qemu-devel <qemu-devel@nongnu.org>
+References: <20260218114233.266178-1-anisinha@redhat.com>
+ <20260218114233.266178-28-anisinha@redhat.com>
+ <3b4b7b7b-7fcd-46ce-bdcb-cd1a30cf5276@xen.org>
+ <793B549F-F866-4BF5-ABAF-A0537BA8713B@redhat.com>
+Content-Language: en-US
+In-Reply-To: <793B549F-F866-4BF5-ABAF-A0537BA8713B@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-71348-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71347-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[redhat.com,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,kvm@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xadimgnik@gmail.com,kvm@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 384A915DE8B
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C7AAF15DF45
 X-Rspamd-Action: no action
 
-On Wed, Feb 18, 2026 at 10:10:38AM -0800, Bobby Eshleman wrote:
->From: Bobby Eshleman <bobbyeshleman@meta.com>
->
->Update the vsock child_ns_mode documentation to include the new the
+On 19/02/2026 10:31, Ani Sinha wrote:
+> 
+> 
+>> On 19 Feb 2026, at 3:09 PM, Paul Durrant <xadimgnik@gmail.com> wrote:
+>>
+>> On 18/02/2026 11:42, Ani Sinha wrote:
+>>> On confidential guests KVM virtual machine file descriptor changes as a
+>>> part of the guest reset process. Xen capabilities needs to be re-initialized in
+>>> KVM against the new file descriptor.
+>>> Signed-off-by: Ani Sinha <anisinha@redhat.com>
+>>> ---
+>>>   target/i386/kvm/xen-emu.c | 50 +++++++++++++++++++++++++++++++++++++--
+>>>   1 file changed, 48 insertions(+), 2 deletions(-)
+>>> diff --git a/target/i386/kvm/xen-emu.c b/target/i386/kvm/xen-emu.c
+>>> index 52de019834..69527145eb 100644
+>>> --- a/target/i386/kvm/xen-emu.c
+>>> +++ b/target/i386/kvm/xen-emu.c
+>>> @@ -44,9 +44,12 @@
+>>>     #include "xen-compat.h"
+>>>   +NotifierWithReturn xen_vmfd_change_notifier;
+>>> +static bool hyperv_enabled;
+>>>   static void xen_vcpu_singleshot_timer_event(void *opaque);
+>>>   static void xen_vcpu_periodic_timer_event(void *opaque);
+>>>   static int vcpuop_stop_singleshot_timer(CPUState *cs);
+>>> +static int do_initialize_xen_caps(KVMState *s, uint32_t hypercall_msr);
+>>>     #ifdef TARGET_X86_64
+>>>   #define hypercall_compat32(longmode) (!(longmode))
+>>> @@ -54,6 +57,30 @@ static int vcpuop_stop_singleshot_timer(CPUState *cs);
+>>>   #define hypercall_compat32(longmode) (false)
+>>>   #endif
+>>>   +static int xen_handle_vmfd_change(NotifierWithReturn *n,
+>>> +                                  void *data, Error** errp)
+>>> +{
+>>> +    int ret;
+>>> +
+>>> +    /* we are not interested in pre vmfd change notification */
+>>> +    if (((VmfdChangeNotifier *)data)->pre) {
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    ret = do_initialize_xen_caps(kvm_state, XEN_HYPERCALL_MSR);
+>>> +    if (ret < 0) {
+>>> +        return ret;
+>>> +    }
+>>> +
+>>> +    if (hyperv_enabled) {
+>>> +        ret = do_initialize_xen_caps(kvm_state, XEN_HYPERCALL_MSR_HYPERV);
+>>> +        if (ret < 0) {
+>>> +            return ret;
+>>> +        }
+>>> +    }
+>>> +    return 0;
+>>
+>> This seems odd. Why use the hyperv_enabled boolean, rather than simply the msr value, since when hyperv_enabled is set you will be calling do_initialize_xen_caps() twice.
+> 
+> I am not sure of enabling capabilities for Xen. I assumed we need to call kvm_xen_init() twice, once normally with XEN_HYPERCALL_MSR and if hyper is enabled, again with XEN_HYPERCALL_MSR_HYPERV. Is that not the case? Is it one or the other but not both? It seems kvm_arch_init() calls kvm_xen_init() once with XEN_HYPERCALL_MSR and another time vcpu_arch_init() calls it again if hyperv is enabled with XEN_HYPERCALL_MSR_HYPERV .
 
-nit: s/the new the/the new
+Yes, it has to be assumed that XEN_HYPERCALL_MSR is correct until 
+Hyper-V supported is enabled, which comes later, at which point the MSR 
+is changed. So you only need save the latest MSR value and use that in 
+xen_handle_vmfd_change().
 
->write-once semantics of setting child_ns_mode. The semantics are
->implemented in a different patch in this series.
-
-s/different/preceding ?
-
-IMO this can be squashed with the previous patch, but not sure netdev 
-policy about that. Not a strong opinion, it's fine also in this way.
-
->
->Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
->---
-> Documentation/admin-guide/sysctl/net.rst | 10 +++++++---
-> 1 file changed, 7 insertions(+), 3 deletions(-)
->
->diff --git a/Documentation/admin-guide/sysctl/net.rst b/Documentation/admin-guide/sysctl/net.rst
->index c10530624f1e..976a176fb451 100644
->--- a/Documentation/admin-guide/sysctl/net.rst
->+++ b/Documentation/admin-guide/sysctl/net.rst
->@@ -581,9 +581,9 @@ The init_net mode is always ``global``.
-> child_ns_mode
-> -------------
->
->-Controls what mode newly created child namespaces will inherit. At namespace
->-creation, ``ns_mode`` is inherited from the parent's ``child_ns_mode``. The
->-initial value matches the namespace's own ``ns_mode``.
->+Write-once. Controls what mode newly created child namespaces will inherit. At
->+namespace creation, ``ns_mode`` is inherited from the parent's
->+``child_ns_mode``. The initial value matches the namespace's own ``ns_mode``.
->
-> Values:
->
->@@ -594,6 +594,10 @@ Values:
-> 	  their sockets will only be able to connect within their own
-> 	  namespace.
->
->+``child_ns_mode`` can only be written once per namespace. Writing the same
->+value that is already set succeeds. Writing a different value after the first
->+write returns ``-EBUSY``.
-
-nit: instead of saying that it can only be written once, we could say 
-that the first write locks the value, to be closer to the actual 
-behavior, something like this: 
-
-   The first write to ``child_ns_mode`` locks its value. Subsequent
-   writes of the same value succeed, but writing a different value
-   returns ``-EBUSY``.
-
-
-Thanks,
-Stefano
-
->+
-> Changing ``child_ns_mode`` only affects namespaces created after the change;
-> it does not modify the current namespace or any existing children.
->
->
->-- 
->2.47.3
->
+> 
+>>
+>>> +}
+>>> +
+>>>   static bool kvm_gva_to_gpa(CPUState *cs, uint64_t gva, uint64_t *gpa,
+>>>                              size_t *len, bool is_write)
+>>>   {
+>>> @@ -111,15 +138,16 @@ static inline int kvm_copy_to_gva(CPUState *cs, uint64_t gva, void *buf,
+>>>       return kvm_gva_rw(cs, gva, buf, sz, true);
+>>>   }
+>>>   -int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
+>>> +static int do_initialize_xen_caps(KVMState *s, uint32_t hypercall_msr)
+>>>   {
+>>> +    int xen_caps, ret;
+>>>       const int required_caps = KVM_XEN_HVM_CONFIG_HYPERCALL_MSR |
+>>>           KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL | KVM_XEN_HVM_CONFIG_SHARED_INFO;
+>>> +
+>>
+>> Gratuitous whitespace change.
+>>
+>>>       struct kvm_xen_hvm_config cfg = {
+>>>           .msr = hypercall_msr,
+>>>           .flags = KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL,
+>>>       };
+>>> -    int xen_caps, ret;
+>>>         xen_caps = kvm_check_extension(s, KVM_CAP_XEN_HVM);
+>>>       if (required_caps & ~xen_caps) {
+>>> @@ -143,6 +171,21 @@ int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
+>>>                        strerror(-ret));
+>>>           return ret;
+>>>       }
+>>> +    return xen_caps;
+>>> +}
+>>> +
+>>> +int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
+>>> +{
+>>> +    int xen_caps;
+>>> +
+>>> +    xen_caps = do_initialize_xen_caps(s, hypercall_msr);
+>>> +    if (xen_caps < 0) {
+>>> +        return xen_caps;
+>>> +    }
+>>> +
+>>
+>> Clearly here the code would be simpler here if you just saved the value of hypercall_msr which you have used in the call above.
+>>
+>>> +    if (!hyperv_enabled && (hypercall_msr == XEN_HYPERCALL_MSR_HYPERV)) {
+>>> +        hyperv_enabled = true;
+>>> +    }
+>>>         /* If called a second time, don't repeat the rest of the setup. */
+>>>       if (s->xen_caps) {
+>>> @@ -185,6 +228,9 @@ int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
+>>>       xen_primary_console_reset();
+>>>       xen_xenstore_reset();
+>>>   +    xen_vmfd_change_notifier.notify = xen_handle_vmfd_change;
+>>> +    kvm_vmfd_add_change_notifier(&xen_vmfd_change_notifier);
+>>> +
+>>>       return 0;
+>>>   }
+> 
+> 
 
 
