@@ -1,43 +1,43 @@
-Return-Path: <kvm+bounces-71342-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71343-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MC8WIV/klmlbqgIAu9opvQ
-	(envelope-from <kvm+bounces-71342-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:22:23 +0100
+	id OMRoDr7llmkuqwIAu9opvQ
+	(envelope-from <kvm+bounces-71343-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:28:14 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AC9315DBE0
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:22:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD39C15DC46
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:28:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2E02F30252A3
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 10:22:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0BF8B3029622
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 10:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D212732D7D9;
-	Thu, 19 Feb 2026 10:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8551333434;
+	Thu, 19 Feb 2026 10:28:02 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A8B38FA3;
-	Thu, 19 Feb 2026 10:21:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE1101DF25F;
+	Thu, 19 Feb 2026 10:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771496518; cv=none; b=sJi3XQMP7J9l1CpJoJ3q1LAroWOpe7aDoD7iqFoRtNgxlrXSlGdlLFa418ohs46zEn2NY4Sv/Tu9ni0vy1sND/e4eTD8QRTPfZE+XpI4Il2DoCYBuZhqeHJNrd/C3KlcUmCr4t1xAHKRrBpRAp7cDweQs+m9a9aQ5HZUr2UFZ/Y=
+	t=1771496882; cv=none; b=iPSn97Ql4kIBsGZjWn9tMew1XZlYzh9s0yZCj0cYORMwYUZytTGD0CXRr68/brbV4QrF/fBQa7bIIaldyDT1gt14boU1IlljZ9g7UBWuopJaRpXiKlZ+eaX8F6AeeTxdkuW12QLhyOCkf9sEA0mvTwkIxmIN7DL312p648hTgq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771496518; c=relaxed/simple;
-	bh=fU/vwsRP1qZP5IE4FnVqYDHuPJvSMR1FGi4lv9ghEW4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t8xPFzaC5xFYt/nlqqgD6jB+DuOjtmRtJdzdgLL0IET8ZL/prQ8yx4rhMt2nPLGm5oa3loQVvSO+ElbuBmVUcMV1yYnrCt4Fz3fSfxs/HPl1Q/KQd3u1Cd/IMNBZuicfEuHtmiF37MhnqrGQpDUYKr4NfIKVdOFSfclsZjqR0co=
+	s=arc-20240116; t=1771496882; c=relaxed/simple;
+	bh=PIkcWsEBxeMOjH8xd0HX5SyYO3lSlkQBKWQVsGNAJlk=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=IqZcAfcSmN9uSd/4MBJTiXB7OexSttznxR4Bn527KCFcxRKFpy8MiaqzFJeUXFF0h9NcQ1r2YH0z1x9JOd1ziA5D09RbMM7Bzua3eyObWpq+SIlmgkSgC1xLf/xaDJqRY3lF7jNk3X2jhhfV2uriNa9sQ0jeHcw4ZmaX4F0Mj/0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 66F60339;
-	Thu, 19 Feb 2026 02:21:48 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CCBCE339;
+	Thu, 19 Feb 2026 02:27:52 -0800 (PST)
 Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CA9993F62B;
-	Thu, 19 Feb 2026 02:21:47 -0800 (PST)
-Message-ID: <b746428e-1a91-4ed9-8800-c9769e86df97@arm.com>
-Date: Thu, 19 Feb 2026 10:21:46 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5F61C3F62B;
+	Thu, 19 Feb 2026 02:27:52 -0800 (PST)
+Message-ID: <6293c484-ee54-46a2-b11c-e1e3c736e578@arm.com>
+Date: Thu, 19 Feb 2026 10:27:50 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -47,9 +47,11 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC PATCH 13/19] x86/resctrl: Add PLZA state tracking and
  context switch handling
-To: Reinette Chatre <reinette.chatre@intel.com>
-Cc: "Moger, Babu" <bmoger@amd.com>, "Moger, Babu" <Babu.Moger@amd.com>,
- "Luck, Tony" <tony.luck@intel.com>, Drew Fustini <fustini@kernel.org>,
+From: Ben Horgan <ben.horgan@arm.com>
+To: Stephane Eranian <eranian@google.com>
+Cc: "Moger, Babu" <bmoger@amd.com>,
+ Reinette Chatre <reinette.chatre@intel.com>, "Moger, Babu"
+ <Babu.Moger@amd.com>, "Luck, Tony" <tony.luck@intel.com>,
  "corbet@lwn.net" <corbet@lwn.net>, "Dave.Martin@arm.com"
  <Dave.Martin@arm.com>, "james.morse@arm.com" <james.morse@arm.com>,
  "tglx@kernel.org" <tglx@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
@@ -83,38 +85,39 @@ Cc: "Moger, Babu" <bmoger@amd.com>, "Moger, Babu" <Babu.Moger@amd.com>,
  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
  "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
  "peternewman@google.com" <peternewman@google.com>,
- "eranian@google.com" <eranian@google.com>,
  "Shenoy, Gautham Ranjal" <gautham.shenoy@amd.com>
-References: <5ec19557-6a62-4158-af82-c70bac75226f@amd.com>
+References: <cover.1769029977.git.babu.moger@amd.com>
+ <17c9c0c252dcfe707dffe5986e7c98cd121f7cef.1769029977.git.babu.moger@amd.com>
+ <aXk8hRtv6ATEjW8A@agluck-desk3>
+ <5ec19557-6a62-4158-af82-c70bac75226f@amd.com>
  <aXpDdUQHCnQyhcL3@agluck-desk3>
  <IA0PPF9A76BB3A655A28E9695C8AD1CC59F9591A@IA0PPF9A76BB3A6.namprd12.prod.outlook.com>
  <bbe80a9a-70f0-4cd1-bd6a-4a45212aa80b@amd.com>
  <7a4ea07d-88e6-4f0f-a3ce-4fd97388cec4@intel.com>
- <1f703c24-a4a9-416e-ae43-21d03f35f0be@intel.com>
- <aYyxAPdTFejzsE42@e134344.arm.com>
- <679dcd01-05e5-476a-91dd-6d1d08637b3e@intel.com>
- <aY3bvKeOcZ9yG686@e134344.arm.com>
- <2b2d0168-307a-40c3-98fa-54902482e861@intel.com>
- <aZM1OY7FALkPWmh6@e134344.arm.com>
- <d704ea1f-ed9f-4814-8fce-81db40b1ee3c@intel.com>
-From: Ben Horgan <ben.horgan@arm.com>
+ <abb049fa-3a3d-4601-9ae3-61eeb7fd8fcf@amd.com>
+ <1a0a7306-f833-45a8-8f2b-c6d2e8b98ff5@intel.com>
+ <fd7e0779-7e29-461d-adb6-0568a81ec59e@arm.com>
+ <fbaa21b3-d010-4b89-8e87-f13d3f176ea3@amd.com>
+ <951b9a1f-a9d7-4834-b6b8-61417e984f2f@arm.com>
+ <CABPqkBSq=cgn-am4qorA_VN0vsbpbfDePSi7gubicpROB1=djw@mail.gmail.com>
+ <845587f3-4c27-46d9-83f8-6b38ccc54183@arm.com>
 Content-Language: en-US
-In-Reply-To: <d704ea1f-ed9f-4814-8fce-81db40b1ee3c@intel.com>
+In-Reply-To: <845587f3-4c27-46d9-83f8-6b38ccc54183@arm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71342-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[46];
+	TAGGED_FROM(0.00)[bounces-71343-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[45];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -126,179 +129,154 @@ X-Spamd-Result: default: False [-1.36 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.965];
+	NEURAL_HAM(-0.00)[-0.966];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arm.com:mid]
-X-Rspamd-Queue-Id: 0AC9315DBE0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:mid,arm.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AD39C15DC46
 X-Rspamd-Action: no action
 
-Hi Reinette,
+Hi Stephane,
 
-On 2/17/26 18:51, Reinette Chatre wrote:
-> Hi Ben,
+On 2/18/26 09:35, Ben Horgan wrote:
+> Hi Stephane,
 > 
-> On 2/16/26 7:18 AM, Ben Horgan wrote:
->> On Thu, Feb 12, 2026 at 10:37:21AM -0800, Reinette Chatre wrote:
->>> On 2/12/26 5:55 AM, Ben Horgan wrote:
->>>> On Wed, Feb 11, 2026 at 02:22:55PM -0800, Reinette Chatre wrote:
->>>>> On 2/11/26 8:40 AM, Ben Horgan wrote:
->>>>>> On Tue, Feb 10, 2026 at 10:04:48AM -0800, Reinette Chatre wrote:
-> 
->>>>>>> It looks like MPAM has a few more capabilities here and the Arm levels are numbered differently
->>>>>>> with EL0 meaning user space. We should thus aim to keep things as generic as possible. For example,
->>>>>>> instead of CPL0 using something like "kernel" or ... ?
+> On 2/18/26 06:22, Stephane Eranian wrote:
+>> On Tue, Feb 17, 2026 at 7:56 AM Ben Horgan <ben.horgan@arm.com> wrote:
+>>>
+>>> Hi Babu,
+>>>
+>>> On 2/16/26 22:52, Moger, Babu wrote:
+>>>> Hi Ben,
+>>>>
+>>>> On 2/16/2026 9:41 AM, Ben Horgan wrote:
+>>>>> Hi Babu, Reinette,
+>>>>>
+>>>>> On 2/14/26 00:10, Reinette Chatre wrote:
+>>>>>> Hi Babu,
 >>>>>>
->>>>>> Yes, PLZA does open up more possibilities for MPAM usage.  I've talked to James
->>>>>> internally and here are a few thoughts.
+>>>>>> On 2/13/26 8:37 AM, Moger, Babu wrote:
+>>>>>>> Hi Reinette,
+>>>>>>>
+>>>>>>> On 2/10/2026 10:17 AM, Reinette Chatre wrote:
+>>>>>>>> Hi Babu,
+>>>>>>>>
+>>>>>>>> On 1/28/26 9:44 AM, Moger, Babu wrote:
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> On 1/28/2026 11:41 AM, Moger, Babu wrote:
+>>>>>>>>>>> On Wed, Jan 28, 2026 at 10:01:39AM -0600, Moger, Babu wrote:
+>>>>>>>>>>>> On 1/27/2026 4:30 PM, Luck, Tony wrote:
+>>>>>>>>>>> Babu,
+>>>>>>>>>>>
+>>>>>>>>>>> I've read a bit more of the code now and I think I understand more.
+>>>>>>>>>>>
+>>>>>>>>>>> Some useful additions to your explanation.
+>>>>>>>>>>>
+>>>>>>>>>>> 1) Only one CTRL group can be marked as PLZA
+>>>>>>>>>>
+>>>>>>>>>> Yes. Correct.
+>>>>>>>>
+>>>>>>>> Why limit it to one CTRL_MON group and why not support it for MON
+>>>>>>>> groups?
+>>>>>>>
+>>>>>>> There can be only one PLZA configuration in a system. The values in
+>>>>>>> the MSR_IA32_PQR_PLZA_ASSOC register (RMID, RMID_EN, CLOSID,
+>>>>>>> CLOSID_EN) must be identical across all logical processors. The only
+>>>>>>> field that may differ is PLZA_EN.
+>>>>>
+>>>>> Does this have any effect on hypervisors?
+>>>>
+>>>> Because hypervisor runs at CPL0, there could be some use case. I have
+>>>> not completely understood that part.
+>>>>
+>>>>>
 >>>>>>
->>>>>> If the user case is just that an option run all tasks with the same closid/rmid
->>>>>> (partid/pmg) configuration when they are running in the kernel then I'd favour a
->>>>>> mount option. The resctrl filesytem interface doesn't need to change and
+>>>>>> ah - this is a significant part that I missed. Since this is a per-
+>>>>>> CPU register it seems
 >>>>>
->>>>> I view mount options as an interface of last resort. Why would a mount option be needed
->>>>> in this case? The existence of the file used to configure the feature seems sufficient?
->>>>
->>>> If we are taking away a closid from the user then the number of CTRL_MON groups
->>>> that can be created changes. It seems reasonable for user-space to expect
->>>> num_closid to be a fixed value.
->>>
->>> I do you see why we need to take away a CLOSID from the user. Consider a user space that
->>
->> Yes, just slightly simpler to take away a CLOSID but could just go with the
->> default CLOSID is also used for the kernel. I would be ok with a file saying the
->> mode, like the mbm_event file does for counter assignment. It slightly misleading
->> that a configuration file is under info but necessary as we don't have another
->> location global to the resctrl mount.
-> 
-> Indeed, the "info" directory has evolved more into a "config" directory.
-> 
->>> runs with just two resource groups, for example, "high priority" and "low priority", it seems
->>> reasonable to make it possible to let the "low priority" tasks run with "high priority"
->>> allocations when in kernel space without needing to dedicate a new CLOSID? More reasonable
->>> when only considering memory bandwidth allocation though.
->>>
->>>>
+>>>>> I also missed that.
 >>>>>
->>>>> Also ...
->>>>>
->>>>> I do not think resctrl should unnecessarily place constraints on what the hardware
->>>>> features are capable of. As I understand, both PLZA and MPAM supports use case where
->>>>> tasks may use different CLOSID/RMID (PARTID/PMG) when running in the kernel. Limiting
->>>>> this to only one CLOSID/PARTID seems like an unmotivated constraint to me at the moment.
->>>>> This may be because I am not familiar with all the requirements here so please do
->>>>> help with insight on how the hardware feature is intended to be used as it relates
->>>>> to its design.
->>>>>
->>>>> We have to be very careful when constraining a feature this much  If resctrl does something
->>>>> like this it essentially restricts what users could do forever.
->>>>
->>>> Indeed, we don't want to unnecessarily restrict ourselves here. I was hoping a
->>>> fixed kernel CLOSID/RMID configuration option might just give all we need for
->>>> usecases we know we have and be minimally intrusive enough to not preclude a
->>>> more featureful PLZA later when new usecases come about.
->>>
->>> Having ability to grow features would be ideal. I do not see how a fixed kernel CLOSID/RMID
->>> configuration leaves room to build on top though. Could you please elaborate?
->>
->> If we initially go with a single new configuration file, e.g. kernel_mode, which
->> could be "match_user" or "use_root, this would be the only initial change to the
->> interface needed. If more usecases present themselves a new mode could be added,
->> e.g. "configurable", and an interface to actually change the rmid/closid for the
->> kernel could be added.
-> 
-> Something like this could be a base to work from. I think only the two ("match_user" and
-> "use_root") are a bit limiting for even the initial implementation though.
-> As I understand, "use_root" implies using the allocations of the default group but
-> does not indicate what MON group (which RMID/PMG) should be used to monitor the
-> work done in kernel space. A way to specify the actual group may be needed?
-
-Yeah, I'm not sure that flexibility is strictly necessary but will make
-the interface easier to use.
-
-> 
->>> I wonder if the benefit of the fixed CLOSID/RMID is perhaps mostly in the cost of
->>> context switching which I do not think is a concern for MPAM but it may be for PLZA?
->>>
->>> One option to support fixed kernel CLOSID/RMID at the beginning and leave room to build
->>> may be to create the kernel_group or "tasks_kernel" interface as a baseline but in first
->>> implementation only allow user space to write the same group to all "kernel_group" files or
->>> to only allow to write to one of the "tasks_kernel" files in the resctrl fs hierarchy. At
->>> that time the associated CLOSID/RMID would become the "fixed configuration" and attempts to
->>> write to others can return "ENOSPC"?
->>
->> I think we'd have to be sure of the final interface if we go this way.
-> 
-> I do not think we should aim to know the final interface since that requires knowing all future
-> hardware features and their implementations in advance. Instead we should aim to have something
-> that we can build on that is accompanied by documentation that supports future flexibility (some may
-> refer to this as "weasel words").
-
-Makes sense.
-
-> 
->>> From what I can tell this still does not require to take away a CLOSID/RMID from user space
->>> though. Dedicating a CLOSID/RMID to kernel work can still be done but be in control of user
->>> that can, for example leave the "tasks" and "cpus" files empty.
->>>
->>>> One complication is that for fixed kernel CLOSID/RMID option is that for x86 you
->>>> may want to be able to monitor a tasks resource usage whether or not it is in
->>>> the kernel or userspace and so only have a fixed CLOSID. However, for MPAM this
->>>> wouldn't work as PMG (~RMID) is scoped to PARTID (~CLOSID).
->>>>
->>>>>
->>>>>> userspace software doesn't need to change. This could either take away a
->>>>>> closid/rmid from userspace and dedicate it to the kernel or perhaps have a
->>>>>> policy to have the default group as the kernel group. If you use the default
->>>>>
->>>>> Similar to above I do not see PLZA or MPAM preventing sharing of CLOSID/RMID (PARTID/PMG)
->>>>> between user space and kernel. I do not see a motivation for resctrl to place such
->>>>> constraint.
->>>>>
->>>>>> configuration, at least for MPAM, the kernel may not be running at the highest
->>>>>> priority as a minimum bandwidth can be used to give a priority boost. (Once we
->>>>>> have a resctrl schema for this.)
+>>>>>> to have the ability for expanded use in the future where different
+>>>>>> CLOSID and RMID may be
+>>>>>> written to it? Is PLZA leaving room for such future enhancement or
+>>>>>> does the spec contain
+>>>>>> the text that state "The values in the MSR_IA32_PQR_PLZA_ASSOC
+>>>>>> register (RMID, RMID_EN,
+>>>>>> CLOSID, CLOSID_EN) must be identical across all logical processors."?
+>>>>>> That is, "forever
+>>>>>> and always"?
 >>>>>>
->>>>>> It could be useful to have something a bit more featureful though. Is there a
->>>>>> need for the two mappings, task->cpl0 config and task->cpl1 to be independent or
->>>>>> would as task->(cp0 config, cp1 config) be sufficient? It seems awkward that
->>>>>> it's not a single write to move a task. If a single mapping is sufficient, then
+>>>>>> If I understand correctly MPAM could have different PARTID and PMG
+>>>>>> for kernel use so we
+>>>>>> need to consider these different architectural behaviors.
 >>>>>
->>>>> Moving a task in x86 is currently two writes by writing the CLOSID and RMID separately.
->>>>> I think the MPAM approach is better and there may be opportunity to do this in a similar
->>>>> way and both architectures use the same field(s) in the task_struct.
+>>>>> Yes, MPAM has a per-cpu register MPAM1_EL1.
+>>>>>
 >>>>
->>>> I was referring to the userspace file write but unifying on a the same fields in
->>>> task_struct could be good. The single write is necessary for MPAM as PMG is
->>>> scoped to PARTID and I don't think x86 behaviour changes if it moves to the same
->>>> approach.
+>>>> oh ok.
 >>>>
+>>>>>>
+>>>>>>> I was initially unsure which RMID should be used when PLZA is
+>>>>>>> enabled on MON groups.
+>>>>>>>
+>>>>>>> After re-evaluating, enabling PLZA on MON groups is still feasible:
+>>>>>>>
+>>>>>>> 1. Only one group in the system can have PLZA enabled.
+>>>>>>> 2. If PLZA is enabled on CTRL_MON group then we cannot enable PLZA
+>>>>>>> on MON group.
+>>>>>>> 3. If PLZA is enabled on the CTRL_MON group, then the CLOSID and
+>>>>>>> RMID of the CTRL_MON group can be written.
+>>>>>>> 4. If PLZA is enabled on a MON group, then the CLOSID of the
+>>>>>>> CTRL_MON group can be used, while the RMID of the MON group can be
+>>>>>>> written.
+>>>>>
+>>>>> Given that CLOSID and RMID are fixed once in the PLZA configuration
+>>>>> could this be simplified by just assuming they have the values of the
+>>>>> default group, CLOSID=0 and RMID=0 and let the user base there
+>>>>> configuration on that?
+>>>>>
+>>>>
+>>>> I didn't understand this question. There are 16 CLOSIDs and 1024 RMIDs.
+>>>> We can use any one of these to enable PLZA.  It is not fixed in that sense.
 >>>
->>> ah - I misunderstood. You are suggesting to have one file that user writes to
->>> to set both user space and kernel space CLOSID/RMID? This sounds like what the
->>
->> Yes, the kernel_groups idea does partially have this as once you've set the
->> kernel_group for a CTRL_MON or MON group then the user space configuration
->> dictates the kernel space configuration. As you pointed out, this is also
->> a draw back of the kernel_groups idea.
->>
->>> existing "tasks" file does but only supports the same CLOSID/RMID for both user
->>> space and kernel space. To support the new hardware features where the CLOSID/RMID
->>> can be different we cannot just change "tasks" interface and would need to keep it
->>> backward compatible. So far I assumed that it would be ok for the "tasks" file
->>> to essentially get new meaning as the CLOSID/RMID for just user space work, which 
->>> seems to require a second file for kernel space as a consequence? So far I have
->>> not seen an option that does not change meaning of the "tasks" file.
->>
->> Would it make sense to have some new type of entries in the tasks file,
->> e.g. k_ctrl_<pid>, k_mon_<pid> to say, in the kernel, use the closid of this
->> CTRL_MON for this task pid or use the rmid of this CTRL_MON/MON group for this task
->> pid? We would still probably need separate files for the cpu configuration.
+>>> Sorry, I wasn't clear. What I'm trying to understand is what you gain by
+>>> this flexibility. Given that the values CLOSID and the RMID are just
+>>> identifiers within the hardware and have only the meaning they are given
+>>> by the grouping and controls/monitors set up by resctrl (or any other
+>>> software interface) would you lose anything by just saying the PLZA
+>>> group has CLOSID=0 and RMID=0. Is there value in changing the PLZA
+>>> CLOSID and RMID or can the same effect happen by just changing the
+>>> resctrl configuration?
+>>>
+>> Not quite.
+>> When you enter the kernel, you want to run unthrottled to avoid
+>> priority inversion situations.
+
+In cases where you want to reserve a cache region for one program you
+may want to avoid giving the kernel access to that region so it doesn't
+pollute it.
+
+>> But at the same time, you still want to be able to monitor the
+>> bandwidth for your thread or job, i..e, keep the same
+>> RMID you have in user space.
 > 
-> I am obligated to nack such a change to the tasks file since it would impact any
-> existing user space parsing of this file.
+> Thanks for sharing your usecase.
+> 
+>>
+>> The kernel is by construction shared by all threads running in the
+>> system. It should run unrestricted or with the
+>> bandwidth allocated to the highest priority tasks.
+>>
+>> PLZA should not change the RMID at all.
+> 
+> Would the above with RMID_EN=0 give you this usecase?
+> 
+> Unfortunately, this isn't possible when rmid/pmg is scoped to
+> closid/partid as is the case in MPAM, i.e. the monitors require a match
+> on the pair (closid, partid). Hence, I think we need to support the case
+> where both RMID and CLOSID change.
 > 
 
-Good to know. Do you consider the format of the tasks file fully fixed?
 
 Thanks,
 
