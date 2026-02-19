@@ -1,85 +1,43 @@
-Return-Path: <kvm+bounces-71341-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71342-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oOqcFGTblmlJpgIAu9opvQ
-	(envelope-from <kvm+bounces-71341-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 10:44:04 +0100
+	id MC8WIV/klmlbqgIAu9opvQ
+	(envelope-from <kvm+bounces-71342-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:22:23 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB5EA15D78B
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 10:44:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AC9315DBE0
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 11:22:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C37043069AEE
-	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 09:39:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2E02F30252A3
+	for <lists+kvm@lfdr.de>; Thu, 19 Feb 2026 10:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB7832BF42;
-	Thu, 19 Feb 2026 09:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lxl9CD+r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D212732D7D9;
+	Thu, 19 Feb 2026 10:21:58 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE494328B7C
-	for <kvm@vger.kernel.org>; Thu, 19 Feb 2026 09:39:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A8B38FA3;
+	Thu, 19 Feb 2026 10:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771493988; cv=none; b=M6suAUs3YaLun4b5EH6WcLsnDHa9Fa0RB5fDxGrgLDBnSWmU1ePo4xboI6tpiLttLOza1MgYicYhZADBMmJ40O11iLSQrif7fsKXeR+FCs33NSxYfDzpfqQN8u6gLcieO9l3vL0lZIwyArDX0Je62aJiiU+HbBrq8insfZl4urA=
+	t=1771496518; cv=none; b=sJi3XQMP7J9l1CpJoJ3q1LAroWOpe7aDoD7iqFoRtNgxlrXSlGdlLFa418ohs46zEn2NY4Sv/Tu9ni0vy1sND/e4eTD8QRTPfZE+XpI4Il2DoCYBuZhqeHJNrd/C3KlcUmCr4t1xAHKRrBpRAp7cDweQs+m9a9aQ5HZUr2UFZ/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771493988; c=relaxed/simple;
-	bh=IE1T+RHVCqmPFncrXfUxNPRTfaJLMSqDtdIAZNSPjmA=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=MV8jI70vexa7JjvkGe1Q946z9d5uotT/vg0/QP0Dmv/0uwRt54tB3wJLW7c9AMYObgkwI3yvTvqVTJfeGEXWvDfzI8ZwfY1VLX8ceP0qRqtcLJ8Il83OOJe0C1SaAsuQBz0/UNGd3G2A3jC4kmvOx6nknaZcTw/SNRQTZ1rPROc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lxl9CD+r; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4833115090dso7121025e9.3
-        for <kvm@vger.kernel.org>; Thu, 19 Feb 2026 01:39:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1771493985; x=1772098785; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0Qwt8Tz8tB4Obh3dtJ6HDehOvnoNxAwIhhD+tN8oggA=;
-        b=Lxl9CD+rhrD0zYj8N0WiI39dKi3SvHDegYx72GZH26w+Mq4uVBCasOPhoGKzWDHguw
-         3FkKqGeDeQX/NpuKrtwNsn34PnwK7n6vNmLXMrlo+V5A3jv9HtVn8NsNP4ZGNtmbc9uN
-         ApzsvfxjE1MNPe5KEjgFd7LPLaTaWu8jsLXoKc8uUW0x7qWW9X8tnsnPEvRPFA/DxllT
-         E2TJZiKDujebhUPigZeMqtLhlUd5SIPyPJUv92A7Xg4luwSj7nt+p+083d6Fbvh9cNeQ
-         tGiUCoKRVNFpPcmbhbLsyLR5r5qjnforovXuQ0yUTklk/IWkPC5t5PFmnolJw3MafH0q
-         6CLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771493985; x=1772098785;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Qwt8Tz8tB4Obh3dtJ6HDehOvnoNxAwIhhD+tN8oggA=;
-        b=OK5UBQg8OB7ddVT7sNbYO53Q/OP7gx/FJCnzDE1bbZn8NMNilsu8cJ/7fzJFtZkB4r
-         MPtVaL0qWvh8M7LulhS7EQ14t0Rp3s1Aj0x23H5ryp33Uz2e8bS/ioy5gIEnva7c/82v
-         z+MTC+o+9JtIi/X4TubYV6kHYF3ha5Vilf2Te54ALOwzolSqVYsetY8mnTqlHysiPJ37
-         6zQufFsPpTNQKkPW7oJyKdRb/UXr7YZfRAvzdtYshJT77VHwB4NHlaI514saVyMGqlee
-         L9wFWnhZ0QL5svtXnLW1e6N71fs2bzG3u8ZSAOUQrphtcbJMkjjyZ0kFBgWOfUKpBpxT
-         TEbA==
-X-Forwarded-Encrypted: i=1; AJvYcCUmZsS8vBGwSJjv7QNyuJNvCEXSHH4LVTDrkr2WrZ8A8VFS0MBOCJch5VBkSQOZH0xoglU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvSpSMQFO86FoeZpmig0XKgrmNKe3EQZWZZW3FeBelEsemIVZf
-	d1uLnm0kIUa/ijZ9UXrdCgi6PAWOIeCO4615nQk7hulRxuPW502OeFHE
-X-Gm-Gg: AZuq6aKvoHw6Q6EptBNI5vdvLHbiNBr6Zybu4HCyZ+eCIIMWvYw5Owa++p1+Jqqd0Fk
-	pULAdSO6v3eo3vmWFboZSp3vKDR4x4e0so4pbMr1+yLqbp3swUKVxPBzOglSqOpWR/RVzo/Iayj
-	H+dhBe4ZADtxXidOYTEbZd7txYJNPUpOgeXwnvK96Sw/nJTecwtVQ2siDXdDN5G7YoNfsaRaBCF
-	srCBgBvvOtC+jjQcUfGKEVvOygUoQbWq89GCv/7bHYZTUlyS9lpNuvuRd+xnQuZDCFrWbvz/nyg
-	tR8tRklK2qDCrEidPj91S5CEbYRKhfHVS29g3Jgsy090KwVy36UUp15QEGICwhRMsuIFBTv8+vc
-	1ky1XPBKzUqCcHqklROwxgxmeMTXfaCTUCT04EhiJxSpEhGndekaW68fFRQxCpcBKc+TrScHWgH
-	b3LWM9ZWqEG1Mgr/4UU/XNpKEcSLTFqg==
-X-Received: by 2002:a05:600c:3e14:b0:47a:935f:61a0 with SMTP id 5b1f17b1804b1-483989ca52emr75382465e9.0.1771493984819;
-        Thu, 19 Feb 2026 01:39:44 -0800 (PST)
-Received: from [10.24.66.212] ([15.248.2.236])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4837a5d562esm336851535e9.15.2026.02.19.01.39.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Feb 2026 01:39:44 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <3b4b7b7b-7fcd-46ce-bdcb-cd1a30cf5276@xen.org>
-Date: Thu, 19 Feb 2026 09:39:43 +0000
+	s=arc-20240116; t=1771496518; c=relaxed/simple;
+	bh=fU/vwsRP1qZP5IE4FnVqYDHuPJvSMR1FGi4lv9ghEW4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t8xPFzaC5xFYt/nlqqgD6jB+DuOjtmRtJdzdgLL0IET8ZL/prQ8yx4rhMt2nPLGm5oa3loQVvSO+ElbuBmVUcMV1yYnrCt4Fz3fSfxs/HPl1Q/KQd3u1Cd/IMNBZuicfEuHtmiF37MhnqrGQpDUYKr4NfIKVdOFSfclsZjqR0co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 66F60339;
+	Thu, 19 Feb 2026 02:21:48 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CA9993F62B;
+	Thu, 19 Feb 2026 02:21:47 -0800 (PST)
+Message-ID: <b746428e-1a91-4ed9-8800-c9769e86df97@arm.com>
+Date: Thu, 19 Feb 2026 10:21:46 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -87,167 +45,263 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 27/34] kvm/xen-emu: re-initialize capabilities during
- confidential guest reset
-To: Ani Sinha <anisinha@redhat.com>, David Woodhouse <dwmw2@infradead.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: kraxel@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org
-References: <20260218114233.266178-1-anisinha@redhat.com>
- <20260218114233.266178-28-anisinha@redhat.com>
+Subject: Re: [RFC PATCH 13/19] x86/resctrl: Add PLZA state tracking and
+ context switch handling
+To: Reinette Chatre <reinette.chatre@intel.com>
+Cc: "Moger, Babu" <bmoger@amd.com>, "Moger, Babu" <Babu.Moger@amd.com>,
+ "Luck, Tony" <tony.luck@intel.com>, Drew Fustini <fustini@kernel.org>,
+ "corbet@lwn.net" <corbet@lwn.net>, "Dave.Martin@arm.com"
+ <Dave.Martin@arm.com>, "james.morse@arm.com" <james.morse@arm.com>,
+ "tglx@kernel.org" <tglx@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
+ "bp@alien8.de" <bp@alien8.de>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "peterz@infradead.org" <peterz@infradead.org>,
+ "juri.lelli@redhat.com" <juri.lelli@redhat.com>,
+ "vincent.guittot@linaro.org" <vincent.guittot@linaro.org>,
+ "dietmar.eggemann@arm.com" <dietmar.eggemann@arm.com>,
+ "rostedt@goodmis.org" <rostedt@goodmis.org>,
+ "bsegall@google.com" <bsegall@google.com>, "mgorman@suse.de"
+ <mgorman@suse.de>, "vschneid@redhat.com" <vschneid@redhat.com>,
+ "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+ "pawan.kumar.gupta@linux.intel.com" <pawan.kumar.gupta@linux.intel.com>,
+ "pmladek@suse.com" <pmladek@suse.com>,
+ "feng.tang@linux.alibaba.com" <feng.tang@linux.alibaba.com>,
+ "kees@kernel.org" <kees@kernel.org>, "arnd@arndb.de" <arnd@arndb.de>,
+ "fvdl@google.com" <fvdl@google.com>,
+ "lirongqing@baidu.com" <lirongqing@baidu.com>,
+ "bhelgaas@google.com" <bhelgaas@google.com>,
+ "seanjc@google.com" <seanjc@google.com>, "xin@zytor.com" <xin@zytor.com>,
+ "Shukla, Manali" <Manali.Shukla@amd.com>,
+ "dapeng1.mi@linux.intel.com" <dapeng1.mi@linux.intel.com>,
+ "chang.seok.bae@intel.com" <chang.seok.bae@intel.com>,
+ "Limonciello, Mario" <Mario.Limonciello@amd.com>,
+ "naveen@kernel.org" <naveen@kernel.org>,
+ "elena.reshetova@intel.com" <elena.reshetova@intel.com>,
+ "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "peternewman@google.com" <peternewman@google.com>,
+ "eranian@google.com" <eranian@google.com>,
+ "Shenoy, Gautham Ranjal" <gautham.shenoy@amd.com>
+References: <5ec19557-6a62-4158-af82-c70bac75226f@amd.com>
+ <aXpDdUQHCnQyhcL3@agluck-desk3>
+ <IA0PPF9A76BB3A655A28E9695C8AD1CC59F9591A@IA0PPF9A76BB3A6.namprd12.prod.outlook.com>
+ <bbe80a9a-70f0-4cd1-bd6a-4a45212aa80b@amd.com>
+ <7a4ea07d-88e6-4f0f-a3ce-4fd97388cec4@intel.com>
+ <1f703c24-a4a9-416e-ae43-21d03f35f0be@intel.com>
+ <aYyxAPdTFejzsE42@e134344.arm.com>
+ <679dcd01-05e5-476a-91dd-6d1d08637b3e@intel.com>
+ <aY3bvKeOcZ9yG686@e134344.arm.com>
+ <2b2d0168-307a-40c3-98fa-54902482e861@intel.com>
+ <aZM1OY7FALkPWmh6@e134344.arm.com>
+ <d704ea1f-ed9f-4814-8fce-81db40b1ee3c@intel.com>
+From: Ben Horgan <ben.horgan@arm.com>
 Content-Language: en-US
-In-Reply-To: <20260218114233.266178-28-anisinha@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <d704ea1f-ed9f-4814-8fce-81db40b1ee3c@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71341-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xadimgnik@gmail.com,kvm@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71342-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[46];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[xen.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AB5EA15D78B
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ben.horgan@arm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.965];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arm.com:mid]
+X-Rspamd-Queue-Id: 0AC9315DBE0
 X-Rspamd-Action: no action
 
-On 18/02/2026 11:42, Ani Sinha wrote:
-> On confidential guests KVM virtual machine file descriptor changes as a
-> part of the guest reset process. Xen capabilities needs to be re-initialized in
-> KVM against the new file descriptor.
+Hi Reinette,
+
+On 2/17/26 18:51, Reinette Chatre wrote:
+> Hi Ben,
 > 
-> Signed-off-by: Ani Sinha <anisinha@redhat.com>
-> ---
->   target/i386/kvm/xen-emu.c | 50 +++++++++++++++++++++++++++++++++++++--
->   1 file changed, 48 insertions(+), 2 deletions(-)
+> On 2/16/26 7:18 AM, Ben Horgan wrote:
+>> On Thu, Feb 12, 2026 at 10:37:21AM -0800, Reinette Chatre wrote:
+>>> On 2/12/26 5:55 AM, Ben Horgan wrote:
+>>>> On Wed, Feb 11, 2026 at 02:22:55PM -0800, Reinette Chatre wrote:
+>>>>> On 2/11/26 8:40 AM, Ben Horgan wrote:
+>>>>>> On Tue, Feb 10, 2026 at 10:04:48AM -0800, Reinette Chatre wrote:
 > 
-> diff --git a/target/i386/kvm/xen-emu.c b/target/i386/kvm/xen-emu.c
-> index 52de019834..69527145eb 100644
-> --- a/target/i386/kvm/xen-emu.c
-> +++ b/target/i386/kvm/xen-emu.c
-> @@ -44,9 +44,12 @@
->   
->   #include "xen-compat.h"
->   
-> +NotifierWithReturn xen_vmfd_change_notifier;
-> +static bool hyperv_enabled;
->   static void xen_vcpu_singleshot_timer_event(void *opaque);
->   static void xen_vcpu_periodic_timer_event(void *opaque);
->   static int vcpuop_stop_singleshot_timer(CPUState *cs);
-> +static int do_initialize_xen_caps(KVMState *s, uint32_t hypercall_msr);
->   
->   #ifdef TARGET_X86_64
->   #define hypercall_compat32(longmode) (!(longmode))
-> @@ -54,6 +57,30 @@ static int vcpuop_stop_singleshot_timer(CPUState *cs);
->   #define hypercall_compat32(longmode) (false)
->   #endif
->   
-> +static int xen_handle_vmfd_change(NotifierWithReturn *n,
-> +                                  void *data, Error** errp)
-> +{
-> +    int ret;
-> +
-> +    /* we are not interested in pre vmfd change notification */
-> +    if (((VmfdChangeNotifier *)data)->pre) {
-> +        return 0;
-> +    }
-> +
-> +    ret = do_initialize_xen_caps(kvm_state, XEN_HYPERCALL_MSR);
-> +    if (ret < 0) {
-> +        return ret;
-> +    }
-> +
-> +    if (hyperv_enabled) {
-> +        ret = do_initialize_xen_caps(kvm_state, XEN_HYPERCALL_MSR_HYPERV);
-> +        if (ret < 0) {
-> +            return ret;
-> +        }
-> +    }
-> +    return 0;
+>>>>>>> It looks like MPAM has a few more capabilities here and the Arm levels are numbered differently
+>>>>>>> with EL0 meaning user space. We should thus aim to keep things as generic as possible. For example,
+>>>>>>> instead of CPL0 using something like "kernel" or ... ?
+>>>>>>
+>>>>>> Yes, PLZA does open up more possibilities for MPAM usage.  I've talked to James
+>>>>>> internally and here are a few thoughts.
+>>>>>>
+>>>>>> If the user case is just that an option run all tasks with the same closid/rmid
+>>>>>> (partid/pmg) configuration when they are running in the kernel then I'd favour a
+>>>>>> mount option. The resctrl filesytem interface doesn't need to change and
+>>>>>
+>>>>> I view mount options as an interface of last resort. Why would a mount option be needed
+>>>>> in this case? The existence of the file used to configure the feature seems sufficient?
+>>>>
+>>>> If we are taking away a closid from the user then the number of CTRL_MON groups
+>>>> that can be created changes. It seems reasonable for user-space to expect
+>>>> num_closid to be a fixed value.
+>>>
+>>> I do you see why we need to take away a CLOSID from the user. Consider a user space that
+>>
+>> Yes, just slightly simpler to take away a CLOSID but could just go with the
+>> default CLOSID is also used for the kernel. I would be ok with a file saying the
+>> mode, like the mbm_event file does for counter assignment. It slightly misleading
+>> that a configuration file is under info but necessary as we don't have another
+>> location global to the resctrl mount.
+> 
+> Indeed, the "info" directory has evolved more into a "config" directory.
+> 
+>>> runs with just two resource groups, for example, "high priority" and "low priority", it seems
+>>> reasonable to make it possible to let the "low priority" tasks run with "high priority"
+>>> allocations when in kernel space without needing to dedicate a new CLOSID? More reasonable
+>>> when only considering memory bandwidth allocation though.
+>>>
+>>>>
+>>>>>
+>>>>> Also ...
+>>>>>
+>>>>> I do not think resctrl should unnecessarily place constraints on what the hardware
+>>>>> features are capable of. As I understand, both PLZA and MPAM supports use case where
+>>>>> tasks may use different CLOSID/RMID (PARTID/PMG) when running in the kernel. Limiting
+>>>>> this to only one CLOSID/PARTID seems like an unmotivated constraint to me at the moment.
+>>>>> This may be because I am not familiar with all the requirements here so please do
+>>>>> help with insight on how the hardware feature is intended to be used as it relates
+>>>>> to its design.
+>>>>>
+>>>>> We have to be very careful when constraining a feature this much  If resctrl does something
+>>>>> like this it essentially restricts what users could do forever.
+>>>>
+>>>> Indeed, we don't want to unnecessarily restrict ourselves here. I was hoping a
+>>>> fixed kernel CLOSID/RMID configuration option might just give all we need for
+>>>> usecases we know we have and be minimally intrusive enough to not preclude a
+>>>> more featureful PLZA later when new usecases come about.
+>>>
+>>> Having ability to grow features would be ideal. I do not see how a fixed kernel CLOSID/RMID
+>>> configuration leaves room to build on top though. Could you please elaborate?
+>>
+>> If we initially go with a single new configuration file, e.g. kernel_mode, which
+>> could be "match_user" or "use_root, this would be the only initial change to the
+>> interface needed. If more usecases present themselves a new mode could be added,
+>> e.g. "configurable", and an interface to actually change the rmid/closid for the
+>> kernel could be added.
+> 
+> Something like this could be a base to work from. I think only the two ("match_user" and
+> "use_root") are a bit limiting for even the initial implementation though.
+> As I understand, "use_root" implies using the allocations of the default group but
+> does not indicate what MON group (which RMID/PMG) should be used to monitor the
+> work done in kernel space. A way to specify the actual group may be needed?
 
-This seems odd. Why use the hyperv_enabled boolean, rather than simply 
-the msr value, since when hyperv_enabled is set you will be calling 
-do_initialize_xen_caps() twice.
+Yeah, I'm not sure that flexibility is strictly necessary but will make
+the interface easier to use.
 
-> +}
-> +
->   static bool kvm_gva_to_gpa(CPUState *cs, uint64_t gva, uint64_t *gpa,
->                              size_t *len, bool is_write)
->   {
-> @@ -111,15 +138,16 @@ static inline int kvm_copy_to_gva(CPUState *cs, uint64_t gva, void *buf,
->       return kvm_gva_rw(cs, gva, buf, sz, true);
->   }
->   
-> -int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
-> +static int do_initialize_xen_caps(KVMState *s, uint32_t hypercall_msr)
->   {
-> +    int xen_caps, ret;
->       const int required_caps = KVM_XEN_HVM_CONFIG_HYPERCALL_MSR |
->           KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL | KVM_XEN_HVM_CONFIG_SHARED_INFO;
-> +
+> 
+>>> I wonder if the benefit of the fixed CLOSID/RMID is perhaps mostly in the cost of
+>>> context switching which I do not think is a concern for MPAM but it may be for PLZA?
+>>>
+>>> One option to support fixed kernel CLOSID/RMID at the beginning and leave room to build
+>>> may be to create the kernel_group or "tasks_kernel" interface as a baseline but in first
+>>> implementation only allow user space to write the same group to all "kernel_group" files or
+>>> to only allow to write to one of the "tasks_kernel" files in the resctrl fs hierarchy. At
+>>> that time the associated CLOSID/RMID would become the "fixed configuration" and attempts to
+>>> write to others can return "ENOSPC"?
+>>
+>> I think we'd have to be sure of the final interface if we go this way.
+> 
+> I do not think we should aim to know the final interface since that requires knowing all future
+> hardware features and their implementations in advance. Instead we should aim to have something
+> that we can build on that is accompanied by documentation that supports future flexibility (some may
+> refer to this as "weasel words").
 
-Gratuitous whitespace change.
+Makes sense.
 
->       struct kvm_xen_hvm_config cfg = {
->           .msr = hypercall_msr,
->           .flags = KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL,
->       };
-> -    int xen_caps, ret;
->   
->       xen_caps = kvm_check_extension(s, KVM_CAP_XEN_HVM);
->       if (required_caps & ~xen_caps) {
-> @@ -143,6 +171,21 @@ int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
->                        strerror(-ret));
->           return ret;
->       }
-> +    return xen_caps;
-> +}
-> +
-> +int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
-> +{
-> +    int xen_caps;
-> +
-> +    xen_caps = do_initialize_xen_caps(s, hypercall_msr);
-> +    if (xen_caps < 0) {
-> +        return xen_caps;
-> +    }
-> +
+> 
+>>> From what I can tell this still does not require to take away a CLOSID/RMID from user space
+>>> though. Dedicating a CLOSID/RMID to kernel work can still be done but be in control of user
+>>> that can, for example leave the "tasks" and "cpus" files empty.
+>>>
+>>>> One complication is that for fixed kernel CLOSID/RMID option is that for x86 you
+>>>> may want to be able to monitor a tasks resource usage whether or not it is in
+>>>> the kernel or userspace and so only have a fixed CLOSID. However, for MPAM this
+>>>> wouldn't work as PMG (~RMID) is scoped to PARTID (~CLOSID).
+>>>>
+>>>>>
+>>>>>> userspace software doesn't need to change. This could either take away a
+>>>>>> closid/rmid from userspace and dedicate it to the kernel or perhaps have a
+>>>>>> policy to have the default group as the kernel group. If you use the default
+>>>>>
+>>>>> Similar to above I do not see PLZA or MPAM preventing sharing of CLOSID/RMID (PARTID/PMG)
+>>>>> between user space and kernel. I do not see a motivation for resctrl to place such
+>>>>> constraint.
+>>>>>
+>>>>>> configuration, at least for MPAM, the kernel may not be running at the highest
+>>>>>> priority as a minimum bandwidth can be used to give a priority boost. (Once we
+>>>>>> have a resctrl schema for this.)
+>>>>>>
+>>>>>> It could be useful to have something a bit more featureful though. Is there a
+>>>>>> need for the two mappings, task->cpl0 config and task->cpl1 to be independent or
+>>>>>> would as task->(cp0 config, cp1 config) be sufficient? It seems awkward that
+>>>>>> it's not a single write to move a task. If a single mapping is sufficient, then
+>>>>>
+>>>>> Moving a task in x86 is currently two writes by writing the CLOSID and RMID separately.
+>>>>> I think the MPAM approach is better and there may be opportunity to do this in a similar
+>>>>> way and both architectures use the same field(s) in the task_struct.
+>>>>
+>>>> I was referring to the userspace file write but unifying on a the same fields in
+>>>> task_struct could be good. The single write is necessary for MPAM as PMG is
+>>>> scoped to PARTID and I don't think x86 behaviour changes if it moves to the same
+>>>> approach.
+>>>>
+>>>
+>>> ah - I misunderstood. You are suggesting to have one file that user writes to
+>>> to set both user space and kernel space CLOSID/RMID? This sounds like what the
+>>
+>> Yes, the kernel_groups idea does partially have this as once you've set the
+>> kernel_group for a CTRL_MON or MON group then the user space configuration
+>> dictates the kernel space configuration. As you pointed out, this is also
+>> a draw back of the kernel_groups idea.
+>>
+>>> existing "tasks" file does but only supports the same CLOSID/RMID for both user
+>>> space and kernel space. To support the new hardware features where the CLOSID/RMID
+>>> can be different we cannot just change "tasks" interface and would need to keep it
+>>> backward compatible. So far I assumed that it would be ok for the "tasks" file
+>>> to essentially get new meaning as the CLOSID/RMID for just user space work, which 
+>>> seems to require a second file for kernel space as a consequence? So far I have
+>>> not seen an option that does not change meaning of the "tasks" file.
+>>
+>> Would it make sense to have some new type of entries in the tasks file,
+>> e.g. k_ctrl_<pid>, k_mon_<pid> to say, in the kernel, use the closid of this
+>> CTRL_MON for this task pid or use the rmid of this CTRL_MON/MON group for this task
+>> pid? We would still probably need separate files for the cpu configuration.
+> 
+> I am obligated to nack such a change to the tasks file since it would impact any
+> existing user space parsing of this file.
+> 
 
-Clearly here the code would be simpler here if you just saved the value 
-of hypercall_msr which you have used in the call above.
+Good to know. Do you consider the format of the tasks file fully fixed?
 
-> +    if (!hyperv_enabled && (hypercall_msr == XEN_HYPERCALL_MSR_HYPERV)) {
-> +        hyperv_enabled = true;
-> +    }
->   
->       /* If called a second time, don't repeat the rest of the setup. */
->       if (s->xen_caps) {
-> @@ -185,6 +228,9 @@ int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
->       xen_primary_console_reset();
->       xen_xenstore_reset();
->   
-> +    xen_vmfd_change_notifier.notify = xen_handle_vmfd_change;
-> +    kvm_vmfd_add_change_notifier(&xen_vmfd_change_notifier);
-> +
->       return 0;
->   }
->   
+Thanks,
+
+Ben
 
 
