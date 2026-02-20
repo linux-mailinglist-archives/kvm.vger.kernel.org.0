@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-71403-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71404-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mBfXLSMzmGleCgMAu9opvQ
-	(envelope-from <kvm+bounces-71403-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 11:10:43 +0100
+	id MIC+Itc1mGn/CgMAu9opvQ
+	(envelope-from <kvm+bounces-71404-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 11:22:15 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30D4A166B22
-	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 11:10:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF265166CC6
+	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 11:22:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DD912303D8A5
-	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 10:10:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C8C4B306B2C1
+	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 10:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9D83382C1;
-	Fri, 20 Feb 2026 10:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E243433CE86;
+	Fri, 20 Feb 2026 10:20:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IGCTXjwn"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="J/mM+Pgw"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141C232D42B;
-	Fri, 20 Feb 2026 10:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA23A33B6CC;
+	Fri, 20 Feb 2026 10:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771582202; cv=none; b=auDNuHs7QKINgTKD/5GsnXsLbnM2abH+8aCIcK2NMr1RuQhf5OPrYjVHufaTd4PxBRAq6DM25SXlUWYREZG0ZUlVHFJEfpwrCmhFZBM0QILDjDuSkm8Fh4iXlufRLf5mH6/QHkiLyKpbazWAEIpBlBBuP9HFsuicVMcJIJHt4Xs=
+	t=1771582851; cv=none; b=NU3CPRoAUVCbazVQXtr+sASSoJo2eqDdp1n+9OmtzTRHfByAQ27HDwo8BWmn3gAaJDKgn4uh3K+gT7Vc4aFbfFRY/hflrmMGlLafl306piZI5dCF5ITgRsCgo/D9aopnz1z0aX665Ku5Jb5sxdLhaHv4OY19Q7hZ6qUy61TXmMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771582202; c=relaxed/simple;
-	bh=m9TZ2GABmSiN5K15vQTGziVzki7NrPcyfXW6rIntFlw=;
+	s=arc-20240116; t=1771582851; c=relaxed/simple;
+	bh=1BHaYVq4Xmc0/xdTGVV1DEJJmFC3rz+BJWvxDLSRdCc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cqTo528yf8PK0FOmUhAxXqcA8Boek/U0Zl4Xu5hJZhcrMwXQnLR0x1bFAjmQhN1ZgKk/Xfprkg9+3VPUTZ/yuF3bA1ZcsEx8orPccxWskGJJ0f0YC4iyGpoAW01Y0RXJCGPqbO/h5r/3agHaWNmPF7k1EBmgn+1IzAqTI5E5Al4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IGCTXjwn; arc=none smtp.client-ip=148.163.158.5
+	 In-Reply-To:Content-Type; b=eaVao+6SIOT74TcFxzz2fZnJMPzhSYVXByfEQyaL0ZEbA+HgbFjvlw8J4O0coqhX+K87o3XSVIxO3mJNkMRUe5B4CB6PdqEdhYobEMORSL2GVpUrtXzF1K+FwOZ7bJ5Ja77PQNTiCSKKrMSE5e39Cu3fltkb8g1svwBvjuT3w4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=J/mM+Pgw; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61JKgua71296133;
-	Fri, 20 Feb 2026 10:09:59 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61JL5E8U1294764;
+	Fri, 20 Feb 2026 10:20:47 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Ho9PRM
-	pMtX3Y4bXy24QwcJxwVicoCEiJViKfvmy+NSg=; b=IGCTXjwnx8UiJFcq7zMwmb
-	H858gPTP5xTw3wXNqQ9RDIRqn8DMg6L1HHL1U4g13rnYN/OCsxgmW/JU72P8aro7
-	GZMxwsBvbFBbK7m2DiEkBkWO3mfEBIte9EDKOhtAxCPikCT0Z1VF62aVxzpY02Zq
-	QgZiFGqDwZuovH6Pg/0ukUESwrynmJ2RxU4cHORsI8jhzQJoWUr6IsqNABHi6C4U
-	JwUH+//H0Mip+sN3p8TvKhYHuw/GVse5FRZFqGuXmbrk98EP37uk5aLK2eDnU7yT
-	3lbO9CtLHikaWxF+yiMGDRz4Fk4mIX4z0WWBr5xa83jkBWab44hZoKD7YCylMVeA
+	:message-id:mime-version:references:subject:to; s=pp1; bh=VWXsy8
+	ToUx0YdEhg4jCQZ4Fq6gm3Gx3Ii8pDIs23bFg=; b=J/mM+PgwRZAEECPFUsdoW9
+	4KQdaVKvYR1uKFaCyRizYNIE4O3xY1wsqRHujSfLPeTfcjMsHvmW5V6/pPkJnD13
+	d8nIqRwqbeyx2NCb9DEvv5XjdconhXzQpyf/Jd1yR3PwVwcZ8KI2Al5FvkP7zSW3
+	JtcB4mHvITAvtIN0vUsQzEIi/M27LXlbDyWKGcAxVsepxx9QqrcPLq4HwByUcT6D
+	6mrX+KmceAwZ3FsKZz0QnN4cbBmf+9DvfPg9strGybEeTeGvVs+Xw3eymACr0I7P
+	YKdlmT79q2JBYdFm2MinIwYGLSKqffzwJURkgtNzZMt+FrC/AG55x+5sO6ODGeYA
 	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4caj64h1h3-1
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4caj64h2mv-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 20 Feb 2026 10:09:58 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61K9jwKC001432;
-	Fri, 20 Feb 2026 10:09:57 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4ccb2bqy8c-1
+	Fri, 20 Feb 2026 10:20:47 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61K9A5db017792;
+	Fri, 20 Feb 2026 10:20:46 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4ccb28qyq0-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 20 Feb 2026 10:09:57 +0000
+	Fri, 20 Feb 2026 10:20:46 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61KA9sXQ50659662
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61KAKgao14352658
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 20 Feb 2026 10:09:54 GMT
+	Fri, 20 Feb 2026 10:20:42 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2C10120071;
-	Fri, 20 Feb 2026 10:09:54 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 8C1502004E;
+	Fri, 20 Feb 2026 10:20:42 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C12C120065;
-	Fri, 20 Feb 2026 10:09:53 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 2240420040;
+	Fri, 20 Feb 2026 10:20:42 +0000 (GMT)
 Received: from [9.111.87.59] (unknown [9.111.87.59])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 20 Feb 2026 10:09:53 +0000 (GMT)
-Message-ID: <37797439-5b6e-4347-8094-0b0cb76a0a91@linux.ibm.com>
-Date: Fri, 20 Feb 2026 11:09:53 +0100
+	Fri, 20 Feb 2026 10:20:42 +0000 (GMT)
+Message-ID: <48e794f6-0dc8-4e7e-8bf7-399015b044c2@linux.ibm.com>
+Date: Fri, 20 Feb 2026 11:20:41 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,8 +80,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 1/3] s390x: snippets: Add reset_guest() to
- lib
+Subject: Re: [kvm-unit-tests PATCH 2/3] s390x: sclp: Add detection of
+ alternate STFLE facilities
 To: Christoph Schlameuss <schlameuss@linux.ibm.com>,
         linux-s390@vger.kernel.org
 Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
@@ -90,7 +90,7 @@ Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>,
         Nina Schoetterl-Glausch <nsg@linux.ibm.com>, kvm@vger.kernel.org
 References: <20260211-vsie-stfle-fac-v1-0-46c7aec5912b@linux.ibm.com>
- <20260211-vsie-stfle-fac-v1-1-46c7aec5912b@linux.ibm.com>
+ <20260211-vsie-stfle-fac-v1-2-46c7aec5912b@linux.ibm.com>
 Content-Language: en-US
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
@@ -135,25 +135,25 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20260211-vsie-stfle-fac-v1-1-46c7aec5912b@linux.ibm.com>
+In-Reply-To: <20260211-vsie-stfle-fac-v1-2-46c7aec5912b@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: PD9AaVAack-2soYfgaqGCqUoVcNJzoeK
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjIwMDA4OCBTYWx0ZWRfX10VxkshMsVyS
- CgGVzwb2lbx11kDz8CQZ/Z+/lJJ0+zK7ixGXWeSnd7ncnQIgI4OM04ZRjbxBpxwHEreOmCzzrNE
- 7ztaS8Wz7GYxu5OdSvHs3GLhJ1Wn6Xa/B1CDWNMzc99cpZ9bA1y7sm+p+u7HutJVzWitBhdUIjp
- sHkTvdvgvsz1koFMIKRb012ZozuNFxK+crEBzlN0EJ/SjSZtG+c8OTZ662wLBCZlMZ0h3D3VeMr
- qh2G9qZ2M91wIPaNmTd86y1Wd3mPZ25lsoRMrkL7wzasU4miZm8PZR/6pC3UUuybvHQQXdTyRc8
- tpzRopsy6R43fuWVnBBzL4CcVR7D1Y7/Hx38qCWFID2bA5k+kypOvLIiLmiySKJlZtAv8JpikD8
- FyJv0r77/RBQcM6MeWwkGC8lD3oNyXN3NvC9/EN6OlrGtqXEFL8sz7EKHaXn2f4ioOTVcio0XxJ
- 4oPN2+txXXoEYUvXj2w==
-X-Proofpoint-GUID: PD9AaVAack-2soYfgaqGCqUoVcNJzoeK
-X-Authority-Analysis: v=2.4 cv=U+mfzOru c=1 sm=1 tr=0 ts=699832f6 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+X-Proofpoint-ORIG-GUID: oSaMGRI9Xa_CSkHB4rJwpbEYEv7mPWgG
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjIwMDA4OCBTYWx0ZWRfX0DEC8xRjEies
+ uQlELepY3eDhn7g+8ruSInf3jctChJRKwLQVF3RFhIethTx/H6TXDtMdowPu/HbVpiPXSOrNO0b
+ RjOMcn1TLEvTHjoUHCzzkrVl0Tn0R3ic2lbEXEUGaX/0vGv23HZJVzRtYvVjgOONvK5za4vaHxF
+ D83rl6Fvf6XnQtorXpKeesNyAGRTws0OOiPBlsrB+yZ8P1/er2UHEP3ddpWSRJTzUz2tZbZ8oaZ
+ dBxFYOiu7bxJnoCYWbwXkGKfYmiXp7+Ozmg0jfpvCDnFobYuL6XFFWdrGODXQ8qAtA8q8XB/KPe
+ KXNIrcVoNfcTahM1RS4VJ/0WQVlCxMbESzyirKVzsx4fIpTP+ckQyabAYxoxVMmhV5C672MnoD1
+ vUmFKwmvWEZ/tQXJj8BOxqb434pfUOw/Lnw7bbrVfgBK/kEgFHBFip26/Y8cs2kdBpzkPXBAZKO
+ K/zqC8rOBDDAa4GvLZQ==
+X-Proofpoint-GUID: oSaMGRI9Xa_CSkHB4rJwpbEYEv7mPWgG
+X-Authority-Analysis: v=2.4 cv=U+mfzOru c=1 sm=1 tr=0 ts=6998357f cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
  a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
  a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8
- a=7iYUXIqZIL68SlDzRG0A:9 a=QEXdDO2ut3YA:10
+ a=eEGcrwR_cEiMOQHAoJgA:9 a=QEXdDO2ut3YA:10
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-02-20_01,2026-02-20_02,2025-10-01_01
@@ -167,7 +167,7 @@ X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -176,10 +176,10 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71403-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71404-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.ibm.com:mid];
 	TAGGED_RCPT(0.00)[kvm];
 	FROM_NEQ_ENVFROM(0.00)[frankja@linux.ibm.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -189,17 +189,80 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 30D4A166B22
+X-Rspamd-Queue-Id: DF265166CC6
 X-Rspamd-Action: no action
 
 On 2/11/26 15:57, Christoph Schlameuss wrote:
 > From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 > 
-> Extract reset_guest from spec_ex-sie into the lib.
-> After reset_guest() the snippet can be executed again.
+> Detect availability of alternate STFLE interpretive execution facilities
+> 1 and 2.
+> Also fix number of unassigned bits in sclp_facilities which wasn't
+> adjusted in a prior commit adding entries to sclp_facilities.
 > 
 > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 > Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> ---
+>   lib/s390x/sclp.c | 2 ++
+>   lib/s390x/sclp.h | 6 +++++-
+>   2 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
+> index 2f902e39e785ff4e139a39be2ffe11b5fa01edc0..7408b813b6396d572d740c19c15175e173fed596 100644
+> --- a/lib/s390x/sclp.c
+> +++ b/lib/s390x/sclp.c
+> @@ -163,8 +163,10 @@ void sclp_facilities_setup(void)
+>   	sclp_facilities.has_cmma = sclp_feat_check(116, SCLP_FEAT_116_BIT_CMMA);
+>   	sclp_facilities.has_64bscao = sclp_feat_check(116, SCLP_FEAT_116_BIT_64BSCAO);
+>   	sclp_facilities.has_esca = sclp_feat_check(116, SCLP_FEAT_116_BIT_ESCA);
+> +	sclp_facilities.has_astfleie1 = sclp_feat_check(116, SCLP_FEAT_116_BIT_ASTFLEIE1);
+>   	sclp_facilities.has_ibs = sclp_feat_check(117, SCLP_FEAT_117_BIT_IBS);
+>   	sclp_facilities.has_pfmfi = sclp_feat_check(117, SCLP_FEAT_117_BIT_PFMFI);
+> +	sclp_facilities.has_astfleie2 = sclp_feat_check(139, SCLP_FEAT_139_BIT_ASTFLEIE2);
+>   
+>   	for (i = 0; i < read_info->entries_cpu; i++, cpu++) {
+>   		/*
+> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
+> index 22f120d1b7ea7d1c3fe822385d0c689e5b3459fe..91a81c902eaa8ee6b999184aeb8a33633efd1065 100644
+> --- a/lib/s390x/sclp.h
+> +++ b/lib/s390x/sclp.h
+> @@ -129,10 +129,12 @@ struct sclp_facilities {
+>   	uint64_t has_cmma : 1;
+>   	uint64_t has_64bscao : 1;
+>   	uint64_t has_esca : 1;
+> +	uint64_t has_astfleie1 : 1;
+>   	uint64_t has_kss : 1;
+>   	uint64_t has_pfmfi : 1;
+>   	uint64_t has_ibs : 1;
+> -	uint64_t : 64 - 15;
+> +	uint64_t has_astfleie2 : 1;
+> +	uint64_t : 64 - 19;
+>   };
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+64 - 17?
+
+I was wondering why the static assert didn't trigger here. Turns out I 
+only added it to a feature branch that didn't go upstream yet...
+
+Could you do me a favor and add a patch that introduces the static assert:
+_Static_assert(sizeof(struct sclp_facilities) == sizeof(uint64_t));
+
+Then again, why do we pad that at all, it's not a FW struct and I hope 
+that we never cast it to u64 and copy it somewhere.
+
+>   
+>   /* bit number within a certain byte */
+> @@ -143,8 +145,10 @@ struct sclp_facilities {
+>   #define SCLP_FEAT_116_BIT_64BSCAO	0
+>   #define SCLP_FEAT_116_BIT_CMMA		1
+>   #define SCLP_FEAT_116_BIT_ESCA		4
+> +#define SCLP_FEAT_116_BIT_ASTFLEIE1	7
+>   #define SCLP_FEAT_117_BIT_PFMFI		1
+>   #define SCLP_FEAT_117_BIT_IBS		2
+> +#define SCLP_FEAT_139_BIT_ASTFLEIE2	1
+>   
+>   typedef struct ReadInfo {
+>   	SCCBHeader h;
+> 
+
 
