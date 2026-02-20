@@ -1,139 +1,162 @@
-Return-Path: <kvm+bounces-71395-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71396-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gP0jIsDfl2n99gIAu9opvQ
-	(envelope-from <kvm+bounces-71395-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 05:14:56 +0100
+	id eH9fNQ0WmGki/wIAu9opvQ
+	(envelope-from <kvm+bounces-71396-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 09:06:37 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C9A81649D2
-	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 05:14:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46D6316583A
+	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 09:06:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0F952302D723
-	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 04:12:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2FFAD3071A5F
+	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 08:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807FE33064A;
-	Fri, 20 Feb 2026 04:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R6V6kP0b"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55DF1335568;
+	Fri, 20 Feb 2026 08:04:11 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B305F32FA3D;
-	Fri, 20 Feb 2026 04:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9472DD5E2
+	for <kvm@vger.kernel.org>; Fri, 20 Feb 2026 08:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771560657; cv=none; b=BfN6C6Bw8cuyqoRk/vfqBGagE3uyxYbEmB49u6qBnGdS3xbkM1hNyWcHMwuWyZOgjLgJl/I8ETWo8XYeWjGLt6mYumkhipWYLyfuWjN5kHrVPDohMDZQtpFAF82i/VFxCE6qkQkImtbpbhH/Jp3sXOBRuT/ePsRgih+UHphsZdE=
+	t=1771574650; cv=none; b=Attq8sME+POzd2LVJYnYJWrv57aRacxCTQISL/ZfmEBZd1N7MJ3GTdz5NzghZ+p2eV2AinE9IUcpCXsBRz6GATq5N5j9rgZYShX8yGMAJ3Muv8mftGoqqFl+fe3Jq7K0OSPeUY5jBUGxWdr01bbcp1FRCoqNA2LMJoAyPMcHkMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771560657; c=relaxed/simple;
-	bh=B9ojwB1QasO9eFz6CVWrutapCwSRDIdZql1m4r+SU+U=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mRg2iqIugM5mwh/qZerca8GNmyl6MAiDz9EwPrLjBGubEn79ocQb9ZcGO6HNpFAIjTsVBa0Q2jRmTcVuyg1rX+m0InlfuqcKxldZW9h24tJJK8drxKKWNWesXauqwR2Tl+nJ/c+Hbo5+bTwI56oylrlQJwS6mTbPgXw4x197en4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R6V6kP0b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94B12C19421;
-	Fri, 20 Feb 2026 04:10:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771560657;
-	bh=B9ojwB1QasO9eFz6CVWrutapCwSRDIdZql1m4r+SU+U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=R6V6kP0b2K0E4zkJZCAWAYnE5G8mAjpiMEQdidmAH4I9Dx2YsY4O/b1KztZfm4Nxz
-	 Lq/sng3k3At1ZHCTHzdppW6WihanXP+64wYH1osYwqIpmOvbRPHOjnMqS1Jkv0bE9g
-	 hnRiqFJWjWMOeBJ05jmObWilO6+Dp4r75MaH8VlDGH2cmCn+h4aVU8Rmtt+POVPqVh
-	 4rHAbZ1qS2KvYuQVcCfYXO+gjE/cZKbbOusBbHdjUhOVI4709oKPAuh62bTwUeMSDF
-	 vLOOEmvvr3VlG2+lIvjvdwcmGtLPUEShkhtkrE2Ht5Hp3oW85jcch1dfqxu0GTNadp
-	 5w4+FzcEa1MkA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FCC73809A88;
-	Fri, 20 Feb 2026 04:11:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1771574650; c=relaxed/simple;
+	bh=vGADSqxID99POmMSYRKWxfqsD0RW8oK82U7YrGJKqks=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N/WYzDwf/Se8enMLyiACwqCmNHbl5c1JyIld0ZInZgYvdmskU7U7a2ena/BtLVyO1q401Fwy6nk5iRkcQy8vIKftih0gLV6n5Ou5cbYolOmqte/Yym/xzubvjUqlDxX6LPMZMOvx/IUsJ95DKoxRdKK39okfE7Q9cfWwOfIGnSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ooseel.net; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ooseel.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-45f171cb842so1279632b6e.1
+        for <kvm@vger.kernel.org>; Fri, 20 Feb 2026 00:04:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771574648; x=1772179448;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yxL+WdrxcUzVCuoQ2517iVUnhtiEO5j9HGMzSGdIHB4=;
+        b=TgS6ilp+yt/zdi3d0Oydt+TkzMDRIJMtZZhuR7EBAAuASm98PTFGXfXLIz7sivbKmp
+         zxGnUvCFbNG+agZoCEegtTCMvE8Gop+X0vkyKr1D2KSzc0NePGIRgOU0UAiVpvQnPFSX
+         Zqsn/p2nKD5GidrK+SDfiJAm93fir/v5/XzP7OuV9WYq3qaC3MOQidNf8YBba+6jYaiC
+         oGXi4phAOclC88W5eGL3jWNQfiE1kq+aYYsi8FhNProXAgOT77/DGslhLGdSD8zcImdn
+         xseVNtqkF8K8y5hojM61ZnB6eAzmhr9xbNlFdvFf7OFBEzuAIl2H/Wo2W3GR1iZrp/oP
+         hgSw==
+X-Forwarded-Encrypted: i=1; AJvYcCUAG6H6H6anCK6GIBYXXmXlvnKOw8LCA7Zwu/u+iv2UK3W6W2bqX8VVu5n+8NFNnwDm//E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBd2QOGbVXc67H0a+lXScEjfO4kdMMT0czt0QaO6A7lc+6zX9+
+	HKeyZd4JCqzesW+Sa4ciPbJvqPy/u5OljH/36C6VsUT3zI/3+2CpHPV55MJ78fsCOiM=
+X-Gm-Gg: AZuq6aKZ0aIOfTcIsIe8IwEWSfGzhqRiak3bEW9TogZngZMtv0jgMtHdyoPT5RteEZM
+	wdgPbSpdYES4SS0t4j8CjiSgaB1Nv7m4okyJ0mb8TZvR7/Z2fl7w7Cwng2YfPZmDecS4UZDjYkZ
+	lXlc2q51IyhWGJgMSVVFWChc+LaKP0jKyef0BKwSe26fq5lpKIpmOO0Or1UX4D9rYJWj8gmXtvA
+	CdsGdx7ax+aZNNFjBHrktuYFEgUVy2h9ENxajQ4nOA/CJGJTC4hufvzYsMIVrnZNBPN5Ft1lE1z
+	3oagrNc8ZOo9Zfm/O8iCX1AS4lo5iQfEcUr9yiSEEX4k49Z8K9Ri4VZ2WzO99MmSTTz15abM0Ee
+	HKjcM581X1nDZvw29u8PIFYeipiKDdkm+FdqCmxnnSmsbNSspijlqrOGqwDQcEMZ2dZIYVlVdyz
+	qATmJ+7wcSGP9iWuUa2fC+Y+Ih9Oh/dtyz4mXIreXlg9ESLSRpn9JZHnU=
+X-Received: by 2002:a05:6808:170f:b0:45a:6e83:fbff with SMTP id 5614622812f47-464275b2a62mr2135479b6e.20.1771574647822;
+        Fri, 20 Feb 2026 00:04:07 -0800 (PST)
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com. [209.85.160.46])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-40eaeb42708sm27155023fac.0.2026.02.20.00.04.06
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Feb 2026 00:04:06 -0800 (PST)
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-40fb2789476so2551246fac.1
+        for <kvm@vger.kernel.org>; Fri, 20 Feb 2026 00:04:06 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVBoITsuTULGtZwfBbUr/UjbpzclI3IWBgMP3Bgw4tBBM+KcaKxnb2nvccFDzswsMj+rdA=@vger.kernel.org
+X-Received: by 2002:a05:6820:1c94:b0:66e:6a46:bfc5 with SMTP id
+ 006d021491bc7-679b0e0bd48mr2560855eaf.12.1771574646207; Fri, 20 Feb 2026
+ 00:04:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] RISC-V: KVM: Fix null pointer dereference in
- kvm_riscv_aia_imsic_rw_attr()
-From: patchwork-bot+linux-riscv@kernel.org
-Message-Id: 
- <177156066578.189817.1206944543601300200.git-patchwork-notify@kernel.org>
-Date: Fri, 20 Feb 2026 04:11:05 +0000
-References: <20260127072219.3366607-1-xujiakai2025@iscas.ac.cn>
-In-Reply-To: <20260127072219.3366607-1-xujiakai2025@iscas.ac.cn>
-To: eanut 6 <jiakaipeanut@gmail.com>
-Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, anup@brainfault.org,
- atish.patra@linux.dev, pjw@kernel.org, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, alex@ghiti.fr, xujiakai2025@iscas.ac.cn,
- jiakaiPeanut@gmail.com
+References: <20260210072530.918038-1-lsahn@ooseel.net>
+In-Reply-To: <20260210072530.918038-1-lsahn@ooseel.net>
+From: Leesoo Ahn <lsahn@ooseel.net>
+Date: Fri, 20 Feb 2026 17:03:54 +0900
+X-Gmail-Original-Message-ID: <CANTT7qhsPkvwnog2V0Q+vsq4Z2axE+Q9Mce9_X-=acRONFfQuw@mail.gmail.com>
+X-Gm-Features: AaiRm51bvSffxJ_AQo5ca2WaIMGMNmz_-eFEDwwLYDWNAuqU-l1pmsLEvT-z6IQ
+Message-ID: <CANTT7qhsPkvwnog2V0Q+vsq4Z2axE+Q9Mce9_X-=acRONFfQuw@mail.gmail.com>
+Subject: Re: [PATCH v1] KVM: Use memdup_user instead of kernel stack to
+ allocate kvm_guest_debug
+To: Paolo Bonzini <pbonzini@redhat.com>, 
+	"open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Cc: lsahn@ooseel.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,kvm@vger.kernel.org];
-	FREEMAIL_CC(0.00)[lists.infradead.org,vger.kernel.org,brainfault.org,linux.dev,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,iscas.ac.cn,gmail.com];
-	TAGGED_FROM(0.00)[bounces-71395-lists,kvm=lfdr.de,linux-riscv];
+	RCPT_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71396-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[ooseel.net];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,brainfault.org:email]
-X-Rspamd-Queue-Id: 2C9A81649D2
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lsahn@ooseel.net,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.980];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ooseel.net:email,mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 46D6316583A
 X-Rspamd-Action: no action
 
-Hello:
+Bump up the patch in order to remind again.
 
-This patch was applied to riscv/linux.git (fixes)
-by Anup Patel <anup@brainfault.org>:
-
-On Tue, 27 Jan 2026 07:22:19 +0000 you wrote:
-> Add a null pointer check for imsic_state before dereferencing it in
-> kvm_riscv_aia_imsic_rw_attr(). While the function checks that the
-> vcpu exists, it doesn't verify that the vcpu's imsic_state has been
-> initialized, leading to a null pointer dereference when accessed.
-> 
-> The crash manifests as:
->   Unable to handle kernel paging request at virtual address
->   dfffffff00000006
->   ...
->   kvm_riscv_aia_imsic_rw_attr+0x2d8/0x854 arch/riscv/kvm/aia_imsic.c:958
->   aia_set_attr+0x2ee/0x1726 arch/riscv/kvm/aia_device.c:354
->   kvm_device_ioctl_attr virt/kvm/kvm_main.c:4744 [inline]
->   kvm_device_ioctl+0x296/0x374 virt/kvm/kvm_main.c:4761
->   vfs_ioctl fs/ioctl.c:51 [inline]
->   ...
-> 
-> [...]
-
-Here is the summary with links:
-  - RISC-V: KVM: Fix null pointer dereference in kvm_riscv_aia_imsic_rw_attr()
-    https://git.kernel.org/riscv/c/aeb1d17d1af5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+2026=EB=85=84 2=EC=9B=94 10=EC=9D=BC (=ED=99=94) PM 4:25, Leesoo Ahn <lsahn=
+@ooseel.net>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+>
+> Switch to using memdup_user to allocate its memory because the size of
+> kvm_guest_debug is over 512 bytes on Arm64 and is burdened allocation
+> from kernel stack.
+>
+> Signed-off-by: Leesoo Ahn <lsahn@ooseel.net>
+> ---
+>  virt/kvm/kvm_main.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+>
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 5b5b69c97665..bc0a53129df7 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4592,12 +4592,15 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>                 break;
+>         }
+>         case KVM_SET_GUEST_DEBUG: {
+> -               struct kvm_guest_debug dbg;
+> +               struct kvm_guest_debug *dbg;
+>
+> -               r =3D -EFAULT;
+> -               if (copy_from_user(&dbg, argp, sizeof(dbg)))
+> +               dbg =3D memdup_user(argp, sizeof(*dbg));
+> +               if (IS_ERR(dbg)) {
+> +                       r =3D PTR_ERR(dbg);
+>                         goto out;
+> -               r =3D kvm_arch_vcpu_ioctl_set_guest_debug(vcpu, &dbg);
+> +               }
+> +               r =3D kvm_arch_vcpu_ioctl_set_guest_debug(vcpu, dbg);
+> +               kfree(dbg);
+>                 break;
+>         }
+>         case KVM_SET_SIGNAL_MASK: {
+> --
+> 2.51.0
+>
 
