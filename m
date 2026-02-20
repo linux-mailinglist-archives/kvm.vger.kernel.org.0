@@ -1,43 +1,78 @@
-Return-Path: <kvm+bounces-71402-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71403-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6OILM3symGleCgMAu9opvQ
-	(envelope-from <kvm+bounces-71402-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 11:07:55 +0100
+	id mBfXLSMzmGleCgMAu9opvQ
+	(envelope-from <kvm+bounces-71403-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 11:10:43 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85EBC166A78
-	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 11:07:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30D4A166B22
+	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 11:10:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E4B51302960F
-	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 10:07:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DD912303D8A5
+	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 10:10:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B7BA337BBC;
-	Fri, 20 Feb 2026 10:07:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9D83382C1;
+	Fri, 20 Feb 2026 10:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IGCTXjwn"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D98931B10B;
-	Fri, 20 Feb 2026 10:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141C232D42B;
+	Fri, 20 Feb 2026 10:10:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771582062; cv=none; b=O5yjSA6o9yDknHemnWo6a83qSrv5OE3twIqnO7cQ5Qw0kfTx2xZ4fAS4a/RS5zlBB0f4aF9otmU0tVxMOgDcUZptAU33oyfDO0/dmEpTDACJN95pt1qHCJYjWkzCY/dtS0VqMMOM7qpCbng6SHmSFnu5gWW7JSQbQ6VveVR+65Y=
+	t=1771582202; cv=none; b=auDNuHs7QKINgTKD/5GsnXsLbnM2abH+8aCIcK2NMr1RuQhf5OPrYjVHufaTd4PxBRAq6DM25SXlUWYREZG0ZUlVHFJEfpwrCmhFZBM0QILDjDuSkm8Fh4iXlufRLf5mH6/QHkiLyKpbazWAEIpBlBBuP9HFsuicVMcJIJHt4Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771582062; c=relaxed/simple;
-	bh=dqcTIDASLwjYCRqOiN1LbO1jTNkrivLooM/JqzFVLQA=;
+	s=arc-20240116; t=1771582202; c=relaxed/simple;
+	bh=m9TZ2GABmSiN5K15vQTGziVzki7NrPcyfXW6rIntFlw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rYwCHlOFg4X1yDrPa7XXZfMQCAmmyM/enMcbt3X8RmFt6PfCc9rddwfHQoHSH0OROAR9efbRQA1nKqPpydltiwzHplgMFahXB9bts8Hy8SfZdDTSODm++YOyTkd5gQjbK65RBIxLGzHZ6jUQHL3pJUnA/dqaCkrnAEE6Vg3NRxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1BF51339;
-	Fri, 20 Feb 2026 02:07:32 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7BFBC3F62B;
-	Fri, 20 Feb 2026 02:07:31 -0800 (PST)
-Message-ID: <5857f3a0-999a-46ed-a36f-d2b02d04274a@arm.com>
-Date: Fri, 20 Feb 2026 10:07:29 +0000
+	 In-Reply-To:Content-Type; b=cqTo528yf8PK0FOmUhAxXqcA8Boek/U0Zl4Xu5hJZhcrMwXQnLR0x1bFAjmQhN1ZgKk/Xfprkg9+3VPUTZ/yuF3bA1ZcsEx8orPccxWskGJJ0f0YC4iyGpoAW01Y0RXJCGPqbO/h5r/3agHaWNmPF7k1EBmgn+1IzAqTI5E5Al4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IGCTXjwn; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61JKgua71296133;
+	Fri, 20 Feb 2026 10:09:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=Ho9PRM
+	pMtX3Y4bXy24QwcJxwVicoCEiJViKfvmy+NSg=; b=IGCTXjwnx8UiJFcq7zMwmb
+	H858gPTP5xTw3wXNqQ9RDIRqn8DMg6L1HHL1U4g13rnYN/OCsxgmW/JU72P8aro7
+	GZMxwsBvbFBbK7m2DiEkBkWO3mfEBIte9EDKOhtAxCPikCT0Z1VF62aVxzpY02Zq
+	QgZiFGqDwZuovH6Pg/0ukUESwrynmJ2RxU4cHORsI8jhzQJoWUr6IsqNABHi6C4U
+	JwUH+//H0Mip+sN3p8TvKhYHuw/GVse5FRZFqGuXmbrk98EP37uk5aLK2eDnU7yT
+	3lbO9CtLHikaWxF+yiMGDRz4Fk4mIX4z0WWBr5xa83jkBWab44hZoKD7YCylMVeA
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4caj64h1h3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 20 Feb 2026 10:09:58 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61K9jwKC001432;
+	Fri, 20 Feb 2026 10:09:57 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4ccb2bqy8c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 20 Feb 2026 10:09:57 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61KA9sXQ50659662
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 20 Feb 2026 10:09:54 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2C10120071;
+	Fri, 20 Feb 2026 10:09:54 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C12C120065;
+	Fri, 20 Feb 2026 10:09:53 +0000 (GMT)
+Received: from [9.111.87.59] (unknown [9.111.87.59])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 20 Feb 2026 10:09:53 +0000 (GMT)
+Message-ID: <37797439-5b6e-4347-8094-0b0cb76a0a91@linux.ibm.com>
+Date: Fri, 20 Feb 2026 11:09:53 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -45,411 +80,126 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 01/19] x86,fs/resctrl: Add support for Global
- Bandwidth Enforcement (GLBE)
-To: Reinette Chatre <reinette.chatre@intel.com>,
- Babu Moger <babu.moger@amd.com>, "Moger, Babu" <bmoger@amd.com>,
- corbet@lwn.net, tony.luck@intel.com, Dave.Martin@arm.com,
- james.morse@arm.com, tglx@kernel.org, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com
-Cc: x86@kernel.org, hpa@zytor.com, peterz@infradead.org,
- juri.lelli@redhat.com, vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
- rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
- vschneid@redhat.com, akpm@linux-foundation.org,
- pawan.kumar.gupta@linux.intel.com, pmladek@suse.com,
- feng.tang@linux.alibaba.com, kees@kernel.org, arnd@arndb.de,
- fvdl@google.com, lirongqing@baidu.com, bhelgaas@google.com,
- seanjc@google.com, xin@zytor.com, manali.shukla@amd.com,
- dapeng1.mi@linux.intel.com, chang.seok.bae@intel.com,
- mario.limonciello@amd.com, naveen@kernel.org, elena.reshetova@intel.com,
- thomas.lendacky@amd.com, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, peternewman@google.com,
- eranian@google.com, gautham.shenoy@amd.com
-References: <cover.1769029977.git.babu.moger@amd.com>
- <aba70a013c12383d53104de0b19cfbf87690c0c3.1769029977.git.babu.moger@amd.com>
- <eb4b7b12-7674-4a1e-925d-2cec8c3f43d2@intel.com>
- <f0f2e3eb-0fdb-4498-9eb8-73111b1c5a84@amd.com>
- <9b02dfc6-b97c-4695-b765-8cb34a617efb@intel.com>
- <3a7c17c0-bb51-4aad-a705-d8d1853ea68a@amd.com>
- <06a237bd-c370-4d3f-99de-124e8c50e711@intel.com>
-From: Ben Horgan <ben.horgan@arm.com>
+Subject: Re: [kvm-unit-tests PATCH 1/3] s390x: snippets: Add reset_guest() to
+ lib
+To: Christoph Schlameuss <schlameuss@linux.ibm.com>,
+        linux-s390@vger.kernel.org
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        =?UTF-8?Q?Nico_B=C3=B6hr?=
+ <nrb@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>, kvm@vger.kernel.org
+References: <20260211-vsie-stfle-fac-v1-0-46c7aec5912b@linux.ibm.com>
+ <20260211-vsie-stfle-fac-v1-1-46c7aec5912b@linux.ibm.com>
 Content-Language: en-US
-In-Reply-To: <06a237bd-c370-4d3f-99de-124e8c50e711@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20260211-vsie-stfle-fac-v1-1-46c7aec5912b@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: PD9AaVAack-2soYfgaqGCqUoVcNJzoeK
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjIwMDA4OCBTYWx0ZWRfX10VxkshMsVyS
+ CgGVzwb2lbx11kDz8CQZ/Z+/lJJ0+zK7ixGXWeSnd7ncnQIgI4OM04ZRjbxBpxwHEreOmCzzrNE
+ 7ztaS8Wz7GYxu5OdSvHs3GLhJ1Wn6Xa/B1CDWNMzc99cpZ9bA1y7sm+p+u7HutJVzWitBhdUIjp
+ sHkTvdvgvsz1koFMIKRb012ZozuNFxK+crEBzlN0EJ/SjSZtG+c8OTZ662wLBCZlMZ0h3D3VeMr
+ qh2G9qZ2M91wIPaNmTd86y1Wd3mPZ25lsoRMrkL7wzasU4miZm8PZR/6pC3UUuybvHQQXdTyRc8
+ tpzRopsy6R43fuWVnBBzL4CcVR7D1Y7/Hx38qCWFID2bA5k+kypOvLIiLmiySKJlZtAv8JpikD8
+ FyJv0r77/RBQcM6MeWwkGC8lD3oNyXN3NvC9/EN6OlrGtqXEFL8sz7EKHaXn2f4ioOTVcio0XxJ
+ 4oPN2+txXXoEYUvXj2w==
+X-Proofpoint-GUID: PD9AaVAack-2soYfgaqGCqUoVcNJzoeK
+X-Authority-Analysis: v=2.4 cv=U+mfzOru c=1 sm=1 tr=0 ts=699832f6 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8
+ a=7iYUXIqZIL68SlDzRG0A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-20_01,2026-02-20_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 bulkscore=0 impostorscore=0 malwarescore=0 spamscore=0
+ adultscore=0 phishscore=0 lowpriorityscore=0 priorityscore=1501
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2602200088
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71402-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[ibm.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[45];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71403-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[frankja@linux.ibm.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ben.horgan@arm.com,kvm@vger.kernel.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	NEURAL_HAM(-0.00)[-0.967];
 	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 85EBC166A78
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: 30D4A166B22
 X-Rspamd-Action: no action
 
-Hi Reinette, Babu,
+On 2/11/26 15:57, Christoph Schlameuss wrote:
+> From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> 
+> Extract reset_guest from spec_ex-sie into the lib.
+> After reset_guest() the snippet can be executed again.
+> 
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 
-On 2/12/26 03:51, Reinette Chatre wrote:
-> Hi Babu,
-> 
-> On 2/11/26 1:18 PM, Babu Moger wrote:
->> On 2/11/26 10:54, Reinette Chatre wrote:
->>> On 2/10/26 5:07 PM, Moger, Babu wrote:
->>>> On 2/9/2026 12:44 PM, Reinette Chatre wrote:
->>>>> On 1/21/26 1:12 PM, Babu Moger wrote:
->>>>>> On AMD systems, the existing MBA feature allows the user to set a bandwidth
->>>>>> limit for each QOS domain. However, multiple QOS domains share system
->>>>>> memory bandwidth as a resource. In order to ensure that system memory
->>>>>> bandwidth is not over-utilized, user must statically partition the
->>>>>> available system bandwidth between the active QOS domains. This typically
->>>>> How do you define "active" QoS Domain?
->>>> Some domains may not have any CPUs associated with that CLOSID. Active meant, I'm referring to domains that have CPUs assigned to the CLOSID.
->>> To confirm, is this then specific to assigning CPUs to resource groups via
->>> the cpus/cpus_list files? This refers to how a user needs to partition
->>> available bandwidth so I am still trying to understand the message here since
->>> users still need to do this even when CPUs are not assigned to resource
->>> groups.
->>>
->> It is not specific to CPU assignment. It applies to task assignment also.
->>  
->> For example:  We have 4 domains;
->>
->> # cat schemata
->>   MB:0=8192;1=8192;2=8192;3=8192
->>
->> If this group has the CPUs assigned to only first two domains. Then the group has only two active domains. Then we will only update the first two domains. The MB values in other domains does not matter.
-> 
-> I see, thank you. As I understand an "active QoS domain" is something only user
-> space can designate. It may be possible for resctrl to get a sense of which QoS domains
-> are "active" when only CPUs are assigned to a resource group but when it comes to task
-> assignment it is user space that controls where tasks belonging to a group can be
-> scheduled and thus which QoS domains are "active" or not. 
-> 
->>
->> #echo "MB:0=8;1=8" > schemata
->>
->> # cat schemata
->>   MB:0=8;1=8;2=8192;3=8192
->>
->> The combined bandwidth can go up to 16(8+8) units. Each unit is 1/8 GB.
->>
->> With GMBA, we can set the combined limit higher level and total bandwidth will not exceed GMBA limit.
-> 
-> Thank you for the confirmation.
-> 
->>
->>>>>> results in system memory being under-utilized since not all QOS domains are
->>>>>> using their full bandwidth Allocation.
->>>>>>
->>>>>> AMD PQoS Global Bandwidth Enforcement(GLBE) provides a mechanism
->>>>>> for software to specify bandwidth limits for groups of threads that span
->>>>>> multiple QoS Domains. This collection of QOS domains is referred to as GLBE
->>>>>> control domain. The GLBE ceiling sets a maximum limit on a memory bandwidth
->>>>>> in GLBE control domain. Bandwidth is shared by all threads in a Class of
->>>>>> Service(COS) across every QoS domain managed by the GLBE control domain.
->>>>> How does this bandwidth allocation limit impact existing MBA? For example, if a
->>>>> system has two domains (A and B) that user space separately sets MBA
->>>>> allocations for while also placing both domains within a "GLBE control domain"
->>>>> with a different allocation, does the individual MBA allocations still matter?
->>>> Yes. Both ceilings are enforced at their respective levels.
->>>> The MBA ceiling is applied at the QoS domain level.
->>>> The GLBE ceiling is applied at the GLBE control  domain level.
->>>> If the MBA ceiling exceeds the GLBE ceiling, the effective MBA limit will be capped by the GLBE ceiling.
->>> It sounds as though MBA and GMBA/GLBE operates within the same parameters wrt
->>> the limits but in examples in this series they have different limits. For example,
->>> in the documentation patch [1] there is this:
->>>
->>>   # cat schemata
->>>      GMB:0=2048;1=2048;2=2048;3=2048
->>>      MB:0=4096;1=4096;2=4096;3=4096
->>>      L3:0=ffff;1=ffff;2=ffff;3=ffff
->>>
->>> followed up with what it will look like in new generation [2]:
->>>
->>>     GMB:0=4096;1=4096;2=4096;3=4096
->>>      MB:0=8192;1=8192;2=8192;3=8192
->>>       L3:0=ffff;1=ffff;2=ffff;3=ffff
->>>
->>> In both examples the per-domain MB ceiling is higher than the global GMB ceiling. With
->>> above showing defaults and you state "If the MBA ceiling exceeds the GLBE ceiling,
->>> the effective MBA limit will be capped by the GLBE ceiling." - does this mean that
->>> MB ceiling can never be higher than GMB ceiling as shown in the examples?
->>
->> That is correct.  There is one more information here.   The MB unit is in 1/8 GB and GMB unit is 1GB.  I have added that in documentation in patch 4.
-> 
-> ah - right. I did not take the different units into account.
-> 
->>
->> The GMB limit defaults to max value 4096 (bit 12 set) when the new group is created.  Meaning GMB limit does not apply by default.
->>
->> When setting the limits, it should be set to same value in all the domains in GMB control domain.  Having different value in each domain results in unexpected behavior.
->>
->>>
->>> Another question, when setting aside possible differences between MB and GMB.
->>>
->>> I am trying to understand how user may expect to interact with these interfaces ...
->>>
->>> Consider the starting state example as below where the MB and GMB ceilings are the
->>> same:
->>>
->>>    # cat schemata
->>>    GMB:0=2048;1=2048;2=2048;3=2048
->>>    MB:0=2048;1=2048;2=2048;3=2048
->>>
->>> Would something like below be accurate? Specifically, showing how the GMB limit impacts the
->>> MB limit:
->>>       # echo "GMB:0=8;2=8" > schemata
->>>    # cat schemata
->>>    GMB:0=8;1=2048;2=8;3=2048
->>>    MB:0=8;1=2048;2=8;3=2048
->>
->> Yes. That is correct.  It will cap the MB setting to  8.   Note that we are talking about unit differences to make it simple.
-> 
-> Thank you for confirming.
-> 
->>
->>
->>> ... and then when user space resets GMB the MB can reset like ...
->>>
->>>    # echo "GMB:0=2048;2=2048" > schemata
->>>    # cat schemata
->>>    GMB:0=2048;1=2048;2=2048;3=2048
->>>    MB:0=2048;1=2048;2=2048;3=2048
->>>
->>> if I understand correctly this will only apply if the MB limit was never set so
->>> another scenario may be to keep a previous MB setting after a GMB change:
->>>
->>>    # cat schemata
->>>    GMB:0=2048;1=2048;2=2048;3=2048
->>>    MB:0=8;1=2048;2=8;3=2048
->>>
->>>    # echo "GMB:0=8;2=8" > schemata
->>>    # cat schemata
->>>    GMB:0=8;1=2048;2=8;3=2048
->>>    MB:0=8;1=2048;2=8;3=2048
->>>
->>>    # echo "GMB:0=2048;2=2048" > schemata
->>>    # cat schemata
->>>    GMB:0=2048;1=2048;2=2048;3=2048
->>>    MB:0=8;1=2048;2=8;3=2048
->>>
->>> What would be most intuitive way for user to interact with the interfaces?
->>
->> I see that you are trying to display the effective behaviors above.
-> 
-> Indeed. My goal is to get an idea how user space may interact with the new interfaces and
-> what would be a reasonable expectation from resctrl be during these interactions.
-> 
->>
->> Please keep in mind that MB and GMB units differ. I recommend showing only the values the user has explicitly configured, rather than the effective settings, as displaying both may cause confusion.
-> 
-> hmmm ... this may be subjective. Could you please elaborate how presenting the effective 
-> settings may cause confusion?
-> 
->>
->> We also need to track the previous settings so we can revert to the earlier value when needed. The best approach is to document this behavior clearly.
-> 
-> Yes, this will require resctrl to maintain more state.
-> 
-> Documenting behavior is an option but I think we should first consider if there are things
-> resctrl can do to make the interface intuitive to use.
-> 
->>>>>>  From the description it sounds as though there is a new "memory bandwidth
->>>>> ceiling/limit" that seems to imply that MBA allocations are limited by
->>>>> GMBA allocations while the proposed user interface present them as independent.
->>>>>
->>>>> If there is indeed some dependency here ... while MBA and GMBA CLOSID are
->>>>> enumerated separately, under which scenario will GMBA and MBA support different
->>>>> CLOSID? As I mentioned in [1] from user space perspective "memory bandwidth"
->>>> I can see the following scenarios where MBA and GMBA can operate independently:
->>>> 1. If the GMBA limit is set to ‘unlimited’, then MBA functions as an independent CLOS.
->>>> 2. If the MBA limit is set to ‘unlimited’, then GMBA functions as an independent CLOS.
->>>> I hope this clarifies your question.
->>> No. When enumerating the features the number of CLOSID supported by each is
->>> enumerated separately. That means GMBA and MBA may support different number of CLOSID.
->>> My question is: "under which scenario will GMBA and MBA support different CLOSID?"
->> No. There is not such scenario.
->>>
->>> Because of a possible difference in number of CLOSIDs it seems the feature supports possible
->>> scenarios where some resource groups can support global AND per-domain limits while other
->>> resource groups can just support global or just support per-domain limits. Is this correct?
->>
->> System can support up to 16 CLOSIDs. All of them support all the features LLC, MB, GMB, SMBA.   Yes. We have separate enumeration for  each feature.  Are you suggesting to change it ?
-> 
-> It is not a concern to have different CLOSIDs between resources that are actually different,
-> for example, having LLC or MB support different number of CLOSIDs. Having the possibility to
-> allocate the *same* resource (memory bandwidth) with varying number of CLOSIDs does present a
-> challenge though. Would it be possible to have a snippet in the spec that explicitly states
-> that MB and GMB will always enumerate with the same number of CLOSIDs? 
-> 
-> Please see below where I will try to support this request more clearly and you can decide if
-> it is reasonable.
->   
->>>>> can be seen as a single "resource" that can be allocated differently based on
->>>>> the various schemata associated with that resource. This currently has a
->>>>> dependency on the various schemata supporting the same number of CLOSID which
->>>>> may be something that we can reconsider?
->>>> After reviewing the new proposal again, I’m still unsure how all the pieces will fit together. MBA and GMBA share the same scope and have inter-dependencies. Without the full implementation details, it’s difficult for me to provide meaningful feedback on new approach.
->>> The new approach is not final so please provide feedback to help improve it so
->>> that the features you are enabling can be supported well.
->>
->> Yes, I am trying. I noticed that the proposal appears to affect how the schemata information is displayed(in info directory). It seems to introduce additional resource information. I don't see any harm in displaying it if it benefits certain architecture.
-> 
-> It benefits all architectures.
-> 
-> There are two parts to the current proposals.
-> 
-> Part 1: Generic schema description
-> I believe there is consensus on this approach. This is actually something that is long
-> overdue and something like this would have been a great to have with the initial AMD
-> enabling. With the generic schema description forming part of resctrl the user can learn
-> from resctrl how to interact with the schemata file instead of relying on external information
-> and documentation.
-> 
-> For example, on an Intel system that uses percentage based proportional allocation for memory
-> bandwidth the new resctrl files will display:
-> info/MB/resource_schemata/MB/type:scalar linear
-> info/MB/resource_schemata/MB/unit:all
-> info/MB/resource_schemata/MB/scale:1
-> info/MB/resource_schemata/MB/resolution:100
-> info/MB/resource_schemata/MB/tolerance:0
-> info/MB/resource_schemata/MB/max:100
-> info/MB/resource_schemata/MB/min:10
-> 
-> 
-> On an AMD system that uses absolute allocation with 1/8 GBps steps the files will display:
-> info/MB/resource_schemata/MB/type:scalar linear
-> info/MB/resource_schemata/MB/unit:GBps
-> info/MB/resource_schemata/MB/scale:1
-> info/MB/resource_schemata/MB/resolution:8
-> info/MB/resource_schemata/MB/tolerance:0
-> info/MB/resource_schemata/MB/max:2048
-> info/MB/resource_schemata/MB/min:1
-> 
-> Having such interface will be helpful today. Users do not need to first figure out
-> whether they are on an AMD or Intel system, and then read the docs to learn the AMD units,
-> before interacting with resctrl. resctrl will be the generic interface it intends to be.
-> 
-> Part 2: Supporting multiple controls for a single resource
-> This is a new feature on which there also appears to be consensus that is needed by MPAM and
-> Intel RDT where it is possible to use different controls for the same resource. For example,
-> there can be a minimum and maximum control associated with the memory bandwidth resource.
-> 
-> For example, 
-> info/
->  └─ MB/
->      └─ resource_schemata/
->          ├─ MB/
->          ├─ MB_MIN/
->          ├─ MB_MAX/
->          ┆
-> 
-> 
-> Here is where the big question comes in for GLBE - is this actually a new resource
-> for which resctrl needs to add interfaces to manage its allocation, or is it instead 
-> an additional control associated with the existing memory bandwith resource?
-> 
-> For me things are actually pointing to GLBE not being a new resource but instead being
-> a new control for the existing memory bandwidth resource.
-> 
-> I understand that for a PoC it is simplest to add support for GLBE as a new resource as is
-> done in this series but when considering it as an actual unique resource does not seem
-> appropriate since resctrl already has a "memory bandwidth" resource. User space expects
-> to find all the resources that it can allocate in info/ - I do not think it is correct
-> to have two separate directories/resources for memory bandwidth here.
-> 
-> What if, instead, it looks something like:
-> 
-> info/
-> └── MB/
->     └── resource_schemata/
->         ├── GMB/
->         │   ├── max:4096
->         │   ├── min:1
->         │   ├── resolution:1
->         │   ├── scale:1
->         │   ├── tolerance:0
->         │   ├── type:scalar linear
->         │   └── unit:GBps
->         └── MB/
->             ├── max:8192
->             ├── min:1
->             ├── resolution:8
->             ├── scale:1
->             ├── tolerance:0
->             ├── type:scalar linear
->             └── unit:GBps
-> 
-> With an interface like above GMB is just another control/schema used to allocate the
-> existing memory bandwidth resource. With the planned files it is possible to express the
-> different maximums and units used by the MB and GMB schema. Users no longer need to
-> dig for the unit information in the docs, it is available in the interface.
-> 
-> Doing something like this does depend on GLBE supporting the same number of CLOSIDs
-> as MB, which seems to be how this will be implemented. If there is indeed a confirmation
-> of this from AMD architecture then we can do something like this in resctrl.
-
-I haven't fully understood what GLBE is but in MPAM we have an optional
-feature in MSC (MPAM devices) called partid narrowing. For some MSC
-there are limited controls and the incoming partid is mapped to an
-effective partid using a mapping. This mapping is software controllable.
-Dave (with Shaopeng and Zeng) has a proposal to use this to use partid
-bits as pmg bits, [1]. This usage would have to be opt-in as it changes
-the number of closid/rmid that MPAM presents to resctrl. If however, the
-user doesn't use that scheme then the controls could be presented as
-controls for groups of closid in resctrl. Is this similar/usable with
-the same interface as GLBE or have I misunderstood?
-
-[1]
-https://lore.kernel.org/linux-arm-kernel/20241212154000.330467-1-Dave.Martin@arm.com/
-
-> 
-> There is a "part 3" to the proposals that attempts to address the new requirement where
-> some of the controls allocate at a different scope while also requiring monitoring at
-> that new scope. After learning more about GLBE this does not seem relevant to GLBE but is
-> something to return to for the "MPAM CPU-less" work. We could already prepare for this
-> by adding the new "scope" schema property though. 
-> 
-> 
-> Reinette
-> 
->>
->> Thanks
->>
->> Babu
->>
->>
->>>
->>> Reinette
->>>
->>> [1] https://lore.kernel.org/lkml/d58f70592a4ce89e744e7378e49d5a36be3fd05e.1769029977.git.babu.moger@amd.com/
->>> [2] https://lore.kernel.org/lkml/e0c79c53-489d-47bf-89b9-f1bb709316c6@amd.com/
->>>
-> 
-> 
-
-
-Thanks,
-
-Ben
-
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
