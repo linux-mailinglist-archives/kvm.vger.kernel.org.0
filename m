@@ -1,154 +1,127 @@
-Return-Path: <kvm+bounces-71414-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71412-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cC3wCP6ZmGkTKAMAu9opvQ
-	(envelope-from <kvm+bounces-71414-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 18:29:34 +0100
+	id QKEOAbqWmGlaJwMAu9opvQ
+	(envelope-from <kvm+bounces-71412-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 18:15:38 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 761F4169B34
-	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 18:29:33 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 246DD169A49
+	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 18:15:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E4367305C8C5
-	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 17:29:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7C21C3012A88
+	for <lists+kvm@lfdr.de>; Fri, 20 Feb 2026 17:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844DB357A49;
-	Fri, 20 Feb 2026 17:29:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D46832ABC3;
+	Fri, 20 Feb 2026 17:15:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="V14mXAto"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MusjWFB4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C718B353ECA;
-	Fri, 20 Feb 2026 17:29:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7391130CD85
+	for <kvm@vger.kernel.org>; Fri, 20 Feb 2026 17:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771608560; cv=none; b=M8PuT67MKhvge5jsraG5Ri92GWJeukXHyqHMDihb1toixUNlJPR1t5M234VEhWNaAWLd4DrkXEkSWck7LMD+cerOOOgrYx+m5/iT4a4LufNyS8bz4GCFcj8rOSibD1EPRrrxAuWVTPD+5JdMka/feU9ZFJERs+im4TpFnuCTR18=
+	t=1771607732; cv=none; b=QdSvMwvst67UWqH7gKM4ETdGEbnueMzaCG4ciFHX7pidoJ+0rhlc0S8f2OjAEdEflWs8jsh6snXp9z4s/4IfSzO4i6aHxJnphSP1qMoo+K+7pqdpk9rcCZlgNbQYIEQWnmWeNX44xbcYL+kmwlXJd7dT+sG/GRl0mgyMvOAcKS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771608560; c=relaxed/simple;
-	bh=9Cyby1P7/giVIIERMRfZ7Dh2BAfpxfst6Jgj546evcU=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=kcuT0wyId1YbKQw1Sut15kKLB3p4QqwP2DM9IbpHatQDacA0ec2Hj5tqrJI993TGSDiDEsK3fgFe1lz12SqJXeksQUSGwZhKSRTeLnclyMqepyxp87G29HpJgWn3b3V8F9LbnFdlgAUO41xU3UVoYSHhXqWh+ee99dNYBov5GsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=V14mXAto; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from smtpclient.apple (c-24-130-165-117.hsd1.ca.comcast.net [24.130.165.117])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 61KHCZiE2496145
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 20 Feb 2026 09:12:36 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 61KHCZiE2496145
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2026012301; t=1771607557;
-	bh=z/HgO+bmDFlpHZlNXeji0TYgAT5VYkUBW8MaAeZESUQ=;
-	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
-	b=V14mXAtohX7ceGG36AKl4JvXUYSVb39PVaPFLBuYjPss/LXzYN4cTlCQZ1780OKkH
-	 +uqnqUH5X55kvRhY9FZtdgMyRyOsa5UdrWbyB/DqjsFTA0fCRG5TwDCtj6XqPygzWj
-	 5hpN0j5r3ce9XFxS7gtX5Ypyu9LdhIHVzk8rzvgt/596YcXOD6e2vjdAJhcXsaHJas
-	 txyfwnAyquwdP0FNhM3G7uZSYQI9rQu6s+ZZn4oY1VpT1iPneK+4x1TGJqludhL4Fq
-	 AMuoZbEGMWkyBtke8LNdys60MVT+FmnaOHG0xhzxn+sd+PJWoCIy9RGn71h15Nw53N
-	 Fmxi6+8XgCoVQ==
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1771607732; c=relaxed/simple;
+	bh=xh1l3uM68eCJR2SH6gaUCO0N9alFSIukiARRMNTDClo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ciGRd4E6iovM6C+vp1hrbBwkx2Z97SPbXnLbisR/SSloXRQpSo4vYSbWYcnWsBqp5Agjyo4ZZuDzMZzad09t2ho5RLc4GpPfraTo1OBFes4L19PNytOYgf3wVLMzeuIU3cQPHsdcn6+MsaXrOXUtqXZnJDddV/jYQbQRcizPDCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MusjWFB4; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3562171b56dso2417837a91.2
+        for <kvm@vger.kernel.org>; Fri, 20 Feb 2026 09:15:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771607731; x=1772212531; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vXPc2TVPq9CrPzaqQARpE12B7qXqTUkpOVKjyqscmPY=;
+        b=MusjWFB4S8JahUL5FvU543fZbIRz953ZP9q9enMGFyz6/rcGjvud3CGJNRcc102tr7
+         8UDaDhAIcmfn3ghT57olGwLz0Ruvj9VFCiW0ZJsnCw9M2CwKYZC7mzhWIoEckS8nvjc4
+         mMihEBg/tkhBIaCBRcwDxOkaDCReJsAty6GXViioyVc7LVQpGzNKY1HuHeKA5VnBGFUN
+         h3JFc2CfG1P0HZaVsnR8iwUw7s9jUUzjBCXkeNd/v3kP0/bbkTaCobCLQl4CmsG1bdi+
+         JDDEcixo2mPrbHhASRrZ6gLjihsRSKVvgJz1TAIAa+fmEto7Tn5bpFCiZunqZbHUDWOC
+         rnTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771607731; x=1772212531;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vXPc2TVPq9CrPzaqQARpE12B7qXqTUkpOVKjyqscmPY=;
+        b=ftR2C08TkIH0iqVK7ahmyYahws2N2H7nPwWbfgXSYRwO97aLWm3Ye+jaOQEFnF6IT2
+         Es7akKJ83875cCLIF33EMAwhUfURSXsLcgSJlrLbfmxJ6ec1W6WXc/8gm3xV9MZB+v8e
+         hu3WYlUAIt6MmbmNUsugmR2O26Y5qnokye/1usctrnu7xI2iQnqECL5SUrK6R2M/tho9
+         N03OwOqdCm5tkI0Str09ACzYiYTRpPyADhH2h5pib/HYXXU8GdnQNjmchlGucwBCMciz
+         NaIbXoQCNltiG3j9oV78pPSflvgu+njcii2LFeWPjVhfXHNypR8jIEK7xvamOEdKJDGt
+         s4Ug==
+X-Forwarded-Encrypted: i=1; AJvYcCXQp8Mlrf8KdJjSv4FVRUCdPvJZ9xeZZzfvCa7MnQWtibyIFsRHXetgQbvLuhv6w926B8E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSpKhGTpLfOkfvf2E8FJsj2zpUoO99eQME0QUzR3FRNWSmlVWk
+	8hL7DWll/fZSHmI9alLy7o87uKFgX0P7nfjd4++mhBTpbG8u/hr9ZL52FUJwF79GAC8KwdCIfrx
+	JToN95w==
+X-Received: from pjbmq13.prod.google.com ([2002:a17:90b:380d:b0:34a:c87f:a95a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1f84:b0:341:8b2b:43c
+ with SMTP id 98e67ed59e1d1-358ae8a4366mr402595a91.18.1771607730730; Fri, 20
+ Feb 2026 09:15:30 -0800 (PST)
+Date: Fri, 20 Feb 2026 09:15:28 -0800
+In-Reply-To: <20260210072530.918038-1-lsahn@ooseel.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.400.21\))
-Subject: Re: [PATCH v3 09/16] x86/msr: Use the alternatives mechanism for
- WRMSR
-From: Xin Li <xin@zytor.com>
-In-Reply-To: <d622a318-f7f8-4cff-b540-38d159ca87f4@suse.com>
-Date: Fri, 20 Feb 2026 09:12:16 -0800
-Cc: Dave Hansen <dave.hansen@intel.com>,
-        Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, kvm@vger.kernel.org, llvm@lists.linux.dev,
-        "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-        Bill Wendling <morbo@google.com>,
-        Justin Stitt <justinstitt@google.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <437EC937-24B7-4E69-B369-F9FAFC46F1B1@zytor.com>
-References: <20260218082133.400602-1-jgross@suse.com>
- <20260218082133.400602-10-jgross@suse.com> <aZYoUE7CmrLg3SVe@google.com>
- <e05a65a7-bf8e-420b-8a36-2d76e56b43b0@intel.com>
- <d622a318-f7f8-4cff-b540-38d159ca87f4@suse.com>
-To: =?utf-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-X-Mailer: Apple Mail (2.3864.400.21)
+Mime-Version: 1.0
+References: <20260210072530.918038-1-lsahn@ooseel.net>
+Message-ID: <aZiWsL9al0LPi0rJ@google.com>
+Subject: Re: [PATCH v1] KVM: Use memdup_user instead of kernel stack to
+ allocate kvm_guest_debug
+From: Sean Christopherson <seanjc@google.com>
+To: Leesoo Ahn <lsahn@ooseel.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, 
+	"open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[zytor.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[zytor.com:s=2026012301];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71414-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,google.com,vger.kernel.org,kernel.org,lists.linux.dev,zytor.com,redhat.com,alien8.de,linux.intel.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-71412-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xin@zytor.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[zytor.com:+];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm,lkml];
-	APPLE_MAILER_COMMON(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,zytor.com:mid,zytor.com:dkim,suse.com:email]
-X-Rspamd-Queue-Id: 761F4169B34
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 246DD169A49
 X-Rspamd-Action: no action
 
+On Tue, Feb 10, 2026, Leesoo Ahn wrote:
+> Switch to using memdup_user to allocate its memory because the size of
+> kvm_guest_debug is over 512 bytes on Arm64 and is burdened allocation
+> from kernel stack.
 
-> On Feb 18, 2026, at 10:44=E2=80=AFPM, J=C3=BCrgen Gro=C3=9F =
-<jgross@suse.com> wrote:
->=20
-> On 18.02.26 22:37, Dave Hansen wrote:
->> On 2/18/26 13:00, Sean Christopherson wrote:
->>> On Wed, Feb 18, 2026, Juergen Gross wrote:
->>>> When available use one of the non-serializing WRMSR variants =
-(WRMSRNS
->>>> with or without an immediate operand specifying the MSR register) =
-in
->>>> __wrmsrq().
->>> Silently using a non-serializing version (or not) seems dangerous =
-(not for KVM,
->>> but for the kernel at-large), unless the rule is going to be that =
-MSR writes need
->>> to be treated as non-serializing by default.
->> Yeah, there's no way we can do this in general. It'll work for 99% of
->> the MSRs on 99% of the systems for a long time. Then the one new =
-system
->> with WRMSRNS is going to have one hell of a heisenbug that'll take =
-years
->> off some poor schmuck's life.
->=20
-> I _really_ thought this was discussed upfront by Xin before he sent =
-out his
-> first version of the series.
+520 bytes is a lot, but it's not _that_ much, especially since
+kvm_arch_vcpu_ioctl_set_guest_debug() is leaf function (ignoring tracing).
 
-I actually reached out to the Intel architects about this before I =
-started
-coding. Turns out, if the CPU supports WRMSRNS, you can use it across =
-the
-board.  The hardware is smart enough to perform a serialized write =
-whenever
-a non-serialized one isn't proper, so there=E2=80=99s no risk.
-
+Is there an actual problem on arm64?  I.e. does this one particular allocation
+lead to stack overflows that otherwise don't happen in KVM?
 
