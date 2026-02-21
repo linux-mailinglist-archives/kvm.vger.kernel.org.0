@@ -1,197 +1,202 @@
-Return-Path: <kvm+bounces-71438-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71439-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4ERHORUBmWnROwMAu9opvQ
-	(envelope-from <kvm+bounces-71438-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 21 Feb 2026 01:49:25 +0100
+	id cIS6GZ8GmWmiPAMAu9opvQ
+	(envelope-from <kvm+bounces-71439-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 21 Feb 2026 02:13:03 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F47316B997
-	for <lists+kvm@lfdr.de>; Sat, 21 Feb 2026 01:49:25 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13AD016BA71
+	for <lists+kvm@lfdr.de>; Sat, 21 Feb 2026 02:13:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EAE34303A861
-	for <lists+kvm@lfdr.de>; Sat, 21 Feb 2026 00:49:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 50800300A32C
+	for <lists+kvm@lfdr.de>; Sat, 21 Feb 2026 01:13:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4C1231A555;
-	Sat, 21 Feb 2026 00:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84E031AA94;
+	Sat, 21 Feb 2026 01:12:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hBbLJYj9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aE3zpOjB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FCFC8E6
-	for <kvm@vger.kernel.org>; Sat, 21 Feb 2026 00:49:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5932F49EB
+	for <kvm@vger.kernel.org>; Sat, 21 Feb 2026 01:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771634954; cv=none; b=FPOuUS1GbKR0olCKNTDRrES8pZECkYobowWtn5PnmBtitS6SVlPpC9UbCWX3r0KqlKZ3a5FORhq+hzArE1BorAFdYAm8UrZqaSviTlu8W3Yf/0+ehrblU15V2204X3s41hZPaIJ96NMaskq9ubeYQVDDmOtKA6uwbiSS1tiEvjU=
+	t=1771636376; cv=none; b=R1Tgr9LLXTmnHIOzN+Mf/AYMQvZBHXsJVzRjJjODol74LRouArX9/WhfbJFElD2x/C7xCDDYvOUsphdgzzTFQ9MLiLY/t5MLVGrFHnWfZyixW6IZhhN9noS4f8fb1FeDE+ifqSo8kV15psnf8pGBZMAR5NIyKNi6e58dazdr50A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771634954; c=relaxed/simple;
-	bh=T7zTvaIxgBfhy5lDDPQ1TN1ZokP0oSGzQHGYLXZ6Qac=;
+	s=arc-20240116; t=1771636376; c=relaxed/simple;
+	bh=sptKJUCd8+x3A8IH5AuYHocimKOtptgixOf8+MB8H8E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uOZBQC3o/aYZkGdPBfYw+xh9jrREtcVafC51a3HRGVfvTPogQ/bTNURP7nLnDwFDbS6AOeUhiAjI5Qk3LQDlBuzBUCf7du8f32wM63kSRPw5e+mWtXbMxWrsofmRGLeRFaiAoT45uMbkeW3mmD03ud7JtATT8Ly2OpVyBb14QqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hBbLJYj9; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=qoQMkzY8hJf6RynTgNAgot5xHNpzvujXrryds4l3v3FuQgGcLZCohK3GHxEhb1q7ePbN0ABqykfQlcb3B6xTMnUz7n5cnyVBrdW2Fw61ug1DF6Kb1QpDiIYq8nwU0ZmwYoAmTrB4VyePqwufP0yPYyFfoE1yI4V3DtjUoiXW0BU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aE3zpOjB; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3562370038dso2209514a91.3
-        for <kvm@vger.kernel.org>; Fri, 20 Feb 2026 16:49:12 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a7a98ba326so40642975ad.1
+        for <kvm@vger.kernel.org>; Fri, 20 Feb 2026 17:12:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771634952; x=1772239752; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771636374; x=1772241174; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CWr0HuJWiATaTNOSdTyLvXYll6+nwgjSWjXAo4M2MD4=;
-        b=hBbLJYj9kNOP80gZpkZRKO+9CjodSRfdlu0m3octLGCbArzU0xZ0Ed9ajL0G6jdT28
-         yjUOOItYHQLjqh/2X3Xn3xWHSl/5C9MOgS9ysLndUdLNNRhsMhnMzPjXdqfHUqhA1mt7
-         ekKnbiWW64+wNOhzJrY4OmeoVlbV/v4NtaE4fugUq55OTEtcnOPOxSYihixow3W9A3hh
-         POKWO6cBqmSakZEd3nb0RPRCN5OQKx8i4WQi0RSeO1zZPDFF0DwQOX0N2HlGKY7LX1JF
-         AettkAHM2r4zqMC8Bbf37Ia0fHiQqjTyZl7q2Gkl0ioy0cD9Ch/a8xuVamdO0ij6a9/D
-         8ygg==
+        bh=m6OAsBgRAO98KlOsG7z1xcbC84TvI4dL/jf3QhS9k/E=;
+        b=aE3zpOjBUc+jTfyAlJ1z6PStKRrhxYJgbP+sbtHkbmbfpFe/0FxWLTbiv4t3OW9hCA
+         D29R1ioY0qKwSmXj9Z1zYKNiDZI4XcAoq3728USPoXDNQm7WrHrmKHMZpElEbyA4M4ly
+         yhb/DnfwL7GmFfJD8Kc3XP2+o1ifz+FQL34+znjsCQ+wIo75+23fSyuIto6Udvxk4P4p
+         FqH9YJ5DixiD9CHFT4IEUAnTpnfkMY6J18KSMFKPs7FvY+et/eo8yXCVjBbP/EHI/Rbo
+         RDTDGgfgQx8KR6RkEKnamREL/SFokOnkdRN8lpj4wlO7DeG1EFmFxo2Ecv/9D267zBqI
+         bfyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771634952; x=1772239752;
+        d=1e100.net; s=20230601; t=1771636374; x=1772241174;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CWr0HuJWiATaTNOSdTyLvXYll6+nwgjSWjXAo4M2MD4=;
-        b=CL41hdIezTSuTadNzFIjiMmf/iMnCrxVUEZ4MkkLF1d6TuR2z7qlWj0E8UxZwBolp7
-         yxav6NTVD8k1Lba+Hrt5V9oWIs8c/59vtIiS9oj9CCIRWNqdHg0g2zsOxTzwA+rlTGyd
-         1zPpNJU0GxrrSjFEix1onIlnWlGVnGkba4DF2WOLBWRCfznTK2ZGQ+42kW+VnwJQUz/V
-         0zrg9XvnXTouqDhN1Ypfjkel6KYlNjcstPYdUoF2rmIpIsdoMMEeg0+q9HQ6RUXIv1Sf
-         g+C9CzhW/Dvemed/PJkgR74a2bvlcvErvDYLexiMpbtHWBzKLDZRtyGj1wNNhl9Ir8Mq
-         YWLA==
-X-Forwarded-Encrypted: i=1; AJvYcCW0f8Ot/RtNtX16C/RP0NrfymDC6zheskWiEymT2PXXG2Xfje7yEOCXovguXqYphHC1Qqw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyNTCWyFPTYbgkoZz2sio1OtZ49FQ7krWBmApzwjoYubyDErtq
-	NaHkcXDwxd8zlYooQLYuocKHRBNoGP6eXUe4iKe05SID+2iL+96I5KKCCFv5EZbrCseBtCvDldn
-	FdEdHgA==
-X-Received: from pjbnc3.prod.google.com ([2002:a17:90b:37c3:b0:354:c63c:5ed6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:17c3:b0:354:e86a:3066
- with SMTP id 98e67ed59e1d1-358ae6b4f77mr1024277a91.0.1771634952017; Fri, 20
- Feb 2026 16:49:12 -0800 (PST)
-Date: Fri, 20 Feb 2026 16:49:10 -0800
-In-Reply-To: <7986057373abcb20585c916804422a13f51d5e55.camel@intel.com>
+        bh=m6OAsBgRAO98KlOsG7z1xcbC84TvI4dL/jf3QhS9k/E=;
+        b=WWFgzwBvShn1i992hZWo0SnNNcKsU5cfvnkoJzu9gYQ+YHeWvEw6m0JvP5BifezhpH
+         0+MVXu3tifKh42mw+KRXS9cqQ0r/W4+b0jB3ERqdxgsD0gwMA3mPRcKxtT2v8Q7V2NgO
+         EdU/PONnY5Ne3VfTnsibgrEa7sMeHyFA8cJ8FOq04QvLb8pQpENGHzKvJ/gn1q3aJZBS
+         S4LUSv6QatpY2FksOEkIGU4Oui0y2IQIp3ot2+mUUhls0NgNz9AYqgeQRSBZOSbtCdQh
+         Ys4zu7ZZcBvYCARCwE0nK1TsPjXx50ams6uIGs+ZEdzR9Xkk6xsJsGb0o8++RrrHd12M
+         NEtw==
+X-Forwarded-Encrypted: i=1; AJvYcCV2YmTmjBSAhBieN3Piz6uOFxICRYzxy8nEMr16ChNAClElU9+6/C1svr1YblpTKqXU/GM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjhNGBXlHHhvy3y6VTwenW/JzjWllJL/9vzCrhayzzZk5AMI6Y
+	lUhQ3qDkNLfoHGTBIISuKlNgP4vPDFm5mLuPn0wyfSFqRa5WEPdhvvXJoSFgK8PBc35wZWyf5qq
+	gjM5EFw==
+X-Received: from pllk12.prod.google.com ([2002:a17:902:760c:b0:2a9:8200:4985])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ce03:b0:2aa:d2f4:9c11
+ with SMTP id d9443c01a7336-2ad5f7019c7mr74255455ad.5.1771636373912; Fri, 20
+ Feb 2026 17:12:53 -0800 (PST)
+Date: Fri, 20 Feb 2026 17:12:52 -0800
+In-Reply-To: <20260206190851.860662-10-yosry.ahmed@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260219002241.2908563-1-seanjc@google.com> <7986057373abcb20585c916804422a13f51d5e55.camel@intel.com>
-Message-ID: <aZkBBlrMd2-P-kKK@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Don't create SPTEs for addresses that
- aren't mappable
+References: <20260206190851.860662-1-yosry.ahmed@linux.dev> <20260206190851.860662-10-yosry.ahmed@linux.dev>
+Message-ID: <aZkGlFwWeRx0ZGCV@google.com>
+Subject: Re: [PATCH v5 09/26] KVM: nSVM: Call enter_guest_mode() before
+ switching to VMCB02
 From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"yosry.ahmed@linux.dev" <yosry.ahmed@linux.dev>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-71439-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-71438-lists,kvm=lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6F47316B997
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 13AD016BA71
 X-Rspamd-Action: no action
 
-On Sat, Feb 21, 2026, Rick P Edgecombe wrote:
-> On Wed, 2026-02-18 at 16:22 -0800, Sean Christopherson wrote:
-> > +static void reset_tdp_unmappable_mask(struct kvm_mmu *mmu)
-> > +{
-> > +	int max_addr_bit;
-> > +
-> > +	switch (mmu->root_role.level) {
-> > +	case PT64_ROOT_5LEVEL:
-> > +		max_addr_bit = 52;
-> > +		break;
-> > +	case PT64_ROOT_4LEVEL:
-> > +		max_addr_bit = 48;
-> > +		break;
-> > +	case PT32E_ROOT_LEVEL:
-> > +		max_addr_bit = 32;
-> > +		break;
-> > +	default:
-> > +		WARN_ONCE(1, "Unhandled root level %u\n", mmu->root_role.level);
-> > +		mmu->unmappable_mask = 0;
+On Fri, Feb 06, 2026, Yosry Ahmed wrote:
+> In preparation for moving more changes that rely on is_guest_mode()
+> before switching to VMCB02, move entering guest mode a bit earlier.
 > 
-> Would it be better to set max_addr_bit to 0 and let rsvd_bits() set it below?
-> Then the unknown case is safer about rejecting things.
-
-No, because speaking from experience, rejecting isn't safer (I had a brain fart
-and thought legacy shadow paging was also affected).  There's no danger to the
-host (other than the WARN itself), and so safety here is all about the guest.
-
-Setting unmappable_mask to -1ull is all but guaranteed to kill the guest, because
-KVM will reject all faults.  Setting unmappable_mask to 0 is only problematic if
-the guest and/or userspace is misbehaving, and even then, the worst case scenario
-isn't horrific, all things considered.
-
-> > +		return;
-> > +	}
-> > +
-> > +	mmu->unmappable_mask = rsvd_bits(max_addr_bit, 63);
-> > +}
-> > +
+> Nothing between the new callsite(s) and the old ones rely on
+> is_guest_mode(), so this should be safe.
 > 
-> Gosh, this forced me to expand my understanding of how the guest and host page
-> levels get glued together. Hopefully this is not too far off...
+> No functional change intended.
 > 
-> In the patch this function is passed both guest_mmu and root_mmu. So sometimes
-> it's going to be L1 GPA address, and sometimes (for AMD nested?) it's going to
-> be an L2 GVA. For the GVA case I don't see how PT32_ROOT_LEVEL can be omitted.
-> It would hit the warning?
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> ---
+>  arch/x86/kvm/svm/nested.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index 29069fc5e8cb..607d99172e2b 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -741,9 +741,6 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+>  
+>  	nested_svm_transition_tlb_flush(vcpu);
+>  
+> -	/* Enter Guest-Mode */
+> -	enter_guest_mode(vcpu);
+> -
+>  	/*
+>  	 * Filled at exit: exit_code, exit_info_1, exit_info_2, exit_int_info,
+>  	 * exit_int_info_err, next_rip, insn_len, insn_bytes.
+> @@ -944,6 +941,8 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+>  
+>  	WARN_ON(svm->vmcb == svm->nested.vmcb02.ptr);
+>  
+> +	enter_guest_mode(vcpu);
+> +
+>  	nested_svm_copy_common_state(svm->vmcb01.ptr, svm->nested.vmcb02.ptr);
+>  
+>  	svm_switch_vmcb(svm, &svm->nested.vmcb02);
+> @@ -1890,6 +1889,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+>  	svm_copy_vmrun_state(&svm->vmcb01.ptr->save, save);
+>  	nested_copy_vmcb_control_to_cache(svm, ctl);
+>  
+> +	enter_guest_mode(vcpu);
+>  	svm_switch_vmcb(svm, &svm->nested.vmcb02);
+>  	nested_vmcb02_prepare_control(svm, svm->vmcb->save.rip, svm->vmcb->save.cs.base);
 
-No, it's always a GPA.  root_mmu translates L1 GPA => L0 GPA and L1 GVA => GPA*;
-guest_mmu translates L2 GPA => L0 GPA; nested_mmu translates L2 GVA => L2 GPA.
 
-Note!  The asterisk is that root_mmu is also used when L2 is active if L1 is NOT
-using TDP, either because KVM isn't using TDP, or because the L1 hypervisor
-decided not to.  In those cases, L2 GPA == L1 GPA from KVM's perspective, because
-the L1 hypervisor is responsible for shadowing L2 GVA => L1 GPA.  And root_mmu
-can also translate L2 GPA => L0 GPA and L2 GVA => L2 GPA (again, L1 GPA == L2 GPA).
+LOL, guess what!  Today end's in 'y', which means there's a nSVM bug!  It's a
+super minor one though, especially in the broader context, I just happened to
+see it when looking at this patch.
 
-> But also the '5' case is weird because as a GVA the max addresse bits should be
-> 57 and a GPA is should be 54.
+As per 3f6821aa147b ("KVM: x86: Forcibly leave nested if RSM to L2 hits shutdown"),
+shutdown on RSM is suppose to hit L1, not L2.  But if enter_svm_guest_mode() fails,
+svm_leave_smm() bails without leaving guest code.  Syzkaller probably hasn't found
+the bug because nested_run_pending doesn't get set, but it's still technically
+wrong.
 
-52, i.e. the architectural max MAXPHYADDR.
+Of course, as the comment in emulator_leave_smm() says, the *entire* RSM flow is
+wrong, because it's not a VM-Enter/VMRUN, it's somethign else entirely.
 
-> And that the TDP side uses 4 and 5 specifically, so the PT64_ just happens to
-> match.
+Anyways, I don't think there's anything to do in this series, but at some point
+we should probably do:
 
-No, it's not a coincidence.  The "truncation" to 52 bits is an architectural
-quirk.  Long ago, people decided 52 bits of PA were enough for anyone, and so
-repurposed bits 63:52 for e.g. NX, SUPPRESS_VE, and software-available bits.
-
-I.e. conceptually, 5-level paging allows for 57 bits of addressing, but EPT and
-NPT and NPT define bits 63:52 to be other things.
-
-> So I'd think this needs a version for GVA and one for GPA.
-
-No, see the last paragraph in the changelog.
-
-Side topic, if you have _any_ idea for better names than guest_mmu vs. nested_mmu,
-speak up.  This is like the fifth? time I've had a discussion about how awful
-those names are, but we've yet to come up with names that suck less.
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index a2452b8ec49d..5cc9ad9b750d 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4877,13 +4877,15 @@ static int svm_leave_smm(struct kvm_vcpu *vcpu, const union kvm_smram *smram)
+        vmcb12 = map.hva;
+        nested_copy_vmcb_control_to_cache(svm, &vmcb12->control);
+        nested_copy_vmcb_save_to_cache(svm, &vmcb12->save);
++
+        ret = enter_svm_guest_mode(vcpu, smram64->svm_guest_vmcb_gpa, vmcb12, false);
+-
+        if (ret)
+-               goto unmap_save;
++               goto leave_nested;
+ 
+        svm->nested.nested_run_pending = 1;
+ 
++leave_nested:
++       svm_leave_nested(vcpu);
+ unmap_save:
+        kvm_vcpu_unmap(vcpu, &map_save);
+ unmap_map:
 
