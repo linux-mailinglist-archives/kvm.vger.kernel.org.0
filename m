@@ -1,159 +1,157 @@
-Return-Path: <kvm+bounces-71507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71508-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sKyqEfmMnGmdJQQAu9opvQ
-	(envelope-from <kvm+bounces-71507-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 18:23:05 +0100
+	id 4PLYHPWMnGmdJQQAu9opvQ
+	(envelope-from <kvm+bounces-71508-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 18:23:01 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B16E17AB86
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 18:23:04 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53B1C17AB7E
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 18:23:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8774F303BCC2
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 17:15:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2D2713027944
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 17:22:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0A6330B22;
-	Mon, 23 Feb 2026 17:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36F13EBF20;
+	Mon, 23 Feb 2026 17:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WgAGk0Bk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qr+WzQzQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0448E330331
-	for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 17:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F91331217
+	for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 17:22:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771866917; cv=none; b=DVBu3l/hs+1CkyYJibBKUPQ4cfLcDiby4zl5OtnebbAroFt7NUEvfqYq+Mq0VLrX2kIlsHiXZ68k9W+QgohVhS2nQxnNKA+xHDun/shF+vTV32AUXO0kgCFWpEXNoy2+zFK9hBXiDgh5dwAoNhlGOHTFed+6WY4jT8E4uUEVMVA=
+	t=1771867327; cv=none; b=mQsRyPg00ciwGGpb8+gvhgtVFCA/bF9KsSw0f4aEpKnevoJu7rCdYA2e2vxaSz6KB4CAWfg4h3u13KFD9hgYc4+dYl4hh4LGSFHLhlvVM9MZBYQHWMUjypeaJRoSIAOinFYBT9Dx4QML2tGPKSz6cwY5tay+MAzkB0RhFFME/Ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771866917; c=relaxed/simple;
-	bh=HKwLbvFmJGYEGnpPr7MOM6oLTlNTOu8bfAhYYTRO13E=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jSpHCfQbwzrobqar9zaOP0qRN70cEx7ZH7nbsUVZO388KRNOdnZ+5sD6FLkmF3S8jhJb41w4FCJqgfNc+MSIgA8S0fTLZj6OHAcuYAkj+Lk3g4Wk5gz5Q00SRsW6oSHX27AtgfxndAJz7Jt9EO2035zB8vOKCe9DVj5JEQy0APY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WgAGk0Bk; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a943e214daso316217645ad.3
-        for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 09:15:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771866915; x=1772471715; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qB/D8oykiAjYH+aojy11MUffmbGAGIdMwqBS+z3LBGk=;
-        b=WgAGk0Bk55uiejxu96L2NKrxY/yQztTYJ8SjfeOjAsYB7UT2PY82EebeMu4INfNuQ8
-         24F1frhdW0Vr57JI/tAe/cCk0U/dEit9Va6WGmeKLxVZAR3pdx3cBZK3r0NM4VJGwqJJ
-         Szq3x6FoggeTgB5m33sAm3rxMwMY+ODR9AMGY+KcITBlHxqT5m0w0O2VGEdEmn179oRm
-         HADjm7dAr5CwfxOTRwl9izLomLx+v68xPhWio0rzKwRLP1UGNWLMxmJRsnfJESaj7yor
-         6DXxIHFxKS+jZ8c3r45dt/NP0itUtxwefT4XNaLp+WqGmprewC88ZCM4mSbtIAzNJCnf
-         DyOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771866915; x=1772471715;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qB/D8oykiAjYH+aojy11MUffmbGAGIdMwqBS+z3LBGk=;
-        b=VcEmQs5R1VUHfx5LJUR2c8OBqFto3hvy86fFdKw6nVGOK4FhTv1rJXprMzAdqRmfCN
-         H4h0NVtT6VmuAlQI/8IjoNv901hyJVIBWlC26WznzGaGDiV4wo65c8uwK0wndCBNd3JX
-         goyv4xBhCQPTknQpSpXc5A/9ZY9eUQPitSPGzq7+G0mctdDTrzqvPFHPw+1R5Bpx9fiJ
-         9EtP2tosSrOn0DLbcY5vuUOHJBFbK/WhpLs9VlY+AzxgT3+GyA+K63VFkljqfbyZRPKC
-         ZFQVhYr4eqU//A+VICN5aS0wwb8x+/RKoHVR7MPlBMmuiUv3Yq1ShrOwyec9vT9qYKoS
-         w/ag==
-X-Forwarded-Encrypted: i=1; AJvYcCXQ8yFDtAYI2hNlVPtftvhMoRtKMuXsxk8xbu7eR7rOzFGMoJFpE0K7avRdk/nfLaymUtE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdIxPN1hUjAx3N5bdmNJkQcj3koiv7x5mYXHWLehdIVqyuFS0c
-	R/zHEZm/kmhOI/VFUoepXDBiptNY3x4hQW7fpdE6wu5neZISwxk+qaOTQprXTOV5fpBCWvA8QZ3
-	KEwoO+w==
-X-Received: from plpw17.prod.google.com ([2002:a17:902:9a91:b0:2a0:c485:7eed])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:b90:b0:2a9:411a:c5c6
- with SMTP id d9443c01a7336-2ad74511698mr75532445ad.39.1771866915160; Mon, 23
- Feb 2026 09:15:15 -0800 (PST)
-Date: Mon, 23 Feb 2026 09:15:13 -0800
-In-Reply-To: <aZyE4zvPtujZ4-6X@tycho.pizza>
+	s=arc-20240116; t=1771867327; c=relaxed/simple;
+	bh=9OOWpG0ivjp12xj5kOLDESJOJ/tOXEg8NufUZP4qUn0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A37JDcaP1R7jM+pnMobsUa3kZ+Q1XP2N8JfAOtUvseRNxRelHPiYyopMBgVUBr9uKYCW8O7rvHQ7tsavzQQe8FmGrWI0M3j0qVRghedRc55CSG6ztgSjmYLVEyDsqxdSgNR6dfVrWI3qkLjXF0EFRsR+FyZ0nylN6b5BvpSgh/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qr+WzQzQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A22AC19421
+	for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 17:22:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771867327;
+	bh=9OOWpG0ivjp12xj5kOLDESJOJ/tOXEg8NufUZP4qUn0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=qr+WzQzQAvr8gmJYJXvgYtfD3T8fjlhPvTPLTalFuGeBdPFV/WGkuvBe/kgNuKYuQ
+	 6RCjSx6CGQqTspwjCvcQs1TtA2gfJGxby4FIv20Zf7mIJ5STSKmwVbbfrbIsHH/iyI
+	 snP3JZIi0OLobAWtKX8fqPRqxJXWyincafISFffeX/OmgvxQ0NmO7zkJYueGz2IHRP
+	 P0TVrHGSmYGz0JPtoBxePYlFuL0cxuYsBdofeywQF9avmGnJ3WezA4jR9EWmJHjBEp
+	 3V48o8Y9WPwJpm3jbPKnAxczj7sWWwhiwogd8kP81xxBHVvTmtcWsDmZVOhvQjYIGM
+	 v7AYHKcU/fFvA==
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b90bb0e8376so90809266b.0
+        for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 09:22:07 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWjGFF3y/Navfr5N/z9rCIg76UjbUAKeqB1CfR9TVjxedNZzyq1L4/mJzFULB9QbPWdyaY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyTeyc4JqtI7shGg4rgTdfV3eq2aeROhPFHYXUDX4V+yr8Ti6O
+	DBfJrPYbGwLtHnzSxubJ3eHEoLy2mEz4zGd7GnVUUrWOewfs8z3NwmwHWOJu2VjIFBpqQHJyQ0X
+	Kwq7T2w3nArYNxNboCct1kPSJVO6q2+M=
+X-Received: by 2002:a17:907:9405:b0:b8f:c684:db28 with SMTP id
+ a640c23a62f3a-b9080f5081emr529638766b.12.1771867326496; Mon, 23 Feb 2026
+ 09:22:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260223162900.772669-1-tycho@kernel.org> <20260223162900.772669-3-tycho@kernel.org>
- <aZyCEBo07EHw2Prk@google.com> <aZyE4zvPtujZ4-6X@tycho.pizza>
-Message-ID: <aZyLIWtffvEnmtYh@google.com>
-Subject: Re: [PATCH 2/4] selftests/kvm: check that SEV-ES VMs are allowed in
- SEV-SNP mode
-From: Sean Christopherson <seanjc@google.com>
-To: Tycho Andersen <tycho@kernel.org>
-Cc: Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <aYqOkvHs3L-AX-CG@google.com> <4g25s35ty23lx2je4aknn6dg4ohviqhkbvvel4wkc4chhgp6af@kbqz3lnezo3j>
+ <aYuE8xQdE5pQrmUs@google.com> <ck57mmdt5phh64cadoqxylw5q2b72ffmabmlzmpphaf27lbtxw@4kscovf6ahve>
+ <aYvIpwjsJ50Ns4ho@google.com> <mxn6y6og34ejncnsvdapcoep4ewcnwnheszhwkp2undkqcu5zv@bpmseexuug5z>
+ <aYvPwH8JcRItaQRI@google.com> <smsla7jgdncodh57uh7dihumnteu5sgxyzby2jc6lcp3moayzf@ixqj4ivmlgb2>
+ <aZj2V9-noq10b5CM@google.com> <ftjb625b4wsz5vdty3fcxqanuxriiqcewqkzp2ml2hc4eojuoc@ewhboiiqmcd4>
+ <aZyHeKp2Dzzrjb5C@google.com>
+In-Reply-To: <aZyHeKp2Dzzrjb5C@google.com>
+From: Yosry Ahmed <yosry@kernel.org>
+Date: Mon, 23 Feb 2026 09:21:55 -0800
+X-Gmail-Original-Message-ID: <CAO9r8zMm185sTzhSZL4pfi5GAT2z33W-nPOaxDVq+AF-wePHUA@mail.gmail.com>
+X-Gm-Features: AaiRm51k__3TarTHRw4JVSUnX05rOFmwAWLHi27G3uT1pXKuAO74W1BQd9t7tZI
+Message-ID: <CAO9r8zMm185sTzhSZL4pfi5GAT2z33W-nPOaxDVq+AF-wePHUA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] KVM: nSVM: Sync next_rip to cached vmcb12 after VMRUN
+ of L2
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71507-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71508-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,amd.com:url]
-X-Rspamd-Queue-Id: 9B16E17AB86
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 53B1C17AB7E
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026, Tycho Andersen wrote:
-> > > +	/*
-> > > +	 * In some cases when SEV-SNP is enabled, firmware disallows starting
-> > > +	 * an SEV-ES VM. When SEV-SNP is enabled try to launch an SEV-ES, and
-> > > +	 * check the underlying firmware error for this case.
-> > > +	 */
-> > > +	vm = vm_sev_create_with_one_vcpu(KVM_X86_SEV_ES_VM, guest_sev_es_code,
-> > > +					 &vcpu);
-> > 
-> > If there's a legimate reason why an SEV-ES VM can't be created, then that needs
-> > to be explicitly enumerated in some way by the kernel.  E.g. is this due to lack
-> > of ASIDs due to CipherTextHiding or something?
-> 
-> Newer firmware that fixes CVE-2025-48514 won't allow SEV-ES VMs to be
-> started with SNP enabled, there is a footnote (2) about it here:
-> 
-> https://www.amd.com/en/resources/product-security/bulletin/amd-sb-3023.html
-> 
-> Probably should have included this in the patch, sorry.
-> 
-> > Throwing a noodle to see if it sticks is not an option.
-> 
-> Sure, we could do some firmware version test to see if it's fixed
-> instead? Or do this same test in the kernel and export that as an
-> ioctl?
+> > > > > Oh, good point.  In that case, I think it makes sense to add the flag asap, so
+> > > > > that _if_ it turns out that KVM needs to consume a field that isn't currently
+> > > > > saved/restored, we'll at least have a better story for KVM's that save/restore
+> > > > > everything.
+> > > >
+> > > > Not sure I follow. Do you mean start serializing everything and setting
+> > > > the flag ASAP (which IIUC would be after the rework we discussed),
+> > >
+> > > Yep.
+> >
+> > I don't think it matters that much when we start doing this. In all
+> > cases:
+> >
+> > 1. KVM will need to be backward-compatible.
+> >
+> > 2. Any new features that depend on save+restore of those fields will be
+> > a in a new KVM that does the 'full' save+restore (assuming we don't let
+> > people add per-field flags).
+> >
+> > The only scenario that I can think of is if a feature can be enabled at
+> > runtime, and we want to be able to enable it for a running VM after
+> > migrating from an old KVM to a new KVM. Not sure how likely this is.
+>
+> The scenario I'm thinking of is where we belatedly realize we should have been
+> saving+restoring a field for a feature that is already supported, e.g. gpat.  If
+> KVM saves+restores everything, then we don't have to come up with a hacky solution
+> for older KVM, because it already provides the desired behavior for the "save",
+> only the "restore" for the older KVM is broken.
+>
+> Does that make sense?  It makes sense in my head, but I'm not sure I communicated
+> the idea very well...
 
-Uh, no idea what would be ideal, but there absolutely needs to be some way to
-communicate lack of effective SEV-ES support to userspace, and in a way that
-doesn't break userspace.
+Kinda? What I am getting at is that we'll always have an old KVM that
+doesn't save everything that we'll need to handle. I think the
+scenario you have in mind is where we introduce a feature *after* we
+start saving everything, and at a later point realize we didn't add
+proper "restore" support, but the "save" support must have always been
+there.
 
-Hrm, I think we also neglected to communicate when SEV and SEV-ES are effectively
-unusable, e.g. due to CipherTextHiding, so maybe we can kill two birds with one
-stone?  IIRC, we didn't bother enumerating the limitation with CipherTextHiding
-because making SEV-ES unusable would require a deliberate act from the admin.
+gPAT is not a good example because it's in the "save" area :P
 
-"Update firmware" is also an deliberate act, but the side effect of SEV-ES being
-disabled, not so much.
+But yeah, I see your point. It's not very straightforward now because
+what we save comes from the cache, and we only cache what we need for
+the current set of features. So this will need to be done on top of
+the rework we've been discussing, where vmcb02 starts being the source
+of truth instead of the cache, then we just (mostly) save vmcb02's
+control area as-is.
 
