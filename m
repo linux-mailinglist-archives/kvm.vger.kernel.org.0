@@ -1,323 +1,360 @@
-Return-Path: <kvm+bounces-71547-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71548-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SCpQBuDhnGnCLwQAu9opvQ
-	(envelope-from <kvm+bounces-71547-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 00:25:20 +0100
+	id yFsxD9DinGnrLwQAu9opvQ
+	(envelope-from <kvm+bounces-71548-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 00:29:20 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B709217F53D
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 00:25:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA2B117F70D
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 00:29:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EBAF5300E58C
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 23:25:18 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 30A9230426BD
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 23:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13EF537F75B;
-	Mon, 23 Feb 2026 23:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D01CB37F8D1;
+	Mon, 23 Feb 2026 23:27:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YuYPOiIr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tlTa2Pl7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1868F3783C9;
-	Mon, 23 Feb 2026 23:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771889116; cv=fail; b=gt/jDOa7sc7zQNsfR0BvtJJZ5ArqbU1+G67/nEgVSkrOVlkvrFVLJHkUj86SGI1GGsNtbv0Zq40nCxdz+Qs5VCTJ/p480UgErPXfnA7FlEbtwD/+bZ5+/cPwclbhyLlqo0RJEmXgQi7iyqlG3azh/N7PZLl+olo9292kPazaI38=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771889116; c=relaxed/simple;
-	bh=L5mYqxVxWypemg70BJJVe8eEAxGfOVIhY3ddu0yszcQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=X+TbA8dDYgeR1KXtxFrI20oa7DXgXpqFEQ/KZ9rhDU3sld2LGRUq0qbpP1vyWIRPXBuaSNBGgmL80Q0ZMpmwjYNGyVncaLbPzwuQzaffiePpcMheU4oy6dHWhTstxLW6YeSAcweo0WVpVNdzYKsd/aLq5h81tmhJBYObhtrSImE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YuYPOiIr; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1771889114; x=1803425114;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=L5mYqxVxWypemg70BJJVe8eEAxGfOVIhY3ddu0yszcQ=;
-  b=YuYPOiIr+L1MVqLVAXLVOISgkrPUH0rlQzottut5sJLYYECffkcdXEt2
-   YFKrmKVOAQ1XjZpI51CFrRbX51LjjAzQjZC++Toy4X51SEOG0qMsCgI9k
-   u2lG3/atqf7MyYlaqvzRAJQAIcLNBoOZiWgNbr1uqo7RGxEwszZ5Az8NV
-   fl+5Z6WPbBUMTpktLbvx48XM8+4B/zAhcs/ycQg+P4NBYO01j/DO6Noyu
-   x3CHbVtqc8o9Qj+01rLO80evlgk2nnmYdPmNmiMn+kG3ObQCWzdRQr3bY
-   6M/nGGksr/j7CQ+8LVlyi5J8J3EmG9ZewUmw9wGLR7VxgjjmIEuZtRtgz
-   w==;
-X-CSE-ConnectionGUID: Gbzvdo1DQBqtYYdBcJe00w==
-X-CSE-MsgGUID: Dl7hajynTzWOkbJT6d2Vvw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11710"; a="60473222"
-X-IronPort-AV: E=Sophos;i="6.21,307,1763452800"; 
-   d="scan'208";a="60473222"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2026 15:24:59 -0800
-X-CSE-ConnectionGUID: dgMaezeaRUy9k9tyUEnIIg==
-X-CSE-MsgGUID: UT+1zp8XSG2C3OF+Cb2pIg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,307,1763452800"; 
-   d="scan'208";a="214096714"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2026 15:24:58 -0800
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Mon, 23 Feb 2026 15:24:58 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35 via Frontend Transport; Mon, 23 Feb 2026 15:24:58 -0800
-Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.1) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Mon, 23 Feb 2026 15:24:58 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=o+ANYMGU5u6bns7xI8srlK7cVIa1zEIlE/Phn9hbREjp8SDc9XbKARyiIFuAFKebmv4m+oTUFbtXwGxfn0WhpEUxz4pIUtTNMyO8uYRSAvfeALFtJNpGzrDJr8zWgiAcVLuROukfpYrnXI3e5jddb5bZl/L57DQ9bwBnOXOan9X7aQo02lJ+zd9mxxklJWmKbGtt3crrPSTGi0MAxUZ3fIe5MeXZqDCgtgxMN/0YKuinVpmnJo5Y+O83IfyMPdX6zYkJwt9snGJNoMChDUJKRiAnhStSt0epa7T4VwujPtpItA+q7jHCyBVxTCX+fJr9dzPzZmru+NEyV0LMLD6EJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=L5mYqxVxWypemg70BJJVe8eEAxGfOVIhY3ddu0yszcQ=;
- b=Cd9QgX8XrFikFvNZsMTxP9OVwEy795lzpbPSpyxJqTvsHo69r75e5qygC+QMatw3o4MCvlTqsemmw6LVqJWILiw7vbzt2eKvvt1J5Y9Ax0x5BCXsIFNek7uSAWiPRbnH4d03Qm6Gz9VkRucUaWMlag65rNmbROKEp47UfeZEQWLJvPFs0cTQdyY4DxaF4MeXFObKWGIfE6S85zR6mi0SzdA8uyNJv5i/DxcUNzcbRalRbfmP8AIXHUlLQoEAjVCy9JmzbxjzGu/v4KSai59mo9ZtAMBtyyrPxB/iGOlLLWakJThu6dkw/wKZmTF+zeRg9en2yWYyl2RzYTkawiWamA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by CH3PR11MB7770.namprd11.prod.outlook.com (2603:10b6:610:129::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Mon, 23 Feb
- 2026 23:23:41 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::3ad:5845:3ab9:5b65]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::3ad:5845:3ab9:5b65%6]) with mapi id 15.20.9632.010; Mon, 23 Feb 2026
- 23:23:41 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "seanjc@google.com" <seanjc@google.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-	"yosry.ahmed@linux.dev" <yosry.ahmed@linux.dev>
-Subject: Re: [PATCH] KVM: x86/mmu: Don't create SPTEs for addresses that
- aren't mappable
-Thread-Topic: [PATCH] KVM: x86/mmu: Don't create SPTEs for addresses that
- aren't mappable
-Thread-Index: AQHcoTXoP5tM7QU8XUq1kA8eNcmjl7WMShkAgAALQwCABJ94AA==
-Date: Mon, 23 Feb 2026 23:23:41 +0000
-Message-ID: <f4dc2f2fd2c2201c9e5d141c0c83c203e1f57975.camel@intel.com>
-References: <20260219002241.2908563-1-seanjc@google.com>
-	 <7986057373abcb20585c916804422a13f51d5e55.camel@intel.com>
-	 <aZkBBlrMd2-P-kKK@google.com>
-In-Reply-To: <aZkBBlrMd2-P-kKK@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.52.3-0ubuntu1.1 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|CH3PR11MB7770:EE_
-x-ms-office365-filtering-correlation-id: 3c550ac3-2bb6-4741-0c53-08de73329498
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700021;
-x-microsoft-antispam-message-info: =?utf-8?B?OE9GcHVvby9zV2FvL01mdXo1SkJ4Z3QvM0ZlT0FtWUo3V0N5Z0lIS0Q1RkhT?=
- =?utf-8?B?WXZQT2grTHl2RmEvck5JbGo1a3dUcnJFZTREck5BWEVjZXNMZmZ2aGNTSTZF?=
- =?utf-8?B?Yy83dHB1Vm9UZlhLcFdmbUp4dnNZNHlqa3BGTWVETEc2WnJDVHhMUzl3eDJj?=
- =?utf-8?B?SHhpNWZHcDRhcWV4Yk8xWnVZdkt0dzh3aHpzdm1NdWVtN1Z0UTRJZERMN2pW?=
- =?utf-8?B?ZXBVTDFRMER6MzR6NG42QnRBWUtIdXJ3UmtqQmM4T1JNKytKS25yQk9MOVdW?=
- =?utf-8?B?bjFQRDBjdnZkdUdwYTZHZC9ycjhYc2JZaEFVbFFraTFCbUNzMzZ0RFRhendT?=
- =?utf-8?B?SzZuSWhHUjM3WFpqcEYvSENOSERpa0w5Rm5VZVJNRENKT0tRUEFGZUFzclIx?=
- =?utf-8?B?V2lPTUUxbFc1SzJwOTZvakRaOFIwVU1ONHR5RFVyZUFMaGkrVTJHUENrYVpS?=
- =?utf-8?B?ZDZneklNcU5FM1Y3RTVwZ1JHQjZhMGkxcDVWR0RwZXdPaXNjaUZmZWZURzZ3?=
- =?utf-8?B?QXNqZUhzSm9zc0wyck9HWUY4WXhTU0huL3lqb2FKa2dDL0Q3MGYvYmFaMzV4?=
- =?utf-8?B?ZmEwVU9EZU41UitEQlNpV1NqbmE4SnVXRHFiSWZIZlN6NXBjRmJpK25OSnk2?=
- =?utf-8?B?SzB3dTJzRDlsWU5RNTJKYmxVVE1aRDE5Nmk2Z1dLN2ZsRGNWRW5jeTFUQkpJ?=
- =?utf-8?B?ajhnZjArNHVUenEzVTJIQVNJNDJZd2hWUjNYSnZwNUlyTjV6T20yQ2h1K2xS?=
- =?utf-8?B?aXYzYW1ncWlXNWRmOGZhV3luZTJyaXJUNCs2dFZteTJ6Q3lqQVIwZys4N1JG?=
- =?utf-8?B?ejBCeE5KVFFUdXF3YlJWMjF0SnZQQThPWGN0NHN4aHUrVU54VC9EWkhwWHRy?=
- =?utf-8?B?L3ExL1dwRVhpbncxNmVuNFRFRHJYamRZbWtOaTBjMkgrc0diNXBldXAvVlAw?=
- =?utf-8?B?Y3hVQytIOHF2dXRSSmtTVjlUS1pJcnIyWC8wWjJGRnY0ajREWUJraUNCemVZ?=
- =?utf-8?B?SGxxa2FrZEcrMHUvTjZ4aGJFVDVvQ2F0bFNzRmRVRU1GWHVSTW02SUhGV1hD?=
- =?utf-8?B?dWJXaTNFWlc4WVlDN0ozOEZiaVRZa3ZuczBFZGduNzBXckRkUVYzMXVSVjJa?=
- =?utf-8?B?RGdSUUNJREpJK0NRVVBYMjJEMjAyWVdqYzNLZDdyZGFPYWhTN01JOEt2STRR?=
- =?utf-8?B?TDhWbm0yMFJqSmtaT205MUxIeTg5VzJHdVdQZEsvUDdiY2FrZjNqdTVFOVpu?=
- =?utf-8?B?WEc3Zk0vQS93TDV5TUozLzVnd0hhVlRmTDJNbHgvMDliYzlTMnVSSkM3WHdY?=
- =?utf-8?B?cjc0MnVJaWJITFVKeEtUVTRucXpIMnBJMjNPREliQVJ1RkdydUxlK3dBYnM1?=
- =?utf-8?B?bEFMK244WW1nV3c3Z21ZK1ZLQkI5ZlEza21KekhFM1ZBZFlTWExPd1dhWEty?=
- =?utf-8?B?RlBCcU9iWWE1Yzd3N2FtQ2M4bFZuWFkvelpYbERZSXV1VWpLV3U3QkFud3RV?=
- =?utf-8?B?anVYd2N0MUpwY2xnKzFpNlNIQUFnUTJaWnZhdEZxWjBSUGhkQkllMGRJRlNw?=
- =?utf-8?B?Nmdwc2xpR2ErTTNJQXUxTHBpdHFyWUNaZUJMWnAyYU5NWmpNZDRwZTFET1Uy?=
- =?utf-8?B?VUE0ZnhvOUN2NTVQRTltMFJ1b1pYSldRc0tqeUFOaFhVYXAxaEpjdGtFMWpV?=
- =?utf-8?B?eUJNUytIcUhlMEdXUFdhQVhOOEtvKy9uc2hUVmJVQ2lXZVg0NkkrTXRwQ1VB?=
- =?utf-8?B?dUNPK2NMTXR1WnQxc25sUkZHZkQ2YjNHS1JBUzNncVlGdTR3SXQvRmxDb3Jq?=
- =?utf-8?B?VERWdjNyT3lLUy9QL0diYklnelF4UjZHWXYyeUFvVmNhc3BFZnlLMGwzcCtP?=
- =?utf-8?B?VWMvU1l4OFZYRnBoLzJ2ZVNaVk45akl3ck9QR3ptcWlLUFVHUlJFeVFoaHBO?=
- =?utf-8?B?aTZtMzdOYWM2WHNDclpiM2xFaFZ5Q2NUTmROdVNNZzZuUmxQUGxadzA2aXpq?=
- =?utf-8?B?YjJmTzZzcjI1YnV3YWZpN3kyMmNWRlM0WUJZb3E5bE1ZeXIwdldsTGpVMHNq?=
- =?utf-8?B?NTN0UVZ2SmpnQlMyaDZkZXl0ZjEyOURxblNyTFFNTHJ0eVRTRTUwbFBEYkRz?=
- =?utf-8?B?Z25IUjMwc0VOWlk4YnZ6OU5iV0NIL2djYW80VU1FcDVmMTlmR1JMaDR0RTNL?=
- =?utf-8?Q?RJYOKwYF4AGJvhXtQ/3StCQ=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Wkc1ejgzQ1RTdDE3bVpKcnZFZXNEeTl4eGMwdXZIaUdpMmdqc3prVmxtc282?=
- =?utf-8?B?U3JsbWVBSU5EWjZwellSeCtOcDNkbys5REVQbllCWXJDb0lvMUt2cGtTUGtk?=
- =?utf-8?B?MzIwQUg2VXFiMnlGRlp2WTJyU0poOEN6WEJ6eWl3eGsxRXJFNWFDTlZoa29F?=
- =?utf-8?B?R3d5UWhyZnJjQ2JISExDQkJJZE81dTdQT3NOVFhkSDZtM09jNHhzTG9uZlBP?=
- =?utf-8?B?VG1HZ3p1WE1jQVBSR2FOT01lOTE2alpLT0RzYWRhd0xQWm02eWl3Zzh5aTRy?=
- =?utf-8?B?SVZlL3hoQkhxZmdYM1VzR2VLQ0RYbHNOaWM2WWVFME9ldmJOcXlxZDhhNEdt?=
- =?utf-8?B?cHp0Z3hHQ0hZYnhIK2Z1K3ZFM0tJbmFTUDV5SzFybmZUTDkvd3FZdVlsZi9J?=
- =?utf-8?B?STQyNUx3U1VGSUdkQmYwVFRhWUlPemM3YmZQcEJkS0NaUWJLdzQxY1BPZVA0?=
- =?utf-8?B?RG1sZjFJSFhkVlJhVFdrVDBLZ2RnQmhUYnhzdGdPVEVUVWh3bkFBUitZbnNJ?=
- =?utf-8?B?ZllyOTB2TWc1aFVnNmpDK3dKcEh1cUlJODJnZ050ZXFWUnVzS29ndkRJUm54?=
- =?utf-8?B?czh5UEJ1dml1UStPZVkwcWVjTjlJS1JNaVJOek9pa0R0UjljNEZpbTVHSWpt?=
- =?utf-8?B?ckNSdGdIamczN1o4WDBMdU1jYWk5OXFuNGxGS3UzMHluM1pIejMrY1pvZHhI?=
- =?utf-8?B?YURjL1pKaHU4YmxZQ3ViKzdXZ3hnY0RPUU5UVGplZU9DczJ4ekU1dDNEMmMx?=
- =?utf-8?B?aE43QmZCM0Rha05lTkEvQ2pyckMzS2R5VkRPOHFJTTZHOC9LU2dLWldta3c1?=
- =?utf-8?B?T0pnM0NLTW9MZHVOSVpWZm42TkgyeVVLQlV6ZFJXbklPcFhoU0lUaXpxajVY?=
- =?utf-8?B?czBkOW9Ib04xNEZTTU44b3hhaFF4RGJIdWYrL0ZBT01Sbm1RTElXYlJnYThO?=
- =?utf-8?B?UW5VRFNwaG5icDBHT1NycjF2bzVYSUpFcE5Vb1dYVjlzVXkwTUQzQldLSURM?=
- =?utf-8?B?SFU5NVNYdkNOUlVjMkhTb0VRb2tGblFlcHZBZWZGditSZWsvRWJGN0ZsY09I?=
- =?utf-8?B?TTZtWExaZDdQekRiQWlGYjJuMGYzdzhESjdLd2NvTStaTXNlVzV2bTZPKzFO?=
- =?utf-8?B?SzBNZFh5SkNGV2VPekUvMzZ6K2hzRTJUSjBSZGRYMjZjV1YrSytXTjAxMGFo?=
- =?utf-8?B?TlhDMmhOdmxtQXg0ZDBZbnpzM0luVDZzQy9qL0oyNVZ3KzZaWmF3Z3dKRzBL?=
- =?utf-8?B?SldnWG9kcndTVWFOdFluU2ZlNE9hSU9Wa0w4Nmx0eVF3WlF4eXI3S21pWlhH?=
- =?utf-8?B?Vm5ZOEgxQnAxV1NzYWJtMTZnTHRVaUN0UndHU21LbVMrV0ViN2NFMElQN1FR?=
- =?utf-8?B?S21WcVlmRUhjOVQrQWt3TjNRejYrVWQveVd6cmQ3Y1NNcGpKSzZVSS9MOWlQ?=
- =?utf-8?B?SE1DemhYRlFHOFFUN1FWMk1rOU5LaTJRamFHeFFDT1VMZld6cVc0MDBlV3VN?=
- =?utf-8?B?MmErTmxRMzdqV2N0NTZsbElZeWYvYkliY0xRZEx4WG5FTEhTaFNiOFpCVTFv?=
- =?utf-8?B?VDRWb05lTnd5M3l3NjJFZGhnMkZYUnFBQy9UNU1jbTRMRDg4UmVjbGNpM2Er?=
- =?utf-8?B?Y0NkR2FUR0VxN200OW42My9UWVBRS0hGZVpvT3ljMnY2TlowN21STERwa2dz?=
- =?utf-8?B?ZnJyeHNoQWxiM3BlSm0rdlkyVEtNNHMxK3BQQWJHbkNsV0R1SnkrOGRMS2hX?=
- =?utf-8?B?ZjFCZkhCckhRSENweUoxazRTRWRuQ202ajQ2M00zaXNCMWFxKzQ3Vmlzelc1?=
- =?utf-8?B?UHlLd25OeG5nRHNYQmVtdk9GNW0xZHprV2FKTmg2Y1VGRGlDM2NUOXZKTExz?=
- =?utf-8?B?cDBsOVg3WkVmU2owakFSMXJhNURlZUZpUGFQTUNYQkJUZ2lrUHlOTk5vVkQ3?=
- =?utf-8?B?R05WeHErdWVoS3IwaUh1WW91ajhoS1lEUHZ4TC8wNUVEU0VMWmt1Vkd1R1lQ?=
- =?utf-8?B?NURtQUpFMnFveWZsREdpa29IS3RHZ3dra1FwdnRUdGtXZXBZUGRHeUFBRjN0?=
- =?utf-8?B?bVp5bENSTUFveGhwbTQ1SVFqclhPTzZZWVZ2QXlGZkdMU21CSlZ1WjBwdlps?=
- =?utf-8?B?M2tmekl6OVVyZHFNNVVsUlRuTEQyTGdZK0wzczFISEdIMEo0dUNLMHdvTVNB?=
- =?utf-8?B?cUJiQlFHb2IzVmpCZUNuVmJKZlBWZGVxZ1Uzdm5XK3lhKys3MmtvdDR2V1hM?=
- =?utf-8?B?TzViSkJFcFp3RTh6eHJjYnRqdEVOSzhpSVcxaUJDN1JBS2lhSXA4STRLNzJn?=
- =?utf-8?B?RVUxQlVvTWVLR3Q3YnZPTHdXK1pjZyt6TWhscmZhMzJmNk9oUEgzMWtObCti?=
- =?utf-8?Q?hZaMoL2EPxpE7iAk=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <81BA3FFF2215C04484E3B84DECE2D031@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6632737F8A5
+	for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 23:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771889263; cv=none; b=O7hDqMWV7pMw0Dj4ciZKpuRiKEhr2Y5BZNkS+XNp4q0oMjUGb2WlUsyQvPhRwcts3K3zm2eALnIpSUnLwmgchhhXf2AL/LiHmnIApIP+LvKO3gHZ9OBIVSMG/oQzWmoXr+HWHdudx0GirzGTG0NqBnXEAyS8E/AuR9S8kmStxjk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771889263; c=relaxed/simple;
+	bh=xEee9cxbr7GG38D2/dBLujjBWCXTmk4ZStmSNh98uT4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=shtYr5be1DD74C64o85ovBGwjvdD2w2XkDjWCCLfqbFNG+5CCp9a6+zZHunzvd/l2Y3lhOJ7ILKMfv++fYf2JhePqbYPjxAbZUUO+mLodhrmEsLHjTk1WFHwZHGkNiqbL/5fmLXVKhfg7CqOdN9/APvrGnCD/+3S/1UDj7WOAVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tlTa2Pl7; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2a964077671so31995ad.0
+        for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 15:27:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771889261; x=1772494061; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+9xRDS+GbzpVTn5dJQsaYxoqI8Nli76XDWLyH8tQ4yc=;
+        b=tlTa2Pl7yC8vFqnCUdHPSyXCbNU1emA/dEGUWJC/oKyPsaajyUG4UwEKed4XzIYF+w
+         +g9tcjoJRBapjLzSfCp93HZkgqeb2WoHR4bEPXMkS8CTV1ak7YDFYwMs6WLSf9dC1QOF
+         1D/gjmzWawCjI1PRJduJSxx6s7Xams/1mwVfjs8jwsNfx8I/fzPrZl88VkdcHR1/LX86
+         oNOYWTy0MLFOCBrgjqCPqEOYw3HwFHF/fVAsSPQJflTFyQvMoOS/uVzJCWq1AwYYSSj/
+         oi3bxrNsPpzr1+JlZgQv4vbnMYNor9fu3mkaY50XOg83Bp30zq5eiUPG0G7seIEI7/Cl
+         X85Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771889261; x=1772494061;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+9xRDS+GbzpVTn5dJQsaYxoqI8Nli76XDWLyH8tQ4yc=;
+        b=OpklZUl8ebGa9JnCSuvWRxWYCQiRZOmFo1+s3Q/X/solDVTjl4g/K76YhuVyzy8tYj
+         XeT8wE/t0tzPK5fOR7DLy8mKc1eTg2mc4qL/LvLdYSt5D4PdIKTF1Bfp3X6BDYQflEJb
+         l+UTEib8rClhj5kN4BYt5G67t1JBYXIQM3+LdLMoWHLleeKzwx6fGy/PWMbjrKa4smKr
+         mv7i0FIxgDY0SqqCeFz+HOE352n2QONumafTbUdvF69zzPFnPAIWKe/aBc+lmhBD+knd
+         SwYYez/3pSZFKZ7HBz2r/alLNwVF10T6M+wHQthH7HQEo51kb/tSxrUdOeXtseEF01FG
+         vs4g==
+X-Forwarded-Encrypted: i=1; AJvYcCXRd1HWxrOfvRFNQyQ9xpXQY7PQaCP9V4VY9x8uxQlpzA1Si4STrrWbqUJD4lCHg1EKCQ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyK2LpDuMob/eZBUMl8HwTt96zGY0m6l1PFMIQhNsUmK/fYPMgZ
+	5zG3zOLC7MKbi0VEdOH/+DvF0z1edUckgRehT+CZP13nzWsC1AW7mUVK41RGNHusAg==
+X-Gm-Gg: ATEYQzxMDH5Znx3L+0xVnB8uCXEJqgx8EyF6cO1rjHh9BPwo4CcUplRPOvO7Tx6oR2M
+	oqYv9ZJbMFqGqb5ZMNmP4ORohC41PhtPWcUpwYvE0BiWtDhs91WTZGRCf4IoUud5Ico6xSAqKUh
+	G3ZM7bBFF25E+lloWn/J114NIdM8v4WC8JhNQIW3uTfuEhbjkuTEL+hWvDI9S7AT5z6owZGzNa8
+	+W6mF/GdApZsDHU+twQSIUziJZWZYOdFTcqC21DG8mHUgo2Qmq6herItJY66epIcK/UadgARoGG
+	6pTjaxTzuIUJxiTtmv/OXIKgQR/96kQ17jJMWoyh+d3qeH2JCzlR+5GdhVX2RxlvmlUdFnXXka9
+	VIiFY9RGCw+EFhOrt0mhXiUZmuFtHQppRIUTccl0KOsvggFs4MeyqcrWgfOVlA5aZPcydc95mR5
+	GNT6n9J3iyM5c+WTx+eMud7JOHk6vX/MMCsQm7nnKxRzEaxifEiAJE2MzAwJVI0A==
+X-Received: by 2002:a17:903:1968:b0:2a0:89b0:71d6 with SMTP id d9443c01a7336-2ada34bcd22mr245115ad.17.1771889260189;
+        Mon, 23 Feb 2026 15:27:40 -0800 (PST)
+Received: from google.com (168.136.83.34.bc.googleusercontent.com. [34.83.136.168])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ad7500e318sm81858705ad.43.2026.02.23.15.27.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Feb 2026 15:27:39 -0800 (PST)
+Date: Mon, 23 Feb 2026 23:27:35 +0000
+From: Samiullah Khawaja <skhawaja@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex@shazbot.org>, 
+	Adithya Jayachandran <ajayachandra@nvidia.com>, Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>, 
+	Alistair Popple <apopple@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Ankit Agrawal <ankita@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Chris Li <chrisl@kernel.org>, David Rientjes <rientjes@google.com>, 
+	Jacob Pan <jacob.pan@linux.microsoft.com>, Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Jonathan Corbet <corbet@lwn.net>, Josh Hilke <jrhilke@google.com>, 
+	Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org, kvm@vger.kernel.org, 
+	Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-mm@kvack.org, 
+	linux-pci@vger.kernel.org, Lukas Wunner <lukas@wunner.de>, 
+	=?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>, Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>, 
+	Pasha Tatashin <pasha.tatashin@soleen.com>, Pranjal Shrivastava <praan@google.com>, 
+	Pratyush Yadav <pratyush@kernel.org>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Rodrigo Vivi <rodrigo.vivi@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Shuah Khan <skhan@linuxfoundation.org>, 
+	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, Tomita Moeko <tomitamoeko@gmail.com>, 
+	Vipin Sharma <vipinsh@google.com>, Vivek Kasireddy <vivek.kasireddy@intel.com>, 
+	William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>, Zhu Yanjun <yanjun.zhu@linux.dev>
+Subject: Re: [PATCH v2 06/22] vfio/pci: Retrieve preserved device files after
+ Live Update
+Message-ID: <bz7mhzvgawf4loxbv74iodj6aaf4e2snlb7szgjk2lia2uxnhr@dcp3m3jl3i63>
+References: <20260129212510.967611-1-dmatlack@google.com>
+ <20260129212510.967611-7-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3c550ac3-2bb6-4741-0c53-08de73329498
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Feb 2026 23:23:41.1651
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3mfVdAEOflAf+wr82BoyiDq2SW7bPZs8Wt9xrr+YaCyyaBM5Ic+PaZ9dYSJH8prJ7WLonTDtDNnVA3e+MneT8mWBxo8vqM+FARpbzCxOVPo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7770
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260129212510.967611-7-dmatlack@google.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-71548-lists,kvm=lfdr.de];
+	FREEMAIL_CC(0.00)[shazbot.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71547-lists,kvm=lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_TWELVE(0.00)[44];
+	DKIM_TRACE(0.00)[google.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rick.p.edgecombe@intel.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-0.996];
+	FROM_NEQ_ENVFROM(0.00)[skhawaja@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: B709217F53D
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AA2B117F70D
 X-Rspamd-Action: no action
 
-T24gRnJpLCAyMDI2LTAyLTIwIGF0IDE2OjQ5IC0wODAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBPbiBTYXQsIEZlYiAyMSwgMjAyNiwgUmljayBQIEVkZ2Vjb21iZSB3cm90ZToNCj4g
-PiBPbiBXZWQsIDIwMjYtMDItMTggYXQgMTY6MjIgLTA4MDAsIFNlYW4gQ2hyaXN0b3BoZXJzb24g
-d3JvdGU6DQo+ID4gPiArc3RhdGljIHZvaWQgcmVzZXRfdGRwX3VubWFwcGFibGVfbWFzayhzdHJ1
-Y3Qga3ZtX21tdSAqbW11KQ0KPiA+ID4gK3sNCj4gPiA+ICsJaW50IG1heF9hZGRyX2JpdDsNCj4g
-PiA+ICsNCj4gPiA+ICsJc3dpdGNoIChtbXUtPnJvb3Rfcm9sZS5sZXZlbCkgew0KPiA+ID4gKwlj
-YXNlIFBUNjRfUk9PVF81TEVWRUw6DQo+ID4gPiArCQltYXhfYWRkcl9iaXQgPSA1MjsNCj4gPiA+
-ICsJCWJyZWFrOw0KPiA+ID4gKwljYXNlIFBUNjRfUk9PVF80TEVWRUw6DQo+ID4gPiArCQltYXhf
-YWRkcl9iaXQgPSA0ODsNCj4gPiA+ICsJCWJyZWFrOw0KPiA+ID4gKwljYXNlIFBUMzJFX1JPT1Rf
-TEVWRUw6DQo+ID4gPiArCQltYXhfYWRkcl9iaXQgPSAzMjsNCj4gPiA+ICsJCWJyZWFrOw0KPiA+
-ID4gKwlkZWZhdWx0Og0KPiA+ID4gKwkJV0FSTl9PTkNFKDEsICJVbmhhbmRsZWQgcm9vdCBsZXZl
-bCAldVxuIiwgbW11LQ0KPiA+ID4gPnJvb3Rfcm9sZS5sZXZlbCk7DQo+ID4gPiArCQltbXUtPnVu
-bWFwcGFibGVfbWFzayA9IDA7DQo+ID4gDQo+ID4gV291bGQgaXQgYmUgYmV0dGVyIHRvIHNldCBt
-YXhfYWRkcl9iaXQgdG8gMCBhbmQgbGV0IHJzdmRfYml0cygpIHNldA0KPiA+IGl0IGJlbG93PyBU
-aGVuIHRoZSB1bmtub3duIGNhc2UgaXMgc2FmZXIgYWJvdXQgcmVqZWN0aW5nIHRoaW5ncy4NCj4g
-DQo+IE5vLCBiZWNhdXNlIHNwZWFraW5nIGZyb20gZXhwZXJpZW5jZSwgcmVqZWN0aW5nIGlzbid0
-IHNhZmVyIChJIGhhZCBhDQo+IGJyYWluIGZhcnQgYW5kIHRob3VnaHQgbGVnYWN5IHNoYWRvdyBw
-YWdpbmcgd2FzIGFsc28gYWZmZWN0ZWQpLsKgDQo+IFRoZXJlJ3Mgbm8gZGFuZ2VyIHRvIHRoZSBo
-b3N0IChvdGhlciB0aGFuIHRoZSBXQVJOIGl0c2VsZiksIGFuZCBzbw0KPiBzYWZldHkgaGVyZSBp
-cyBhbGwgYWJvdXQgdGhlIGd1ZXN0Lg0KPiANCj4gU2V0dGluZyB1bm1hcHBhYmxlX21hc2sgdG8g
-LTF1bGwgaXMgYWxsIGJ1dCBndWFyYW50ZWVkIHRvIGtpbGwgdGhlDQo+IGd1ZXN0LCBiZWNhdXNl
-IEtWTSB3aWxsIHJlamVjdCBhbGwgZmF1bHRzLsKgIFNldHRpbmcgdW5tYXBwYWJsZV9tYXNrDQo+
-IHRvIDAgaXMgb25seSBwcm9ibGVtYXRpYyBpZiB0aGUgZ3Vlc3QgYW5kL29yIHVzZXJzcGFjZSBp
-cw0KPiBtaXNiZWhhdmluZywgYW5kIGV2ZW4gdGhlbiwgdGhlIHdvcnN0IGNhc2Ugc2NlbmFyaW8g
-aXNuJ3QgaG9ycmlmaWMsDQo+IGFsbCB0aGluZ3MgY29uc2lkZXJlZC4NCg0KQ29uZnVzZWQgTU0g
-Y29kZSBtYWtlcyBtZSBuZXJ2b3VzLCBidXQgZmFpciBlbm91Z2guDQoNCj4gDQo+ID4gPiArCQly
-ZXR1cm47DQo+ID4gPiArCX0NCj4gPiA+ICsNCj4gPiA+ICsJbW11LT51bm1hcHBhYmxlX21hc2sg
-PSByc3ZkX2JpdHMobWF4X2FkZHJfYml0LCA2Myk7DQo+ID4gPiArfQ0KPiA+ID4gKw0KPiA+IA0K
-PiA+IEdvc2gsIHRoaXMgZm9yY2VkIG1lIHRvIGV4cGFuZCBteSB1bmRlcnN0YW5kaW5nIG9mIGhv
-dyB0aGUgZ3Vlc3QNCj4gPiBhbmQgaG9zdCBwYWdlIGxldmVscyBnZXQgZ2x1ZWQgdG9nZXRoZXIu
-IEhvcGVmdWxseSB0aGlzIGlzIG5vdCB0b28NCj4gPiBmYXIgb2ZmLi4uDQo+ID4gDQo+ID4gSW4g
-dGhlIHBhdGNoIHRoaXMgZnVuY3Rpb24gaXMgcGFzc2VkIGJvdGggZ3Vlc3RfbW11IGFuZCByb290
-X21tdS4NCj4gPiBTbyBzb21ldGltZXMgaXQncyBnb2luZyB0byBiZSBMMSBHUEEgYWRkcmVzcywg
-YW5kIHNvbWV0aW1lcyAoZm9yDQo+ID4gQU1EIG5lc3RlZD8pIGl0J3MgZ29pbmcgdG8gYmUgYW4g
-TDIgR1ZBLiBGb3IgdGhlIEdWQSBjYXNlIEkgZG9uJ3QNCj4gPiBzZWUgaG93IFBUMzJfUk9PVF9M
-RVZFTCBjYW4gYmUgb21pdHRlZC4gSXQgd291bGQgaGl0IHRoZSB3YXJuaW5nPw0KPiANCj4gTm8s
-IGl0J3MgYWx3YXlzIGEgR1BBLsKgIHJvb3RfbW11IHRyYW5zbGF0ZXMgTDEgR1BBID0+IEwwIEdQ
-QSBhbmQgTDENCj4gR1ZBID0+IEdQQSo7IGd1ZXN0X21tdSB0cmFuc2xhdGVzIEwyIEdQQSA9PiBM
-MCBHUEE7IG5lc3RlZF9tbXUNCj4gdHJhbnNsYXRlcyBMMiBHVkEgPT4gTDIgR1BBLg0KPiANCj4g
-Tm90ZSHCoCBUaGUgYXN0ZXJpc2sgaXMgdGhhdCByb290X21tdSBpcyBhbHNvIHVzZWQgd2hlbiBM
-MiBpcyBhY3RpdmUNCj4gaWYgTDEgaXMgTk9UIHVzaW5nIFREUCwgZWl0aGVyIGJlY2F1c2UgS1ZN
-IGlzbid0IHVzaW5nIFREUCwgb3INCj4gYmVjYXVzZSB0aGUgTDEgaHlwZXJ2aXNvciBkZWNpZGVk
-IG5vdCB0by7CoCBJbiB0aG9zZSBjYXNlcywgTDIgR1BBID09DQo+IEwxIEdQQSBmcm9tIEtWTSdz
-IHBlcnNwZWN0aXZlLCBiZWNhdXNlIHRoZSBMMSBoeXBlcnZpc29yIGlzDQo+IHJlc3BvbnNpYmxl
-IGZvciBzaGFkb3dpbmcgTDIgR1ZBID0+IEwxIEdQQS7CoCBBbmQgcm9vdF9tbXUgY2FuIGFsc28N
-Cj4gdHJhbnNsYXRlIEwyIEdQQSA9PiBMMCBHUEEgYW5kIEwyIEdWQSA9PiBMMiBHUEEgKGFnYWlu
-LCBMMSBHUEEgPT0gTDINCj4gR1BBKS4NCg0KSSBhcHByZWNpYXRlIHlvdSB0YWtpbmcgdGhlIHRp
-bWUgdG8gZXhwbGFpbi4gVHJhY2luZyB0aHJvdWdoIHdpdGggdGhlDQphYm92ZSBJIHJlYWxpemUg
-SSB3YXMgdW5kZXIgdGhlIHdyb25nIGltcHJlc3Npb24gYWJvdXQgaG93IG5lc3RlZCBTVk0NCndv
-cmtlZC4NCg0KPiANCj4gPiBCdXQgYWxzbyB0aGUgJzUnIGNhc2UgaXMgd2VpcmQgYmVjYXVzZSBh
-cyBhIEdWQSB0aGUgbWF4IGFkZHJlc3NlDQo+ID4gYml0cyBzaG91bGQgYmUgNTcgYW5kIGEgR1BB
-IGlzIHNob3VsZCBiZSA1NC4NCj4gDQo+IDUyLCBpLmUuIHRoZSBhcmNoaXRlY3R1cmFsIG1heCBN
-QVhQSFlBRERSLg0KDQpPb3BzIHllcyBJIG1lYW50IDUyLiBCdXQgaWYgaXQgaXMgYWx3YXlzIG1h
-eCBwaHlzaWNhbCBhZGRyZXNzIGFuZCBub3QNCnRyeWluZyB0byBoYW5kbGUgVkEncyB0b28sIHdo
-eSBpcyBQVDMyRV9ST09UX0xFVkVMIDMyIGluc3RlYWQgb2YNCjM2P8KgVGhhdCBhbHNvIHNlbmQg
-bWUgZG93biB0aGUgcGF0aCBvZiBhc3N1bWluZyBHVkFzIHdlcmUgaW4gdGhlIG1peCwNCmJ1dCBu
-b3cgSSBzZWUgaXQgaXMgdXNlZCBmb3IgMzIgYml0IFNWTS4NCg0KPiANCltzbmlwXQ0KPiANCj4g
-DQo+ID4gU28gSSdkIHRoaW5rIHRoaXMgbmVlZHMgYSB2ZXJzaW9uIGZvciBHVkEgYW5kIG9uZSBm
-b3IgR1BBLg0KPiANCj4gTm8sIHNlZSB0aGUgbGFzdCBwYXJhZ3JhcGggaW4gdGhlIGNoYW5nZWxv
-Zy4NCj4gDQo+IFNpZGUgdG9waWMsIGlmIHlvdSBoYXZlIF9hbnlfIGlkZWEgZm9yIGJldHRlciBu
-YW1lcyB0aGFuIGd1ZXN0X21tdQ0KPiB2cy4gbmVzdGVkX21tdSwgc3BlYWsgdXAuwqAgVGhpcyBp
-cyBsaWtlIHRoZSBmaWZ0aD8gdGltZSBJJ3ZlIGhhZCBhDQo+IGRpc2N1c3Npb24gYWJvdXQgaG93
-IGF3ZnVsIHRob3NlIG5hbWVzIGFyZSwgYnV0IHdlJ3ZlIHlldCB0byBjb21lIHVwDQo+IHdpdGgg
-bmFtZXMgdGhhdCBzdWNrIGxlc3MuDQoNCkkgZG9uJ3QuIEFzIGFib3ZlLCBJIGdvdCBjb25mdXNl
-ZCB3aXRoIHNvbWUgd3JvbmcgYXNzdW1wdGlvbnMuIFRoZQ0KbmFtZXMgc2VlbSByZWFzb25hYmxl
-LiBUaGUgc2hvcnQgbm90ZXMgYWJvdXQgdGhlIHRyYW5zbGF0aW9uIGlucHV0IGFuZA0KZm9yIGVh
-Y2ggTU1VIG1pZ2h0IGJlIG5pY2UgdG8gaGF2ZSBzb21ld2hlcmUuDQo=
+On Thu, Jan 29, 2026 at 09:24:53PM +0000, David Matlack wrote:
+>From: Vipin Sharma <vipinsh@google.com>
+>
+>Enable userspace to retrieve preserved VFIO device files from VFIO after
+>a Live Update by implementing the retrieve() and finish() file handler
+>callbacks.
+>
+>Use an anonymous inode when creating the file, since the retrieved
+>device file is not opened through any particular cdev inode, and the
+>cdev inode does not matter in practice.
+>
+>For now the retrieved file is functionally equivalent a opening the
+>corresponding VFIO cdev file. Subsequent commits will leverage the
+>preserved state associated with the retrieved file to preserve bits of
+>the device across Live Update.
+>
+>Signed-off-by: Vipin Sharma <vipinsh@google.com>
+>Co-developed-by: David Matlack <dmatlack@google.com>
+>Signed-off-by: David Matlack <dmatlack@google.com>
+>---
+> drivers/vfio/device_cdev.c             | 21 ++++++---
+> drivers/vfio/pci/vfio_pci_liveupdate.c | 60 +++++++++++++++++++++++++-
+> drivers/vfio/vfio_main.c               | 13 ++++++
+> include/linux/vfio.h                   | 12 ++++++
+> 4 files changed, 98 insertions(+), 8 deletions(-)
+>
+>diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
+>index 8ceca24ac136..935f84a35875 100644
+>--- a/drivers/vfio/device_cdev.c
+>+++ b/drivers/vfio/device_cdev.c
+>@@ -16,14 +16,8 @@ void vfio_init_device_cdev(struct vfio_device *device)
+> 	device->cdev.owner = THIS_MODULE;
+> }
+>
+>-/*
+>- * device access via the fd opened by this function is blocked until
+>- * .open_device() is called successfully during BIND_IOMMUFD.
+>- */
+>-int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep)
+>+int __vfio_device_fops_cdev_open(struct vfio_device *device, struct file *filep)
+> {
+>-	struct vfio_device *device = container_of(inode->i_cdev,
+>-						  struct vfio_device, cdev);
+> 	struct vfio_device_file *df;
+> 	int ret;
+>
+>@@ -52,6 +46,19 @@ int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep)
+> 	vfio_device_put_registration(device);
+> 	return ret;
+> }
+>+EXPORT_SYMBOL_GPL(__vfio_device_fops_cdev_open);
+>+
+>+/*
+>+ * device access via the fd opened by this function is blocked until
+>+ * .open_device() is called successfully during BIND_IOMMUFD.
+>+ */
+>+int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep)
+>+{
+>+	struct vfio_device *device = container_of(inode->i_cdev,
+>+						  struct vfio_device, cdev);
+>+
+>+	return __vfio_device_fops_cdev_open(device, filep);
+>+}
+>
+> static void vfio_df_get_kvm_safe(struct vfio_device_file *df)
+> {
+>diff --git a/drivers/vfio/pci/vfio_pci_liveupdate.c b/drivers/vfio/pci/vfio_pci_liveupdate.c
+>index f01de98f1b75..7f4117181fd0 100644
+>--- a/drivers/vfio/pci/vfio_pci_liveupdate.c
+>+++ b/drivers/vfio/pci/vfio_pci_liveupdate.c
+>@@ -8,6 +8,8 @@
+>
+> #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+>
+>+#include <linux/anon_inodes.h>
+>+#include <linux/file.h>
+> #include <linux/kexec_handover.h>
+> #include <linux/kho/abi/vfio_pci.h>
+> #include <linux/liveupdate.h>
+>@@ -108,13 +110,68 @@ static int vfio_pci_liveupdate_freeze(struct liveupdate_file_op_args *args)
+> 	return ret;
+> }
+>
+>+static int match_device(struct device *dev, const void *arg)
+>+{
+>+	struct vfio_device *device = container_of(dev, struct vfio_device, device);
+>+	const struct vfio_pci_core_device_ser *ser = arg;
+>+	struct pci_dev *pdev;
+>+
+>+	pdev = dev_is_pci(device->dev) ? to_pci_dev(device->dev) : NULL;
+>+	if (!pdev)
+>+		return false;
+>+
+>+	return ser->bdf == pci_dev_id(pdev) && ser->domain == pci_domain_nr(pdev->bus);
+>+}
+>+
+> static int vfio_pci_liveupdate_retrieve(struct liveupdate_file_op_args *args)
+> {
+>-	return -EOPNOTSUPP;
+>+	struct vfio_pci_core_device_ser *ser;
+>+	struct vfio_device *device;
+>+	struct file *file;
+>+	int ret;
+>+
+>+	ser = phys_to_virt(args->serialized_data);
+>+
+>+	device = vfio_find_device(ser, match_device);
+>+	if (!device)
+>+		return -ENODEV;
+>+
+>+	/*
+>+	 * Simulate opening the character device using an anonymous inode. The
+>+	 * returned file has the same properties as a cdev file (e.g. operations
+>+	 * are blocked until BIND_IOMMUFD is called).
+>+	 */
+>+	file = anon_inode_getfile_fmode("[vfio-device-liveupdate]",
+>+					&vfio_device_fops, NULL,
+>+					O_RDWR, FMODE_PREAD | FMODE_PWRITE);
+>+	if (IS_ERR(file)) {
+>+		ret = PTR_ERR(file);
+>+		goto out;
+>+	}
+>+
+>+	ret = __vfio_device_fops_cdev_open(device, file);
+>+	if (ret) {
+>+		fput(file);
+>+		goto out;
+>+	}
+>+
+>+	args->file = file;
+>+
+>+out:
+>+	/* Drop the reference from vfio_find_device() */
+>+	put_device(&device->device);
+>+
+>+	return ret;
+>+}
+>+
+>+static bool vfio_pci_liveupdate_can_finish(struct liveupdate_file_op_args *args)
+>+{
+>+	return args->retrieved;
+> }
+>
+> static void vfio_pci_liveupdate_finish(struct liveupdate_file_op_args *args)
+> {
+>+	kho_restore_free(phys_to_virt(args->serialized_data));
+> }
+>
+> static const struct liveupdate_file_ops vfio_pci_liveupdate_file_ops = {
+>@@ -123,6 +180,7 @@ static const struct liveupdate_file_ops vfio_pci_liveupdate_file_ops = {
+> 	.unpreserve = vfio_pci_liveupdate_unpreserve,
+> 	.freeze = vfio_pci_liveupdate_freeze,
+> 	.retrieve = vfio_pci_liveupdate_retrieve,
+>+	.can_finish = vfio_pci_liveupdate_can_finish,
+> 	.finish = vfio_pci_liveupdate_finish,
+> 	.owner = THIS_MODULE,
+> };
+>diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+>index 276f615f0c28..89c5feef75d5 100644
+>--- a/drivers/vfio/vfio_main.c
+>+++ b/drivers/vfio/vfio_main.c
+>@@ -13,6 +13,7 @@
+> #include <linux/cdev.h>
+> #include <linux/compat.h>
+> #include <linux/device.h>
+>+#include <linux/device/class.h>
+> #include <linux/fs.h>
+> #include <linux/idr.h>
+> #include <linux/iommu.h>
+>@@ -1758,6 +1759,18 @@ int vfio_dma_rw(struct vfio_device *device, dma_addr_t iova, void *data,
+> }
+> EXPORT_SYMBOL(vfio_dma_rw);
+>
+>+struct vfio_device *vfio_find_device(const void *data, device_match_t match)
+>+{
+>+	struct device *device;
+>+
+>+	device = class_find_device(vfio.device_class, NULL, data, match);
+>+	if (!device)
+>+		return NULL;
+>+
+>+	return container_of(device, struct vfio_device, device);
+>+}
+>+EXPORT_SYMBOL_GPL(vfio_find_device);
+>+
+> /*
+>  * Module/class support
+>  */
+>diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+>index 9aa1587fea19..dc592dc00f89 100644
+>--- a/include/linux/vfio.h
+>+++ b/include/linux/vfio.h
+>@@ -419,4 +419,16 @@ int vfio_virqfd_enable(void *opaque, int (*handler)(void *, void *),
+> void vfio_virqfd_disable(struct virqfd **pvirqfd);
+> void vfio_virqfd_flush_thread(struct virqfd **pvirqfd);
+>
+>+#if IS_ENABLED(CONFIG_VFIO_DEVICE_CDEV)
+>+int __vfio_device_fops_cdev_open(struct vfio_device *device, struct file *filep);
+>+#else
+>+static inline int __vfio_device_fops_cdev_open(struct vfio_device *device,
+>+					       struct file *filep)
+>+{
+>+	return -EOPNOTSUPP;
+>+}
+>+#endif /* IS_ENABLED(CONFIG_VFIO_DEVICE_CDEV) */
+>+
+>+struct vfio_device *vfio_find_device(const void *data, device_match_t match);
+>+
+> #endif /* VFIO_H */
+>-- 
+>2.53.0.rc1.225.gd81095ad13-goog
+>
+
+Reviewed-by: Samiullah Khawaja <skhawaja@google.com>
 
