@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-71485-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71488-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8GhfAXR5nGlfIAQAu9opvQ
-	(envelope-from <kvm+bounces-71485-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 16:59:48 +0100
+	id iGiNNsd5nGlfIAQAu9opvQ
+	(envelope-from <kvm+bounces-71488-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 17:01:11 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9446B17939E
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 16:59:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4919E179415
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 17:01:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EB70B314B86E
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 15:56:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BEFEA31C0A26
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 15:56:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66413101C8;
-	Mon, 23 Feb 2026 15:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF28313558;
+	Mon, 23 Feb 2026 15:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cYBvgsSl"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="E9xsGQP0"
 X-Original-To: kvm@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012046.outbound.protection.outlook.com [40.107.209.46])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010024.outbound.protection.outlook.com [52.101.56.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185162BF00A;
-	Mon, 23 Feb 2026 15:55:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64AD430AAA9;
+	Mon, 23 Feb 2026 15:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.24
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771862149; cv=fail; b=a63K5mgUsNY7qUWul9Dd2jGzVZiPmIWUBqaMmK7LYLDYiiOhr8JMSY3Xh8m4wyWBl/H5NkuLmM9KcIi3QbtRlyOU7eZf/bzUColc1GBsjx1OwtchmTeXJG4C5tibeyYFAhafGa5jzES2SgQ4CLV0ebm0mQ4vN0YtFK3knCFngg4=
+	t=1771862150; cv=fail; b=VVH3/VxP+FwMzzYJs/6qjPFqR2qd+wUK0o+zFoppYQTr8ihtqeYVIyhSEzGmuPzbkX3EzxsnfDEBQ8RhCOFlxXKd45W4A5JHed5w5YMN08McRtyTo4A+GMF7CAJXXXzz5YyILY5xe0dI8D6R0KiBiW33Q5MLUe5cw6WAu6j2lB8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771862149; c=relaxed/simple;
-	bh=/48JkPGcwYBVGJOYTLgYwFZd9pzXcL3Lr8tqCuQndi8=;
+	s=arc-20240116; t=1771862150; c=relaxed/simple;
+	bh=g6r/8oIAVimzZBq29YK1UI/PGWw1WlW8HsNv6BBZb4U=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bnN3a8N8cNbHh5RG6miXrmT21MvSIP9qErnqP/VZK2bKUOHBoQwmqM10u3fqDM7Abdg8ZsthzljDK5dspsja6QHVHw1I/leVmV22oax4TrtC3VBreD/rPAtHKnDGAvc1+0NaWmqSFhYt9jD4D5TAYDC0jif/ad70hWbdgOgtqNA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cYBvgsSl; arc=fail smtp.client-ip=40.107.209.46
+	 MIME-Version:Content-Type; b=SyH3413Ze8YQ2yR2FNW6edpZ1BX4qqaG+VJNiwn/Fe+G1YrBTq/a1z5+JA4sFJTbrAyhhjNzc1oL09atectffCdSnenN62Y0bZsIHFp4UC8PEh69+/zPSLZv+ZQ1ZStQP1CQbvgcmi23xuBBjssMwtC+X2x9Kr5UqzrzdwBdh1g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=E9xsGQP0; arc=fail smtp.client-ip=52.101.56.24
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YLzSMnYXGggcINqI7+e/7u+1Eo407M7vZL6dZ6Mg2iiA5f1y/IlrLv1oKpM6UpFQDMrsLRBYWGpj2S0esJqfiKYDsqpXZE5Hascaqd1zOK/G35XppuVuTl1EHd7RyryhBEMjOddmXDD/hZ7GeLr6ycbkRnXeRsLrh5R3oOeB3/1Vk03iJFZxvc1JRmSZI6rln4Q4we0FrOS15meN+pc5Mmu1VTykJt5Y564O2jiH7QJuxNw9CV/FpY5JdNq7Kw76URy9Jr4P16MLoK2lgaPM+Zf1hKKcpi/m+4YDYBHT5NBr9fbl543+KHnLCLIoId/RpGNeYHOfN1SAISFsjMbF7g==
+ b=XSYbaZUlLwI2oslnf8E4WiiS9jdJ3GfMrozPM1Wx6lfnLqOK0S6jnksoBpFFX5FV+KGIQUqpE7h6qnW/+cmhJGYXhQCdAbdPF99ywHVciiJaqDwUAEUFvJr4ERXXoUJHWNQaNiJb1U8hhAD1jQ8cIM8RbIxUEnL5LneYLk4uk6doDFF92hOBHddLt0popWMiASFqjQ+gUuRg+wDTa3YAwP33mB+suDhEbr0/Sk0nG5lZryN1sHn7YkILCXUpnqIaw97pstmtWCaLY0ufqvFLxOx01tT4+dBQb9eYm6K0WSKb09s3TvWXceu7aLqVr5iPNR3KVIWCbOAWg83poLEv2A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jPvQL6+3OunCG9gwbeHmCGLE+4Uf9UnBCcYpn28wJ1o=;
- b=o7kPre/jHOWpV24HPnXixnmlwfYKzeMRGs4JjN70h9NguwXU+iePpwAKhEpkXFgzDnD+3BI3se7n3RDa9WAukbCcn56kiHad12UkyntP44TGVbPdPXCD6m1R2ZVhkeuydS2o83DXsuSnMqvlooiieQEK099euXAegWT3IGUIrrsZCQMnldWqKrInaHoCoZFrbRa1FLNWwPaEuHGDuBJaPsV1L4VUPOfKeuNeg9s6R7xSodf+8DxBcrN3hvMdWTMG//ztMFEufozmBdeXQ7RK3hMtk6RL76t2KiKsdv3qFGdo/ZajgSlQuWge9R8Looc9EKrjMHTpKiIUvGzneJ+wwQ==
+ bh=XG1Emf5niFZeaGGr1StNoL/JjI1MdxauRNQHOsbP7r0=;
+ b=NeBh8TdKF4+ByhQnkyIJXsQub3KIRH+ExfQneBtg642kbIXsSnfZAkLBTBlKPijEHwhK/DoYzXV4OST/vGhNTjL6S/tm2wVF2hHCCwLwy+okRHY0eGKNwHBJDBmByJQGtWAfOPqvJY4KdK/M54IF+qP0LP5natN9/CJWGlAlAmYZTGlsgAZJM3P9jxZbGLtCkSEXhYbHHLwdK623ZlKXqgX8ZuB8sxHH1tG6PCrgKIYd+iL2bdjD9tnfrUVkw3ibMaaxpXaBkurl7Z4y6S45KQx31g20+4kW1b1Sb3d3ZHpv/U4z2zqcmaDSfJkeYU092nWbDOQZ1j9b9rhixlOxWg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.118.232) smtp.rcpttodomain=ziepe.ca smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -48,16 +48,16 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jPvQL6+3OunCG9gwbeHmCGLE+4Uf9UnBCcYpn28wJ1o=;
- b=cYBvgsSl/CBD9Xamc3NPa2vCQcDiRV7cHEEC6lDbk30IbPkBzjfIEzQqb8clqNOzTZMGodzU5aEgkHUZLEfeg4mHt5wF9HlwQnprlcntU9X7KC/R71ePaxkLddwi7O3TSrZZVpkmzeSoM0jnAfDqOzbu0ldB52IPsSDMWXW/Y34OCJOSYCtSpB9rZV0b0BEGkmAkgzUGLOtRsP1gDT4Sjr4QdgwxISdzmCnZJ1EsBx/XUdDrVyxgj9qNUno8QYsigx5hCJ0pT+HJrWwXu1AS/HLfGr+SH2eDCp8FTcS4bIB6HH2P6DCJSkkM7aolZDY5FFmp1jK3O7j7y+U2uiv1vQ==
-Received: from DM6PR14CA0070.namprd14.prod.outlook.com (2603:10b6:5:18f::47)
- by DM4PR12MB6109.namprd12.prod.outlook.com (2603:10b6:8:ae::11) with
+ bh=XG1Emf5niFZeaGGr1StNoL/JjI1MdxauRNQHOsbP7r0=;
+ b=E9xsGQP0IFud0iTxiVJ1oh2LXSTiWdtb206Yt2L6RDp9eHTJgkUJ5jMIcotd67QJ5iAe7BEI8uNBJ8f8lPcZ9DiFRTpkbap5C4b3NsAkuXqVjrdGsgbT9j40L48UBBkeyTiIB2bBPljQu3xNKyh4HixEIGK8rYHORhShnm0HA9+pKj4bdEzCIx/7r3Sz0hCqjD3Azojq4LX3RMnAO7OcrgqVA1CwkPSTHzKMWh9niYkxl39LzOP3H2Y9HC+IFWT3gX4c8UErxFGTB7kQV5PPVPlPLJySnue+RvnoZJzWjx31fmGUdcSnovzCNR+WNPWOdMaEfzcZzaZL9R+3Jk62NQ==
+Received: from DM6PR14CA0069.namprd14.prod.outlook.com (2603:10b6:5:18f::46)
+ by DS7PR12MB6071.namprd12.prod.outlook.com (2603:10b6:8:9d::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.21; Mon, 23 Feb
- 2026 15:55:40 +0000
+ 2026 15:55:41 +0000
 Received: from DS3PEPF0000C37A.namprd04.prod.outlook.com
- (2603:10b6:5:18f:cafe::3b) by DM6PR14CA0070.outlook.office365.com
- (2603:10b6:5:18f::47) with Microsoft SMTP Server (version=TLS1_3,
+ (2603:10b6:5:18f:cafe::f) by DM6PR14CA0069.outlook.office365.com
+ (2603:10b6:5:18f::46) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.21 via Frontend Transport; Mon,
  23 Feb 2026 15:55:39 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
@@ -69,7 +69,7 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
 Received: from mail.nvidia.com (216.228.118.232) by
  DS3PEPF0000C37A.mail.protection.outlook.com (10.167.23.4) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Mon, 23 Feb 2026 15:55:40 +0000
+ 15.20.9632.12 via Frontend Transport; Mon, 23 Feb 2026 15:55:41 +0000
 Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
  (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 23 Feb
@@ -89,9 +89,9 @@ To: <ankita@nvidia.com>, <vsethi@nvidia.com>, <jgg@nvidia.com>,
 CC: <cjia@nvidia.com>, <zhiw@nvidia.com>, <kjaju@nvidia.com>,
 	<yishaih@nvidia.com>, <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH RFC v2 14/15] vfio/nvgrace-gpu: Add link from pci to EGM
-Date: Mon, 23 Feb 2026 15:55:13 +0000
-Message-ID: <20260223155514.152435-15-ankita@nvidia.com>
+Subject: [PATCH RFC v2 15/15] vfio/nvgrace-egm: register EGM PFNMAP range with memory_failure
+Date: Mon, 23 Feb 2026 15:55:14 +0000
+Message-ID: <20260223155514.152435-16-ankita@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260223155514.152435-1-ankita@nvidia.com>
 References: <20260223155514.152435-1-ankita@nvidia.com>
@@ -101,195 +101,259 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37A:EE_|DM4PR12MB6109:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6a424ccd-d7b0-4496-3380-08de72f3fe52
+X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37A:EE_|DS7PR12MB6071:EE_
+X-MS-Office365-Filtering-Correlation-Id: a118353b-f719-4c3c-e850-08de72f3fee5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|1800799024|376014|82310400026|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RStEaWREYktQcnZuelY2UjM4MzBvdUszTVNCb2RhUFU0VFhhYnI3T1I3N3NU?=
- =?utf-8?B?Z3lyWUlqK29oa0k1Nm1FZnlHSmQxVUgxNWxjN1Q1VENvL2VNRkgzWGNzWGtt?=
- =?utf-8?B?aUlSMWdyWHZzckVjNkRkOGZ2emdmL1pZVTFBTlo5UVB6RE0xQVBTNjUyUHNj?=
- =?utf-8?B?MW5RbExvRmw2OHRGZ3hEbXVWTzdHbVVGZkVUV0RDSDBmNmhZbDdPZXZCbGdR?=
- =?utf-8?B?UFY1M1Z6RlFvVlZPOThzNkNYcjlDcVhvbjVja1VoUjFPdm04R0lHcnNYQ3My?=
- =?utf-8?B?SXhGbVZMSEYwVWx3NTZFNzBYRnFEc1hJY0VYZnA3Z0JjbUZkQXlMbG53dVBR?=
- =?utf-8?B?QWlwNXF5czU1Ym1tUHRrOTVHdldvbFJIN0xnSVJFeUhDNzNOd2JTWlR1SzRz?=
- =?utf-8?B?L1k0dUJRR1hyd01RaFNOVDlwQnd0amVReENuK2ZvM3Jmd1daMFVuekVWdTBq?=
- =?utf-8?B?c0pqNk54QmJOSnpkS2IzR0hQeTYrNWUrcyt2cU5uQTMwZVFReWtuRUh3N29Z?=
- =?utf-8?B?REpaRkZxaXNIdWw1TmV3Q2VzWElRNVhrNHhtVnlxSUdEWnpxQjlkUXEwTm1D?=
- =?utf-8?B?enhxZmhhZFVXZnFsQ0IzSjhzWFRzUjhXYmVmd2Q1Q09uZ2FYaUJqa1orS05n?=
- =?utf-8?B?RnlId2lJYmo5REQrcTdLTHF2d2t4Y1FRaS9JeHc3SnZXYnB1U3p6VzFRSTYw?=
- =?utf-8?B?SHpGTG5aM1lRa0cyTTBCTkV0SmFBajNhSXB5LzIrUSt4OURXeURXVHFxMjZ2?=
- =?utf-8?B?NzdtYTIvRTRYZ3hIUTdYNExZU2RLRHBjNWVyYUxUa3JPTHducXNEUERyKytU?=
- =?utf-8?B?WDVyYVFqMVNQNEV4OTJKS25HTzBlTnpLVHVsYW1SVnlkUGc1TlRDcUdHc2tW?=
- =?utf-8?B?ZU50eERwcUZZQXhzZzJZYUpVR1M1YnZVZkFXTUpDcHZ6ZlRmU3AwaHJtZElL?=
- =?utf-8?B?MzU2R2tJVjhtUVUvYmEwclQyQ1N5bE1wYW1BZFZpSEdEOTlSYWJnSWJkYnZj?=
- =?utf-8?B?bExYVkhwRFFOZ3NtTWlpYkpHWXMvOXQ0Zi9oWHFYaStjWUZ1bDkvY0c2Rko4?=
- =?utf-8?B?YlR1WjlWQ0lFL015VkN5OW45ck45Q3U2UHpQOVNCd29meTlMM1I4ZVZUVXcx?=
- =?utf-8?B?eE5tdE5tSWdjWmlGU3NmWGtUR2JtRmJQbE1TQlZOTzV4L1NqV2s3dDFrQlAv?=
- =?utf-8?B?bnRpUXUvSFpnY3Q3M2w1Vy9XZ1VSbW1XbUF5TFNtNnVFVmJzZXBvS0E4RTJQ?=
- =?utf-8?B?aDN0aFBSTjVoM1VBSzRqalVqQ2svME96d1cxTWQxNFg2RTE2UWhiKzVybDJR?=
- =?utf-8?B?bkVEanRiSUR1YnNwTmxyTDFQNngrYWUwamo5OGFwN1QvaTlwL290V1BNdy9Z?=
- =?utf-8?B?THgvYWhXYmU4c2dYWDhZMUZKeFYvU2hLTisxNUFmdjZPRVArODM0Q1N1RGlK?=
- =?utf-8?B?a2lHOXpYQ25YS2NXazZ2a3g1TVdRclZSYWcvWHhQTzVBTUJYOG5VZWZPMndK?=
- =?utf-8?B?MkplendFWXZuSFRsaUhVdVc4dW80aVBJWHI4SXU3R3RZb000TmdaRjVoSEZM?=
- =?utf-8?B?aUxYU04xeUhhMnZiU3R5SHpnY3JwdDZyK2Jld0NCc29jQ2dTdk1QMUhtY2VM?=
- =?utf-8?B?YjVSVTFTY2Jjbkx3TXhBNkVtUXYyMEhNdWJtYXVua1BUOHRZR3BYZXo3d280?=
- =?utf-8?B?WjFyNDVIUDFkMENXY0tuUVlQV2xHZ3JaZTZrNG9vbmFzVmtzaDFhWXBPaTlr?=
- =?utf-8?B?NEtxWHFXSUJxVzF6UHF3LzdUaHNwbkFpOUY0Q0R3NSttcE56RGRRU3lBbmo1?=
- =?utf-8?B?b2ZYTGIwaDczaDNMdm0xU29IV0VTaHcwdmVOYUdlcGxRaEZzOWhTcFZzbDJp?=
- =?utf-8?B?dG1iMnJxRFVPZUhXZ3dFQWVLVzVVekpYZ3FjbVZlTXRtSXhza3NlRndDL3dW?=
- =?utf-8?B?U3RPOUZJMFgzeVBnR05lOTc1YVc5M2FFczNQRjl5VVhxdUFNQUFUYTYycHZY?=
- =?utf-8?B?a3ZOMy8rV1R0eCtFL3FpUVl6VGhQNXNoMXpXS0FuaDZFeFFSSEV6dmxVOTZz?=
- =?utf-8?B?VWdITEdmeHBGRzQ4RmZxeUFVWFFWOXdxOXQzUUR2bnBVc3ZVem1KOVhnWGJt?=
- =?utf-8?B?UFd0czVBc2RrdnRRYlFnM21lMnFUMGtXQXJoVENHaXBiTE5jYjBLOWh0aTlq?=
- =?utf-8?B?VWlUNm9SRmRwS29Rb21xM1pERzAzcEFtVEUyWW1wMFpydi9DUHd0VnZhZ2ti?=
- =?utf-8?B?TTZpdmF6K0hCdzYvUjZXQXpSN3dBPT0=?=
+	=?us-ascii?Q?ZzjfmrpmvA8tE6fO4+ucA2kYg56b7gACHHiesfEM5VTkpasOYUrnHixaQA6e?=
+ =?us-ascii?Q?Hp8NSijF8VZIW1WYuisojZVt1APj1/sZWOyjBjmn+Nx/lA1vavJPasSUxjCA?=
+ =?us-ascii?Q?7i9N3HHIkXFyFbTxfEFeD7VJrG4e6yLY7j3GBzuyjarypmK/6nim/B416tIK?=
+ =?us-ascii?Q?Vn64dU9fTEAgzH7WyqhNzfLLlCYxXMjiuE5i0NEBNOjW+YVLweXNVb1Ocjcg?=
+ =?us-ascii?Q?fFNy2jj3E7xmBqH7A7it1JE2pWkvpCbbFJ4Kve36rMVJisS+LA4wJh6NGSrn?=
+ =?us-ascii?Q?WXHJZ7cZi5YepU/y4pN2bkVNU94OzHHszsdFqzT32O/B1xjRfdGdHRGjZdXi?=
+ =?us-ascii?Q?xRXq6rcnsABwTjcn36zkhMBPALddhVtGEVuOJV8XYoqhC2HH6tzPa+CwBzas?=
+ =?us-ascii?Q?VTQeTyKAYS5VzxgthuoNzgAPLmJdYIq3LzkcCkgmJJcpeybhGauQZKdw85LB?=
+ =?us-ascii?Q?QPl9B/UwaEQU7w4oqqh9KK2lUDd4cvJvVxfov0bpMbTDOqbdpLf9/Fp2HIUW?=
+ =?us-ascii?Q?GxuJtzI1AH0dRTvd7nFBGTjJuvUrMpE3ahcxOm8WW8FrDiyM/KXHt2Dfuqvd?=
+ =?us-ascii?Q?DFvTpewgM9T0hUW3/2ipSEpw+JOqs7QZuwZoJpJdbWR0jm6+TxN+ZZjQD6Fb?=
+ =?us-ascii?Q?pRgLLGAVnQ4EiL8TQGXTBVLOAhDnuszkXBzuSYZEPSj0IBrFP50L7DJRjiHG?=
+ =?us-ascii?Q?fm9FYb4rvoE+ZZ5tUZSaYjFdyRFPegCVhk0mi7nvBfIy9duVU9dEkhFAqkvd?=
+ =?us-ascii?Q?x+meQaY4Xg5XrOBkHz3ww0wQd8tn/B2W1bxFLOSkwMQl57RjQL0YCosHon38?=
+ =?us-ascii?Q?X1xUEiCwvcfzwOx3p7YpJI5lnGAqtQRLfiLPLhR0PpGlH+cZKznmDkwNgwXV?=
+ =?us-ascii?Q?OgwqujrqjtkKVq7aXRErKO0b70bnqQ8PmMeWhtR/IMvU0ZfUntEwAeI0DZNL?=
+ =?us-ascii?Q?HIp6SeGDSR2XNJRKwSAwk2l1QpoJDvPLHZ5hGw4n4ogFniTcdftsVSG2RDGJ?=
+ =?us-ascii?Q?XpNye559om90NV47qRblnZz4P6Mpjc6XOGof0Irz37p4VEwhIZdIwufCQmXs?=
+ =?us-ascii?Q?0mgI7m3YD4MqZVDwV528gYr00qOvUwA/JsW5UIf79QufM9swuoBwG7gDS78a?=
+ =?us-ascii?Q?1eOjhjHbrqROKcMkrUjFrioTU31Yrmqm/OgP4/xGnHCq7cNv6SVQPNSOFQGJ?=
+ =?us-ascii?Q?N+zApQEbPBnK42CubRlamU4WV7OPWdjR2A9TmFIOmcUAHWZQGYNEWieQFvIR?=
+ =?us-ascii?Q?1o0jsN/WRvYcCbQMEyWyUnoIFsrAfXTESHj86ioL4ui30zXrBBIxySwIkhI7?=
+ =?us-ascii?Q?4z0kqph0ucoQE4R3TqfKVBJGJgrWorxFE/s9707/sBs7eajLTgMLRff/s4vg?=
+ =?us-ascii?Q?N2J5H6jJCRXpc96AI7BMUeBl/mENrhV1Vm2ALrO+1Juk5tLfFglJMLe8E+ri?=
+ =?us-ascii?Q?CD0VdcNwqCpfbJYB4Hp3iS65VPj5XAhF44U9u27L1taObQh6KL0UgSNVCQru?=
+ =?us-ascii?Q?ySJ5OfbAeuzp8eHrL3jZsM+YLugjnKLuPai/htv00nO7I4439pd/YZfGXsnO?=
+ =?us-ascii?Q?i7nFDEfr6qL6QVWNnzE2l6mcdS4/Hii6dBMxD1NLVyGJ9QYThzcylS65hoJk?=
+ =?us-ascii?Q?97CK9+CW+NTVqlfg9K05p3CGsPMSH980dc/utO4igzm/n5xoBb9c6e0Zw9dJ?=
+ =?us-ascii?Q?abCNjg=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	be/Yg1wsjyzR4JuddN/+CnbTDht/6taQ/OhWqpHTqQDAX0lU6RiS5ZnRTHO3Wd4qPzxiO+nyYJ4Kwec72urXI8VrK4FJtm6Whz3WPV2M+gXvls69D+mYyEdRTJNYbpwwyzqOUSCrtjDCd6GHBlQM9a6FBMyLbu5ITkSGyYgcrN8k0roxPwCJHoTSoLcSsWB+4CrEgq3UaWgGft+ZfnX5fO64qEXzcDCx/saHqkZoHSONASv9nAJTKekyCd0Da9+WqLCh40Nmf0A8tETeyb0XIWHLX1MuFI3k9X8wKcquLWR+tAIPeSKggo2KdHKRZxod0WA2YFNKky+rW7ZQ/BZ7iYyJwxH4lTtZpAD+ZWGMCDM/bIcvk6Kn9CR6ZKdNHEB14JzKlWLVA1v4ZpHqfUQm8DlvMuXBpNiFTFONE719aBUswW+7AyflGPDZvCR8AwjZ
+	g9r1rNs2LdmBcky2OiSDcVvL/ZnA/PbZ+AZ+bclIawuhH+vzBZiS4CtNlkBVvrmea/oELyBFC+aI9i/0tQjr7s0jbxv2kGwFrdkf0+H1zk8oVOuqRykR3hLFdG/ME8jNr75wzg7b9+pKbRW626YqX7Lcaylp04bIMwLE4RXOitqUZ8+mSibu6HQXThEvwiEv5Ba3IqekJYyYUeK9zVSKDNZfgjRzUZzq+6Kaoq08ZbmC1cIjWcfx6ljVqTvr67EEvOK0P+YEAva2LJ1pLPAPII1r3yfux4Ib7t/OnrHLGVdJn1NJqDhwvMwesn806QvY6HSY9D+RwbhtDnih/jdEuqr4dD0pFU3LWzaSgh/oaZT3g9lgqRXDyxuT1kQUN2fXd/D5qfKRygE74WZW6bnRztXR0B9BDPhXGpx8XIjWD/eiPdxDdVSn+AAgZctioVhK
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2026 15:55:40.1317
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2026 15:55:41.1001
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6a424ccd-d7b0-4496-3380-08de72f3fe52
+X-MS-Exchange-CrossTenant-Network-Message-Id: a118353b-f719-4c3c-e850-08de72f3fee5
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	DS3PEPF0000C37A.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6109
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6071
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [1.34 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71485-lists,kvm=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:mid,nvidia.com:email];
+	TAGGED_FROM(0.00)[bounces-71488-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[Nvidia.com:+];
 	FROM_NO_DN(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[14];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ankita@nvidia.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:mid,nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-0.999];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: 9446B17939E
+X-Rspamd-Queue-Id: 4919E179415
 X-Rspamd-Action: no action
 
 From: Ankit Agrawal <ankita@nvidia.com>
 
-To replicate the host EGM topology in the VM in terms of
-the GPU affinity, the userspace need to be aware of which
-GPUs belong to the same socket as the EGM region.
+EGM carveout memory is mapped directly into userspace (QEMU) and is not
+added to the kernel. It is not managed by the kernel page allocator and
+has no struct pages. The module can thus utilize the Linux memory manager's
+memory_failure mechanism for regions with no struct pages. The Linux MM
+code exposes register/unregister APIs allowing modules to register such
+memory regions for memory_failure handling.
 
-Expose the list of GPUs associated with an EGM region
-through sysfs. The list can be queried from the auxiliary
-device path.
+Register the EGM PFN range with the MM memory_failure infrastructure on
+open, and unregister it on the last close. Provide a PFN-to-VMA offset
+callback that validates the PFN is within the EGM region and the VMA,
+then converts it to a file offset and records the poisoned offset in the
+existing hashtable for reporting to userspace.
 
-On a 2-socket, 4 GPU Grace Blackwell setup, the GPUs shows
-up at /sys/class/egm/egmX.
-
-E.g. ls /sys/class/egm/egm4/
-0008:01:00.0  0009:01:00.0  dev  device  egm_size  power  subsystem  uevent
-
-Suggested-by: Matthew R. Ochs <mochs@nvidia.com>
 Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 ---
- drivers/vfio/pci/nvgrace-gpu/egm_dev.c | 47 +++++++++++++++++++++++++-
- 1 file changed, 46 insertions(+), 1 deletion(-)
+ drivers/vfio/pci/nvgrace-gpu/egm.c | 100 +++++++++++++++++++++++++++++
+ 1 file changed, 100 insertions(+)
 
-diff --git a/drivers/vfio/pci/nvgrace-gpu/egm_dev.c b/drivers/vfio/pci/nvgrace-gpu/egm_dev.c
-index 6d716c3a3257..3bdd5bb41e1b 100644
---- a/drivers/vfio/pci/nvgrace-gpu/egm_dev.c
-+++ b/drivers/vfio/pci/nvgrace-gpu/egm_dev.c
-@@ -56,6 +56,50 @@ int nvgrace_gpu_fetch_egm_property(struct pci_dev *pdev, u64 *pegmphys,
- 	return ret;
+diff --git a/drivers/vfio/pci/nvgrace-gpu/egm.c b/drivers/vfio/pci/nvgrace-gpu/egm.c
+index 2e4024c25e8a..5b60db6294a8 100644
+--- a/drivers/vfio/pci/nvgrace-gpu/egm.c
++++ b/drivers/vfio/pci/nvgrace-gpu/egm.c
+@@ -6,6 +6,7 @@
+ #include <linux/vfio_pci_core.h>
+ #include <linux/nvgrace-egm.h>
+ #include <linux/egm.h>
++#include <linux/memory-failure.h>
+ 
+ #define MAX_EGM_NODES 4
+ 
+@@ -23,6 +24,7 @@ struct chardev {
+ 	struct cdev cdev;
+ 	atomic_t open_count;
+ 	DECLARE_HASHTABLE(htbl, 0x10);
++	struct pfn_address_space pfn_address_space;
+ };
+ 
+ static struct nvgrace_egm_dev *
+@@ -34,6 +36,94 @@ egm_chardev_to_nvgrace_egm_dev(struct chardev *egm_chardev)
+ 	return container_of(aux_dev, struct nvgrace_egm_dev, aux_dev);
  }
  
-+static struct device *egm_find_chardev(struct nvgrace_egm_dev *egm_dev)
++static int pfn_memregion_offset(struct chardev *egm_chardev,
++				unsigned long pfn,
++				pgoff_t *pfn_offset_in_region)
 +{
-+	char name[32] = { 0 };
++	unsigned long start_pfn, num_pages;
++	struct nvgrace_egm_dev *egm_dev =
++		egm_chardev_to_nvgrace_egm_dev(egm_chardev);
 +
-+	scnprintf(name, sizeof(name), "egm%lld", egm_dev->egmpxm);
-+	return device_find_child_by_name(&egm_dev->aux_dev.dev, name);
-+}
++	start_pfn = PHYS_PFN(egm_dev->egmphys);
++	num_pages = egm_dev->egmlength >> PAGE_SHIFT;
 +
-+static int nvgrace_egm_create_gpu_links(struct nvgrace_egm_dev *egm_dev,
-+					struct pci_dev *pdev)
-+{
-+	struct device *chardev_dev = egm_find_chardev(egm_dev);
-+	int ret;
++	if (pfn < start_pfn || pfn >= start_pfn + num_pages)
++		return -EFAULT;
 +
-+	if (!chardev_dev)
-+		return 0;
-+
-+	ret = sysfs_create_link(&chardev_dev->kobj,
-+				&pdev->dev.kobj,
-+				dev_name(&pdev->dev));
-+
-+	put_device(chardev_dev);
-+
-+	if (ret && ret != -EEXIST)
-+		return ret;
++	*pfn_offset_in_region = pfn - start_pfn;
 +
 +	return 0;
 +}
 +
-+static void remove_egm_symlinks(struct nvgrace_egm_dev *egm_dev,
-+				struct pci_dev *pdev)
++static int track_ecc_offset(struct chardev *egm_chardev,
++			    unsigned long mem_offset)
 +{
-+	struct device *chardev_dev;
++	struct h_node *cur_page, *ecc_page;
 +
-+	chardev_dev = egm_find_chardev(egm_dev);
-+	if (!chardev_dev)
-+		return;
++	hash_for_each_possible(egm_chardev->htbl, cur_page, node, mem_offset) {
++		if (cur_page->mem_offset == mem_offset)
++			return 0;
++	}
 +
-+	sysfs_remove_link(&chardev_dev->kobj,
-+			  dev_name(&pdev->dev));
++	ecc_page = kzalloc(sizeof(*ecc_page), GFP_NOFS);
++	if (!ecc_page)
++		return -ENOMEM;
 +
-+	put_device(chardev_dev);
++	ecc_page->mem_offset = mem_offset;
++
++	hash_add(egm_chardev->htbl, &ecc_page->node, ecc_page->mem_offset);
++
++	return 0;
 +}
 +
- int add_gpu(struct nvgrace_egm_dev *egm_dev, struct pci_dev *pdev)
++static int nvgrace_egm_pfn_to_vma_pgoff(struct vm_area_struct *vma,
++					unsigned long pfn,
++					pgoff_t *pgoff)
++{
++	struct chardev *egm_chardev = vma->vm_file->private_data;
++	pgoff_t vma_offset_in_region = vma->vm_pgoff &
++		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
++	pgoff_t pfn_offset_in_region;
++	int ret;
++
++	ret = pfn_memregion_offset(egm_chardev, pfn, &pfn_offset_in_region);
++	if (ret)
++		return ret;
++
++	/* Ensure PFN is not before VMA's start within the region */
++	if (pfn_offset_in_region < vma_offset_in_region)
++		return -EFAULT;
++
++	/* Calculate offset from VMA start */
++	*pgoff = vma->vm_pgoff +
++		 (pfn_offset_in_region - vma_offset_in_region);
++
++	/* Track and save the poisoned offset */
++	return track_ecc_offset(egm_chardev, *pgoff << PAGE_SHIFT);
++}
++
++static int
++nvgrace_egm_vfio_pci_register_pfn_range(struct inode *inode,
++					struct chardev *egm_chardev)
++{
++	struct nvgrace_egm_dev *egm_dev =
++		egm_chardev_to_nvgrace_egm_dev(egm_chardev);
++	unsigned long pfn, nr_pages;
++	int ret;
++
++	pfn = PHYS_PFN(egm_dev->egmphys);
++	nr_pages = egm_dev->egmlength >> PAGE_SHIFT;
++
++	egm_chardev->pfn_address_space.node.start = pfn;
++	egm_chardev->pfn_address_space.node.last = pfn + nr_pages - 1;
++	egm_chardev->pfn_address_space.mapping = inode->i_mapping;
++	egm_chardev->pfn_address_space.pfn_to_vma_pgoff = nvgrace_egm_pfn_to_vma_pgoff;
++
++	ret = register_pfn_address_space(&egm_chardev->pfn_address_space);
++
++	return ret;
++}
++
+ static int nvgrace_egm_open(struct inode *inode, struct file *file)
  {
- 	struct gpu_node *node;
-@@ -68,7 +112,7 @@ int add_gpu(struct nvgrace_egm_dev *egm_dev, struct pci_dev *pdev)
+ 	struct chardev *egm_chardev =
+@@ -41,6 +131,7 @@ static int nvgrace_egm_open(struct inode *inode, struct file *file)
+ 	struct nvgrace_egm_dev *egm_dev =
+ 		egm_chardev_to_nvgrace_egm_dev(egm_chardev);
+ 	void *memaddr;
++	int ret;
  
- 	list_add_tail(&node->list, &egm_dev->gpus);
+ 	if (atomic_cmpxchg(&egm_chardev->open_count, 0, 1) != 0)
+ 		return -EBUSY;
+@@ -77,6 +168,13 @@ static int nvgrace_egm_open(struct inode *inode, struct file *file)
  
--	return 0;
-+	return nvgrace_egm_create_gpu_links(egm_dev, pdev);
+ 	file->private_data = egm_chardev;
+ 
++	ret = nvgrace_egm_vfio_pci_register_pfn_range(inode, egm_chardev);
++	if (ret && ret != -EOPNOTSUPP) {
++		file->private_data = NULL;
++		atomic_dec(&egm_chardev->open_count);
++		return ret;
++	}
++
+ 	return 0;
  }
  
- void remove_gpu(struct nvgrace_egm_dev *egm_dev, struct pci_dev *pdev)
-@@ -77,6 +121,7 @@ void remove_gpu(struct nvgrace_egm_dev *egm_dev, struct pci_dev *pdev)
+@@ -85,6 +183,8 @@ static int nvgrace_egm_release(struct inode *inode, struct file *file)
+ 	struct chardev *egm_chardev =
+ 		container_of(inode->i_cdev, struct chardev, cdev);
  
- 	list_for_each_entry_safe(node, tmp, &egm_dev->gpus, list) {
- 		if (node->pdev == pdev) {
-+			remove_egm_symlinks(egm_dev, pdev);
- 			list_del(&node->list);
- 			kfree(node);
- 		}
++	unregister_pfn_address_space(&egm_chardev->pfn_address_space);
++
+ 	file->private_data = NULL;
+ 
+ 	atomic_dec(&egm_chardev->open_count);
 -- 
 2.34.1
 
