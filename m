@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-71453-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71454-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0MzgLDL8m2kC+wMAu9opvQ
-	(envelope-from <kvm+bounces-71453-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 08:05:22 +0100
+	id mHHILT38m2kC+wMAu9opvQ
+	(envelope-from <kvm+bounces-71454-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 08:05:33 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B51717280A
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 08:05:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 969EA172829
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 08:05:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1051D3016B93
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 07:05:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A963F3020A45
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 07:05:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD4FE24C076;
-	Mon, 23 Feb 2026 07:05:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426BA34AB1E;
+	Mon, 23 Feb 2026 07:05:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d3osSZSX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B6J0k94Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E6634CFCC
-	for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 07:04:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2446734D4EC
+	for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 07:04:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771830299; cv=none; b=CD/5NE3gmoIOtrIUjY9HfeaPpHA87LENUrwtaEt315un3SMZJ8Ho5wHXuke9MxL3/3mhoDYsQ1HjLNyzQmclCb6AiL4Fl0uNC+KVJT9jfkTAEQnI63UPVogG4DtnkdIW9uP+FBKSXelNdhEqFao8/I64drpp4YmMK8dvPy6T6EE=
+	t=1771830302; cv=none; b=HJXfNVdFqsgL5yNH7yriJrSZFf0iQzGj/kGZGV+3p+U6NIfMUE10WVrdjxqBhHErYJmnAnxzkpc8pZ3biOAiV2pC1SB01dWLzI92nyaTdTvajb7DdAoBVFEVUL0dyYBwtn1YdJJi4L6B9WkXkzL0zVa1sF12TrHDl/kTyUx9kTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771830299; c=relaxed/simple;
-	bh=jE9SWcy5OcAaB03+1AxluJ85cRuAv6Q4+ACJtj/hcCM=;
+	s=arc-20240116; t=1771830302; c=relaxed/simple;
+	bh=d3UwQnzpg88aX6gn7ACJy409YivRzc8RbQqNjcTrFfw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bbXT1cwLVWUnGjXltErpZEAYXhKVFgNZ723rhuAAFsZQWCjIw4px2IIc0ZKDkJXg30gHkBEuWKpoM/ESFsod3RIgNocw1K5HHS6mA/hJfUI//Q0BH28dSYFu/K/+UVNu1VECI1ZnJvCL6UJXgnaekvVNO2CUJP7qcq8aZi0KjK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d3osSZSX; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=HrqZVRpZ+P1pL3HYWzQquczwxBqUxw76jKQ8j+VKjNaQz+AH46b3CyBHfO1oV42zOonKKualLs1Z/PjgNbm4iW77KpTmPKHKGOiI8XsMjPKMuWuKLPGm7CvbRpcpX+1nAZcDOr6B74FPoWhd5+SPnpIc/mSG7miuYIGrXmXBdo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B6J0k94Y; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-824a3ebfdfeso1654510b3a.3
-        for <kvm@vger.kernel.org>; Sun, 22 Feb 2026 23:04:58 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2aad6045810so41922455ad.3
+        for <kvm@vger.kernel.org>; Sun, 22 Feb 2026 23:04:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771830298; x=1772435098; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771830299; x=1772435099; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tZVo84a8gYXfxb6fQudIUthBz+u2OhxnqcpBYF66SVE=;
-        b=d3osSZSXLUzwXIA1idTDrF+7M6NOyz6EO9RGsDR1p1iDWHQ23giSAoW5Aq9FrWYY+F
-         f8fU7E5k3+zaTuOzRtSZiqiAGiLudiOHhAKWTf4tEyxbc2EXpK2J7iY3XSpvJSSxEU5H
-         2RHt0a0zcwu+TbxmE9ownCbigw1TKukbKwpuosidUt5chrMcnEI8KsYLcXAnHOZwA6UV
-         ogaZTYkIFHMGSgVJcLUZx8kTVFphXVy08ezXR+/I5k7O8W57+13InZqcZZ+tzxGgTgtT
-         aC22sclknyrG+jd/U9P7l0TqGNN2N9H/5/4fHSSV8XMLLreyxxlnAYoCTtgg5qAm2NKV
-         DDXw==
+        bh=W8EPkBYTIogg/WcIy2FNnZriREPEXUqsGjhG96y07ko=;
+        b=B6J0k94YQxKXI/ATg+nnFkMegMK0+AC3JXFPYcwdbPpJQI6PB8F1FKAxK5PeGupwMD
+         dQJiUUDatgLKphe4YPs2kJyg4BVq8njg69WHA9tn1ejUCn40awFihwD4+fcLibNP/Uj6
+         tb9oa8JlrGzeqcUhc/n+1Q3oxnmEdSCiQvj+lYLuqUem6hLo0pechZbbnDqqhMnh/QBZ
+         ivocdVkfelgivR5MVabH5RikvqZO4Zlsw38O4Bv6QXxI7oLDATsARVJEK+lA1eIME57O
+         /OiaeQf5FaexRoN2Dx+l9fekkDYwz7TjsM7SK0rThrs8nviZtP4Vliz75osEJNYEittI
+         l9LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771830298; x=1772435098;
+        d=1e100.net; s=20230601; t=1771830299; x=1772435099;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tZVo84a8gYXfxb6fQudIUthBz+u2OhxnqcpBYF66SVE=;
-        b=gUesl8m6R/JMBt3TNVz9oEyLEcGQX2wO6uOrL2w1b3uxK3S3U3mMDgPkvnv4/pPwOL
-         NSBSbjEAMSSAEDiMP5sY2oX8Zgd4NJruOs0d4nk7z0hGLADQjNeKTd73xAWMbJCjMUw0
-         BXUtxu7BORkL+0+us+qgQQO70t51gbY3aEJLgy9COb+a+X+9mCb8PzgB/MVGNP2Iw9GM
-         +O1vGOMp55gsJ1SrLmypxyn9BfQ/5vT7T2IGsoaXTIc8xZI1ZR9/uK1ftDf9PdQSO0Cj
-         MgSgvHbaQrjiMMRyFykn/42xNup+1sv7LrWvCKaaYHdoEWqHyM6Mx7Tb06/a5A9Fht/n
-         XfGg==
-X-Forwarded-Encrypted: i=1; AJvYcCVecc5N3lovth8wR53P2la/zxxQABuDZq/lCTP3rkGNlkVnTIC3ogfowuegzkTxSyl12Gk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2cUlTZiXURBsz6NHMkwwZ2yvRJ8Bs+0UBohvFHx+AaCzMQiD8
-	qxGRWdoWOB39O3tknwxwLExMJsXzfU/NsVGV8ixL1fYcweeWycVtXryFsLRqTA+kOo+0TmClvy8
-	U1HUKh/aIMiyySFYgDiglMEkdLA==
-X-Received: from pfbdf2.prod.google.com ([2002:a05:6a00:4702:b0:824:b56e:1181])
+        bh=W8EPkBYTIogg/WcIy2FNnZriREPEXUqsGjhG96y07ko=;
+        b=j0lXPfsjSVyZkiF0/olsRxtsLX79UnM1Y9ieil4mTGPyOWgfYndcLnWWTdvCTSXDT9
+         jA6MbYEV4ITx60G9w79K0LTEvSMA/kYoUTZY0jmzHT8SGh3SfRFktidFtnY+suwqy9ZA
+         nB9XzJSRCqtYmkIeVNpHLf+K9QGxcCfWkygy1sjbwgnspubdIDz60nx2KJZm+Vy1yL50
+         3bukcrWVNPLT4hyxO/Q4qIR34aj0zba5muQqcYZaSA8f7Yi3VKcCrYuGfBPbi62wfl1n
+         o4LQSWocA+8AWBC48Ck7DVKXIRegzcN7zCOLUnRuMKx0VTbwMHFqdZUOqhK3XxYWhuac
+         RcMw==
+X-Forwarded-Encrypted: i=1; AJvYcCX1LetlLf9MQd15Uh6T1s8hZb0ZnryGVp2HCI91PoC6K+Sucw8zNdiMyVig7yiXsxQvJf0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzvflx3m/ZgzykjeERrOYDr5hdosyA8TseLCHLDSzNQZydiz5Ly
+	hHBki+2rzKTCioXDweazuLSSGJR7bcqS/nZP6SQzQYTHzZpNPLOMai4L1fxY2XxXfKMoPMkAbZ9
+	meiTo7fzzHqbQKu1rXUzPydWVFA==
+X-Received: from pjbx30.prod.google.com ([2002:a17:90a:38a1:b0:356:3562:569c])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:4ac1:b0:823:ad3:4ff4 with SMTP id d2e1a72fcca58-826daa0521bmr4935965b3a.37.1771830297745;
- Sun, 22 Feb 2026 23:04:57 -0800 (PST)
-Date: Mon, 23 Feb 2026 07:04:38 +0000
+ 2002:a17:903:248:b0:2a0:a33f:3049 with SMTP id d9443c01a7336-2ad743fe006mr64180505ad.4.1771830299282;
+ Sun, 22 Feb 2026 23:04:59 -0800 (PST)
+Date: Mon, 23 Feb 2026 07:04:39 +0000
 In-Reply-To: <cover.1771826352.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <cover.1771826352.git.ackerleytng@google.com>
 X-Mailer: git-send-email 2.53.0.345.g96ddfc5eaa-goog
-Message-ID: <45a3e4c00f4494c5f91aa1ccd9c400525a55ed45.1771826352.git.ackerleytng@google.com>
-Subject: [RFC PATCH v1 05/10] mm: Export unmap_mapping_folio() for KVM
+Message-ID: <e08ed6869b9f555169476d220d7e8112e7163cee.1771826352.git.ackerleytng@google.com>
+Subject: [RFC PATCH v1 06/10] mm: filemap: Export filemap_remove_folio()
 From: Ackerley Tng <ackerleytng@google.com>
 To: linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
 	linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org, 
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-71453-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71454-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -118,88 +118,43 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_TWELVE(0.00)[30];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5B51717280A
+X-Rspamd-Queue-Id: 969EA172829
 X-Rspamd-Action: no action
 
-guest_memfd needs a way to unmap a folio from all userspace processes. This
-is required as part of a folio's truncation process. The function
-unmap_mapping_folio() provides exactly this functionality.
+Export filemap_remove_folio() for use by KVM.
 
-Move its declaration from the internal mm/internal.h to the public
-include/linux/mm.h and export the symbol.
+KVM requires this function to remove folios from guest_memfd's filemap.
 
-unmap_mapping_folio() will be used by guest_memfd in a later patch to
-implement a custom truncation function.
-
-No functional change intended.
+guest_memfd used to rely on higher-level, exported truncation functions. To
+track memory that is actually allocated (i.e. i_blocks, st_blocks),
+guest_memfd will need a custom truncation function to do accounting cleanup
+and will be using filemap_remove_folio() for truncation.
 
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 ---
- include/linux/mm.h | 2 ++
- mm/internal.h      | 2 --
- mm/memory.c        | 2 ++
- 3 files changed, 4 insertions(+), 2 deletions(-)
+ mm/filemap.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 7f04f1eaab15a..97fa861364590 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -2690,6 +2690,7 @@ extern vm_fault_t handle_mm_fault(struct vm_area_struct *vma,
- extern int fixup_user_fault(struct mm_struct *mm,
- 			    unsigned long address, unsigned int fault_flags,
- 			    bool *unlocked);
-+void unmap_mapping_folio(struct folio *folio);
- void unmap_mapping_pages(struct address_space *mapping,
- 		pgoff_t start, pgoff_t nr, bool even_cows);
- void unmap_mapping_range(struct address_space *mapping,
-@@ -2710,6 +2711,7 @@ static inline int fixup_user_fault(struct mm_struct *mm, unsigned long address,
- 	BUG();
- 	return -EFAULT;
- }
-+static inline void unmap_mapping_folio(struct folio *folio) { }
- static inline void unmap_mapping_pages(struct address_space *mapping,
- 		pgoff_t start, pgoff_t nr, bool even_cows) { }
- static inline void unmap_mapping_range(struct address_space *mapping,
-diff --git a/mm/internal.h b/mm/internal.h
-index f35dbcf99a86b..98351be76238b 100644
---- a/mm/internal.h
-+++ b/mm/internal.h
-@@ -953,7 +953,6 @@ static inline bool free_area_empty(struct free_area *area, int migratetype)
- struct anon_vma *folio_anon_vma(const struct folio *folio);
- 
- #ifdef CONFIG_MMU
--void unmap_mapping_folio(struct folio *folio);
- extern long populate_vma_page_range(struct vm_area_struct *vma,
- 		unsigned long start, unsigned long end, int *locked);
- extern long faultin_page_range(struct mm_struct *mm, unsigned long start,
-@@ -1131,7 +1130,6 @@ static inline struct file *maybe_unlock_mmap_for_io(struct vm_fault *vmf,
- 	return fpin;
- }
- #else /* !CONFIG_MMU */
--static inline void unmap_mapping_folio(struct folio *folio) { }
- static inline void mlock_new_folio(struct folio *folio) { }
- static inline bool need_mlock_drain(int cpu) { return false; }
- static inline void mlock_drain_local(void) { }
-diff --git a/mm/memory.c b/mm/memory.c
-index da360a6eb8a48..983bb25517cb7 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -78,6 +78,7 @@
- #include <linux/sched/sysctl.h>
+diff --git a/mm/filemap.c b/mm/filemap.c
+index ebd75684cb0a7..379d62239fc5f 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -49,6 +49,7 @@
+ #include <linux/sched/mm.h>
+ #include <linux/sysctl.h>
  #include <linux/pgalloc.h>
- #include <linux/uaccess.h>
 +#include <linux/kvm_types.h>
  
- #include <trace/events/kmem.h>
+ #include <asm/tlbflush.h>
+ #include "internal.h"
+@@ -262,6 +263,7 @@ void filemap_remove_folio(struct folio *folio)
  
-@@ -4244,6 +4245,7 @@ void unmap_mapping_folio(struct folio *folio)
- 					 last_index, &details);
- 	i_mmap_unlock_read(mapping);
+ 	filemap_free_folio(mapping, folio);
  }
-+EXPORT_SYMBOL_FOR_KVM(unmap_mapping_folio);
++EXPORT_SYMBOL_FOR_KVM(filemap_remove_folio);
  
- /**
-  * unmap_mapping_pages() - Unmap pages from processes.
+ /*
+  * page_cache_delete_batch - delete several folios from page cache
 -- 
 2.53.0.345.g96ddfc5eaa-goog
 
