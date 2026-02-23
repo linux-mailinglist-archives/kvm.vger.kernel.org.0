@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-71454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71455-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mHHILT38m2kC+wMAu9opvQ
-	(envelope-from <kvm+bounces-71454-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 08:05:33 +0100
+	id mAsiDUH8m2kC+wMAu9opvQ
+	(envelope-from <kvm+bounces-71455-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 08:05:37 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 969EA172829
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 08:05:33 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D44B1172837
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 08:05:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A963F3020A45
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 07:05:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0CEAD30185F2
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 07:05:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426BA34AB1E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF2734DB7E;
 	Mon, 23 Feb 2026 07:05:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B6J0k94Y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OdYFkPBf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2446734D4EC
-	for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 07:04:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0EC34D91E
+	for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 07:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771830302; cv=none; b=HJXfNVdFqsgL5yNH7yriJrSZFf0iQzGj/kGZGV+3p+U6NIfMUE10WVrdjxqBhHErYJmnAnxzkpc8pZ3biOAiV2pC1SB01dWLzI92nyaTdTvajb7DdAoBVFEVUL0dyYBwtn1YdJJi4L6B9WkXkzL0zVa1sF12TrHDl/kTyUx9kTc=
+	t=1771830302; cv=none; b=kv9GFH7+wicOwMAT63nJPsd/z5B3cIIG4x8DuH1NDcpR19wXqRWQoH5oyNTN9Eld/n2m+MbZHDPKS5eEJNhtClW1roIPlj2Ilg+ahVjUgpod9xUsAaWV/RcWqe6Gg31XqkDmefB4Bh8zRQSoSNrtuG4dzYi2OToOGGuK1NOgB5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1771830302; c=relaxed/simple;
-	bh=d3UwQnzpg88aX6gn7ACJy409YivRzc8RbQqNjcTrFfw=;
+	bh=4AzPo53RW7z1u/HbYb3WJwZj9BjSBVUkolJYB1GMnjw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HrqZVRpZ+P1pL3HYWzQquczwxBqUxw76jKQ8j+VKjNaQz+AH46b3CyBHfO1oV42zOonKKualLs1Z/PjgNbm4iW77KpTmPKHKGOiI8XsMjPKMuWuKLPGm7CvbRpcpX+1nAZcDOr6B74FPoWhd5+SPnpIc/mSG7miuYIGrXmXBdo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B6J0k94Y; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=hZLhQYf0t02DA34+/TIE5V2yZueECmSzmXu1xV5brHp9zimu0vluLdMyn/y18kB8ycKFbZgn9SQ6cxgkeJvg5ROI4nFCN1PAdWLA46LrwFsOS6dpxwIut4uAkaIOcApW8C/h1og5zyps2rHzOQSyAMXaBEiKAaz1eEaHj9JUkpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OdYFkPBf; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2aad6045810so41922455ad.3
-        for <kvm@vger.kernel.org>; Sun, 22 Feb 2026 23:04:59 -0800 (PST)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-824b5cae336so1667170b3a.3
+        for <kvm@vger.kernel.org>; Sun, 22 Feb 2026 23:05:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771830299; x=1772435099; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771830301; x=1772435101; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W8EPkBYTIogg/WcIy2FNnZriREPEXUqsGjhG96y07ko=;
-        b=B6J0k94YQxKXI/ATg+nnFkMegMK0+AC3JXFPYcwdbPpJQI6PB8F1FKAxK5PeGupwMD
-         dQJiUUDatgLKphe4YPs2kJyg4BVq8njg69WHA9tn1ejUCn40awFihwD4+fcLibNP/Uj6
-         tb9oa8JlrGzeqcUhc/n+1Q3oxnmEdSCiQvj+lYLuqUem6hLo0pechZbbnDqqhMnh/QBZ
-         ivocdVkfelgivR5MVabH5RikvqZO4Zlsw38O4Bv6QXxI7oLDATsARVJEK+lA1eIME57O
-         /OiaeQf5FaexRoN2Dx+l9fekkDYwz7TjsM7SK0rThrs8nviZtP4Vliz75osEJNYEittI
-         l9LQ==
+        bh=LofWqILwJgF/mJhvsOWfJxePDPZCogY694ZgccXLsPg=;
+        b=OdYFkPBfQH4Od8qHGMA/2NYywEzCZPCaiMbzPeT2P1O4bPQO6lgX37BBuYJgY+uVdl
+         uZFSi6I89L0ezxGImCQizgqr/u/jSdeaNky8s1uFmNRwaEEkk6Ghfex10g+KS5SigmMu
+         VF/w1xhRRhxa5hEf6Zf7vhTkJa/1xMNFy7II99r8u99fnZXh0nwgHbwz5b3Bc4DOqfwP
+         4EIPp+IFB3T8ePLrruXguj1Z0+zMU7iUrie/K2wI5LllZLxzrx5AwuZnQxb6BxTKTBMZ
+         BCe+uXR5qX25sl0+edj5NbA6pgXnSA4hjDlcA1hvzp/pUkbAEC+tTmY4gyoswRqnUETK
+         Nehw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771830299; x=1772435099;
+        d=1e100.net; s=20230601; t=1771830301; x=1772435101;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W8EPkBYTIogg/WcIy2FNnZriREPEXUqsGjhG96y07ko=;
-        b=j0lXPfsjSVyZkiF0/olsRxtsLX79UnM1Y9ieil4mTGPyOWgfYndcLnWWTdvCTSXDT9
-         jA6MbYEV4ITx60G9w79K0LTEvSMA/kYoUTZY0jmzHT8SGh3SfRFktidFtnY+suwqy9ZA
-         nB9XzJSRCqtYmkIeVNpHLf+K9QGxcCfWkygy1sjbwgnspubdIDz60nx2KJZm+Vy1yL50
-         3bukcrWVNPLT4hyxO/Q4qIR34aj0zba5muQqcYZaSA8f7Yi3VKcCrYuGfBPbi62wfl1n
-         o4LQSWocA+8AWBC48Ck7DVKXIRegzcN7zCOLUnRuMKx0VTbwMHFqdZUOqhK3XxYWhuac
-         RcMw==
-X-Forwarded-Encrypted: i=1; AJvYcCX1LetlLf9MQd15Uh6T1s8hZb0ZnryGVp2HCI91PoC6K+Sucw8zNdiMyVig7yiXsxQvJf0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzvflx3m/ZgzykjeERrOYDr5hdosyA8TseLCHLDSzNQZydiz5Ly
-	hHBki+2rzKTCioXDweazuLSSGJR7bcqS/nZP6SQzQYTHzZpNPLOMai4L1fxY2XxXfKMoPMkAbZ9
-	meiTo7fzzHqbQKu1rXUzPydWVFA==
-X-Received: from pjbx30.prod.google.com ([2002:a17:90a:38a1:b0:356:3562:569c])
+        bh=LofWqILwJgF/mJhvsOWfJxePDPZCogY694ZgccXLsPg=;
+        b=e/WrCOUAUxBcoNr2XJXRREuX4HZGa2D77ZVkNXW9KaJK78+DmLccJG6RDgKGGGukls
+         CTM/Mumw1hDwh+tUE9pDj9/glmCuyryf9aQYFtgFwcZ23ss05LlWOB5CcgM4OojKnF3D
+         Sjgb6m1mVBNnXrHUGYSGDxhD5Nk9YoC5a+J4UJsCnOBJEoorPueYi8IqcROQQR984Lzs
+         rd3UJVkqTnSSLoXd4kI41yzN6NBLx0mo0J1Vih+KrcnRcq6wFQhwcAGql7H9dQFaXobh
+         dJtqu8zHcs/qD71U8uel1QQYzE3xCSEuHH4wAVkh4easamz0v6HUvaO3IsIEG+5bEszZ
+         rVzw==
+X-Forwarded-Encrypted: i=1; AJvYcCXRzv/W5Bym9nmTLiSqdA5BSd/U8bgqrPaoCcjDu45hZMPDwWwuc/1et9CygilnFHrW15s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXOwvR1UabgCgpITPJl7r9WqrvIAPh10c2UHn7TI/w8kw7TPf5
+	OBp7R4zGu1A2dSnIbmiH3Gb1p4fey+VaeD+vw1Qws8E7U7StZNjTzoyvdiXcCXINbtgzTv+CPDO
+	G6UPdLCsKZpeS4wCt1NsHHakH+Q==
+X-Received: from pfwz14.prod.google.com ([2002:a05:6a00:1d8e:b0:7cf:2dad:ff87])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:248:b0:2a0:a33f:3049 with SMTP id d9443c01a7336-2ad743fe006mr64180505ad.4.1771830299282;
- Sun, 22 Feb 2026 23:04:59 -0800 (PST)
-Date: Mon, 23 Feb 2026 07:04:39 +0000
+ 2002:a05:6a00:438e:b0:823:3056:78c6 with SMTP id d2e1a72fcca58-826da9f10bfmr6260281b3a.41.1771830300774;
+ Sun, 22 Feb 2026 23:05:00 -0800 (PST)
+Date: Mon, 23 Feb 2026 07:04:40 +0000
 In-Reply-To: <cover.1771826352.git.ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <cover.1771826352.git.ackerleytng@google.com>
 X-Mailer: git-send-email 2.53.0.345.g96ddfc5eaa-goog
-Message-ID: <e08ed6869b9f555169476d220d7e8112e7163cee.1771826352.git.ackerleytng@google.com>
-Subject: [RFC PATCH v1 06/10] mm: filemap: Export filemap_remove_folio()
+Message-ID: <976ac2117ed9be6339e898cd80daed8f32b5044e.1771826352.git.ackerleytng@google.com>
+Subject: [RFC PATCH v1 07/10] KVM: guest_memfd: Implement custom truncation function
 From: Ackerley Tng <ackerleytng@google.com>
 To: linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
 	linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org, 
@@ -97,18 +97,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-71454-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71455-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
@@ -118,43 +118,94 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_TWELVE(0.00)[30];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 969EA172829
+X-Rspamd-Queue-Id: D44B1172837
 X-Rspamd-Action: no action
 
-Export filemap_remove_folio() for use by KVM.
+Implement custom truncation function for guest_memfd, and replace calls to
+truncate_inode_pages_range() with calls to this custom truncation function.
 
-KVM requires this function to remove folios from guest_memfd's filemap.
+The custom truncation function removes a lot of the generality supported by
+truncate_inode_pages_range() not required by guest_memfd, such as
 
-guest_memfd used to rely on higher-level, exported truncation functions. To
-track memory that is actually allocated (i.e. i_blocks, st_blocks),
-guest_memfd will need a custom truncation function to do accounting cleanup
-and will be using filemap_remove_folio() for truncation.
++ sub-PAGE_SIZE truncations
++ Support for writeback
+
+In a later patch, guest_memfd use this custom truncation function to handle
+updating of i_blocks and i_bytes in the inode during truncation.
 
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 ---
- mm/filemap.c | 2 ++
- 1 file changed, 2 insertions(+)
+ virt/kvm/guest_memfd.c | 43 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 41 insertions(+), 2 deletions(-)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index ebd75684cb0a7..379d62239fc5f 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -49,6 +49,7 @@
- #include <linux/sched/mm.h>
- #include <linux/sysctl.h>
- #include <linux/pgalloc.h>
-+#include <linux/kvm_types.h>
- 
- #include <asm/tlbflush.h>
- #include "internal.h"
-@@ -262,6 +263,7 @@ void filemap_remove_folio(struct folio *folio)
- 
- 	filemap_free_folio(mapping, folio);
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index 57dec458bfa77..e6c66ab7062b3 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -247,6 +247,45 @@ static void kvm_gmem_invalidate_end(struct inode *inode, pgoff_t start,
+ 		__kvm_gmem_invalidate_end(f, start, end);
  }
-+EXPORT_SYMBOL_FOR_KVM(filemap_remove_folio);
  
- /*
-  * page_cache_delete_batch - delete several folios from page cache
++static void kvm_gmem_truncate_folio(struct folio *folio)
++{
++	folio_lock(folio);
++
++	if (folio_mapped(folio))
++		unmap_mapping_folio(folio);
++
++	/*
++	 * guest_memfd doesn't need writeback, skip anything to do with
++	 * writeback and just clear the dirty flag.
++	 */
++	folio_clear_dirty(folio);
++	filemap_remove_folio(folio);
++
++	folio_unlock(folio);
++}
++
++static void kvm_gmem_truncate_range(struct inode *inode, pgoff_t start,
++				    size_t nr_pages)
++
++{
++	struct folio_batch fbatch;
++	pgoff_t next;
++	pgoff_t last;
++	int i;
++
++	last = start + nr_pages - 1;
++
++	folio_batch_init(&fbatch);
++	next = start;
++	while (filemap_get_folios(inode->i_mapping, &next, last, &fbatch)) {
++		for (i = 0; i < folio_batch_count(&fbatch); ++i)
++			kvm_gmem_truncate_folio(fbatch.folios[i]);
++
++		folio_batch_release(&fbatch);
++		cond_resched();
++	}
++}
++
+ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
+ {
+ 	pgoff_t start = offset >> PAGE_SHIFT;
+@@ -260,7 +299,7 @@ static long kvm_gmem_punch_hole(struct inode *inode, loff_t offset, loff_t len)
+ 
+ 	kvm_gmem_invalidate_begin(inode, start, end);
+ 
+-	truncate_inode_pages_range(inode->i_mapping, offset, offset + len - 1);
++	kvm_gmem_truncate_range(inode, offset, len >> PAGE_SHIFT);
+ 
+ 	kvm_gmem_invalidate_end(inode, start, end);
+ 
+@@ -984,7 +1023,7 @@ static void kvm_gmem_evict_inode(struct inode *inode)
+ 
+ 	truncate_inode_pages_final_prepare(mapping);
+ 
+-	truncate_inode_pages_range(mapping, 0, inode->i_size);
++	kvm_gmem_truncate_range(inode, 0, inode->i_size >> PAGE_SHIFT);
+ 
+ 	clear_inode(inode);
+ }
 -- 
 2.53.0.345.g96ddfc5eaa-goog
 
