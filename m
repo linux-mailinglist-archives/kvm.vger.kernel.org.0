@@ -1,145 +1,210 @@
-Return-Path: <kvm+bounces-71527-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71532-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kKSrAfbFnGnJKAQAu9opvQ
-	(envelope-from <kvm+bounces-71527-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 22:26:14 +0100
+	id 2An5MzzMnGlHKQQAu9opvQ
+	(envelope-from <kvm+bounces-71532-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 22:53:00 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E9E117D914
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 22:26:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A1D117DCB9
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 22:53:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 16DE7308385F
-	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 21:25:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A8D68308CC46
+	for <lists+kvm@lfdr.de>; Mon, 23 Feb 2026 21:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA1C6378D7E;
-	Mon, 23 Feb 2026 21:25:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91CF37A496;
+	Mon, 23 Feb 2026 21:51:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R9lrV1Kp"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="gm79Vk5c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0871B378839
-	for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 21:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 035243793DC;
+	Mon, 23 Feb 2026 21:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771881956; cv=none; b=Cwt8a427W3EgsZAnsuv184Cnhd1ZUf9dUT4+cbGO0VYp5yvQJkLFUMLBRZ9/8AC6/kg2Wfrwl+V3Ui35HVpfMdE8QGT13r4HiX+cCYDIMtxJe/sdEw0HXUcd7sSU613+EDJR35M+AZ/jrJu2QY6ZuFVGBwv7f7Nko5E9rxMcHY8=
+	t=1771883513; cv=none; b=s96ZxnYSRLGfN4ZKuK4P1IORYpI8IftW3OgYK7tYrxlkFzmDgQOE5+c4YSel/Eg3YS71GPU4uHHim52RCdw02mh1/u+D/Rzp2emPeIzVJ4a4uevDtvgp6jAiXChGD3At2EXQoxp0FADDxQ1cuOblnQWCOU/kgXjSFSijkDtCVTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771881956; c=relaxed/simple;
-	bh=5qrxHX3bbBe6uAJtF0a/rnfGROb7vCb843CW5WKefvA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uRv9DyUIon4MMCSioTMQsBmUFQQUtzBTY92idQMTnhBAHxkgIWh+7vxdDP0UblZG2eoo4t2v8RcgR9fbDZSpg29KpnEksUTLyjc6sVcd+7M+mITVi/u3jEBQbBebepoBXjtXroOYh7XS7q75+5dVsj2WQkbClpl19lUVg5xonYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R9lrV1Kp; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-358e5e33ddcso6110a91.1
-        for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 13:25:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771881954; x=1772486754; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vCvwJ+2gLIpJ0sJnMXjuHPVyD3E0eG9cwiLrsfl8ftM=;
-        b=R9lrV1KpOje8PFAH0xuYF2jvc/szKqtyy9HOiA4b9VOx4R3mm7fswiaWfvScu9UjW0
-         6QNJS5QlNINOwgeEwg4UWEI+AgRFeSq0bgVSMKSV9vyq2LH2ilIZFOkxtmyyGElF5Bez
-         8NjqrQR/VeTAFH0duq7m26qe78pVMpLoJNCTiK2nVzCAQstJwDfvxcLt5HIbyrk9Hkcz
-         Cg9IVXcYTVvGiIKQQfblK3b310ePF9BziD9ounZIuGLckkPFd4DRgCMYb0y+ZxNZRJzg
-         JrInjB5E36hQ1Pd4veHeejd+75rGj7XBuNVePZvs4Hyc3mOtbWrM/80M8Y3hNpNjktL/
-         6QNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771881954; x=1772486754;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vCvwJ+2gLIpJ0sJnMXjuHPVyD3E0eG9cwiLrsfl8ftM=;
-        b=WXWAEIEV5uyW39fzUhrCmIhbFYTDSFq9oXkZ047SmD16Y4StcmqiSP01xrNA1RWwse
-         k4W4UgphzYKpI46140xiyOV2qhbcdm71x29vAi84bK1vy5+WJfiZUiHuOlmIgFind7Zd
-         XDngWlVbpPbQcTc2NfisKA0m2X+Px56IBCZxGiuxpQvdsWJMn3U9gF1/15PnCsR0Swnf
-         kEXpLHp1RcMnrvLsJdQwQi2Fk1C8DuN+NQEU0oxmgwwVHDoXuKv5A6k4SuLBL5irQMRC
-         js2op7PLF0Flt3dLRXTjkeDOLfX4DOvtJgjMFnjVAG7AlFUHBSd/zth0xYkqbH+DXWP+
-         2tkQ==
-X-Gm-Message-State: AOJu0YzylXQGAX3Gk1rzuwMyblZWjwGG1BuEf2u4jdVj8dVHt0Z9JOFt
-	Psf2hTzqd0guLRbXNzlDZMTPu09M5qD/G/wIRGvvvhoUs/DwXJKrilqpA4o6MtiMCgi5MHN4wOj
-	f7jiSRg==
-X-Received: from pjbkl12.prod.google.com ([2002:a17:90b:498c:b0:352:c413:d36b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2e0f:b0:32e:3829:a71c
- with SMTP id 98e67ed59e1d1-358ae8b23damr9479940a91.16.1771881954244; Mon, 23
- Feb 2026 13:25:54 -0800 (PST)
-Date: Mon, 23 Feb 2026 13:25:52 -0800
-In-Reply-To: <9e899034687731c7ee6d431ae49dbe3f5ca13a6c.camel@intel.com>
+	s=arc-20240116; t=1771883513; c=relaxed/simple;
+	bh=WKnPEDwDIfx+k5AfNNeAwDt7AQEjK30PPk/wAUXfwj8=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=VxdNr8DNKS6ch3FYfCwZ+Z9wODuHvndefGV99L0ATMahzNh8i5ZcrfOE8D/xJzJkqLtj2H9llYWQ4VbqdQrIBmQh0PxhHdJcpwdVGlXQgDFXH1HqmRoEpvpMhrnnrvVCBUxwkEXNRKUMtZXp1EaHEswqfIprGvYLaivnAj05yms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=gm79Vk5c; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from ehlo.thunderbird.net (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 61NLYvH01544899
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Mon, 23 Feb 2026 13:34:57 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 61NLYvH01544899
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2026012301; t=1771882498;
+	bh=OaFmr3lJa5FSZUIHPiZLMbyOO2f/Re90qGLN732/lLY=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=gm79Vk5cwr8hNbIiGsR3JzHXzJQGWJTEtYUA+hPYy6TkMmg7Mr1W2UizsTNuqVPzr
+	 YwcmONmbFNgNXkWq0pDAWWEZLPyG7x4xWO0eP19Lr3Jex99pdgsRU+Elo8HHHBPcDY
+	 fyKtu++A/UxVfX6Z55Jxpw0PHCP44DcmN+0auikXCRF8aJ6GnUYfYW3d/k5IVHU9oj
+	 BSZNEFhf7ntBhItORhDSYcI8iNzILj+RNyFJphbBSRQMrbJ267Z0MwmbzE/8Zqqusn
+	 B18floV2S7wSJFcL3w2xZOpwgm+14a7FZyYvNVs4S9UAKjM/g60ZeBugjQp4wht6Mp
+	 FSnHcqszWoNOA==
+Date: Mon, 23 Feb 2026 13:34:49 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Xin Li <xin@zytor.com>, Dave Hansen <dave.hansen@intel.com>
+CC: =?ISO-8859-1?Q?J=FCrgen_Gro=DF?= <jgross@suse.com>,
+        Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org,
+        x86@kernel.org, kvm@vger.kernel.org, llvm@lists.linux.dev,
+        Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+        Bill Wendling <morbo@google.com>,
+        Justin Stitt <justinstitt@google.com>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v3_09/16=5D_x86/msr=3A_Use_t?=
+ =?US-ASCII?Q?he_alternatives_mechanism_for_WRMSR?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <14FE6A05-0864-4BD5-8331-0C2E6B8A28F8@zytor.com>
+References: <20260218082133.400602-1-jgross@suse.com> <20260218082133.400602-10-jgross@suse.com> <aZYoUE7CmrLg3SVe@google.com> <e05a65a7-bf8e-420b-8a36-2d76e56b43b0@intel.com> <d622a318-f7f8-4cff-b540-38d159ca87f4@suse.com> <437EC937-24B7-4E69-B369-F9FAFC46F1B1@zytor.com> <542ff5d7-1cff-4ef9-af48-f0378aa2a05c@intel.com> <14FE6A05-0864-4BD5-8331-0C2E6B8A28F8@zytor.com>
+Message-ID: <9BD31A13-A285-4C81-B590-5241C47D3F5C@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260219002241.2908563-1-seanjc@google.com> <5a826ae2c3549303c205817520623fe3fc4699ec.camel@intel.com>
- <aZyGY41LybO8mVBT@google.com> <9e899034687731c7ee6d431ae49dbe3f5ca13a6c.camel@intel.com>
-Message-ID: <aZzF4C1L9EdEBViW@google.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Don't create SPTEs for addresses that
- aren't mappable
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Yan Y Zhao <yan.y.zhao@intel.com>, 
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
-	"yosry.ahmed@linux.dev" <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	SUBJ_EXCESS_QP(1.20)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[zytor.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[zytor.com:s=2026012301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71527-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5E9E117D914
+	TAGGED_FROM(0.00)[bounces-71532-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[suse.com,google.com,vger.kernel.org,kernel.org,lists.linux.dev,redhat.com,alien8.de,linux.intel.com,gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hpa@zytor.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[zytor.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[kvm,lkml];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,zytor.com:mid,zytor.com:dkim,zytor.com:email]
+X-Rspamd-Queue-Id: 6A1D117DCB9
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026, Kai Huang wrote:
-> On Mon, 2026-02-23 at 08:54 -0800, Sean Christopherson wrote:
-> > On Mon, Feb 23, 2026, Kai Huang wrote:
-> > > But the odd is if the fault->addr is L2 GPA or L2 GVA, then the shared bit
-> > > (which is concept of L1 guest) doesn't apply to it.
-> > > 
-> > > Btw, from hardware's point of view, does EPT/NPT silently drops high
-> > > unmappable bits of GPA or it generates some kinda EPT violation/misconfig?
-> > 
-> > EPT violation.  The SDM says:
-> > 
-> >   With 4-level EPT, bits 51:48 of the guest-physical address must all be zero;
-> >   otherwise, an EPT violation occurs (see Section 30.3.3).
-> > 
-> > I can't find anything in the APM (shocker, /s) that clarifies the exact NPT
-> > behavior.  It barely even alludes to the use of hCR4.LA57 for controlling the
-> > depth of the walk.  But I'm fairly certain NPT behaves identically.
-> 
-> Then in case of nested EPT (ditto for NPT), shouldn't L0 emulate an VMEXIT
-> to L1 if fault->addr exceeds mappable bits?
+On February 23, 2026 9:56:28 AM PST, Xin Li <xin@zytor=2Ecom> wrote:
+>
+>>>> I _really_ thought this was discussed upfront by Xin before he sent o=
+ut his
+>>>> first version of the series=2E
+>>> I actually reached out to the Intel architects about this before I sta=
+rted
+>>> coding=2E Turns out, if the CPU supports WRMSRNS, you can use it acros=
+s the
+>>> board=2E  The hardware is smart enough to perform a serialized write w=
+henever
+>>> a non-serialized one isn't proper, so there=E2=80=99s no risk=2E
+>>=20
+>> Could we be a little more specific here, please?
+>
+>Sorry as I=E2=80=99m no longer with Intel, I don=E2=80=99t have access to=
+ those emails=2E
+>
+>Got to mention, also to reply to Sean=E2=80=99s challenge, as usual I did=
+n=E2=80=99t get
+>detailed explanation about how would hardware implement WRMSRNS,
+>except it falls back to do a serialized write when it=E2=80=99s not *prop=
+er*=2E
+>
+>
+>>=20
+>> If it was universally safe to s/WRMSR/WRMSRNS/, then there wouldn't hav=
+e
+>> been a need for WRMSRNS in the ISA=2E
+>>=20
+>> Even the WRMSRNS description in the SDM talks about some caveats with
+>> "performance-monitor events" MSRs=2E That sounds like it contradicts th=
+e
+>> idea that the "hardware is smart enough" universally to tolerate using
+>> WRMSRNS *EVERYWHERE*=2E
+>>=20
+>> It also says:
+>>=20
+>> Like WRMSR, WRMSRNS will ensure that all operations before it do
+>> not use the new MSR value and that all operations after the
+>> WRMSRNS do use the new value=2E
+>>=20
+>> Which is a handy guarantee for sure=2E But, it's far short of a fully
+>> serializing instruction=2E
+>
+>
 
-Huh.  Yes, for sure.  I was expecting FNAME(walk_addr_generic) to handle that,
-but AFAICT it doesn't.  Assuming I'm not missing something, that should be fixed
-before landing this patch, otherwise I believe KVM would terminate the entire VM
-if L2 accesses memory that L1 can't map.
+So to get a little bit of clarity here as to the architectural contract as=
+ opposed to the current implementations:
+
+1=2E WRNSRNS is indeed intended as an opt-in, as opposed to declaring rand=
+om registers non-serializing a posteori by sheer necessity in technical vio=
+lation of the ISA=2E
+
+We should not blindly replace all WRMSRs with WRMSRNS=2E We should, howeve=
+r, make wrmsrns() fall back to WRMSR on hardware which does not support it,=
+ so we can unconditionally replace it at call sites=2E Many, probably most,=
+ would be possible to replace, but for those that make no difference perfor=
+mance-wise there is really no reason to worry about the testing=2E=20
+
+It is also quite likely we will find cases where we need *one* serializati=
+on after writing to a whole group of MSRs=2E In that case, we may want to a=
+dd a sync_cpu_after_wrmsrns() [or something like that] which does a sync_cp=
+u() if and only if WRMSRNS is supported=2E
+
+I don't know if there will ever be any CPUs which support WRMSRNS but not =
+SERIALIZE, so it might be entirely reasonable to have WRMSRNS depend on SER=
+IALIZE and not bother with the IRET fallback variation=2E
+
+2=2E WRMSRNS *may* perform a fully serializing write if the hardware imple=
+mentation does not support a faster write method for a certain MSR=2E This =
+is particularly likely for MSRs that have system-wide consequences, but it =
+is also a legitimate option for the hardware implementation for MSRs that a=
+re not expected to have any kind of performance impact (full serialization =
+is a very easy way to ensure full consistency and so reduces implementation=
+ and verification burden=2E)
+
+3=2E All registers, including MSRs, in x86 are subject to scoreboarding, m=
+eaning that so-called "psychic effects" (a direct effect being observable b=
+efore the cause) or use of stale resources are never permitted=2E This does=
+ *not* imply that events cannot be observed out of order, and cross-CPU vis=
+ibility has its own rules, but that is not relevant for most registers=2E
+
+4=2E WRMSRNS immediate can be reasonably expected to be significantly fast=
+er than even WRMSRNS ecx (at least for MSRs deemed valuable to optimize), b=
+ecause the MSR number is available to the hardware at the very beginning of=
+ the instruction pipeline=2E To take proper advantage of that, it is desira=
+ble to avoid calling wrmsrns() with a non-constant value in code paths wher=
+e performance matters, even if it bloats the code somewhat=2E The main case=
+ which I can think about that might actually matter is context-switching wi=
+th perf enabled (also a good example for wanting to SERIALIZE or at least M=
+FENCE or LFENCE after the batch write if they will have effects before retu=
+rning to user space=2E) There is also of course the option of dynamically g=
+enerating a code snippet if the list of MSRs is too dynamic=2E
+
 
