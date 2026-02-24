@@ -1,130 +1,124 @@
-Return-Path: <kvm+bounces-71554-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71555-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gKfBESbznGkvMQQAu9opvQ
-	(envelope-from <kvm+bounces-71554-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 01:39:02 +0100
+	id KNrSDOv1nGlEMQQAu9opvQ
+	(envelope-from <kvm+bounces-71555-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 01:50:51 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD70F18046A
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 01:39:01 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68F291804F4
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 01:50:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6047A3113F7F
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 00:38:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 58AA13034241
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 00:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB37231830;
-	Tue, 24 Feb 2026 00:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zKoqDksO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9E82238C3B;
+	Tue, 24 Feb 2026 00:50:42 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D7822D4C8
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 00:38:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4478ADF59;
+	Tue, 24 Feb 2026 00:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771893486; cv=none; b=pVodcdU/Sv5mjxWLgybKBGv1MsgJrIQMM+rlNqymXRkDJ1q0Ogis+omtTmcavX2gHSsIUSqRNT43Vwl1Ak/VMV+NZX5UiaC2STo9Pod57q2PF+LahMYryTjCw8pnO+0k+hqMA8QiIOrdbq7z8E5LXWeK2yr4nlJ/KX4GalhiO18=
+	t=1771894242; cv=none; b=YnXLW0D4ZhHdcsXwZ1gC3HbtVecw2Q3yd+3rBpWMo+Hviuv6JzUAyHxn9+NzyLHhexMkr46VovE2FyBWzdPY0YlxwByQuRvJofy4ah2kFSnBOl0nWV5m1jZ95YTmVvrGhgz6Rv1tjaJH3msGnZdjM2llzoF/iqeOcTsKd4RLO2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771893486; c=relaxed/simple;
-	bh=95et0iiZOFvEmrwQk1B0aEKVgA5Luw2xyZ7YltWllHw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VErnv0Ih/OyChm6f6fXuXeITBrc26pd7E5nVzrDL9MRTTUrY/myFOFYlcvlbldZgktviAnIu7l2O/O6N0ZEx3cmBSPaFpZQjfgOgZWHqlooCZsES0POkBb2d37rCSapfu92upaf097FW8Bqa4gkor2KH6l9knwiBfv1pTXE/aV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zKoqDksO; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ad7e454f38so210627745ad.0
-        for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 16:38:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771893484; x=1772498284; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mRUtYfiuCHkE01sKVfZHqk1HVPwnQ18HuftgTQ+yBvY=;
-        b=zKoqDksOgtZ+EHEyMXmGtvjdFyR+nXBkGjpV3iRQBgPirCiu+7sAn3JpbaYU8r00+T
-         OPUWLBvuXGpBV5AM3NdvZU91FPE42VG9od5T7dQC7/Wcb7WW5hJR4dwmw4teiVhnQsts
-         gEpmcvFCHcpoC2IDXG/o1y6sXDKcq1ZiZAyLhTQZxB+acA7fq+fL3DyYu927E0p8HFNN
-         0CYwA5uL6D3TAiUBusV8Jbo+jUhp3i3S/mGD61SaVSHF2Ud0jhBF+muR3/3uED5be9bW
-         nVypl8g3vSLLoSr56lyMJs54YcHjvShIMiLPn64y2xa1Zv5XnFGyin7cSckn/g7IX1zt
-         SzvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771893484; x=1772498284;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mRUtYfiuCHkE01sKVfZHqk1HVPwnQ18HuftgTQ+yBvY=;
-        b=UKGQ/2oR0o0SElfrqVD5tKlS0hAQWpbFRmSaGPpsVsA2HiqkvbRbvrcQZx3qCs6OH0
-         yavsojBTAOyHlb8tlSl2NMx3OKfQuH1AGElPhVJPUm112mYvSPQkxjTCWjy3TZjXAfoY
-         W4+XBmOFTKJWKRsSJ3zDmRph3oUDF/SjnP7LB3dCp0rNeJPpycecPhsBDXPxcrM0qf/f
-         ZYKEX6ZrFnHB2/ZWzAcM4a3mfcbFKtJiwKcKbi/BNIZSNfIPqwgVEYox1qVf+qUFBn9B
-         T5U5lEul58u4xFj5N3wZaYUguEWyKoYFshwK2x4Ib/PJjL106CGk1QyciclqrLo2ies/
-         Xj/g==
-X-Forwarded-Encrypted: i=1; AJvYcCWqQsH9RWouLQAOhL+yQzpJRLKb1Bz1eRn5/qZKtuB7d9ZBNJ8zo4AGalFJk0EPDPAj7pA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQOT/hM0ovabPeS0nRCjpZw+Pk8w6rq67bb56tQHqmnHCmbgj4
-	rqfjI/5YADNVLajumktO21pMMlia2NSqBWlkhptl3lnTMS2N4Vk74hFNQmKzoGIJaiOBMlxJ+FX
-	FLMk/yw==
-X-Received: from pjbay5.prod.google.com ([2002:a17:90b:305:b0:352:de4e:4038])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2acc:b0:2a0:9755:2e97
- with SMTP id d9443c01a7336-2ad7444c497mr102963395ad.15.1771893483878; Mon, 23
- Feb 2026 16:38:03 -0800 (PST)
-Date: Mon, 23 Feb 2026 16:38:02 -0800
-In-Reply-To: <20260206190851.860662-8-yosry.ahmed@linux.dev>
+	s=arc-20240116; t=1771894242; c=relaxed/simple;
+	bh=2tzj0jyPREPsI/4mmp4+9uVJiVadSzsWqSXSwmTxmZA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ZofB2t/5q9EM4AFTPCjnS4nA/WaTeLnKR2OLUg4hiAamWt8WsLwjNd5JipayI7YQCLFvqlLi2N1HGS45vqa1n5AjMfbG7rzjMc4uezjscWAutlOvIOyEVb/hWAENSa85GnZEaXdpfX5YVXwAVbiOoDU2eXOGw+hwhzyma0xTUXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from fric.. (unknown [210.73.43.101])
+	by APP-01 (Coremail) with SMTP id qwCowAC3X2vK9ZxpYRabCA--.55558S2;
+	Tue, 24 Feb 2026 08:50:18 +0800 (CST)
+From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+To: xujiakai2025@iscas.ac.cn
+Cc: alex@ghiti.fr,
+	anup@brainfault.org,
+	aou@eecs.berkeley.edu,
+	atish.patra@linux.dev,
+	jiakaiPeanut@gmail.com,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	palmer@dabbelt.com,
+	paul.walmsley@sifive.com
+Subject: Re: [PATCH] RISC-V: KVM: Fix null pointer dereference in kvm_riscv_vcpu_aia_rmw_topei()
+Date: Tue, 24 Feb 2026 00:50:18 +0000
+Message-Id: <20260224005018.3979656-1-xujiakai2025@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260130101557.1314385-1-xujiakai2025@iscas.ac.cn>
+References: <20260130101557.1314385-1-xujiakai2025@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260206190851.860662-1-yosry.ahmed@linux.dev> <20260206190851.860662-8-yosry.ahmed@linux.dev>
-Message-ID: <aZzy6mIkYunIUyZV@google.com>
-Subject: Re: [PATCH v5 07/26] KVM: nSVM: Triple fault if restore host CR3
- fails on nested #VMEXIT
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowAC3X2vK9ZxpYRabCA--.55558S2
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUO57AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+	kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8I
+	cVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87
+	Iv6xkF7I0E14v26r4UJVWxJr1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28I
+	cVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx
+	0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwAC
+	jI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc2xSY4AK67AK6w
+	1l42xK82IYc2Ij64vIr41l4c8EcI0Ec7CjxVAaw2AFwI0_Jw0_GFyl4I8I3I0E4IkC6x0Y
+	z7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zV
+	AF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4l
+	IxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCw
+	CI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnI
+	WIevJa73UjIFyTuYvjfU5nmRUUUUU
+X-CM-SenderInfo: 50xmxthndljiysv6x2xfdvhtffof0/1tbiCQ8ICWmcbKfMkwAAsm
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71554-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-71555-lists,kvm=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[ghiti.fr,brainfault.org,eecs.berkeley.edu,linux.dev,gmail.com,lists.infradead.org,vger.kernel.org,dabbelt.com,sifive.com];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[xujiakai2025@iscas.ac.cn,kvm@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.987];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CD70F18046A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,iscas.ac.cn:mid]
+X-Rspamd-Queue-Id: 68F291804F4
 X-Rspamd-Action: no action
 
-On Fri, Feb 06, 2026, Yosry Ahmed wrote:
-> @@ -1140,7 +1140,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
->  
->  	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map)) {
->  		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
-> -		return 1;
-> +		return;
->  	}
+Hi all,
 
-And then here I think we can do the same thing, e.g.
+Just a gentle ping on the patch below, sent about three weeks ago.
 
-	if (nested_svm_load_cr3(vcpu, vmcb01->save.cr3, false, true))
-		kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+This fixes a NULL pointer dereference in the AIA TOPEI RMW path that can
+be triggered by fuzzed ioctl sequences before per-vCPU IMSIC state is
+initialized.
+
+Any feedback would be appreciated.
+
+Thanks,
+Jiakai
+
 
