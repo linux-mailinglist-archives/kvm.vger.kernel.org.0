@@ -1,144 +1,248 @@
-Return-Path: <kvm+bounces-71670-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71669-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4HX1LCkUnml+TQQAu9opvQ
-	(envelope-from <kvm+bounces-71670-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 22:12:09 +0100
+	id UDGxLD8QnmlBTQQAu9opvQ
+	(envelope-from <kvm+bounces-71669-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 21:55:27 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3061218C9F7
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 22:12:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3534018C86B
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 21:55:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E72CA3095954
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 21:12:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 91DC0305E338
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 20:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C765533C1BE;
-	Tue, 24 Feb 2026 21:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8766F33B967;
+	Tue, 24 Feb 2026 20:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fU9VoxpY"
 X-Original-To: kvm@vger.kernel.org
-Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60FA233A70F
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 21:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96FF223702;
+	Tue, 24 Feb 2026 20:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771967526; cv=none; b=Y5atrHi4FeSsLZiPbJJoaBitVJ3lYCglWCW9Ff+zN24v3NbSFCz1OEVFjsA6m8W1Q8oapo3qLI4SRH9De3FrZOeis2HpQyZrF1hXMVM1UiqXTsps0/9PgwMrAWT3Tet9U2j/0Bo/LmZ1N7iql+TWZGOmSPb4ULykVf7ZMwKzMTY=
+	t=1771966458; cv=none; b=UrnWBL1gfcFxHD4yBnnAz/tsqFruYyYCYy8arFGsY8udGfjxr1VZhY0iDfZ97FT3az4J4UK5UYG3N95hhOBzMCvklGZFO9SYeOa4qHGJsboR9RPZDPDFo6qvlOLp2llmWX1PMeKzfMWkhbj9fyw06/PfDZcUgRfphNmbtvtNbH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771967526; c=relaxed/simple;
-	bh=o2XZhoStTauDKWELbYgjl0TfZM824nSbVdrRhcJHmeA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VsjGJvzQogfZz9nOyZWbBxIyr7MASZCbKWeMUumfw6VLeRt8I7xSP55OFUZ74GHFxQLPssJTfZMdpQzDq/n5yub5xEHg9pYDcsSazEeeOjUziycM4vZ5/07ptqb5wx4YF1gNFT3+4KONPGdMtuldqjhs0A2ttyZQ4m0we9oo5gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=pass smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vps-ovh.mhejs.net
-Received: from MUA
-	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
-	(Exim 4.98.2)
-	(envelope-from <mhej@vps-ovh.mhejs.net>)
-	id 1vuzOi-0000000DESC-2xFT;
-	Tue, 24 Feb 2026 21:52:48 +0100
-Message-ID: <79f110e1-b217-4a70-81f7-d596f822dde5@maciej.szmigiero.name>
-Date: Tue, 24 Feb 2026 21:52:43 +0100
+	s=arc-20240116; t=1771966458; c=relaxed/simple;
+	bh=EgVAY0e5tBoSz6A6iwW5/XO8EvjgmD/hBAtfckjnAIc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DYAnzz9U5FxQuc4Rqy2FvOFxvDucL3f8KD4suueeBHMUNoT65/1L3p18QpxlaZMypcuRRyPHwTUsrxUXeKJnCEucpZ+X/dqjB2S4vz9bSufpCdTNTepXugqXrWhR4ZqvrCff0tOy71HcYw/OboNreJlLI4JJdDQ4QZ89hfRDxBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fU9VoxpY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 279EDC116D0;
+	Tue, 24 Feb 2026 20:54:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771966458;
+	bh=EgVAY0e5tBoSz6A6iwW5/XO8EvjgmD/hBAtfckjnAIc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fU9VoxpYqnAVrd4t/fIENYWIsMId2KNEP3dfw2h4SjQzeH/MBV/5Cee/wntRTQCP6
+	 8EADR9JKKOK/hSexd/fEomD/ZrU3e+Mo0cAkKAlisOPYRwuKJXzT3MA26tdQTXMvpb
+	 cFKvEXyKAe/X10m3pmNX2H1z0cczPw3iZWdEsiJJoujd4S5bnLIF7pTBSYnWQRgIVb
+	 lO1qmLmIs5NJLzUq5pV5qVfuG1vDdgGb4JylPzxBqN/lvS2sL0Y7jYkwDaBcxLLsMY
+	 M8xREJGMjxcu5uVJY3DLJp8/BXSitkrqLBWUKwurl88mBMEyWsx/eqM0TQ42RGOP4K
+	 O37lVNZp675Mw==
+Date: Tue, 24 Feb 2026 12:54:16 -0800
+From: Oliver Upton <oupton@kernel.org>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, catalin.marinas@arm.com,
+	will@kernel.org, maz@kernel.org, miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com, broonie@kernel.org, ardb@kernel.org,
+	suzuki.poulose@arm.com, lpieralisi@kernel.org,
+	yangyicong@hisilicon.com, joey.gouly@arm.com, yuzenghui@huawei.com
+Subject: Re: [PATCH v13 7/8] KVM: arm64: use CASLT instruction for swapping
+ guest descriptor
+Message-ID: <aZ4P-AcVjxfCFsew@kernel.org>
+References: <20260223174802.458411-1-yeoreum.yun@arm.com>
+ <20260223174802.458411-8-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] target/i386/kvm: Configure proper KVM SEOIB behavior
-To: Khushit Shah <khushit.shah@nutanix.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <eduardo@habkost.net>,
- "Michael S . Tsirkin" <mst@redhat.com>, Marcelo Tosatti
- <mtosatti@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Sean Christopherson <seanjc@google.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20251126093742.2110483-1-khushit.shah@nutanix.com>
- <F09B2DC7-6825-48B4-94A9-741260832167@nutanix.com>
- <C1DC0AAE-AE34-42E1-A15C-E03D1EE4D770@nutanix.com>
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Content-Language: en-US, pl-PL
-Disposition-Notification-To: "Maciej S. Szmigiero"
- <mail@maciej.szmigiero.name>
-In-Reply-To: <C1DC0AAE-AE34-42E1-A15C-E03D1EE4D770@nutanix.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Sender: mhej@vps-ovh.mhejs.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260223174802.458411-8-yeoreum.yun@arm.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.04 / 15.00];
-	HEADER_FORGED_MDN(2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71670-lists,kvm=lfdr.de];
-	DMARC_NA(0.00)[szmigiero.name];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[habkost.net,redhat.com,gmail.com,google.com,vger.kernel.org,nongnu.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71669-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.954];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mail@maciej.szmigiero.name,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[oupton@kernel.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,maciej.szmigiero.name:mid]
-X-Rspamd-Queue-Id: 3061218C9F7
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3534018C86B
 X-Rspamd-Action: no action
 
-On 10.12.2025 06:23, Khushit Shah wrote:
-> Hi,
+On Mon, Feb 23, 2026 at 05:48:01PM +0000, Yeoreum Yun wrote:
+> Use the CASLT instruction to swap the guest descriptor when FEAT_LSUI
+> is enabled, avoiding the need to clear the PAN bit.
 > 
-> I wanted to follow up on this patch to see if there are any review comments
-> or feedback. I'm planning to prepare a v2 that addresses the following:
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> ---
+>  arch/arm64/include/asm/futex.h | 17 +----------------
+>  arch/arm64/include/asm/lsui.h  | 27 +++++++++++++++++++++++++++
+>  arch/arm64/kvm/at.c            | 32 +++++++++++++++++++++++++++++++-
+>  3 files changed, 59 insertions(+), 17 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/lsui.h
 > 
-> 1. Move the SEOIB configuration code from x86-common.c to KVM-specific code
->     (kvm_arch_init()).
-> 
-> 2. Refactor as per the changes on the KVM side of the patch.
-> 
-> Before proceeding with v2, I have a design question regarding the scope of
-> the fix:
-> 
-> Currently, the patch sets the SEOIB state for all machine types on new power-ons
-> based on the IOAPIC version. This means that any new VM powered on with a
-> patched QEMU will get the proper SEOIB behavior.
-> 
-> However, I'm wondering if we should instead:
-> - Define a new machine property (i.e, "seoib-policy") that defines the SEOIB
->    behavior.
-> - Only enable the new SEOIB behavior in the latest machine type version
->    (10.2?), keeping older machine types in QUIRKED mode.
-> 
-> The question is: should new power-ons of *all* machine types set the SEOIB
-> state automatically, or should we scope this fix to the latest machine type
-> versions only via a machine property?
-> 
-> I'd appreciate your thoughts on this design decision before I finalise v2.
+> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+> index b579e9d0964d..6779c4ad927f 100644
+> --- a/arch/arm64/include/asm/futex.h
+> +++ b/arch/arm64/include/asm/futex.h
+> @@ -7,11 +7,9 @@
+>  
+>  #include <linux/futex.h>
+>  #include <linux/uaccess.h>
+> -#include <linux/stringify.h>
+>  
+> -#include <asm/alternative.h>
+> -#include <asm/alternative-macros.h>
+>  #include <asm/errno.h>
+> +#include <asm/lsui.h>
+>  
+>  #define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
+>  
+> @@ -91,8 +89,6 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+>  
+>  #ifdef CONFIG_ARM64_LSUI
+>  
+> -#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> -
+>  #define LSUI_FUTEX_ATOMIC_OP(op, asm_op)				\
+>  static __always_inline int						\
+>  __lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+> @@ -235,17 +231,6 @@ __lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+>  {
+>  	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
+>  }
+> -
+> -#define __lsui_llsc_body(op, ...)					\
+> -({									\
+> -	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
+> -		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
+> -})
+> -
+> -#else	/* CONFIG_ARM64_LSUI */
+> -
+> -#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
+> -
+>  #endif	/* CONFIG_ARM64_LSUI */
+>  
+>  
+> diff --git a/arch/arm64/include/asm/lsui.h b/arch/arm64/include/asm/lsui.h
+> new file mode 100644
+> index 000000000000..4f956188835e
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/lsui.h
+> @@ -0,0 +1,27 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef __ASM_LSUI_H
+> +#define __ASM_LSUI_H
+> +
+> +#include <linux/compiler_types.h>
+> +#include <linux/stringify.h>
+> +#include <asm/alternative.h>
+> +#include <asm/alternative-macros.h>
+> +#include <asm/cpucaps.h>
+> +
+> +#ifdef CONFIG_ARM64_LSUI
+> +
+> +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> +
+> +#define __lsui_llsc_body(op, ...)					\
+> +({									\
+> +	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
+> +		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
+> +})
+> +
+> +#else	/* CONFIG_ARM64_LSUI */
+> +
+> +#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
+> +
+> +#endif	/* CONFIG_ARM64_LSUI */
+> +
+> +#endif	/* __ASM_LSUI_H */
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 885bd5bb2f41..1aceeef04567 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -9,6 +9,7 @@
+>  #include <asm/esr.h>
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+> +#include <asm/lsui.h>
+>  
+>  static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool s1ptw)
+>  {
+> @@ -1704,6 +1705,33 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
+>  	}
+>  }
+>  
+> +#ifdef CONFIG_ARM64_LSUI
+> +static int __lsui_swap_desc(u64 __user *ptep, u64 old, u64 new)
+> +{
+> +	u64 tmp = old;
+> +	int ret = 0;
+> +
+> +	uaccess_ttbr0_enable();
+> +
+> +	asm volatile(__LSUI_PREAMBLE
+> +		     "1: caslt	%[old], %[new], %[addr]\n"
+> +		     "2:\n"
+> +		     _ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w[ret])
+> +		     : [old] "+r" (old), [addr] "+Q" (*ptep), [ret] "+r" (ret)
+> +		     : [new] "r" (new)
+> +		     : "memory");
+> +
+> +	uaccess_ttbr0_disable();
+> +
+> +	if (ret)
+> +		return ret;
+> +	if (tmp != old)
+> +		return -EAGAIN;
+> +
+> +	return ret;
+> +}
+> +#endif
+> +
+>  static int __lse_swap_desc(u64 __user *ptep, u64 old, u64 new)
+>  {
+>  	u64 tmp = old;
+> @@ -1779,7 +1807,9 @@ int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new)
+>  		return -EPERM;
+>  
+>  	ptep = (u64 __user *)hva + offset;
+> -	if (cpus_have_final_cap(ARM64_HAS_LSE_ATOMICS))
+> +	if (IS_ENABLED(CONFIG_ARM64_LSUI) && cpus_have_final_cap(ARM64_HAS_LSUI))
 
-Now that the KVM side of this patch is in Linus tree are there any plans
-to submit a v2 for visibility and with updated flag naming even before
-getting the questions above answered?
-
-> Regards,
-> Khushit
-> 
+cpucap_is_possible() is where the Kconfig check should go.
 
 Thanks,
-Maciej
-
+Oliver
 
