@@ -1,113 +1,113 @@
-Return-Path: <kvm+bounces-71630-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71631-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OIgZCBnhnWnpSQQAu9opvQ
-	(envelope-from <kvm+bounces-71630-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:34:17 +0100
+	id 8GcgD/vhnWnpSQQAu9opvQ
+	(envelope-from <kvm+bounces-71631-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:38:03 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C21618A94A
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:34:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A975E18A9D7
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:38:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4F17F307D7F7
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 17:34:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4086430A3191
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 17:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A7343A9DB1;
-	Tue, 24 Feb 2026 17:34:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01C53A9D91;
+	Tue, 24 Feb 2026 17:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jolJbCoX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O+yyE1qx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D30E33ADA0
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 17:33:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C73793803D1
+	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 17:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.175
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771954440; cv=pass; b=Jtk6I5tQnCtrHoChuG2yz2sIMZgdIA81dXIEmSgFo2vjLvbQ2KktvnfpBXQeD8Bc2fQj7VnBnk+Z1Gia5bTYx/U3niYkgYdKNws5DDrwXSdAhAeEKYFA7kA5C/nweAGYheeyabz2o0qdXu3K6yhSXHJcoeZIDonZCOHGeV/Fwsg=
+	t=1771954649; cv=pass; b=Y4zIMXfN3aOIjgQYW7HrW5lqfBD+Q0B3oBanP7YiGmPWyKe+XkZ5BZTkDf5GDM12a3tDygL7+LSzsmDM15xU9G7gHm0aaDYXdWP4Su0OcEz5S9KE/5Whqc7H2wpr2VUPuE6OrX+U6tXQwcVG36EnJ9PjV4miaG39Hbn6da4RoxE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771954440; c=relaxed/simple;
-	bh=cCuihnC83rVuxNh9g4clqD2+2gMDD3M/m5qB3+opnzg=;
+	s=arc-20240116; t=1771954649; c=relaxed/simple;
+	bh=NzE6Dg5T/WZzjhrxSxryu35IDaiffOedvMQkCnbUBbs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HDyRqCaQpjR+Wj0TClO4qMHXTHsBPv1sOkdxli4Oj0Os+5hbdi43q7uJ6iS1ymLLYltajPPif5EFyU323PJhn0O9fmwNF8HP1vSDkPiKJ65WzugLZTkkoeLTLOEBBnMvIaNgc4vJ/QBlQoXY7Q0grA4P2z37sVJJFV3O1yxT67I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jolJbCoX; arc=pass smtp.client-ip=209.85.217.41
+	 To:Cc:Content-Type; b=ll6AuRxAOyFH4tZEj4LDltYyARGbUYNMweHVeV060pyjknHdHaMCZrXu4HSXErPTgBxPZU/LtQawnwA4P30aBoOqR0c/ppoIV1vi4TFnqBCjPc6aqsmo3G+RNaRs/9yAz50BTNBD/gy+G0CjpMzeHD7SdCnh/YYRxcz0m9B7avw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O+yyE1qx; arc=pass smtp.client-ip=209.85.221.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-5fe0959ae3dso23368137.1
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 09:33:59 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771954438; cv=none;
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-56641200d6eso6478190e0c.0
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 09:37:27 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771954647; cv=none;
         d=google.com; s=arc-20240605;
-        b=FdlD2qXn53JpMNTCK1hbhBaPifnLMWYwjOhdWPnXXzWlK9SzIybVYRNWax1QA9jDdM
-         Bn+rpylj7e+uZM5lwQvVUeyKUQZ/E6UhlSVIr9p5Bs3PJhZm+DS5/MdfF4sQzC6S31m0
-         7e3fkXX5Lmzzn2PUAIA/195BLXSfL45LY/waJBW7btd0C4oeqFHNTZAGqEIsweNKxMvq
-         V3BxjG3cYlnpwLuyQIpFBAcBXfHFI+6Oxh9echxCH48b5G4LTZxJ2pBHC6OhxbqME00z
-         wd+igx614nxNgrwBiDo0rdq/zy2QCFBa3DDR9WPDZT3Lq7FgiiBvXEchhB1eGw4+tn6W
-         /Qfw==
+        b=PY4Ohys/6IN5ilQkd6iFpuaUYqQ/lf0c8FzlXqjhbUjQnk0olUWojdg/hqwuBzNnrg
+         SCxnF9siuuSCPa+RTBX90jfp2NJRig+hWMPIq4bloNXWOpoWFa9GHnR2c4YuCNQRtXAb
+         TPo2Nb+5xpT3hJtRVkLCAw+VYYyw7gaq0E7OMmjii45EuKcASuzp1rxZl6nbzjzbmuC8
+         EDan/UoKP0lvKybUfI2eyjeDn8TecZb1pvZKUhU0umK5jsjw/D2IDKcpaQgr9h0JGd0T
+         ATzIHnMu5fl44gLOWF8LmZs/MadlLNI6P0NeUMuqIZO7IxEDzfSYAi2vXlQHq2Pq/qu2
+         4Llg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=ifttwnYsIrEN6pRSBIiuqj7H8s+5kPdjKC4U9v3r5Ew=;
-        fh=JBRfcRsjXFFdns6mAmgYaf/O1NQfp/qIDa5sxLGyTzI=;
-        b=MqKQ6DDN88aLEWXKye2rGb3pg5Cy1M5afEsbRPaiNRG6qOz6qes6fOtyJ2GG5n4+Em
-         WAyDjY+im5Fic9Caq3JXPhYXvt+lK4Y97oHs82kYufYH9DDjz1S5qyY8XJLPfNYomGkl
-         YPEVHULEQQLfzQOewR+gekOOX4Sz+34DC0hbbQ2Uf1vQli9A8BWkRXk8gCg6tEpZjtqg
-         uUX5kyAPCbNeMbGALPi9TdK+cXhwWVPiQVUZUwMkXhoP2Ytywtg2OpAErld9qOASH/Ut
-         LLUVyDjglX2hWEP0cU1GzLCi9RNpqYh1CcRnY3rHUfmz6oEu0Eero8Eri/QmB6Xg7JQG
-         3yNg==;
+        bh=WVyG+GjslObEPoiorlcEtEb0lbImQuwl2+xBSlYjPvU=;
+        fh=B9hcVx/XeyNB7wnvFQl5s8IWC4Rhl0EJh/GiBumJZkQ=;
+        b=LiYa82d0K9jB5WlVNIUh+egUymFgbWA6wxQ8ze0WYDQm9b1NvWRmGazFXb43gC9Tku
+         4oJ/CZi7Es7FoK1rla4KrJzcBpiTemJ9HN7Xn/9Zearf8o0T5pqwWWxuGUYiXfKwpqtA
+         jY4AASSB9dm+Z2/OSpHl6ai0r553mnK9I5v8iArdgOtdKB2EXHR2IUjfB54nBx6nKa89
+         9gvzNTAbIe+wn979qs5XKB8DbpGXaciYmVTTZdY2ULVkNoyNWIp09PB3IeL2GJ4o0ZLi
+         j23qmg9ZMccVVfgYTcDq72399tw231BgtKsppvpII9bwewwxm4/C0JEN/8lAJOuIkSqD
+         MuAQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771954438; x=1772559238; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771954647; x=1772559447; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ifttwnYsIrEN6pRSBIiuqj7H8s+5kPdjKC4U9v3r5Ew=;
-        b=jolJbCoXdMN41Sl54UH1EhIF9lYgMnUAkv31VR7d6YHVfXhNEMI/oWJeEqnwMX6hHl
-         TXbMLy906AtVogBxlEiPhmHP2/az0SGQhOe2Wk8iSROqBd1ZVWZ9FQu0biRx/10+7W9v
-         9vsTLLwtCZvluGsn7DRIhKOr8fJpk8xV1sg2pmfX1MMyoJLgm9bu/Z55W4/uMZ6ejAWA
-         oPZ2xKSlt3hnT73Wi2swQS2owsGclHr3lFH+SjxmRPrb7Jq0rrgaNsZRKBKURZCiUdZe
-         fV6uj9DlFicm9uEimVZ1LpRi55AsLMi9t/kE7ornmeU7Z08w94OggX7daje69SKh6xP4
-         ICfQ==
+        bh=WVyG+GjslObEPoiorlcEtEb0lbImQuwl2+xBSlYjPvU=;
+        b=O+yyE1qxUOAg6dKVlAaP7DqeAKGiTg2vj+80mJTczPFmVifUrvXeiRAUTHwcY494hs
+         nYb1zcEenz5Pr9R+S5wX2fzs6WzUVhJq3NHDLMU1dUIaQLuUMHJZppn+L6jA2ywQRraX
+         e0mJSaajncxDDeSLw5ZGMRSxhBxvuucjh4gIMTqlxMEn9XOaUjH+JZpANuq66YMr/C77
+         cVNZr4KOfDMzrm6CHNWYiua1MCYdmhCYINFR4ZAoUJe0W+1ywY/RGZKP0jA5xVOuFSPN
+         CedJgKBY/KmNHzfLvo3a+Lt7jvxYnRPAZFJmKLozY4jiCcQo3hZpYtW8JIF7cczZ3JQp
+         WWQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771954438; x=1772559238;
+        d=1e100.net; s=20230601; t=1771954647; x=1772559447;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ifttwnYsIrEN6pRSBIiuqj7H8s+5kPdjKC4U9v3r5Ew=;
-        b=i93z/3pUrow0GSifRcs/bbShueiZx5ivXD2g9kcSwP/VZlv4T+awaEC7oyUZWzqcWC
-         wC41M/C7f5r0kL9hwF/AKYJG0tE7OmzPGkuu9DoDhQ+ee3gHOvRK1OWSDEWKuJJen2KJ
-         yz+dSftBAbl4kFQYFwSzKY6Oe4vwJHrxzTg0VNPNwli2G4utz0axrioaftj6ErhC58Ne
-         rqNOcHh2m3Bg/K4wLU+bUsXG6m+vcxumCRjLWD3ZJbDV/w8hbICfjlCQU8jGRAZuD9ld
-         cPqg3sttLC6Yf81Ca8uG8R6ewCjIR9JYtxXhwllk5qaUXDg/O6Q86EqT0Sb30hbEWCQp
-         u6Ng==
-X-Forwarded-Encrypted: i=1; AJvYcCWZPtzszju+4GuOyz9SXUaaFTuv+5udqDZtnPHpTXb/wrW+8DixJwGw9vJYYSxalwT3Z6c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlYdTcm9QWte3coqyKY4w7Jk2PQRniNUri7cWUHpowV4r2J2+x
-	Nh1OSOF0hK6zHwjz9L5UY+zMq9aTfjt1M3UHBNK6SHTD3WFbFmHfYTBWRm66Fmy0Je8uHGcWqqE
-	GUIpyYuzmsFuTicNwhKQu6NzoJVNBiFl69C4Cx4SL
-X-Gm-Gg: ATEYQzwpWKtAZX4Nbnwp3yqzMGTbXgYirauy7T4KSPhFa8zg4ktES4oL462bpsA21cI
-	p78pfRdwoHSS+PIj+wUrAZspCK88hTktxxMN5ku8m8zIHJRcvrqJ0e1gOKYeqJKZ1mP7V6+1nHS
-	J98RSlHXUj2lxfp+tVNzxTMYVvMYWBOgk+nuxSUQ24oz/iPj8WIL0X2C0MPyzNnQDBpnMNPbXk7
-	jAHdfsAo8I6qzwHNy3DnMjtJOd1C7HPUzkqOm2V66RQm9oBiQEDB/AkC5tIgruAV196cIxlaoKH
-	m/V9aNY=
-X-Received: by 2002:a05:6102:e0a:b0:5ef:b32c:dff8 with SMTP id
- ada2fe7eead31-5feffd8e046mr571923137.5.1771954437826; Tue, 24 Feb 2026
- 09:33:57 -0800 (PST)
+        bh=WVyG+GjslObEPoiorlcEtEb0lbImQuwl2+xBSlYjPvU=;
+        b=PIiDnUEu4WWGZtvnkzB+6Y3Atn7NMmvbqymG72YNdTolBnhkzUBhKLTDe3Da/wxiAR
+         YoYEjRRXqgjpNYaWaIJiAOammlvx7FXVJLul1E3s7PDKdbT9uaLgWsWQJkKOPZB4g+Zf
+         4U8CQccWWLcRoREHe+v4kfItj0FB7M7AU2VNvvkfQOpN/Cxdk1//1OxWHy1RCzZjOBHI
+         EW5OO512CxksQvDztpJ54K18hA99Dze8vR2omqmlo/vWYwJ60CLCXJIDuiAnrRWhu5A1
+         e0JIUa88bRRYXIDGSodwvACMzyeyNloeKo4fxc4dD3BKP+wESdv4WVpeN/zqBMUnhjUX
+         HZfg==
+X-Forwarded-Encrypted: i=1; AJvYcCU4FdQLYhT3wGglQp0gGUoO/w4vjueqzIw7rnTNK4XM/boeDtPG8XPEacievYLneaozaVU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyo0T+bn0P3eIWhhVjITChG2HeRTqxGFD9qsWesoa9kJ6KHIwQH
+	UOHzfcl7uf+Kyv2UT5U4nDMwlvTFMVv3XobTZreaxp8qxQ2l/SkThrU91KeiDru/Rt6/whj9Nx6
+	Vn/Bi5qr7Kb6Kcm4ZYSe7MKCK2eN7p7qImOP/4gwB
+X-Gm-Gg: ATEYQzyME551nVG2glZdQGl7ywiBS+4zrld+MkqUxcRmd+OcW30V+0JP68XvyehZquq
+	+WzAQKIgL2dQPxNfR64ALOcwGQjf7sL8EdFr+V9Un4A8kfhPu793k/dJDIbrg2UX89CXwkhLnC/
+	kjtg3BmhYbXN0gQftlzitcM6PdPi8OW9K+4+/qRDUk16A3w/YBr1u9ldVkLfZ+c8snXUHt37jjP
+	rwaxRh6Afbv1t17q5Y3uakKX/xW7TdLe/8OIn5fmCTXFFPMEGU4UbBC6wU95GbMJKWG6+h8aRBT
+	kTWcmnQ=
+X-Received: by 2002:a05:6102:e11:b0:5f5:3835:4796 with SMTP id
+ ada2fe7eead31-5feb2eebe4fmr7234443137.15.1771954646379; Tue, 24 Feb 2026
+ 09:37:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260129212510.967611-1-dmatlack@google.com> <20260129212510.967611-3-dmatlack@google.com>
- <aZ1svGur9IxQ7Td2@google.com>
-In-Reply-To: <aZ1svGur9IxQ7Td2@google.com>
+References: <20260129212510.967611-1-dmatlack@google.com> <20260129212510.967611-4-dmatlack@google.com>
+ <aZ1xAyN0vgLWIi5y@google.com>
+In-Reply-To: <aZ1xAyN0vgLWIi5y@google.com>
 From: David Matlack <dmatlack@google.com>
-Date: Tue, 24 Feb 2026 09:33:28 -0800
-X-Gm-Features: AaiRm50ftzuk34ivxDcB4SNiM7gs91UDwPlTbTMB1CMe8djixeonPg3t_5VqAYg
-Message-ID: <CALzav=fSpd6H5pQNtJoFHdNtWVO11vffhWQFsMFkM+osGuE0wQ@mail.gmail.com>
-Subject: Re: [PATCH v2 02/22] PCI: Add API to track PCI devices preserved
- across Live Update
+Date: Tue, 24 Feb 2026 09:36:50 -0800
+X-Gm-Features: AaiRm51zYRUGqNlquBQBjZ_Ao68Y3fgUdHKViouV8m9qg-AcIptaKIFOE6taQzc
+Message-ID: <CALzav=cMsDyUrOPgkr5ouROPmsEAN2icsL266M4FxY3P6BNd1w@mail.gmail.com>
+Subject: Re: [PATCH v2 03/22] PCI: Inherit bus numbers from previous kernel
+ during Live Update
 To: Pranjal Shrivastava <praan@google.com>
 Cc: Alex Williamson <alex@shazbot.org>, Adithya Jayachandran <ajayachandra@nvidia.com>, 
 	Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>, 
@@ -137,11 +137,11 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71630-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71631-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -155,150 +155,42 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 8C21618A94A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: A975E18A9D7
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 1:18=E2=80=AFAM Pranjal Shrivastava <praan@google.c=
+On Tue, Feb 24, 2026 at 1:36=E2=80=AFAM Pranjal Shrivastava <praan@google.c=
 om> wrote:
-> On Thu, Jan 29, 2026 at 09:24:49PM +0000, David Matlack wrote:
-> > + * Copyright (c) 2025, Google LLC.
+> On Thu, Jan 29, 2026 at 09:24:50PM +0000, David Matlack wrote:
+
+> > +     if (pci_liveupdate_incoming_nr_devices())
+> > +             return false;
 >
-> Nit: Should these be 2026 now?
+> Following the comment on Patch 2 regarding propagating errors, the check
+> if (pci_liveupdate_incoming_nr_devices()) should be made explicit to
+> distinguish between "Preservation Active" and "Retrieval Failed".
 
-Yes! Thanks for catching that.
+As mentioned in the previous patch, the errors mean "no incoming
+devices" rather than "retrieval failed".
 
-> > +int pci_liveupdate_outgoing_preserve(struct pci_dev *dev)
-> > +{
-> > +     struct pci_dev_ser new =3D INIT_PCI_DEV_SER(dev);
-> > +     struct pci_ser *ser;
-> > +     int i, ret;
-> > +
-> > +     /* Preserving VFs is not supported yet. */
-> > +     if (dev->is_virtfn)
-> > +             return -EINVAL;
-> > +
-> > +     guard(mutex)(&pci_flb_outgoing_lock);
-> > +
-> > +     if (dev->liveupdate_outgoing)
-> > +             return -EBUSY;
-> > +
-> > +     ret =3D liveupdate_flb_get_outgoing(&pci_liveupdate_flb, (void **=
-)&ser);
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     if (ser->nr_devices =3D=3D ser->max_nr_devices)
-> > +             return -E2BIG;
+> >                               while (parent->parent) {
+> > -                                     if ((!pcibios_assign_all_busses()=
+) &&
+> > +                                     if (!assign_all_busses &&
+> >                                           (parent->busn_res.end > max) =
+&&
+> >                                           (parent->busn_res.end <=3D ma=
+x+i)) {
+> >                                               j =3D 1;
 >
-> I'm wondering how (or if) this handles hot-plugged devices?
-> max_nr_devices is calculated based on for_each_pci_dev at the time of
-> the first preservation.. what happens if a device is hotplugged after
-> the first device is preserved but before the second one is, does
-> max_nr_devices become stale? Since ser->max_nr_devices will not reflect
-> the actual possible device count, potentially leading to an unnecessary
-> -E2BIG failure?
+> Looks like we over-ride the pci=3Dassign-busses boot param here.
+> We should document how this change affects the pci=3Dassign-busses kernel
+> command line. If both are present, the inheritance required by LUO would
+> likely take precedence to prevent DMA corruption, but a doc update & a
+> warning to the user would be nice.
 
-Yes, it's possible to run out space to preserve devices if devices are
-hot-plugged and then preserved. But I think it's better to defer
-handling such a use-case exists (unless you see an obvious simple
-solution). So far I am not seeing preserving hot-plugged devices
-across Live Update as a high priority use-case to support.
-
-> > +u32 pci_liveupdate_incoming_nr_devices(void)
-> > +{
-> > +     struct pci_ser *ser;
-> > +     int ret;
-> > +
-> > +     ret =3D liveupdate_flb_get_incoming(&pci_liveupdate_flb, (void **=
-)&ser);
-> > +     if (ret)
-> > +             return 0;
->
-> Masking this error looks troubled, in the following patch, I see that
-> the retval 0 is treated as a fresh boot, but the IOMMU mappings for that
-> BDF might still be preserved? Which could lead to DMA aliasing issues,
-> without a hint of what happened since we don't even log anything.
-
-All fo the non-0 errors indicate there are 0 incoming devices at the
-time of the call, so I think returning 0 is appropriate.
-
- - EOPNOTSUPP: Live Update is not enabled.
- - ENODATA: Live Update is finished (all incoming devices have been restore=
-d).
- - ENOTENT: No PCI data was preserved across the Live Update.
-
-None of these cover the case where an IOMMU mapping for BDF X is
-preserved, but device X is not preserved. This is a case we should
-handle in some way... but here is not that place.
-
->
-> Maybe we could have something like the following:
->
-> int pci_liveupdate_incoming_nr_devices(void)
-> {
->         struct pci_ser *ser;
->         int ret;
->
->         ret =3D liveupdate_flb_get_incoming(&pci_liveupdate_flb, (void **=
-)&ser);
->         if (ret) {
->                 if (ret !=3D -ENOENT)
->                         pr_warn("PCI: Failed to retrieve preservation lis=
-t: %d\n", ret);
-
-This would cause this warning to get printed if Live Update was
-disabled, or if no PCI devices were preserved. But both of those are
-not error scenarios.
-
-> > +void pci_liveupdate_setup_device(struct pci_dev *dev)
-> > +{
-> > +     struct pci_ser *ser;
-> > +     int ret;
-> > +
-> > +     ret =3D liveupdate_flb_get_incoming(&pci_liveupdate_flb, (void **=
-)&ser);
-> > +     if (ret)
-> > +             return;
->
-> We should log something here either at info / debug level since the
-> error isn't bubbled up and the luo_core doesn't scream about it either.
-
-Any error from liveupdate_flb_get_incoming() simply means there are no
-incoming devices. So I don't think there's any error to report in
-dmesg.
-
-> > +     dev->liveupdate_incoming =3D !!pci_ser_find(ser, dev);
->
-> This feels a little hacky, shall we go for something like:
->
-> dev->liveupdate_incoming =3D (pci_ser_find(ser, dev) !=3D NULL); ?
-
-In my experience in the kernel (mostly from KVM), explicity comparison
-to NULL is less preferred to treating a pointer as a boolean. But I'm
-ok with following whatever is the locally preferred style for this
-kind of check.
-
-> > @@ -582,6 +583,10 @@ struct pci_dev {
-> >       u8              tph_mode;       /* TPH mode */
-> >       u8              tph_req_type;   /* TPH requester type */
-> >  #endif
-> > +#ifdef CONFIG_LIVEUPDATE
-> > +     unsigned int    liveupdate_incoming:1;  /* Preserved by previous =
-kernel */
-> > +     unsigned int    liveupdate_outgoing:1;  /* Preserved for next ker=
-nel */
-> > +#endif
-> >  };
->
-> This would start another anon bitfield container, should we move this
-> above within the existing bitfield? If we've run pahole and found this
-> to be better, then this should be fine.
-
-Yeah I simply appended these new fields to the very end of the struct.
-If we care about optimizing the packing of struct pci_dev I can find a
-better place to put it.
+Good call, I'll add a log message and update kernel-parameters.txt in v3.
 
