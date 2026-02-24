@@ -1,175 +1,178 @@
-Return-Path: <kvm+bounces-71556-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71557-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8HKXKBT2nGlEMQQAu9opvQ
-	(envelope-from <kvm+bounces-71556-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 01:51:32 +0100
+	id sMPxCPP2nGlkMQQAu9opvQ
+	(envelope-from <kvm+bounces-71557-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 01:55:15 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08E2D180511
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 01:51:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91A2018053E
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 01:55:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 191DF3046B96
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 00:51:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BD9A5305466E
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 00:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D537239E9B;
-	Tue, 24 Feb 2026 00:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF7C23ABBF;
+	Tue, 24 Feb 2026 00:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kY13hAt/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E+DgHxW0"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C0CDF59
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 00:51:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7A1223DE7
+	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 00:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771894276; cv=none; b=LIGAlnkWDVyqP45c/yGuyB5YC0KwYFPBChZW/raBKz3BCmYNnMX0AudnPVhRr67a7MkRQ/IT6448eQB1sk3+48yZ8vKBsqpdXRnN1Y6CeIIqQfE48rZDgFqMfKIEI7Rq0us9GaDd9MvuuBeU0P2kfpTZazxTTTpx4DeOnWabztg=
+	t=1771894510; cv=none; b=gjz4NjgSB7HwFx/KptTYY9uSvmOHJdeMTkCp3iCEhEY9EEWRLUI2rTFy50L8jiD3IhHVnW2E6NAVmgPuy8AuS97Unqe4HVYiYWevtmZLZjoZXxmDm1ue7UgaA/gBUfwLXNZOdeYhhs9C8GYVcJpI7CAiYG0yYbCEmQfSMr5Mma4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771894276; c=relaxed/simple;
-	bh=QyBeWgJTo9UA9GrHncoMlxJYBEa6ccrv4Man4D/b5I4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O94z+WUli23RiZjUkNt2VzNboHQp+0Wr75jxTZZRoFCnBcr0B2jzBitSiiRLkzNeQafQqSlc8GF+JrXa0+1aE+j6ZMWawOXInXUgDjoHynqpHjQH1Gdmkq+ECREDUOvQoUZU+7mjSQtYDZDEKLF9zODUYtp9XOMQsL4eV5v1cQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kY13hAt/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92F16C2BC86
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 00:51:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771894276;
-	bh=QyBeWgJTo9UA9GrHncoMlxJYBEa6ccrv4Man4D/b5I4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=kY13hAt/LRgrT+LJxmzBEQZi7eT+DerHFe/7FHbQ2avnpzUXh+sWH4iWp8YWIWWc9
-	 uyAXj80zAnqIFMNGM+G9Je9WhjVQsQHfnA6WoXIChwVBr9faF24STxdsS6RlI4Y4Eq
-	 FcfKuX9U2byXotcv4dPp8blW3sq6Wky6/zXdiJzVfPW/GibkhmFGmkSSJ2sPAQKhBK
-	 92r7MenqnmHukhkHYxvzt496rSvS1+H7RPTjt8bJ8tWSOaiWyBxVdmos6jC9ZUxBLV
-	 2Gzn+eGct4NVjutv3JIOvQt8kefWmYuTmMnpa+A7+KoDFQPHnfuJjqFI9e9KD8Sb6v
-	 3a+uazSEDurUw==
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b8845cb580bso755596266b.3
-        for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 16:51:16 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUFWt0cj503IZkLJGnHlqWrPMdRtVtNptqrlmOYR/WfbZAobsWtef7PEjNDHF+6r31nois=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyr2N4L4LEBwYB8LyIBzPBtJ79pamqAyGzvJS5gbyBULw/x14jd
-	FJq7G6mzcLnjkF6rhc8Nm023/uP3pmzpT/dO76oDw24QLpPAOYLu7wEswgnP8UBL60stiFd9gE4
-	PTjdGQtFjQ2SlHCtIfL6SgeJcQoQI9ac=
-X-Received: by 2002:a17:907:94cc:b0:b87:12d2:fa1a with SMTP id
- a640c23a62f3a-b908191f1d6mr627159866b.12.1771894275333; Mon, 23 Feb 2026
- 16:51:15 -0800 (PST)
+	s=arc-20240116; t=1771894510; c=relaxed/simple;
+	bh=yzHGZZ2ewLti5LjEpsu8YoWspgLFHukV4Dkns5nW6fo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Xp6LMhvSIVIPi2oeOlj/A8fPvs1gapBI7ahVT1EhF396j9JfsPUND42BKOM9ZVg7a2cFrT6/7lgtJx8EOe1bagi6YHYEWyS3OPu1zeE11V7zDtTDB7gvgw2PC2fsi++2wWZ2j3f0OHN3FzMyG8YWjMDMP9xjSoC+LQ89TXJSRnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E+DgHxW0; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35842aa350fso27996555a91.0
+        for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 16:55:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771894507; x=1772499307; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Qk5qzRrV4XbbKnkQ2PaR5i8agEGx80lRKWSK1C2rXwg=;
+        b=E+DgHxW0xZK41VGQCxO7ThCjjwz1GcT8Zi1sO1UWgIb5p+svhhFir4NB/jeqb+RmVE
+         YcfBEcHITD/fZ0Gaotk6k/XPN7yyji6tC8zQ7QjI7PYwRx6avBbjnWHTxy34xTkG7VFi
+         eQQFUQ7XyCGMMDK/Xta32BoPZRYoYw6ePpgLVEHrVGTPSXQcN9Vd/+/IyJhW6GmPSqAV
+         sQXJoi36EUoH83CSQRIB44gvT8kSXtCERvWdMegUTg9bjKQhq7LZAnPsqKee7X/MD2nQ
+         h8T0yP0qxUcgRiVknBg+CB4odT3HljEOrf6bCGFW+uaoGlq7lzOCX7gNkwnEZPro8qvQ
+         55VQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771894507; x=1772499307;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Qk5qzRrV4XbbKnkQ2PaR5i8agEGx80lRKWSK1C2rXwg=;
+        b=da5E7k7L9qPQIrbeb5ECBSBcfo66XWPzp1MurDjRBoHbiWDxDPw8ZiZmEwYsJbOEqK
+         TYKe2Gpb4l0XVlmGeO0hSn0qKUQU90vyu5WPUUt6aMpGdlr51je9oShjiGyIp9BKcL2Z
+         gb80W1YqtdTlbryaMzvyI7b2n7LjEXHKAcbZhyr1fWC+5GePukFFls8oOMVOFezokQwp
+         dSW1S9S134llPc/JnSU7bO7xc8nbpyWIgTk65LKrIBrfHrdMsyhGtw0MbcYMyjQc30pK
+         t2meVbqrppQo0hd40/BqaBU8RlKK5SXKsr83WlHkVq1r64cititdUnEfz+1pnXNB4PXc
+         PgWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV6mlYC+BWfVQ1kHacOLxdZBMibmFtLtHOCrxWzRKwYPxC+lSrXZSDvW4/v6nR2+g+mcjQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkCOB2fymerwvu4b6TXWEVryx7f0rrBnM3EDAs87H0mzby8hEA
+	84g0csFF8gm/7sSEwbYlkb6LModS9dTJpikKAGXpGJ0h3K0UaxpxckMq9iLXo0C5cww5mQjFZaY
+	WliEizB2cxPtj0A==
+X-Received: from pjbsz4.prod.google.com ([2002:a17:90b:2d44:b0:354:aa76:8270])
+ (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:548d:b0:353:e91:9b38 with SMTP id 98e67ed59e1d1-358aea06d44mr7524548a91.34.1771894507380;
+ Mon, 23 Feb 2026 16:55:07 -0800 (PST)
+Date: Mon, 23 Feb 2026 16:54:38 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260206190851.860662-1-yosry.ahmed@linux.dev>
- <20260206190851.860662-7-yosry.ahmed@linux.dev> <aZzyanOAcoAnh01A@google.com>
-In-Reply-To: <aZzyanOAcoAnh01A@google.com>
-From: Yosry Ahmed <yosry@kernel.org>
-Date: Mon, 23 Feb 2026 16:51:04 -0800
-X-Gmail-Original-Message-ID: <CAO9r8zMv6E5j7=c-1oqpOihWk0w6a0rexf5FRaP-7PZSwV4vBQ@mail.gmail.com>
-X-Gm-Features: AaiRm52y2dulrFZMsHBcOpUK4cHWuIY5Yvz9WheIyyxhCE9Z1O45g3b-M2dxO24
-Message-ID: <CAO9r8zMv6E5j7=c-1oqpOihWk0w6a0rexf5FRaP-7PZSwV4vBQ@mail.gmail.com>
-Subject: Re: [PATCH v5 06/26] KVM: nSVM: Triple fault if mapping VMCB12 fails
- on nested #VMEXIT
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.371.g1d285c8824-goog
+Message-ID: <20260224005500.1471972-1-jmattson@google.com>
+Subject: [PATCH v5 00/10] KVM: x86: nSVM: Improve PAT virtualization
+From: Jim Mattson <jmattson@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Yosry Ahmed <yosry@kernel.org>
+Cc: Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71556-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71557-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 08E2D180511
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 91A2018053E
 X-Rspamd-Action: no action
 
-> > @@ -1146,8 +1136,16 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
-> >       /* in case we halted in L2 */
-> >       kvm_set_mp_state(vcpu, KVM_MP_STATE_RUNNABLE);
-> >
-> > +     svm->nested.vmcb12_gpa = 0;
-> > +
-> > +     if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map)) {
-> > +             kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
-> > +             return 1;
->
-> Returning early isn't entirely correct.  In fact, I think it's worse than the
-> current behavior in many aspects.
->
-> By doing leave_guest_mode() and not switching back to vmcb01 and not putting
-> vcpu->arch.mmu back to root_mmu, the vCPU will be in L1 but with vmcb02 and L2's
-> MMU active.
+Currently, KVM's implementation of nested SVM treats the PAT MSR the same
+way whether or not nested NPT is enabled: L1 and L2 share a single
+PAT. However, the APM specifies that when nested NPT is enabled, the host
+(L1) and the guest (L2) should have independent PATs: hPAT for L1 and gPAT
+for L2. This patch series implements the architectural specification in
+KVM.
 
-Hmm yeah, the same problem also exists in
-nested_svm_vmrun_error_vmexit() after "KVM: nSVM: Restrict mapping
-VMCB12 on nested VMRUN". In that path, we only need to map vmcb12 to
-zero event_inj in __nested_svm_vmexit(). We can probably move them to
-the callers (nested_svm_vmrun_error_vmexit() and nested_svm_vmexit())
-to make it easier to skip if mapping fails.
+Use the existing PAT MSR (vcpu->arch.pat) for hPAT. Add a new field,
+svm->nested.gpat, for gPAT. With nested NPT enabled, redirect guest
+accesses to the IA32_PAT MSR to gPAT. All other accesses, including
+userspace accesses via KVM_{GET,SET}_MSRS, continue to reference hPAT.  The
+special handling of userspace accesses ensures save/restore forward
+compatibility (i.e. resuming a new checkpoint on an older kernel). When an
+old kernel restores a checkpoint from a new kernel, the gPAT will be lost,
+and L2 will simply use L1's PAT, which is the existing behavior of the old
+kernel anyway.
 
->
-> The idea I can come up with is to isolate the vmcb12 writes (which is suprisingly
-> straightforward), and then simply skip the vmcb12 updates.  E.g.
->
-> ---
-[..]
-> @@ -1184,14 +1168,53 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
->         if (guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS))
->                 vmcb12->control.next_rip  = vmcb02->control.next_rip;
->
-> +       if (nested_vmcb12_has_lbrv(vcpu))
-> +               svm_copy_lbrs(&vmcb12->save, &vmcb02->save);
-> +
->         vmcb12->control.int_ctl           = svm->nested.ctl.int_ctl;
->         vmcb12->control.event_inj         = svm->nested.ctl.event_inj;
->         vmcb12->control.event_inj_err     = svm->nested.ctl.event_inj_err;
->
-> +       trace_kvm_nested_vmexit_inject(vmcb12->control.exit_code,
-> +                                      vmcb12->control.exit_info_1,
-> +                                      vmcb12->control.exit_info_2,
-> +                                      vmcb12->control.exit_int_info,
-> +                                      vmcb12->control.exit_int_info_err,
-> +                                      KVM_ISA_SVM);
-> +}
-> +
-> +int nested_svm_vmexit(struct vcpu_svm *svm)
-> +{
-> +       struct kvm_vcpu *vcpu = &svm->vcpu;
-> +       struct vmcb *vmcb01 = svm->vmcb01.ptr;
-> +       struct vmcb *vmcb02 = svm->nested.vmcb02.ptr;
-> +       struct vmcb *vmcb12;
-> +       struct kvm_host_map map;
-> +       int rc;
-> +
-> +       if (!kvm_vcpu_map(vcpu, gpa_to_gfn(svm->nested.vmcb12_gpa), &map)) {
-> +               vmcb12 = map.hva;
+v1: https://lore.kernel.org/kvm/20260113003016.3511895-1-jmattson@google.com/
+v2: https://lore.kernel.org/kvm/20260115232154.3021475-1-jmattson@google.com/
+v3: https://lore.kernel.org/kvm/20260205214326.1029278-1-jmattson@google.com/
+v4: https://lore.kernel.org/kvm/20260212155905.3448571-1-jmattson@google.com/
 
-Maybe also kvm_vcpu_map() mapping call to
-nested_svm_vmexit_update_vmcb12() and inject a tripe fault if it
-fails? Probably plays nicer with "KVM: nSVM: Restrict mapping VMCB12
-on nested VMRUN".
+  v4 -> v5:
+  * Separate commit to remove vmcb_is_dirty() from first v4 commit [Yosry, Sean]
+  * Introduce svm_get_pat and svm_set_pat to keep all hPAT vs gPAT logic
+    together in one place.
+  * Remove the no longer common logic for get/set IA32_PAT. [Sean]
+  * Make vmcb02's g_pat authoritative for gPAT.
+  * Clear legacy_gpat_semantics when forcing the vCPU out of guest mode and
+    when processing a second KVM_SET_NESTED_STATE that doesn't have legacy
+    semantics. [Sean]
 
-Otherwise it looks good to me.
+Note that this series should be applied after Yosry's v5 "Nested SVM fixes,
+cleanups, and hardening."
 
-Should I send a new version to add all the changes?
+Jim Mattson (10):
+  KVM: SVM: Remove vmcb_is_dirty()
+  KVM: x86: nSVM: Clear VMCB_NPT clean bit when updating hPAT from guest
+    mode
+  KVM: x86: nSVM: Cache and validate vmcb12 g_pat
+  KVM: x86: nSVM: Set vmcb02.g_pat correctly for nested NPT
+  KVM: x86: nSVM: Redirect IA32_PAT accesses to either hPAT or gPAT
+  KVM: x86: Remove common handling of MSR_IA32_CR_PAT
+  KVM: x86: nSVM: Save gPAT to vmcb12.g_pat on VMEXIT
+  KVM: x86: nSVM: Save/restore gPAT with KVM_{GET,SET}_NESTED_STATE
+  KVM: x86: nSVM: Handle restore of legacy nested state
+  KVM: selftests: nSVM: Add svm_nested_pat test
+
+ arch/x86/include/uapi/asm/kvm.h               |   5 +
+ arch/x86/kvm/svm/nested.c                     |  63 +++-
+ arch/x86/kvm/svm/svm.c                        |  57 +++-
+ arch/x86/kvm/svm/svm.h                        |  20 +-
+ arch/x86/kvm/vmx/vmx.c                        |   9 +-
+ arch/x86/kvm/x86.c                            |   9 -
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../selftests/kvm/x86/svm_nested_pat_test.c   | 298 ++++++++++++++++++
+ 8 files changed, 422 insertions(+), 40 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/svm_nested_pat_test.c
+
+-- 
+2.53.0.371.g1d285c8824-goog
+
 
