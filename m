@@ -1,247 +1,255 @@
-Return-Path: <kvm+bounces-71604-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71605-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Ed9Gp92nWmAQAQAu9opvQ
-	(envelope-from <kvm+bounces-71604-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 10:59:59 +0100
+	id 6IawIct6nWmAQAQAu9opvQ
+	(envelope-from <kvm+bounces-71605-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 11:17:47 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FEF41850E9
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 10:59:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7B8318535A
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 11:17:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B859D300693C
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 09:59:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C64B315450E
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 10:14:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5843374169;
-	Tue, 24 Feb 2026 09:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D166377558;
+	Tue, 24 Feb 2026 10:14:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nhbSBJ0t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xutZiDmS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6261372B5B;
-	Tue, 24 Feb 2026 09:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771927175; cv=none; b=pyDTcmftWOqUIoLtdnkgxSPt43VjDs3rYNjHhgxMMwvU2chZMnGACj1UK5oRmkStd2tQ1fUhSmgO5EmdO8NUkrSp2dgoaFhI4wIiLvkMeddrvhpg7xf/HVpfzceHRH+PPBOIbYn5hM7P/gjphOaEQn7C1c9ZDVN0wpa6ohifJWs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771927175; c=relaxed/simple;
-	bh=O+Zfk8pGYhZ441ezTmlQeAxENiyrxw4mHnh8Grp9ijA=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:Subject:From:
-	 References:In-Reply-To; b=Ac1reyFCOrtsGpFy+ZuAbtbJ4fTiFHlaGhskzwTzxdOijTMiTI5H+2OXZe5xgyghSe5wVwOSa6scTiCrGJTT3n3hqPnoOFaU1aXkW9Bza4Lcx1vB93RXF183orIZnlhR+AQSugFvUokPvzOFkvfEQL8dtHBEVIUXPcRASvrpA98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nhbSBJ0t; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61NJ0XIs3294422;
-	Tue, 24 Feb 2026 09:59:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=YCCV5l
-	xRdf4T7FqyIrwuoRCkVr0xbrZ7pAvhQ4fOuDs=; b=nhbSBJ0tTevdXKZc4KITBv
-	5aFtX90AB59l8LvuFdjWLJNEaOHjbiySP76u76cf3O6wfVajpX9GADwKs1Wsive+
-	gfxdjnHlGg0xjZ6ZiperdGOrzb0IX9SImwRP6OC1t5KVikFEerFl7+Cut1fMAkMN
-	ISdf1nXVdxsXs0ML00Gluews4f/Yt9Ll+PTKJKjF+48S+ZipIkZQcCBIcmc7twP0
-	bGsDEYeO2bJfvkR6CNS43N2vzKahS2OCYTyRF346iYkJ2vsG/DGZzl7yWe6yJhDT
-	EE8669fjqd6jFWPgkDpVoIIhYhIFquVR9RHQUq9E9mKrkW5RcLC3rtwQZtYJvZjg
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cf4brtcg8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Feb 2026 09:59:32 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61O8XJVq003382;
-	Tue, 24 Feb 2026 09:59:31 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cfs8jr6nb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Feb 2026 09:59:31 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61O9xRwD39911714
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 24 Feb 2026 09:59:27 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BD2D320043;
-	Tue, 24 Feb 2026 09:59:27 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 92D4E20040;
-	Tue, 24 Feb 2026 09:59:27 +0000 (GMT)
-Received: from darkmoore (unknown [9.87.150.101])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 24 Feb 2026 09:59:27 +0000 (GMT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5854A376BC8
+	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 10:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771928049; cv=pass; b=HJGwrXIt5hBmLjgiG88YDpy6dwqERY82unxOak+dkvB8S/iot04gWG6zaPKgEHP0uWsJrm92rkAed55bBv+twFsYjGQa1e4sTCxAUFdXfhrPN13+EOmDEICG9CPW9KHv1N54DD473ZW167q/Oxc/t1kHd3W5ahTvD1W0e7FRBKw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771928049; c=relaxed/simple;
+	bh=IyKhJiJuQRzoX6JzUZnwApPT0auX0X1bnVL6krBBBGY=;
+	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nlFuly0+WAHRzk2LL2DGZy0Vjm9v2nRBxmqZBwRbpNTtwBpWWb7lDnfqQrsoZOnTc+A7o+9C8/k5XRcUKUueqAJ9ErDBB2/eGQvnOzV3s9fsPm7zeQaMqrijQdniQFcxrYu3AHqsL8uc7ssjCOaqscyyBaa4azZ2g6xTdJZQEts=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xutZiDmS; arc=pass smtp.client-ip=209.85.217.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-5f9ed174ebcso2965663137.1
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 02:14:08 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771928047; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NaJedhNOf1/mvJ1xMArk48MHIEWb54NxPzNX9jK9XzEBZHE7S7JpdKtKMIoM4l4ayY
+         YonFVfNpZ0LHdCwwlGbStrdKkTgh3yBcW3ejU+Nn8yc0lCqiM0XKAaRbo8imi42svRij
+         kz17c89/evtn03nLJHSE/vHrCWmUgfhfhU8zSVQSI4nLgAta6yALvvFxWDoSLOsfr8FZ
+         iKKzpjjytjGKU8WyICHbjcGxXEAOiONp8xTenv/hi3Bk2PGjzv48a4tmx8/T1nbWbE3c
+         NKCLxqKzgn4k4PN43wNOatjDdwJMiUEs4Qqnp2VUyvXv9g7xNQUwmKgr61kc33BJpbDz
+         CXbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:dkim-signature;
+        bh=LuhKBmL9p2A6pZ7W4MZ0PQ69Fw1Xjb7zt9bmn80iyFA=;
+        fh=QuGRZV+lwkLB3Ja08qWMJmOBQhdHSed+R2+HERPlsPk=;
+        b=OqCtib3lUu5Jth/jOIohMHsEUDaOlVziCthg9Dh1Y53cIa4oMwxzrYO8HrqRFtDgeP
+         MmtHxBqVzyV9i0woX2Ps7IgMFajeFJve+DvwTr8c/5RuSkKufCujNcvxgeq7zUq7+a6Q
+         k5T5sEqHdEmlq+8yjOJEyXK8+FbsRcXpu6y/LEWo4IlIxcgD7n6VnBoPNAmMcgQWSCb5
+         oOXNMYLrzXeew/gP5C9Jiwx6zG42oisBafscu54wj2nVcJ0vYkqNbmILaPL9YYDEmrsH
+         I3Bif12AVe0FD0tjZtBdPCF7vNQ9S8qJj9hdhSGY/0mCIDNtx+cY7pn7H6mlUvPNTA03
+         hHMg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771928047; x=1772532847; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LuhKBmL9p2A6pZ7W4MZ0PQ69Fw1Xjb7zt9bmn80iyFA=;
+        b=xutZiDmSUlD/DMw9tfRVwQ9hAjtus32ia4wnAOb4AbBw7jr2Pm/Xeyu4VTDbCOhraH
+         MrgT5sQiAEgdjnlWVSDG2WKes5jO3DXmb/YOByUrMxO3MXnvVegtgdeaA9+2fF3Wq1Om
+         u9Sv0YWyLXsQQd+5xV6tfBcgSbDj2yKpD5aCdSGwyMZACC0ZPvJX6Q39jfIp8NrTgJjw
+         kyq5c4qxILldKJznLZvhwWn3nF/DgY5oMxa84BvNp7Jnaejlif8GJxMO6NswQUUEHtsQ
+         DMl5rPYwO77Zq/dJ/jbcRSeY2UsVNhd2Nte7ea3TQgG/BmmYWAzBsySDJUuwnLu+KX14
+         Nv3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771928047; x=1772532847;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LuhKBmL9p2A6pZ7W4MZ0PQ69Fw1Xjb7zt9bmn80iyFA=;
+        b=cbNh4D9OUDnjO5CJAO6SrzVlEXRXHXNnZBh0Z0iP6PozvfLnjdMwAhexMA+vYMGCga
+         j8R4LvgK4FkTFQYrFs8OHQNPRe6pDsR2OJy/EnF8629mKuGfvvAOrqOSp/m1Lc3JHZD1
+         dBTK8hLRN8x2qeEjzOis9hRK0fPDcxpWON1vEwQfK+kNIFOtFp93q79IGnfmCzd9eAvq
+         PLTGoC6OA27gjbTxQo8u7cGmmhW/tyue6WMhSca3BM7rAwpvg1mB7DpHeALd0f4l8GLa
+         /VYnrTi2pHa/hE6MZJkv5puz6Ehn8UlvSMt6DThmt+gEvh1v0iyO26X1yxY5DHyJc+ry
+         09iQ==
+X-Gm-Message-State: AOJu0YxKWVe08keOhT3SzW3hEh4Il3kBuF1iB7oaFvu8+OtUP7KvtVIA
+	G+pjwjtz8rTneYP4AwGiYM9j8v2t0UME2jKWFu4yKSJSTs8q1Rt1ebdBj1Qd5EDYNB8GTCj8iN0
+	fE4u6pl2YaTwRtUCEa9Z/fdRAa/8mUuZs85iZjhuiLAsN5l872bVLPxN0LUpHVA==
+X-Gm-Gg: ATEYQzy+F7qcKsZRqM1B1HG5W3kuOI8/BKX6RcLRBiki2DR5k9sOir59A4bHhzIoXwX
+	ZAnUb+XRtWlwfNuFRDysICKeGE6e/i4XiTWCrOR0RbRYYL9xK3IISA7wVnmmW0uQ5/EfXNlKghi
+	/90Jd757275qGoGAyV0IanqIwtLFsnkuDhJjgSbnpHtLNU3oR1KHgibICBSBGOH3ezKquGJrx+9
+	+3/+mz2s8d3p0ygYAtDnxs0nOnVUdN70SHyia6W86QyymrVm4aIaHtRT/0wKqYYiSkXf3AJL6MD
+	untlWI2MrbRFScnpF0wGVNVUOb2fmpxGtDsSxE3s
+X-Received: by 2002:a05:6102:e11:b0:5f8:d3b4:9517 with SMTP id
+ ada2fe7eead31-5feb2c4ea4amr5648164137.0.1771928046467; Tue, 24 Feb 2026
+ 02:14:06 -0800 (PST)
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 24 Feb 2026 02:14:05 -0800
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 24 Feb 2026 02:14:05 -0800
+From: Ackerley Tng <ackerleytng@google.com>
+In-Reply-To: <CAEvNRgFMNywpDRr+WeNsVj=MnsbhZp9H3j0QRDo_eOP+kGCNJw@mail.gmail.com>
+References: <cover.1770071243.git.ackerleytng@google.com> <86ad28b767524e1e654b9c960e39ca8bfb24c114.1770071243.git.ackerleytng@google.com>
+ <CAEvNRgFMNywpDRr+WeNsVj=MnsbhZp9H3j0QRDo_eOP+kGCNJw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 24 Feb 2026 10:59:22 +0100
-Message-Id: <DGN3R8SWDO7Q.1HPQ9C03X4YUJ@linux.ibm.com>
-Cc: "Christian Borntraeger" <borntraeger@linux.ibm.com>,
-        "Claudio Imbrenda"
- <imbrenda@linux.ibm.com>,
-        "Heiko Carstens" <hca@linux.ibm.com>,
-        "Vasily
- Gorbik" <gor@linux.ibm.com>,
-        "Alexander Gordeev" <agordeev@linux.ibm.com>,
-        "Sven Schnelle" <svens@linux.ibm.com>,
-        "Hendrik Brueckner"
- <brueckner@linux.ibm.com>,
-        "Nina Schoetterl-Glausch" <nsg@linux.ibm.com>, <kvm@vger.kernel.org>
-To: "Janosch Frank" <frankja@linux.ibm.com>,
-        "Christoph Schlameuss"
- <schlameuss@linux.ibm.com>,
-        <linux-s390@vger.kernel.org>
-Subject: Re: [PATCH 4/4] KVM: s390: vsie: Implement ASTFLEIE facility 2
-From: "Christoph Schlameuss" <schlameuss@linux.ibm.com>
-X-Mailer: aerc 0.21.0
-References: <20260212-vsie-alter-stfle-fac-v1-0-d772be74a4da@linux.ibm.com>
- <20260212-vsie-alter-stfle-fac-v1-4-d772be74a4da@linux.ibm.com>
- <ee72e730-87f2-439e-b6a6-2f153ec055af@linux.ibm.com>
-In-Reply-To: <ee72e730-87f2-439e-b6a6-2f153ec055af@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: C_rxH_J27SunkGsgJ_5s0tssjLs4zv93
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI0MDA4MSBTYWx0ZWRfX42d0Wq6SvxMr
- UJ0itOLDzTDlhwgKHPYDbUFe4b3ap4QTeIxvwQV9b/7NG+QejWA0NvVv+frCSWMP6tYmYyXt8aq
- H+zPQHeDnWsD6kt9LqWajNsU4j19Y0o0JtkUxXen2usvrbtD1fxuHju+kf/ysXp/6+hQvKCNCCp
- yUylGTUe52YQ5Yb2uDozx/p7Kiqq6/x7AK6SPbxrU+eNF2ff7paG94kiqgsEA6OyqNJh9OmsW0R
- E7rc/Ikk8CikVh0O/S8wVbYfsI1FOJBfxbBsZW43aM7UYkRbs5tW0kkIJYtXJisOXaNvznYQsDE
- pC0QglXJ9sONd9qmEhGymyfV6IrGU7OmR05xmFN4E52BSh77oJVZQQIevR/cxI5gWx9Y/qmQutI
- 3lhutFnHXp2b1uWTb8XO5AV3S2k/x+q3GERuS4Hk+uxABRWJqHLYneKTT7NEo0mqhpMhPkKDOHb
- ECgXr+of90QC8eBqZlA==
-X-Authority-Analysis: v=2.4 cv=eNceTXp1 c=1 sm=1 tr=0 ts=699d7684 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8
- a=AQfm25OE03uikATvrrkA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: C_rxH_J27SunkGsgJ_5s0tssjLs4zv93
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-24_01,2026-02-23_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 phishscore=0 suspectscore=0 adultscore=0
- bulkscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602240081
+MIME-Version: 1.0
+Date: Tue, 24 Feb 2026 02:14:05 -0800
+X-Gm-Features: AaiRm51EKOaIOw7Xa64Dg1IqVEZq_6qI_aDRRZTOYQVamaSRRKhT7UeHK_oqjfM
+Message-ID: <CAEvNRgFBLgvYoR_XTH-LiN1Q00R9u1HGC5URbstLPxYtedS0MA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 09/37] KVM: guest_memfd: Add support for KVM_SET_MEMORY_ATTRIBUTES2
+To: kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, x86@kernel.org
+Cc: aik@amd.com, andrew.jones@linux.dev, binbin.wu@linux.intel.com, 
+	bp@alien8.de, brauner@kernel.org, chao.p.peng@intel.com, 
+	chao.p.peng@linux.intel.com, chenhuacai@kernel.org, corbet@lwn.net, 
+	dave.hansen@linux.intel.com, david@kernel.org, hpa@zytor.com, 
+	ira.weiny@intel.com, jgg@nvidia.com, jmattson@google.com, jroedel@suse.de, 
+	jthoughton@google.com, maobibo@loongson.cn, mathieu.desnoyers@efficios.com, 
+	maz@kernel.org, mhiramat@kernel.org, michael.roth@amd.com, mingo@redhat.com, 
+	mlevitsk@redhat.com, oupton@kernel.org, pankaj.gupta@amd.com, 
+	pbonzini@redhat.com, prsampat@amd.com, qperret@google.com, 
+	ricarkol@google.com, rick.p.edgecombe@intel.com, rientjes@google.com, 
+	rostedt@goodmis.org, seanjc@google.com, shivankg@amd.com, shuah@kernel.org, 
+	steven.price@arm.com, tabba@google.com, tglx@linutronix.de, 
+	vannapurve@google.com, vbabka@suse.cz, willy@infradead.org, wyihan@google.com, 
+	yan.y.zhao@intel.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-71604-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[schlameuss@linux.ibm.com,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71605-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 8FEF41850E9
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_GT_50(0.00)[50];
+	TO_DN_NONE(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E7B8318535A
 X-Rspamd-Action: no action
 
-On Fri Feb 20, 2026 at 11:07 AM CET, Janosch Frank wrote:
-> On 2/12/26 10:24, Christoph Schlameuss wrote:
->> From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
->>=20
->> Implement shadowing of format-2 facility list when running in VSIE.
->>=20
->> ASTFLEIE2 is available since IBM z16.
->> To function G1 has to run this KVM code and G1 and G2 have to run QEMU
->> with ASTFLEIE2 support.
->>=20
->> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
->> Co-developed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
->> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
->> ---
->
-> [...]
->
->> +static int handle_stfle_2(struct kvm_vcpu *vcpu, struct vsie_page *vsie=
-_page,
->> +			  u32 fac_list_origin)
->> +{
->> +	struct kvm_s390_sie_block *scb_s =3D &vsie_page->scb_s;
->> +	u8 *shadow_fac =3D &vsie_page->fac[0];
->> +	u64 len;
->> +
->> +	if (read_guest_real(vcpu, fac_list_origin, &len, sizeof(len)))
->> +		return set_validity_icpt(scb_s, 0x1090U);
->> +	fac_list_origin +=3D sizeof(len);
->> +	len =3D (len & 0xff);
->> +	memcpy(shadow_fac, &len, sizeof(len)); /* discard reserved bits */
->> +	shadow_fac +=3D sizeof(len);
->
-> You can choose between adding a struct for the new format and what you=20
-> did here. Is this really the better option?
->
->
-> Add the struct and add a constant for the format 2 format control used=20
-> in the second to last line of this function while you're at it.
->
+Ackerley Tng <ackerleytng@google.com> writes:
 
-Will do.
-
->> +	len +=3D 1;
->> +	/* assert no overflow with maximum len */
->> +	BUILD_BUG_ON(sizeof(vsie_page->fac) < 257 * sizeof(u64));> +	if (read_=
-guest_real(vcpu, fac_list_origin, shadow_fac, len *=20
-> sizeof(u64)))
->> +		return set_validity_icpt(scb_s, 0x1090U);
+> Ackerley Tng <ackerleytng@google.com> writes:
 >
-> Sprinkle in some \n between the build bugs and code or just move them to=
-=20
-> the top as one block.
-> I'd much rather have build bugs at the top of the function than inside=20
-> the code.
->
->> +	BUILD_BUG_ON(!IS_ALIGNED(offsetof(struct vsie_page, fac), 8));
->
-> That was already added last patch, no?
->
+>>
+>> [...snip...]
+>>
+> Before this lands, Sean wants, at the very minimum, an in-principle
+> agreement on guest_memfd behavior with respect to whether or not memory
+> should be preserved on conversion.
+>>
+>> [...snip...]
+>>
 
-Yes, it was. Keeping the one in handle_stfle(). We actually can put both ne=
-wly
-introduced build bug macros there.
+Here's what I've come up with, following up from last guest_memfd
+biweekly.
 
->> +	scb_s->fac =3D (u32)virt_to_phys(&vsie_page->fac) | 2;
->> +	return 0;
->> +}
->> +
->>   /*
->>    * Try to shadow + enable the guest 2 provided facility list.
->>    * Retry instruction execution if enabled for and provided by guest 2.
->> @@ -1057,9 +1080,11 @@ static int handle_stfle(struct kvm_vcpu *vcpu, st=
-ruct vsie_page *vsie_page)
->>   		case 0:
->>   			return handle_stfle_0(vcpu, vsie_page, fac_list_origin);
->>   		case 1:
->> +			return set_validity_icpt(&vsie_page->scb_s, 0x1330U);
->>   		case 2:
->> +			return handle_stfle_2(vcpu, vsie_page, fac_list_origin);
->>   		case 3:
->> -			unreachable();
->> +			return set_validity_icpt(&vsie_page->scb_s, 0x1330U);
->>   		}
->>   	}
->>   	return 0;
->>=20
+Every KVM_SET_MEMORY_ATTRIBUTES2 request will be accompanied by an
+enum set_memory_attributes_content_policy:
 
+    enum set_memory_attributes_content_policy {
+    	SET_MEMORY_ATTRIBUTES_CONTENT_ZERO,
+    	SET_MEMORY_ATTRIBUTES_CONTENT_READABLE,
+    	SET_MEMORY_ATTRIBUTES_CONTENT_ENCRYPTED,
+    }
+
+Within guest_memfd's KVM_SET_MEMORY_ATTRIBUTES2 handler, guest_memfd
+will make an arch call
+
+    kvm_gmem_arch_content_policy_supported(kvm, policy, gfn, nr_pages)
+
+where every arch will get to return some error if the requested policy
+is not supported for the given range.
+
+ZERO is the simplest of the above, it means that after the conversion
+the memory will be zeroed for the next reader.
+
++ TDX and SNP today will support ZERO since the firmware handles
+  zeroing.
++ pKVM and SW_PROTECTED_VM will apply software zeroing.
++ Purpose: having this policy in the API allows userspace to be sure
+  that the memory is zeroed after the conversion - there is no need to
+  zero again in userspace (addresses concern that Sean pointed out)
+
+READABLE means that after the conversion, the memory is readable by
+userspace (if converting to shared) or readable by the guest (if
+converting to private).
+
++ TDX and SNP (today) can't support this, so return -EOPNOTSUPP
++ SW_PROTECTED_VM will support this and do nothing extra on
+  conversion, since there is no encryption anyway and all content
+  remains readable.
++ pKVM will make use of the arch function above.
+
+Here's where I need input: (David's questions during the call about
+the full flow beginning with the guest prompted this).
+
+Since pKVM doesn't encrypt the memory contents, there must be some way
+that pKVM can say no when userspace requests to convert and retain
+READABLE contents? I think pKVM's arch function can be used to check
+if the guest previously made a conversion request. Fuad, to check that
+the guest made a conversion request, what's other parameters are
+needed other than gfn and nr_pages?
+
+ENCRYPTED means that after the conversion, the memory contents are
+retained as-is, with no decryption.
+
++ TDX and SNP (today) can't support this, so return -EOPNOTSUPP
++ pKVM and SW_PROTECTED_VM can do nothing, but doing nothing retains
+  READABLE content, not ENCRYPTED content, hence SW_PROTECTED_VM
+  should return -EOPNOTSUPP.
++ Michael, you mentioned during the call that SNP is planning to
+  introduce a policy that retains the ENCRYPTED version for a special
+  GHCB call. ENCRYPTED is meant for that use case. Does it work? I'm
+  assuming that SNP should only support this policy given some
+  conditions, so would the arch call as described above work?
++ If this policy is specified on conversion from shared to private,
+  always return -EOPNOTSUPP.
++ When this first lands, ENCRYPTED will not be a valid option, but I'm
+  listing it here so we have line of sight to having this support.
+
+READABLE and ENCRYPTED defines the state after conversion clearly
+(instead of DONT_CARE or similar).
+
+DESTROY could be another policy, which means that after the
+conversion, the memory is unreadable. This is the option to address
+what David brought up during the call, for cases where userspace knows
+it is going to free the memory already and doesn't care about the
+state as long as nobody gets to read it. This will not implemented
+when feature first lands, but is presented here just to show how this
+can be extended in future.
+
+Right now, I'm thinking that one of the above policies MUST be
+specified (not specifying a policy will result in -EINVAL).
+
+How does this sound?
 
