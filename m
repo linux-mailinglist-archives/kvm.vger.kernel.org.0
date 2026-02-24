@@ -1,255 +1,171 @@
-Return-Path: <kvm+bounces-71605-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71606-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6IawIct6nWmAQAQAu9opvQ
-	(envelope-from <kvm+bounces-71605-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 11:17:47 +0100
+	id OBtwAGd6nWmAQAQAu9opvQ
+	(envelope-from <kvm+bounces-71606-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 11:16:07 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7B8318535A
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 11:17:46 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6079A1852FB
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 11:16:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0C64B315450E
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 10:14:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 562F930A4CD0
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 10:16:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D166377558;
-	Tue, 24 Feb 2026 10:14:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F7937757A;
+	Tue, 24 Feb 2026 10:16:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xutZiDmS"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="lteHn4Kh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5854A376BC8
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 10:14:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771928049; cv=pass; b=HJGwrXIt5hBmLjgiG88YDpy6dwqERY82unxOak+dkvB8S/iot04gWG6zaPKgEHP0uWsJrm92rkAed55bBv+twFsYjGQa1e4sTCxAUFdXfhrPN13+EOmDEICG9CPW9KHv1N54DD473ZW167q/Oxc/t1kHd3W5ahTvD1W0e7FRBKw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771928049; c=relaxed/simple;
-	bh=IyKhJiJuQRzoX6JzUZnwApPT0auX0X1bnVL6krBBBGY=;
-	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nlFuly0+WAHRzk2LL2DGZy0Vjm9v2nRBxmqZBwRbpNTtwBpWWb7lDnfqQrsoZOnTc+A7o+9C8/k5XRcUKUueqAJ9ErDBB2/eGQvnOzV3s9fsPm7zeQaMqrijQdniQFcxrYu3AHqsL8uc7ssjCOaqscyyBaa4azZ2g6xTdJZQEts=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xutZiDmS; arc=pass smtp.client-ip=209.85.217.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-5f9ed174ebcso2965663137.1
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 02:14:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771928047; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NaJedhNOf1/mvJ1xMArk48MHIEWb54NxPzNX9jK9XzEBZHE7S7JpdKtKMIoM4l4ayY
-         YonFVfNpZ0LHdCwwlGbStrdKkTgh3yBcW3ejU+Nn8yc0lCqiM0XKAaRbo8imi42svRij
-         kz17c89/evtn03nLJHSE/vHrCWmUgfhfhU8zSVQSI4nLgAta6yALvvFxWDoSLOsfr8FZ
-         iKKzpjjytjGKU8WyICHbjcGxXEAOiONp8xTenv/hi3Bk2PGjzv48a4tmx8/T1nbWbE3c
-         NKCLxqKzgn4k4PN43wNOatjDdwJMiUEs4Qqnp2VUyvXv9g7xNQUwmKgr61kc33BJpbDz
-         CXbA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:dkim-signature;
-        bh=LuhKBmL9p2A6pZ7W4MZ0PQ69Fw1Xjb7zt9bmn80iyFA=;
-        fh=QuGRZV+lwkLB3Ja08qWMJmOBQhdHSed+R2+HERPlsPk=;
-        b=OqCtib3lUu5Jth/jOIohMHsEUDaOlVziCthg9Dh1Y53cIa4oMwxzrYO8HrqRFtDgeP
-         MmtHxBqVzyV9i0woX2Ps7IgMFajeFJve+DvwTr8c/5RuSkKufCujNcvxgeq7zUq7+a6Q
-         k5T5sEqHdEmlq+8yjOJEyXK8+FbsRcXpu6y/LEWo4IlIxcgD7n6VnBoPNAmMcgQWSCb5
-         oOXNMYLrzXeew/gP5C9Jiwx6zG42oisBafscu54wj2nVcJ0vYkqNbmILaPL9YYDEmrsH
-         I3Bif12AVe0FD0tjZtBdPCF7vNQ9S8qJj9hdhSGY/0mCIDNtx+cY7pn7H6mlUvPNTA03
-         hHMg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771928047; x=1772532847; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LuhKBmL9p2A6pZ7W4MZ0PQ69Fw1Xjb7zt9bmn80iyFA=;
-        b=xutZiDmSUlD/DMw9tfRVwQ9hAjtus32ia4wnAOb4AbBw7jr2Pm/Xeyu4VTDbCOhraH
-         MrgT5sQiAEgdjnlWVSDG2WKes5jO3DXmb/YOByUrMxO3MXnvVegtgdeaA9+2fF3Wq1Om
-         u9Sv0YWyLXsQQd+5xV6tfBcgSbDj2yKpD5aCdSGwyMZACC0ZPvJX6Q39jfIp8NrTgJjw
-         kyq5c4qxILldKJznLZvhwWn3nF/DgY5oMxa84BvNp7Jnaejlif8GJxMO6NswQUUEHtsQ
-         DMl5rPYwO77Zq/dJ/jbcRSeY2UsVNhd2Nte7ea3TQgG/BmmYWAzBsySDJUuwnLu+KX14
-         Nv3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771928047; x=1772532847;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LuhKBmL9p2A6pZ7W4MZ0PQ69Fw1Xjb7zt9bmn80iyFA=;
-        b=cbNh4D9OUDnjO5CJAO6SrzVlEXRXHXNnZBh0Z0iP6PozvfLnjdMwAhexMA+vYMGCga
-         j8R4LvgK4FkTFQYrFs8OHQNPRe6pDsR2OJy/EnF8629mKuGfvvAOrqOSp/m1Lc3JHZD1
-         dBTK8hLRN8x2qeEjzOis9hRK0fPDcxpWON1vEwQfK+kNIFOtFp93q79IGnfmCzd9eAvq
-         PLTGoC6OA27gjbTxQo8u7cGmmhW/tyue6WMhSca3BM7rAwpvg1mB7DpHeALd0f4l8GLa
-         /VYnrTi2pHa/hE6MZJkv5puz6Ehn8UlvSMt6DThmt+gEvh1v0iyO26X1yxY5DHyJc+ry
-         09iQ==
-X-Gm-Message-State: AOJu0YxKWVe08keOhT3SzW3hEh4Il3kBuF1iB7oaFvu8+OtUP7KvtVIA
-	G+pjwjtz8rTneYP4AwGiYM9j8v2t0UME2jKWFu4yKSJSTs8q1Rt1ebdBj1Qd5EDYNB8GTCj8iN0
-	fE4u6pl2YaTwRtUCEa9Z/fdRAa/8mUuZs85iZjhuiLAsN5l872bVLPxN0LUpHVA==
-X-Gm-Gg: ATEYQzy+F7qcKsZRqM1B1HG5W3kuOI8/BKX6RcLRBiki2DR5k9sOir59A4bHhzIoXwX
-	ZAnUb+XRtWlwfNuFRDysICKeGE6e/i4XiTWCrOR0RbRYYL9xK3IISA7wVnmmW0uQ5/EfXNlKghi
-	/90Jd757275qGoGAyV0IanqIwtLFsnkuDhJjgSbnpHtLNU3oR1KHgibICBSBGOH3ezKquGJrx+9
-	+3/+mz2s8d3p0ygYAtDnxs0nOnVUdN70SHyia6W86QyymrVm4aIaHtRT/0wKqYYiSkXf3AJL6MD
-	untlWI2MrbRFScnpF0wGVNVUOb2fmpxGtDsSxE3s
-X-Received: by 2002:a05:6102:e11:b0:5f8:d3b4:9517 with SMTP id
- ada2fe7eead31-5feb2c4ea4amr5648164137.0.1771928046467; Tue, 24 Feb 2026
- 02:14:06 -0800 (PST)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 24 Feb 2026 02:14:05 -0800
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 24 Feb 2026 02:14:05 -0800
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <CAEvNRgFMNywpDRr+WeNsVj=MnsbhZp9H3j0QRDo_eOP+kGCNJw@mail.gmail.com>
-References: <cover.1770071243.git.ackerleytng@google.com> <86ad28b767524e1e654b9c960e39ca8bfb24c114.1770071243.git.ackerleytng@google.com>
- <CAEvNRgFMNywpDRr+WeNsVj=MnsbhZp9H3j0QRDo_eOP+kGCNJw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA3737754C;
+	Tue, 24 Feb 2026 10:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771928161; cv=none; b=B/9n7B7T8duWJfEkUqOkZbBAJ4fNdKHhyPAqQqL/0S2YUqbNiJMfvQPvY0o7/3LKngr1aweMUzWynFSL812zhiN2tYAL+ndsg8K7OGohdAF62uCOxpk9+jvJRgMHi3s9a/c+AVxMQInjjLgTISyEa9/mnIylG8EId1EbP2VG6kk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771928161; c=relaxed/simple;
+	bh=5B5cAzdDcjLLpVYza5TDGpe1UXwE3kCTyLiwb2CY1oM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ta0N6OaU+Wdg8TePncAmBIDQ6lczmolkOt5SEV/X5xGzXxmdzomNLuiOd0mOzrwmNPpgBBr0/YYpghREajXzEfcJ/4e8RAIvC5HkYpU7QFuN9HcxMgZSgmrP+tbguxbg+S+8mZnF5uxb6KjRjvftYg5CPjwypQVlFRm0aSmhz+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=lteHn4Kh; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
+	Content-Type; bh=+y6mpXkhpbtYLeqbNljk7F9iKBKEFPBV8KPGNECdZ50=;
+	b=lteHn4KhorCsEwXQBa93Oc/jks7LbvF3bYClSeIFeb2JquQbnPMP3UEScgGRQx
+	MGjJkGOD9EKcpMBcgdIbp+gHXsHXJdyfe/jeyIA6tFB24mryudNmTbsdqq81c8J/
+	zGmziDx6k1OGF0WXSHlpwdbbO5OOrbS9abDyG8nIzqWL4=
+Received: from [10.0.2.15] (unknown [])
+	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wDnT786ep1pPJVVMQ--.54843S2;
+	Tue, 24 Feb 2026 18:15:24 +0800 (CST)
+Message-ID: <4d17f847-0269-4a97-aa28-d3350faaf9c0@163.com>
+Date: Tue, 24 Feb 2026 18:15:12 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 24 Feb 2026 02:14:05 -0800
-X-Gm-Features: AaiRm51EKOaIOw7Xa64Dg1IqVEZq_6qI_aDRRZTOYQVamaSRRKhT7UeHK_oqjfM
-Message-ID: <CAEvNRgFBLgvYoR_XTH-LiN1Q00R9u1HGC5URbstLPxYtedS0MA@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 09/37] KVM: guest_memfd: Add support for KVM_SET_MEMORY_ATTRIBUTES2
-To: kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, x86@kernel.org
-Cc: aik@amd.com, andrew.jones@linux.dev, binbin.wu@linux.intel.com, 
-	bp@alien8.de, brauner@kernel.org, chao.p.peng@intel.com, 
-	chao.p.peng@linux.intel.com, chenhuacai@kernel.org, corbet@lwn.net, 
-	dave.hansen@linux.intel.com, david@kernel.org, hpa@zytor.com, 
-	ira.weiny@intel.com, jgg@nvidia.com, jmattson@google.com, jroedel@suse.de, 
-	jthoughton@google.com, maobibo@loongson.cn, mathieu.desnoyers@efficios.com, 
-	maz@kernel.org, mhiramat@kernel.org, michael.roth@amd.com, mingo@redhat.com, 
-	mlevitsk@redhat.com, oupton@kernel.org, pankaj.gupta@amd.com, 
-	pbonzini@redhat.com, prsampat@amd.com, qperret@google.com, 
-	ricarkol@google.com, rick.p.edgecombe@intel.com, rientjes@google.com, 
-	rostedt@goodmis.org, seanjc@google.com, shivankg@amd.com, shuah@kernel.org, 
-	steven.price@arm.com, tabba@google.com, tglx@linutronix.de, 
-	vannapurve@google.com, vbabka@suse.cz, willy@infradead.org, wyihan@google.com, 
-	yan.y.zhao@intel.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/4] KVM: x86: selftests: Add Hygon CPUs support and
+ fix failures
+To: seanjc@google.com, pbonzini@redhat.com, shuah@kernel.org
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260212103841.171459-1-zhiquan_li@163.com>
+From: Zhiquan Li <zhiquan_li@163.com>
+Content-Language: en-US
+In-Reply-To: <20260212103841.171459-1-zhiquan_li@163.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:_____wDnT786ep1pPJVVMQ--.54843S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJw47XF1ruF1fZw45KF1DAwb_yoW5Jw1xpa
+	4Fvan0kFsrJ3WIka4xtr1kXr1Iyrs3CFWUtr1Ut347Aw15Aa4xtw4Ska1UZ3Z3Cr4rZ3y5
+	Aa4DtF43Ga1UAaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U7CzNUUUUU=
+X-CM-SenderInfo: 52kl13xdqbzxi6rwjhhfrp/xtbCwh1vWGmdej1v4AAA3U
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71605-lists,kvm=lfdr.de];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-71606-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_GT_50(0.00)[50];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[163.com];
+	DKIM_TRACE(0.00)[163.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[zhiquan_li@163.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_NONE(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E7B8318535A
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6079A1852FB
 X-Rspamd-Action: no action
 
-Ackerley Tng <ackerleytng@google.com> writes:
 
-> Ackerley Tng <ackerleytng@google.com> writes:
->
->>
->> [...snip...]
->>
-> Before this lands, Sean wants, at the very minimum, an in-principle
-> agreement on guest_memfd behavior with respect to whether or not memory
-> should be preserved on conversion.
->>
->> [...snip...]
->>
+On 2/12/26 18:38, Zhiquan Li wrote:
+> This series to add support for Hygon CPUs and fix 11 KVM selftest failures
+> on Hygon architecture.
+> 
+> Patch 1 add CPU vendor detection for Hygon and add a global variable
+> "host_cpu_is_hygon" to identify if the test is running on a Hygon CPU.
+> It is the prerequisite for the following fixes.
+> 
+> Patch 2 add a flag to identify AMD compatible CPU and figure out the
+> compatible cases, so that Hygon CPUs can re-use them.
+> Following test failures on Hygon platform can be fixed by this patch:
+> - access_tracking_perf_test
+> - demand_paging_test
+> - dirty_log_perf_test
+> - dirty_log_test
+> - kvm_page_table_test
+> - memslot_modification_stress_test
+> - pre_fault_memory_test
+> - x86/dirty_log_page_splitting_test
+> - x86/fix_hypercall_test
+> 
+> Patch 3 fix x86/pmu_event_filter_test failure by allowing the tests for
+> Hygon CPUs.
+> 
+> Patch 4 fix x86/msrs_test failure while writing the MSR_TSC_AUX reserved
+> bits without RDPID support.
+> Sean has made a perfect solution for the issue and provided the patch.
+> It has been verified on Intel, AMD and Hygon platforms, no regression.
+> 
 
-Here's what I've come up with, following up from last guest_memfd
-biweekly.
+Kindly ping for any review on these.
 
-Every KVM_SET_MEMORY_ATTRIBUTES2 request will be accompanied by an
-enum set_memory_attributes_content_policy:
+Best Regards,
+Zhiquan
 
-    enum set_memory_attributes_content_policy {
-    	SET_MEMORY_ATTRIBUTES_CONTENT_ZERO,
-    	SET_MEMORY_ATTRIBUTES_CONTENT_READABLE,
-    	SET_MEMORY_ATTRIBUTES_CONTENT_ENCRYPTED,
-    }
+> ---
+> 
+> V1: https://lore.kernel.org/kvm/20260209041305.64906-1-zhiquan_li@163.com/T/#t
+> 
+> Changes since V1:
+> - Rebased to kvm-x86/next.
+> - Followed Sean's suggestion, added a flag to identify AMD compatible test
+>   cases, then v1/patch 2 and v1/patch 3 can be combined to v2/patch 2.
+> - Followed Sean's suggestion, simplified patch 4, that is v2/patch 3 now.
+> - Sean provided the v2/patch 4 for the issue reported by v1/patch5, I
+>   replaced my SoB with "Reported-by" tag.
+> 
+> ---
+> 
+> Sean Christopherson (1):
+>   KVM: selftests: Fix reserved value WRMSR testcase for multi-feature
+>     MSRs
+> 
+> Zhiquan Li (3):
+>   KVM: x86: selftests: Add CPU vendor detection for Hygon
+>   KVM: x86: selftests: Add a flag to identify AMD compatible test cases
+>   KVM: x86: selftests: Allow the PMU event filter test for Hygon
+> 
+>  .../testing/selftests/kvm/include/x86/processor.h |  7 +++++++
+>  tools/testing/selftests/kvm/lib/x86/processor.c   | 15 +++++++++++----
+>  .../selftests/kvm/x86/fix_hypercall_test.c        |  2 +-
+>  tools/testing/selftests/kvm/x86/msrs_test.c       |  4 ++--
+>  .../selftests/kvm/x86/pmu_event_filter_test.c     |  3 ++-
+>  .../testing/selftests/kvm/x86/xapic_state_test.c  |  2 +-
+>  6 files changed, 24 insertions(+), 9 deletions(-)
+> 
+> 
+> base-commit: e944fe2c09f405a2e2d147145c9b470084bc4c9a
 
-Within guest_memfd's KVM_SET_MEMORY_ATTRIBUTES2 handler, guest_memfd
-will make an arch call
-
-    kvm_gmem_arch_content_policy_supported(kvm, policy, gfn, nr_pages)
-
-where every arch will get to return some error if the requested policy
-is not supported for the given range.
-
-ZERO is the simplest of the above, it means that after the conversion
-the memory will be zeroed for the next reader.
-
-+ TDX and SNP today will support ZERO since the firmware handles
-  zeroing.
-+ pKVM and SW_PROTECTED_VM will apply software zeroing.
-+ Purpose: having this policy in the API allows userspace to be sure
-  that the memory is zeroed after the conversion - there is no need to
-  zero again in userspace (addresses concern that Sean pointed out)
-
-READABLE means that after the conversion, the memory is readable by
-userspace (if converting to shared) or readable by the guest (if
-converting to private).
-
-+ TDX and SNP (today) can't support this, so return -EOPNOTSUPP
-+ SW_PROTECTED_VM will support this and do nothing extra on
-  conversion, since there is no encryption anyway and all content
-  remains readable.
-+ pKVM will make use of the arch function above.
-
-Here's where I need input: (David's questions during the call about
-the full flow beginning with the guest prompted this).
-
-Since pKVM doesn't encrypt the memory contents, there must be some way
-that pKVM can say no when userspace requests to convert and retain
-READABLE contents? I think pKVM's arch function can be used to check
-if the guest previously made a conversion request. Fuad, to check that
-the guest made a conversion request, what's other parameters are
-needed other than gfn and nr_pages?
-
-ENCRYPTED means that after the conversion, the memory contents are
-retained as-is, with no decryption.
-
-+ TDX and SNP (today) can't support this, so return -EOPNOTSUPP
-+ pKVM and SW_PROTECTED_VM can do nothing, but doing nothing retains
-  READABLE content, not ENCRYPTED content, hence SW_PROTECTED_VM
-  should return -EOPNOTSUPP.
-+ Michael, you mentioned during the call that SNP is planning to
-  introduce a policy that retains the ENCRYPTED version for a special
-  GHCB call. ENCRYPTED is meant for that use case. Does it work? I'm
-  assuming that SNP should only support this policy given some
-  conditions, so would the arch call as described above work?
-+ If this policy is specified on conversion from shared to private,
-  always return -EOPNOTSUPP.
-+ When this first lands, ENCRYPTED will not be a valid option, but I'm
-  listing it here so we have line of sight to having this support.
-
-READABLE and ENCRYPTED defines the state after conversion clearly
-(instead of DONT_CARE or similar).
-
-DESTROY could be another policy, which means that after the
-conversion, the memory is unreadable. This is the option to address
-what David brought up during the call, for cases where userspace knows
-it is going to free the memory already and doesn't care about the
-state as long as nobody gets to read it. This will not implemented
-when feature first lands, but is presented here just to show how this
-can be extended in future.
-
-Right now, I'm thinking that one of the above policies MUST be
-specified (not specifying a policy will result in -EINVAL).
-
-How does this sound?
 
