@@ -1,80 +1,83 @@
-Return-Path: <kvm+bounces-71644-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71645-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yB2aGyrtnWncSgQAu9opvQ
-	(envelope-from <kvm+bounces-71644-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 19:25:46 +0100
+	id oLDiA17unWncSgQAu9opvQ
+	(envelope-from <kvm+bounces-71645-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 19:30:54 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 107F018B569
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 19:25:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6405418B68A
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 19:30:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ACC8B3004636
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:25:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C5A6A306B2F6
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:25:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26F433AD9C;
-	Tue, 24 Feb 2026 18:25:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 896A23AA1A4;
+	Tue, 24 Feb 2026 18:25:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gi1b/Iap"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0apdZdVQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
+Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896112874E6
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 18:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9A93644A7
+	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 18:25:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771957539; cv=none; b=hVBzwMNsvLQwxq11YUt1uZnJ7SqFabseEPnkcpQxzaLYI5AKUk5V9X42q5DAj1eLSZNVIZAIKKvZGtJ9vMOnhrEVgG1wYIcqB+TXSnn89vq3tHgXzS+5tecgrYdVJ7tWppRiJFLIUMPT0+6oCFEpJhm680MIZfUCKf0/dmxyca8=
+	t=1771957539; cv=none; b=mNRNVYOtD4A9SnSJAtiUZoBaHhDJ2yYGdocyraOxFHUrEfqi4V3qQoAyoU/f9WYkyhcv09E83Xj2OO6sNyWEoFU5UFoL2fsHnF0nGF88RJEENzDpa88nvMW2New3ftxXyBY4uvIKMvKf10zEM/HtIswi1PZS28DSZnbtn9fWg/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1771957539; c=relaxed/simple;
-	bh=uuqe1GZHlkUKstTlH2UG6Od3U3SW4paxzIEGbvrLeak=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LSxpwyEqAwymmt5b7fLyHZSZPU4ooUvfnGPdh7vP8pLf7RwgPtnQTM3KCoN2OTieVJoViSFz5oO5OWjrq4ffRRfVBbcyLrxD2eO9JF5zuEjTc22JPPLKiYq+RWR2xZF3NKhrtcICElwce4F10l2jnXLmcuQhuJJ4m3xtopYgbuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gi1b/Iap; arc=none smtp.client-ip=209.85.210.74
+	bh=VPgmUc1W/PstaSNg9BA0aLpGy2DMtKlMVZ2vml+wXjk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iw5ZAh9CW0kcQ0aYzl4ahAu4k8t+OSF+S033K/WvIOvcfLcn0zF6iP0bOhi1YKyx22ZJSd6n6eYverMILygiSLUQlf7bSwXoI3MaWYJoKvegVEW9Tof3cubwzpW2S5A3MIwXKMlIdv1uuxZPdUhFupNi95/L8QQRf4h6PDbqL4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0apdZdVQ; arc=none smtp.client-ip=209.85.210.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
-Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-7d18cbba769so56923934a34.3
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 10:25:37 -0800 (PST)
+Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7d4bd29099eso71121236a34.2
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 10:25:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771957536; x=1772562336; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FSfrPHwZe7tcTRvqF7oCxkJB0Uyq1ow3w008PpM/4ww=;
-        b=gi1b/IapIc7W/ucjMlFBn8Mx4IwsL7PKlKceEei1cqzzHkgUefSyJHaC0ki3+sI8Rs
-         KhA7fPJ9FiKl0Jqf2sSPi9SbIFtua1wA1AJc2an+wFeDp2Cj6stu0F8Zpq57bQhwBgi/
-         LxhpRVYHgUMeKeoACmvU8Hnt+GKRCPEoKxaa3yJro48bTnE6ONFrFg2XhgaBlufDc0AQ
-         Kps/Bdswjgnxh1c8HId4Yr0idhKGh8u9iWOpDpQOFczOwi7OiceorDg/+F9LlsbGxhus
-         JqwJyMAxDNc2J8VfY0cEftnRgXRv88AbSewZtUz63NDgfAx4I8ABsN97XjNnsA/C34xg
-         w8Mw==
+        d=google.com; s=20230601; t=1771957537; x=1772562337; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7yYcH80TlRJEoXywxjzS5+u+dAUmU/HoiYfOPoDy8HQ=;
+        b=0apdZdVQB/JmCQOSbUbi9f5xpj2xgoo1bAicH5C1C2IDBl5/Q3RNr5jXe/BThAT8EX
+         VlXczEHsZUMSWjiWSwSl7mvNPQwX+FBGtn5+3sNFw++7Ii1Fee3JUM1scRFHzKR5fJdZ
+         JwRXnZ+CZXxZkPhVJ2g1mraf+1Uyff7Z4NVNWUc+h+dqdKf1qYcUENfpKyUnDTja6O3Q
+         oRG0YnVie9HPkbii9pxf79jzFDEOK32Qb+fACn1j60EyK/2/BhsJKZ+qC0kdo9FmP/Z5
+         KgYGkTvduUEq1ycgZ8iwn6+UQ7G9SpN53XFqhXeZy4ayHdHYhFy3LLzFD9qQ5fboRgoP
+         RWVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771957536; x=1772562336;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FSfrPHwZe7tcTRvqF7oCxkJB0Uyq1ow3w008PpM/4ww=;
-        b=exlkyPTc13Px46uWVA8PrvL/MyKLm36Gm+4wzMugA/TXRoL0Gxbe3Sm91syHcWUWj8
-         k2yY7lfNMgJ6U41QHejX+MJxVgPR/zFer1XPRp9wXUl9GE26/G8ernWpIGNEL7YThEaN
-         PM4E8B4vCifHiwl9HGcUbyzl2tcgWU3YmAd2SiTrEEkU8jv9vb71yz8FS1t7T9+WvHyr
-         fEu0l1BSV2suRFdWRwfHKsDM0p2U6Y31P2HldLdRU7dN3aWeA6ooVTiTajeBDt3I2ELm
-         MEIY5duI4DdQBi4V/tV5VpfJbapWiwx1tz02kqX5B52OWMtDwidO9vVh/UH1o5VDO56Y
-         TSjw==
-X-Forwarded-Encrypted: i=1; AJvYcCV6qPqQODwte4LUBPmoFhJERvaI/V2xdg+7BZFapt5/dM9A7mG43W+Si8IuPy8kJYqRTKQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyu415W8rSWER7KwEVM3fTV8wvY1fMFSx9CfyHUmYlwzmT+VqWo
-	yA/E3p0MXqBwMAbgwnIF63THAD07NuSeZ01zhC9AmJ7JDGsulCTLeg3+WpJAgJUUOPf9AZjxr/y
-	D8e5h3D34Zw==
-X-Received: from illo6.prod.google.com ([2002:a05:6e02:1146:b0:43c:22f4:457c])
- (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6820:626:b0:679:e750:6c10
- with SMTP id 006d021491bc7-679e7506da8mr232713eaf.24.1771957536129; Tue, 24
- Feb 2026 10:25:36 -0800 (PST)
-Date: Tue, 24 Feb 2026 18:25:24 +0000
+        d=1e100.net; s=20230601; t=1771957537; x=1772562337;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7yYcH80TlRJEoXywxjzS5+u+dAUmU/HoiYfOPoDy8HQ=;
+        b=Rzyzbj/neaPIH4G7+t3z9fmRq7p4DG75xn/T3GKFORTMYREiKFK8a/Hg/jcUlk+pTo
+         Iqm+Z0YxIHuEcgXd/zlqZMJgqhdEK5aHJ1VMhGoE1W/C2KvQOlJ7LqryZ6bfyvJyQjFX
+         MHg3DTefS3SwCQYHqMU4J8AtCJMa+8fcpXSfDvhJQKajzm7sAVwjYMv2Vz2waz1aP8Yr
+         p1pH/hKjOa9ZqxeldCaCDVvLCkllWx/v6LgJSQvQ6AvOK3ev4NDhBNiU2VNdiaEyt+8L
+         WqOi4lUexjbRWDY5IZUFPGL+Vn7uxfZAFmwTyrJs1N9CatvjxMUGjU2YraKmALP+pYPv
+         dSwg==
+X-Forwarded-Encrypted: i=1; AJvYcCW01xH4FYhe0xRrb3U3DTJYcjWLSdnwkHOZHMbhUpDAVCFPMvYPSnRHy0lqGLCGMfGLbq4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0qZx9lZ9TcFNWmTPsjLKlC9utI23CdEwH3zQ77ikTYnTf/uMo
+	huhEgS3la1GBhI9u0OHzAwAbbD2ljGHgwaEF8ptweTImBPd5ODUjSjYFOzTwoxL0G/z1qUi6nfo
+	hTiRqFWiyDA==
+X-Received: from ilqk1.prod.google.com ([2002:a92:c9c1:0:b0:4e0:8c1e:e15])
+ (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6820:169e:b0:678:a4f1:c369
+ with SMTP id 006d021491bc7-679c44754c9mr6789966eaf.24.1771957537453; Tue, 24
+ Feb 2026 10:25:37 -0800 (PST)
+Date: Tue, 24 Feb 2026 18:25:25 +0000
+In-Reply-To: <20260224182532.3914470-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260224182532.3914470-1-rananta@google.com>
 X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
-Message-ID: <20260224182532.3914470-1-rananta@google.com>
-Subject: [PATCH v4 0/8] vfio: selftest: Add SR-IOV UAPI test
+Message-ID: <20260224182532.3914470-2-rananta@google.com>
+Subject: [PATCH v4 1/8] vfio: selftests: Add -Wall and -Werror to the Makefile
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: David Matlack <dmatlack@google.com>, Alex Williamson <alex@shazbot.org>
 Cc: Vipin Sharma <vipinsh@google.com>, Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, 
@@ -87,17 +90,17 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71644-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71645-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[rananta@google.com,kvm@vger.kernel.org];
@@ -106,123 +109,33 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 107F018B569
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6405418B68A
 X-Rspamd-Action: no action
 
-Hello,
+Add the compiler flags, -Wall and -Werror, to catch all the build
+warnings and flag them as a build error, respectively. This is to
+ensure that no obvious programmer errors are introduced. We can
+add -Wno-* flags in the future to ignore specific warnings as necesasry.
 
-This series adds a vfio selftest, vfio_pci_sriov_uapi_test.c, to get some
-coverage on SR-IOV UAPI handling. Specifically, it includes the
-following cases that iterates over all the iommu modes:
- - Setting correct/incorrect/NULL tokens during device init.
- - Close the PF device immediately after setting the token.
- - Change/override the PF's token after device init.
+Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+---
+ tools/testing/selftests/vfio/Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
-The test takes care of creating/setting up the VF device, and hence, it
-can be executed like any other test, simply by passing the PF's BDF to
-run.sh. For example,
-
-$ ./scripts/setup.sh 0000:16:00.1
-$ ./scripts/run.sh ./vfio_pci_sriov_uapi_test
-
-TAP version 13
-1..45
-# Starting 45 tests from 15 test cases.
-#  RUN           vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.init_token_match ...
-Created 1 VF (0000:1a:00.0) under the PF: 0000:16:00.1
-#            OK  vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.init_token_match
-ok 1 vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.init_token_match
-#  RUN           vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.pf_early_close ...
-Created 1 VF (0000:1a:00.0) under the PF: 0000:16:00.1
-#            OK  vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.pf_early_close
-ok 2 vfio_pci_sriov_uapi_test.vfio_type1_iommu_same_uuid.pf_early_close
-[...]
-#  RUN           vfio_pci_sriov_uapi_test.iommufd_null_uuid.override_token ...
-Created 1 VF (0000:1a:00.0) under the PF: 0000:16:00.1
-#            OK  vfio_pci_sriov_uapi_test.iommufd_null_uuid.override_token
-ok 45 vfio_pci_sriov_uapi_test.iommufd_null_uuid.override_token
-# PASSED: 45 / 45 tests passed.
-# Totals: pass:45 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-Thank you.
-Raghavendra
-
-v4: Suggestions by David and Alex
-- Assert that the value computed in sysfs_val_get() in an int. Rename the
-  function to sysfs_val_get_int() to better reflect what the function is doing. (Alex)
-- Add the missing Signed-off-by tag in patch-7 (David).
-
-v3: Suggestions by David Matlack (thanks!)
-- Introduce a patch to add -Wall and -Werror to the vfio Makefile.
-- Use snprintf_assert() where they were missed.
-- Rename the functions as suggested in the sysfs lib and the test file.
-- Alloc the output char * buffer in the functions sysfs_driver_get() and
-  sysfs_sriov_vf_bdf_get() instead of relying on the caller to pass one.
-  The caller is now responsible for freeing these buffers.
-- Remove unnecessary initializations of local variables in sysfs and the
-  vfio_pci_device libraries.
-- Move the inclusion of -luuid to the top level Makefile.
-- Introduce vfio_pci_device_{alloc|free}() and let the test and the functions in
-  vfio_pci_device.c use this.
-- Return -errno for the ioctl failure in __vfio_device_bind_iommufd() instead of
-  directly calling ioctl_assert().
-- Since the vfio-pci driver sets the 'driver_override' to the driver of PF,
-  instead of clearing sriov_drivers_autoprobe and binding the VF explicitly to
-  the 'vfio-pci' driver, only assert that it's already bound.
-- By extension to the above point, remove the unnecessary functions from the sysfs
-  lib.
-
-v2: Suggestions by David Matlack (thank you)
- - Introduce snprintf_assert() to check against content trucation.
- - Introduce a new sysfs library to handle all the common vfio/pci sysfs
-   operations.
- - Rename vfio_pci_container_get_device_fd() to
-   vfio_pci_group_get_device_fd().
- - Use a fixed size 'arg' array instead of dynamic allocation in
-   __vfio_pci_group_get_device_fd().
- - Exclude vfio_pci_device_init() to accept the 'vf_token' arg.
- - Move the vfio_pci_sriov_uapi_test.c global variable to the FIXTURE()
-   struct or as TEST_F() local variables.
- - test_vfio_pci_container_setup() returns 'int' to indicate status.
- - Skip the test if nr_vfs != 0.
- - Explicitly set "sriov_drivers_autoprobe" for the PF.
- - Make sure to bind the VF device to the "vfio-pci" driver.
- - Cleanup the things done by FIXTURE_SETUP() in FIXTURE_TEARDOWN().
-
-v3: https://lore.kernel.org/all/20260204010057.1079647-1-rananta@google.com/
-v2: https://lore.kernel.org/all/20251210181417.3677674-1-rananta@google.com/
-v1: https://lore.kernel.org/all/20251104003536.3601931-1-rananta@google.com/
-
-Raghavendra Rao Ananta (8):
-  vfio: selftests: Add -Wall and -Werror to the Makefile
-  vfio: selftests: Introduce snprintf_assert()
-  vfio: selftests: Introduce a sysfs lib
-  vfio: selftests: Extend container/iommufd setup for passing vf_token
-  vfio: selftests: Expose more vfio_pci_device functions
-  vfio: selftests: Add helper to set/override a vf_token
-  vfio: selftests: Add helpers to alloc/free vfio_pci_device
-  vfio: selftests: Add tests to validate SR-IOV UAPI
-
- tools/testing/selftests/vfio/Makefile         |   4 +
- .../selftests/vfio/lib/include/libvfio.h      |   1 +
- .../vfio/lib/include/libvfio/assert.h         |   5 +
- .../vfio/lib/include/libvfio/sysfs.h          |  12 ++
- .../lib/include/libvfio/vfio_pci_device.h     |  11 +
- tools/testing/selftests/vfio/lib/libvfio.mk   |   1 +
- tools/testing/selftests/vfio/lib/sysfs.c      | 141 ++++++++++++
- .../selftests/vfio/lib/vfio_pci_device.c      | 156 ++++++++++----
- .../selftests/vfio/vfio_dma_mapping_test.c    |   6 +-
- .../selftests/vfio/vfio_pci_device_test.c     |  21 +-
- .../selftests/vfio/vfio_pci_sriov_uapi_test.c | 200 ++++++++++++++++++
- 11 files changed, 507 insertions(+), 51 deletions(-)
- create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/sysfs.h
- create mode 100644 tools/testing/selftests/vfio/lib/sysfs.c
- create mode 100644 tools/testing/selftests/vfio/vfio_pci_sriov_uapi_test.c
-
-
-base-commit: d721f52e31553a848e0e9947ca15a49c5674aef3
---
+diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/selftests/vfio/Makefile
+index 3c796ca99a509..e8f9023cf2479 100644
+--- a/tools/testing/selftests/vfio/Makefile
++++ b/tools/testing/selftests/vfio/Makefile
+@@ -15,6 +15,7 @@ include lib/libvfio.mk
+ 
+ CFLAGS += -I$(top_srcdir)/tools/include
+ CFLAGS += -MD
++CFLAGS += -Wall -Werror
+ CFLAGS += $(EXTRA_CFLAGS)
+ 
+ LDFLAGS += -pthread
+-- 
 2.53.0.414.gf7e9f6c205-goog
 
 
