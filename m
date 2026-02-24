@@ -1,106 +1,110 @@
-Return-Path: <kvm+bounces-71632-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71633-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SHQYMBfinWnpSQQAu9opvQ
-	(envelope-from <kvm+bounces-71632-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:38:31 +0100
+	id WPjAB4TjnWnpSQQAu9opvQ
+	(envelope-from <kvm+bounces-71633-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:44:36 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5597C18AA04
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:38:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8088818AAF3
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:44:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5150430C4562
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 17:37:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3954F30D0246
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 17:43:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3AA3A9DBA;
-	Tue, 24 Feb 2026 17:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0F03AA1A9;
+	Tue, 24 Feb 2026 17:43:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KyVvMOVA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xylueOVz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DDA03A9D8C
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 17:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376623A9DB5
+	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 17:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771954666; cv=none; b=XMxYJjEKifqBV2LHVQfpS2q9vTptTQ3H7ALdGOSun6qtypgSRKgUdJ4fswAVS/4SI256FhsjBGF5V1MfXht6yPA59t7Ys2fH9iQZ4hCKHmT/ib+ZepChUv7QcRNXwbUqkmM2SN2o7uRgqzzVgHpaFEkk8PL9YRriYMoQFC4ylnM=
+	t=1771955014; cv=none; b=LgNPObn11kKfWr4VhgY9u6nATN/paPag8wd2gkbvhCpaogVyCYBbeBggvhBP4Dut7vqqV26lKl3ws/XpTXJoff0JLPZKsJ/Q+UbZKCRbX/pGnkFUqTM0W5Y4dpgtGyDFcVr1t70Sr7oVQl0xNrNeLInqCmf0i13dSEMkTySvv9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771954666; c=relaxed/simple;
-	bh=mCCVv6L04cWt7rC+dXX4D8L5HIoEgr+4KNHsOMYBn7k=;
+	s=arc-20240116; t=1771955014; c=relaxed/simple;
+	bh=CzXhE6NIlz4EonhiaZ5X2vjm+voehRbxgQYJDKg7pfY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=buhQwbNA90fgEpQxjtmq4ZDlS2iB4v/di+8Kwh7I89dG/YEzj5zFa8jjaDCOvo3Y7QAMO7wL/vibukbvwFxujJiwOW7fcU02YXwRFqseAwBHkqtxRsboQyRbxfvMcn5a3w5p5+td7+NM+WiM8+GcCgD74iWHYXMa0OGt0kPubvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KyVvMOVA; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=F5EtVpgE1hgb0oA59ryeUDN+kKajp5SAFqGEFIjN02eurYenLsyrNxVMOqdQ1S6MOfIcBPmGx+Gy0sTPJbYOogGOc3HTb32dxanMkso9Gd0DtYZ9zwzH02xdoyRGvKgX04XiJWiYX1uBcuxWGedFF8OmybuwJtbaIERcwtD3760=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xylueOVz; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a76f2d7744so62212725ad.3
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 09:37:44 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3562370038dso5148571a91.3
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 09:43:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771954664; x=1772559464; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771955012; x=1772559812; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YBYOBVXP4vivMMEN8JfHO64Zg9pUzxocpjlkKoATuFs=;
-        b=KyVvMOVAcn/btlvd/NKGj5h3hwxorHzG32TFQT1aBEtKnWCNTLM6RlofhDWaN/C0Go
-         vI1Ry9GDRSxD1ahrr4eBO/7TjE64uBbrOsbatNccMBDYU9ajOTGsWtOU3LTuy7soBs58
-         8DXhLAC17Q+XzpJYmjh0Xl0pOnaDirUw0yH3Q9crzNAz9Cg0xPzT4MuN4UcpQ9+bzZ5c
-         Qfb94FL5WKDOjt9xkxcahfiUr81KNJqJ3csD1Yr3X67RPTVavVTwT89dtd28i+x8xBOX
-         BbSQpG7Q996iyFb0CGrHqctPZSuWjsuf20i0fCu8E7Q7TqzWxSdki6T/y0LP6goqTBuW
-         f4eA==
+        bh=7EJ6jDZkcc54+WfMFP83ReJ+Vv39B7Cq+a8KWyoH30M=;
+        b=xylueOVzD3NHwth8hX+kofCnh4QGm1w6LBpFpTOTc0f2m8Mh77Kct3OBXyWoj2zN0X
+         A4d6d8HzHwoFT/4gxQ3Ky1HBcjaBgXwwzTMzuX+mrj9ZFRFBTC0JMKH3ZKj86pF35ssP
+         fWoTzA7qkTwTf3QsxNAjiVKjwfgVq4ijw2bXdtupgzUq0oabjhgJDG5xlPXSrEqfvHBQ
+         S4KwfzQ0mUvAzpxIeqz48Df9pugb36b47rhhaWjLTR769eDpUuMTTRcgGIfg0viyavlp
+         +r8iRa0plO7YpdcAHbsmm1GAb9+Ia4drPeZAlUSZ1H9L4+3Y4GKuIL9CpILxY6HkZh0x
+         b5LA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771954664; x=1772559464;
+        d=1e100.net; s=20230601; t=1771955012; x=1772559812;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YBYOBVXP4vivMMEN8JfHO64Zg9pUzxocpjlkKoATuFs=;
-        b=MC7rdw8CG/9sL0A08r6sE+LvqLaZpbQ5mkieo5ZK9laG12y8GDnWztVoWa+rW7ZhZY
-         oFx19yZNjqFF6oPyMZ7DNT3yam8XaKEbTuOZMC2IJY+QGFH6bS8T8kwWsCzZWSxbIr7/
-         3YavkvdYiiju0mW6kC+XdLS9EkYUVxVRKIRXx3Qy6zCaC3dmfimHqVtWSPkWwF3PPChk
-         9XbaFDTmAiE0x9NnSZtww3PrTAJuiS3w8tPTfBBgVx3tnT/r+LlWqjhmJlmF4AZKhEiS
-         SdtdJYv6pZLJ1ivqtQoADJ1nqeit6iudmFcHauKD5T3hgcrBi/VC1EyJYLbvQXkaTtsN
-         LfmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX8pX/nGSu6/c6q5LdD5j7ClQdmk01auxqefr/UrzWcfs4f9ivm9UQnwCPmiG+I0kABs1A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyemg7A27Z82WJahSgtC/qsWLSF5qMGhE3KkO1+WNul4zFOK3e4
-	qpNV4VyEKdC37L3TuNcgksffQ/WUmLZTEKu/xFU82nrM42Z4cWLmjshHPrXezDpDYAUEklYfMDR
-	lXUHebw==
-X-Received: from plbiw20.prod.google.com ([2002:a17:903:454:b0:2a0:7f81:6066])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:32cb:b0:2aa:d816:e1a9
- with SMTP id d9443c01a7336-2ad744e0aeamr104939405ad.28.1771954664283; Tue, 24
- Feb 2026 09:37:44 -0800 (PST)
-Date: Tue, 24 Feb 2026 09:37:43 -0800
-In-Reply-To: <20260224071822.369326-5-chengkev@google.com>
+        bh=7EJ6jDZkcc54+WfMFP83ReJ+Vv39B7Cq+a8KWyoH30M=;
+        b=Y/VoVsB1Yw1OmChX1nC9IQYd5aSpmGw16/bGv1Y25UQA+5DUo3s75Ki9PAvHYDXlRA
+         GHkoK4NuSMov1hOw59Ytr5gelg7TdawNUM7jaJIlWJbkb9ZW32hsB8ajJVTWujpSRZWF
+         HlZm2+1EUiZB1/TR1W2LCQTfeqAo3RXmuBLYehvLVvkDCGPNwyoYTR6I9EI3g8AsXXO3
+         tZyVmH1w+RYOqgKE7nAPwzW1GJnefjSDGqGea2N9kdEqvq3Q2UezFDyix5cmurMcKhIo
+         XW2Yvi2ty8scENXO7iaEMDEHn66rX3GuGG4A+2H1mJ8CVRuwa0xllprp0j5m6UmEZPtN
+         HFPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXgrFf0NzYC+xApPi7TGyzw//PGfTq+iX168Uap8C/15P2BwZ75zjFthCbv2i1/qpJxYok=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAanSMLrwcrNty2F7dMNLl5iCXIXITDysLZ9Q2Jte0MudFTrey
+	c70kHE/MRTYPCIp2sRwpmmAW6BbM/V3vdBTMu9uXnLN9fmgmVZgOwVwya6QiR0WoqYoZXFk4MOX
+	x6pMlmQ==
+X-Received: from pjqs3.prod.google.com ([2002:a17:90a:ad83:b0:358:eb53:2d1a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4b10:b0:356:2db3:1206
+ with SMTP id 98e67ed59e1d1-358ae80a6a3mr10275503a91.13.1771955012397; Tue, 24
+ Feb 2026 09:43:32 -0800 (PST)
+Date: Tue, 24 Feb 2026 09:43:31 -0800
+In-Reply-To: <20260224005500.1471972-6-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260224071822.369326-1-chengkev@google.com> <20260224071822.369326-5-chengkev@google.com>
-Message-ID: <aZ3h508kM-rDYKIs@google.com>
-Subject: Re: [PATCH V2 4/4] KVM: selftests: Add nested page fault injection test
+References: <20260224005500.1471972-1-jmattson@google.com> <20260224005500.1471972-6-jmattson@google.com>
+Message-ID: <aZ3jQ1prL4dgG0-H@google.com>
+Subject: Re: [PATCH v5 05/10] KVM: x86: nSVM: Redirect IA32_PAT accesses to
+ either hPAT or gPAT
 From: Sean Christopherson <seanjc@google.com>
-To: Kevin Cheng <chengkev@google.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	yosry.ahmed@linux.dev
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Yosry Ahmed <yosry@kernel.org>
 Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71632-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71633-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -108,44 +112,53 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5597C18AA04
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8088818AAF3
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026, Kevin Cheng wrote:
-> Add a test that exercises nested page fault injection during L2
-> execution. L2 executes I/O string instructions (OUTSB/INSB) that access
-> memory restricted in L1's nested page tables (NPT/EPT), triggering a
-> nested page fault that L0 must inject to L1.
-> 
-> The test supports both AMD SVM (NPF) and Intel VMX (EPT violation) and
-> verifies that:
->   - The exit reason is an NPF/EPT violation
->   - The access type and permission bits are correct
->   - The faulting GPA is correct
-> 
-> Three test cases are implemented:
->   - Unmap the final data page (final translation fault, OUTSB read)
->   - Unmap a PT page (page walk fault, OUTSB read)
->   - Write-protect the final data page (protection violation, INSB write)
->   - Write-protect a PT page (protection violation on A/D update, OUTSB
->     read)
+On Mon, Feb 23, 2026, Jim Mattson wrote:
+> +static void svm_set_pat(struct kvm_vcpu *vcpu, bool from_host, u64 data)
+> +{
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +
+> +	if (svm_pat_accesses_gpat(vcpu, from_host)) {
+> +		vmcb_set_gpat(svm->vmcb, data);
+> +	} else {
+> +		svm->vcpu.arch.pat = data;
+> +		if (npt_enabled) {
+> +			vmcb_set_gpat(svm->vmcb01.ptr, data);
+> +			if (is_guest_mode(&svm->vcpu) &&
+> +			    !nested_npt_enabled(svm))
+> +				vmcb_set_gpat(svm->vmcb, data);
+> +		}
+> +	}
 
-Either in this test or in KUT, we need coverage for validating faults that are
-reported by hardware, i.e. for faults that _don't_ go through the emulator.
+Overall, this LGTM.  For this particular code, any objection to using early
+returns to reduce indentation?  The else branch above is a bit gnarly, especially
+when legacy_gpat_semantics comes along.
 
-E.g. there's this "todo" of sorts in KUT:
+I.e. end up with this
 
-	case VMX_EPT_VIOLATION:
-		/*
-		 * Exit-qualifications are masked not to account for advanced
-		 * VM-exit information. Once KVM supports this feature, this
-		 * masking should be removed.
-		 */
-		exit_qual &= ~EPT_VLT_GUEST_MASK;
+  static void svm_set_pat(struct kvm_vcpu *vcpu, bool from_host, u64 data)
+  {
+	struct vcpu_svm *svm = to_svm(vcpu);
 
+	if (svm_pat_accesses_gpat(vcpu, from_host)) {
+		vmcb_set_gpat(svm->vmcb, data);
+		return;
+	}
 
-Or maybe both?  I generally prefer selftests for maintenance purposes, and you've
-already written this test...
+	svm->vcpu.arch.pat = data;
+
+	if (!npt_enabled)
+		return;
+
+	vmcb_set_gpat(svm->vmcb01.ptr, data);
+	if (is_guest_mode(&svm->vcpu) &&
+	    (svm->nested.legacy_gpat_semantics || !nested_npt_enabled(svm)))
+		vmcb_set_gpat(svm->vmcb, data);
+  }
+
+I can fixup when applying (unless you and/or Yosry object).
 
