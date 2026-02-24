@@ -1,238 +1,168 @@
-Return-Path: <kvm+bounces-71671-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71672-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KIEfFH4YnmmcTQQAu9opvQ
-	(envelope-from <kvm+bounces-71671-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 22:30:38 +0100
+	id oD/AMvYanmntTQQAu9opvQ
+	(envelope-from <kvm+bounces-71672-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 22:41:10 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E3E618CC7D
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 22:30:38 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3B5918CD35
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 22:41:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A31BB30636A2
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 21:30:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7C36F303ADA3
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 21:41:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3DD33F37E;
-	Tue, 24 Feb 2026 21:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B441333E346;
+	Tue, 24 Feb 2026 21:41:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BKcFN1Qn"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="NMSMY7jD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-dy1-f201.google.com (mail-dy1-f201.google.com [74.125.82.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8A8226D00
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 21:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1359330D5E;
+	Tue, 24 Feb 2026 21:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771968629; cv=none; b=qe8RBc0Vz2dK40ji0Qxp7YF/h50YrpwvSUHGOt46okur7JTcCmJ3MTJyLi4lYMH/oH5jR8HeWOR+VnTIVLE0Pdyo1TSyYMMqRubYVP1trr8U40OzEhNd5pAXS9lrTjRinVK1kXuCcJpFg7/CzXkQuhTmXHw6ZZe3RHdzUPausfE=
+	t=1771969264; cv=none; b=oHAPZ3WoIAcz1ARdJZVCJW/Q0r0Ifq/qFAiokbe46ICtUquPKIXEoLfGPsdv20EX6YriKCZkrldnO9XxQvuoh7pmjDBcDuWKZP5zg/SckNF56VOUiXY9DnFPxMAVdrk3Yr9Hx5NRyssMmrrlVTS5rHxvFhqLYOWN/qCgQFYUWv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771968629; c=relaxed/simple;
-	bh=FXKeSoSMfzizdfAiGbgrzg+JYZn/1M0RS192UpKNA8o=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dQ+HvfJdg2Yg6dy3M4U5O3+Fadj2WbFcBlt4IEy2/ZaZWHE2cYa1bPHEVaxqBlSPTk0ttSr289EAjbLdcdog7RSg4h7ujlAt4ixAYs+3R8m3zTb2CmC/AezbLpPk8Q0d0G7VO5fA21kWlB3Ya9CrZDlnKQ2rKmk2zhDoWe/OTsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--changyuanl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BKcFN1Qn; arc=none smtp.client-ip=74.125.82.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--changyuanl.bounces.google.com
-Received: by mail-dy1-f201.google.com with SMTP id 5a478bee46e88-2b81ff82e3cso134641eec.0
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 13:30:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771968626; x=1772573426; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fp3gQv/wLfwDQnfgoRQPjUqkZeQgl8EZgadP4mI+PPw=;
-        b=BKcFN1QnTJBkevYWv29g4n5UA3W6IMKFkH4PYtx2HkE1QKQpzQuPmbEt1JvwrPfj8T
-         YlOpZtM6adgpEdPWpcxxYSi0PWHDuJ9iLaHLJIDZgMTCdhDokrKAl8hwLOgNHK+7PbZk
-         bet3KVdBXz+Rvn+/wpZ6TNYrhLut0oRJf9UHmp+s1DX/JrwSi/UsizKLFqE9Cplx2AEX
-         osEyX9SdpxTMpMIus4OsIA/U6Yo2GNOHSsIjOeb35tPyCGxqa+mCAf6d/bZxr0p5J487
-         rynvCrtYhyEAXOTbVVwJMVVwaHTcZ7+88+GNL9an7SOGAVBOSLFQXcPx0UXZCwGotOH8
-         XfOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771968626; x=1772573426;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fp3gQv/wLfwDQnfgoRQPjUqkZeQgl8EZgadP4mI+PPw=;
-        b=BV2uwJ1cZUNLEfQO6XFXHq+pXLdz80QpcVuewnnoN4F5y8Y2ZHYzeyQpzaslWt5dv3
-         WfCIgDG0DzMdLgpv/5fBouqsJ5SfHq0xQYZBCAD5S1F/J7lBiVgfiIj7K021SMIysUgA
-         +kmwR6W+ufATes/t3FP8CsEwvSUQS/tytxKQiYK3dV5oVZEtdxAAmjmJELbanIYOWcqY
-         M/2ULfVDsQxdlFRK33LZtEY+ziNeITgdebyw95iAIc/TIcj+Sl59YkHSHwOQCsypUNjD
-         u1c5+zYmh9t8CdaV/muSguItl5Xm9Zh9scZQMGUfin+a6+B0cXdAcW9Ze0kZtjA0j5jc
-         y4vw==
-X-Forwarded-Encrypted: i=1; AJvYcCXsPPSJf/QVzdGwTMThWVZcK4rlRf+/UZSE6YrQu23Lrj/kgh72QSR8zCHpyAZlPXggBzk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydkXfL7tUJjwJrJKJP8TruRoXoyE7Z9PxiyKM5Xj2LJQhtObon
-	M6PxQTpAnTgIdeSbgpljY0+rv3uZj06uNhIru14xiARV6wjbca/trryRqmoOQKgoVO7YzQrxslS
-	seZp6llik2r4vR3TKDpA9Jw==
-X-Received: from dlnn36.prod.google.com ([2002:a05:7022:61a4:b0:127:16bc:8eaa])
- (user=changyuanl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:7022:209:b0:119:e569:f874 with SMTP id a92af1059eb24-1277f547694mr557374c88.17.1771968625917;
- Tue, 24 Feb 2026 13:30:25 -0800 (PST)
-Date: Tue, 24 Feb 2026 13:29:39 -0800
-In-Reply-To: <213d614fe73e183a230c8f4e0c8fa1cc3d45df39.camel@intel.com>
+	s=arc-20240116; t=1771969264; c=relaxed/simple;
+	bh=+HSICUHFLvHnBFAoTDKXR2zMyLREOjt65Qz6kpcM9Gw=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=l+8HLZPlqYL7AiRqX3UX/mX7Olc4Xjn3/o2+0jhxk5uWvi9l5W2+21D+2/73DD/DGudYKHx9NvD52VZOSFMEThyk0afgl+4AKRZzjVmK5yDg7lZMU9haDDbb6kB44zc7qn0GgjZjzV64Nf7AodHdLLmc4ra7zY3w3EOU+1QhT1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=NMSMY7jD; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id BB14440E00DA;
+	Tue, 24 Feb 2026 21:41:00 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id q5CoELQlXxnA; Tue, 24 Feb 2026 21:40:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1771969256; bh=vAU0bo7eUhVFomxVI2D4gQZiONaHqP7dsPgBM4WoGxo=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=NMSMY7jD1XSyL7pLlfZG7kEEhDhh5n2EEn+L/YjeIBE/HcKuaDlpOL1ikrAWCUjgC
+	 HpI3pPJQuGsTVdJcRf1x2KhsKVfr1FDRUFRR1yUsVaTjWfCsDRhaTX8xwsxoOtLn2N
+	 /kd3QWl7/UelTw57+W71uTdxvXBOoi3HwT2qx1Tc7apUGL3Q3O0f73JuRhwL04daj8
+	 Z8nBHaAuRr6zkogA84MO3kSFSpnpIbp27SKIl0X0Fi3NPB8/XMCwSK5LcqPKV8MlYo
+	 lOQH629eJPlrHRj2Rq34SVul/t12ws9ymxgvTb3AgwMxEh2i+mGtihq8T4fWYBCijt
+	 bBs4l0lP3VQ2VRt6hzTY3KSjY35FfloUQw5TS8d+svENIFTRhMUPGZsyozlnIZqGsq
+	 W/WQksxnn02zJViDpGCfs55TDGBhNVKQSXtLiXImnSC+lIOhk400CgoN9xUE0ijZsV
+	 x+9vgpyBVk7RTLUEj6L+y8ausT5xlvNCSNJM6RF8LA3LeAJjyNbEGc/ME/Cpuj7AMR
+	 XjotVpctIsrVKr78B7NejSj/NsVXIDD/yN+YPVR0WrEQnX4qfPeREon0XcIsYKwwuQ
+	 hzQ+sHGWzG/Kgdq550joQaM2F9Iz2niOY+cutPgZ252uU0B/a0dqqH9oecSVABaiuB
+	 rXAN/KnimdEKObkEryIROyXI=
+Received: from ehlo.thunderbird.net (unknown [IPv6:2a02:3035:662:6ae7:d92b:d96d:181a:344f])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7A4F740E00DE;
+	Tue, 24 Feb 2026 21:40:38 +0000 (UTC)
+Date: Tue, 24 Feb 2026 21:40:28 +0000
+From: Borislav Petkov <bp@alien8.de>
+To: Dave Hansen <dave.hansen@intel.com>, Kim Phillips <kim.phillips@amd.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ linux-coco@lists.linux.dev, x86@kernel.org
+CC: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ K Prateek Nayak <kprateek.nayak@amd.com>, Nikunj A Dadhania <nikunj@amd.com>,
+ Tom Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>,
+ Borislav Petkov <borislav.petkov@amd.com>, Naveen Rao <naveen.rao@amd.com>,
+ David Kaplan <david.kaplan@amd.com>,
+ Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, stable@kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_1/3=5D_cpu/bugs=3A_Fix_selectin?=
+ =?US-ASCII?Q?g_Automatic_IBRS_using_spectre=5Fv2=3Deibrs?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <6b3b0c86-99eb-406d-b88d-3d71613bef9e@intel.com>
+References: <20260224180157.725159-1-kim.phillips@amd.com> <20260224180157.725159-2-kim.phillips@amd.com> <6b3b0c86-99eb-406d-b88d-3d71613bef9e@intel.com>
+Message-ID: <E9013CF4-D30E-4366-A8C4-8C249ECF395C@alien8.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <213d614fe73e183a230c8f4e0c8fa1cc3d45df39.camel@intel.com>
-X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
-Message-ID: <20260224212939.2081828-1-changyuanl@google.com>
-Subject: Re: [PATCH] KVM: TDX: Set SIGNIFCANT_INDEX flag for supported CPUIDs
-From: Changyuan Lyu <changyuanl@google.com>
-To: rick.p.edgecombe@intel.com
-Cc: binbin.wu@intel.com, bp@alien8.de, changyuanl@google.com, 
-	dave.hansen@linux.intel.com, hpa@zytor.com, isaku.yamahata@intel.com, 
-	kas@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com, 
-	seanjc@google.com, tglx@kernel.org, x86@kernel.org, xiaoyao.li@intel.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.96 / 15.00];
+	SUBJ_EXCESS_QP(1.20)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[alien8.de,none];
+	R_DKIM_ALLOW(-0.20)[alien8.de:s=alien8];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-71671-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-71672-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[changyuanl@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.999];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2E3E618CC7D
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[alien8.de:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bp@alien8.de,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
+	TAGGED_RCPT(0.00)[kvm];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,alien8.de:mid,alien8.de:dkim]
+X-Rspamd-Queue-Id: F3B5918CD35
 X-Rspamd-Action: no action
 
-Hi Rick!
-
-On Tue, 24 Feb 2026 01:57:46 +0000, Edgecombe, Rick P wrote:
-> On Mon, 2026-02-23 at 13:43 -0800, Changyuan Lyu wrote:
-> > [...]
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index 2d7a4d52ccfb4..0c524f9a94a6c 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -172,9 +172,15 @@ static void td_init_cpuid_entry2(struct
-> > kvm_cpuid_entry2 *entry, unsigned char i
-> >  	entry->ecx = (u32)td_conf->cpuid_config_values[idx][1];
-> >  	entry->edx = td_conf->cpuid_config_values[idx][1] >> 32;
-> >
-> > -	if (entry->index == KVM_TDX_CPUID_NO_SUBLEAF)
-> > +	if (entry->index == KVM_TDX_CPUID_NO_SUBLEAF) {
-> >  		entry->index = 0;
-> > +		entry->flags &= ~KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+On February 24, 2026 6:22:36 PM UTC, Dave Hansen <dave=2Ehansen@intel=2Ecom=
+> wrote:
+>On 2/24/26 10:01, Kim Phillips wrote:
+>> @@ -2136,7 +2136,8 @@ static void __init spectre_v2_select_mitigation(v=
+oid)
+>>  	if ((spectre_v2_cmd =3D=3D SPECTRE_V2_CMD_EIBRS ||
+>>  	     spectre_v2_cmd =3D=3D SPECTRE_V2_CMD_EIBRS_LFENCE ||
+>>  	     spectre_v2_cmd =3D=3D SPECTRE_V2_CMD_EIBRS_RETPOLINE) &&
+>> -	    !boot_cpu_has(X86_FEATURE_IBRS_ENHANCED)) {
+>> +	    !(boot_cpu_has(X86_FEATURE_IBRS_ENHANCED) ||
+>> +	      boot_cpu_has(X86_FEATURE_AUTOIBRS))) {
+>>  		pr_err("EIBRS selected but CPU doesn't have Enhanced or Automatic IB=
+RS=2E Switching to AUTO select\n");
+>>  		spectre_v2_cmd =3D SPECTRE_V2_CMD_AUTO;
+>>  	}
 >
-> There are two callers of this. One is already zeroed, and the other has
-> stack garbage in flags. But that second caller doesn't look at the
-> flags so it is harmless. Maybe it would be simpler and clearer to just
-> zero init the entry struct in that caller. Then you don't need to clear
-> it here. Or alternatively set flags to zero above, and then add
-> KVM_CPUID_FLAG_SIGNIFCANT_INDEX if needed. Rather than manipulating a
-> single bit in a field of garbage, which seems weird.
-
-Thanks for the suggestion. I agree that initializing entry->flags to 0 at
-the start of td_init_cpuid_entry2() is much cleaner.
-
-> > +	} else {
-> > +		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-> > +	}
-> >
-> > +	WARN_ON_ONCE(cpuid_function_is_indexed(entry->function) !=
-> > +		     !!(entry->flags &
-> > KVM_CPUID_FLAG_SIGNIFCANT_INDEX));
+>Didn't we agree to just use the "Intel feature" name? See this existing
+>code:
 >
-> It warns on leaf 0x23 for me. Is it intentional?
-
-Leaf 0x23 is not in the list of cpuid_function_is_indexed.
-Thanks Binbin for the explanation!
-
-> This warning kind of begs the question of how how much consistency
-> there should be between KVM_TDX_CAPABILITIES and
-> KVM_GET_SUPPORTED_CPUID. There was quite a bit of debate on this and in
-> the end we moved forward with a solution that did the bare minimum
-> consistency checking.
+>>         /*
+>>          * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the Inte=
+l feature
+>>          * flag and protect from vendor-specific bugs via the whitelist=
+=2E
+>>          *
+>>          * Don't use AutoIBRS when SNP is enabled because it degrades h=
+ost
+>>          * userspace indirect branch performance=2E
+>>          */
+>>         if ((x86_arch_cap_msr & ARCH_CAP_IBRS_ALL) ||
+>>             (cpu_has(c, X86_FEATURE_AUTOIBRS) &&
+>>              !cpu_feature_enabled(X86_FEATURE_SEV_SNP))) {
+>>                 setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
+>>                 if (!cpu_matches(cpu_vuln_whitelist, NO_EIBRS_PBRSB) &&
+>>                     !(x86_arch_cap_msr & ARCH_CAP_PBRSB_NO))
+>>                         setup_force_cpu_bug(X86_BUG_EIBRS_PBRSB);
+>>         }
 >
-> We actually have been looking at some potential TDX module changes to
-> fix the deficiencies from not enforcing the consistency. But didn't
-> consider this pattern. Can you explain more about the failure mode?
+>You're probably not seeing X86_FEATURE_IBRS_ENHANCED because it doesn't
+>get forced under SNP=2E
 
-The main purpose of this patch was to make the KVM_TDX_GET_CPUID API
-more intuitive from userspace VMM's perspective.
-Since both KVM_TDX_CAPABILITIES and KVM_GET_SUPPORTED_CPUID return
-struct kvm_cpuid_entry2, I expected the semantic of the flag in both APIs
-to be the same, as I didn't find any special notes to the contrary in the
-TDX documentation Documentation/virt/kvm/x86/intel-tdx.rst .
-
-> >  	/*
-> >  	 * The TDX module doesn't allow configuring the guest phys
-> > addr bits
-> >  	 * (EAX[23:16]).  However, KVM uses it as an interface to
-> > the userspace
-> > --
-
-Regarding the WARN_ON_ONCE, I understand it touches on the larger
-consistency and compatibility questions that require more discussion
-as you and Sean mentioned. Since I am new to TDX and lack the full context
-on those prior debates, I removed the WARN_ON_ONCE check and focus only on
-the KVM_CPUID_FLAG_SIGNIFCANT_INDEX consistency fix, which was the core of
-this patch.
-
-Best,
-Changyuan
-
------------------------
-
-From 18b967b718911c09872c3717d8ab083fa59c4a70 Mon Sep 17 00:00:00 2001
-From: Changyuan Lyu <changyuanl@google.com>
-Date: Fri, 20 Feb 2026 09:55:28 -0800
-Subject: [PATCH] KVM: TDX: Set SIGNIFCANT_INDEX flag for supported CPUIDs
-
-Set the KVM_CPUID_FLAG_SIGNIFCANT_INDEX flag in the kvm_cpuid_entry2
-structures returned by KVM_TDX_CAPABILITIES if the CPUID is indexed.
-This ensures consistency with the CPUID entries returned by
-KVM_GET_SUPPORTED_CPUID.
-
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Changyuan Lyu <changyuanl@google.com>
----
- arch/x86/kvm/vmx/tdx.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 2d7a4d52ccfb4..1c039eab2f3d8 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -167,6 +167,7 @@ static void td_init_cpuid_entry2(struct kvm_cpuid_entry2 *entry, unsigned char i
-
- 	entry->function = (u32)td_conf->cpuid_config_leaves[idx];
- 	entry->index = td_conf->cpuid_config_leaves[idx] >> 32;
-+	entry->flags = 0;
- 	entry->eax = (u32)td_conf->cpuid_config_values[idx][0];
- 	entry->ebx = td_conf->cpuid_config_values[idx][0] >> 32;
- 	entry->ecx = (u32)td_conf->cpuid_config_values[idx][1];
-@@ -174,6 +175,9 @@ static void td_init_cpuid_entry2(struct kvm_cpuid_entry2 *entry, unsigned char i
-
- 	if (entry->index == KVM_TDX_CPUID_NO_SUBLEAF)
- 		entry->index = 0;
-+	else
-+		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-+
-
- 	/*
- 	 * The TDX module doesn't allow configuring the guest phys addr bits
---
-2.53.0.414.gf7e9f6c205-goog
+Set the Intel flag somewhere in the SNP init path=2E=2E=2E?
+--=20
+Small device=2E Typos and formatting crap
 
