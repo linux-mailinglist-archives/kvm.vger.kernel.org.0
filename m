@@ -1,58 +1,59 @@
-Return-Path: <kvm+bounces-71680-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71681-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wELtN6Ennmn5TgQAu9opvQ
-	(envelope-from <kvm+bounces-71680-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 23:35:13 +0100
+	id YAuTBoonnmn5TgQAu9opvQ
+	(envelope-from <kvm+bounces-71681-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 23:34:50 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DE4C18D66C
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 23:35:13 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D63AE18D641
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 23:34:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DCF25302B221
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 22:34:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 21F243067E6B
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 22:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33B413612E4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8327736165B;
 	Tue, 24 Feb 2026 22:34:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWpt5+pr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rACZK4IG"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A70352926;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC7C35B62C;
 	Tue, 24 Feb 2026 22:34:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771972463; cv=none; b=bt27ywinI9/eHfPeXPRqYw8elBzGFgw5/7P+KzefGcZ2vW84AZG9iWl0NfI209UbwL5FG7iviWoiYXMxUed6P5MDkdap17xfn0TxFOYoR6kqAdOunGr3mPgE+4T+Etcnx0wFJ5eyiTmMQUpsxjjlVdsUGphtipBu9T//SMOAaxo=
+	t=1771972463; cv=none; b=fjlnBSd6VN+J7+a5Ayw4DyPZvZcy9vk7FNMtr/GGyK7G9wQ5Cv1BewD+atUs3ShU04kcsJI9QTu/+V2Zf8ipzzl+4q3wRz/LP7CFCFI4PP7VgIzkdfhelE6B9g+n7N93flXiSvXx/QWTCIK2avmY+eGYrNbR7JglKfih0aiScYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1771972463; c=relaxed/simple;
-	bh=j5MTxH2ZUc2Um2PtXTxg0iEINlTGV/IJPm7hODaEIpQ=;
+	bh=Lf5SqEFhbFhXQTZaAcWAw6rxFcn0CcQDoxXm+TMCMvI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RkdE0uEdIcglSicdMONm1c35OT+mri6N5ma500rXn4U7BEAyaX31Zgs3cjZ1EzLAe64W5zliZkK94+7tAwCbMdRpn9yGhUonqCN1Sx/GX6N2sjW2EjAumUhCgotY9VPCCHOK7KzTD2nHlEYfc4Haf2HDcCjpkvFxXwMVSZKjkuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWpt5+pr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D28DBC2BCB1;
-	Tue, 24 Feb 2026 22:34:22 +0000 (UTC)
+	 MIME-Version; b=tHtWvwFJWzV2aGoiPvkyFR7OhxmMaH4KXwlnAgYrkUQTTSdepXc4KW/+bfHBgpR3OIbAaAGEhQPmF4Rsqsbu9e/0JPOphd9YJx53KZlor2pjGYCu8F5yKL6hTn/z5dTRUB93aNrPZ47NTddwwuAm9K3t9JNx2hfDRcGbs3y/8LQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rACZK4IG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38DBFC19423;
+	Tue, 24 Feb 2026 22:34:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1771972463;
-	bh=j5MTxH2ZUc2Um2PtXTxg0iEINlTGV/IJPm7hODaEIpQ=;
+	bh=Lf5SqEFhbFhXQTZaAcWAw6rxFcn0CcQDoxXm+TMCMvI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZWpt5+prx1HpijmbAs1NeqkPWpYsG4fHECKVRfLfz3GbOqq22bgyPbW7/9aHKSMis
-	 G1w/M1F/wJuSvzSckAA0Ks+b8vFCZT/t76hCvi0jbli+HgQx4OduX33cy9wV8ePkEr
-	 u9zpiTvMt54pxTt9jg3xrWLSpG2Z7o5A+RgAg9RVh2OzxSGkwQjH9vF0duij1RAV3H
-	 VOvwgAed8AinyJ42okHykngzhi5J5P67A9GkKhdVQGfjxfGndHQfzlJVqlS+rdbnfN
-	 OwP+yGkgkfvoSmI31G5YqITNlF0A4JSYKXBL2syGCmRxvU1kDkBDcy1XhKz0AeTjoN
-	 ujJLi9275XEYA==
+	b=rACZK4IGW5NpfpXH2dkv5x024becpOWb/6V3wK0U8bEFwvmy2Olj6w1hurKFiABc6
+	 k9xgb8drnS49mtcDRveiFEFYyMXOtz9xxkV5J3vCUgR8JDHqH3Ge02QahICVqKRiqR
+	 wzVg/YYYqLb9nQOyc/ffzpPA/f9YIhTAwRJCtCvZ/s5jzJAs9/0X8jbCI+NvSw1T25
+	 JMkYgkMEmOMPhx7nsgzaSViA1NS4soK5JaXnmKpeyz8P9KzWxAfRMiv4yOd/UPbdU6
+	 Eb53d+k1PglUOcwhb5gzMiGFjberYTwsKjLuEJYivbHNST3DqSGhMmrmiQGG9trJ2c
+	 STEP5fdmdowDw==
 From: Yosry Ahmed <yosry@kernel.org>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Yosry Ahmed <yosry@kernel.org>
-Subject: [PATCH v6 04/31] KVM: selftests: Add a test for LBR save/restore (ft. nested)
-Date: Tue, 24 Feb 2026 22:33:38 +0000
-Message-ID: <20260224223405.3270433-5-yosry@kernel.org>
+	Yosry Ahmed <yosry@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH v6 05/31] KVM: nSVM: Always inject a #GP if mapping VMCB12 fails on nested VMRUN
+Date: Tue, 24 Feb 2026 22:33:39 +0000
+Message-ID: <20260224223405.3270433-6-yosry@kernel.org>
 X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
 In-Reply-To: <20260224223405.3270433-1-yosry@kernel.org>
 References: <20260224223405.3270433-1-yosry@kernel.org>
@@ -69,18 +70,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71680-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71681-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
@@ -89,201 +90,43 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8DE4C18D66C
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D63AE18D641
 X-Rspamd-Action: no action
 
-Add a selftest exercising save/restore with usage of LBRs in both L1 and
-L2, and making sure all LBRs remain intact.
+nested_svm_vmrun() currently only injects a #GP if kvm_vcpu_map() fails
+with -EINVAL. But it could also fail with -EFAULT if creating a host
+mapping failed. Inject a #GP in all cases, no reason to treat failure
+modes differently.
 
+Fixes: 8c5fbf1a7231 ("KVM/nSVM: Use the new mapping API for mapping guest memory")
+CC: stable@vger.kernel.org
+Co-developed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Yosry Ahmed <yosry@kernel.org>
 ---
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/include/x86/processor.h     |   5 +
- .../selftests/kvm/x86/svm_lbr_nested_state.c  | 145 ++++++++++++++++++
- 3 files changed, 151 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/svm_lbr_nested_state.c
+ arch/x86/kvm/svm/nested.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index fdec90e854671..36b48e766e499 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -112,6 +112,7 @@ TEST_GEN_PROGS_x86 += x86/svm_vmcall_test
- TEST_GEN_PROGS_x86 += x86/svm_int_ctl_test
- TEST_GEN_PROGS_x86 += x86/svm_nested_shutdown_test
- TEST_GEN_PROGS_x86 += x86/svm_nested_soft_inject_test
-+TEST_GEN_PROGS_x86 += x86/svm_lbr_nested_state
- TEST_GEN_PROGS_x86 += x86/tsc_scaling_sync
- TEST_GEN_PROGS_x86 += x86/sync_regs_test
- TEST_GEN_PROGS_x86 += x86/ucna_injection_test
-diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-index 4ebae4269e681..db0171935197d 100644
---- a/tools/testing/selftests/kvm/include/x86/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86/processor.h
-@@ -1360,6 +1360,11 @@ static inline bool kvm_is_ignore_msrs(void)
- 	return get_kvm_param_bool("ignore_msrs");
- }
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 52d8536845927..fab0d3d5baa27 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -1011,12 +1011,9 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
+ 	}
  
-+static inline bool kvm_is_lbrv_enabled(void)
-+{
-+	return !!get_kvm_amd_param_integer("lbrv");
-+}
-+
- uint64_t *vm_get_pte(struct kvm_vm *vm, uint64_t vaddr);
+ 	vmcb12_gpa = svm->vmcb->save.rax;
+-	ret = kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map);
+-	if (ret == -EINVAL) {
++	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map)) {
+ 		kvm_inject_gp(vcpu, 0);
+ 		return 1;
+-	} else if (ret) {
+-		return kvm_skip_emulated_instruction(vcpu);
+ 	}
  
- uint64_t kvm_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
-diff --git a/tools/testing/selftests/kvm/x86/svm_lbr_nested_state.c b/tools/testing/selftests/kvm/x86/svm_lbr_nested_state.c
-new file mode 100644
-index 0000000000000..bf16abb1152e0
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/svm_lbr_nested_state.c
-@@ -0,0 +1,145 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2026, Google, Inc.
-+ */
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "svm_util.h"
-+
-+
-+#define L2_GUEST_STACK_SIZE 64
-+
-+#define DO_BRANCH() do { asm volatile("jmp 1f\n 1: nop"); } while (0)
-+
-+struct lbr_branch {
-+	u64 from, to;
-+};
-+
-+volatile struct lbr_branch l2_branch;
-+
-+#define RECORD_AND_CHECK_BRANCH(b)					\
-+do {									\
-+	wrmsr(MSR_IA32_DEBUGCTLMSR, DEBUGCTLMSR_LBR);			\
-+	DO_BRANCH();							\
-+	(b)->from = rdmsr(MSR_IA32_LASTBRANCHFROMIP);			\
-+	(b)->to = rdmsr(MSR_IA32_LASTBRANCHTOIP);			\
-+	/* Disable LBR right after to avoid overriding the IPs */	\
-+	wrmsr(MSR_IA32_DEBUGCTLMSR, 0);					\
-+									\
-+	GUEST_ASSERT_NE((b)->from, 0);					\
-+	GUEST_ASSERT_NE((b)->to, 0);					\
-+} while (0)
-+
-+#define CHECK_BRANCH_MSRS(b)						\
-+do {									\
-+	GUEST_ASSERT_EQ((b)->from, rdmsr(MSR_IA32_LASTBRANCHFROMIP));	\
-+	GUEST_ASSERT_EQ((b)->to, rdmsr(MSR_IA32_LASTBRANCHTOIP));	\
-+} while (0)
-+
-+#define CHECK_BRANCH_VMCB(b, vmcb)					\
-+do {									\
-+	GUEST_ASSERT_EQ((b)->from, vmcb->save.br_from);			\
-+	GUEST_ASSERT_EQ((b)->to, vmcb->save.br_to);			\
-+} while (0)
-+
-+static void l2_guest_code(struct svm_test_data *svm)
-+{
-+	/* Record a branch, trigger save/restore, and make sure LBRs are intact */
-+	RECORD_AND_CHECK_BRANCH(&l2_branch);
-+	GUEST_SYNC(true);
-+	CHECK_BRANCH_MSRS(&l2_branch);
-+	vmmcall();
-+}
-+
-+static void l1_guest_code(struct svm_test_data *svm, bool nested_lbrv)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb = svm->vmcb;
-+	struct lbr_branch l1_branch;
-+
-+	/* Record a branch, trigger save/restore, and make sure LBRs are intact */
-+	RECORD_AND_CHECK_BRANCH(&l1_branch);
-+	GUEST_SYNC(true);
-+	CHECK_BRANCH_MSRS(&l1_branch);
-+
-+	/* Run L2, which will also do the same */
-+	generic_svm_setup(svm, l2_guest_code,
-+			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	if (nested_lbrv)
-+		vmcb->control.virt_ext = LBR_CTL_ENABLE_MASK;
-+	else
-+		vmcb->control.virt_ext &= ~LBR_CTL_ENABLE_MASK;
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+	GUEST_ASSERT(svm->vmcb->control.exit_code == SVM_EXIT_VMMCALL);
-+
-+	/* Trigger save/restore one more time before checking, just for kicks */
-+	GUEST_SYNC(true);
-+
-+	/*
-+	 * If LBR_CTL_ENABLE is set, L1 and L2 should have separate LBR MSRs, so
-+	 * expect L1's LBRs to remain intact and L2 LBRs to be in the VMCB.
-+	 * Otherwise, the MSRs are shared between L1 & L2 so expect L2's LBRs.
-+	 */
-+	if (nested_lbrv) {
-+		CHECK_BRANCH_MSRS(&l1_branch);
-+		CHECK_BRANCH_VMCB(&l2_branch, vmcb);
-+	} else {
-+		CHECK_BRANCH_MSRS(&l2_branch);
-+	}
-+	GUEST_DONE();
-+}
-+
-+void test_lbrv_nested_state(bool nested_lbrv)
-+{
-+	struct kvm_x86_state *state = NULL;
-+	struct kvm_vcpu *vcpu;
-+	vm_vaddr_t svm_gva;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	pr_info("Testing with nested LBRV %s\n", nested_lbrv ? "enabled" : "disabled");
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
-+	vcpu_alloc_svm(vm, &svm_gva);
-+	vcpu_args_set(vcpu, 2, svm_gva, nested_lbrv);
-+
-+	for (;;) {
-+		vcpu_run(vcpu);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_SYNC:
-+			/* Save the vCPU state and restore it in a new VM on sync */
-+			pr_info("Guest triggered save/restore.\n");
-+			state = vcpu_save_state(vcpu);
-+			kvm_vm_release(vm);
-+			vcpu = vm_recreate_with_one_vcpu(vm);
-+			vcpu_load_state(vcpu, state);
-+			kvm_x86_state_cleanup(state);
-+			break;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			/* NOT REACHED */
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+done:
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
-+	TEST_REQUIRE(kvm_is_lbrv_enabled());
-+
-+	test_lbrv_nested_state(/*nested_lbrv=*/false);
-+	test_lbrv_nested_state(/*nested_lbrv=*/true);
-+
-+	return 0;
-+}
+ 	ret = kvm_skip_emulated_instruction(vcpu);
 -- 
 2.53.0.414.gf7e9f6c205-goog
 
