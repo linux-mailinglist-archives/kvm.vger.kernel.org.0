@@ -1,172 +1,196 @@
-Return-Path: <kvm+bounces-71642-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71643-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MLxUMvzrnWncSgQAu9opvQ
-	(envelope-from <kvm+bounces-71642-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 19:20:44 +0100
+	id uMbpD5/snWncSgQAu9opvQ
+	(envelope-from <kvm+bounces-71643-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 19:23:27 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E54C318B3B8
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 19:20:43 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E241C18B4E9
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 19:23:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 279F83050E5A
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:20:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E805B305B386
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD472C21F1;
-	Tue, 24 Feb 2026 18:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5650A3A9DA5;
+	Tue, 24 Feb 2026 18:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jbk9WMnX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ggeqbgf1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3822BE642
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 18:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DBC12C027C;
+	Tue, 24 Feb 2026 18:22:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771957227; cv=none; b=hdV72HcnkH7y2SsaC20gfWJ1IUhCn8qdMqAiVqggSRf257Gs6NnMfCy/n4NS3SANfwVDePKAmZmba/RXf9jYCvc9uoMddHhSRuJHvnAfBUwNYXfGQBC6pUKxWqSj8s+bvhgHIkLsL1xtqqpkmCeoCFRNFAJL5vL0c90odBG/mzg=
+	t=1771957360; cv=none; b=Yir6K4Y8EgqTSHful1okhg7pVQcqZSvJdWeuGvW4emWlXIMNe6ZjR4VuhNz4kdeBTblGiHndeOx/Yy4u/+wk/fiGw1ogNt2UlHFNt4pi/5EeGhJKHvoF16UH7TWQTAep+i+m9BCKCiCu/Ob6JjpkNr16B4mD7Pql84nKQLB1EXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771957227; c=relaxed/simple;
-	bh=6HBIbz1MIHxgv47f23pkLD3mpNvQPB8Pf233Cy+qpbI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Hg9ygp1IIx0GbpOT5Iln67DZ6RVTb8YZamTFPBsrMO0vnqOEvSYSJhxJm1R7TXbkSpYNt1+Cx4MtBlUCVc8zfRCDA6rv1Im7FCBcQbbnRtNfsn4U5VhLJOwy0KW13IpJkds8K2nkYTNPL0n/FE6spW0ums1MCHAISmETo8AJjCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jbk9WMnX; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2adad0625d1so39197695ad.0
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 10:20:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771957226; x=1772562026; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XPIHlG6KtLJYesq6Mh62LHbWNEo//7J55cZVZpHo2WQ=;
-        b=jbk9WMnXeZKwYpTD4Rmto/OgrR90S1QYFk9KPfqe8iU0p2fr2D3QuSr3YT/ZWxnaIT
-         l6od1qQtKwsVpbepzjpI+nf722Indm2goMGEgEHp7Vu12d07P3HJCW9tVJs4KckFxR4e
-         3xFkZgXPrgaXZ9IJCdm2HQAcPKqO3YKXboLOnux5UgZCzQYBjTkUxBYg6qQou7XCx4Rc
-         L3/FPYF88UmbNnBOU5C5RSZCb5esgM0NAp5hlSaKbZrzXqQ6fXGbsv2sbUdCIzKrPdum
-         9/YfaZ/gfsb81qhwC0UC24RaTiW85OZVgHMYeVNczSODfKRmW28gZ5DwZ1Kfhfgi83a2
-         eVvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771957226; x=1772562026;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XPIHlG6KtLJYesq6Mh62LHbWNEo//7J55cZVZpHo2WQ=;
-        b=tj/BM8DHwQgrikD8jfa/ffx4H18P8gD8T3ZcJIEKR3WjISYfJ5owazBZGi/7N0Xs/l
-         AmTRqKHz1md1FRH2aCssvedYKqxVrzQVY7+1N9kJ1b6ks6gxfYi62D+NaIDGBqr1Hmab
-         suAiQ4UI6vyt7A96OXqN6q+FCLepQpKWF4S/EbLuBttnvv6XBEo5oJ9hzsNK9U9xoeHI
-         l0m0uvwcoHtWEAAc36L4g+SBubCmp+wbZW66ckKnlwHpBIkoWkXMVoKRvCdXgTTOaYV5
-         K7yE632GQOZpwFs/lOlz2v6H4Eg67yovS1q1rfZD6h3Kst0Pslvtno+25fNfvQalpR9G
-         wD+A==
-X-Forwarded-Encrypted: i=1; AJvYcCV03xSQrV6ubaoV2aii/fEoP8XZHxmUNO/v4nRPNwlOIqPr00yJl4Y8PEPcuEzQVLJp9lo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnZ0SgXLzNNr6fvsyUDZCjRcBIMa7+H1GzbIGjER6o3ZWrZpyZ
-	/dt2BxBYU3p9AxY2b7nu3Ljre8S59F5IkBySIQ7LSISVFuQItZ5Twgs9WCGEbGgbAO2wa/VRzfa
-	2+2mUXw==
-X-Received: from plbw5.prod.google.com ([2002:a17:902:d3c5:b0:2ad:555b:cb2b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1212:b0:2a0:cccf:9d24
- with SMTP id d9443c01a7336-2ad744280cfmr117088455ad.16.1771957225490; Tue, 24
- Feb 2026 10:20:25 -0800 (PST)
-Date: Tue, 24 Feb 2026 10:20:23 -0800
-In-Reply-To: <20260223215118.2154194-2-bvanassche@acm.org>
+	s=arc-20240116; t=1771957360; c=relaxed/simple;
+	bh=tQcoU85UUD9XcuHHDL6vWV2ziTAyXgdu2WUkS0PPoe4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MS0+48uGRuyL9LeDQxyCiN6NdL4KMBZb/pHXlA0TtvYfwsmhcODTw/onvj1kXiQwdb05B1lA8CUGhuCGjVcjn+IfCZ1umivxPHrjcxmAcAY5FNxuYJN5Mo3IuRP2uUYTLazW4qfIc38H4iQTqMaz4q3rZYeqKq3wmSFUaZflybE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ggeqbgf1; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1771957357; x=1803493357;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=tQcoU85UUD9XcuHHDL6vWV2ziTAyXgdu2WUkS0PPoe4=;
+  b=ggeqbgf1HkQeJdxxvTHtVnNgMsC4oYz8GIo7LtzSj7nSUCj20BXka1eI
+   yrhIdkCaNRlriDp+0XRED1wFJ/ozSr+OxMT6dDJAbnThJe8M/UKGP96MI
+   ItMk6vCcEHTAiqP6hoa4wXrk76OemeCR54gMvyea+sw7Nt1DVpfbeyNVW
+   gK1i9pFyAjUYexzTjFbHwfzH+DfA/o57rsmAR+8kZm+jTQZ8ycreZqMTH
+   bdGqIA13k7kBp5S5RRAkuFr9+mYGCkj7+fMQvd5eDu0x+3LZOuGnXiSl6
+   EpanBdbnMMYOlNmhAfnfrbKm+7hP54ifyuzhUipNpQ6HP23d480bFg53d
+   w==;
+X-CSE-ConnectionGUID: bIKmPFnATlaEMkUn0Clkxg==
+X-CSE-MsgGUID: JPvnzNLNTbSJd5F9ffTNjw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11711"; a="83696386"
+X-IronPort-AV: E=Sophos;i="6.21,309,1763452800"; 
+   d="scan'208";a="83696386"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2026 10:22:37 -0800
+X-CSE-ConnectionGUID: o/17PFgXSwGl7DplXy5bbg==
+X-CSE-MsgGUID: qOYXcZTcQMSSYspjpo9T9w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,309,1763452800"; 
+   d="scan'208";a="220586598"
+Received: from schen9-mobl4.amr.corp.intel.com (HELO [10.125.111.27]) ([10.125.111.27])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2026 10:22:36 -0800
+Message-ID: <6b3b0c86-99eb-406d-b88d-3d71613bef9e@intel.com>
+Date: Tue, 24 Feb 2026 10:22:36 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260223215118.2154194-1-bvanassche@acm.org> <20260223215118.2154194-2-bvanassche@acm.org>
-Message-ID: <aZ3r5_P74tUJm2oF@google.com>
-Subject: Re: [PATCH 01/62] kvm: Make pi_enable_wakeup_handler() easier to analyze
-From: Sean Christopherson <seanjc@google.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Will Deacon <will@kernel.org>, Boqun Feng <boqun@kernel.org>, Waiman Long <longman@redhat.com>, 
-	linux-kernel@vger.kernel.org, Marco Elver <elver@google.com>, 
-	Christoph Hellwig <hch@lst.de>, Steven Rostedt <rostedt@goodmis.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <nathan@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Jann Horn <jannh@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] cpu/bugs: Fix selecting Automatic IBRS using
+ spectre_v2=eibrs
+To: Kim Phillips <kim.phillips@amd.com>, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, linux-coco@lists.linux.dev, x86@kernel.org
+Cc: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, K Prateek Nayak
+ <kprateek.nayak@amd.com>, Nikunj A Dadhania <nikunj@amd.com>,
+ Tom Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>,
+ Borislav Petkov <borislav.petkov@amd.com>, Borislav Petkov <bp@alien8.de>,
+ Naveen Rao <naveen.rao@amd.com>, David Kaplan <david.kaplan@amd.com>,
+ Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, stable@kernel.org
+References: <20260224180157.725159-1-kim.phillips@amd.com>
+ <20260224180157.725159-2-kim.phillips@amd.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20260224180157.725159-2-kim.phillips@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71642-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-71643-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,acm.org:email]
-X-Rspamd-Queue-Id: E54C318B3B8
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim]
+X-Rspamd-Queue-Id: E241C18B4E9
 X-Rspamd-Action: no action
 
-For the scope, please use:
+On 2/24/26 10:01, Kim Phillips wrote:
+> @@ -2136,7 +2136,8 @@ static void __init spectre_v2_select_mitigation(void)
+>  	if ((spectre_v2_cmd == SPECTRE_V2_CMD_EIBRS ||
+>  	     spectre_v2_cmd == SPECTRE_V2_CMD_EIBRS_LFENCE ||
+>  	     spectre_v2_cmd == SPECTRE_V2_CMD_EIBRS_RETPOLINE) &&
+> -	    !boot_cpu_has(X86_FEATURE_IBRS_ENHANCED)) {
+> +	    !(boot_cpu_has(X86_FEATURE_IBRS_ENHANCED) ||
+> +	      boot_cpu_has(X86_FEATURE_AUTOIBRS))) {
+>  		pr_err("EIBRS selected but CPU doesn't have Enhanced or Automatic IBRS. Switching to AUTO select\n");
+>  		spectre_v2_cmd = SPECTRE_V2_CMD_AUTO;
+>  	}
 
-   KVM: VMX:
+Didn't we agree to just use the "Intel feature" name? See this existing
+code:
 
-On Mon, Feb 23, 2026, Bart Van Assche wrote:
-> The Clang thread-safety analyzer does not support comparing expressions
-> that use per_cpu(). Hence introduce a new local variable to capture the
-> address of a per-cpu spinlock. This patch prepares for enabling the
-> Clang thread-safety analyzer.
-> 
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  arch/x86/kvm/vmx/posted_intr.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> index 4a6d9a17da23..f8711b7b85a8 100644
-> --- a/arch/x86/kvm/vmx/posted_intr.c
-> +++ b/arch/x86/kvm/vmx/posted_intr.c
-> @@ -164,6 +164,7 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
->  	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
->  	struct vcpu_vt *vt = to_vt(vcpu);
->  	struct pi_desc old, new;
-> +	raw_spinlock_t *wakeup_lock;
->  
->  	lockdep_assert_irqs_disabled();
->  
-> @@ -179,11 +180,11 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
->  	 * entirety of the sched_out critical section, i.e. the wakeup handler
->  	 * can't run while the scheduler locks are held.
->  	 */
-> -	raw_spin_lock_nested(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu),
-> -			     PI_LOCK_SCHED_OUT);
-> +	wakeup_lock = &per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu);
+>         /*
+>          * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the Intel feature
+>          * flag and protect from vendor-specific bugs via the whitelist.
+>          *
+>          * Don't use AutoIBRS when SNP is enabled because it degrades host
+>          * userspace indirect branch performance.
+>          */
+>         if ((x86_arch_cap_msr & ARCH_CAP_IBRS_ALL) ||
+>             (cpu_has(c, X86_FEATURE_AUTOIBRS) &&
+>              !cpu_feature_enabled(X86_FEATURE_SEV_SNP))) {
+>                 setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
+>                 if (!cpu_matches(cpu_vuln_whitelist, NO_EIBRS_PBRSB) &&
+>                     !(x86_arch_cap_msr & ARCH_CAP_PBRSB_NO))
+>                         setup_force_cpu_bug(X86_BUG_EIBRS_PBRSB);
+>         }
 
-Addressing this piecemeal doesn't seem maintainable in the long term.  The odds
-of unintentionally regressing the coverage with a cleanup are rather high.  Or
-we'll end up with confused and/or grumpy developers because they're required to
-write code in a very specific way because of what are effectively shortcomings
-in the compiler.
-
-> +	raw_spin_lock_nested(wakeup_lock, PI_LOCK_SCHED_OUT);
->  	list_add_tail(&vt->pi_wakeup_list,
->  		      &per_cpu(wakeup_vcpus_on_cpu, vcpu->cpu));
-> -	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-> +	raw_spin_unlock(wakeup_lock);
->  
->  	WARN(pi_test_sn(pi_desc), "PI descriptor SN field set before blocking");
->  
+You're probably not seeing X86_FEATURE_IBRS_ENHANCED because it doesn't
+get forced under SNP.
 
