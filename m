@@ -1,248 +1,238 @@
-Return-Path: <kvm+bounces-71669-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71671-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UDGxLD8QnmlBTQQAu9opvQ
-	(envelope-from <kvm+bounces-71669-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 21:55:27 +0100
+	id KIEfFH4YnmmcTQQAu9opvQ
+	(envelope-from <kvm+bounces-71671-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 22:30:38 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3534018C86B
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 21:55:26 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E3E618CC7D
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 22:30:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 91DC0305E338
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 20:54:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A31BB30636A2
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 21:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8766F33B967;
-	Tue, 24 Feb 2026 20:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3DD33F37E;
+	Tue, 24 Feb 2026 21:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fU9VoxpY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BKcFN1Qn"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f201.google.com (mail-dy1-f201.google.com [74.125.82.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96FF223702;
-	Tue, 24 Feb 2026 20:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8A8226D00
+	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 21:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771966458; cv=none; b=UrnWBL1gfcFxHD4yBnnAz/tsqFruYyYCYy8arFGsY8udGfjxr1VZhY0iDfZ97FT3az4J4UK5UYG3N95hhOBzMCvklGZFO9SYeOa4qHGJsboR9RPZDPDFo6qvlOLp2llmWX1PMeKzfMWkhbj9fyw06/PfDZcUgRfphNmbtvtNbH4=
+	t=1771968629; cv=none; b=qe8RBc0Vz2dK40ji0Qxp7YF/h50YrpwvSUHGOt46okur7JTcCmJ3MTJyLi4lYMH/oH5jR8HeWOR+VnTIVLE0Pdyo1TSyYMMqRubYVP1trr8U40OzEhNd5pAXS9lrTjRinVK1kXuCcJpFg7/CzXkQuhTmXHw6ZZe3RHdzUPausfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771966458; c=relaxed/simple;
-	bh=EgVAY0e5tBoSz6A6iwW5/XO8EvjgmD/hBAtfckjnAIc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DYAnzz9U5FxQuc4Rqy2FvOFxvDucL3f8KD4suueeBHMUNoT65/1L3p18QpxlaZMypcuRRyPHwTUsrxUXeKJnCEucpZ+X/dqjB2S4vz9bSufpCdTNTepXugqXrWhR4ZqvrCff0tOy71HcYw/OboNreJlLI4JJdDQ4QZ89hfRDxBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fU9VoxpY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 279EDC116D0;
-	Tue, 24 Feb 2026 20:54:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771966458;
-	bh=EgVAY0e5tBoSz6A6iwW5/XO8EvjgmD/hBAtfckjnAIc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fU9VoxpYqnAVrd4t/fIENYWIsMId2KNEP3dfw2h4SjQzeH/MBV/5Cee/wntRTQCP6
-	 8EADR9JKKOK/hSexd/fEomD/ZrU3e+Mo0cAkKAlisOPYRwuKJXzT3MA26tdQTXMvpb
-	 cFKvEXyKAe/X10m3pmNX2H1z0cczPw3iZWdEsiJJoujd4S5bnLIF7pTBSYnWQRgIVb
-	 lO1qmLmIs5NJLzUq5pV5qVfuG1vDdgGb4JylPzxBqN/lvS2sL0Y7jYkwDaBcxLLsMY
-	 M8xREJGMjxcu5uVJY3DLJp8/BXSitkrqLBWUKwurl88mBMEyWsx/eqM0TQ42RGOP4K
-	 O37lVNZp675Mw==
-Date: Tue, 24 Feb 2026 12:54:16 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, catalin.marinas@arm.com,
-	will@kernel.org, maz@kernel.org, miko.lenczewski@arm.com,
-	kevin.brodsky@arm.com, broonie@kernel.org, ardb@kernel.org,
-	suzuki.poulose@arm.com, lpieralisi@kernel.org,
-	yangyicong@hisilicon.com, joey.gouly@arm.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v13 7/8] KVM: arm64: use CASLT instruction for swapping
- guest descriptor
-Message-ID: <aZ4P-AcVjxfCFsew@kernel.org>
-References: <20260223174802.458411-1-yeoreum.yun@arm.com>
- <20260223174802.458411-8-yeoreum.yun@arm.com>
+	s=arc-20240116; t=1771968629; c=relaxed/simple;
+	bh=FXKeSoSMfzizdfAiGbgrzg+JYZn/1M0RS192UpKNA8o=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dQ+HvfJdg2Yg6dy3M4U5O3+Fadj2WbFcBlt4IEy2/ZaZWHE2cYa1bPHEVaxqBlSPTk0ttSr289EAjbLdcdog7RSg4h7ujlAt4ixAYs+3R8m3zTb2CmC/AezbLpPk8Q0d0G7VO5fA21kWlB3Ya9CrZDlnKQ2rKmk2zhDoWe/OTsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--changyuanl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BKcFN1Qn; arc=none smtp.client-ip=74.125.82.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--changyuanl.bounces.google.com
+Received: by mail-dy1-f201.google.com with SMTP id 5a478bee46e88-2b81ff82e3cso134641eec.0
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 13:30:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1771968626; x=1772573426; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fp3gQv/wLfwDQnfgoRQPjUqkZeQgl8EZgadP4mI+PPw=;
+        b=BKcFN1QnTJBkevYWv29g4n5UA3W6IMKFkH4PYtx2HkE1QKQpzQuPmbEt1JvwrPfj8T
+         YlOpZtM6adgpEdPWpcxxYSi0PWHDuJ9iLaHLJIDZgMTCdhDokrKAl8hwLOgNHK+7PbZk
+         bet3KVdBXz+Rvn+/wpZ6TNYrhLut0oRJf9UHmp+s1DX/JrwSi/UsizKLFqE9Cplx2AEX
+         osEyX9SdpxTMpMIus4OsIA/U6Yo2GNOHSsIjOeb35tPyCGxqa+mCAf6d/bZxr0p5J487
+         rynvCrtYhyEAXOTbVVwJMVVwaHTcZ7+88+GNL9an7SOGAVBOSLFQXcPx0UXZCwGotOH8
+         XfOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771968626; x=1772573426;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fp3gQv/wLfwDQnfgoRQPjUqkZeQgl8EZgadP4mI+PPw=;
+        b=BV2uwJ1cZUNLEfQO6XFXHq+pXLdz80QpcVuewnnoN4F5y8Y2ZHYzeyQpzaslWt5dv3
+         WfCIgDG0DzMdLgpv/5fBouqsJ5SfHq0xQYZBCAD5S1F/J7lBiVgfiIj7K021SMIysUgA
+         +kmwR6W+ufATes/t3FP8CsEwvSUQS/tytxKQiYK3dV5oVZEtdxAAmjmJELbanIYOWcqY
+         M/2ULfVDsQxdlFRK33LZtEY+ziNeITgdebyw95iAIc/TIcj+Sl59YkHSHwOQCsypUNjD
+         u1c5+zYmh9t8CdaV/muSguItl5Xm9Zh9scZQMGUfin+a6+B0cXdAcW9Ze0kZtjA0j5jc
+         y4vw==
+X-Forwarded-Encrypted: i=1; AJvYcCXsPPSJf/QVzdGwTMThWVZcK4rlRf+/UZSE6YrQu23Lrj/kgh72QSR8zCHpyAZlPXggBzk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydkXfL7tUJjwJrJKJP8TruRoXoyE7Z9PxiyKM5Xj2LJQhtObon
+	M6PxQTpAnTgIdeSbgpljY0+rv3uZj06uNhIru14xiARV6wjbca/trryRqmoOQKgoVO7YzQrxslS
+	seZp6llik2r4vR3TKDpA9Jw==
+X-Received: from dlnn36.prod.google.com ([2002:a05:7022:61a4:b0:127:16bc:8eaa])
+ (user=changyuanl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:7022:209:b0:119:e569:f874 with SMTP id a92af1059eb24-1277f547694mr557374c88.17.1771968625917;
+ Tue, 24 Feb 2026 13:30:25 -0800 (PST)
+Date: Tue, 24 Feb 2026 13:29:39 -0800
+In-Reply-To: <213d614fe73e183a230c8f4e0c8fa1cc3d45df39.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260223174802.458411-8-yeoreum.yun@arm.com>
+Mime-Version: 1.0
+References: <213d614fe73e183a230c8f4e0c8fa1cc3d45df39.camel@intel.com>
+X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
+Message-ID: <20260224212939.2081828-1-changyuanl@google.com>
+Subject: Re: [PATCH] KVM: TDX: Set SIGNIFCANT_INDEX flag for supported CPUIDs
+From: Changyuan Lyu <changyuanl@google.com>
+To: rick.p.edgecombe@intel.com
+Cc: binbin.wu@intel.com, bp@alien8.de, changyuanl@google.com, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, isaku.yamahata@intel.com, 
+	kas@kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, mingo@redhat.com, pbonzini@redhat.com, 
+	seanjc@google.com, tglx@kernel.org, x86@kernel.org, xiaoyao.li@intel.com
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71669-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-71671-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[oupton@kernel.org,kvm@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[changyuanl@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3534018C86B
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2E3E618CC7D
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026 at 05:48:01PM +0000, Yeoreum Yun wrote:
-> Use the CASLT instruction to swap the guest descriptor when FEAT_LSUI
-> is enabled, avoiding the need to clear the PAN bit.
-> 
-> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> ---
->  arch/arm64/include/asm/futex.h | 17 +----------------
->  arch/arm64/include/asm/lsui.h  | 27 +++++++++++++++++++++++++++
->  arch/arm64/kvm/at.c            | 32 +++++++++++++++++++++++++++++++-
->  3 files changed, 59 insertions(+), 17 deletions(-)
->  create mode 100644 arch/arm64/include/asm/lsui.h
-> 
-> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
-> index b579e9d0964d..6779c4ad927f 100644
-> --- a/arch/arm64/include/asm/futex.h
-> +++ b/arch/arm64/include/asm/futex.h
-> @@ -7,11 +7,9 @@
->  
->  #include <linux/futex.h>
->  #include <linux/uaccess.h>
-> -#include <linux/stringify.h>
->  
-> -#include <asm/alternative.h>
-> -#include <asm/alternative-macros.h>
->  #include <asm/errno.h>
-> +#include <asm/lsui.h>
->  
->  #define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
->  
-> @@ -91,8 +89,6 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
->  
->  #ifdef CONFIG_ARM64_LSUI
->  
-> -#define __LSUI_PREAMBLE	".arch_extension lsui\n"
-> -
->  #define LSUI_FUTEX_ATOMIC_OP(op, asm_op)				\
->  static __always_inline int						\
->  __lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
-> @@ -235,17 +231,6 @@ __lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
->  {
->  	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
->  }
-> -
-> -#define __lsui_llsc_body(op, ...)					\
-> -({									\
-> -	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
-> -		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
-> -})
-> -
-> -#else	/* CONFIG_ARM64_LSUI */
-> -
-> -#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
-> -
->  #endif	/* CONFIG_ARM64_LSUI */
->  
->  
-> diff --git a/arch/arm64/include/asm/lsui.h b/arch/arm64/include/asm/lsui.h
-> new file mode 100644
-> index 000000000000..4f956188835e
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/lsui.h
-> @@ -0,0 +1,27 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef __ASM_LSUI_H
-> +#define __ASM_LSUI_H
-> +
-> +#include <linux/compiler_types.h>
-> +#include <linux/stringify.h>
-> +#include <asm/alternative.h>
-> +#include <asm/alternative-macros.h>
-> +#include <asm/cpucaps.h>
-> +
-> +#ifdef CONFIG_ARM64_LSUI
-> +
-> +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
-> +
-> +#define __lsui_llsc_body(op, ...)					\
-> +({									\
-> +	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
-> +		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
-> +})
-> +
-> +#else	/* CONFIG_ARM64_LSUI */
-> +
-> +#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
-> +
-> +#endif	/* CONFIG_ARM64_LSUI */
-> +
-> +#endif	/* __ASM_LSUI_H */
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 885bd5bb2f41..1aceeef04567 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -9,6 +9,7 @@
->  #include <asm/esr.h>
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
-> +#include <asm/lsui.h>
->  
->  static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool s1ptw)
->  {
-> @@ -1704,6 +1705,33 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
->  	}
->  }
->  
-> +#ifdef CONFIG_ARM64_LSUI
-> +static int __lsui_swap_desc(u64 __user *ptep, u64 old, u64 new)
-> +{
-> +	u64 tmp = old;
-> +	int ret = 0;
-> +
-> +	uaccess_ttbr0_enable();
-> +
-> +	asm volatile(__LSUI_PREAMBLE
-> +		     "1: caslt	%[old], %[new], %[addr]\n"
-> +		     "2:\n"
-> +		     _ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w[ret])
-> +		     : [old] "+r" (old), [addr] "+Q" (*ptep), [ret] "+r" (ret)
-> +		     : [new] "r" (new)
-> +		     : "memory");
-> +
-> +	uaccess_ttbr0_disable();
-> +
-> +	if (ret)
-> +		return ret;
-> +	if (tmp != old)
-> +		return -EAGAIN;
-> +
-> +	return ret;
-> +}
-> +#endif
-> +
->  static int __lse_swap_desc(u64 __user *ptep, u64 old, u64 new)
->  {
->  	u64 tmp = old;
-> @@ -1779,7 +1807,9 @@ int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new)
->  		return -EPERM;
->  
->  	ptep = (u64 __user *)hva + offset;
-> -	if (cpus_have_final_cap(ARM64_HAS_LSE_ATOMICS))
-> +	if (IS_ENABLED(CONFIG_ARM64_LSUI) && cpus_have_final_cap(ARM64_HAS_LSUI))
+Hi Rick!
 
-cpucap_is_possible() is where the Kconfig check should go.
+On Tue, 24 Feb 2026 01:57:46 +0000, Edgecombe, Rick P wrote:
+> On Mon, 2026-02-23 at 13:43 -0800, Changyuan Lyu wrote:
+> > [...]
+> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > index 2d7a4d52ccfb4..0c524f9a94a6c 100644
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -172,9 +172,15 @@ static void td_init_cpuid_entry2(struct
+> > kvm_cpuid_entry2 *entry, unsigned char i
+> >  	entry->ecx = (u32)td_conf->cpuid_config_values[idx][1];
+> >  	entry->edx = td_conf->cpuid_config_values[idx][1] >> 32;
+> >
+> > -	if (entry->index == KVM_TDX_CPUID_NO_SUBLEAF)
+> > +	if (entry->index == KVM_TDX_CPUID_NO_SUBLEAF) {
+> >  		entry->index = 0;
+> > +		entry->flags &= ~KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+>
+> There are two callers of this. One is already zeroed, and the other has
+> stack garbage in flags. But that second caller doesn't look at the
+> flags so it is harmless. Maybe it would be simpler and clearer to just
+> zero init the entry struct in that caller. Then you don't need to clear
+> it here. Or alternatively set flags to zero above, and then add
+> KVM_CPUID_FLAG_SIGNIFCANT_INDEX if needed. Rather than manipulating a
+> single bit in a field of garbage, which seems weird.
 
-Thanks,
-Oliver
+Thanks for the suggestion. I agree that initializing entry->flags to 0 at
+the start of td_init_cpuid_entry2() is much cleaner.
+
+> > +	} else {
+> > +		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+> > +	}
+> >
+> > +	WARN_ON_ONCE(cpuid_function_is_indexed(entry->function) !=
+> > +		     !!(entry->flags &
+> > KVM_CPUID_FLAG_SIGNIFCANT_INDEX));
+>
+> It warns on leaf 0x23 for me. Is it intentional?
+
+Leaf 0x23 is not in the list of cpuid_function_is_indexed.
+Thanks Binbin for the explanation!
+
+> This warning kind of begs the question of how how much consistency
+> there should be between KVM_TDX_CAPABILITIES and
+> KVM_GET_SUPPORTED_CPUID. There was quite a bit of debate on this and in
+> the end we moved forward with a solution that did the bare minimum
+> consistency checking.
+>
+> We actually have been looking at some potential TDX module changes to
+> fix the deficiencies from not enforcing the consistency. But didn't
+> consider this pattern. Can you explain more about the failure mode?
+
+The main purpose of this patch was to make the KVM_TDX_GET_CPUID API
+more intuitive from userspace VMM's perspective.
+Since both KVM_TDX_CAPABILITIES and KVM_GET_SUPPORTED_CPUID return
+struct kvm_cpuid_entry2, I expected the semantic of the flag in both APIs
+to be the same, as I didn't find any special notes to the contrary in the
+TDX documentation Documentation/virt/kvm/x86/intel-tdx.rst .
+
+> >  	/*
+> >  	 * The TDX module doesn't allow configuring the guest phys
+> > addr bits
+> >  	 * (EAX[23:16]).  However, KVM uses it as an interface to
+> > the userspace
+> > --
+
+Regarding the WARN_ON_ONCE, I understand it touches on the larger
+consistency and compatibility questions that require more discussion
+as you and Sean mentioned. Since I am new to TDX and lack the full context
+on those prior debates, I removed the WARN_ON_ONCE check and focus only on
+the KVM_CPUID_FLAG_SIGNIFCANT_INDEX consistency fix, which was the core of
+this patch.
+
+Best,
+Changyuan
+
+-----------------------
+
+From 18b967b718911c09872c3717d8ab083fa59c4a70 Mon Sep 17 00:00:00 2001
+From: Changyuan Lyu <changyuanl@google.com>
+Date: Fri, 20 Feb 2026 09:55:28 -0800
+Subject: [PATCH] KVM: TDX: Set SIGNIFCANT_INDEX flag for supported CPUIDs
+
+Set the KVM_CPUID_FLAG_SIGNIFCANT_INDEX flag in the kvm_cpuid_entry2
+structures returned by KVM_TDX_CAPABILITIES if the CPUID is indexed.
+This ensures consistency with the CPUID entries returned by
+KVM_GET_SUPPORTED_CPUID.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Changyuan Lyu <changyuanl@google.com>
+---
+ arch/x86/kvm/vmx/tdx.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 2d7a4d52ccfb4..1c039eab2f3d8 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -167,6 +167,7 @@ static void td_init_cpuid_entry2(struct kvm_cpuid_entry2 *entry, unsigned char i
+
+ 	entry->function = (u32)td_conf->cpuid_config_leaves[idx];
+ 	entry->index = td_conf->cpuid_config_leaves[idx] >> 32;
++	entry->flags = 0;
+ 	entry->eax = (u32)td_conf->cpuid_config_values[idx][0];
+ 	entry->ebx = td_conf->cpuid_config_values[idx][0] >> 32;
+ 	entry->ecx = (u32)td_conf->cpuid_config_values[idx][1];
+@@ -174,6 +175,9 @@ static void td_init_cpuid_entry2(struct kvm_cpuid_entry2 *entry, unsigned char i
+
+ 	if (entry->index == KVM_TDX_CPUID_NO_SUBLEAF)
+ 		entry->index = 0;
++	else
++		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
++
+
+ 	/*
+ 	 * The TDX module doesn't allow configuring the guest phys addr bits
+--
+2.53.0.414.gf7e9f6c205-goog
 
