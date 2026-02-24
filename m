@@ -1,190 +1,322 @@
-Return-Path: <kvm+bounces-71628-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71629-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yLoBAxDbnWmuSQQAu9opvQ
-	(envelope-from <kvm+bounces-71628-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:08:32 +0100
+	id EF7gKeLgnWnpSQQAu9opvQ
+	(envelope-from <kvm+bounces-71629-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:33:22 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C44AE18A502
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:08:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06CD818A933
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:33:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3319D3012D17
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 17:08:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 32C5130CB13F
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 17:31:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07EFA3A9D83;
-	Tue, 24 Feb 2026 17:08:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D453A9DA6;
+	Tue, 24 Feb 2026 17:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cnrMBM1h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cP2SG1rY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378523A9002
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 17:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF8A3A961E
+	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 17:31:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771952899; cv=none; b=sjw5XXLV4Zb9A+iFHalHn66b78B0XlLRTewwEAf/6pp9xBF6W7ssCxMSfxxPDNQ3l+nJSOYD1f2EQuo5evcEpwMhusmAmf7zqUY8WLHxU/hG2nv8UUz0vg6GFvvwc/OGI2F0MvJJdJSTwZ2GdKQWUpqbMjzSikm+na9iiKkBItk=
+	t=1771954311; cv=none; b=mQlwdY4F8E6LceQDmFZrq8kQW5fLoO5/RCrT53aM/54riAJBSQbeFzLVg5o9DKfDWuX9TmHwKsNyI6iVarXqUTn6i2+kbeqf2oWprIoRtDSS4SQv/7BUtIZGXfOsO8S7TV7Md0TpBrjKHwbDrm3bRM1Ij1d1ZxcOOjhq/6lcJyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771952899; c=relaxed/simple;
-	bh=U6OeKTFflZEsOwAbudBFuNdKmsclm262M3wZ2aA4UMs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hjEHbi73hXv59GKPAJRuz49SOs8cMfaMzAOlmNy4kJrYIPWvPPXDHaUCT4JgOCIwF3ovSwd4Mykde2kw23un9Admpigrkb8qfInzQEEQI7EdnfUAHA9cG90uCabgO9yZ4ofy7dhh3f99NrE65qGpo9wa+M3W1cFP5DzoD7PElLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cnrMBM1h; arc=none smtp.client-ip=209.85.214.171
+	s=arc-20240116; t=1771954311; c=relaxed/simple;
+	bh=EwpXaeWzxU9JXsOZ/kU5orA5NKUcth5xtqHL2bq2ne4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=qGgjfTFeTWyNwzyPSYWRhnrtZyiImHz8RgWXYgIkS/egOAD8zjovc/GrBKvj6h2YedfMevTtDri9QWnBcK999Yk976+X34AKC3BGiXzT2UjYpmp0r6cr3SdVAdyCpVL4Hg4+/lVy+YktCQJ90Km53oP05d4+dcmt/At/zubFph0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cP2SG1rY; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2ada9e4ea32so14995ad.1
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 09:08:18 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-358e95e81aeso3681885a91.0
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 09:31:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771952897; x=1772557697; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xJz4QDTcumvz9JVrQMb51pWWatd7LKwHk5h8C7Rf46E=;
-        b=cnrMBM1hieWtTBHXZV0gag7wLK8HvLxY28h/SBDTCUIy6KPFOgIem9w8RNsm0u42jv
-         NtW5HOeVPUIIi0C0GZAXq0mZc+shIo1MsC2vucGY4BEcRYIobcf6+VnGX9kWz5Sd33xM
-         Qc9/scTuCIwMZboy3D0dv4n5vVIvAQrbTBPQnsghsjzUwJu4I3XVFoo1dQb0JJeAYF53
-         zfZlw59RVfhClDrz2sMZKWRjsM/VqsY9uqVbbuCPQpEy22Sq/Mwb39yTmzWoXxbNFfx4
-         337KTEAs+MfsoWA6UkjlZyPE03Vhr2alGa8K4p1lQYJrgLZiuDggmP/DMrMTHtJoM5Y0
-         bwcw==
+        d=google.com; s=20230601; t=1771954309; x=1772559109; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VuPOB7rG9LKyBkb7Y8YEmUtdQmZnS0ImLK7NP0qREno=;
+        b=cP2SG1rYnlIJ9FwPxPr41Cli0MhPXtZu8lIAaqhdBc50mvj78bYK4IRJ4Qk/GcasRR
+         7XzYJFBLWUKurXVHfz0frJvkBvuxKs/xdeq9EY0CLVLoGIsYF4Rr0Bq3UcUiVrinSGuQ
+         l9Vc5S7dcrTevvUa0i8/Xgkc82nctnrJ6gBY+stp48l2q2cUzW3roeGnBXg0xMpk2WoF
+         dI8O0mNT28ZrXEKe+lwvoyaFSmKuV0RkDCvQc7MgntKM/IK3/KZ6JQ/jMzIKV7jylhyH
+         AtJ/uXR88jCtmBxiBDfXwPsCHdch/1wzMpzWHJTfjJxn5F32e+FDdPQIZpUGE3wK5iVo
+         KozA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771952897; x=1772557697;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xJz4QDTcumvz9JVrQMb51pWWatd7LKwHk5h8C7Rf46E=;
-        b=uY64GZb+Hhj7yNXxOVGcZNi6j1QLdgYeIeaZsl3LLL0T8ZLCW6sqYM2B4soWry3iDv
-         mUhfkmXFXyB8u0a8C7YMkckHeY61v7kZ6iv50Jq/XiPZXtNeEsgCuman7y42ifZCzrzI
-         R6yJqjvYevAY26TmVA7bei3dUZL3A4B8FPkaYjDUBVscfieMd3Hu1+0+nDbemQZDtQkk
-         RNhvts8JJcYqMdxtquwnbDP7CPQZmaKjRfhSSaQue8yLkocZqurIMTYTC9RbUxOTkrmt
-         yR4mzSu2nFTExJIcPQ60IAbFJXzXU1oUV5fhUGfoNDJvR02WnnptZz4C0i2wzhHPtHuq
-         jWpA==
-X-Forwarded-Encrypted: i=1; AJvYcCXtnfJ6o00AWu8kEMeXzFS4jc+X8osw/kaNLuJuWvabYCMNZybxwKS8vOC9R76+TuKJJFo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9aXBx9L7r5hw2QIvBXS4GKm32kVrDfbPLtT1tVRfvCFVzFPKZ
-	oOT11tv4bH7mxgz1o12PYHvHuSwi3as49kUft74fjcXzNVYSZBCDdCOKzFGuYVaLQA==
-X-Gm-Gg: ATEYQzy578ZCndeACLjEYQDK4FSTk6lPM1HruyetxdDGSnd4bYQ0YQ1pzCzpqYVaPHR
-	0nNL0O+XY2CY6E1d5pkfPsVcAfza7G8+80V1axnvdI6WfJmVEKIfbWt1sspexhnftMly5Tx4cmW
-	jbL+DhdiXfXRbqgpH6JgBrPKG89QILlSGbtP3lt7lX7ywEUi2Rs2aKPLtPMWXjk0lKPGFivrxZG
-	szwv4ADP+/eytA0pxIyzB+2l9EyqohY89FmZlCCtB69Akm3UNh8m5tDZt/BJfm8uIwgrt7SCGoM
-	DHK5AhxYmTKaDYsLADXMRgBDK/IgamjJsMSWmfTxXUYtzfGffxQFTHCc8jzMUY6I1OZ0/pdlTgq
-	HIRgMceuRgL/ugna8FUz55fnpIMe95CmSpFF4Bb1W2ZD6oCyImKAQBYe3uZORGahnDT/WZ9q69X
-	7dhCxr88L/o3u9KemdbwxYD2iUmPHb8iuOrvh1bhtiL38LJSPEJBEwQy3eH7IBSg==
-X-Received: by 2002:a17:903:b87:b0:297:f2a0:e564 with SMTP id d9443c01a7336-2ada346b6c2mr1775335ad.11.1771952896593;
-        Tue, 24 Feb 2026 09:08:16 -0800 (PST)
-Received: from google.com (168.136.83.34.bc.googleusercontent.com. [34.83.136.168])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82719e7ed8asm1521995b3a.5.2026.02.24.09.08.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Feb 2026 09:08:15 -0800 (PST)
-Date: Tue, 24 Feb 2026 17:08:11 +0000
-From: Samiullah Khawaja <skhawaja@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Alex Williamson <alex@shazbot.org>, 
-	Adithya Jayachandran <ajayachandra@nvidia.com>, Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>, 
-	Alistair Popple <apopple@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Ankit Agrawal <ankita@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Chris Li <chrisl@kernel.org>, David Rientjes <rientjes@google.com>, 
-	Jacob Pan <jacob.pan@linux.microsoft.com>, Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Jonathan Corbet <corbet@lwn.net>, Josh Hilke <jrhilke@google.com>, 
-	Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org, kvm@vger.kernel.org, 
-	Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-mm@kvack.org, 
-	linux-pci@vger.kernel.org, Lukas Wunner <lukas@wunner.de>, 
-	=?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>, Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>, 
-	Pasha Tatashin <pasha.tatashin@soleen.com>, Pranjal Shrivastava <praan@google.com>, 
-	Pratyush Yadav <pratyush@kernel.org>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Rodrigo Vivi <rodrigo.vivi@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Shuah Khan <skhan@linuxfoundation.org>, 
-	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, Tomita Moeko <tomitamoeko@gmail.com>, 
-	Vipin Sharma <vipinsh@google.com>, Vivek Kasireddy <vivek.kasireddy@intel.com>, 
-	William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>, Zhu Yanjun <yanjun.zhu@linux.dev>
-Subject: Re: [PATCH v2 01/22] liveupdate: Export symbols needed by modules
-Message-ID: <rlftyyae4w4frzcpvyecda32vxod6uambsb7cja274lugs4nhy@3yk3oki2kwo5>
-References: <20260129212510.967611-1-dmatlack@google.com>
- <20260129212510.967611-2-dmatlack@google.com>
+        d=1e100.net; s=20230601; t=1771954309; x=1772559109;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VuPOB7rG9LKyBkb7Y8YEmUtdQmZnS0ImLK7NP0qREno=;
+        b=sBUbKJwR5A6hKwJmCauGmPyL128ykjBl+1EKFk7s5f2inoYcN9jjfC6SfFY8HGYZVa
+         Ph+68XGaXPzgPyiDfq8cpz3QLjP2U9IgJPZNXg7ep9CxjAjYB9s2kNhDWyln1YvbljIA
+         9x4bSfXQXpBUFp5IcAHhHhq6k9/tjlyflhEG0wnfsuSuij5l6dY3O2S9kM5revLay6o5
+         +an9jr0IW2Yt+E6Y57IdZnYwhpxcMSyyH+mQuBvCtVj8+26wn2xR3yZPg1qrZhKb++52
+         DlzTuqi2jkx4MDRKInE3txlaWMHvPCdjT5QLMYTAX0nP+dxOfNKv9AFW6n35Vydswfak
+         76jw==
+X-Forwarded-Encrypted: i=1; AJvYcCXxnXzZzjANxLKCkuBoIQLz3i71TqlTbFVK+v06dhwTB+auAod5p4wjRRrG12rC19Sv1k4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziQdcOVVN10OlrunVJTpB3QPyqN1XajBDxgLQDnmqJwipA6x+U
+	bKKKNhaQjsbqBXT8jNsw72ZMhLjtwjh8e8XUGrg5Jx2Rt0eNKztiTCWTFxoI9IjRfsARynYFL0n
+	zYqL2aw==
+X-Received: from pjxx5.prod.google.com ([2002:a17:90b:58c5:b0:354:c506:5ac1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4f4e:b0:356:4c1f:98d4
+ with SMTP id 98e67ed59e1d1-358ae8194ffmr10415719a91.13.1771954309148; Tue, 24
+ Feb 2026 09:31:49 -0800 (PST)
+Date: Tue, 24 Feb 2026 09:31:47 -0800
+In-Reply-To: <20260224071822.369326-4-chengkev@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260129212510.967611-2-dmatlack@google.com>
+Mime-Version: 1.0
+References: <20260224071822.369326-1-chengkev@google.com> <20260224071822.369326-4-chengkev@google.com>
+Message-ID: <aZ3gg2VsrWGKrX4l@google.com>
+Subject: Re: [PATCH V2 3/4] KVM: VMX: Don't consult original exit
+ qualification for nested EPT violation injection
+From: Sean Christopherson <seanjc@google.com>
+To: Kevin Cheng <chengkev@google.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	yosry.ahmed@linux.dev
+Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71628-lists,kvm=lfdr.de];
-	FREEMAIL_CC(0.00)[shazbot.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev];
+	TAGGED_FROM(0.00)[bounces-71629-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[skhawaja@google.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C44AE18A502
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 06CD818A933
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 09:24:48PM +0000, David Matlack wrote:
->Export liveupdate_enabled(), liveupdate_register_file_handler(), and
->liveupdate_unregister_file_handler(). All of these will be used by
->vfio-pci in a subsequent commit, which can be built as a module.
->
->Signed-off-by: David Matlack <dmatlack@google.com>
->---
-> kernel/liveupdate/luo_core.c | 1 +
-> kernel/liveupdate/luo_file.c | 2 ++
-> 2 files changed, 3 insertions(+)
->
->diff --git a/kernel/liveupdate/luo_core.c b/kernel/liveupdate/luo_core.c
->index dda7bb57d421..59d7793d9444 100644
->--- a/kernel/liveupdate/luo_core.c
->+++ b/kernel/liveupdate/luo_core.c
->@@ -255,6 +255,7 @@ bool liveupdate_enabled(void)
-> {
-> 	return luo_global.enabled;
-> }
->+EXPORT_SYMBOL_GPL(liveupdate_enabled);
->
-> /**
->  * DOC: LUO ioctl Interface
->diff --git a/kernel/liveupdate/luo_file.c b/kernel/liveupdate/luo_file.c
->index 35d2a8b1a0df..32759e846bc9 100644
->--- a/kernel/liveupdate/luo_file.c
->+++ b/kernel/liveupdate/luo_file.c
->@@ -872,6 +872,7 @@ int liveupdate_register_file_handler(struct liveupdate_file_handler *fh)
-> 	luo_session_resume();
-> 	return err;
-> }
->+EXPORT_SYMBOL_GPL(liveupdate_register_file_handler);
->
-> /**
->  * liveupdate_unregister_file_handler - Unregister a liveupdate file handler
->@@ -917,3 +918,4 @@ int liveupdate_unregister_file_handler(struct liveupdate_file_handler *fh)
-> 	liveupdate_test_register(fh);
-> 	return err;
-> }
->+EXPORT_SYMBOL_GPL(liveupdate_unregister_file_handler);
->-- 
->2.53.0.rc1.225.gd81095ad13-goog
->
+On Tue, Feb 24, 2026, Kevin Cheng wrote:
+> ---
+>  arch/x86/kvm/mmu/paging_tmpl.h | 16 +++++++++++++++-
+>  arch/x86/kvm/vmx/nested.c      |  3 ---
+>  2 files changed, 15 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index f148c92b606ba..a084b5e50effc 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -386,8 +386,19 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+>  					     nested_access, &walker->fault);
+>  
+>  		if (unlikely(real_gpa == INVALID_GPA)) {
+> +			/*
+> +			 * Unconditionally set the NPF error_code bits and
+> +			 * EPT exit_qualification bits for nested page
+> +			 * faults.  The walker doesn't know whether L1 uses
+> +			 * NPT or EPT, and each injection handler consumes
+> +			 * only the field it cares about (error_code for
+> +			 * NPF, exit_qualification for EPT violations), so
+> +			 * setting both is harmless.
+> +			 */
+>  #if PTTYPE != PTTYPE_EPT
+>  			walker->fault.error_code |= PFERR_GUEST_PAGE_MASK;
+> +			walker->fault.exit_qualification |=
+> +				EPT_VIOLATION_GVA_IS_VALID;
 
-Reviewed-by: Samiullah Khawaja <skhawaja@google.com>
+This looks all kinds of wrong.  Shouldn't it be?
+
+#if PTTYPE == PTTYPE_EPT
+			walker->fault.exit_qualification |= EPT_VIOLATION_GVA_IS_VALID;
+#else
+			walker->fault.error_code |= PFERR_GUEST_PAGE_MASK;
+#endif
+
+Ooooh, right, never mind, this is the case where KVM detects a fault on the
+L2 GPA => L1 GPA translation when walking L2 GVA=>GPA.
+
+This is very counter-intuitive, and unconditionally setting both is rather ugly.
+To address both, what if we peek at the guest_mmu to determine whether the fault
+is EPT vs. NPT?  E.g.
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 3911ac9bddfd..db43560ba6f8 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5263,6 +5263,9 @@ static bool sync_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
+        return false;
+ }
+ 
++static bool kvm_nested_fault_is_ept(struct kvm_vcpu *vcpu,
++                                   struct x86_exception *exception);
++
+ #define PTTYPE_EPT 18 /* arbitrary */
+ #define PTTYPE PTTYPE_EPT
+ #include "paging_tmpl.h"
+@@ -5276,6 +5279,13 @@ static bool sync_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
+ #include "paging_tmpl.h"
+ #undef PTTYPE
+ 
++static bool kvm_nested_fault_is_ept(struct kvm_vcpu *vcpu,
++                                   struct x86_exception *exception)
++{
++       WARN_ON_ONCE(!exception->nested_page_fault);
++       return vcpu->arch.guest_mmu.page_fault == ept_page_fault;
++}
++
+ static void __reset_rsvds_bits_mask(struct rsvd_bits_validate *rsvd_check,
+                                    u64 pa_bits_rsvd, int level, bool nx,
+                                    bool gbpages, bool pse, bool amd)
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index a084b5e50eff..0c9ce7a4815b 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -387,19 +387,14 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 
+                if (unlikely(real_gpa == INVALID_GPA)) {
+                        /*
+-                        * Unconditionally set the NPF error_code bits and
+-                        * EPT exit_qualification bits for nested page
+-                        * faults.  The walker doesn't know whether L1 uses
+-                        * NPT or EPT, and each injection handler consumes
+-                        * only the field it cares about (error_code for
+-                        * NPF, exit_qualification for EPT violations), so
+-                        * setting both is harmless.
++                        * Set EPT Violation flags even if the fault is an
++                        * EPT Misconfig, fault.exit_qualification is ignored
++                        * for EPT Misconfigs.
+                         */
+-#if PTTYPE != PTTYPE_EPT
+-                       walker->fault.error_code |= PFERR_GUEST_PAGE_MASK;
+-                       walker->fault.exit_qualification |=
+-                               EPT_VIOLATION_GVA_IS_VALID;
+-#endif
++                       if (kvm_nested_fault_is_ept(vcpu, &walker->fault))
++                               walker->fault.exit_qualification |= EPT_VIOLATION_GVA_IS_VALID;
++                       else
++                               walker->fault.error_code |= PFERR_GUEST_PAGE_MASK;
+                        return 0;
+                }
+ 
+@@ -458,12 +453,11 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 
+        real_gpa = kvm_translate_gpa(vcpu, mmu, gfn_to_gpa(gfn), access, &walker->fault);
+        if (real_gpa == INVALID_GPA) {
+-#if PTTYPE != PTTYPE_EPT
+-               walker->fault.error_code |= PFERR_GUEST_FINAL_MASK;
+-               walker->fault.exit_qualification |=
+-                       EPT_VIOLATION_GVA_IS_VALID |
+-                       EPT_VIOLATION_GVA_TRANSLATED;
+-#endif
++               if (kvm_nested_fault_is_ept(vcpu, &walker->fault))
++                       walker->fault.exit_qualification |= EPT_VIOLATION_GVA_IS_VALID |
++                                                           EPT_VIOLATION_GVA_TRANSLATED;
++               else
++                       walker->fault.error_code |= PFERR_GUEST_FINAL_MASK;
+                return 0;
+        }
+ 
+>  #endif
+>  			return 0;
+>  		}
+> @@ -449,6 +460,9 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+>  	if (real_gpa == INVALID_GPA) {
+>  #if PTTYPE != PTTYPE_EPT
+>  		walker->fault.error_code |= PFERR_GUEST_FINAL_MASK;
+> +		walker->fault.exit_qualification |=
+> +			EPT_VIOLATION_GVA_IS_VALID |
+> +			EPT_VIOLATION_GVA_TRANSLATED;
+>  #endif
+>  		return 0;
+>  	}
+> @@ -496,7 +510,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+>  	 * [2:0] - Derive from the access bits. The exit_qualification might be
+>  	 *         out of date if it is serving an EPT misconfiguration.
+>  	 * [5:3] - Calculated by the page walk of the guest EPT page tables
+> -	 * [7:8] - Derived from [7:8] of real exit_qualification
+> +	 * [7:8] - Set at the kvm_translate_gpa() call sites above
+>  	 *
+>  	 * The other bits are set to 0.
+>  	 */
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 248635da67661..6a167b1d51595 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -444,9 +444,6 @@ static void nested_ept_inject_page_fault(struct kvm_vcpu *vcpu,
+>  			exit_qualification = 0;
+>  		} else {
+>  			exit_qualification = fault->exit_qualification;
+> -			exit_qualification |= vmx_get_exit_qual(vcpu) &
+> -					      (EPT_VIOLATION_GVA_IS_VALID |
+> -					       EPT_VIOLATION_GVA_TRANSLATED);
+
+Hmm, this isn't quite correct.  If KVM injects an EPT Violation (or a #NPF) when
+handling an EPT Violation (or #NPF) from L2, then KVM _should_ follow hardware.
+
+Aha!  I think the easiest way to deal with that is to flag nested page faults
+that were the result of walking L1's TDP when handling an L2 TDP page fault, and
+then let vendor code extract the fault information out of hardaware.
+
+Alternatively, we could plumb in VMX's EPT_VIOLATION_GVA_IS_VALID as a synthetic
+error code, but I think that be harder to follow overall, especially for VMX.
+
+@@ -799,8 +793,10 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+         * The page is not mapped by the guest.  Let the guest handle it.
+         */
+        if (!r) {
+-               if (!fault->prefetch)
++               if (!fault->prefetch) {
++                       walker.fault.hardware_nested_page_fault = walker.fault.nested_page_fault;
+                        kvm_inject_emulated_page_fault(vcpu, &walker.fault);
++               }
+ 
+                return RET_PF_RETRY;
+        }
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 6a167b1d5159..9e7d541d256b 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -443,8 +443,13 @@ static void nested_ept_inject_page_fault(struct kvm_vcpu *vcpu,
+                        vm_exit_reason = EXIT_REASON_EPT_MISCONFIG;
+                        exit_qualification = 0;
+                } else {
+-                       exit_qualification = fault->exit_qualification;
+                        vm_exit_reason = EXIT_REASON_EPT_VIOLATION;
++
++                       exit_qualification = fault->exit_qualification;
++                       if (fault->hardware_nested_page_fault)
++                               exit_qualification |= vmx_get_exit_qual(vcpu) &
++                                                     (EPT_VIOLATION_GVA_IS_VALID |
++                                                      EPT_VIOLATION_GVA_TRANSLATED);
+                }
+ 
+                /*
+
+
+
+
+>  			vm_exit_reason = EXIT_REASON_EPT_VIOLATION;
+>  		}
+>  
+> -- 
+> 2.53.0.414.gf7e9f6c205-goog
+> 
 
