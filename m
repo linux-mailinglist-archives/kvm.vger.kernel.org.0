@@ -1,196 +1,151 @@
-Return-Path: <kvm+bounces-71631-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71632-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8GcgD/vhnWnpSQQAu9opvQ
-	(envelope-from <kvm+bounces-71631-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:38:03 +0100
+	id SHQYMBfinWnpSQQAu9opvQ
+	(envelope-from <kvm+bounces-71632-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:38:31 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A975E18A9D7
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:38:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5597C18AA04
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:38:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4086430A3191
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 17:37:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5150430C4562
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 17:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01C53A9D91;
-	Tue, 24 Feb 2026 17:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3AA3A9DBA;
+	Tue, 24 Feb 2026 17:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O+yyE1qx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KyVvMOVA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C73793803D1
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 17:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771954649; cv=pass; b=Y4zIMXfN3aOIjgQYW7HrW5lqfBD+Q0B3oBanP7YiGmPWyKe+XkZ5BZTkDf5GDM12a3tDygL7+LSzsmDM15xU9G7gHm0aaDYXdWP4Su0OcEz5S9KE/5Whqc7H2wpr2VUPuE6OrX+U6tXQwcVG36EnJ9PjV4miaG39Hbn6da4RoxE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771954649; c=relaxed/simple;
-	bh=NzE6Dg5T/WZzjhrxSxryu35IDaiffOedvMQkCnbUBbs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ll6AuRxAOyFH4tZEj4LDltYyARGbUYNMweHVeV060pyjknHdHaMCZrXu4HSXErPTgBxPZU/LtQawnwA4P30aBoOqR0c/ppoIV1vi4TFnqBCjPc6aqsmo3G+RNaRs/9yAz50BTNBD/gy+G0CjpMzeHD7SdCnh/YYRxcz0m9B7avw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O+yyE1qx; arc=pass smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DDA03A9D8C
+	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 17:37:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771954666; cv=none; b=XMxYJjEKifqBV2LHVQfpS2q9vTptTQ3H7ALdGOSun6qtypgSRKgUdJ4fswAVS/4SI256FhsjBGF5V1MfXht6yPA59t7Ys2fH9iQZ4hCKHmT/ib+ZepChUv7QcRNXwbUqkmM2SN2o7uRgqzzVgHpaFEkk8PL9YRriYMoQFC4ylnM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771954666; c=relaxed/simple;
+	bh=mCCVv6L04cWt7rC+dXX4D8L5HIoEgr+4KNHsOMYBn7k=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=buhQwbNA90fgEpQxjtmq4ZDlS2iB4v/di+8Kwh7I89dG/YEzj5zFa8jjaDCOvo3Y7QAMO7wL/vibukbvwFxujJiwOW7fcU02YXwRFqseAwBHkqtxRsboQyRbxfvMcn5a3w5p5+td7+NM+WiM8+GcCgD74iWHYXMa0OGt0kPubvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KyVvMOVA; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-56641200d6eso6478190e0c.0
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 09:37:27 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771954647; cv=none;
-        d=google.com; s=arc-20240605;
-        b=PY4Ohys/6IN5ilQkd6iFpuaUYqQ/lf0c8FzlXqjhbUjQnk0olUWojdg/hqwuBzNnrg
-         SCxnF9siuuSCPa+RTBX90jfp2NJRig+hWMPIq4bloNXWOpoWFa9GHnR2c4YuCNQRtXAb
-         TPo2Nb+5xpT3hJtRVkLCAw+VYYyw7gaq0E7OMmjii45EuKcASuzp1rxZl6nbzjzbmuC8
-         EDan/UoKP0lvKybUfI2eyjeDn8TecZb1pvZKUhU0umK5jsjw/D2IDKcpaQgr9h0JGd0T
-         ATzIHnMu5fl44gLOWF8LmZs/MadlLNI6P0NeUMuqIZO7IxEDzfSYAi2vXlQHq2Pq/qu2
-         4Llg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=WVyG+GjslObEPoiorlcEtEb0lbImQuwl2+xBSlYjPvU=;
-        fh=B9hcVx/XeyNB7wnvFQl5s8IWC4Rhl0EJh/GiBumJZkQ=;
-        b=LiYa82d0K9jB5WlVNIUh+egUymFgbWA6wxQ8ze0WYDQm9b1NvWRmGazFXb43gC9Tku
-         4oJ/CZi7Es7FoK1rla4KrJzcBpiTemJ9HN7Xn/9Zearf8o0T5pqwWWxuGUYiXfKwpqtA
-         jY4AASSB9dm+Z2/OSpHl6ai0r553mnK9I5v8iArdgOtdKB2EXHR2IUjfB54nBx6nKa89
-         9gvzNTAbIe+wn979qs5XKB8DbpGXaciYmVTTZdY2ULVkNoyNWIp09PB3IeL2GJ4o0ZLi
-         j23qmg9ZMccVVfgYTcDq72399tw231BgtKsppvpII9bwewwxm4/C0JEN/8lAJOuIkSqD
-         MuAQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a76f2d7744so62212725ad.3
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 09:37:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771954647; x=1772559447; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WVyG+GjslObEPoiorlcEtEb0lbImQuwl2+xBSlYjPvU=;
-        b=O+yyE1qxUOAg6dKVlAaP7DqeAKGiTg2vj+80mJTczPFmVifUrvXeiRAUTHwcY494hs
-         nYb1zcEenz5Pr9R+S5wX2fzs6WzUVhJq3NHDLMU1dUIaQLuUMHJZppn+L6jA2ywQRraX
-         e0mJSaajncxDDeSLw5ZGMRSxhBxvuucjh4gIMTqlxMEn9XOaUjH+JZpANuq66YMr/C77
-         cVNZr4KOfDMzrm6CHNWYiua1MCYdmhCYINFR4ZAoUJe0W+1ywY/RGZKP0jA5xVOuFSPN
-         CedJgKBY/KmNHzfLvo3a+Lt7jvxYnRPAZFJmKLozY4jiCcQo3hZpYtW8JIF7cczZ3JQp
-         WWQw==
+        d=google.com; s=20230601; t=1771954664; x=1772559464; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YBYOBVXP4vivMMEN8JfHO64Zg9pUzxocpjlkKoATuFs=;
+        b=KyVvMOVAcn/btlvd/NKGj5h3hwxorHzG32TFQT1aBEtKnWCNTLM6RlofhDWaN/C0Go
+         vI1Ry9GDRSxD1ahrr4eBO/7TjE64uBbrOsbatNccMBDYU9ajOTGsWtOU3LTuy7soBs58
+         8DXhLAC17Q+XzpJYmjh0Xl0pOnaDirUw0yH3Q9crzNAz9Cg0xPzT4MuN4UcpQ9+bzZ5c
+         Qfb94FL5WKDOjt9xkxcahfiUr81KNJqJ3csD1Yr3X67RPTVavVTwT89dtd28i+x8xBOX
+         BbSQpG7Q996iyFb0CGrHqctPZSuWjsuf20i0fCu8E7Q7TqzWxSdki6T/y0LP6goqTBuW
+         f4eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771954647; x=1772559447;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WVyG+GjslObEPoiorlcEtEb0lbImQuwl2+xBSlYjPvU=;
-        b=PIiDnUEu4WWGZtvnkzB+6Y3Atn7NMmvbqymG72YNdTolBnhkzUBhKLTDe3Da/wxiAR
-         YoYEjRRXqgjpNYaWaIJiAOammlvx7FXVJLul1E3s7PDKdbT9uaLgWsWQJkKOPZB4g+Zf
-         4U8CQccWWLcRoREHe+v4kfItj0FB7M7AU2VNvvkfQOpN/Cxdk1//1OxWHy1RCzZjOBHI
-         EW5OO512CxksQvDztpJ54K18hA99Dze8vR2omqmlo/vWYwJ60CLCXJIDuiAnrRWhu5A1
-         e0JIUa88bRRYXIDGSodwvACMzyeyNloeKo4fxc4dD3BKP+wESdv4WVpeN/zqBMUnhjUX
-         HZfg==
-X-Forwarded-Encrypted: i=1; AJvYcCU4FdQLYhT3wGglQp0gGUoO/w4vjueqzIw7rnTNK4XM/boeDtPG8XPEacievYLneaozaVU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyo0T+bn0P3eIWhhVjITChG2HeRTqxGFD9qsWesoa9kJ6KHIwQH
-	UOHzfcl7uf+Kyv2UT5U4nDMwlvTFMVv3XobTZreaxp8qxQ2l/SkThrU91KeiDru/Rt6/whj9Nx6
-	Vn/Bi5qr7Kb6Kcm4ZYSe7MKCK2eN7p7qImOP/4gwB
-X-Gm-Gg: ATEYQzyME551nVG2glZdQGl7ywiBS+4zrld+MkqUxcRmd+OcW30V+0JP68XvyehZquq
-	+WzAQKIgL2dQPxNfR64ALOcwGQjf7sL8EdFr+V9Un4A8kfhPu793k/dJDIbrg2UX89CXwkhLnC/
-	kjtg3BmhYbXN0gQftlzitcM6PdPi8OW9K+4+/qRDUk16A3w/YBr1u9ldVkLfZ+c8snXUHt37jjP
-	rwaxRh6Afbv1t17q5Y3uakKX/xW7TdLe/8OIn5fmCTXFFPMEGU4UbBC6wU95GbMJKWG6+h8aRBT
-	kTWcmnQ=
-X-Received: by 2002:a05:6102:e11:b0:5f5:3835:4796 with SMTP id
- ada2fe7eead31-5feb2eebe4fmr7234443137.15.1771954646379; Tue, 24 Feb 2026
- 09:37:26 -0800 (PST)
+        d=1e100.net; s=20230601; t=1771954664; x=1772559464;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YBYOBVXP4vivMMEN8JfHO64Zg9pUzxocpjlkKoATuFs=;
+        b=MC7rdw8CG/9sL0A08r6sE+LvqLaZpbQ5mkieo5ZK9laG12y8GDnWztVoWa+rW7ZhZY
+         oFx19yZNjqFF6oPyMZ7DNT3yam8XaKEbTuOZMC2IJY+QGFH6bS8T8kwWsCzZWSxbIr7/
+         3YavkvdYiiju0mW6kC+XdLS9EkYUVxVRKIRXx3Qy6zCaC3dmfimHqVtWSPkWwF3PPChk
+         9XbaFDTmAiE0x9NnSZtww3PrTAJuiS3w8tPTfBBgVx3tnT/r+LlWqjhmJlmF4AZKhEiS
+         SdtdJYv6pZLJ1ivqtQoADJ1nqeit6iudmFcHauKD5T3hgcrBi/VC1EyJYLbvQXkaTtsN
+         LfmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX8pX/nGSu6/c6q5LdD5j7ClQdmk01auxqefr/UrzWcfs4f9ivm9UQnwCPmiG+I0kABs1A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyemg7A27Z82WJahSgtC/qsWLSF5qMGhE3KkO1+WNul4zFOK3e4
+	qpNV4VyEKdC37L3TuNcgksffQ/WUmLZTEKu/xFU82nrM42Z4cWLmjshHPrXezDpDYAUEklYfMDR
+	lXUHebw==
+X-Received: from plbiw20.prod.google.com ([2002:a17:903:454:b0:2a0:7f81:6066])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:32cb:b0:2aa:d816:e1a9
+ with SMTP id d9443c01a7336-2ad744e0aeamr104939405ad.28.1771954664283; Tue, 24
+ Feb 2026 09:37:44 -0800 (PST)
+Date: Tue, 24 Feb 2026 09:37:43 -0800
+In-Reply-To: <20260224071822.369326-5-chengkev@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260129212510.967611-1-dmatlack@google.com> <20260129212510.967611-4-dmatlack@google.com>
- <aZ1xAyN0vgLWIi5y@google.com>
-In-Reply-To: <aZ1xAyN0vgLWIi5y@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Tue, 24 Feb 2026 09:36:50 -0800
-X-Gm-Features: AaiRm51zYRUGqNlquBQBjZ_Ao68Y3fgUdHKViouV8m9qg-AcIptaKIFOE6taQzc
-Message-ID: <CALzav=cMsDyUrOPgkr5ouROPmsEAN2icsL266M4FxY3P6BNd1w@mail.gmail.com>
-Subject: Re: [PATCH v2 03/22] PCI: Inherit bus numbers from previous kernel
- during Live Update
-To: Pranjal Shrivastava <praan@google.com>
-Cc: Alex Williamson <alex@shazbot.org>, Adithya Jayachandran <ajayachandra@nvidia.com>, 
-	Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Ankit Agrawal <ankita@nvidia.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>, 
-	David Rientjes <rientjes@google.com>, Jacob Pan <jacob.pan@linux.microsoft.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, 
-	Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org, 
-	kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, 
-	linux-pci@vger.kernel.org, Lukas Wunner <lukas@wunner.de>, 
-	=?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>, 
-	Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>, 
-	Pasha Tatashin <pasha.tatashin@soleen.com>, Pratyush Yadav <pratyush@kernel.org>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Samiullah Khawaja <skhawaja@google.com>, 
-	Shuah Khan <skhan@linuxfoundation.org>, 
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
-	Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>, 
-	Vivek Kasireddy <vivek.kasireddy@intel.com>, William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>, 
-	Zhu Yanjun <yanjun.zhu@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20260224071822.369326-1-chengkev@google.com> <20260224071822.369326-5-chengkev@google.com>
+Message-ID: <aZ3h508kM-rDYKIs@google.com>
+Subject: Re: [PATCH V2 4/4] KVM: selftests: Add nested page fault injection test
+From: Sean Christopherson <seanjc@google.com>
+To: Kevin Cheng <chengkev@google.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	yosry.ahmed@linux.dev
+Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71631-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71632-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[shazbot.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: A975E18A9D7
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5597C18AA04
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 1:36=E2=80=AFAM Pranjal Shrivastava <praan@google.c=
-om> wrote:
-> On Thu, Jan 29, 2026 at 09:24:50PM +0000, David Matlack wrote:
+On Tue, Feb 24, 2026, Kevin Cheng wrote:
+> Add a test that exercises nested page fault injection during L2
+> execution. L2 executes I/O string instructions (OUTSB/INSB) that access
+> memory restricted in L1's nested page tables (NPT/EPT), triggering a
+> nested page fault that L0 must inject to L1.
+> 
+> The test supports both AMD SVM (NPF) and Intel VMX (EPT violation) and
+> verifies that:
+>   - The exit reason is an NPF/EPT violation
+>   - The access type and permission bits are correct
+>   - The faulting GPA is correct
+> 
+> Three test cases are implemented:
+>   - Unmap the final data page (final translation fault, OUTSB read)
+>   - Unmap a PT page (page walk fault, OUTSB read)
+>   - Write-protect the final data page (protection violation, INSB write)
+>   - Write-protect a PT page (protection violation on A/D update, OUTSB
+>     read)
 
-> > +     if (pci_liveupdate_incoming_nr_devices())
-> > +             return false;
->
-> Following the comment on Patch 2 regarding propagating errors, the check
-> if (pci_liveupdate_incoming_nr_devices()) should be made explicit to
-> distinguish between "Preservation Active" and "Retrieval Failed".
+Either in this test or in KUT, we need coverage for validating faults that are
+reported by hardware, i.e. for faults that _don't_ go through the emulator.
 
-As mentioned in the previous patch, the errors mean "no incoming
-devices" rather than "retrieval failed".
+E.g. there's this "todo" of sorts in KUT:
 
-> >                               while (parent->parent) {
-> > -                                     if ((!pcibios_assign_all_busses()=
-) &&
-> > +                                     if (!assign_all_busses &&
-> >                                           (parent->busn_res.end > max) =
-&&
-> >                                           (parent->busn_res.end <=3D ma=
-x+i)) {
-> >                                               j =3D 1;
->
-> Looks like we over-ride the pci=3Dassign-busses boot param here.
-> We should document how this change affects the pci=3Dassign-busses kernel
-> command line. If both are present, the inheritance required by LUO would
-> likely take precedence to prevent DMA corruption, but a doc update & a
-> warning to the user would be nice.
+	case VMX_EPT_VIOLATION:
+		/*
+		 * Exit-qualifications are masked not to account for advanced
+		 * VM-exit information. Once KVM supports this feature, this
+		 * masking should be removed.
+		 */
+		exit_qual &= ~EPT_VLT_GUEST_MASK;
 
-Good call, I'll add a log message and update kernel-parameters.txt in v3.
+
+Or maybe both?  I generally prefer selftests for maintenance purposes, and you've
+already written this test...
 
