@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-71571-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71572-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CL9PFjH8nGmtMQQAu9opvQ
-	(envelope-from <kvm+bounces-71571-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 02:17:37 +0100
+	id 8CWiELH+nGnhMQQAu9opvQ
+	(envelope-from <kvm+bounces-71572-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 02:28:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4F9A180712
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 02:17:36 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68E33180794
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 02:28:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3057B30610F1
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 01:17:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5C8AB3009E25
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 01:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2828D233723;
-	Tue, 24 Feb 2026 01:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 028B423C8AE;
+	Tue, 24 Feb 2026 01:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U7cHlaf9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jqwA3zQY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD311D5147
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 01:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9A370810
+	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 01:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771895844; cv=none; b=JFCFRMXTgqki+Z/uQR5JSQU33osJKpBI6x8b4tswSf7zJiNrZpxipBZbHZG2n+WSSrElYINe/II0FJd55lChhl2nAUToGl80ND4oU0lyog0ZwWhW64taazj5Qk2A0GTLE+VxzOkIJbmpOpSVTfMyu69rMz/KkdjUvtoxjlBbzYc=
+	t=1771896478; cv=none; b=QB92xXusOkPfDCcMf4mtcYvaaq0lL5iGZrABWAvot6U6VzQTMdrhlRqaVQTMBvQJt91Md1nCB1SH6xmKUiR8lUrr5sfbJwbvBfeG0kB8Ow7LvLYKvGOAeCfAgPN6XXbRQ7T2HaJ/X4k9OMOl5ivx0Nw1ldZQYNNVRr44gXP6mTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771895844; c=relaxed/simple;
-	bh=p8H5A0cWs42UL3akO8wLtDpZcdWp3ZP170VyCPvtqj4=;
+	s=arc-20240116; t=1771896478; c=relaxed/simple;
+	bh=vvdEvLfoWawoL6K+kTA9bEko7R7Ro3WCOIidwUL60Mo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=haAKGeB2K0Gb3mq5yUGdr3YivDaEUAoz6PIg3DhIT+2rPig4PAfHFPZ/SlqiRmSt9q9JSsj5DxC7ReNowz0hFUXkzvpPD7OrYw+qXqkEKxr1Lzj4StvGQqwz7Ou/EWvul7gzJouoBt4uTewE9pY9gMQF0vPPmjpTwehQBeZIsec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U7cHlaf9; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=E9paKCt1PKFMYr00cGR38+UnVMsTr4uEuc4Trm5isI4+bIaptFk1OrxLvsuRxTVb91O14f8c4oMYT6S6iubu4WcfYxhEU7BebJ0IQzTPI3yEf/pjfKkJRDVPlj9tAL2xL7ExQnEqD2SZhwlRgfWvcBnPjyCO7cQgHCsSnVAFg7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jqwA3zQY; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2aae3810558so54481185ad.0
-        for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 17:17:23 -0800 (PST)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c6de1ee12a3so3354026a12.2
+        for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 17:27:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771895843; x=1772500643; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771896475; x=1772501275; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kChrrW250LzJPu0oBX9hRHHO4cuW/vqalTK9qkJ2fwQ=;
-        b=U7cHlaf9AKum8TbciDM4iX4H/eSQc8T1bo+T6KiJxQd+pFuAExsH0sEB99yuREWdV1
-         E3cLrCRC24vbgVoJ8IZDteHT82U9Q8sJmlfx03pgQQnvMl3Z85lhAuFZ70627GzNiF4O
-         EP/4cddDvJOLrHa0V3ZNdeOHVAQlRZ38pRSo2yJNjyjG3e/4t+mthBm3TkxBJsfEu71B
-         Z3sYIDmiD4JlO26YXBbmcQkbPud5tWNLcupisysl3CD5aCOVetvZIaF+Oe1M5zwG617z
-         ilrkcqpaQ+uHucqBpty1XEQp0WXpZXJGtyANhQpQhyzcAWBSzuKgZHpsafs71/NOhWag
-         PQEQ==
+        bh=imQRkcmOy4DPdumAym14O8Grk4dKcX7e7AP+6BT4u5Y=;
+        b=jqwA3zQYt/wuT5YntfNvrapgTe/b6tzqNv0WGhLFaMVXR3JiRJ2anubQh49f0P8Gd5
+         f0kpUEWwwMXZzXzITGyjau64nQOVpT3zwJ7bywKuoEzuK+LypjSCmyDaVvNil1xbYg/q
+         BOgvot4u9fVFsm+n4LzgIQkbz7eYjbK74OnAvL7s362NCgt6dTQUwctV2WtT1Db4Ouo6
+         6kJvbrkTNlRkwQGwn5BBt7VXDsbfS2pW7Ci6XgGBGZqCeiVKisBM9LP/D9gf3BECWDWy
+         4bmeTa9eArA9GK6gIIPtIX70iDblaFnkOHP2IJhIEYutbl4fmlrwnXfzpaVNZo5oUUts
+         3Bbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771895843; x=1772500643;
+        d=1e100.net; s=20230601; t=1771896475; x=1772501275;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kChrrW250LzJPu0oBX9hRHHO4cuW/vqalTK9qkJ2fwQ=;
-        b=pAuBots79+9C03SQ7R7D8zT/ctTxDvwUrMVpNXIKENJmRRyFd4XDBxFsg3tkT5mzOH
-         F7WPN2LcIHoWLx7+gMQAoR5qwRzQmaD4ju6BkXvQeI3g6qXar08lf7HX5QEob44UG+KS
-         OLj1iEmW6stS9SLqrcuukCrdseI5f/EjzypZGYXjsG3C+9l1MHR8QwZ3fyueKGZfXv3G
-         vM2tso/EOqj397yeRTP3GyGdPwDoUtQ8ysR4AbcSs7RL9ME73P7RmsQ3OQ9amsNJ2mEG
-         GbEqtv2bfAfDGLYpJw97D/s0bjrKMW5n5rh/kH3J0pLL6qrOWkUogjXcTT1IVVl5L5/O
-         kDLw==
-X-Forwarded-Encrypted: i=1; AJvYcCXl11Ot5iUtil0K1N/JNFnDwsGLGPYcmQ+lDau2VdgAxhP+uIxQAfinmRf+X3LfgBrLfdI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwD0SXm4fYT71QOQ6GnyOopZ5aVxz+QxmiL6aSJTW6shnpM0G38
-	I6dGzO7uV5+GKCvWQjuJnEntut5S4FQXipcHrXBdGHyFklWgAqYlHRLdZHLG8VFfPLvN8NCVFV9
-	WcGnQfQ==
-X-Received: from plcb18.prod.google.com ([2002:a17:902:d312:b0:2aa:d2b9:ae45])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1210:b0:2aa:f9d7:68a8
- with SMTP id d9443c01a7336-2ad74511d60mr88062385ad.28.1771895842481; Mon, 23
- Feb 2026 17:17:22 -0800 (PST)
-Date: Mon, 23 Feb 2026 17:17:20 -0800
-In-Reply-To: <CAO9r8zMv6E5j7=c-1oqpOihWk0w6a0rexf5FRaP-7PZSwV4vBQ@mail.gmail.com>
+        bh=imQRkcmOy4DPdumAym14O8Grk4dKcX7e7AP+6BT4u5Y=;
+        b=I+1KO2wj1E8cz6E3FKNIi5Sbnk/P9LB5m54muQmNCxlEjRI9ECRcIRa4tygruiMLcS
+         GlQ4rFgQ/a+RCTKUvtoKlrfGiSpQHxYUm26bqB34qHvxrmvyo2SnlFvmD9xX4sfATofQ
+         gOrOUkvpyp9t2Zi6tzVZsoLih8WgqZLzdtrL4usas9JLHz6ktziXmy9aKE7zuXuuI0nR
+         E8IoBIgZnyIN8eHTcexWRBgWI6HtJodEa42Ho0daa4pKmND6d1OJHq79ptRlBvbZWY9Q
+         +fa2rSeefUu+EcWyezd4heNEA0ZzOQUpmCnPPbmiFyzdjcqtQ2sS9BzGLC4kWThPgHYq
+         Dm3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUS4NZ9XVg0uaKrgOhRlP7mYxli1FiyO2EGGX79dTHUXOCG4GfgVwQn71/qefosAmCLt4Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsT8tZMnhn+RU0R/lJ5pJwVqrBjDut4E84iRnsPWUaYI1EmV+5
+	NtARYLBCrK25kDSlHVlyccs/aYyD1YOwQygVlDARb4YgznB9VOjYW+uzdxYdRxMljh7QAJOu4B7
+	OrMF/cA==
+X-Received: from pgbfp12.prod.google.com ([2002:a05:6a02:2cec:b0:c52:a841:c79d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:748b:b0:38b:e55a:97c9
+ with SMTP id adf61e73a8af0-39545ebb1b9mr8817920637.28.1771896475278; Mon, 23
+ Feb 2026 17:27:55 -0800 (PST)
+Date: Mon, 23 Feb 2026 17:27:54 -0800
+In-Reply-To: <CAO9r8zP1hwzgX3iXDu3TuYQAiqdKrSOw6yuLL+PQFwm=CH0Lug@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,26 +75,26 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260206190851.860662-1-yosry.ahmed@linux.dev>
- <20260206190851.860662-7-yosry.ahmed@linux.dev> <aZzyanOAcoAnh01A@google.com> <CAO9r8zMv6E5j7=c-1oqpOihWk0w6a0rexf5FRaP-7PZSwV4vBQ@mail.gmail.com>
-Message-ID: <aZz8IGGbrMurzgox@google.com>
-Subject: Re: [PATCH v5 06/26] KVM: nSVM: Triple fault if mapping VMCB12 fails
- on nested #VMEXIT
+ <20260206190851.860662-26-yosry.ahmed@linux.dev> <aZzfhY1qigh71n2e@google.com>
+ <CAO9r8zP1hwzgX3iXDu3TuYQAiqdKrSOw6yuLL+PQFwm=CH0Lug@mail.gmail.com>
+Message-ID: <aZz-muXa7RgSR1Ul@google.com>
+Subject: Re: [PATCH v5 25/26] KVM: nSVM: Sanitize control fields copied from VMCB12
 From: Sean Christopherson <seanjc@google.com>
 To: Yosry Ahmed <yosry@kernel.org>
 Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+	linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71571-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71572-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -102,7 +102,7 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -111,84 +111,70 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B4F9A180712
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 68E33180794
 X-Rspamd-Action: no action
 
 On Mon, Feb 23, 2026, Yosry Ahmed wrote:
-> > > @@ -1146,8 +1136,16 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
-> > >       /* in case we halted in L2 */
-> > >       kvm_set_mp_state(vcpu, KVM_MP_STATE_RUNNABLE);
+> > > @@ -499,32 +499,35 @@ void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
+> > >       if (!guest_cpu_cap_has(vcpu, X86_FEATURE_NPT))
+> > >               to->misc_ctl &= ~SVM_MISC_ENABLE_NP;
 > > >
-> > > +     svm->nested.vmcb12_gpa = 0;
+> > > -     to->iopm_base_pa        = from->iopm_base_pa;
+> > > -     to->msrpm_base_pa       = from->msrpm_base_pa;
+> > > +     /*
+> > > +      * Copy the ASID here because nested_vmcb_check_controls() will check
+> > > +      * it.  The ASID could be invalid, or conflict with another VM's ASID ,
+> >
+> > Spurious space before the command.
+> >
+> > > +      * so it should never be used directly to run L2.
+> > > +      */
+> > > +     to->asid = from->asid;
 > > > +
-> > > +     if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map)) {
-> > > +             kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
-> > > +             return 1;
+> > > +     /* Lower bits of IOPM_BASE_PA and MSRPM_BASE_PA are ignored */
+> > > +     to->iopm_base_pa        = from->iopm_base_pa & PAGE_MASK;
+> > > +     to->msrpm_base_pa       = from->msrpm_base_pa & PAGE_MASK;
+> > >>      to->tsc_offset          = from->tsc_offset;
+> > > -     to->tlb_ctl             = from->tlb_ctl;
 > >
-> > Returning early isn't entirely correct.  In fact, I think it's worse than the
-> > current behavior in many aspects.
+> > I don't think we should completely drop tlb_ctl.  KVM doesn't do anything with
+> > vmcb12's tlb_ctl only because we haven't addressed the TODO list in
+> > nested_svm_transition_tlb_flush().  I think I would rather update this code to
+> > sanitize the field now, as opposed to waiting until we address that TODO.
 > >
-> > By doing leave_guest_mode() and not switching back to vmcb01 and not putting
-> > vcpu->arch.mmu back to root_mmu, the vCPU will be in L1 but with vmcb02 and L2's
-> > MMU active.
+> > KVM advertises X86_FEATURE_FLUSHBYASID, so I think we can do the right thing
+> > without having to speculate on what the future will bring.
+> >
+> > Alternatively, we could add a TODO here or update the one in
+> > nested_svm_transition_tlb_flush(), but that seems like more overall work than
+> > just hardening the code.
 > 
-> Hmm yeah, the same problem also exists in
-> nested_svm_vmrun_error_vmexit() after "KVM: nSVM: Restrict mapping
-> VMCB12 on nested VMRUN". In that path, we only need to map vmcb12 to
-> zero event_inj in __nested_svm_vmexit(). We can probably move them to
-> the callers (nested_svm_vmrun_error_vmexit() and nested_svm_vmexit())
-> to make it easier to skip if mapping fails.
-
-Agreed, I don't see a better option.
-
-> > The idea I can come up with is to isolate the vmcb12 writes (which is suprisingly
-> > straightforward), and then simply skip the vmcb12 updates.  E.g.
-> >
-> > ---
-> [..]
-> > @@ -1184,14 +1168,53 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
-> >         if (guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS))
-> >                 vmcb12->control.next_rip  = vmcb02->control.next_rip;
-> >
-> > +       if (nested_vmcb12_has_lbrv(vcpu))
-> > +               svm_copy_lbrs(&vmcb12->save, &vmcb02->save);
-> > +
-> >         vmcb12->control.int_ctl           = svm->nested.ctl.int_ctl;
-> >         vmcb12->control.event_inj         = svm->nested.ctl.event_inj;
-> >         vmcb12->control.event_inj_err     = svm->nested.ctl.event_inj_err;
-> >
-> > +       trace_kvm_nested_vmexit_inject(vmcb12->control.exit_code,
-> > +                                      vmcb12->control.exit_info_1,
-> > +                                      vmcb12->control.exit_info_2,
-> > +                                      vmcb12->control.exit_int_info,
-> > +                                      vmcb12->control.exit_int_info_err,
-> > +                                      KVM_ISA_SVM);
-> > +}
-> > +
-> > +int nested_svm_vmexit(struct vcpu_svm *svm)
-> > +{
-> > +       struct kvm_vcpu *vcpu = &svm->vcpu;
-> > +       struct vmcb *vmcb01 = svm->vmcb01.ptr;
-> > +       struct vmcb *vmcb02 = svm->nested.vmcb02.ptr;
-> > +       struct vmcb *vmcb12;
-> > +       struct kvm_host_map map;
-> > +       int rc;
-> > +
-> > +       if (!kvm_vcpu_map(vcpu, gpa_to_gfn(svm->nested.vmcb12_gpa), &map)) {
-> > +               vmcb12 = map.hva;
+> I will drop the ASID change.
 > 
-> Maybe also kvm_vcpu_map() mapping call to
-> nested_svm_vmexit_update_vmcb12() and inject a tripe fault if it
-> fails? Probably plays nicer with "KVM: nSVM: Restrict mapping VMCB12
-> on nested VMRUN".
+> I honestly don't know where to draw the line at this point. Should I
+> split sanitizing all different fields into different patches? Or just
+> split the tlb_ctl change? What about the I/O and MSR bitmap change?
 
-Oh, yeah, good call!  That would be way cleaner (I initially didn't move all
-vmcb12 reference, but that's a *really* good argument for doing so).
+FWIW, my rule of thumb is that, when writing the changelog, if I find myself
+either (a) having to explain mostly unrelated things or (b) generalizing away
+details, then I should split the patch.
 
-> Otherwise it looks good to me.
-> 
-> Should I send a new version to add all the changes?
+In this case, I would do:
 
-Yes please.  Thanks!
+  1. int_ctl and friends
+  2. tlb_cnt (with a changelog explaining why we're keeping it even though it's unused)
+  3. ~0xfffull => PAGE_MASK cleanup
+  4. ASID comment
+
+Though honestly, I would drop the ASID change.  The comment is misleading and
+arguably flat out wrong.  This
+
+  The ASID could be invalid, or conflict with another VM's ASID, so it should
+  never be used directly to run L2.
+
+isn't why KVM musn't use the ASID from vmcb12 verbatim, the real reason is that
+the ASID space managed by KVM is logical different than the one managed by L1.
+I.e. KVM needs to shadow L1's ASID space, for all intents and purposes.  And so
+KVM should never use vmcb12's ASID verbatim because it needs to be "translated".
 
