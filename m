@@ -1,535 +1,271 @@
-Return-Path: <kvm+bounces-71589-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71590-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kP4lAPFQnWkBOgQAu9opvQ
-	(envelope-from <kvm+bounces-71589-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 08:19:13 +0100
+	id sDfTA5hgnWkDPAQAu9opvQ
+	(envelope-from <kvm+bounces-71590-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 09:26:00 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E527182E94
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 08:19:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 683381839F1
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 09:25:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7F909302BB82
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 07:18:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 335F2310C49F
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 08:21:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D055364047;
-	Tue, 24 Feb 2026 07:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8BF636657D;
+	Tue, 24 Feb 2026 08:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eyNeL6Km"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="fCuqYHXm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013016.outbound.protection.outlook.com [40.107.201.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E96364041
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 07:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771917520; cv=none; b=LqhRPcL5mWpQ2TbVVfdY9c8ULneE8swI1xzGCbeHCGMQiX0p53/JgPpXnbahNq5pE2KIyil0W0BOpOeNxPMOXOkdLI65tn4vLG5WvPMzGX/mzq+vcssgmVEHNRCEY3QcN9hQXsirUeGBtYIC0txCtiyIWPeV17Xvahg+wQ5mVGo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771917520; c=relaxed/simple;
-	bh=o2lXAF8DlbMbY3dKElYJx00rNsVLLWMFknS+lu6kFMg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=V3aguOSJfwYsvBea+hKiti4+aP+zdcJNuYKWaR4wy/lANPZ3wIv/4OvAfBk1onQJ4RsczxS/t0tth+/OeMyhntVGLACwi7JtrRju34ZD6TCruWXDv60WJjCSBqz59JykNiWpVLS/82mm2JpMmY7iZjVxscJfqeurLwtUNmfHeSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eyNeL6Km; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-354490889b6so24121178a91.3
-        for <kvm@vger.kernel.org>; Mon, 23 Feb 2026 23:18:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771917512; x=1772522312; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iHhMMK4VWyZxrOQeZtJ11bNmNzWKZ3L+l8EC7z1Hl3w=;
-        b=eyNeL6KmycK2ZxMoDP7s7Up+ke4yWKa34aS2ExgaqT5YNJnsC8MHpL0ZUU7RlRHLib
-         QRhdFjuAY2mMGrh28pHgnWFNM3oq/bzPqxv2wwK08UFX0o2c29BryOKdpJjQlog+nhyB
-         /fDe/icqgq9Lp3fqwOzVTWaFg657lxPlwxRxYF6O5DJi9/CxKNy9FfWu1Xa/3P1vi8lD
-         jAhzK626IXWllY/2MTEPIc7F86KVjY7JRPQaYD0LefcIHW75FAAmEZ3zisVm4W8Z1qRy
-         T2dtc2XsVCoLLCv1WgYPDyu56aNo3Imcr5ZO89l7pOhkUASFBCiaP6wTC9mP+/IE4gim
-         iJTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771917512; x=1772522312;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iHhMMK4VWyZxrOQeZtJ11bNmNzWKZ3L+l8EC7z1Hl3w=;
-        b=asjxYi9mSjFRyHwcdd6To5khTQMuq3j5tAG7Byktg6oc4mPNzP/zOZUnHQM3lFm3E3
-         Q7BlOeh4JRq6A8HUoLwbjmKogBWf7RzhiFjoY6b7GVwV5voZbRMixr9EKemvCoRajmZ9
-         zWRCA96ZFkgXGu+fFWs/QNdw2KSD4uWXrloCCFpJjs9ktTadymJJlUfepZqtlqPq0HOy
-         4Pp8BTmyzMtQLCEpak/Pk0Gx/VvqlUeis2mXgiJzXeZvjHhjvb9Kug9fC2wFT2TiiBS0
-         Ff2b0S71Iq1zARiegsFvsULzZ5PlR2Gdud8A5IhUr/nseHOggDPTVW/cz6XrI8J4sRVy
-         QJVg==
-X-Gm-Message-State: AOJu0YzwxuXgBfIF8w5C+B5L2D4MvS6sX/3CIGSwisNwPjkMpI2hijCQ
-	vGe82T5MpMRjWQAguDJlIhoDt3F0h/Xlyz41AxdmJ7DDgWpXwOF41tQtUYI4zg8fHMTz5qr5HOd
-	9RFQlZUxAQLMVWw==
-X-Received: from pje3.prod.google.com ([2002:a17:90b:5503:b0:356:2f4b:a4dc])
- (user=chengkev job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90a:d645:b0:354:c441:a758 with SMTP id 98e67ed59e1d1-358ae8c2723mr9322133a91.19.1771917512061;
- Mon, 23 Feb 2026 23:18:32 -0800 (PST)
-Date: Tue, 24 Feb 2026 07:18:22 +0000
-In-Reply-To: <20260224071822.369326-1-chengkev@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADDE262FD0
+	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 08:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771921310; cv=fail; b=j6gTPI5KqmDE0Pb1VOO1D5YkpAiMi13tVwzTETO98JKU82rfoQjDI24ZsXU9awic+ME+YzX94CusZz8quvaV85SzGH8nbHWVhd0FUCb4dsGpNccHvz5AhxagUIv4+nc/LOwvT9X5ZEXGx45qkNori6WCXQUqXAkXCuim1Crhfdw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771921310; c=relaxed/simple;
+	bh=ji5otG+A5W/SAN+Le2jLe66PlQfKRFQ5WfQtt9xMotw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ep2i4CNTiXJisaDbiATEMocM1UefyGr7x2XL40wQceCc+BNot0hmjgRlnRCX/X+KM1jZge444a0HmeDljWX8b+oRA1KqPD+DFeRJ+IEBMjePXFAazrmvCKD+bi9tqUADMbuXSshUKcdDKsQvW4VCb6G97jo+edh+SJZZSKgeDDY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=fCuqYHXm; arc=fail smtp.client-ip=40.107.201.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=zS8yvWfn0zZJFDGO5fYHRthH5+6kIt5lSbP/vOmO+BgJyZ/oXL/eM+7uOoG3zWMjQCAmPuGN/KchwVt7oPiUDR+CvaR9/ruz2yCbH3Rf+iOpXeVcuDtju4f4HYTHGfI3v+31MZm0XgV4kampTJ69Kf199QqyLu4ljKb9+A3dUaEaFLVIKtPZHwSGtxaiZNb6y8M+ZE79ef40ZGouMOL5KGOtwTqfXVqxTScJBBzhoPrrCHqlFExEhczOpkUSCicSSXXh1JnDiFMVtQMUORN8Pg3Z/3GrR7AphKDUzWmUESJZLjkNwsdx01Ok9glghe9KIsdBJVtbDQS8+BlpPGm92g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nUmkPY8eU3zlNixrggZTjdkxDELBrQ7nAZZQP9JrQrs=;
+ b=aWOO70steKT+D6aTtFNZZDJmZSC70WQxQmQbbSG/4UgalNwVYqJE3V1b9+vNCeXwV5A8i/SJMFnVftCSACp3MURiv6D/X3foBO/78hOWPaDXWPfulF9YS4DMcOI/jPKWrh0k/Wa5n5lb3A8FODzEwp7B5N1n8HEtF3KPi7imheG4ZzhwknscWb80/elRcgLbPzvMcM+Xzeou3oJwjyOgwfXSiGwysLRTm0fZXunRzLyvSBGGgcls9yio1UAN0CSzLTSgovkY+G0TCODZpPc7kgFjB2Hl7PdrFyOG37X7/tBnrwTWEBuKoN9KAeqkE4zRKbsD3osvr+yOCdv7bkK/Sg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nUmkPY8eU3zlNixrggZTjdkxDELBrQ7nAZZQP9JrQrs=;
+ b=fCuqYHXmOC/KveOvSFSQlR9mIfavncvoBgiDDxLYbGqmFPqKt353ICwt0iPE+RgjqyokUUv4kJ7ImK6M8kE3g9hpwC8cEg190/tlUZ4R/e17CKrTjVhQAgsEP9fkuk3D0sO9Q1S+4Jj0mDD0FZ4ny0+AeMtWFm8HojTSPcE8Te50GAdcVMG/tbu4COzgxQQo1Gq7XiXUFFzraz+3CGjsjvob1loKgWxeX+wvvlhZiD1vu+WEoHEDPGXMmTNqBwER40DDA+RWy8irefIKQEKJSwBzooZltZ2EXkZh5BVCYtrGR8g4K8wmteV0j+uXsCwTJHlxjzdEt89RlQ4yRz9xIQ==
+Received: from SJ0PR03CA0294.namprd03.prod.outlook.com (2603:10b6:a03:39e::29)
+ by CY8PR12MB7490.namprd12.prod.outlook.com (2603:10b6:930:91::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Tue, 24 Feb
+ 2026 08:21:44 +0000
+Received: from CO1PEPF000075ED.namprd03.prod.outlook.com
+ (2603:10b6:a03:39e:cafe::32) by SJ0PR03CA0294.outlook.office365.com
+ (2603:10b6:a03:39e::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.22 via Frontend Transport; Tue,
+ 24 Feb 2026 08:21:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1PEPF000075ED.mail.protection.outlook.com (10.167.249.36) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9632.12 via Frontend Transport; Tue, 24 Feb 2026 08:21:44 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Feb
+ 2026 00:21:26 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Feb
+ 2026 00:21:25 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Tue, 24
+ Feb 2026 00:21:22 -0800
+From: Yishai Hadas <yishaih@nvidia.com>
+To: <alex.williamson@redhat.com>, <jgg@nvidia.com>
+CC: <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
+	<joao.m.martins@oracle.com>, <leonro@nvidia.com>, <yishaih@nvidia.com>,
+	<maorg@nvidia.com>, <avihaih@nvidia.com>, <liulongfang@huawei.com>,
+	<giovanni.cabiddu@intel.com>, <kwankhede@nvidia.com>
+Subject: [PATCH vfio 0/6] Add support for PRE_COPY initial bytes re-initialization
+Date: Tue, 24 Feb 2026 10:20:13 +0200
+Message-ID: <20260224082019.25772-1-yishaih@nvidia.com>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260224071822.369326-1-chengkev@google.com>
-X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
-Message-ID: <20260224071822.369326-5-chengkev@google.com>
-Subject: [PATCH V2 4/4] KVM: selftests: Add nested page fault injection test
-From: Kevin Cheng <chengkev@google.com>
-To: seanjc@google.com, pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, yosry.ahmed@linux.dev, 
-	Kevin Cheng <chengkev@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000075ED:EE_|CY8PR12MB7490:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8b20d394-1824-4b1d-0363-08de737dbec5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?MRGQNNlXeKn1XDxb7wUgAYox0MZBE4GrecQxxSeYh1JmFW7Cjaw1Y9dlOtgY?=
+ =?us-ascii?Q?QhJk/z+mxLbiEpS9GMXqd7UD3ipEPLxCo3o9QAxIN1UQQUoBNj51EzFMt+EO?=
+ =?us-ascii?Q?ft6Lt/4OpoioCc084o/YfavdGs4j+5YX/ff/CfcxWF/OGYyduWUPDPPSib/g?=
+ =?us-ascii?Q?IQtuCBr+xCrGFeNF4nzWNdKygm0HzlXmg9gWH7QTEtm+ugr7cea4B2jxjFyO?=
+ =?us-ascii?Q?vEKeaFY4h4KF4FxNDs5H6mj6mCVTVFxyVrjYHwxGaOoh3yC8MmdrNYA1zxC2?=
+ =?us-ascii?Q?zw3Vl8x+nLxcW7IyaXQwWH/avBRnAl45j+aWEK+YzLVHLkRVAAi6VpblxSYf?=
+ =?us-ascii?Q?uhtCniCjGyqCIF+NtPPNaKqn6ocJ5W26AyyskZeLURQ0YFWjlquFTTjy71NZ?=
+ =?us-ascii?Q?hMpku5cgI7kx9wuhcZpfCuwEV95sXeumwDAdx4O90fQXMQYykvalvRDCCS/Q?=
+ =?us-ascii?Q?A9LsF72gDj3pvyhRwNGq+3UChFXkvz9GGs/4okZChBhj7V6+u/6B/rd1Cy+M?=
+ =?us-ascii?Q?msldRWsf4vEKZp25543577ltm5sPHa0I1moTIBaB4QD4b+z8Z8HbJmadWcf9?=
+ =?us-ascii?Q?OXvK31P61iYvUtg7Oqh0c92sgH5U3WrP5GaixJikkUB6LwIoiYg3q5bZU0dB?=
+ =?us-ascii?Q?nzqlXWDMQVBTrpKQWsmj9yTjV55OTqTqUq1n2ZXi1HbaASxiBlvqQera+7Ni?=
+ =?us-ascii?Q?wSBzPIC03/bWirdR1L/O4VAT1p260otYDNxSJsDxf2yJ1oS72ab1dn7qalBx?=
+ =?us-ascii?Q?izyAj3jYx6+50jdaLe4RkxptGYh8iUDpwEDMjzMXyk8ugvyflJ0lTz2KF53C?=
+ =?us-ascii?Q?NS0VXMut49xbiq+lM6ki35ZGd1yKVYckzyIuhzOaqOXH3C9U0ixtGR6qY3Lj?=
+ =?us-ascii?Q?xuj56dtUenAc7ese+pCS2kILpY/9JlpzhPIMd1TNXzOlqREJ0dit8Q0Xxh1I?=
+ =?us-ascii?Q?26AugfoEqVIZy6H3xeB1HHAOkGNArvUfxo0EuT9iGBoAyyKTu1bjyZvwojSX?=
+ =?us-ascii?Q?C8iwCsbjZIIBOykogjoeZ6WwxOTThM3jlkMrBujDX/CzhBYtSaqEwVlzpl8Y?=
+ =?us-ascii?Q?DeQWEVSQEf7aloe+81uDKaEcH+scNMp1yobLn9Cv4yIdukKmJ75QVNZygB0R?=
+ =?us-ascii?Q?GFqComws8yYCVtz0Xt90/Qa8vMckgUwK+UzCp2O3eOdPP7TSZI+Br4iAQEHT?=
+ =?us-ascii?Q?nEWKC2/jqLFGS/rIdhHA0eKhkzHsNi1pTIXgoqojuBATTwPoy9mc3qCSGWIZ?=
+ =?us-ascii?Q?cVFNvI2Q0FOLruitJSWWCOjLxVzKzgnh+YVHrE8P/daMwhkzHfZBC1hIcv9X?=
+ =?us-ascii?Q?zZ0IHdYydC6rvKfx92AO5DhKTJwFM/UEZmW/IQ3oH5XEadi1YiotCy2t7dZY?=
+ =?us-ascii?Q?GApAlyRdAvCw+W+QNPiiX5cNUfe6drF17JhTWtcApO5btDgskLE8Az35IiZT?=
+ =?us-ascii?Q?I4Sr+pkBzd/Gcevmp9E3rskqQfacMcMVNmp6cAXKsN115P6Df4U2G3CCrgao?=
+ =?us-ascii?Q?reNLe/8Kl9qUPNMxusap37Q8/2a82Pl/18V1rMaab1axKBzbCFadu9YKO16y?=
+ =?us-ascii?Q?yuMgUmO+hXQ75h4mcAPhccX8g4UDHrlkmBeMAH76j2Kx9JFjq1Sw5rIEYh3y?=
+ =?us-ascii?Q?vOtt3NGS2WZIEDWs7lcVlwPbLD+IyX/KEE3orKTMfRgRFxZONotllUBDiW9v?=
+ =?us-ascii?Q?wy//aw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	UY4vh2F7fI7vzk0PnCBuNc/LBAyHKkiImhlTYjSoQMhn79bzLroAF+5cEH0PwWr6WZtg0igaNVr1hx6LoJ5KmQ8jJv9oT1E6kilUJ9rWtQ7WUHslYQcayJZRBnMXBgIc4KUoNfKv7KMGPic9gtAqeL4zVq8RZZbLKS591K2WZua5/AkV0AgsrdZ3IdrRK/RcMEsAW5nH4fLbBCbcF8LKBb6MUAq9f3RfDgHyuolqYnLAS2CHCa75UY15mbjWDyOmm/pjBKOda3mY8lptp64tjuKCAg9XMNKk7ldgNkkxN8AXekJRdHn1J58twXRLfCtqhpgHqqVkbda6tYAlagj55RfNAm1DjrrSnGHVk+7T7bHqVmnGur+czbHxU4hhcrOk5AgdCyt4Ai4jMt1/usrk3WfsjGoXCKT4PRYG7YwlCwpXXyMCGAuzFT9BKCTrJIRQ
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2026 08:21:44.0443
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b20d394-1824-4b1d-0363-08de737dbec5
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000075ED.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7490
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71589-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71590-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yishaih@nvidia.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chengkev@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5E527182E94
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 683381839F1
 X-Rspamd-Action: no action
 
-Add a test that exercises nested page fault injection during L2
-execution. L2 executes I/O string instructions (OUTSB/INSB) that access
-memory restricted in L1's nested page tables (NPT/EPT), triggering a
-nested page fault that L0 must inject to L1.
+This series introduces support for re-initializing the initial_bytes
+value during the VFIO PRE_COPY migration phase.
 
-The test supports both AMD SVM (NPF) and Intel VMX (EPT violation) and
-verifies that:
-  - The exit reason is an NPF/EPT violation
-  - The access type and permission bits are correct
-  - The faulting GPA is correct
+Background
+==========
+As currently defined, initial_bytes is monotonically decreasing and
+precedes dirty_bytes when reading from the saving file descriptor.
+The transition from initial_bytes to dirty_bytes is unidirectional and
+irreversible.
 
-Three test cases are implemented:
-  - Unmap the final data page (final translation fault, OUTSB read)
-  - Unmap a PT page (page walk fault, OUTSB read)
-  - Write-protect the final data page (protection violation, INSB write)
-  - Write-protect a PT page (protection violation on A/D update, OUTSB
-    read)
+The initial_bytes are considered critical data that is highly
+recommended to be transferred to the target as part of PRE_COPY.
+Without this data, the PRE_COPY phase would be ineffective.
 
-Signed-off-by: Kevin Cheng <chengkev@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../selftests/kvm/x86/nested_npf_test.c       | 374 ++++++++++++++++++
- 2 files changed, 375 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/nested_npf_test.c
+Problem Statement
+=================
+In some cases, a new chunk of critical data may appear during the
+PRE_COPY phase. The current API does not provide a mechanism for the
+driver to report an updated initial_bytes value when this occurs.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index fdec90e854671..55703d6be5e7a 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -93,6 +93,7 @@ TEST_GEN_PROGS_x86 += x86/nested_dirty_log_test
- TEST_GEN_PROGS_x86 += x86/nested_emulation_test
- TEST_GEN_PROGS_x86 += x86/nested_exceptions_test
- TEST_GEN_PROGS_x86 += x86/nested_invalid_cr3_test
-+TEST_GEN_PROGS_x86 += x86/nested_npf_test
- TEST_GEN_PROGS_x86 += x86/nested_set_state_test
- TEST_GEN_PROGS_x86 += x86/nested_tsc_adjust_test
- TEST_GEN_PROGS_x86 += x86/nested_tsc_scaling_test
-diff --git a/tools/testing/selftests/kvm/x86/nested_npf_test.c b/tools/testing/selftests/kvm/x86/nested_npf_test.c
-new file mode 100644
-index 0000000000000..7725e5dc3a386
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/nested_npf_test.c
-@@ -0,0 +1,374 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2025, Google, Inc.
-+ */
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "svm_util.h"
-+#include "vmx.h"
-+
-+#define L2_GUEST_STACK_SIZE 64
-+
-+#define EPT_VIOLATION_ACC_READ		BIT(0)
-+#define EPT_VIOLATION_ACC_WRITE		BIT(1)
-+#define EPT_VIOLATION_ACC_INSTR		BIT(2)
-+#define EPT_VIOLATION_PROT_READ		BIT(3)
-+#define EPT_VIOLATION_PROT_WRITE	BIT(4)
-+#define EPT_VIOLATION_PROT_EXEC		BIT(5)
-+#define EPT_VIOLATION_GVA_IS_VALID	BIT(7)
-+#define EPT_VIOLATION_GVA_TRANSLATED	BIT(8)
-+
-+enum test_type {
-+	TEST_FINAL_PAGE_UNMAPPED,	    /* Final data page not present */
-+	TEST_PT_PAGE_UNMAPPED,		    /* Page table page not present */
-+	TEST_FINAL_PAGE_WRITE_PROTECTED,    /* Final data page read-only */
-+	TEST_PT_PAGE_WRITE_PROTECTED,	    /* Page table page read-only */
-+};
-+
-+static vm_vaddr_t l2_test_page;
-+static void (*l2_entry)(void);
-+
-+#define TEST_IO_PORT 0x80
-+#define TEST1_VADDR 0x8000000ULL
-+#define TEST2_VADDR 0x10000000ULL
-+#define TEST3_VADDR 0x18000000ULL
-+#define TEST4_VADDR 0x20000000ULL
-+
-+/*
-+ * L2 executes OUTS reading from l2_test_page, triggering a nested page
-+ * fault on the read access.
-+ */
-+static void l2_guest_code_outs(void)
-+{
-+	asm volatile("outsb" ::"S"(l2_test_page), "d"(TEST_IO_PORT) : "memory");
-+	GUEST_FAIL("L2 should not reach here");
-+}
-+
-+/*
-+ * L2 executes INS writing to l2_test_page, triggering a nested page
-+ * fault on the write access.
-+ */
-+static void l2_guest_code_ins(void)
-+{
-+	asm volatile("insb" ::"D"(l2_test_page), "d"(TEST_IO_PORT) : "memory");
-+	GUEST_FAIL("L2 should not reach here");
-+}
-+
-+static void l1_vmx_code(struct vmx_pages *vmx, uint64_t expected_fault_gpa,
-+			 uint64_t test_type)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	uint64_t exit_qual;
-+
-+	GUEST_ASSERT(vmx->vmcs_gpa);
-+	GUEST_ASSERT(prepare_for_vmx_operation(vmx));
-+	GUEST_ASSERT(load_vmcs(vmx));
-+
-+	prepare_vmcs(vmx, l2_entry, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	GUEST_ASSERT(!vmlaunch());
-+
-+	/* Verify we got an EPT violation exit */
-+	__GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_EPT_VIOLATION,
-+		       "Expected EPT violation (0x%x), got 0x%lx",
-+		       EXIT_REASON_EPT_VIOLATION,
-+		       vmreadz(VM_EXIT_REASON));
-+
-+	exit_qual = vmreadz(EXIT_QUALIFICATION);
-+
-+	switch (test_type) {
-+	case TEST_FINAL_PAGE_UNMAPPED:
-+		/* Read access, final translation, page not present */
-+		__GUEST_ASSERT(exit_qual & EPT_VIOLATION_ACC_READ,
-+			       "Expected ACC_READ set, exit_qual 0x%lx",
-+			       exit_qual);
-+		__GUEST_ASSERT(exit_qual & EPT_VIOLATION_GVA_IS_VALID,
-+			       "Expected GVA_IS_VALID set, exit_qual 0x%lx",
-+			       exit_qual);
-+		__GUEST_ASSERT(exit_qual & EPT_VIOLATION_GVA_TRANSLATED,
-+			       "Expected GVA_TRANSLATED set, exit_qual 0x%lx",
-+			       exit_qual);
-+		break;
-+	case TEST_PT_PAGE_UNMAPPED:
-+		/* Read access, page walk fault, page not present */
-+		__GUEST_ASSERT(exit_qual & EPT_VIOLATION_ACC_READ,
-+			       "Expected ACC_READ set, exit_qual 0x%lx",
-+			       exit_qual);
-+		__GUEST_ASSERT(exit_qual & EPT_VIOLATION_GVA_IS_VALID,
-+			       "Expected GVA_IS_VALID set, exit_qual 0x%lx",
-+			       exit_qual);
-+		__GUEST_ASSERT(!(exit_qual & EPT_VIOLATION_GVA_TRANSLATED),
-+			       "Expected GVA_TRANSLATED clear, exit_qual 0x%lx",
-+			       exit_qual);
-+		break;
-+	case TEST_FINAL_PAGE_WRITE_PROTECTED:
-+		/* Write access, final translation, page present but read-only */
-+		__GUEST_ASSERT(exit_qual & EPT_VIOLATION_ACC_WRITE,
-+			       "Expected ACC_WRITE set, exit_qual 0x%lx",
-+			       exit_qual);
-+		__GUEST_ASSERT(exit_qual & EPT_VIOLATION_PROT_READ,
-+			       "Expected PROT_READ set, exit_qual 0x%lx",
-+			       exit_qual);
-+		__GUEST_ASSERT(!(exit_qual & EPT_VIOLATION_PROT_WRITE),
-+			       "Expected PROT_WRITE clear, exit_qual 0x%lx",
-+			       exit_qual);
-+		__GUEST_ASSERT(exit_qual & EPT_VIOLATION_GVA_IS_VALID,
-+			       "Expected GVA_IS_VALID set, exit_qual 0x%lx",
-+			       exit_qual);
-+		__GUEST_ASSERT(exit_qual & EPT_VIOLATION_GVA_TRANSLATED,
-+			       "Expected GVA_TRANSLATED set, exit_qual 0x%lx",
-+			       exit_qual);
-+		break;
-+	case TEST_PT_PAGE_WRITE_PROTECTED:
-+		/* Write access (A/D update), page walk, page present but read-only */
-+		__GUEST_ASSERT(exit_qual & EPT_VIOLATION_ACC_WRITE,
-+			       "Expected ACC_WRITE set, exit_qual 0x%lx",
-+			       exit_qual);
-+		__GUEST_ASSERT(exit_qual & EPT_VIOLATION_PROT_READ,
-+			       "Expected PROT_READ set, exit_qual 0x%lx",
-+			       exit_qual);
-+		__GUEST_ASSERT(!(exit_qual & EPT_VIOLATION_PROT_WRITE),
-+			       "Expected PROT_WRITE clear, exit_qual 0x%lx",
-+			       exit_qual);
-+		__GUEST_ASSERT(exit_qual & EPT_VIOLATION_GVA_IS_VALID,
-+			       "Expected GVA_IS_VALID set, exit_qual 0x%lx",
-+			       exit_qual);
-+		__GUEST_ASSERT(!(exit_qual & EPT_VIOLATION_GVA_TRANSLATED),
-+			       "Expected GVA_TRANSLATED clear, exit_qual 0x%lx",
-+			       exit_qual);
-+		break;
-+	}
-+
-+	__GUEST_ASSERT(vmreadz(GUEST_PHYSICAL_ADDRESS) == expected_fault_gpa,
-+		       "Expected guest_physical_address = 0x%lx, got 0x%lx",
-+		       expected_fault_gpa,
-+		       vmreadz(GUEST_PHYSICAL_ADDRESS));
-+
-+	GUEST_DONE();
-+}
-+
-+static void l1_svm_code(struct svm_test_data *svm, uint64_t expected_fault_gpa,
-+			 uint64_t test_type)
-+{
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	struct vmcb *vmcb = svm->vmcb;
-+	uint64_t exit_info_1;
-+
-+	generic_svm_setup(svm, l2_entry,
-+			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	run_guest(vmcb, svm->vmcb_gpa);
-+
-+	/* Verify we got an NPF exit */
-+	__GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_NPF,
-+		       "Expected NPF exit (0x%x), got 0x%lx", SVM_EXIT_NPF,
-+		       vmcb->control.exit_code);
-+
-+	exit_info_1 = vmcb->control.exit_info_1;
-+
-+	switch (test_type) {
-+	case TEST_FINAL_PAGE_UNMAPPED:
-+		/* Read access, final translation, page not present */
-+		__GUEST_ASSERT(exit_info_1 & PFERR_GUEST_FINAL_MASK,
-+			       "Expected GUEST_FINAL set, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		__GUEST_ASSERT(!(exit_info_1 & PFERR_GUEST_PAGE_MASK),
-+			       "Expected GUEST_PAGE clear, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		__GUEST_ASSERT(!(exit_info_1 & PFERR_PRESENT_MASK),
-+			       "Expected PRESENT clear, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		break;
-+	case TEST_PT_PAGE_UNMAPPED:
-+		/* Read access, page walk fault, page not present */
-+		__GUEST_ASSERT(exit_info_1 & PFERR_GUEST_PAGE_MASK,
-+			       "Expected GUEST_PAGE set, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		__GUEST_ASSERT(!(exit_info_1 & PFERR_GUEST_FINAL_MASK),
-+			       "Expected GUEST_FINAL clear, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		__GUEST_ASSERT(!(exit_info_1 & PFERR_PRESENT_MASK),
-+			       "Expected PRESENT clear, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		break;
-+	case TEST_FINAL_PAGE_WRITE_PROTECTED:
-+		/* Write access, final translation, page present but read-only */
-+		__GUEST_ASSERT(exit_info_1 & PFERR_GUEST_FINAL_MASK,
-+			       "Expected GUEST_FINAL set, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		__GUEST_ASSERT(!(exit_info_1 & PFERR_GUEST_PAGE_MASK),
-+			       "Expected GUEST_PAGE clear, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		__GUEST_ASSERT(exit_info_1 & PFERR_PRESENT_MASK,
-+			       "Expected PRESENT set, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		__GUEST_ASSERT(exit_info_1 & PFERR_WRITE_MASK,
-+			       "Expected WRITE set, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		break;
-+	case TEST_PT_PAGE_WRITE_PROTECTED:
-+		/* Write access (A/D update), page walk, page present but read-only */
-+		__GUEST_ASSERT(exit_info_1 & PFERR_GUEST_PAGE_MASK,
-+			       "Expected GUEST_PAGE set, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		__GUEST_ASSERT(!(exit_info_1 & PFERR_GUEST_FINAL_MASK),
-+			       "Expected GUEST_FINAL clear, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		__GUEST_ASSERT(exit_info_1 & PFERR_PRESENT_MASK,
-+			       "Expected PRESENT set, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		__GUEST_ASSERT(exit_info_1 & PFERR_WRITE_MASK,
-+			       "Expected WRITE set, exit_info_1 0x%lx",
-+			       (unsigned long)exit_info_1);
-+		break;
-+	}
-+
-+	__GUEST_ASSERT(vmcb->control.exit_info_2 == expected_fault_gpa,
-+		       "Expected exit_info_2 = 0x%lx, got 0x%lx",
-+		       expected_fault_gpa,
-+		       vmcb->control.exit_info_2);
-+
-+	GUEST_DONE();
-+}
-+
-+static void l1_guest_code(void *data, uint64_t expected_fault_gpa,
-+			  uint64_t test_type)
-+{
-+	if (this_cpu_has(X86_FEATURE_VMX))
-+		l1_vmx_code(data, expected_fault_gpa, test_type);
-+	else
-+		l1_svm_code(data, expected_fault_gpa, test_type);
-+}
-+
-+/* Returns the GPA of the PT page that maps @vaddr. */
-+static uint64_t get_pt_gpa_for_vaddr(struct kvm_vm *vm, uint64_t vaddr)
-+{
-+	uint64_t *pte;
-+
-+	pte = vm_get_pte(vm, vaddr);
-+	TEST_ASSERT(pte && (*pte & 0x1), "PTE not present for vaddr 0x%lx",
-+		    (unsigned long)vaddr);
-+
-+	return addr_hva2gpa(vm, (void *)((uint64_t)pte & ~0xFFFULL));
-+}
-+
-+static void run_test(enum test_type type)
-+{
-+	vm_paddr_t expected_fault_gpa;
-+	vm_vaddr_t nested_gva;
-+
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
-+	vm_enable_tdp(vm);
-+
-+	if (kvm_cpu_has(X86_FEATURE_VMX))
-+		vcpu_alloc_vmx(vm, &nested_gva);
-+	else
-+		vcpu_alloc_svm(vm, &nested_gva);
-+
-+	switch (type) {
-+	case TEST_FINAL_PAGE_UNMAPPED:
-+		/*
-+		 * Unmap the final data page from NPT/EPT. The guest page
-+		 * table walk succeeds, but the final GPA->HPA translation
-+		 * fails. L2 reads from the page via OUTS.
-+		 */
-+		l2_entry = l2_guest_code_outs;
-+		l2_test_page = vm_vaddr_alloc(vm, vm->page_size, TEST1_VADDR);
-+		expected_fault_gpa = addr_gva2gpa(vm, l2_test_page);
-+		break;
-+	case TEST_PT_PAGE_UNMAPPED:
-+		/*
-+		 * Unmap a page table page from NPT/EPT. The hardware page
-+		 * table walk fails when translating the PT page's GPA
-+		 * through NPT/EPT. L2 reads from the page via OUTS.
-+		 */
-+		l2_entry = l2_guest_code_outs;
-+		l2_test_page = vm_vaddr_alloc(vm, vm->page_size, TEST2_VADDR);
-+		expected_fault_gpa = get_pt_gpa_for_vaddr(vm, l2_test_page);
-+		break;
-+	case TEST_FINAL_PAGE_WRITE_PROTECTED:
-+		/*
-+		 * Write-protect the final data page in NPT/EPT.  The page
-+		 * is present and readable, but not writable.  L2 writes to
-+		 * the page via INS, triggering a protection violation.
-+		 */
-+		l2_entry = l2_guest_code_ins;
-+		l2_test_page = vm_vaddr_alloc(vm, vm->page_size, TEST3_VADDR);
-+		expected_fault_gpa = addr_gva2gpa(vm, l2_test_page);
-+		break;
-+	case TEST_PT_PAGE_WRITE_PROTECTED:
-+		/*
-+		 * Write-protect a page table page in NPT/EPT.  The page is
-+		 * present and readable, but not writable.  The guest page
-+		 * table walk needs write access to set A/D bits, so it
-+		 * triggers a protection violation on the PT page.
-+		 * L2 reads from the page via OUTS.
-+		 */
-+		l2_entry = l2_guest_code_outs;
-+		l2_test_page = vm_vaddr_alloc(vm, vm->page_size, TEST4_VADDR);
-+		expected_fault_gpa = get_pt_gpa_for_vaddr(vm, l2_test_page);
-+		break;
-+	}
-+
-+	tdp_identity_map_default_memslots(vm);
-+
-+	if (type == TEST_FINAL_PAGE_WRITE_PROTECTED ||
-+	    type == TEST_PT_PAGE_WRITE_PROTECTED)
-+		*tdp_get_pte(vm, expected_fault_gpa) &= ~PTE_WRITABLE_MASK(&vm->stage2_mmu);
-+	else
-+		*tdp_get_pte(vm, expected_fault_gpa) &= ~(PTE_PRESENT_MASK(&vm->stage2_mmu) |
-+							   PTE_READABLE_MASK(&vm->stage2_mmu) |
-+							   PTE_WRITABLE_MASK(&vm->stage2_mmu) |
-+							   PTE_EXECUTABLE_MASK(&vm->stage2_mmu));
-+
-+	sync_global_to_guest(vm, l2_entry);
-+	sync_global_to_guest(vm, l2_test_page);
-+	vcpu_args_set(vcpu, 3, nested_gva, expected_fault_gpa, (uint64_t)type);
-+
-+	/*
-+	 * For the INS-based write test, KVM emulates the instruction and
-+	 * first reads from the I/O port, which exits to userspace.
-+	 * Re-enter the guest so emulation can proceed to the memory
-+	 * write, where the nested page fault is triggered.
-+	 */
-+	for (;;) {
-+		vcpu_run(vcpu);
-+
-+		if (vcpu->run->exit_reason == KVM_EXIT_IO &&
-+		    vcpu->run->io.port == TEST_IO_PORT &&
-+		    vcpu->run->io.direction == KVM_EXIT_IO_IN) {
-+			continue;
-+		}
-+		break;
-+	}
-+
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_DONE:
-+		break;
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+	default:
-+		TEST_FAIL("Unexpected exit reason: %d", vcpu->run->exit_reason);
-+	}
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX) || kvm_cpu_has(X86_FEATURE_SVM));
-+	TEST_REQUIRE(kvm_cpu_has_tdp());
-+
-+	run_test(TEST_FINAL_PAGE_UNMAPPED);
-+	run_test(TEST_PT_PAGE_UNMAPPED);
-+	run_test(TEST_FINAL_PAGE_WRITE_PROTECTED);
-+	run_test(TEST_PT_PAGE_WRITE_PROTECTED);
-+
-+	return 0;
-+}
+Solution
+========
+For that, we extend the VFIO_MIG_GET_PRECOPY_INFO ioctl with an output
+flag named VFIO_PRECOPY_INFO_REINIT to allow drivers reporting a new
+initial_bytes value during the PRE_COPY phase.
+
+However, Currently, existing VFIO_MIG_GET_PRECOPY_INFO implementations
+don't assign info.flags before copy_to_user(), this effectively echoes
+userspace-provided flags back as output, preventing the field from being
+used to report new reliable data from the drivers.
+
+Reliable use of the new VFIO_PRECOPY_INFO_REINIT flag requires userspace
+to explicitly opt in. For that we introduce a new feature named
+VFIO_DEVICE_FEATURE_MIG_PRECOPY_INFOv2.
+
+User should opt-in to the above feature with a SET operation, no data is
+required and any supplied data is ignored.
+
+When the caller opts in:
+- We set info.flags to zero, otherwise we keep v1 behaviour as is for
+  compatibility reasons.
+- The new output flag VFIO_PRECOPY_INFO_REINIT can be used reliably.
+- The VFIO_PRECOPY_INFO_REINIT output flag indicates that new initial
+  data is present on the stream. The initial_bytes value should be
+  re-evaluated relative to the readiness state for transition to
+  STOP_COPY.
+
+The mlx5 VFIO driver is extended to support this case when the
+underlying firmware also supports the REINIT migration state.
+
+As part of this series, a core helper function is introduced to provide
+shared functionality for implementing the VFIO_MIG_GET_PRECOPY_INFO
+ioctl, and all drivers have been updated to use it.
+
+Note:
+We may need to send the net/mlx5 patch to VFIO as a pull request to
+avoid conflicts prior to acceptance.
+
+Yishai
+
+Yishai Hadas (6):
+  vfio: Define uAPI for re-init initial bytes during the PRE_COPY phase
+  vfio: Add support for VFIO_DEVICE_FEATURE_MIG_PRECOPY_INFOv2
+  vfio: Adapt drivers to use the core helper vfio_check_precopy_ioctl
+  net/mlx5: Add IFC bits for migration state
+  vfio/mlx5: consider inflight SAVE during PRE_COPY
+  vfio/mlx5: Add REINIT support to VFIO_MIG_GET_PRECOPY_INFO
+
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |  17 +--
+ drivers/vfio/pci/mlx5/cmd.c                   |  25 +++-
+ drivers/vfio/pci/mlx5/cmd.h                   |   6 +-
+ drivers/vfio/pci/mlx5/main.c                  | 118 +++++++++++-------
+ drivers/vfio/pci/qat/main.c                   |  17 +--
+ drivers/vfio/pci/vfio_pci_core.c              |   1 +
+ drivers/vfio/pci/virtio/migrate.c             |  17 +--
+ drivers/vfio/vfio_main.c                      |  20 +++
+ include/linux/mlx5/mlx5_ifc.h                 |  16 ++-
+ include/linux/vfio.h                          |  40 ++++++
+ include/uapi/linux/vfio.h                     |  22 ++++
+ samples/vfio-mdev/mtty.c                      |  16 +--
+ 12 files changed, 217 insertions(+), 98 deletions(-)
+
 -- 
-2.53.0.414.gf7e9f6c205-goog
+2.18.1
 
 
