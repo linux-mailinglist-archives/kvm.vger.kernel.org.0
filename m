@@ -1,188 +1,157 @@
-Return-Path: <kvm+bounces-71676-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71677-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Ko2ORkonmn5TgQAu9opvQ
-	(envelope-from <kvm+bounces-71676-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 23:37:13 +0100
+	id qEfNJHsnnmn5TgQAu9opvQ
+	(envelope-from <kvm+bounces-71677-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 23:34:35 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A6BE18D6FB
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 23:37:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5663618D622
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 23:34:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6744730E97C0
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 22:34:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5FB1A306116B
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 22:34:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9711134CFBA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C44D934D915;
 	Tue, 24 Feb 2026 22:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VHUZMGp3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rdEt87CW"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBFE8F4A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F011E2FF14D;
 	Tue, 24 Feb 2026 22:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771972461; cv=none; b=ipc/Su2c+30dBKGBMqjYe67h/zLLai9gckz+yFXZHNSrk8Q2EycsjKiTOKDFwn1fIY7GIvIQdlZ+njBm9zqw8zpmMYkWmOEdPcysLkN7TSTu7JH69A0+4SKAfvlUpJx4NUhv9/xCFOlFYCGltUO6jbh0QUj6MXjlAdB8aKwyHsA=
+	t=1771972462; cv=none; b=UDkGcDi/Cs5JVmnTK3ePCwWjhi6g9+0nPTwJ5CFQGc2y6AgDafqmqAS746PnLXF33dPzZcbK3qV1v89i8U2NN2d8alrG9OB712aQQZqHt5+5BBR/RhsdePfpMI0ebInw5hZE7fl7ypt8mthbBQP+xQesdcuYIilbXg8JvQKDH/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771972461; c=relaxed/simple;
-	bh=Z127UEFMX+xC/GQ4f7BhqeRAlZyC95G5cspFEeYWSAk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZkjVx5J76UOol9dL9C2fLNxkWb8qauuMUkH2A2oTQYO29bN4KCWoHUgoNwbetg27qQzd6azz+1cjc0DrBCkJznYuTPs5AvSYTpncN9S4rfH7reYIBE9vekQ7dwH8FPNpek6spzGTKRtNO6/RWozLyFdxDcdJVVmpW3tdAdDAhMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VHUZMGp3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3610BC116D0;
+	s=arc-20240116; t=1771972462; c=relaxed/simple;
+	bh=Vhp3vuWokN317wHEb9O9UL3ilPmfH+y4ZZA1i44uBXg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YwPe9cisE/AXEJdox5xjh5HZbL7lJ932gnHH+iJAyCLweqdlVoNT4ufQpdHsO7A6Qqxa+beJEuMqv5M8NaDWYZVkhTlOtqqgFdsBmUvwjuaEdHzzh78b79cuUzO1HrV2osksO+xgdslBNyckQI+IuLaRII+b6I/m/SNbEixr2J4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rdEt87CW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96E8FC19423;
 	Tue, 24 Feb 2026 22:34:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1771972461;
-	bh=Z127UEFMX+xC/GQ4f7BhqeRAlZyC95G5cspFEeYWSAk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=VHUZMGp3okznwL8sD3KNancaTMKOU8kZsS0uVC1bJJyYKkb5CD42bfOlbN9c7BaP7
-	 a8+mHVkInCscFi8scvuHEoi+C9CewUjp8TnqlkEvewyjgM77DVUu4x1hBdpy07XhGB
-	 OCOukjDFsKuT0uae8ExxEt4h0j++Q1aSgv6L23/wHsfdQzR2TObzZINgKgP4zVkYtE
-	 PwCZcqJaezK6YEua7rqutKwdjYDXTWhp2RLM0fMed6Naz32piLD8pYNQcEW0xGJ3Un
-	 1msOkPOkG9J66RaLlKUIqvxidORevelOYjig5mODigok/JwOb1rzLd0pNbMEAHpYMY
-	 EKPJ5doJ6Nj1Q==
+	bh=Vhp3vuWokN317wHEb9O9UL3ilPmfH+y4ZZA1i44uBXg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rdEt87CWIFfBIlDirRh7TT4naJikdwC6O5lZdYxe05MXCamybiAz2YU/TPbWwSqTR
+	 neMf7Cj6EXr18sskbWLV7G6yzL5nCdxN70P41B8qKDun4dgkS8Vmc3aaYPCgIY41hn
+	 Rs/gcVUK79cRSbXM4cyNzl+Ae3RHdAGoKYV8cm3/eyOhueLhxCCg2RKqD/+OVSzadW
+	 BwvbamYKK8RQaASYhRDF8JRBzvocv9ot3JuyhvnJhOrB/en9C/0n6Kxk0YRUSeH4HQ
+	 BJW33ERf7PYRjnOerXRP9CwvCNR+F28jT8s+ozpqxIkWggX0kb3MtY2QPd2WEPk9u7
+	 xmn/DWKuiAPPA==
 From: Yosry Ahmed <yosry@kernel.org>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Yosry Ahmed <yosry@kernel.org>
-Subject: [PATCH 00/31] Nested SVM fixes, cleanups, and hardening
-Date: Tue, 24 Feb 2026 22:33:34 +0000
-Message-ID: <20260224223405.3270433-1-yosry@kernel.org>
+	Yosry Ahmed <yosry@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH v6 01/31] KVM: nSVM: Avoid clearing VMCB_LBR in vmcb12
+Date: Tue, 24 Feb 2026 22:33:35 +0000
+Message-ID: <20260224223405.3270433-2-yosry@kernel.org>
 X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
+In-Reply-To: <20260224223405.3270433-1-yosry@kernel.org>
+References: <20260224223405.3270433-1-yosry@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71676-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71677-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[hcr0.pg:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4A6BE18D6FB
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5663618D622
 X-Rspamd-Action: no action
 
-A group of semi-related fixes, cleanups, and hardening patches for nSVM.
-The series is essentially a group of related mini-series stitched
-together for syntactic and semantic dependencies. The first 22 patches
-(except patch 3) are all optimistically CC'd to stable as they are fixes
-or refactoring leading up to bug fixes. Although I am not sure how much
-of that will actually apply to stable trees.
+svm_copy_lbrs() always marks VMCB_LBR dirty in the destination VMCB.
+However, nested_svm_vmexit() uses it to copy LBRs to vmcb12, and
+clearing clean bits in vmcb12 is not architecturally defined.
 
-Patches 1-3 here are v2 of the last 3 patches in the LBRV fixes series
-[1]. The first 3 patches of [1] are already upstream.
+Move vmcb_mark_dirty() to callers and drop it for vmcb12.
 
-Patches 4-17 are fixes for failure handling in the nested VMRUN and
-#VMEXIT code paths, ending with a nice unified code path for handling
-VMRUN failures as suggested by Sean. Within this block, patches 7-12 are
-refactoring needed for patches 13-14.
+This also facilitates incoming refactoring that does not pass the entire
+VMCB to svm_copy_lbrs().
 
-Patches 18-22 are fixes for missing or made-up consistency checks.
+Fixes: d20c796ca370 ("KVM: x86: nSVM: implement nested LBR virtualization")
+Cc: stable@vger.kernel.org
+Signed-off-by: Yosry Ahmed <yosry@kernel.org>
+---
+ arch/x86/kvm/svm/nested.c | 7 +++++--
+ arch/x86/kvm/svm/svm.c    | 2 --
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-Patches 23-24 are renames and cleanups.
-
-Patches 25-30 add hardening to reading the VMCB12, caching all used
-fields in the save area to prevent theoritical TOC-TOU bugs, sanitizing
-used fields in the control area, and restricting accesses to the VMCB12
-through guest memory.
-
-Finally, patch 31 is a selftest for nested VMRUN and #VMEXIT failures
-due to failing to map vmcb12.
-
-v5 -> v6:
-- Set VMCB_LBR dirty when setting LBR registers [Yosry].
-- Fix state leakage in LBR save/restore test [Kevin Cheng].
-- Do not abort nested #VMEXIT flow if mapping vmcb12 or restoring L1 CR3
-  fails [Sean].
-- Break down the patch sanitizing control fields from vmcb12 and drop
-  the ASID comment change [Sean].
-- Add a selftest for VMRUN and #VMEXIT with unmappable vmcb12 [Yosry].
-
-v5: https://lore.kernel.org/kvm/20260206190851.860662-1-yosry.ahmed@linux.dev/
-
-Yosry Ahmed (31):
-  KVM: nSVM: Avoid clearing VMCB_LBR in vmcb12
-  KVM: SVM: Switch svm_copy_lbrs() to a macro
-  KVM: SVM: Add missing save/restore handling of LBR MSRs
-  KVM: selftests: Add a test for LBR save/restore (ft. nested)
-  KVM: nSVM: Always inject a #GP if mapping VMCB12 fails on nested VMRUN
-  KVM: nSVM: Refactor checking LBRV enablement in vmcb12 into a helper
-  KVM: nSVM: Refactor writing vmcb12 on nested #VMEXIT as a helper
-  KVM: nSVM: Triple fault if mapping VMCB12 fails on nested #VMEXIT
-  KVM: nSVM: Triple fault if restore host CR3 fails on nested #VMEXIT
-  KVM: nSVM: Drop nested_vmcb_check_{save/control}() wrappers
-  KVM: nSVM: Call enter_guest_mode() before switching to VMCB02
-  KVM: nSVM: Make nested_svm_merge_msrpm() return an errno
-  KVM: nSVM: Call nested_svm_merge_msrpm() from enter_svm_guest_mode()
-  KVM: nSVM: Call nested_svm_init_mmu_context() before switching to
-    VMCB02
-  KVM: nSVM: Refactor minimal #VMEXIT handling out of
-    nested_svm_vmexit()
-  KVM: nSVM: Unify handling of VMRUN failures with proper cleanup
-  KVM: nSVM: Clear EVENTINJ field in VMCB12 on nested #VMEXIT
-  KVM: nSVM: Drop the non-architectural consistency check for NP_ENABLE
-  KVM: nSVM: Add missing consistency check for nCR3 validity
-  KVM: nSVM: Add missing consistency check for hCR0.PG and NP_ENABLE
-  KVM: nSVM: Add missing consistency check for EFER, CR0, CR4, and CS
-  KVM: nSVM: Add missing consistency check for EVENTINJ
-  KVM: SVM: Rename vmcb->nested_ctl to vmcb->misc_ctl
-  KVM: SVM: Rename vmcb->virt_ext to vmcb->misc_ctl2
-  KVM: nSVM: Cache all used fields from VMCB12
-  KVM: nSVM: Restrict mapping VMCB12 on nested VMRUN
-  KVM: nSVM: Use PAGE_MASK to drop lower bits of bitmap GPAs from vmcb12
-  KVM: nSVM: Sanitize TLB_CONTROL field when copying from vmcb12
-  KVM: nSVM: Sanitize INT/EVENTINJ fields when copying from vmcb12
-  KVM: nSVM: Only copy SVM_MISC_ENABLE_NP from VMCB01's misc_ctl
-  KVM: selftest: Add a selftest for VMRUN/#VMEXIT with unmappable vmcb12
-
- arch/x86/include/asm/svm.h                    |  20 +-
- arch/x86/kvm/svm/nested.c                     | 570 +++++++++++-------
- arch/x86/kvm/svm/sev.c                        |   4 +-
- arch/x86/kvm/svm/svm.c                        |  68 ++-
- arch/x86/kvm/svm/svm.h                        |  50 +-
- arch/x86/kvm/x86.c                            |   3 +
- tools/testing/selftests/kvm/Makefile.kvm      |   2 +
- .../selftests/kvm/include/x86/processor.h     |   5 +
- tools/testing/selftests/kvm/include/x86/svm.h |  14 +-
- tools/testing/selftests/kvm/lib/x86/svm.c     |   2 +-
- .../kvm/x86/nested_vmsave_vmload_test.c       |  16 +-
- .../selftests/kvm/x86/svm_lbr_nested_state.c  | 145 +++++
- .../kvm/x86/svm_nested_invalid_vmcb12_gpa.c   |  95 +++
- 13 files changed, 711 insertions(+), 283 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/x86/svm_lbr_nested_state.c
- create mode 100644 tools/testing/selftests/kvm/x86/svm_nested_invalid_vmcb12_gpa.c
-
-
-base-commit: 183bb0ce8c77b0fd1fb25874112bc8751a461e49
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index de90b104a0dd5..a31f3be1e16ec 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -714,6 +714,7 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
+ 	} else {
+ 		svm_copy_lbrs(vmcb02, vmcb01);
+ 	}
++	vmcb_mark_dirty(vmcb02, VMCB_LBR);
+ 	svm_update_lbrv(&svm->vcpu);
+ }
+ 
+@@ -1232,10 +1233,12 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+ 		kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+ 
+ 	if (unlikely(guest_cpu_cap_has(vcpu, X86_FEATURE_LBRV) &&
+-		     (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK)))
++		     (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK))) {
+ 		svm_copy_lbrs(vmcb12, vmcb02);
+-	else
++	} else {
+ 		svm_copy_lbrs(vmcb01, vmcb02);
++		vmcb_mark_dirty(vmcb01, VMCB_LBR);
++	}
+ 
+ 	svm_update_lbrv(vcpu);
+ 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 8f8bc863e2143..a2452b8ec49db 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -848,8 +848,6 @@ void svm_copy_lbrs(struct vmcb *to_vmcb, struct vmcb *from_vmcb)
+ 	to_vmcb->save.br_to		= from_vmcb->save.br_to;
+ 	to_vmcb->save.last_excp_from	= from_vmcb->save.last_excp_from;
+ 	to_vmcb->save.last_excp_to	= from_vmcb->save.last_excp_to;
+-
+-	vmcb_mark_dirty(to_vmcb, VMCB_LBR);
+ }
+ 
+ static void __svm_enable_lbrv(struct kvm_vcpu *vcpu)
 -- 
 2.53.0.414.gf7e9f6c205-goog
 
