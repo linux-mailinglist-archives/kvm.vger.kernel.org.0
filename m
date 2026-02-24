@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-71592-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71594-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8KhxGKRgnWkDPAQAu9opvQ
-	(envelope-from <kvm+bounces-71592-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 09:26:12 +0100
+	id ACwPH7dgnWkoPQQAu9opvQ
+	(envelope-from <kvm+bounces-71594-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 09:26:31 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6E711839F8
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 09:26:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AF1E183A0E
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 09:26:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7A97B316C659
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 08:21:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 771F2317727A
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 08:22:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E12E364E8F;
-	Tue, 24 Feb 2026 08:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F222364EBB;
+	Tue, 24 Feb 2026 08:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RUgNqLJS"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lu+lIhry"
 X-Original-To: kvm@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011062.outbound.protection.outlook.com [52.101.52.62])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013014.outbound.protection.outlook.com [40.93.201.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53FF936657D
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 08:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02319366803
+	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 08:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.14
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771921315; cv=fail; b=c9RsT26pOTPGnnVdJM7DiXs4IgoZoexf9ssXrX2zZ4q8axwEXMQYGw4kjaww874iavxqxno/GJPjQhwVfPrH0PLUPtVoAd7pQ3R5KJ2dTOlQi2xD8Dukbou9PXsRhlv4gmMhYdGnqrOwIjK39oIzMeqfxuubgo2eproHAH6xrwU=
+	t=1771921323; cv=fail; b=crb6qM97RTLn1ZJWavCsPBf7MG3ajuRdbMaOScM7W28ifxa+RvcPGz8rTPuXJTUAYbY3cCNe0QmfOVxexuV18vRqUpjbsSyWlqnsPYhUy3dIfQ1AAK3Y3Dws2xdEWyMdW9xtLOd9rwCZkDTQXSl9f2K5677nxJoCurUIbbwx1tA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771921315; c=relaxed/simple;
-	bh=Gp3CfnsajItluhSCh1sTVAOCRFc8giia5cJ/hoGE4uQ=;
+	s=arc-20240116; t=1771921323; c=relaxed/simple;
+	bh=LXz4gd4KpWTrSUL9w4gooFEdowRvESkQMlUQvmcD1V4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C01XT3rmGcn32VHwCUbTo+tvQkxd8wnaNPIHP88PisQopB9uUTnKWma2yEKEWw9EbAVEMECxwpE47vrTpguqeT2Yq/Vv3FfK77hxmlsueUagT6sDMYxE1vwzFndtbrDWsn1CUOGDzmkkKckjvo/u7GUfjHOotNt35CpKxJCGFXM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RUgNqLJS; arc=fail smtp.client-ip=52.101.52.62
+	 MIME-Version:Content-Type; b=OdXqcBk7SKdtfPUUSPGAAX4sTVVH/h8FQmoHKvL7pQ1NbH/MElzyh2aQGvVt8uC+NM0bCDVoQsxDOrBG/cuS/kOAbu4ebHvsTuKawfWiMU4c84Gfa2wjtByQnVC5jWnlTVw4wrxuLm/9iOtWUZcumFS6XAyfGHhzRR9NODX8ZTs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lu+lIhry; arc=fail smtp.client-ip=40.93.201.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MJynWJQuHZvx5Rtq4IaL/RhOzEyUSX0SmBVy0ZxO8Pz+s1S6ZHZUyVWPruI+ovMHXtfJSlzlU6nTTDf5Jpox2C9CyLHSuvCZ9aDpBYcotJzJ7DtXtxPVA7L+Vi1H/5Q/mahka9Owir64bSiEjCadNkFbarTTLMeWJIP1dbDbv6VUL39AJ9+w0NQLFhVj1Kv3fP1Z2yqgOtsM2ulKBvmvnWMCAt34OoCJlazbDDEqd7vXCyA4EfUAi1H7NaM9hgO4kjsY2PvhsroQIhzxF+UG9RCsbA13w6JTbnirFj6kP7scmBsCcOk4Ru0Pgj2eqgEdBcDpBC11ZJnU3eJO76RFnQ==
+ b=qWOfEOMKaZbliInOqzwY7oihpZNqY3cUwkdx83Uw8moKrJlN4oZ2LHsJXRc79VTSoYScuYqTa1xvfME4X8tQC5LNriSVjwZGRzUcBKS2Ss0Ch/kYeX3FlH3ILZrao8gsJnkwMIhF2N/s+CGifPSuUzs+xutWSa52LJv71h/sTrpqvwagFyfvTHqfJzest+1LSkGviL46lTHX//MYTSVfery6puV3w5/VTtC/gyi8/IpXnT/tKNLKYpvpWnPRBMimOqFxHpfxFr6bHpB1EsiRUGYegARaemU4zaW0IWmSXQLA7c3C3QiDsSd8dub2j26mU0Pwf4l/kPdvKVH1o/Okww==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OgIX+Hu8iExhnSHFQzKg0IFBtBczwCgtyDOAuF4vH9E=;
- b=FYrWzQt1U86ESHf/qNeLwRdyaqmMmdCY0ayY/XEL3gEQitqdt1TlBlmwQa+K44ZGdIv3ejfd6swiR0cBQ9FkVNV/7NYJ3EhJAAgucdpnafSOj1hJ5jqLSPOOqJAbyEECL1HdHGHdO03FQynsXOdkn2AR9GSA6XnmDxpTdjQiGEXnmjzx9Yx6gWSeL/OD02dKweJPZGOGwnzHAOEwC98UNnpvMBpdWYLYxiFTOhn20vD7JWRUjLS/zgP1pKeVylJpS54KplCFxy7HXiB73rlKG6EaxxFlVQm/uF3AM5stuE/g7kwZS3AE4AR7I/z+V+EIHf4wqgmTB6E3I+uCI5v42g==
+ bh=WqLdaXCKxAgOXJhg5zrvJ9Ssz6mFV44KAfp5cpRJILc=;
+ b=LXm9zwQuTtYVQx78WVUDLElhuuH+mSwQRxAm3XagFrBYN5DC4UzIiGpW/u7s8gUGKlOjHFX/MJpV0SYmlpsSslofPOMLay5TVmS/3R0BhJ+26RWGfIXeygsoDpcMv4yCGvVkdPhCOhWzdwYYTcCPIUSECTSpGkxCtS0qfCPpTpu3ln0W7mnWa+LkDzy7L6dbpqlczk6YlI5fgbAbeSO/HXF0kz+NdYsG23U8o+C/z+WasN3A/v7RO3tSjbgl9RODEGdMCE+o79xmBnYVDTlvFiEsYopZWnfbD/ayaI6P2XL7RX8z7/kkx7Lxax1zxZ/dVp7UstlRqzEdnC4NySnm+g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -48,18 +48,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OgIX+Hu8iExhnSHFQzKg0IFBtBczwCgtyDOAuF4vH9E=;
- b=RUgNqLJS3JSEmi+CCjkiAujmUM6mEUq6s6cZdt/uLeD0TpZ1TcvwDYSLPEXdPMKX2Z8uErXPy9fr8agzxRkYYp9ChXzO0DZyj8G6Qt2f6NYPke0ewSVtSNWM7OJ8DUaZh32xdaMU8N+xyVn8oOH5r4vBaWy5wTVoqHvrnPQkYDu7nVcvjkYFzVEy4/teKANDUZP4z9icQBoFGSKtveGMLAeNpfkbxV3VSakcFbAQIvQMoBcVlC+Il81kv1y8BYkMj+OaowP5OAFiUzMhIHpi2q2mW0l7BAWdCLQuCuB3vGy590ZUnTBMxhScR4UOrrbYzN4PibaW3GxwOLPPNReZhg==
-Received: from BYAPR21CA0021.namprd21.prod.outlook.com (2603:10b6:a03:114::31)
- by SA5PPF6CDAEAF48.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8cf) with
+ bh=WqLdaXCKxAgOXJhg5zrvJ9Ssz6mFV44KAfp5cpRJILc=;
+ b=lu+lIhryRuq0BiAiPYVfDaTIp6hNUfl1rJscEHh6I2OhxlK7msiTHHNtCJXYB6e5X745a0k7cj7CzedfCJcEkpifv2GbzhrNufnExDMwJfhK4/OckWvLnHIW/cONIuALrEKpgqvqHlPS1sPWqued72NvNzTFE00HioRBl6R/2JBZf/qVucuomopU3paSNPP2ySDabSXcziFqtaoLjIlmTUpx2OEgvU7Y9Zk7QXUGivFya9ct41X3lzNrj292yxLV0qbluAn9xyBNrYzfNTjJOAd2ntb51CFzTc2ZGuxYumUYSX2R3VR4XnmpZrTZefK4hcZlydlGs2HkgYXnVxYbCQ==
+Received: from SJ0PR13CA0120.namprd13.prod.outlook.com (2603:10b6:a03:2c5::35)
+ by SJ2PR12MB7846.namprd12.prod.outlook.com (2603:10b6:a03:4c9::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.10; Tue, 24 Feb
- 2026 08:21:50 +0000
-Received: from CO1PEPF000075F2.namprd03.prod.outlook.com
- (2603:10b6:a03:114:cafe::fe) by BYAPR21CA0021.outlook.office365.com
- (2603:10b6:a03:114::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.6 via Frontend Transport; Tue,
- 24 Feb 2026 08:21:49 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.21; Tue, 24 Feb
+ 2026 08:21:54 +0000
+Received: from CO1PEPF000075F0.namprd03.prod.outlook.com
+ (2603:10b6:a03:2c5:cafe::95) by SJ0PR13CA0120.outlook.office365.com
+ (2603:10b6:a03:2c5::35) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.22 via Frontend Transport; Tue,
+ 24 Feb 2026 08:21:51 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -67,29 +67,29 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- CO1PEPF000075F2.mail.protection.outlook.com (10.167.249.41) with Microsoft
+ CO1PEPF000075F0.mail.protection.outlook.com (10.167.249.39) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Tue, 24 Feb 2026 08:21:49 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ 15.20.9632.12 via Frontend Transport; Tue, 24 Feb 2026 08:21:54 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Feb
- 2026 00:21:33 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ 2026 00:21:36 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 24 Feb
- 2026 00:21:32 -0800
+ 2026 00:21:36 -0800
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
  with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Tue, 24
- Feb 2026 00:21:29 -0800
+ Feb 2026 00:21:33 -0800
 From: Yishai Hadas <yishaih@nvidia.com>
 To: <alex.williamson@redhat.com>, <jgg@nvidia.com>
 CC: <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
 	<joao.m.martins@oracle.com>, <leonro@nvidia.com>, <yishaih@nvidia.com>,
 	<maorg@nvidia.com>, <avihaih@nvidia.com>, <liulongfang@huawei.com>,
 	<giovanni.cabiddu@intel.com>, <kwankhede@nvidia.com>
-Subject: [PATCH vfio 2/6] vfio: Add support for VFIO_DEVICE_FEATURE_MIG_PRECOPY_INFOv2
-Date: Tue, 24 Feb 2026 10:20:15 +0200
-Message-ID: <20260224082019.25772-3-yishaih@nvidia.com>
+Subject: [PATCH vfio 3/6] vfio: Adapt drivers to use the core helper vfio_check_precopy_ioctl
+Date: Tue, 24 Feb 2026 10:20:16 +0200
+Message-ID: <20260224082019.25772-4-yishaih@nvidia.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20260224082019.25772-1-yishaih@nvidia.com>
 References: <20260224082019.25772-1-yishaih@nvidia.com>
@@ -104,58 +104,58 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000075F2:EE_|SA5PPF6CDAEAF48:EE_
-X-MS-Office365-Filtering-Correlation-Id: e9aa9684-c9bc-415f-0701-08de737dc223
+X-MS-TrafficTypeDiagnostic: CO1PEPF000075F0:EE_|SJ2PR12MB7846:EE_
+X-MS-Office365-Filtering-Correlation-Id: 279ff03a-319f-41e3-41b8-08de737dc4da
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?WVV076Ve5qTT3IXpOgfVudUkkMONQSOU3Yi7RTm7P75FR94QDx/8IE+0B97Y?=
- =?us-ascii?Q?8IBGlESHgv3vpnFfXrg+w/2QVeq2I9HJ80ZzIWFllsrZOiTkzX96L5xd73P7?=
- =?us-ascii?Q?GhW1l4MnDkXvCSg8jdUpOlWwrY/sC6KlvCx9LMB1EbCmDmckqEG1/TBzmEok?=
- =?us-ascii?Q?extcKqSts26KfuKr4Cca94stUwVeOtvcmW5g+xx6StQ0lPSJLnMHIeHv0WBH?=
- =?us-ascii?Q?/+aqQ8Vg85jVDqQQ4KDd6STkpMLXl/SJsHo7S8AIe5rH8YCsxHPXSv6NDgbV?=
- =?us-ascii?Q?NrlBI1Gw8G2oBMqzp9sZp1dbe8ohpx9l6YegDBIl9K9bbrOSAJKITg0VTQGU?=
- =?us-ascii?Q?kgy2vr5bzsCYmIEuyC5bBnrURx7YrNcqcoxY6K2wMzCrBUbpLItli/SxQcAI?=
- =?us-ascii?Q?6pn2zS0YGSR/VuWN9M4ix3dGRMoMsk5uU6HH82gbJPZ5yQvRxy7UKTgoK1QP?=
- =?us-ascii?Q?4Xx7nTdbhe2xVj5do1llcd/fknUuE9sveQoDfVzyxUVlRp5CjHPnhIF6ROO0?=
- =?us-ascii?Q?A6wig7d0lcxe0JQMCIf1S7NfDGJhIiPaVDKT+W0ieXm0PAlhRvTBRkFpWu0I?=
- =?us-ascii?Q?kVseIzQI0veHEfccqIUpP86Xk/foyqvKXz8WfEdNSYdd8xsml/iNQ2b+5xS9?=
- =?us-ascii?Q?HaEgkJk/5DwgdIWBHGurSm6Vh/LJcYVa7LoPsVBOX62I8t2bM+g6akE9FLfy?=
- =?us-ascii?Q?LAFRIi4s9G0Lti9xvFAj0C+s63sgQVyrOdSobnnk/c4psr/JakLoF39QUEwe?=
- =?us-ascii?Q?uBNqM85+PbjWLJMkeMQQx3By0rKdFH5PCBNoDq/2UZU0tqa/KMaiS6kznthY?=
- =?us-ascii?Q?nmI1IuE+1rK/zEPfYwDCRIOyLKTcldFstXnSeU/yaCFX97Cns9xA+t4jptFl?=
- =?us-ascii?Q?O2yQ33+U/jCt322cMAdqLEQRHl3IIvLy9E2k7Qk8qVhqvVQLMLf6k5AaGrR8?=
- =?us-ascii?Q?MwhP4wU2X80j/oScE71IxU48YpJIFlkBmcwVTXeQNwIw3pS/kkg50rrKMMhc?=
- =?us-ascii?Q?xX5VrigYWjnmvufqvtJEVPtSRR9LkMbcHWDgS/PtZxxiNT80LUODJrwlhGLs?=
- =?us-ascii?Q?ZqlOko8KkbyMBNRPF3m0z+rNv1BPJNE1kToZLtYkuT9VN1jB0YmWJPWP9kDB?=
- =?us-ascii?Q?WS08wrNEWAfL0RwxGHQyemkb+YUR+D4x3xj1IIOPVCvetCl6RTVhXFnXUS70?=
- =?us-ascii?Q?A9BPsBA8D5cYoS0YDvUPrtldTtaeLH3jTYUxKNxOovD62SqO0B57ZNr75KrP?=
- =?us-ascii?Q?/0Ko+Z0dY+yVh1xM41GuJheyR7DVQfXVa47iJaXrJub6xGc95Wa4JI/Wkp34?=
- =?us-ascii?Q?fgRJhs1Zwl4Aes4w16Pl76OLxJiWDBKXl12mOYLi/sykhn3YYtTGRT7i3G6m?=
- =?us-ascii?Q?p5POVrlIq+Ovvi7WYcFAw5kNnpgAA5dVhMn22Dr1cglrasdyEkkOPUNsJSE4?=
- =?us-ascii?Q?DBt+Y+uLdRsz3C695PYtiVPTxmhzTHfgE0c2LzJaFFHV006ZPbE3B334Gu0+?=
- =?us-ascii?Q?9fWdYC4ehtJKeUPhKAKUvX/+2FAJ4VCTfnFuaqsSdNJSAbHHVtFPiAHgcYGk?=
- =?us-ascii?Q?IO1ocYkFT+pB26M2t4R76vpo8vfihPV6ADLOyPzRyo/96tsK0v116Ol0QmJk?=
- =?us-ascii?Q?BIJ5NvDrEJEg3tNCLZwetIrC1jKWK0n15Hq5QG9TGqHcldnjSNQqv57DdoAK?=
- =?us-ascii?Q?enIjtw=3D=3D?=
+	=?us-ascii?Q?RjV8dHnGEMaSC4vOE+OGDqR14ysQ0VVngGmdgnXNcaMtusg0yZz2qXXaAUr+?=
+ =?us-ascii?Q?97F/aoF1pL4zK6kgUvoDvFDPSIsphwhxIN8e/x2ZBhMf7EV9K17ZzJcmpcB0?=
+ =?us-ascii?Q?IRi/Zc3OG+xJjZPArGPMvZrErQMhAHkZIMj5Yw5t02tpmI2cvxFZKUEjJCQo?=
+ =?us-ascii?Q?xeRTUFf5Djdx5Nkwmc1FJxZShaBbrONlIy8yfeGFmydvsLGXYRYdt8MmTNll?=
+ =?us-ascii?Q?8vXGYbwtekKpTZWRyELCsjBOL4J52D4Y9qVcVE1UlMtWcmUTweR4KfsRG30X?=
+ =?us-ascii?Q?QukrmyVezDoeuQg0c2PQnrSOIwN0PcuE0O+CDqs6wiiUpTYkWiA7RRdiFeS4?=
+ =?us-ascii?Q?TYQMmfiXnx8TPgsNzA7OppBOAkbh2ipu2EMbmjZXmim8ihoHAnH+P7VpGE59?=
+ =?us-ascii?Q?qWRuyNU5N+5kZQ3czFnSSAVQFgJSgbikGJK6ncgfUOCdiGoDc3efdUZSDyKg?=
+ =?us-ascii?Q?4aDtvvW7OQ/JblG9npTZg6kx/nXmdUTKus+UZ9K2tqkJYWqrAcfHOrjWjGPM?=
+ =?us-ascii?Q?J00mJ0FFyyVfbNMFjn8XCzO5msAXsAThG8AjiP6gay/Sa5iRWswEUEGMBqhH?=
+ =?us-ascii?Q?iWaBFeMOo9I8q1LksVC85XICNz7qpkYO8XRE4TxP1QPJDR4324s7PQ873si0?=
+ =?us-ascii?Q?cgYwgiJvIvE+zvjqGQvr8YKJ9cXriVrS0bOix4j/cZNUUygwy7x4PY5HHxPe?=
+ =?us-ascii?Q?7ut3AQtCq6YpPzGBsidT2rHEwntPOEI8RuOxmizJxwI+sc9LzRD8fEitExmi?=
+ =?us-ascii?Q?gBy9KwmkDkb7wxH33M1Xz6ar9mFlRrfErIf2csvYPqwUiWISoRp8AxKdrmtG?=
+ =?us-ascii?Q?zPkcpqFAynfs4sJMObpK1ufTExDYJ8pvcXxkW2+QAxQiGFyPcwCYP0JE7Z1G?=
+ =?us-ascii?Q?WKUsHC1zS0lmOOC7fqxpl4fsMea4BQzSHa3xMLeKhSfhhX6ERotBT9AZ2pQh?=
+ =?us-ascii?Q?lQRgwqJFaK4LTc/8LRKhLhwRGD+/zf1JkPyfMwwUgsMKqqhNlfvcZy3oILMR?=
+ =?us-ascii?Q?d/G8iZUjYdqALc2ePGtG3FsPsGk1wfv4Ypm4h5Jf58TvhEOuCJIDbQHMRXmj?=
+ =?us-ascii?Q?dv6aEnhVDal+sRwlCQ/ly0/ZvoXCPAiuiAKrw14yuIjkMgF3AwVKKmgj+bl5?=
+ =?us-ascii?Q?5dKQReUxD9tTdtOcbt5YiW190xYIluIH6hbshaafvWlKnBtJfTFs3BoqhCeU?=
+ =?us-ascii?Q?EBvTGMybwxjz7UVAd417VKfMPy85AXeYnMwt4UebnADbcmMKY0f3hJLLlTno?=
+ =?us-ascii?Q?BYvBxvdohh3EItc7Vsd47qmRYS27h04E3o93iJtgJ62ondXXPDkFZsc4JehP?=
+ =?us-ascii?Q?F9F9dyIMtvAowaEmFltddaRL93t6FeBS5GkkcTJQ67SuI3lrVTJy10T1aej/?=
+ =?us-ascii?Q?5YVD2es6eBdu+601S9P7CCpAo/UtDJiQcfz1pj9XqQooqmGbM3eUj4yvj07k?=
+ =?us-ascii?Q?e8msf0Kh/HWeHMzaIEPCmteEvqHKrOQ5ssahW+29UR9ns7hIsBVJUdx26/fR?=
+ =?us-ascii?Q?Mumv3YSGJPoH7AbxJXGYka6PhEfrntjoPTMlTvhRwX77moT/TSN8HoH0A8ha?=
+ =?us-ascii?Q?Sf/GJB2xsWNgUjBxOR4z8eB9T1eEyvQxOgX9dMwJfVK5o63BUB4rfUM7fOli?=
+ =?us-ascii?Q?jzv9QJLUTtYquT1KB3i1bwwhPd/dJapaC5A9xUe6QwPKFjplF/fSj62V1QLO?=
+ =?us-ascii?Q?n8eF2g=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	BsSqzk/NVFtTi3FrPu5J7JwPMx97t9vGtSlHpoPjse13gcJ91H5rDXCmlXmdP6PtEuA0Sh1Gs97ejroWef25OF+wKlhK2vBTpw/yqrqI5hiDhLmskpKyPQ46WM0to2f5JmD/+H5LCBAjFkVpcUx0rWTghLaCdNOK7a2h/do3QkZXGtq77bLSlr6BfFPFEzpViX9AFRalalaFSO21eVJWM0l/+EyzKDmv+uT5xqo2Iu8AHPBbXdxNU8+DWUEWtT6mCMcoGj02uUbn8BWH1mU8dGhKGpurUCZrPS1OHJOLElqIzkCpQO+lFxjh8v64kUJQE8fq2Ibcf3WmbG63ADOqQc5SHVOXI5nEn89U70A46b27bejzmhAk9oZo3RdY6XNZUARJeC1gnwvYawlOCZiL1Jn7FGtAk2Gv4gTSWp476X0o16Rw2mGsAF+BYBmVZuV8
+	vDp4mRP6gYG/L5xfA7oAAe2E3zUfbNd+JWONjvvucFUQoaPIyoAfwbkWM4Msn1whDONQwQdvp2GhWkBNw2KZLw2P7wy2C6st9/z+4jcbQG4YjWZ/+XmS/mEG5x+zFpNPU2rbT08OGKx8nb7gRLGaGxlU4EbJNwV6dn4hRiEzlvNGXS+rOwfrD5ZTVd7rPnx5dguqO4ACvSCNdTdHlDYiSBazQeuPCbW9n+p70rmK/uCpzwGHFGyzZp+7X/H7rzuwcOSvH7te94uU50gBiciC7fYpZDX3Ph++Vq4AhsB/mQLrYxDREBcZD9sehFKm0T2VBoGDhWet7ucH2wbycO96Px+4y755JvmBhKehfzUtczdo27O5idXYSvIOc/wSkIx1EMeYN48EFoqEvF1XhFYJKk2Xs3m/KZt2ajIde9OcAuSBNKOovrjaFWLeoMwYAC9W
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2026 08:21:49.6992
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2026 08:21:54.2483
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e9aa9684-c9bc-415f-0701-08de737dc223
+X-MS-Exchange-CrossTenant-Network-Message-Id: 279ff03a-319f-41e3-41b8-08de737dc4da
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000075F2.namprd03.prod.outlook.com
+	CO1PEPF000075F0.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPF6CDAEAF48
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7846
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.34 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
@@ -167,7 +167,7 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71592-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71594-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -183,91 +183,272 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,nvidia.com:email,Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[kvm];
 	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: B6E711839F8
+X-Rspamd-Queue-Id: 1AF1E183A0E
 X-Rspamd-Action: no action
 
-Currently, existing VFIO_MIG_GET_PRECOPY_INFO implementations don't
-assign info.flags before copy_to_user().
+Introduce a core helper function for VFIO_MIG_GET_PRECOPY_INFO and adapt
+all drivers to use it.
 
-Because they copy the struct in from userspace first, this effectively
-echoes userspace-provided flags back as output, preventing the field
-from being used to report new reliable data from the drivers.
-
-Add support for a new device feature named
-VFIO_DEVICE_FEATURE_MIG_PRECOPY_INFOv2.
-
-On SET, enables the v2 pre_copy_info behaviour, where the
-vfio_precopy_info.flags is a valid output field.
+It centralizes the common code and ensures that output flags are cleared
+on entry, in case user opts in to VFIO_DEVICE_FEATURE_MIG_PRECOPY_INFOv2.
+This preventing any unintended echoing of userspace data back to
+userspace.
 
 Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 ---
- drivers/vfio/pci/vfio_pci_core.c |  1 +
- drivers/vfio/vfio_main.c         | 20 ++++++++++++++++++++
- include/linux/vfio.h             |  1 +
- 3 files changed, 22 insertions(+)
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 17 +++-----
+ drivers/vfio/pci/mlx5/main.c                  | 18 +++------
+ drivers/vfio/pci/qat/main.c                   | 17 +++-----
+ drivers/vfio/pci/virtio/migrate.c             | 17 +++-----
+ include/linux/vfio.h                          | 39 +++++++++++++++++++
+ samples/vfio-mdev/mtty.c                      | 16 +++-----
+ 6 files changed, 68 insertions(+), 56 deletions(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index d43745fe4c84..e22280f53ebf 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -736,6 +736,7 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev)
- #endif
- 	vfio_pci_core_disable(vdev);
+diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+index 1d367cff7dcf..bb121f635b9f 100644
+--- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
++++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+@@ -857,18 +857,12 @@ static long hisi_acc_vf_precopy_ioctl(struct file *filp,
+ 	struct hisi_acc_vf_core_device *hisi_acc_vdev = migf->hisi_acc_vdev;
+ 	loff_t *pos = &filp->f_pos;
+ 	struct vfio_precopy_info info;
+-	unsigned long minsz;
+ 	int ret;
  
-+	core_vdev->precopy_info_flags_fix = 0;
- 	vfio_pci_dma_buf_cleanup(vdev);
+-	if (cmd != VFIO_MIG_GET_PRECOPY_INFO)
+-		return -ENOTTY;
+-
+-	minsz = offsetofend(struct vfio_precopy_info, dirty_bytes);
+-
+-	if (copy_from_user(&info, (void __user *)arg, minsz))
+-		return -EFAULT;
+-	if (info.argsz < minsz)
+-		return -EINVAL;
++	ret = vfio_check_precopy_ioctl(&hisi_acc_vdev->core_device.vdev, cmd,
++				       arg, &info);
++	if (ret)
++		return ret;
  
- 	mutex_lock(&vdev->igate);
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 742477546b15..2243a6eb5547 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -964,6 +964,23 @@ vfio_ioctl_device_feature_migration_data_size(struct vfio_device *device,
+ 	mutex_lock(&hisi_acc_vdev->state_mutex);
+ 	if (hisi_acc_vdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY) {
+@@ -893,7 +887,8 @@ static long hisi_acc_vf_precopy_ioctl(struct file *filp,
+ 	mutex_unlock(&migf->lock);
+ 	mutex_unlock(&hisi_acc_vdev->state_mutex);
+ 
+-	return copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
++	return copy_to_user((void __user *)arg, &info,
++		offsetofend(struct vfio_precopy_info, dirty_bytes)) ? -EFAULT : 0;
+ out:
+ 	mutex_unlock(&migf->lock);
+ 	mutex_unlock(&hisi_acc_vdev->state_mutex);
+diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
+index dbba6173894b..fb541c17c712 100644
+--- a/drivers/vfio/pci/mlx5/main.c
++++ b/drivers/vfio/pci/mlx5/main.c
+@@ -463,21 +463,14 @@ static long mlx5vf_precopy_ioctl(struct file *filp, unsigned int cmd,
+ 	struct mlx5_vhca_data_buffer *buf;
+ 	struct vfio_precopy_info info = {};
+ 	loff_t *pos = &filp->f_pos;
+-	unsigned long minsz;
+ 	size_t inc_length = 0;
+ 	bool end_of_data = false;
+ 	int ret;
+ 
+-	if (cmd != VFIO_MIG_GET_PRECOPY_INFO)
+-		return -ENOTTY;
+-
+-	minsz = offsetofend(struct vfio_precopy_info, dirty_bytes);
+-
+-	if (copy_from_user(&info, (void __user *)arg, minsz))
+-		return -EFAULT;
+-
+-	if (info.argsz < minsz)
+-		return -EINVAL;
++	ret = vfio_check_precopy_ioctl(&mvdev->core_device.vdev, cmd, arg,
++				       &info);
++	if (ret)
++		return ret;
+ 
+ 	mutex_lock(&mvdev->state_mutex);
+ 	if (mvdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY &&
+@@ -545,7 +538,8 @@ static long mlx5vf_precopy_ioctl(struct file *filp, unsigned int cmd,
+ 
+ done:
+ 	mlx5vf_state_mutex_unlock(mvdev);
+-	if (copy_to_user((void __user *)arg, &info, minsz))
++	if (copy_to_user((void __user *)arg, &info,
++			 offsetofend(struct vfio_precopy_info, dirty_bytes)))
+ 		return -EFAULT;
  	return 0;
+ 
+diff --git a/drivers/vfio/pci/qat/main.c b/drivers/vfio/pci/qat/main.c
+index b982d4ae666c..b3a4b7a55696 100644
+--- a/drivers/vfio/pci/qat/main.c
++++ b/drivers/vfio/pci/qat/main.c
+@@ -121,18 +121,12 @@ static long qat_vf_precopy_ioctl(struct file *filp, unsigned int cmd,
+ 	struct qat_mig_dev *mig_dev = qat_vdev->mdev;
+ 	struct vfio_precopy_info info;
+ 	loff_t *pos = &filp->f_pos;
+-	unsigned long minsz;
+ 	int ret = 0;
+ 
+-	if (cmd != VFIO_MIG_GET_PRECOPY_INFO)
+-		return -ENOTTY;
+-
+-	minsz = offsetofend(struct vfio_precopy_info, dirty_bytes);
+-
+-	if (copy_from_user(&info, (void __user *)arg, minsz))
+-		return -EFAULT;
+-	if (info.argsz < minsz)
+-		return -EINVAL;
++	ret = vfio_check_precopy_ioctl(&qat_vdev->core_device.vdev, cmd, arg,
++				       &info);
++	if (ret)
++		return ret;
+ 
+ 	mutex_lock(&qat_vdev->state_mutex);
+ 	if (qat_vdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY &&
+@@ -160,7 +154,8 @@ static long qat_vf_precopy_ioctl(struct file *filp, unsigned int cmd,
+ 	mutex_unlock(&qat_vdev->state_mutex);
+ 	if (ret)
+ 		return ret;
+-	return copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
++	return copy_to_user((void __user *)arg, &info,
++		offsetofend(struct vfio_precopy_info, dirty_bytes)) ? -EFAULT : 0;
  }
  
-+static int
-+vfio_ioctl_device_feature_migration_precopy_info_v2(struct vfio_device *device,
-+						    u32 flags, size_t argsz)
-+{
-+	int ret;
+ static ssize_t qat_vf_save_read(struct file *filp, char __user *buf,
+diff --git a/drivers/vfio/pci/virtio/migrate.c b/drivers/vfio/pci/virtio/migrate.c
+index 35fa2d6ed611..7e11834ad512 100644
+--- a/drivers/vfio/pci/virtio/migrate.c
++++ b/drivers/vfio/pci/virtio/migrate.c
+@@ -443,19 +443,13 @@ static long virtiovf_precopy_ioctl(struct file *filp, unsigned int cmd,
+ 	struct vfio_precopy_info info = {};
+ 	loff_t *pos = &filp->f_pos;
+ 	bool end_of_data = false;
+-	unsigned long minsz;
+ 	u32 ctx_size = 0;
+ 	int ret;
+ 
+-	if (cmd != VFIO_MIG_GET_PRECOPY_INFO)
+-		return -ENOTTY;
+-
+-	minsz = offsetofend(struct vfio_precopy_info, dirty_bytes);
+-	if (copy_from_user(&info, (void __user *)arg, minsz))
+-		return -EFAULT;
+-
+-	if (info.argsz < minsz)
+-		return -EINVAL;
++	ret = vfio_check_precopy_ioctl(&virtvdev->core_device.vdev, cmd, arg,
++				       &info);
++	if (ret)
++		return ret;
+ 
+ 	mutex_lock(&virtvdev->state_mutex);
+ 	if (virtvdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY &&
+@@ -514,7 +508,8 @@ static long virtiovf_precopy_ioctl(struct file *filp, unsigned int cmd,
+ 
+ done:
+ 	virtiovf_state_mutex_unlock(virtvdev);
+-	if (copy_to_user((void __user *)arg, &info, minsz))
++	if (copy_to_user((void __user *)arg, &info,
++			 offsetofend(struct vfio_precopy_info, dirty_bytes)))
+ 		return -EFAULT;
+ 	return 0;
+ 
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 3ff21374aeee..cd71261b6d01 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -16,6 +16,7 @@
+ #include <linux/cdev.h>
+ #include <uapi/linux/vfio.h>
+ #include <linux/iova_bitmap.h>
++#include <linux/uaccess.h>
+ 
+ struct kvm;
+ struct iommufd_ctx;
+@@ -285,6 +286,44 @@ static inline int vfio_check_feature(u32 flags, size_t argsz, u32 supported_ops,
+ 	return 1;
+ }
+ 
++/**
++ * vfio_check_precopy_ioctl - Validate user input for the VFIO_MIG_GET_PRECOPY_INFO ioctl
++ * @vdev: The vfio device
++ * @cmd: Cmd from the ioctl
++ * @arg: Arg from the ioctl
++ * @info: Driver pointer to hold the userspace input to the ioctl
++ *
++ * For use in a driver's get_precopy_info. Checks that the inputs to the
++ * VFIO_MIG_GET_PRECOPY_INFO ioctl are correct.
 +
-+	if (!(device->migration_flags & VFIO_MIGRATION_PRE_COPY))
++ * Returns 0 on success, otherwise errno.
++ */
++
++static inline int
++vfio_check_precopy_ioctl(struct vfio_device *vdev, unsigned int cmd,
++			 unsigned long arg, struct vfio_precopy_info *info)
++{
++	unsigned long minsz;
++
++	if (cmd != VFIO_MIG_GET_PRECOPY_INFO)
++		return -ENOTTY;
++
++	minsz = offsetofend(struct vfio_precopy_info, dirty_bytes);
++
++	if (copy_from_user(info, (void __user *)arg, minsz))
++		return -EFAULT;
++
++	if (info->argsz < minsz)
 +		return -EINVAL;
 +
-+	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_SET, 0);
-+	if (ret != 1)
-+		return ret;
++	/* keep v1 behaviour as is for compatibility reasons */
++	if (vdev->precopy_info_flags_fix)
++		/* flags are output, set its initial value to 0 */
++		info->flags = 0;
 +
-+	device->precopy_info_flags_fix = 1;
 +	return 0;
 +}
 +
- static int vfio_ioctl_device_feature_migration(struct vfio_device *device,
- 					       u32 flags, void __user *arg,
- 					       size_t argsz)
-@@ -1251,6 +1268,9 @@ static int vfio_ioctl_device_feature(struct vfio_device *device,
- 		return vfio_ioctl_device_feature_migration_data_size(
- 			device, feature.flags, arg->data,
- 			feature.argsz - minsz);
-+	case VFIO_DEVICE_FEATURE_MIG_PRECOPY_INFOv2:
-+		return vfio_ioctl_device_feature_migration_precopy_info_v2(
-+			device, feature.flags, feature.argsz - minsz);
- 	default:
- 		if (unlikely(!device->ops->device_feature))
- 			return -ENOTTY;
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index e90859956514..3ff21374aeee 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -52,6 +52,7 @@ struct vfio_device {
- 	struct vfio_device_set *dev_set;
- 	struct list_head dev_set_list;
- 	unsigned int migration_flags;
-+	u8 precopy_info_flags_fix;
- 	struct kvm *kvm;
+ struct vfio_device *_vfio_alloc_device(size_t size, struct device *dev,
+ 				       const struct vfio_device_ops *ops);
+ #define vfio_alloc_device(dev_struct, member, dev, ops)				\
+diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+index bd92c38379b8..c1070af69544 100644
+--- a/samples/vfio-mdev/mtty.c
++++ b/samples/vfio-mdev/mtty.c
+@@ -837,18 +837,11 @@ static long mtty_precopy_ioctl(struct file *filp, unsigned int cmd,
+ 	struct mdev_state *mdev_state = migf->mdev_state;
+ 	loff_t *pos = &filp->f_pos;
+ 	struct vfio_precopy_info info = {};
+-	unsigned long minsz;
+ 	int ret;
  
- 	/* Members below here are private, not for driver use */
+-	if (cmd != VFIO_MIG_GET_PRECOPY_INFO)
+-		return -ENOTTY;
+-
+-	minsz = offsetofend(struct vfio_precopy_info, dirty_bytes);
+-
+-	if (copy_from_user(&info, (void __user *)arg, minsz))
+-		return -EFAULT;
+-	if (info.argsz < minsz)
+-		return -EINVAL;
++	ret = vfio_check_precopy_ioctl(&mdev_state->vdev, cmd, arg, &info);
++	if (ret)
++		return ret;
+ 
+ 	mutex_lock(&mdev_state->state_mutex);
+ 	if (mdev_state->state != VFIO_DEVICE_STATE_PRE_COPY &&
+@@ -875,7 +868,8 @@ static long mtty_precopy_ioctl(struct file *filp, unsigned int cmd,
+ 	info.initial_bytes = migf->filled_size - *pos;
+ 	mutex_unlock(&migf->lock);
+ 
+-	ret = copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
++	ret = copy_to_user((void __user *)arg, &info,
++		offsetofend(struct vfio_precopy_info, dirty_bytes)) ? -EFAULT : 0;
+ unlock:
+ 	mtty_state_mutex_unlock(mdev_state);
+ 	return ret;
 -- 
 2.18.1
 
