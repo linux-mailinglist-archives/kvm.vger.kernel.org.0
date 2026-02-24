@@ -1,204 +1,210 @@
-Return-Path: <kvm+bounces-71597-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71598-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sAACFiFhnWksPQQAu9opvQ
-	(envelope-from <kvm+bounces-71597-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 09:28:17 +0100
+	id ePO3MX9mnWlgPQQAu9opvQ
+	(envelope-from <kvm+bounces-71598-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 09:51:11 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC427183AB1
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 09:28:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BB22183FDC
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 09:51:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6D2DE310A629
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 08:26:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8E6B23043AD1
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 08:50:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599F6364EBB;
-	Tue, 24 Feb 2026 08:26:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BC9369205;
+	Tue, 24 Feb 2026 08:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G4CFCtsM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PrhLybBc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAE12749E6
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 08:26:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB2A286A9;
+	Tue, 24 Feb 2026 08:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771921582; cv=none; b=j8nax6IB6EqkGios2y7YcdGN/AWF2muoskC+3Av/vOFRP7AR1hzvRfkhLeiy8sTEkqy/iymlofETtO8tPIi8lnM161GqYfQpaVfsOe57zLGaJz0UNki918eAFN+1jeKo6Jh/8E3K8acCKk424YhSK2rsSrmIBXY7Fh+BABnfY8A=
+	t=1771923051; cv=none; b=kxUuxvrF9qzBrVUSf0AQeXiFa3sl+hU4g+ehde2D4Zbzh0CBNmCEOO51TeMLCkwrtxr8e1t+TUiXjgcFolK/EKrMcFhPX8zQOzTHdBErg4HkPVfL4qfXKqpR0UxOWdGXLiF5tn1saFQzYH675qGaknissIsfuehm8QdLTRfezCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771921582; c=relaxed/simple;
-	bh=FtVWnKmSAhQscaTbVknx7Fz3wyNfwC/jGqjGpMz7VS0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fm45m2QzWpDyjzVKkq2/EMqtFqdlC/bvBBPHle1jIyJtXfKV14J2Uy8vfOOEBBgtmdQzc53ri0fMh5FBV8/z+56qg7aLOJoefli6nafNx5/pZ619IFdhT+FiPrw4vQugXc3DKBAsTSfUGSfGrhU+S15owmGv5sBd2igRzHyAB3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G4CFCtsM; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2aad8123335so52145ad.1
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 00:26:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771921579; x=1772526379; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iUKKSXBfGZuIEKcFLX2f8iJcwGvlTC3YM5y4lXwVnQE=;
-        b=G4CFCtsMICVyzaAypfUZ338DIBY4soPUuU0FX3024SLL9l4H00OcgqGF6c9hviu/dF
-         J41eDXW05Ks4RBO7Ds5Nhj1WCm9uLK4XiYCaulfk/w49OHDWYMajuutoLuzgYB+Wl3xh
-         hDtfhHGv5C6yz8z/yqv/FaqwI4g9LRtCNwOd6nzCJHpCOcpOgVrKm+uHioWFW0bh/KhH
-         2RvCRzKl6tz9Py3Sn04bbF3PwE7r+jgbVzzWkZj89y+9OPofQ2CZzHTRsvrZX5AC2bGN
-         oo3379qQzfaOHCQ5euxTJRqNUcYRgQy139PVKTdlNfq6wz7nKSw68X59IedHMvyIBJQR
-         BZsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771921579; x=1772526379;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iUKKSXBfGZuIEKcFLX2f8iJcwGvlTC3YM5y4lXwVnQE=;
-        b=iw3IT2PGEhCnQAM00lmO+/UM+x+xxEtBINnt3DD/ajhrNO+QH4r9RlRuiqOIzBcxC/
-         5+BotwgtYGHITdjsbmtiU8cV00+OrC6V/HJdhZoGUBDX01JKtp/cSOXMx6osz63RWBCy
-         Y6LgkTmxupmsE6p9IIZLr34VE/saJQUl4R+rZ9zbEZpTczL/95YuMyv3G4aPsl6nQepq
-         IHFCP503AHJwK3UOdRR9NY46T2EdXGQ3I6OinKMCAAWslms7VtLaavGAMeAoggNpI3gB
-         6aH239xFdH3p3KGYLoywPtp9Z06fCfHJenOv/xPes3XVlarWRc1lcTbFCgJQzheokjM8
-         Dulg==
-X-Forwarded-Encrypted: i=1; AJvYcCVKs034aMZjwCHSU8R+VavQof4IqvWYNBXtID/MPg4zAoR+cLpnf9cbDNzKUcDsCiD5CA4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5Nt3mvQNnD/XsNcTSwLiD76eKroc1aCISiMi3Xlof/KMJq8QQ
-	tIcdK0hahm8XCsNCmJNoxT5KCiHgVCG3Y7rokoh0t97N8L6F5ezCI1lu4m3KIAyM9g==
-X-Gm-Gg: ATEYQzxw60bLGgP9KA6qofb21l+430cDnxkQTslrdIb7Bk5NxsAsXU0Hv0DIkI27rFK
-	fB+ZxUN1caTffCZDPfFWpDEvF2Sn1UOsHC4OCcVSvqKcsYb9xvQ68aMGgEGGj7VlEViSkrXlyxP
-	ashP2gEzVqD8c6RgVElF/P0415zw/VXRxK6m0Wx1lKpQSqgAtSej4Bc+zXTvcIzIT3VwOgCFNhh
-	R7js4JhTRRACEnEYsfVYVHD/2JfSNlCXeDT1ZXLDd/s+RGltCtLCiRFM5JbLfq358FTNNEDDWEB
-	CmtpLnThPtYHSbXro80WPcEM/x0mW19DE4xhPAdfCsiQ+nmKtvU8M5sH4MmnH8AW6gktq8pxvma
-	Hja3UaHgLfBkIew4q2ntbaqYpLSFQ24zB9yBlMo8lbcmZH8BwCWMu2fihfsGeZui9hqF3FhncfR
-	3t5yQLLIdu0KefWVvX21lLTjN7bcjaD+PIFC1KFl/zRNzqSdserquYaQL1aaQk92i2uh5t2Q0=
-X-Received: by 2002:a17:903:2f04:b0:2a0:7fac:c031 with SMTP id d9443c01a7336-2ad997f5113mr1474945ad.14.1771921579006;
-        Tue, 24 Feb 2026 00:26:19 -0800 (PST)
-Received: from google.com (222.245.187.35.bc.googleusercontent.com. [35.187.245.222])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ada77cc13bsm13228715ad.47.2026.02.24.00.26.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Feb 2026 00:26:18 -0800 (PST)
-Date: Tue, 24 Feb 2026 08:26:08 +0000
-From: Pranjal Shrivastava <praan@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Alex Williamson <alex@shazbot.org>,
-	Adithya Jayachandran <ajayachandra@nvidia.com>,
-	Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>,
-	David Rientjes <rientjes@google.com>,
-	Jacob Pan <jacob.pan@linux.microsoft.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Corbet <corbet@lwn.net>, Josh Hilke <jrhilke@google.com>,
-	Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org,
-	kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	Lukas Wunner <lukas@wunner.de>,
-	=?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>,
-	Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Tomita Moeko <tomitamoeko@gmail.com>,
-	Vipin Sharma <vipinsh@google.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
-	Zhu Yanjun <yanjun.zhu@linux.dev>
-Subject: Re: [PATCH v2 01/22] liveupdate: Export symbols needed by modules
-Message-ID: <aZ1goNCgY8xz9n6K@google.com>
-References: <20260129212510.967611-1-dmatlack@google.com>
- <20260129212510.967611-2-dmatlack@google.com>
+	s=arc-20240116; t=1771923051; c=relaxed/simple;
+	bh=C75KOvvjHFWqov1guLEmtGNejIuoHElmRmt3toQluh0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DpHgUEr3jbaPBEROWVXoa6+ApgWIRBfXPdSbCkKVMaf9Iv4Svm/vC7Mgu1GVyZb9b0ifKi4PQ9CsbAoXpKkvLiOkX4A6kdUsakfqQTFhmqe+qItMlDa/KeMTvvX6MelpDKo8wXQAuJTdyayQ4iJIQVx8PqsAiFApldzU9Jqp1Hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PrhLybBc; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1771923050; x=1803459050;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=C75KOvvjHFWqov1guLEmtGNejIuoHElmRmt3toQluh0=;
+  b=PrhLybBcgfLEAWpWtqsbpbepWlFGhlEsFCCqUUVdEBJqMb4ho5wzes7d
+   mrze6VTpAcuneV+6/vIQ5jpt1O1FNfzYbTmI8yrrR0xVL/f6w+iD5/zDF
+   0Px/6j08jMH3J/E5+FziASZXhxTBTorDuUmkXlyOJnTwdxycth9V7qRzG
+   nR13LADdl9cbvQJNemAJrzqS1MBW/P4R16n9EL81sDv6I0uTa4QeEqsT3
+   W7o4sX8MBmU31eF/EU5BleKknJSG6+y8YK5JP9MC9xivpyWh3IYTlHTKb
+   b6eW44iNz1BaCsEFGdpWC1DR8e8cMk58IGwWT2YysLi7a0nqJd+p1/+AA
+   g==;
+X-CSE-ConnectionGUID: whH/6VoaR8m9RHPltb0FAQ==
+X-CSE-MsgGUID: JaZIDVSXTKC/wgMtlcJ70A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11710"; a="76792981"
+X-IronPort-AV: E=Sophos;i="6.21,308,1763452800"; 
+   d="scan'208";a="76792981"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2026 00:50:49 -0800
+X-CSE-ConnectionGUID: lXzU1TXXQJSjwmAmcNrmIA==
+X-CSE-MsgGUID: gv5EC7wERniXtS/dN3xTRw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,308,1763452800"; 
+   d="scan'208";a="253567991"
+Received: from unknown (HELO [10.238.1.83]) ([10.238.1.83])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2026 00:50:45 -0800
+Message-ID: <fd3b58fd-a450-471a-89a3-541c3f88c874@linux.intel.com>
+Date: Tue, 24 Feb 2026 16:50:47 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260129212510.967611-2-dmatlack@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: TDX: Set SIGNIFCANT_INDEX flag for supported CPUIDs
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+ "changyuanl@google.com" <changyuanl@google.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "seanjc@google.com" <seanjc@google.com>, "Wu, Binbin" <binbin.wu@intel.com>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Cc: "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+ "kas@kernel.org" <kas@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+ "mingo@redhat.com" <mingo@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+ "tglx@kernel.org" <tglx@kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>
+References: <20260223214336.722463-1-changyuanl@google.com>
+ <213d614fe73e183a230c8f4e0c8fa1cc3d45df39.camel@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <213d614fe73e183a230c8f4e0c8fa1cc3d45df39.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[shazbot.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev];
-	TAGGED_FROM(0.00)[bounces-71597-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[intel.com:+];
+	TAGGED_FROM(0.00)[bounces-71598-lists,kvm=lfdr.de];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[praan@google.com,kvm@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[binbin.wu@linux.intel.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AC427183AB1
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,linux.intel.com:mid]
+X-Rspamd-Queue-Id: 4BB22183FDC
 X-Rspamd-Action: no action
 
-On Thu, Jan 29, 2026 at 09:24:48PM +0000, David Matlack wrote:
-> Export liveupdate_enabled(), liveupdate_register_file_handler(), and
-> liveupdate_unregister_file_handler(). All of these will be used by
-> vfio-pci in a subsequent commit, which can be built as a module.
+
+
+On 2/24/2026 9:57 AM, Edgecombe, Rick P wrote:
+> +binbin
 > 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  kernel/liveupdate/luo_core.c | 1 +
->  kernel/liveupdate/luo_file.c | 2 ++
->  2 files changed, 3 insertions(+)
+> On Mon, 2026-02-23 at 13:43 -0800, Changyuan Lyu wrote:
+>> Set the KVM_CPUID_FLAG_SIGNIFCANT_INDEX flag in the kvm_cpuid_entry2
+>> structures returned by KVM_TDX_CAPABILITIES if the CPUID is indexed.
+>> This ensures consistency with the CPUID entries returned by
+>> KVM_GET_SUPPORTED_CPUID.
+>>
+>> Additionally, add a WARN_ON_ONCE() to verify that the TDX module's
+>> reported entries align with KVM's expectations regarding indexed
+>> CPUID functions.
+>>
+>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>> Signed-off-by: Changyuan Lyu <changyuanl@google.com>
+>> ---
+>>  arch/x86/kvm/vmx/tdx.c | 8 +++++++-
+>>  1 file changed, 7 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+>> index 2d7a4d52ccfb4..0c524f9a94a6c 100644
+>> --- a/arch/x86/kvm/vmx/tdx.c
+>> +++ b/arch/x86/kvm/vmx/tdx.c
+>> @@ -172,9 +172,15 @@ static void td_init_cpuid_entry2(struct
+>> kvm_cpuid_entry2 *entry, unsigned char i
+>>  	entry->ecx = (u32)td_conf->cpuid_config_values[idx][1];
+>>  	entry->edx = td_conf->cpuid_config_values[idx][1] >> 32;
+>>  
+>> -	if (entry->index == KVM_TDX_CPUID_NO_SUBLEAF)
+>> +	if (entry->index == KVM_TDX_CPUID_NO_SUBLEAF) {
+>>  		entry->index = 0;
+>> +		entry->flags &= ~KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+> 
+> There are two callers of this. One is already zeroed, and the other has
+> stack garbage in flags. But that second caller doesn't look at the
+> flags so it is harmless. Maybe it would be simpler and clearer to just
+> zero init the entry struct in that caller. Then you don't need to clear
+> it here. Or alternatively set flags to zero above, and then add
+> KVM_CPUID_FLAG_SIGNIFCANT_INDEX if needed. Rather than manipulating a
+> single bit in a field of garbage, which seems weird.
+> 
+>> +	} else {
+>> +		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+>> +	}
+>>  
+>> +	WARN_ON_ONCE(cpuid_function_is_indexed(entry->function) !=
+>> +		     !!(entry->flags &
+>> KVM_CPUID_FLAG_SIGNIFCANT_INDEX));
+> 
+> It warns on leaf 0x23 for me. Is it intentional?
+
+I guess because the list in cpuid_function_is_indexed() is hard-coded
+and 0x23 is not added into the list yet.
+
+It's fine for existing KVM code because cpuid_function_is_indexed() is
+only used to check that if a CPUID entry is queried without index, it
+shouldn't be included in the indexed list.
+
+But adding the consistency check here would cause compatibility issue.
+Generally, if a new CPUID indexed function is added for some new CPU and
+the TDX module reports it, KVM versions without the CPUID function in
+the list will trigger the warning.
+
+
+> 
+> This warning kind of begs the question of how how much consistency
+> there should be between KVM_TDX_CAPABILITIES and
+> KVM_GET_SUPPORTED_CPUID. There was quite a bit of debate on this and in
+> the end we moved forward with a solution that did the bare minimum
+> consistency checking.
+> 
+> We actually have been looking at some potential TDX module changes to
+> fix the deficiencies from not enforcing the consistency. But didn't
+> consider this pattern. Can you explain more about the failure mode?  
+> 
+>>  	/*
+>>  	 * The TDX module doesn't allow configuring the guest phys
+>> addr bits
+>>  	 * (EAX[23:16]).  However, KVM uses it as an interface to
+>> the userspace
+>> --
 > 
 
-Reviewed-by: Pranjal Shrivastava <praan@google.com>
-
-> diff --git a/kernel/liveupdate/luo_core.c b/kernel/liveupdate/luo_core.c
-> index dda7bb57d421..59d7793d9444 100644
-> --- a/kernel/liveupdate/luo_core.c
-> +++ b/kernel/liveupdate/luo_core.c
-> @@ -255,6 +255,7 @@ bool liveupdate_enabled(void)
->  {
->  	return luo_global.enabled;
->  }
-> +EXPORT_SYMBOL_GPL(liveupdate_enabled);
->  
->  /**
->   * DOC: LUO ioctl Interface
-> diff --git a/kernel/liveupdate/luo_file.c b/kernel/liveupdate/luo_file.c
-> index 35d2a8b1a0df..32759e846bc9 100644
-> --- a/kernel/liveupdate/luo_file.c
-> +++ b/kernel/liveupdate/luo_file.c
-> @@ -872,6 +872,7 @@ int liveupdate_register_file_handler(struct liveupdate_file_handler *fh)
->  	luo_session_resume();
->  	return err;
->  }
-> +EXPORT_SYMBOL_GPL(liveupdate_register_file_handler);
->  
->  /**
->   * liveupdate_unregister_file_handler - Unregister a liveupdate file handler
-> @@ -917,3 +918,4 @@ int liveupdate_unregister_file_handler(struct liveupdate_file_handler *fh)
->  	liveupdate_test_register(fh);
->  	return err;
->  }
-> +EXPORT_SYMBOL_GPL(liveupdate_unregister_file_handler);
-> -- 
-> 2.53.0.rc1.225.gd81095ad13-goog
-> 
 
