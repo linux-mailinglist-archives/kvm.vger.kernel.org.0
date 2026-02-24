@@ -1,183 +1,230 @@
-Return-Path: <kvm+bounces-71617-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71618-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eHdRAOibnWnwQgQAu9opvQ
-	(envelope-from <kvm+bounces-71617-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 13:39:04 +0100
+	id UHI5GCi3nWmQRQQAu9opvQ
+	(envelope-from <kvm+bounces-71618-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 15:35:20 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D2D6187117
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 13:39:03 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18B691886FD
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 15:35:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A231431E046E
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 12:35:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CAC3B3061105
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 14:34:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D977B39A81C;
-	Tue, 24 Feb 2026 12:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E60D039E6E4;
+	Tue, 24 Feb 2026 14:34:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OxeRycpe"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jtpEG2+6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC87395DBC;
-	Tue, 24 Feb 2026 12:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771936512; cv=none; b=MfAWnnL8PXYyDelds3EzsOJ4T+HeL/dBfDF27sQDx1irqtCmIdykCeCGjshBLmnBGasZ9hdK9mIlda73D2wSK9vR9qTjoY1zksDVlz/vO0Wok7K4xNThycGvxEtGMYmcjupkh9E8pn6LlhWqo2RSAj90cGrYwvlZgsUrp83U4PE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771936512; c=relaxed/simple;
-	bh=jgV0M3inHIdG82dqe/HOmmFItJk44LXErTHkR3d5wdI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TAZzuL702bPGU66H9GfCemXeeVHA0DHRWvZzWZxqYbXmC+JiG4IQQYlN8mozqDVKmVZIXstU+2FrEC5R8RtouWhh2/KpGKR2+D2toopurKgH2v+4IBYsPJhlG0NbOf+ylhq0xT4oEcFYzhFv5qOKffGY2xnI5j7/fgqHGZD20VQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OxeRycpe; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61O90xGr2849182;
-	Tue, 24 Feb 2026 12:35:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=2GRSXU
-	xjybI8Mm7DxJNae/l+qDkmGkl+yaEQNMvLc2U=; b=OxeRycpedKmxNhw8HrxayP
-	bOQDZb+kuRk41Dlt0UpEg+ZaaMtfmfodjakkMmIZYK9pIz5aJpZFwQRToeBBQ7X6
-	nEiJxBoBF2C5lqAWtBbmnTHPl4bgJgI6m3L6425lPl0DO7hqxI0W1Gw7xo9nqGUM
-	LYYylD3imAL5j2QcLjEXNz4T7HJFKk5LbdT/7E+jh1uPyWPBnSrIGItSRbG91Bto
-	5T0FhSf7SE5d1PSSNAJ+3GVqgrL/Z1iM9346ObdVwxNoJUHeqpyGxs6gv9lL736v
-	ZO9HupmAVhp9I6QiD623Pyq+IORUAPd1WOeI2c1H5tLJLLpFI7knSkU7Boj5ia7g
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cf24gb4jc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Feb 2026 12:35:04 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61O9CZRw027887;
-	Tue, 24 Feb 2026 12:35:03 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cfsr1rj4p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Feb 2026 12:35:03 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61OCYxGr30802326
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 24 Feb 2026 12:35:00 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D44C820040;
-	Tue, 24 Feb 2026 12:34:59 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 92B9F20063;
-	Tue, 24 Feb 2026 12:34:59 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 24 Feb 2026 12:34:59 +0000 (GMT)
-From: Julian Ruess <julianr@linux.ibm.com>
-Date: Tue, 24 Feb 2026 13:34:34 +0100
-Subject: [PATCH v2 3/3] MAINTAINERS: add VFIO ISM PCI DRIVER section
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6878405C
+	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 14:34:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771943692; cv=pass; b=h/xzWSr43bHLI8pGmh5IKSckA35VpuFR82wtBcQAzNsI2NRkw5M70YT3M5e+/JMnC0DV8uKxi1NTABHg9bXuW3sNPmJJ/mL4uNQOXGJDKdICaSXH22jd8kNFobGnVFXzg/BrBky57RpIhVsMgx/J0zZp4+XqM5lNAveyp2TZLzo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771943692; c=relaxed/simple;
+	bh=LQS9s54PGR0RH5bznKavqJ+ILVh4MiTnEjfub296dow=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HSzQ7BPlXjc2f13snz9P0KjHgqew6tEKDcF8tUKMMstO51CF0ITWmrtpGvNEcRUaaVp19clMWCtjzwF52LbaRQxUk4C2/twF5los7J0L0czpLHn9ywdyXGabmIOndZvS0tSJhpOmTYUFbF+MheYvQvNlKjxqr0cZ+c2VujqhtOg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jtpEG2+6; arc=pass smtp.client-ip=74.125.224.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-64ad79dfb6eso5480325d50.0
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 06:34:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771943689; cv=none;
+        d=google.com; s=arc-20240605;
+        b=cBjusRvrbIL5Fnnaxd7Qi2LlNhltbXY61Nen2qqOLc1aDhX/HjuQc/1EAcYbOcriJc
+         uGkUIrvGC9bGzjpqc+zPCCbjqcQVgUYle/1MfSxI6UWfCbTGIOQG8+uRTnk+zuxJxsTo
+         /IyUVgMUJJIA/XE4svz242W1zu8moHIJxo9LM+EbYh8Nh4yYb8eE6zZZGA7S+rrs08HN
+         Jkn8G7cEhmHfhb4T8TERa12GM5wgqdVcEVuuJedG6SvCYBANdrZMWoY4obLHwR79YaQK
+         kfzNEUDsy9qfED5tnJpIsuQxkTZ9GTb9uSsWaiSF4YZdGhPDJSMh4meZSdsLMMGUOB4P
+         VShw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=aflH0qDkgG4fC1sHybb7ibjojgZXGjJ7kgR08XJSBto=;
+        fh=bMwu3hK7yjWev2c2cb55fPc2fpPoK//w4+PaevVMEOQ=;
+        b=D8Z2mc/YxzQK7eEbqQtoKcqJ8QSRqvTGHZw0lJfgiPnn7BrOn/TK2IR5MFwNk6oSUq
+         EfYJVVqywin+rg1NoAnOt8o/FW+r+E/jRf/ZL31JoYY3wnztTvnhEZP87qIEG2NsmGMS
+         EIGGZY7VWiCVq4B0RTrH8jQW0T8Ki1PdUj7OjR/cUMJ/GcLqNPcKl/Q1kkdYa08rOves
+         5XVlb7ankGySAY6Ro8Vaa4dq+CRWpDaJM3rPgYsFL2kaY7bzFl7/nr5U32A+NqQb0+DE
+         Cr64UQsewG2SSvU2MXH6DiVCwjvLuj9wmZ9svZNV6DwiT7sA2OOt/ETm1rtTG4rbUQ+G
+         1nlA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1771943689; x=1772548489; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=aflH0qDkgG4fC1sHybb7ibjojgZXGjJ7kgR08XJSBto=;
+        b=jtpEG2+6lKuIyfYpGesdq4Y4FBxJrlit/dU/ZsAPJOMk8+OIwpJ8hXX/+9VHp7o63o
+         dXt+Uyde+ZHeOQsrNYJtQu8ffLwzqy1Qcs3Tm4cj18fOK+HYjHJZ8B2bMPdoxoiy4KlD
+         O+3pPBFO0enfsDyIrgFWteMT/Ska+t3zf42gY56mDEikKldtWhU9kqWfrT1aXlfvtgjt
+         v+M+RRAYjL68kSChqSI7/wO5jTVJG+CHwUHoOqoV2Ligr3j3BPdIINYJ4L/46q8bPt84
+         XwZ619WTI6HxZsGOr5ifiT+4z7z2pmmgm6Y55kvEUzVWOg2K54I2PDdFzkWaSO9P9Scs
+         0ZLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771943689; x=1772548489;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aflH0qDkgG4fC1sHybb7ibjojgZXGjJ7kgR08XJSBto=;
+        b=xO9HODo8jPAlFkf7YkeXbx5HRIQvhcdd3LFNFK40Ug+/ZlTd9kve/vQLZtmR8o5Te6
+         k995Go1fHYiseWd0MEitmXOoNLWX2LW27WaivnrweWHdkJWymTwa2s83lD6C7Bkudxfm
+         aR1C3Orx8tExlm0cZSXDF9dV3o1pXwWYyPeTHIEJvgBRiF3P69FDDQFQB2VfHfc0ARPQ
+         t+wfiu6E/UZ3iu44UO1uG2Nz3HGHgEb2a4MB0QBSQo/qQhicBubm3gzrJxpzr/cNf2SK
+         lj9sXsntjxkH7Qilq+dqbQ9MjhbT00UuuHYsC9ZlSkeIIdJr7TQSWWuWgJv/FI9/BXqx
+         kq4w==
+X-Forwarded-Encrypted: i=1; AJvYcCV/cpPyLLzpPDORP8Y+Ocv4WcqTTOoSP2yPeHSorx6J7mqpG/FAXvSwTcc1DMnpGr3Fwi4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2LZFJtKOQaB7AeqZwr+FKVlOjDDJuzzoMe3m8UHdYMql0MWxa
+	ImXUCcXuQnURMufmeYE2iprSdkWVFz+z7354zYqzxKTLnu7auC4OndMdMjdQ1RtVCz0OU3crAs4
+	y8v8ciaXK/lLHyq47fjt6M3Ff7l71Ls1YAdonhXoP3Q==
+X-Gm-Gg: ATEYQzyL7yDswT3StBEKfJFKt2EHp5gs/vcbnWGt/y4DTQHo65p4VSKcy6gzceCRqk5
+	I6qXharWwZXRA58DoaL6H0SPWiC6JCwtBtJxg/mXZa3x/q/hJk1+2q+xhFevTGXX/BwvAfXZWB2
+	i5+Y9MpEGZKccbYrG24IafGf4yuNdLdYEYSi957qWJPrFtE2tvYIvCIQ5LkHqjTRB1H9e6oe4k3
+	Ufw2kw1xAyyhKiZgWVIgLglpurstTPfnEv2lAAbTyTjQooPFJvdi35jSsXaI5iBd/fNO+RtuUUI
+	jtjo78+jxQN62yIgD3yGGsCxcMfWioPGbqx25HV/0/Vhy7u9SUjCeeJURdKWvUr7mjE=
+X-Received: by 2002:a05:690e:dc2:b0:64a:d9f5:d412 with SMTP id
+ 956f58d0204a3-64c78c1054cmr9104750d50.43.1771943688633; Tue, 24 Feb 2026
+ 06:34:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260224-vfio_pci_ism-v2-3-f010945373fa@linux.ibm.com>
-References: <20260224-vfio_pci_ism-v2-0-f010945373fa@linux.ibm.com>
-In-Reply-To: <20260224-vfio_pci_ism-v2-0-f010945373fa@linux.ibm.com>
-To: schnelle@linux.ibm.com, wintera@linux.ibm.com, ts@linux.ibm.com,
-        oberpar@linux.ibm.com, gbayer@linux.ibm.com,
-        Alex Williamson <alex@shazbot.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Shameer Kolothum <skolothumtho@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Cc: mjrosato@linux.ibm.com, alifm@linux.ibm.com, raspl@linux.ibm.com,
-        hca@linux.ibm.com, agordeev@linux.ibm.com, gor@linux.ibm.com,
-        julianr@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-pci@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=TNRIilla c=1 sm=1 tr=0 ts=699d9af8 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8
- a=VwQbUJbxAAAA:8 a=Ikd4Dj_1AAAA:8 a=pktR2d_FFHlprNNHfO0A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: jelGowaXYEAFxmg675U-D9l3YFnzYKES
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI0MDA5OCBTYWx0ZWRfX7QCzjVxsjQTW
- Iox9qUdokImXmDj+oD9IBOVPs4NEhXvM2hAnvXma74HPXy74+/0semJoZioTwVJjVu7EUuwkTBB
- dCgLJsfGzma8IWx0YerfTGB5YK2h9CZOSPjUNIlFnFWkZlpv4Gv/4/TC0WF6vksvxsoT2Mmfthd
- SOMfT5g7rMareBeh1cTDpVEPxjB9CqwvmTfPOrgCDx8Us0CGuRUqr4uvGWVWqwGMxQI99m/BFy5
- M9U/VCyJFrJoI6LI/hoQmAZHvC/q0gzX/9Gi2nUhu3y2TKh2j0N75yUNfHZiDecOHiLQLpOSdP4
- 6nCOBJIUmcYWMUsNGXfFU9BL3kMBZ892QJJxKZKphfxh7JEaM9zRrO40IlD05LFaQBfLyhdp8Gg
- 4Kwe2QsQn/xYdppLglFTPzBiWsb3vntRI5106RK0RD4gZeVQGK2eBmIUQDi+3ZkqEPv6ihF90ZP
- Cod4YTBQlEmszQS40Ng==
-X-Proofpoint-ORIG-GUID: jelGowaXYEAFxmg675U-D9l3YFnzYKES
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-24_01,2026-02-23_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 suspectscore=0 adultscore=0 priorityscore=1501 impostorscore=0
- spamscore=0 clxscore=1015 bulkscore=0 lowpriorityscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602240098
+References: <20260220115656.4831-1-sebott@redhat.com> <20260220115656.4831-2-sebott@redhat.com>
+In-Reply-To: <20260220115656.4831-2-sebott@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 24 Feb 2026 14:34:37 +0000
+X-Gm-Features: AaiRm515uOhz39gYNVWQiyM_zHuBmfxeUElFEXao9Pe5eZx0PQvwmWIjvVpaqkY
+Message-ID: <CAFEAcA8O2UEKToJ+zXA6=vvgkRyPKrPwtfHnti7yyGgCGwoJeA@mail.gmail.com>
+Subject: Re: [PATCH v6 1/1] target/arm/kvm: add kvm-psci-version vcpu property
+To: Sebastian Ott <sebott@redhat.com>
+Cc: qemu-devel@nongnu.org, eric.auger@redhat.com, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, pbonzini@redhat.com, qemu-arm@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	TAGGED_FROM(0.00)[bounces-71617-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71618-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.ibm.com:mid];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[julianr@linux.ibm.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[peter.maydell@linaro.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 5D2D6187117
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linaro.org:dkim,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 18B691886FD
 X-Rspamd-Action: no action
 
-ism_vfio_pci is a new kernel component that allows
-to use the ISM device from userspace. Add myself
-as a maintainer.
+On Fri, 20 Feb 2026 at 11:57, Sebastian Ott <sebott@redhat.com> wrote:
+>
+> Provide a kvm specific vcpu property to override the default
+> (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
+> by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+>
+> Note: in order to support PSCI v0.1 we need to drop vcpu
+> initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
+>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Tested-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+> ---
+>  docs/system/arm/cpu-features.rst | 11 ++++++++
+>  target/arm/cpu.c                 |  8 +++++-
+>  target/arm/kvm.c                 | 48 ++++++++++++++++++++++++++++++--
+>  3 files changed, 64 insertions(+), 3 deletions(-)
+>
+> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
+> index 3db1f19401..ce19ae6a04 100644
+> --- a/docs/system/arm/cpu-features.rst
+> +++ b/docs/system/arm/cpu-features.rst
+> @@ -204,6 +204,17 @@ the list of KVM VCPU features and their descriptions.
+>    the guest scheduler behavior and/or be exposed to the guest
+>    userspace.
+>
+> +``kvm-psci-version``
+> +  Set the Power State Coordination Interface (PSCI) firmware ABI version
+> +  that KVM provides to the guest. By default KVM will use the newest
+> +  version that it knows about (which is PSCI v1.3 in Linux v6.13).
+> +
+> +  You only need to set this if you want to be able to migrate this
+> +  VM to a host machine running an older kernel that does not
+> +  recognize the PSCI version that this host's kernel defaults to.
+> +
+> +  Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3.
+> +
+>  TCG VCPU Features
+>  =================
+>
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 10f8280eef..60f391651d 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1144,7 +1144,13 @@ static void arm_cpu_initfn(Object *obj)
+>       * picky DTB consumer will also provide a helpful error message.
+>       */
+>      cpu->dtb_compatible = "qemu,unknown";
+> -    cpu->psci_version = QEMU_PSCI_VERSION_0_1; /* By default assume PSCI v0.1 */
+> +    if (!kvm_enabled()) {
+> +        /* By default KVM will use the newest PSCI version that it knows about.
+> +         * This can be changed using the kvm-psci-version property.
+> +         * For others assume PSCI v0.1 by default.
+> +         */
+> +        cpu->psci_version = QEMU_PSCI_VERSION_0_1;
+> +    }
+>      cpu->kvm_target = QEMU_KVM_ARM_TARGET_NONE;
+>
+>      if (tcg_enabled() || hvf_enabled()) {
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index ded582e0da..5453460965 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -485,6 +485,28 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
+>      ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+>  }
+>
+> +static char *kvm_get_psci_version(Object *obj, Error **errp)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +
+> +    return g_strdup_printf("%d.%d",
+> +                           (int) PSCI_VERSION_MAJOR(cpu->psci_version),
+> +                           (int) PSCI_VERSION_MINOR(cpu->psci_version));
+> +}
+> +
+> +static void kvm_set_psci_version(Object *obj, const char *value, Error **errp)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +    uint16_t maj, min;
+> +
+> +    if (sscanf(value, "%hd.%hd", &maj, &min) != 2) {
 
-Signed-off-by: Julian Ruess <julianr@linux.ibm.com>
----
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+%hd is a signed value, so this will accept "-3.-5" I think ?
+Probably we want %hu.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 55af015174a54e17cc7449e5a80b6cdc83aa6fde..88d728abeab4faedf5bfefbf98ab45e288d1332c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -27710,6 +27710,12 @@ L:	kvm@vger.kernel.org
- S:	Maintained
- F:	drivers/vfio/pci/hisilicon/
- 
-+VFIO ISM PCI DRIVER
-+M:	Julian Ruess <julianr@linux.ibm.com>
-+L:	kvm@vger.kernel.org
-+S:	Maintained
-+F:	drivers/vfio/pci/ism/
-+
- VFIO MEDIATED DEVICE DRIVERS
- M:	Kirti Wankhede <kwankhede@nvidia.com>
- L:	kvm@vger.kernel.org
+(If you agree I can just make this fix locally, no need for you to respin.)
 
--- 
-2.51.0
-
+-- PMM
 
