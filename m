@@ -1,267 +1,172 @@
-Return-Path: <kvm+bounces-71653-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71654-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EOZHHDzunWncSgQAu9opvQ
-	(envelope-from <kvm+bounces-71653-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 19:30:20 +0100
+	id UNwWDVTunWncSgQAu9opvQ
+	(envelope-from <kvm+bounces-71654-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 19:30:44 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E95118B65C
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 19:30:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D568518B67A
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 19:30:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1E4A330711D7
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:28:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0E8DE302B187
+	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 18:29:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58DD3A9DB1;
-	Tue, 24 Feb 2026 18:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B6B3A4F31;
+	Tue, 24 Feb 2026 18:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xYxOtapm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gvab/GP+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CD63783BE
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 18:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9789028F949
+	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 18:29:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771957647; cv=pass; b=R1mchXVfUcwIW/dO1UUFcf0nnnubWxRv1Wq4UicvZfVN4I+F58VMsFQ7UouZxJYEkhgnG2VZQyQuTk3FkUOJN0SaNJrgsgq6wjf6Y4id0QI2JpR1B0+p9jJKt3Xr6kAPYeHY6K6BhQxv7YDFXU3Ljk2YZ8ZlH1pVCH+Ro9RFSqA=
+	t=1771957768; cv=pass; b=g7969Wyn6jVmMuKlDzwymilEggptZeaDUc5wMrSfnFueITYEA0FgWYPaPq/283++VBoujzWuiHVnc6t8DkUQiQSr1IADad7WE978og3H+MTG0DXUiAzLRYJyBb4+Oi6u09ak41aObNYyis2122csch92q44E9miQUszmX65jODo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771957647; c=relaxed/simple;
-	bh=HAuh6hNvn+rO1WP+txWihpv8KlXSbQuFrLSY44tLtFk=;
+	s=arc-20240116; t=1771957768; c=relaxed/simple;
+	bh=4tFKqKq7LxHiApRhoTkOfQequmtDldphLqXpvVMEAek=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RrTia+Qsc5jJiDXtWTkiAPcUK7QflawxgMlwd30aiKS+DdmkMTZt2vimH37vYvG875IdpMHzIrLY904z4YZnB+tj0ettcIDDzEmuHAo6lIK8RwgVLFXvxqUpTqEl7PIqbZQv8o3mMQsJXny5bQ6+AI4ALdCE3roRdJ07ZeYWYTM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xYxOtapm; arc=pass smtp.client-ip=209.85.160.175
+	 To:Cc:Content-Type; b=IgdivfXcSToPrE5iPlvquY346sT7xf+7S6A+ovWBpZRhGAz1lnSqNb7Hn8Vt16jZJmwv8hiaxvz3kz0yuJpoBtwFTJ11WenofW71yEwkZVOh0qGQdXwa4eeEKceOqvgOk2VOxme6tDLfNS7HiIZ7ZR4EwRxzCdAMq5tZox2IIk8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gvab/GP+; arc=pass smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5033b64256dso35941cf.0
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 10:27:25 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771957645; cv=none;
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-652fe3bf65aso667a12.1
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 10:29:25 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771957764; cv=none;
         d=google.com; s=arc-20240605;
-        b=e6NXjmuQ//wI80YXE4ojM/26D9Ra3VNxnCVEY/cK9AaKjc+Rh9503/oKIXxhrpFw1w
-         9B5LdoGVHvZyB/3DTJgENM8YHgrcElQewG+0La8D6WiSVh3v1BdZXK8+Oeq1P+RkZbW7
-         PjHilYF8rxIDPja2eNjk42jfbeW7riMlBwJkF7RXZ2w44zBqU4SAx4qkfG3XjrfSurhG
-         /W7Cb3k0ZESr1iOJo1e42MzLGdICswJUgZp53POHXFnTTu2eRz4NJTN909L+3OmIqFhD
-         NdDTuAXD50c8e7EmXaMcQMyCju89/Cfe1B50uqJdh+ASni+lFD4s6IFGkXy3ph9swzyD
-         wIvA==
+        b=IR9itaQJo7R3xxiZDw9mFlL/53VSGLUu/EzNOAwbu6xLytgvNk8W1xMjL6GVGyvi6K
+         /aMMMu8P1cDBPY6xcqNej73EUVKLP1cGMnYiD3SHmXmtaiQF8w8pHECcHj8kdM+L5O/g
+         h4Lg9iXDVdTSDdaXL0GaEQp8T40CV5P3xCohO6vn0oUOhffRQTx6oRQgZ/gKsrkFVKIP
+         gPCi1upisGH3YqyvhqSHCjdpIUkEMO92m7Da2EZn9ClKG37JXb3rDAHtzZQtii6zYwwz
+         gfONI/s+38JTCZnre4Vq2+bTR96qga136pATKTeOnduu3MuFehGAsdpal1JTNGx/6gmk
+         2nQw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=j5mvX/eKCN1YDbVafCQL9PUCJRghx9s2J+P+m1PrlTo=;
-        fh=EvJukL1cS4vpaWdFGBp/+mAQn55JATHvZQTbTZAxJkU=;
-        b=PA9O8KAjuyqm8ldY6/Li3bS4yd+3jSk1ZLUFL+rlrrZGU8QYWyEAmb0H47d4qBYO3l
-         Et52hjaacz+NWbBc01xnEgZSqy6JrEHXAvXj3LfK/HUSWzTcF4xr7CznhQKy4We2Q90Q
-         Y36F8zrfJntS3AqNy4PDJ6K4fvWSeQHPjCPSJvIanvpre8sjfxW+fnv2mnOTPBTufuGL
-         FCvNdOYhmD/LYguYZ/2ewJt/+DuE2xYRNU1n4xo1vafSYFcaB1/UeHUbI3QD9ZNDElFA
-         qLmRnmU1IMGYz5zZLX69HyrY/x3vMpYErlTrsOKjWc3fhbmNwQWuR19/dBMLNxjzLn09
-         V+bA==;
+        bh=runWMJn0J9oOBYzJ6m4yNE1KKJE9xc/latz4EBzuSpE=;
+        fh=q66sFD2fadJzPYcoWOQCyWpBIk9xkBRm3Ifid27yeDM=;
+        b=OY26e+dEBeCBcF6dRVKaUJjfOBLy9mVN1nqOQ3JV7zjQedW4H5W1dpnq86vVevnRFE
+         M8OJnjtPOvH25MfxnpBpSl23h+BQILGHfOsbpmMsDBl5U/hIpXpCvA3Q4KDJ2LPilxL8
+         tDJO3UyC4r6Glp0YDk4u+sSbmIJ1OMh33qn14JB6K6rKuMkbbwOUAtH0vuH2vmi6O4fc
+         1T31MDhBL+RnzzkLt4pNeJSKs2q2pxLqjKBQWIzvSvQhOgN4WknZ8Z/30yf/C05XIRWZ
+         nXbY/tlVrYnoi4r8hmLgSzQLqsCWWSlXwsvYhbJtF3O9V5n7SpG0j7ttWjBVn3y0dbNJ
+         fqYg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771957645; x=1772562445; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1771957764; x=1772562564; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j5mvX/eKCN1YDbVafCQL9PUCJRghx9s2J+P+m1PrlTo=;
-        b=xYxOtapmuZqo/l2WgbOKATwKDAYvgaBSu0vkt8w3Bs547aXR6xwSTrFVvJ93iuCpQ4
-         Jqt9dHzu4dj6ZU/bYe1pMw3TpuX/PHs3L+5LdPCdvQLTZsnVVXUpevTYtO8X26VCL2B7
-         uVzsrjH/s5MQcPHYXdKng/IAC/gxegIIyzp6bwePEcd+uoY/NcFIcRjKQh9EPDTudrtz
-         T5CMW/SYJ8V0dN8i/u6gdXHZiNp67lijfEnqMunWw5vke4CJ+kF66eMXTaOiFctHzS0C
-         t2ckObKto4uKx5EZ92FJCcPPgrJhZq/ByvVVEl3WZtT8c3B1eXSP+oNRNyhhFVxUtctN
-         Hz8w==
+        bh=runWMJn0J9oOBYzJ6m4yNE1KKJE9xc/latz4EBzuSpE=;
+        b=gvab/GP+lZncX3N4RcEUDJxBbDiSekrfIRiA4b6AW7v0vYMvlKH8/XWwzpVEMNsF7w
+         lJ1Myf+X9XNahOkqRyinlTcuSS9zoRIUQwENEExWwX0D0N1n5PqQPKkqxc+TnL9xJBvT
+         TRBjUkVxCz6B+6p/3zb8n6N1JjfARgOHpS3WwEukXU9jOB2xN2niK2l8Sqfcaea55ClV
+         4gLB566hoLbIJfiK/16sxVhbxzaYLHXmPa6Om1o465+WhBBMF8XA1qdDAtGmRGB+9MAJ
+         tPDDRkOOa+/jIcmsLUCmIxxba8miJhvSDAE6CAnaH7w3WX7C24dLhDUpIpbY8ITbuwIJ
+         YccQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771957645; x=1772562445;
+        d=1e100.net; s=20230601; t=1771957764; x=1772562564;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=j5mvX/eKCN1YDbVafCQL9PUCJRghx9s2J+P+m1PrlTo=;
-        b=VIaPpZS4kEJk6L5LdGSpfmRA2WA+s/VGER11NIMVkBV/ShaWGJYe9Y6ZfyqAt3h3l1
-         R/3nfx2N8sJmAy5zB/u/RA0IofnZ8gfGF3wqU6oR94EoxtnELL4ZXw9yeKgs8336CmQl
-         xzeqxXjpQJawIn8e4cg++RuB3zGtUCOXTZupMLIk92sYPhGMlF/ZOwY1lSRViuZAVvst
-         7LJXljr0k3WCx0yTk8l4TEAd8LzznMTdX4PVakIXX7VZLsuE1aGTkXTa4+B1jorTfmoD
-         4qydoOATLxZuGDliKllslsMma66sOjY/Ad6ku8SWZVtTusT9S1XXy+60uH+a18v4+6t3
-         z2pw==
-X-Forwarded-Encrypted: i=1; AJvYcCUL2DNYwJGv8A6TYAAj7UU+iUFxX30Gr6WuRBPQEXgLPAtYCRdw++TYbJ3Yn2hiLcBW5k8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLDMU1FT/hcVRbf+L4vtPVBDoqudeCQUYx6hSs8Kg76fH4tpea
-	V6ETpkxcFK5EMHgnXG9KNriHm52j5zldAhjew9ATDRAA4GGRwCyStXKhEuq444TlCnSzSjG9UP8
-	z9EIOkH/5cwRaGt48yqZb7D3a4cAcU33aXhySKZU0
-X-Gm-Gg: AZuq6aJeX+gcqfZmlrV9+1oMitBWPjKP4OQ1lyJ6q2s4cVhnP1/YEgxbUdGw/AFty+T
-	kS8Vz+CHqX1lfYvfz00yh2qzqd+u38iztw5AjWd67allb0U7gtGaNeIjzgaeeBdwBYhghAEzPqJ
-	OMgMRAOUt7PD6thMZae+7f08CyEWpXuBvIDCjgigIR3CVDD2itbQbcXgeXm8+wxrm5+/omCOrhR
-	geELZU146ZmBJlA3GdTzI8uChYfKvbAhjozO1w1vbcfMxSBWk9n8KXAamKmVH+j27R/kKG2WY21
-	krGbeyIT
-X-Received: by 2002:a05:622a:513:b0:4e8:aa24:80ec with SMTP id
- d75a77b69052e-50738e097bamr475151cf.14.1771957644132; Tue, 24 Feb 2026
- 10:27:24 -0800 (PST)
+        bh=runWMJn0J9oOBYzJ6m4yNE1KKJE9xc/latz4EBzuSpE=;
+        b=eZiL/8eHh5CSmABwYdnXP5Kh1CKuvKE9emRF+9HWEAYx/KOMiEm9QJCvJTUHzt0Dvy
+         rSM3YZVhfySeNdGRzg6bR75nWYU4lmyzBL/XWt1b/ibpffGdj8sz0topeG2flD58juOv
+         iJXc/YnDC8PhNNPs7A1zrtcsHJ5Fch5cIdBzFmFyqDmbu9tub/A+uy0L9ReuwEhyvesE
+         KnUcDWhl2iYeFEJxjHS9I7GbO0MSjIhDs9jBlbiaZ42HFqHdbcWxMzWKpflB8OPisVlc
+         VBnlRtXgzPBYhYAQ3ZiBR1XvGn8HViHu7ELZjs+L+Nt8BCcU0jpMqHLYDoN4ccvKL5oC
+         eOIw==
+X-Forwarded-Encrypted: i=1; AJvYcCVwabfZJPL2n5zXDL2cR5x76aOO08IXM84tUOWtpXjDRAyBz0KDOD7h5PCmyCMjO8wVjgg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy15s6vAV6XOqabKBjuE1P1Bo/WcEN7qPuHSz4nAAk5PkyECrf+
+	IzgzFFP0c7KwHClI9shK4rUWvOQFgx8JfGndQyTrVxGQQGV+w7qVa0CI7RMxxDDJN5EUUHNs1cI
+	ayuImftgRai7VcbZQPGHvee7mI4F5rg+o0GGv89QP
+X-Gm-Gg: ATEYQzw2koWsWz3phuONKmhQmXvCvT7yDvpX43HKrjoDRlF/EeTtJvZ9vAA0caHf2pb
+	yDyCHG/aZJc091+InrHUlNDFIGVzi+uUmFf9wuvymBOk81zn04J3CbOOBnszZLTodZGjdccvTZl
+	mtgUEJFmJTEREzfiFyOIdE++9lpTVvoFen3k5z2R26HeB+qAFIxpOn3p2/8PRzNIEepuLBLHuv9
+	gKRxGyKVZ7ta6n/20gyZbYE4yLzfyn/hUp1eBpCmU/wzxl9wh6KR6cJG86BpT0gNhOe7yMbCxdQ
+	1E2KtNw=
+X-Received: by 2002:aa7:d8c9:0:b0:65f:76c8:b92f with SMTP id
+ 4fb4d7f45d1cf-65f823a9090mr3867a12.0.1771957763587; Tue, 24 Feb 2026 10:29:23
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260204010057.1079647-1-rananta@google.com> <20260204010057.1079647-4-rananta@google.com>
- <20260206134843.4ab04ee2@shazbot.org>
-In-Reply-To: <20260206134843.4ab04ee2@shazbot.org>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Tue, 24 Feb 2026 10:27:12 -0800
-X-Gm-Features: AaiRm523akUbQj0hhfOUz7eXlQUQclt5zCwmh0QozGos6LhdSjTp8wVD9p70XOc
-Message-ID: <CAJHc60xMC84zzeTVXj8kbKkNvNpy1_TUajht7Sn=KGfgsto7oA@mail.gmail.com>
-Subject: Re: [PATCH v3 3/8] vfio: selftests: Introduce a sysfs lib
-To: Alex Williamson <alex@shazbot.org>
-Cc: David Matlack <dmatlack@google.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	Vipin Sharma <vipinsh@google.com>, Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <20260224180157.725159-1-kim.phillips@amd.com> <20260224180157.725159-2-kim.phillips@amd.com>
+ <6b3b0c86-99eb-406d-b88d-3d71613bef9e@intel.com>
+In-Reply-To: <6b3b0c86-99eb-406d-b88d-3d71613bef9e@intel.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Tue, 24 Feb 2026 10:29:11 -0800
+X-Gm-Features: AaiRm52tDwFSIncbciiIXzMFhAD28L3SFP_lpf0FhC49DMlc8OhD_P85p32kjvM
+Message-ID: <CALMp9eQzaWJvnTtJzcyvTuYFT3JSgo+4Tu2w4a7mPoEah4P5jw@mail.gmail.com>
+Subject: Re: [PATCH 1/3] cpu/bugs: Fix selecting Automatic IBRS using spectre_v2=eibrs
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Kim Phillips <kim.phillips@amd.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-coco@lists.linux.dev, x86@kernel.org, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	K Prateek Nayak <kprateek.nayak@amd.com>, Nikunj A Dadhania <nikunj@amd.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, 
+	Borislav Petkov <borislav.petkov@amd.com>, Borislav Petkov <bp@alien8.de>, Naveen Rao <naveen.rao@amd.com>, 
+	David Kaplan <david.kaplan@amd.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+	stable@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71653-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71654-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rananta@google.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,shazbot.org:email]
-X-Rspamd-Queue-Id: 0E95118B65C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:email,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: D568518B67A
 X-Rspamd-Action: no action
 
-On Fri, Feb 6, 2026 at 12:48=E2=80=AFPM Alex Williamson <alex@shazbot.org> =
-wrote:
+On Tue, Feb 24, 2026 at 10:23=E2=80=AFAM Dave Hansen <dave.hansen@intel.com=
+> wrote:
 >
-> On Wed,  4 Feb 2026 01:00:52 +0000
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
+> On 2/24/26 10:01, Kim Phillips wrote:
+> > @@ -2136,7 +2136,8 @@ static void __init spectre_v2_select_mitigation(v=
+oid)
+> >       if ((spectre_v2_cmd =3D=3D SPECTRE_V2_CMD_EIBRS ||
+> >            spectre_v2_cmd =3D=3D SPECTRE_V2_CMD_EIBRS_LFENCE ||
+> >            spectre_v2_cmd =3D=3D SPECTRE_V2_CMD_EIBRS_RETPOLINE) &&
+> > -         !boot_cpu_has(X86_FEATURE_IBRS_ENHANCED)) {
+> > +         !(boot_cpu_has(X86_FEATURE_IBRS_ENHANCED) ||
+> > +           boot_cpu_has(X86_FEATURE_AUTOIBRS))) {
+> >               pr_err("EIBRS selected but CPU doesn't have Enhanced or A=
+utomatic IBRS. Switching to AUTO select\n");
+> >               spectre_v2_cmd =3D SPECTRE_V2_CMD_AUTO;
+> >       }
 >
-> > Introduce a sysfs library to handle the common reads/writes to the
-> > PCI sysfs files, for example, getting the total number of VFs supported
-> > by the device via /sys/bus/pci/devices/$BDF/sriov_totalvfs. The library
-> > will be used in the upcoming test patch to configure the VFs for a give=
-n
-> > PF device.
-> >
-> > Opportunistically, move vfio_pci_get_group_from_dev() to this library a=
-s
-> > it falls under the same bucket. Rename it to sysfs_iommu_group_get() to
-> > align with other function names.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  .../selftests/vfio/lib/include/libvfio.h      |   1 +
-> >  .../vfio/lib/include/libvfio/sysfs.h          |  12 ++
-> >  tools/testing/selftests/vfio/lib/libvfio.mk   |   1 +
-> >  tools/testing/selftests/vfio/lib/sysfs.c      | 136 ++++++++++++++++++
-> >  .../selftests/vfio/lib/vfio_pci_device.c      |  22 +--
-> >  5 files changed, 151 insertions(+), 21 deletions(-)
-> >  create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/sy=
-sfs.h
-> >  create mode 100644 tools/testing/selftests/vfio/lib/sysfs.c
-> >
-> > diff --git a/tools/testing/selftests/vfio/lib/include/libvfio.h b/tools=
-/testing/selftests/vfio/lib/include/libvfio.h
-> > index 279ddcd70194..bbe1d7616a64 100644
-> > --- a/tools/testing/selftests/vfio/lib/include/libvfio.h
-> > +++ b/tools/testing/selftests/vfio/lib/include/libvfio.h
-> > @@ -5,6 +5,7 @@
-> >  #include <libvfio/assert.h>
-> >  #include <libvfio/iommu.h>
-> >  #include <libvfio/iova_allocator.h>
-> > +#include <libvfio/sysfs.h>
-> >  #include <libvfio/vfio_pci_device.h>
-> >  #include <libvfio/vfio_pci_driver.h>
-> >
-> > diff --git a/tools/testing/selftests/vfio/lib/include/libvfio/sysfs.h b=
-/tools/testing/selftests/vfio/lib/include/libvfio/sysfs.h
-> > new file mode 100644
-> > index 000000000000..c48d5ef00ba6
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/vfio/lib/include/libvfio/sysfs.h
-> > @@ -0,0 +1,12 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +#ifndef SELFTESTS_VFIO_LIB_INCLUDE_LIBVFIO_SYSFS_H
-> > +#define SELFTESTS_VFIO_LIB_INCLUDE_LIBVFIO_SYSFS_H
-> > +
-> > +int sysfs_sriov_totalvfs_get(const char *bdf);
-> > +int sysfs_sriov_numvfs_get(const char *bdf);
-> > +void sysfs_sriov_numvfs_set(const char *bdfs, int numvfs);
-> > +char *sysfs_sriov_vf_bdf_get(const char *pf_bdf, int i);
-> > +unsigned int sysfs_iommu_group_get(const char *bdf);
-> > +char *sysfs_driver_get(const char *bdf);
-> > +
-> > +#endif /* SELFTESTS_VFIO_LIB_INCLUDE_LIBVFIO_SYSFS_H */
-> > diff --git a/tools/testing/selftests/vfio/lib/libvfio.mk b/tools/testin=
-g/selftests/vfio/lib/libvfio.mk
-> > index 9f47bceed16f..b7857319c3f1 100644
-> > --- a/tools/testing/selftests/vfio/lib/libvfio.mk
-> > +++ b/tools/testing/selftests/vfio/lib/libvfio.mk
-> > @@ -6,6 +6,7 @@ LIBVFIO_SRCDIR :=3D $(selfdir)/vfio/lib
-> >  LIBVFIO_C :=3D iommu.c
-> >  LIBVFIO_C +=3D iova_allocator.c
-> >  LIBVFIO_C +=3D libvfio.c
-> > +LIBVFIO_C +=3D sysfs.c
-> >  LIBVFIO_C +=3D vfio_pci_device.c
-> >  LIBVFIO_C +=3D vfio_pci_driver.c
-> >
-> > diff --git a/tools/testing/selftests/vfio/lib/sysfs.c b/tools/testing/s=
-elftests/vfio/lib/sysfs.c
-> > new file mode 100644
-> > index 000000000000..f01598ff15d7
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/vfio/lib/sysfs.c
-> > @@ -0,0 +1,136 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +#include <fcntl.h>
-> > +#include <unistd.h>
-> > +#include <stdlib.h>
-> > +#include <string.h>
-> > +#include <linux/limits.h>
-> > +
-> > +#include <libvfio.h>
-> > +
-> > +static int sysfs_val_get(const char *component, const char *name,
-> > +                      const char *file)
-> > +{
-> > +     char path[PATH_MAX];
-> > +     char buf[32];
-> > +     int fd;
-> > +
-> > +     snprintf_assert(path, PATH_MAX, "/sys/bus/pci/%s/%s/%s", componen=
-t, name, file);
-> > +     fd =3D open(path, O_RDONLY);
-> > +     if (fd < 0)
-> > +             return fd;
-> > +
-> > +     VFIO_ASSERT_GT(read(fd, buf, ARRAY_SIZE(buf)), 0);
-> > +     VFIO_ASSERT_EQ(close(fd), 0);
-> > +
-> > +     return strtol(buf, NULL, 0);
->
-> I'm surprised we're not sanitizing the strtol() here, ie.
->
->         errno =3D 0;
->         ret =3D strtol(buf, NULL, 0);
->         VFIO_ASSERT_EQ(errno, 0, "sysfs path \"%s\" is not an integer: \"=
-%s\"\n", path, buf);
->
->         return ret;
->
-Thanks for the suggestion. I've applied this in v4 and renamed the
-function to sysfs_val_get_int() to make things clear.
+> Didn't we agree to just use the "Intel feature" name?
 
-- Raghavendra
+Aren't they quite different? IIRC, IBRS_ENHANCED protects host
+userspace from guest indirect branch steering (i.e. VMSCAPE style
+attacks), but AUTOIBRS does not.
 
