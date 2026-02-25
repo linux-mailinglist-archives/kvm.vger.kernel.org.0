@@ -1,519 +1,174 @@
-Return-Path: <kvm+bounces-71895-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71896-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cDEYHrZ6n2lYcQQAu9opvQ
-	(envelope-from <kvm+bounces-71895-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 23:41:58 +0100
+	id QHjOMmt7n2lmcQQAu9opvQ
+	(envelope-from <kvm+bounces-71896-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 23:44:59 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F02E719E625
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 23:41:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C05F19E6DA
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 23:44:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1A50830680B2
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 22:41:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9AEFA30902F7
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 22:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D5A350A3D;
-	Wed, 25 Feb 2026 22:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22894350A3D;
+	Wed, 25 Feb 2026 22:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="FtNRN51z";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ZCUaIfRs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BdmvKaFH"
 X-Original-To: kvm@vger.kernel.org
-Received: from flow-a3-smtp.messagingengine.com (flow-a3-smtp.messagingengine.com [103.168.172.138])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62593349B15;
-	Wed, 25 Feb 2026 22:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5723D32AACE
+	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 22:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772059294; cv=none; b=W456e9fO9TqgIKEwRuQYvZGM054a8EB5/9IiZGG2C3WGsb90oYUyUv4Jo2sO/SDQOYwylZbPJl9eaern745mBOUDGMKXTADj6ANAO+psfmFNdmrB/IVEXxIZt9Lubp2kJKgnlBkUVrbKp0YLv64x9WIokmscm6pif6AZ+OeEawg=
+	t=1772059456; cv=none; b=q7Qi2Z1+AzP/L4AGPEC55BTaGqmolj8V8fYEa83ww7Ek7WHXn6EW1JS6XxB2ce+HNhbWxM8M8v+Df8DsY02+tb53bziAefYcqWh2Vv8AKnBolApS+tChExK9jJZx15cZCMOwYrTAaFReVb0SdngpLjLU4u+cak+Us8RB3To5Iwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772059294; c=relaxed/simple;
-	bh=Bc0XqHku1OsEEGLJ+wJTYNl8fp5rlmK1qimwaJyAAWE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qdD8qsy9kwPKhnPGu9TcH7JHncFSNzzRTouxpyqoKAlk29EcSXByEYGi8VRbnjiO7JdzvcGIkjXDeVAnT6Vz+3f6cuwoG/Ti8ZobnQnNdrRz8sAstRQHhlbyNQHrYBYGtWDdZsglFSlls/ADy5Gw9MCuk6Y6b+2qQFZ4x/PQHsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=FtNRN51z; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZCUaIfRs; arc=none smtp.client-ip=103.168.172.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailflow.phl.internal (Postfix) with ESMTP id 639591380B4B;
-	Wed, 25 Feb 2026 17:41:29 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Wed, 25 Feb 2026 17:41:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1772059289;
-	 x=1772066489; bh=Oep9Y9MGDl6EnmjeOoassNkQMcZjeQipwaxd+cacIYs=; b=
-	FtNRN51zlLJSzOqZgYSf06qT/hPgX0Xh1t+FmulssFeEUF5T82rV6Q+97x1H38YL
-	+vvwu1/aKxjyYy+J+aSj74n9zKKNdSbcGGFoaYL5GPr44+Mz8b3u6wdQBqiy8S3q
-	brj5Jx3Ig+dsu8r0hzCEk4IFPGsG3AcJb7H20fydPUgMp6WBEZww92bEYjyCyFK4
-	//AZ6+wONeSFmxuIh5NIe9gZAVkS6eUqw4owFWRQlLz0e0d2bpulb8ZcI8P4Rj0U
-	13FZth1NOOabJgAvxdlyXHXjLZ5x6/9rdqGk6KV4uCPyblAuSowiX8TZsh/gNNsf
-	SeCJPk86afvEwLHUfHxWGg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1772059289; x=
-	1772066489; bh=Oep9Y9MGDl6EnmjeOoassNkQMcZjeQipwaxd+cacIYs=; b=Z
-	CUaIfRsN1obBn4ydniZ2O5erKca5LBToJSQ58QZBTARgOisVPzmZgQwuP2/GoAmP
-	bdQQMAZ/i0SHPFJKvaFcdUV/Vn+Y74lMvHJ1O2XlwPEDlKFMG3SFNXIVwevwC2vY
-	+n908/d+3HpiQTQTrQzt1ZZjrbSy5oJKU8/YBlKfba5m1k/ElNmZBgbBMxSPTUFV
-	RkT/35Ar32EdP7rXK0FCzMlh1w5KrA+CKu0LgULtpLLbwNNd+ZhaQewF6LFhowQB
-	j1Bq5BnnkBxv5La9urpOgjqfkMg0cAAHvzq1PncEUPrF36nJeLj9bGI7L2hkzXXp
-	NSf0CazlxHND4vyYQvCZg==
-X-ME-Sender: <xms:mHqfaTxjHv1XxumCl1CA_axj93CQXqrt011zORmHxaIjcS59rd84sw>
-    <xme:mHqfaYE4Fvmzpidx0yWcmrWwsyakqQk3lxCK9evXetu0ZaJPXwyxIatu8Ss0zCCMq
-    BC9XLQOLw4RTMwitR9FQc4oKRipaM70Bz8QdCLfdhHM5rCcXz8s-g>
-X-ME-Received: <xmr:mHqfaRh6z8Ki4tpCy7iQwcBL7gPLTxgPzOuHNSbAQoXmwHHaqEuzvnMPmb4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeegfeehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
-    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
-    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepgeehpdhmohguvgep
-    shhmthhpohhuthdprhgtphhtthhopegumhgrthhlrggtkhesghhoohhglhgvrdgtohhmpd
-    hrtghpthhtoheprghjrgihrggthhgrnhgurhgrsehnvhhiughirgdrtghomhdprhgtphht
-    thhopehgrhgrfhesrghmrgiiohhnrdgtohhmpdhrtghpthhtoheprghmrghsthhrohesfh
-    gsrdgtohhmpdhrtghpthhtoheprghpohhpphhlvgesnhhvihguihgrrdgtohhmpdhrtghp
-    thhtoheprghkphhmsehlihhnuhigqdhfohhunhgurghtihhonhdrohhrghdprhgtphhtth
-    hopegrnhhkihhtrgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepsghhvghlghgrrghs
-    sehgohhoghhlvgdrtghomhdprhgtphhtthhopegthhhrihhslheskhgvrhhnvghlrdhorh
-    hg
-X-ME-Proxy: <xmx:mHqfabr1x-RS8v4yk7Ri9Ixpw6iqffu9JXPyV-SGCEDqKCi6V4lK0Q>
-    <xmx:mHqfaZJxOBkG3oH8UxMu0LpcbZrqQh4iuU5F9aBBxW7ACQS6l1EwRQ>
-    <xmx:mHqfae9h-Q9i8ZreTJZJfSoPQn3KhwG90kZC0faYdr6TAQ4avjQQGg>
-    <xmx:mHqfadJpQjmVGfptc-41b-pfPVxlVNUKzzyM6Qm5JVECVHYT5CMc5g>
-    <xmx:mXqfaWTmGPbaduxr2fz7lpdqZoYt3tYbiAu7lHoLUCYuIXRhXyYpudEL>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 25 Feb 2026 17:41:25 -0500 (EST)
-Date: Wed, 25 Feb 2026 15:41:24 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: David Matlack <dmatlack@google.com>
-Cc: Adithya Jayachandran <ajayachandra@nvidia.com>,
- Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>,
- Alistair Popple <apopple@nvidia.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Ankit Agrawal <ankita@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Chris Li <chrisl@kernel.org>, David Rientjes <rientjes@google.com>,
- Jacob Pan <jacob.pan@linux.microsoft.com>,
- Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Jonathan Corbet <corbet@lwn.net>, Josh Hilke <jrhilke@google.com>,
- Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org,
- kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
- Leon Romanovsky <leonro@nvidia.com>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org,
- Lukas Wunner <lukas@wunner.de>,
- " =?UTF-8?B?TWljaGHFgg==?= Winiarski" <michal.winiarski@intel.com>,
- Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>,
- Pasha Tatashin <pasha.tatashin@soleen.com>,
- Pranjal Shrivastava <praan@google.com>,
- Pratyush Yadav <pratyush@kernel.org>,
- Raghavendra Rao Ananta <rananta@google.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Saeed Mahameed <saeedm@nvidia.com>,
- Samiullah Khawaja <skhawaja@google.com>,
- Shuah Khan <skhan@linuxfoundation.org>,
- "Thomas =?UTF-8?B?SGVsbHN0csO2bQ==?=" <thomas.hellstrom@linux.intel.com>,
- Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>,
- William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
- Zhu Yanjun <yanjun.zhu@linux.dev>, alex@shazbot.org
-Subject: Re: [PATCH v2 05/22] vfio/pci: Preserve vfio-pci device files
- across Live Update
-Message-ID: <20260225154124.78e18fa4@shazbot.org>
-In-Reply-To: <20260129212510.967611-6-dmatlack@google.com>
-References: <20260129212510.967611-1-dmatlack@google.com>
-	<20260129212510.967611-6-dmatlack@google.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1772059456; c=relaxed/simple;
+	bh=g/KGEimT/X+0VqaoMce6mZB36StxBuHTz74wXUXwxPg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RTF9NynILwXTlspTZ0Z+No8Lv7B8zpwTGQdZnR9GHsm4UBtC69cH3pYWL14V8u2lXgR7gVHPOYtacZ1BIGpSE+9qty/zaJTb+I6LHl2EDJui9VtiLbmYdiJanm3JzkVMSPaOiJPDoUGdI8SkLQnsIRz0Bals1jRHwt8IGW4N3j0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BdmvKaFH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 134D0C19423
+	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 22:44:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772059456;
+	bh=g/KGEimT/X+0VqaoMce6mZB36StxBuHTz74wXUXwxPg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=BdmvKaFHhqVyMXncCB0L6IYQawHQvnmP2puA1ugyu/9IFABsz1cBFvRSW++lH7BOF
+	 qibtJZ4FRTd6yRxDUnwgGdiZi1R5CFniCn2PyS8cz5Gk7cocpKbtwPSFrWn8Zu1Jsr
+	 L2qzbG5JTfa6jDBzmBhtMmHZ7iJ1LnFml6PQp95VoRt0fUqDATHsliWpTpxiHBVfy9
+	 +tFY53nklCGN3h7vZrgZez8EAx05onI8FZ3w7RMTJMcXhx2ek6U7yLoiECrg1UE1SI
+	 AMUpSncMgsLzd9G4eR2rdCesjnKp7c3NOf14b54daEoOuec8pDkQ7j1QIVVwRjpTIf
+	 WZvGeYhMwEWtw==
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b885e8c6727so43852566b.1
+        for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 14:44:15 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXKsz6mrW4IKsFO+Sr3vf6i4wos5HHlWE1rAdKBVWiQFaW7D4BlTp7yi2sInRyXVImu/+4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjUoI7d15foTMCILcTrasiPd8HXA4pcj2yceDDpv+Ur2mJbOhg
+	3t6zojIlT/f9easgml3SI6eu2y086eptKgS3aHhZ00sMIfV9Yu4d5T8EE5mNnXBAp9Nu+VVZiaC
+	zUdMAKfdvGb1Y6zjTSNMTCFvC7trNYF0=
+X-Received: by 2002:a17:907:3e82:b0:b8f:c684:db28 with SMTP id
+ a640c23a62f3a-b9356f99d4cmr45998766b.12.1772059454826; Wed, 25 Feb 2026
+ 14:44:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20260224223405.3270433-1-yosry@kernel.org> <20260224223405.3270433-17-yosry@kernel.org>
+In-Reply-To: <20260224223405.3270433-17-yosry@kernel.org>
+From: Yosry Ahmed <yosry@kernel.org>
+Date: Wed, 25 Feb 2026 14:44:03 -0800
+X-Gmail-Original-Message-ID: <CAO9r8zP3-=M+3hyve4-0uGXCsKrhwmx+YPXzw0b-+WfTRS-M1g@mail.gmail.com>
+X-Gm-Features: AaiRm50piw7sYl7IlcOqh1IjoW7ZIltJcKpNFA31qLSldsYHKfqSuGLBfbMNb-c
+Message-ID: <CAO9r8zP3-=M+3hyve4-0uGXCsKrhwmx+YPXzw0b-+WfTRS-M1g@mail.gmail.com>
+Subject: Re: [PATCH v6 16/31] KVM: nSVM: Unify handling of VMRUN failures with
+ proper cleanup
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm3,messagingengine.com:s=fm3];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[45];
-	FREEMAIL_CC(0.00)[nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev,shazbot.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-71895-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71896-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shazbot.org:mid,shazbot.org:dkim,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: F02E719E625
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7C05F19E6DA
 X-Rspamd-Action: no action
 
-On Thu, 29 Jan 2026 21:24:52 +0000
-David Matlack <dmatlack@google.com> wrote:
-
-> From: Vipin Sharma <vipinsh@google.com>
-> 
-> Implement the live update file handler callbacks to preserve a vfio-pci
-> device across a Live Update. Subsequent commits will enable userspace to
-> then retrieve this file after the Live Update.
-> 
-> Live Update support is scoped only to cdev files (i.e. not
-> VFIO_GROUP_GET_DEVICE_FD files).
-> 
-> State about each device is serialized into a new ABI struct
-> vfio_pci_core_device_ser. The contents of this struct are preserved
-> across the Live Update to the next kernel using a combination of
-> Kexec-Handover (KHO) to preserve the page(s) holding the struct and the
-> Live Update Orchestrator (LUO) to preserve the physical address of the
-> struct.
-> 
-> For now the only contents of struct vfio_pci_core_device_ser the
-> device's PCI segment number and BDF, so that the device can be uniquely
-> identified after the Live Update.
-> 
-> Require that userspace disables interrupts on the device prior to
-> freeze() so that the device does not send any interrupts until new
-> interrupt handlers have been set up by the next kernel.
-> 
-> Reset the device and restore its state in the freeze() callback. This
-> ensures the device can be received by the next kernel in a consistent
-> state. Eventually this will be dropped and the device can be preserved
-> across in a running state, but that requires further work in VFIO and
-> the core PCI layer.
-> 
-> Note that LUO holds a reference to this file when it is preserved. So
-> VFIO is guaranteed that vfio_df_device_last_close() will not be called
-> on this device no matter what userspace does.
-> 
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> Co-developed-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  drivers/vfio/pci/vfio_pci.c            |  2 +-
->  drivers/vfio/pci/vfio_pci_liveupdate.c | 84 +++++++++++++++++++++++++-
->  drivers/vfio/pci/vfio_pci_priv.h       |  2 +
->  drivers/vfio/vfio.h                    | 13 ----
->  drivers/vfio/vfio_main.c               | 10 +--
->  include/linux/kho/abi/vfio_pci.h       | 15 +++++
->  include/linux/vfio.h                   | 28 +++++++++
->  7 files changed, 129 insertions(+), 25 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index 19e88322af2c..0260afb9492d 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -125,7 +125,7 @@ static int vfio_pci_open_device(struct vfio_device *core_vdev)
->  	return 0;
->  }
->  
-> -static const struct vfio_device_ops vfio_pci_ops = {
-> +const struct vfio_device_ops vfio_pci_ops = {
->  	.name		= "vfio-pci",
->  	.init		= vfio_pci_core_init_dev,
->  	.release	= vfio_pci_core_release_dev,
-> diff --git a/drivers/vfio/pci/vfio_pci_liveupdate.c b/drivers/vfio/pci/vfio_pci_liveupdate.c
-> index b84e63c0357b..f01de98f1b75 100644
-> --- a/drivers/vfio/pci/vfio_pci_liveupdate.c
-> +++ b/drivers/vfio/pci/vfio_pci_liveupdate.c
-> @@ -8,25 +8,104 @@
->  
->  #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
->  
-> +#include <linux/kexec_handover.h>
->  #include <linux/kho/abi/vfio_pci.h>
->  #include <linux/liveupdate.h>
->  #include <linux/errno.h>
-> +#include <linux/vfio.h>
->  
->  #include "vfio_pci_priv.h"
->  
->  static bool vfio_pci_liveupdate_can_preserve(struct liveupdate_file_handler *handler,
->  					     struct file *file)
->  {
-> -	return false;
-> +	struct vfio_device_file *df = to_vfio_device_file(file);
-> +
-> +	if (!df)
-> +		return false;
-> +
-> +	/* Live Update support is limited to cdev files. */
-> +	if (df->group)
-> +		return false;
-> +
-> +	return df->device->ops == &vfio_pci_ops;
->  }
-
-Why can't we use vfio_device_cdev_opened() here and avoid all the new
-exposure in public headers?
-
-      struct vfio_device *device = vfio_device_from_file(file);                 
-                                                                                
-      if (!device)                                                              
-          return false;                                                         
-                                                                                
-      if (!vfio_device_cdev_opened(device))
-          return false;
-
-      return device->ops == &vfio_pci_ops;
-
->  
->  static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
->  {
-> -	return -EOPNOTSUPP;
-> +	struct vfio_device *device = vfio_device_from_file(args->file);
-> +	struct vfio_pci_core_device_ser *ser;
-> +	struct vfio_pci_core_device *vdev;
-> +	struct pci_dev *pdev;
-> +
-> +	vdev = container_of(device, struct vfio_pci_core_device, vdev);
-> +	pdev = vdev->pdev;
-> +
-> +	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM))
-> +		return -EINVAL;
-> +
-> +	if (vfio_pci_is_intel_display(pdev))
-> +		return -EINVAL;
-
-Some comments describing what's missing, if these are TODO or DONTCARE
-would be useful.
-
-> +
-> +	ser = kho_alloc_preserve(sizeof(*ser));
-> +	if (IS_ERR(ser))
-> +		return PTR_ERR(ser);
-> +
-> +	ser->bdf = pci_dev_id(pdev);
-> +	ser->domain = pci_domain_nr(pdev->bus);
-> +
-> +	args->serialized_data = virt_to_phys(ser);
-> +	return 0;
->  }
->  
->  static void vfio_pci_liveupdate_unpreserve(struct liveupdate_file_op_args *args)
->  {
-> +	kho_unpreserve_free(phys_to_virt(args->serialized_data));
-> +}
-> +
-> +static int vfio_pci_liveupdate_freeze(struct liveupdate_file_op_args *args)
-> +{
-> +	struct vfio_device *device = vfio_device_from_file(args->file);
-> +	struct vfio_pci_core_device *vdev;
-> +	struct pci_dev *pdev;
-> +	int ret;
-> +
-> +	vdev = container_of(device, struct vfio_pci_core_device, vdev);
-> +	pdev = vdev->pdev;
-> +
-> +	guard(mutex)(&device->dev_set->lock);
-> +
-> +	/*
-> +	 * Userspace must disable interrupts on the device prior to freeze so
-> +	 * that the device does not send any interrupts until new interrupt
-> +	 * handlers have been established by the next kernel.
-> +	 */
-> +	if (vdev->irq_type != VFIO_PCI_NUM_IRQS) {
-> +		pci_err(pdev, "Freeze failed! Interrupts are still enabled.\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	pci_dev_lock(pdev);
-
-device_lock() is a dangerous source of deadlocks, for instance how can
-we know the freeze isn't occurring with an outstanding driver unbind?
-
-> +
-> +	ret = pci_load_saved_state(pdev, vdev->pci_saved_state);
-> +	if (ret)
-> +		goto out;
-> +
-> +	/*
-> +	 * Reset the device and restore it back to its original state before
-> +	 * handing it to the next kernel.
-> +	 *
-> +	 * Eventually both of these should be dropped and the device should be
-> +	 * kept running with its current state across the Live Update.
-> +	 */
-> +	if (vdev->reset_works)
-> +		ret = __pci_reset_function_locked(pdev);
-> +
-> +	pci_restore_state(pdev);
-> +
-> +out:
-> +	pci_dev_unlock(pdev);
-> +	return ret;
->  }
->  
->  static int vfio_pci_liveupdate_retrieve(struct liveupdate_file_op_args *args)
-> @@ -42,6 +121,7 @@ static const struct liveupdate_file_ops vfio_pci_liveupdate_file_ops = {
->  	.can_preserve = vfio_pci_liveupdate_can_preserve,
->  	.preserve = vfio_pci_liveupdate_preserve,
->  	.unpreserve = vfio_pci_liveupdate_unpreserve,
-> +	.freeze = vfio_pci_liveupdate_freeze,
->  	.retrieve = vfio_pci_liveupdate_retrieve,
->  	.finish = vfio_pci_liveupdate_finish,
->  	.owner = THIS_MODULE,
-> diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_pci_priv.h
-> index 68966ec64e51..d3da79b7b03c 100644
-> --- a/drivers/vfio/pci/vfio_pci_priv.h
-> +++ b/drivers/vfio/pci/vfio_pci_priv.h
-> @@ -11,6 +11,8 @@
->  /* Cap maximum number of ioeventfds per device (arbitrary) */
->  #define VFIO_PCI_IOEVENTFD_MAX		1000
->  
-> +extern const struct vfio_device_ops vfio_pci_ops;
-> +
->  struct vfio_pci_ioeventfd {
->  	struct list_head	next;
->  	struct vfio_pci_core_device	*vdev;
-> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-> index 50128da18bca..6b89edbbf174 100644
-> --- a/drivers/vfio/vfio.h
-> +++ b/drivers/vfio/vfio.h
-> @@ -16,17 +16,6 @@ struct iommufd_ctx;
->  struct iommu_group;
->  struct vfio_container;
->  
-> -struct vfio_device_file {
-> -	struct vfio_device *device;
-> -	struct vfio_group *group;
+> @@ -939,22 +939,19 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+>                                     vmcb12->control.intercepts[INTERCEPT_WORD4],
+>                                     vmcb12->control.intercepts[INTERCEPT_WORD5]);
+>
 > -
-> -	u8 access_granted;
-> -	u32 devid; /* only valid when iommufd is valid */
-> -	spinlock_t kvm_ref_lock; /* protect kvm field */
-> -	struct kvm *kvm;
-> -	struct iommufd_ctx *iommufd; /* protected by struct vfio_device_set::lock */
-> -};
+>         svm->nested.vmcb12_gpa = vmcb12_gpa;
+>
+>         WARN_ON(svm->vmcb == svm->nested.vmcb02.ptr);
+>
+>         enter_guest_mode(vcpu);
+>
+> +       if (!nested_vmcb_check_save(vcpu, &svm->nested.save) ||
+> +           !nested_vmcb_check_controls(vcpu, &svm->nested.ctl))
+> +               return -EINVAL;
+> +
+>         if (nested_npt_enabled(svm))
+>                 nested_svm_init_mmu_context(vcpu);
+>
+> -       nested_svm_copy_common_state(svm->vmcb01.ptr, svm->nested.vmcb02.ptr);
 > -
->  void vfio_device_put_registration(struct vfio_device *device);
->  bool vfio_device_try_get_registration(struct vfio_device *device);
->  int vfio_df_open(struct vfio_device_file *df);
-> @@ -34,8 +23,6 @@ void vfio_df_close(struct vfio_device_file *df);
->  struct vfio_device_file *
->  vfio_allocate_device_file(struct vfio_device *device);
->  
-> -extern const struct file_operations vfio_device_fops;
+> -       svm_switch_vmcb(svm, &svm->nested.vmcb02);
+> -       nested_vmcb02_prepare_control(svm, vmcb12->save.rip, vmcb12->save.cs.base);
+> -       nested_vmcb02_prepare_save(svm, vmcb12);
 > -
->  #ifdef CONFIG_VFIO_NOIOMMU
->  extern bool vfio_noiommu __read_mostly;
->  #else
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index f7df90c423b4..276f615f0c28 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -1436,15 +1436,7 @@ const struct file_operations vfio_device_fops = {
->  	.show_fdinfo	= vfio_device_show_fdinfo,
->  #endif
->  };
-> -
-> -static struct vfio_device *vfio_device_from_file(struct file *file)
-> -{
-> -	struct vfio_device_file *df = file->private_data;
-> -
-> -	if (file->f_op != &vfio_device_fops)
-> -		return NULL;
-> -	return df->device;
-> -}
-> +EXPORT_SYMBOL_GPL(vfio_device_fops);
+>         ret = nested_svm_load_cr3(&svm->vcpu, svm->nested.save.cr3,
+>                                   nested_npt_enabled(svm), from_vmrun);
+>         if (ret)
 
-Seems we just need to export vfio_device_from_file().  Thanks,
+I think the above is wrong (as pointed out by an internal AI bot).
+nested_vmcb02_prepare_save() also initializes architectural state to
+L2's, moving it after nested_svm_load_cr3() means that
+nested_svm_load_cr3() will use L1's architectural state (e.g. in
+is_pae_paging(), but more importantly in kvm_init_mmu()).
 
-Alex
+The only clean-ish solution I can think of is to refactor loading L2's
+architectural state out of nested_vmcb02_prepare_save(), and keep it
+before nested_svm_load_cr3(). Then, also refactor restoring L1's
+architectural state out of nested_svm_vmexit() and also do it in
+nested_svm_vmrun_error_vmexit().
 
->  
->  /**
->   * vfio_file_is_valid - True if the file is valid vfio file
-> diff --git a/include/linux/kho/abi/vfio_pci.h b/include/linux/kho/abi/vfio_pci.h
-> index 37a845eed972..9bf58a2f3820 100644
-> --- a/include/linux/kho/abi/vfio_pci.h
-> +++ b/include/linux/kho/abi/vfio_pci.h
-> @@ -9,6 +9,9 @@
->  #ifndef _LINUX_LIVEUPDATE_ABI_VFIO_PCI_H
->  #define _LINUX_LIVEUPDATE_ABI_VFIO_PCI_H
->  
-> +#include <linux/compiler.h>
-> +#include <linux/types.h>
-> +
->  /**
->   * DOC: VFIO PCI Live Update ABI
->   *
-> @@ -25,4 +28,16 @@
->  
->  #define VFIO_PCI_LUO_FH_COMPATIBLE "vfio-pci-v1"
->  
-> +/**
-> + * struct vfio_pci_core_device_ser - Serialized state of a single VFIO PCI
-> + * device.
-> + *
-> + * @bdf: The device's PCI bus, device, and function number.
-> + * @domain: The device's PCI domain number (segment).
-> + */
-> +struct vfio_pci_core_device_ser {
-> +	u16 bdf;
-> +	u16 domain;
-> +} __packed;
-> +
->  #endif /* _LINUX_LIVEUPDATE_ABI_VFIO_PCI_H */
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index e90859956514..9aa1587fea19 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -81,6 +81,34 @@ struct vfio_device {
->  #endif
->  };
->  
-> +struct vfio_device_file {
-> +	struct vfio_device *device;
-> +	struct vfio_group *group;
-> +
-> +	u8 access_granted;
-> +	u32 devid; /* only valid when iommufd is valid */
-> +	spinlock_t kvm_ref_lock; /* protect kvm field */
-> +	struct kvm *kvm;
-> +	struct iommufd_ctx *iommufd; /* protected by struct vfio_device_set::lock */
-> +};
-> +
-> +extern const struct file_operations vfio_device_fops;
-> +
-> +static inline struct vfio_device_file *to_vfio_device_file(struct file *file)
-> +{
-> +	if (file->f_op != &vfio_device_fops)
-> +		return NULL;
-> +
-> +	return file->private_data;
-> +}
-> +
-> +static inline struct vfio_device *vfio_device_from_file(struct file *file)
-> +{
-> +	struct vfio_device_file *df = to_vfio_device_file(file);
-> +
-> +	return df ? df->device : NULL;
-> +}
-> +
->  /**
->   * struct vfio_device_ops - VFIO bus driver device callbacks
->   *
+We can probably move it to __nested_svm_vmexit(), assuming nothing
+else in nested_svm_vmexit() relies on it.
 
+That being said, I am open to suggestions for better options.
+
+> @@ -966,6 +963,17 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+>                         return ret;
+>         }
+>
+> +       /*
+> +        * Any VMRUN failure needs to happen before this point, such that the
+> +        * nested #VMEXIT is injected properly by nested_svm_vmrun_error_vmexit().
+> +        */
+> +
+> +       nested_svm_copy_common_state(svm->vmcb01.ptr, svm->nested.vmcb02.ptr);
+> +
+> +       svm_switch_vmcb(svm, &svm->nested.vmcb02);
+> +       nested_vmcb02_prepare_control(svm, vmcb12->save.rip, vmcb12->save.cs.base);
+> +       nested_vmcb02_prepare_save(svm, vmcb12);
+> +
+
+Another problem here, hidden above the context lines is a call to
+nested_svm_merge_msrpm(), which updates msrpm_base_pa in the active
+VMCB, which should be vmcb02, but will be vmcb01 because we moved the
+VMCB switch below it.
+
+I think the easiest thing to do here is make nested_svm_merge_msrpm()
+explicitly update msrpm_base_pa in vmcb02, I think this is probably
+better anyway.
 
