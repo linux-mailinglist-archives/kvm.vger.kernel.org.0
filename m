@@ -1,422 +1,256 @@
-Return-Path: <kvm+bounces-71809-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71810-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +PelBY6qnmntWgQAu9opvQ
-	(envelope-from <kvm+bounces-71809-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 08:53:50 +0100
+	id 4KnOODusnmntWgQAu9opvQ
+	(envelope-from <kvm+bounces-71810-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 09:00:59 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C689193C25
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 08:53:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B535193DEE
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 09:00:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 765C93045006
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 07:52:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1DA093120223
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 07:56:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B55306486;
-	Wed, 25 Feb 2026 07:52:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A56530E84E;
+	Wed, 25 Feb 2026 07:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="h45s57/C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cMr5HWXx"
 X-Original-To: kvm@vger.kernel.org
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011027.outbound.protection.outlook.com [52.101.62.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12D12FF170;
-	Wed, 25 Feb 2026 07:52:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.27
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772005959; cv=fail; b=IaPOU1IhyFNssFcZsBBaJRwtcxMMwsDWnBUvZ7XJA3a7qqBUYa1VncWo9/oUupUACeTcj+ZtsPGrvHUHwFA2KHsHvc5GXRugujazfYw64RUXl7EaSnnZn+OfyaJb38fdUQEbBG8mdIBM0VwC93FC4mcB+NtKUuCKqEoP9WkgtyI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772005959; c=relaxed/simple;
-	bh=iNPWfAbvNi0sSWa3slLyqgZmhtP9fIJo2CWwKvarGC4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NP2GG9nTO1hwVTg/zSQcri4YjUXWsigWL4yuVLmyaV28S0/t8l16YBgIAloFrUUBnTM2Z+IRI2VnJiexRnGsPVyCS0HHb61pRlUB45DYvdaXS47TSp0OxYp+6dPnqx+e7NtCNoergwpRxAWwnZWJKMj7TR6z46Oj3U7EccweC5I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=h45s57/C; arc=fail smtp.client-ip=52.101.62.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=S4+9O9iKrW6xB4kYsIP64D1wDNcDcIFKd3KbBt+hJtXq8Uandv3vLg9gT9nMsCENx1FYmACYrH6klbEoBoHSU77U5PZn84n/pDvS7NtSk4Ih/x//xYMKDEge/oLWjaW1nCX3FQXqxvW+vAWB54Asx/bYOASYfYFEQ5tLR/mqYv5bVBvhC5/oYETLIT2hack0a6QjlLXsC6R2K08Gy0Jby5r1dm2wCbLSLPuH4cgcx4+u9lRIX42JuRWA9OOH4sYkW3xZjCyj6jh6WCReXJX6t4pLaNDHkHic2FGPt03iOE5XWN9271Cyqc6y4RFwlxHs5cyvvn3m0/84338lo9WTrg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W8uOaPMyzcf4fHALNlJb5qM9uxuSYoRNOmYbQ0BL2x0=;
- b=M4toLzySierkFHzrdLVL7Dl4CuyEEH74fNx0Ybxin2wfrYypdjaS+A1uF5s2lnl5/1UYFgcP2D02ZhMCNFCaNIuSxzhdO26wmPlWvHQg+62dWObUiSu8dQU3VtcKrnha8nCUPPmDX9le1vLKWYC6JYICMW4Q8qs3ZnAbMx4PJiAnantWjwZGVRhW/sk4gNqZLt45fw19CksskmPFMwddA5NoM7Iy2xxvod1pZ3i3qVYR7ozbOeG/h4KYZJKI1WIS4qvWxa//2IujyEA30IiodbDVtGeIeoollqaeDIlUUR705/56LJKKgTCO+nLCZiAo7p8K5fqi+5Uzsruq8gocaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W8uOaPMyzcf4fHALNlJb5qM9uxuSYoRNOmYbQ0BL2x0=;
- b=h45s57/Cg8/+1k5x44FBuGl6FTaREzsdBnLCDZ0vlnUkeBhdjTtqi5LpctrLMy/RpIRpGrjPFsGo7ov+vjzxVIA3y4etZKvaHvS5T9cAFreSBxpNwr/PyLohmeh8O8UQuVE/Bc9JwU6vqGkqbTQDBdPwSh+t1Ip4YF33tk8kz5M=
-Received: from BL0PR1501CA0013.namprd15.prod.outlook.com
- (2603:10b6:207:17::26) by DS7PR12MB6166.namprd12.prod.outlook.com
- (2603:10b6:8:99::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Wed, 25 Feb
- 2026 07:52:32 +0000
-Received: from BL02EPF0001A106.namprd05.prod.outlook.com
- (2603:10b6:207:17:cafe::c6) by BL0PR1501CA0013.outlook.office365.com
- (2603:10b6:207:17::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.22 via Frontend Transport; Wed,
- 25 Feb 2026 07:52:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- BL02EPF0001A106.mail.protection.outlook.com (10.167.241.139) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 07:52:31 +0000
-Received: from aiemdee.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 25 Feb
- 2026 01:52:23 -0600
-From: Alexey Kardashevskiy <aik@amd.com>
-To: <linux-kernel@vger.kernel.org>
-CC: <kvm@vger.kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian
-	<kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>, Will Deacon
-	<will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, Steve Sistare <steven.sistare@oracle.com>, "Nicolin
- Chen" <nicolinc@nvidia.com>, <iommu@lists.linux.dev>, Alexey Kardashevskiy
-	<aik@amd.com>, <linux-coco@lists.linux.dev>, Dan Williams
-	<dan.j.williams@intel.com>, Santosh Shukla <santosh.shukla@amd.com>, "Pratik
- R . Sampat" <prsampat@amd.com>, Ackerley Tng <ackerleytng@google.com>, "Sean
- Christopherson" <seanjc@google.com>, Fuad Tabba <tabba@google.com>, Xu Yilun
-	<yilun.xu@linux.intel.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: [RFC PATCH kernel] iommufd: Allow mapping from KVM's guest_memfd
-Date: Wed, 25 Feb 2026 18:52:11 +1100
-Message-ID: <20260225075211.3353194-1-aik@amd.com>
-X-Mailer: git-send-email 2.52.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF9E30CDAE
+	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 07:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772006165; cv=none; b=FlxQlLhxxTUGUKAIoTvI2b8amOlEAxzRjkQLNZ7P1bWwZ40oxGDzibNcpKVABOvDBh61pl/bbPvM0cq6jZG1Dk+y00eznE7WnMvECrbH282j7T4IHzGx3O22wLOVZai81U1IFqF2Kq7tKIFcfOCsilrYQkzTr3DdNVahKsToC4g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772006165; c=relaxed/simple;
+	bh=/phNhW5Uy8/CpWeGcbySlurAcomYqpo/e8d49tUgN+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QmWlYHLMF7hF1v8/+Zkj5HYzjNIcQAQgQMU2w32u11SFMp6smBTVfQqfo+bYT+p+lNnDihPYGIVRfam2FY/pqLzG6zYogG2rI9GdWSYOlOVQOeQ90eKsq8yMrJVH9ti8VznHWAxfHXMiL00XfseSGkdpRikm+pT54w/Qfl8b6IE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cMr5HWXx; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2aad8123335so58365ad.1
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 23:56:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772006163; x=1772610963; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sT2VtKh2V5oEus0jIgTdEjDE+//UyVLRT7BohuHzzWw=;
+        b=cMr5HWXxsinnyXoEwMHazVNRF3kOv/wkVKQxR+M98tFKdRWHFYT8B06/GW9yfsBqAW
+         j5fFyDjk/0eKSa7ZENGTrj1QKZkZ75EZZYioyJhoS34pkZFhd3iC3jGQldklBdUtr90D
+         ox8GgTpNMyc5aFO8FWk/RCKCyXYWDJ5Iqe2S1AVAbuiYtc54b7/YCL5SkVCCXzLcow+s
+         2FpsosqfcxYfpLVjeGADRu3H4JO0TBCamAHtADHIVnFtQh98APl2+mvxIAJR5+qrI1XZ
+         QPCVl26UKxp+e6jQQ+SOE1Q4WxjNLJYKkT4sCVAvh3byNDLO4broTTmZ4rO3wlC5jvso
+         3PxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772006163; x=1772610963;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sT2VtKh2V5oEus0jIgTdEjDE+//UyVLRT7BohuHzzWw=;
+        b=HR4RmA+zHWeeu0UaLBv4EcR6zLLgmPFwxyl2HuYFkWiAeYFygnTMhYqKzMTjxJvgJE
+         xngRpzJcr4NZ8RG+MM5U1hk2AejswMTo7lHyx3GlnvIECisBOm7iXMipM9S6XCx4tnwK
+         4BXoPi7G1pXqRFD/1vvGU4wLJVKTkd/kkiL+OZlT+dlcqiZu4+khT/g+weVO6fSAZm4N
+         GzPbyktWU8G0XkGdiIh7KcUk83g7mynu/+OUbFkhvrVX+1c55TTLLv36JFLNzEfXiBQb
+         aah+UmsZIZM+hZgMxJHghOo0PL6z8mHqW3/4fXAz8GEl2qBn7MYZw8iqfbcu4I2yrSBM
+         CK4w==
+X-Forwarded-Encrypted: i=1; AJvYcCUBhirCusPNRPpYWwgwINoF6yJ00xC1qJ1BdLZUB5dZGrzykNclPbacpgJUbrFYH9JsX0M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxK0dX6CBvY4NXC/C85kB9kcd0DtEkL3CLauD3el1BIMY7UEKrb
+	FYolDDB1SxYgxZmK9p0/64gry73m37fpBINzxNO5qiRMyY0cFp/CUbycdHY8HsjTTQ==
+X-Gm-Gg: ATEYQzwHTLAgHgIf3KOrZ/T8NkqYNZBZKmxHaDGm87WGcBxT0A356/wcnBJXL2NC0ht
+	hIcI+Dk2sWYq+qEDInvNWlZ+VnTaDGoua4qlQIqh0uhtYq+LQmtJ7jlC7kL7rwQe3iW7oPZri9Q
+	nbsn46BiztpK0+HNT/h6gHZY6pNybYScs5GpIvTAqlEgTSep+8avlc4fN6Nb0++tpKyHWsGq2Ww
+	2xq2pkhbOZ1Zmakk6GzAQrqAmNW7rhgdlAZZykEaZN4GICDVFkCwqRDSKzDtt/pQCa7l2tGtDNw
+	Ph67UlabyR5R1esTT2H3jgmmQN07xneAiDgMJFkits7oPralgXBhM0pRjdaAw02U7ua2put7QMX
+	O50KbaNQTabMgn2NFsudgp4E+2wmqPPhM/24LADmlE92uH/zGB9dX5MqfOj5hqDQA+MO1WQz2TD
+	NikZgYcWcaiaXqwEXMlP0xaFWyN6s2THlk3BpwDD7yv6bYIctkO68Qu751oy+n
+X-Received: by 2002:a17:902:d592:b0:2a7:6c4e:5924 with SMTP id d9443c01a7336-2adca6e950fmr1322615ad.12.1772006162194;
+        Tue, 24 Feb 2026 23:56:02 -0800 (PST)
+Received: from google.com (222.245.187.35.bc.googleusercontent.com. [35.187.245.222])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ad7500e2b2sm124024035ad.52.2026.02.24.23.55.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Feb 2026 23:56:01 -0800 (PST)
+Date: Wed, 25 Feb 2026 07:55:51 +0000
+From: Pranjal Shrivastava <praan@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex@shazbot.org>,
+	Adithya Jayachandran <ajayachandra@nvidia.com>,
+	Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>,
+	David Rientjes <rientjes@google.com>,
+	Jacob Pan <jacob.pan@linux.microsoft.com>,
+	Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Jonathan Corbet <corbet@lwn.net>, Josh Hilke <jrhilke@google.com>,
+	Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org,
+	kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
+	Leon Romanovsky <leonro@nvidia.com>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	Lukas Wunner <lukas@wunner.de>,
+	=?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>,
+	Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Tomita Moeko <tomitamoeko@gmail.com>,
+	Vipin Sharma <vipinsh@google.com>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
+	Zhu Yanjun <yanjun.zhu@linux.dev>
+Subject: Re: [PATCH v2 07/22] vfio/pci: Notify PCI subsystem about devices
+ preserved across Live Update
+Message-ID: <aZ6rB-zmpaR3RLB_@google.com>
+References: <20260129212510.967611-1-dmatlack@google.com>
+ <20260129212510.967611-8-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A106:EE_|DS7PR12MB6166:EE_
-X-MS-Office365-Filtering-Correlation-Id: 75a7f91a-71da-4a43-1515-08de7442d4c8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|376014|7416014|1800799024|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?JLPaNDMZYkzRYIGA0FeqorLKsDrRVoDCPbZcQ3FTovZVpUc/pV0ERfN9gBLX?=
- =?us-ascii?Q?xo5EOnGPciPBBC9hWV0QNiN8LvQxUVz810j3bBYE00y2X2BchHR+ArnDJd4W?=
- =?us-ascii?Q?P3TLSu5v2ZG8BNiudxq+F8+Qcc/53TixzTy2/EMt6kOgZZrMkVv15T4UG2GN?=
- =?us-ascii?Q?MZWJsZg62cWvXy1ZpcMeT++lbVWs3VAQhnd00cQrAQe1Zf2TPJai0VxJxHBr?=
- =?us-ascii?Q?LWCkPV6dvTcDeo02UvgYknM/sFD1+ykNc2ME8RQwE08irBy+03PKy/+X5xLw?=
- =?us-ascii?Q?nXDKx9lG/JQ+EVtA1XyjwJrJi2adibVSF+FK39+6XEW3wNvq/71Y+upoToQV?=
- =?us-ascii?Q?EchX8/knbzRIwQWmbAJB4bHsTOi2FSFLnFhI4yozAdRYK2cuyws3O0JpxJ4F?=
- =?us-ascii?Q?/LN8dqKZPJWvlj5ltyXH82+/JcBtSRK/g1SYSooSG7eQFdAPTNT66qhD3uEP?=
- =?us-ascii?Q?A/fqr/5kTB02hIPuh6PNGwjkqu/7go49b1MKxCmqKsH1d2P1zGPEOecg8jCC?=
- =?us-ascii?Q?+gF/gSqozwEPX8g9ENeRSePJzEUCJcWBCQUfnjw+8hYhpDFFHEcgTVbkiPnT?=
- =?us-ascii?Q?/cG7tW7meyPAumFlFqZ1qr9U+Qhf0kLbxr4L1pNOJLDPS/raakoHILsZAZMQ?=
- =?us-ascii?Q?OS4nmFxmOxJJAJIqg8Zb4+tvGJd06UXBvj/gCI6F4rlFbyKz6toS1+vAJlLR?=
- =?us-ascii?Q?SiL5OCS+OF/Fo6uCg/3BmXENjEdpXVnNrgJRwZFWZ0BIzy+KCWH2iKBZxXbc?=
- =?us-ascii?Q?0N1P0ZU591WWQ8cCysd9Q+1qDr1mFO5GYsxL0SNBg8VC5rh6cRzNyPnsYCFY?=
- =?us-ascii?Q?WcDRJdpW6g4wXF3Sz9jtJFg2tSnIgtJgv7e0ydMGiZENjZ+Ymx1sHqAV8TCl?=
- =?us-ascii?Q?DzGFUU+J5KIbVEdaER4KmQaQk25JYOPx9OQAB9sjC9j/fAEcz8ybU4x2P3lk?=
- =?us-ascii?Q?vSR97Bti0yukqkjrCu3F0ZZyni59nhGgfUABFm2WkaDk4i8ODwzxoQN66ZvF?=
- =?us-ascii?Q?7qUhh1z9YFwol/woRJUIaict4XGcLQJpWgknUQRU0vgk5tWmzBNk00pfAMF3?=
- =?us-ascii?Q?ZdJse20QmO4wOxIgSVrnKWClfTVr0q54hOetUIqVS3Fi6I1FalIhLziCkbHp?=
- =?us-ascii?Q?EA38DZykthjgxn/eKLTdm355YthxEIn26gau0sCq7fdK+O2hiHhJ08Dd6iq9?=
- =?us-ascii?Q?A32B1Cvfv3ev+wT6pQybgcH7Onb7zNJjdVOa32sInwh1fW6n7n/bQgkJHXzf?=
- =?us-ascii?Q?iFcnVaT/rBQbwOsp73hvwX/wnqQQKYdH2U/rJS+fLjE/IGlkNUXm/NRfTCqn?=
- =?us-ascii?Q?/fxAj36yJJeNoCY2dk5Jprs8aMEn7PuKya+pgLVuYntTzeq6xGbqgpEl3wna?=
- =?us-ascii?Q?hf4/mdFaGduUEO00j32ZFolym8c63wGd4poP8xJtMGq2IMb1NVrkD16/6dqs?=
- =?us-ascii?Q?idy2OUZjkskvj7Bt3n49SfVdhT31ifjC2W8I79BZ5XTKlkLhPD6k+gsjua/8?=
- =?us-ascii?Q?dPxGG1hk2pE5B+OiOWXQz8V4pdDU8e0S+b9PTd/j6a9P+k4kNVZAvAOE+xGG?=
- =?us-ascii?Q?wUK3PMaeBzqgpmmou0WCCW7nudtSTpS0gM/Osx3KzGXjqgoNzAouDVKnWD8Z?=
- =?us-ascii?Q?RiwaFz0wmOqKR/InqZxD9YhpA06mp58jLXmGp6SbUuHdJQOtylA8bv1ycCMz?=
- =?us-ascii?Q?W+tHoA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(7416014)(1800799024)(13003099007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	rCEYdvds6LZ3vctCvc1fjPi7ZBKiMSqhOdmHRyJ/bmHZcJexnQ6ONIu5/Z/8Tv0xNrJxSp993k/a6vPK2kDRt7alMPMZSIf2NZ5axUCF+LpU28/n0XEHNi05QXjaOFl4f9W6mXvUpRpaakqFRviQzjUf7lzcpZpiZyhWvjdMuw/NarQSc36EqCF1s6Ms9HfL5xz8Yh4lbRxm/H3LLZcyfkNmmGHSLyjGLJtOlvwo9HU6g8b/O2qw/rVQJ4OyolFJ/XghQGBLbNgLSegMVXVhMUwAoGyPeteLr2SxJXz+/mnXwHmzq1IDiVis887MK18MITJAFdJHwYHWgz3nT9oaGiAOl6hH47p348GrRA46/z4g1XXrmzdfoAq5siYdTogyAd+HovzuKXCZcJaftCi98IJE6GNx28IBXjzOtt6oZXjOIa0dyxLhbZoc1VUBuAoz
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 07:52:31.9362
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 75a7f91a-71da-4a43-1515-08de7442d4c8
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0001A106.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6166
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260129212510.967611-8-dmatlack@google.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	FREEMAIL_CC(0.00)[shazbot.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev];
+	TAGGED_FROM(0.00)[bounces-71810-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_TWELVE(0.00)[44];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71809-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aik@amd.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.999];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 7C689193C25
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[praan@google.com,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5B535193DEE
 X-Rspamd-Action: no action
 
-CoCo VMs get their private memory allocated from guest_memfd
-("gmemfd") which is a KVM facility similar to memfd.
-The gmemfds does not allow mapping private memory to the userspace
-so the IOMMU_IOAS_MAP ioctl does not work.
+On Thu, Jan 29, 2026 at 09:24:54PM +0000, David Matlack wrote:
+> Notify the PCI subsystem about devices vfio-pci is preserving across
+> Live Update by registering the vfio-pci liveupdate file handler with the
+> PCI subsystem's FLB handler.
+> 
+> Notably this will ensure that devices preserved through vfio-pci will
+> have their PCI bus numbers preserved across Live Update, allowing VFIO
+> to use BDF as a key to identify the device across the Live Update and
+> (in the future) allow the device to continue DMA operations across
+> the Live Update.
+> 
+> This also enables VFIO to detect that a device was preserved before
+> userspace first retrieves the file from it, which will be used in
+> subsequent commits.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_liveupdate.c | 25 ++++++++++++++++++++++++-
+>  1 file changed, 24 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_liveupdate.c b/drivers/vfio/pci/vfio_pci_liveupdate.c
+> index 7f4117181fd0..ad915352303f 100644
+> --- a/drivers/vfio/pci/vfio_pci_liveupdate.c
+> +++ b/drivers/vfio/pci/vfio_pci_liveupdate.c
+> @@ -53,6 +53,8 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
+>  	if (IS_ERR(ser))
+>  		return PTR_ERR(ser);
+>  
+> +	pci_liveupdate_outgoing_preserve(pdev);
+> +
+>  	ser->bdf = pci_dev_id(pdev);
+>  	ser->domain = pci_domain_nr(pdev->bus);
+>  
+> @@ -62,6 +64,9 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
+>  
+>  static void vfio_pci_liveupdate_unpreserve(struct liveupdate_file_op_args *args)
+>  {
+> +	struct vfio_device *device = vfio_device_from_file(args->file);
+> +
+> +	pci_liveupdate_outgoing_unpreserve(to_pci_dev(device->dev));
+>  	kho_unpreserve_free(phys_to_virt(args->serialized_data));
+>  }
+>  
+> @@ -171,6 +176,9 @@ static bool vfio_pci_liveupdate_can_finish(struct liveupdate_file_op_args *args)
+>  
+>  static void vfio_pci_liveupdate_finish(struct liveupdate_file_op_args *args)
+>  {
+> +	struct vfio_device *device = vfio_device_from_file(args->file);
+> +
+> +	pci_liveupdate_incoming_finish(to_pci_dev(device->dev));
+>  	kho_restore_free(phys_to_virt(args->serialized_data));
+>  }
+>  
+> @@ -192,10 +200,24 @@ static struct liveupdate_file_handler vfio_pci_liveupdate_fh = {
+>  
+>  int __init vfio_pci_liveupdate_init(void)
+>  {
+> +	int ret;
+> +
+>  	if (!liveupdate_enabled())
+>  		return 0;
+> 
+> -	return liveupdate_register_file_handler(&vfio_pci_liveupdate_fh);
+> +	ret = liveupdate_register_file_handler(&vfio_pci_liveupdate_fh);
+> +	if (ret)
+> +		return ret;
 
-Use the existing IOMMU_IOAS_MAP_FILE ioctl to allow mapping from
-fd + offset. Detect the gmemfd case in pfn_reader_user_pin().
+Nit: We might need to handle the retval here if we remove the
+liveupdate_enabled() check above (as discussed in patch 2).
 
-For the new guest_memfd type, no additional reference is taken as
-pinning is guaranteed by the KVM guest_memfd library.
+> +
+> +	ret = pci_liveupdate_register_fh(&vfio_pci_liveupdate_fh);
+> +	if (ret)
+> +		goto error;
+> +
+> +	return 0;
+> +
+> +error:
+> +	liveupdate_unregister_file_handler(&vfio_pci_liveupdate_fh);
+> +	return ret;
+>  }
+>  
+>  void vfio_pci_liveupdate_cleanup(void)
+> @@ -203,5 +225,6 @@ void vfio_pci_liveupdate_cleanup(void)
+>  	if (!liveupdate_enabled())
+>  		return;
+>  
+> +	WARN_ON_ONCE(pci_liveupdate_unregister_fh(&vfio_pci_liveupdate_fh));
 
-There is no KVM-GMEMFD->IOMMUFD direct notification mechanism as
-the assumption is that:
-1) page stage change events will be handled by VMM which is going
-to call IOMMUFD to remap pages;
-2) shrinking GMEMFD equals to VM memory unplug and VMM is going to
-handle it.
+same here.
 
-Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
----
+>  	liveupdate_unregister_file_handler(&vfio_pci_liveupdate_fh);
+>  }
 
-This is for Trusted IO == TEE-IO == PCIe TDISP, etc.
-
-Previously posted here:
-https://lore.kernel.org/r/20250218111017.491719-13-aik@amd.com
-The main comment was "what is the lifetime of those folios()" and
-GMEMFD + QEMU should take care of it.
-
-And horrendous stuff like this is not really useful:
-https://github.com/AMDESE/linux-kvm/commit/7d73fd2cccb8489b1
-
----
- include/linux/kvm_host.h      |  4 +
- drivers/iommu/iommufd/pages.c | 80 ++++++++++++++++++--
- virt/kvm/guest_memfd.c        | 36 +++++++++
- 3 files changed, 113 insertions(+), 7 deletions(-)
-
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 995db7a7ba57..9369cf22b24e 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2673,4 +2673,8 @@ unsigned long kvm_get_vm_memory_attributes(struct kvm *kvm, gfn_t gfn);
- int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
- 					   struct kvm_memory_attributes2 *attrs);
- 
-+bool kvm_is_gmemfd(struct file *file);
-+struct folio *kvm_gmemfd_get_pfn(struct file *file, unsigned long index,
-+				 unsigned long *pfn, int *max_order);
-+
- #endif
-diff --git a/drivers/iommu/iommufd/pages.c b/drivers/iommu/iommufd/pages.c
-index dbe51ecb9a20..4c07e39e17d0 100644
---- a/drivers/iommu/iommufd/pages.c
-+++ b/drivers/iommu/iommufd/pages.c
-@@ -56,6 +56,9 @@
- #include <linux/slab.h>
- #include <linux/sched/mm.h>
- #include <linux/vfio_pci_core.h>
-+#include <linux/pagemap.h>
-+#include <linux/memcontrol.h>
-+#include <linux/kvm_host.h>
- 
- #include "double_span.h"
- #include "io_pagetable.h"
-@@ -660,7 +663,8 @@ static void batch_from_pages(struct pfn_batch *batch, struct page **pages,
- }
- 
- static int batch_from_folios(struct pfn_batch *batch, struct folio ***folios_p,
--			     unsigned long *offset_p, unsigned long npages)
-+			     unsigned long *offset_p, unsigned long npages,
-+			     bool do_pin)
- {
- 	int rc = 0;
- 	struct folio **folios = *folios_p;
-@@ -676,7 +680,7 @@ static int batch_from_folios(struct pfn_batch *batch, struct folio ***folios_p,
- 
- 		if (!batch_add_pfn_num(batch, pfn, nr, BATCH_CPU_MEMORY))
- 			break;
--		if (nr > 1) {
-+		if (nr > 1 && do_pin) {
- 			rc = folio_add_pins(folio, nr - 1);
- 			if (rc) {
- 				batch_remove_pfn_num(batch, nr);
-@@ -697,6 +701,7 @@ static int batch_from_folios(struct pfn_batch *batch, struct folio ***folios_p,
- static void batch_unpin(struct pfn_batch *batch, struct iopt_pages *pages,
- 			unsigned int first_page_off, size_t npages)
- {
-+	bool do_unpin = !kvm_is_gmemfd(pages->file);
- 	unsigned int cur = 0;
- 
- 	while (first_page_off) {
-@@ -710,9 +715,12 @@ static void batch_unpin(struct pfn_batch *batch, struct iopt_pages *pages,
- 		size_t to_unpin = min_t(size_t, npages,
- 					batch->npfns[cur] - first_page_off);
- 
--		unpin_user_page_range_dirty_lock(
--			pfn_to_page(batch->pfns[cur] + first_page_off),
--			to_unpin, pages->writable);
-+		/* Do nothing for guest_memfd */
-+		if (do_unpin)
-+			unpin_user_page_range_dirty_lock(
-+				pfn_to_page(batch->pfns[cur] + first_page_off),
-+				to_unpin, pages->writable);
-+
- 		iopt_pages_sub_npinned(pages, to_unpin);
- 		cur++;
- 		first_page_off = 0;
-@@ -872,6 +880,57 @@ static long pin_memfd_pages(struct pfn_reader_user *user, unsigned long start,
- 	return npages_out;
- }
- 
-+static long pin_guest_memfd_pages(struct pfn_reader_user *user, loff_t start, unsigned long npages)
-+{
-+	struct page **upages = user->upages;
-+	unsigned long offset = 0;
-+	loff_t uptr = start;
-+	long rc = 0;
-+
-+	for (unsigned long i = 0; (uptr - start) < (npages << PAGE_SHIFT); ++i) {
-+		unsigned long gfn = 0, pfn = 0;
-+		int max_order = 0;
-+		struct folio *folio;
-+
-+		folio = kvm_gmemfd_get_pfn(user->file, uptr >> PAGE_SHIFT, &pfn, &max_order);
-+		if (IS_ERR(folio))
-+			rc = PTR_ERR(folio);
-+
-+		if (rc == -EINVAL && i == 0) {
-+			pr_err_once("Must be vfio mmio at gfn=%lx pfn=%lx, skipping\n", gfn, pfn);
-+			return rc;
-+		}
-+
-+		if (rc) {
-+			pr_err("%s: %ld %ld %lx -> %lx\n", __func__,
-+			       rc, i, (unsigned long) uptr, (unsigned long) pfn);
-+			break;
-+		}
-+
-+		if (i == 0)
-+			offset = offset_in_folio(folio, start) >> PAGE_SHIFT;
-+
-+		user->ufolios[i] = folio;
-+
-+		if (upages) {
-+			unsigned long np = (1UL << (max_order + PAGE_SHIFT)) - offset_in_folio(folio, uptr);
-+
-+			for (unsigned long j = 0; j < np; ++j)
-+				*upages++ = folio_page(folio, offset + j);
-+		}
-+
-+		uptr += (1UL << (max_order + PAGE_SHIFT)) - offset_in_folio(folio, uptr);
-+	}
-+
-+	if (!rc) {
-+		rc = npages;
-+		user->ufolios_next = user->ufolios;
-+		user->ufolios_offset = offset;
-+	}
-+
-+	return rc;
-+}
-+
- static int pfn_reader_user_pin(struct pfn_reader_user *user,
- 			       struct iopt_pages *pages,
- 			       unsigned long start_index,
-@@ -925,7 +984,13 @@ static int pfn_reader_user_pin(struct pfn_reader_user *user,
- 
- 	if (user->file) {
- 		start = pages->start + (start_index * PAGE_SIZE);
--		rc = pin_memfd_pages(user, start, npages);
-+		if (kvm_is_gmemfd(pages->file)) {
-+			rc = pin_guest_memfd_pages(user, start, npages);
-+		} else {
-+			pr_err("UNEXP PINFD start=%lx sz=%lx file=%lx",
-+				start, npages << PAGE_SHIFT, (ulong) pages->file);
-+			rc = pin_memfd_pages(user, start, npages);
-+		}
- 	} else if (!remote_mm) {
- 		uptr = (uintptr_t)(pages->uptr + start_index * PAGE_SIZE);
- 		rc = pin_user_pages_fast(uptr, npages, user->gup_flags,
-@@ -1221,7 +1286,8 @@ static int pfn_reader_fill_span(struct pfn_reader *pfns)
- 				 npages);
- 	else
- 		rc = batch_from_folios(&pfns->batch, &user->ufolios_next,
--				       &user->ufolios_offset, npages);
-+				       &user->ufolios_offset, npages,
-+				       !kvm_is_gmemfd(pfns->pages->file));
- 	return rc;
- }
- 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index e4e21068cf2a..2a313888c21b 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -1794,3 +1794,39 @@ void kvm_gmem_exit(void)
- 	rcu_barrier();
- 	kmem_cache_destroy(kvm_gmem_inode_cachep);
- }
-+
-+bool kvm_is_gmemfd(struct file *file)
-+{
-+	if (!file)
-+		return false;
-+
-+	if (file->f_op != &kvm_gmem_fops)
-+		return false;
-+
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(kvm_is_gmemfd);
-+
-+struct folio *kvm_gmemfd_get_pfn(struct file *file, unsigned long index,
-+				 unsigned long *pfn, int *max_order)
-+{
-+	struct inode *inode = file_inode(file);
-+	struct folio *folio;
-+
-+	if (!inode || !kvm_is_gmemfd(file))
-+		return NULL;
-+
-+	folio = kvm_gmem_get_folio(inode, index);
-+	if (!folio)
-+		return NULL;
-+
-+
-+	*pfn = folio_pfn(folio) + (index & (folio_nr_pages(folio) - 1));
-+	*max_order = folio_order(folio);
-+
-+	folio_put(folio);
-+	folio_unlock(folio);
-+
-+	return folio;
-+}
-+EXPORT_SYMBOL_GPL(kvm_gmemfd_get_pfn);
--- 
-2.52.0
-
+Reviewed-by: Pranjal Shrivastava <praan@google.com>
+Thanks,
+Praan
 
