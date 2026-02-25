@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-71722-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71723-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IMxnFUpKnmnXUQQAu9opvQ
-	(envelope-from <kvm+bounces-71722-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 02:03:06 +0100
+	id wEr4LllKnmnXUQQAu9opvQ
+	(envelope-from <kvm+bounces-71723-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 02:03:21 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88BA918E7F9
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 02:03:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28AB118E801
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 02:03:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8A788306ED26
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 01:00:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AF39A3070DD6
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 01:00:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7994428AAEE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C92299924;
 	Wed, 25 Feb 2026 01:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EcWDyfxn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J6r5QVWj"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63DF7281341;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C7D285419;
 	Wed, 25 Feb 2026 01:00:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771981203; cv=none; b=TslAdCpD+2abUWzw9PTS5rLH89ZyuNRrU8q2STxaf3pddxy+Lwp1Mv9WfD3s1Zu3sfV+UtXiOTFLJ4Jtzf53VylnGrR0/PAUJxwz4XtysCosaSInUMWQNt89JKyA3vlUfyO3w4NMJVg5pcfehMiTGZjP7QXz98NyGsrdAXnZjXY=
+	t=1771981203; cv=none; b=gnc/BETjWmzPuC256E4rk/qOeF7TZQYB0Y7Pbovg+4TUZ9B/F1+Pegq8K4DpNVILLPm1yHOus6nlxU2Wu6IlnhrPAKDeFq2sQPS/R5b/XnCsPr3i5ZutsG2saNrxs8qcUimYz2XEsyLSvAzl2CYn9paAn7B8u2/nUMoaGIy7gOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1771981203; c=relaxed/simple;
-	bh=EBI2/8YnpxLRi6IkbJP88GTbYLkwR+A/P5v8Y9wBJHQ=;
+	bh=FavqCuxwPI2jjEa8BSTc8DH2PtmtIb+TIzINQXl1X+w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S6Ot2lOKkJADUe9SZV8ED5AMtgezyE2jBDf2EMSTnnfsX5HT1uCJJgOQUgNEQmbm6f63IPWUk/8zvVTdbLzyO6v3Wi/Con5ObIjBZ58gnRQJnjWua7Pg6mOvoYiFNzabnCKdn5ZkeD1rmmld3IB28ed0eGbY5tfmqluMiJmQe5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EcWDyfxn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8079C2BC86;
-	Wed, 25 Feb 2026 01:00:02 +0000 (UTC)
+	 MIME-Version; b=GGR/ew6MtrqNx6fISbpT2PUIQImZqvgF89BL+lnh/HLSLPEGXSvkqDZUzXcRaObeGNEBQFqtgoeEbH2az300H+M3Tsnhw7LLtgRObZpF+1gQpTnB0Csc/x5OKgus3tluypUA7gWGr2xTA4OcCD/92z2fIFRzKU1vlS9o3s+0Soo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J6r5QVWj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DDFDC116D0;
+	Wed, 25 Feb 2026 01:00:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1771981203;
-	bh=EBI2/8YnpxLRi6IkbJP88GTbYLkwR+A/P5v8Y9wBJHQ=;
+	bh=FavqCuxwPI2jjEa8BSTc8DH2PtmtIb+TIzINQXl1X+w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EcWDyfxnDw7YQxEL7+/jf6tA182IkMuyqR+uQ01I3OBTGHSM5OulZB4y+YSIEverf
-	 ZFKKe9k7nEYkY8VTF0TRg+kvDmc9GPTg19Vaa01s0CVlPR+aTaeFhvuPmaEmrDQV6V
-	 RQVXVLwoYbUkHhBGqrUdxRAUb/zX0FipOLBcb1iriZ6qaL5LzoAzLhFjz7EHGclnHF
-	 UI4JuxMdYLE8pRgctScBrgfvgbAWwDnMSkRCtrS/K4CZ3wylN0xARcblYdwrAh6pWb
-	 qPo8tnY4nRZVhtUQ884LUXnUDIfH9iNpiQKWyW9qxl43AqJ2Dvy6lmhrLoQCWeNdKk
-	 fUL6FAydK/Z7g==
+	b=J6r5QVWjVceXFSgUpkcP7WbDG86YQWboasi78WVoxH+KyzKYjF5mjGoC0DdA8n3fX
+	 kEZF61o2RzlIwBsL+F51TmdSsGq+2rCZM1ys4ngJHi2FZJIoTKdTtLcg8IE8OkCqwQ
+	 taImdHlRXiVgSTPE0xWBaMZVSnA0ue3THP5lRVnvAkPkU2FqaIqzbhGthvEMjl2R7O
+	 6Tc4PxkcswXCw5uJ0tnolNt00tf3FuyoLKOvE9KmCK6pfleE2SqJBYlQMdE3PGxouu
+	 3NxmixNOeOjDLuv5pDLBtPy6XQm6TNJn70U5eUYRGhfnTZkVnKbhH7lc1sz+weJhR1
+	 juaE3+nZKNVwg==
 From: Yosry Ahmed <yosry@kernel.org>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -51,9 +51,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH v3 6/8] KVM: nSVM: Delay stuffing L2's current RIP into NextRIP until vCPU run
-Date: Wed, 25 Feb 2026 00:59:48 +0000
-Message-ID: <20260225005950.3739782-7-yosry@kernel.org>
+Subject: [PATCH v3 7/8] KVM: nSVM: Delay setting soft IRQ RIP tracking fields until vCPU run
+Date: Wed, 25 Feb 2026 00:59:49 +0000
+Message-ID: <20260225005950.3739782-8-yosry@kernel.org>
 X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
 In-Reply-To: <20260225005950.3739782-1-yosry@kernel.org>
 References: <20260225005950.3739782-1-yosry@kernel.org>
@@ -76,7 +76,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71722-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71723-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -92,102 +92,110 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	RCPT_COUNT_FIVE(0.00)[6];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 88BA918E7F9
+X-Rspamd-Queue-Id: 28AB118E801
 X-Rspamd-Action: no action
 
-For guests with NRIPS disabled, L1 does not provide NextRIP when running
-an L2 with an injected soft interrupt, instead it advances L2's RIP
-before running it. KVM uses L2's current RIP as the NextRIP in vmcb02 to
-emulate a CPU without NRIPS.
+In the save+restore path, when restoring nested state, the values of RIP
+and CS base passed into nested_vmcb02_prepare_control() are mostly
+incorrect.  They are both pulled from the vmcb02. For CS base, the value
+is only correct if system regs are restored before nested state. The
+value of RIP is whatever the vCPU had in vmcb02 before restoring nested
+state (zero on a freshly created vCPU).
 
-However, in svm_set_nested_state(), the value used for L2's current RIP
-comes from vmcb02, which is just whatever the vCPU had in vmcb02 before
-restoring nested state (zero on a freshly created vCPU). Passing the
-cached RIP value instead (i.e. kvm_rip_read()) would only fix the issue
-if registers are restored before nested state.
-
-Instead, split the logic of setting NextRIP in vmcb02. Handle the
-'normal' case of initializing vmcb02's NextRIP using NextRIP from vmcb12
-(or KVM_GET_NESTED_STATE's payload) in nested_vmcb02_prepare_control().
-Delay the special case of stuffing L2's current RIP into vmcb02's
-NextRIP until shortly before the vCPU is run, to make sure the most
-up-to-date value of RIP is used regardless of KVM_SET_REGS and
-KVM_SET_NESTED_STATE's relative ordering.
+Instead, take a similar approach to NextRIP, and delay initializing the
+RIP tracking fields until shortly before the vCPU is run, to make sure
+the most up-to-date values of RIP and CS base are used regardless of
+KVM_SET_SREGS, KVM_SET_REGS, and KVM_SET_NESTED_STATE's relative
+ordering.
 
 Fixes: cc440cdad5b7 ("KVM: nSVM: implement KVM_GET_NESTED_STATE and KVM_SET_NESTED_STATE")
 CC: stable@vger.kernel.org
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Yosry Ahmed <yosry@kernel.org>
 ---
- arch/x86/kvm/svm/nested.c | 25 ++++++++-----------------
- arch/x86/kvm/svm/svm.c    | 17 +++++++++++++++++
- 2 files changed, 25 insertions(+), 17 deletions(-)
+ arch/x86/kvm/svm/nested.c | 17 ++++++++---------
+ arch/x86/kvm/svm/svm.c    | 10 ++++++++++
+ 2 files changed, 18 insertions(+), 9 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index f3ed1bdbe76c9..dcd4a8eb156f2 100644
+index dcd4a8eb156f2..4499241b4e401 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -845,24 +845,15 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
- 	vmcb02->control.event_inj_err       = svm->nested.ctl.event_inj_err;
- 
- 	/*
--	 * NextRIP is consumed on VMRUN as the return address pushed on the
--	 * stack for injected soft exceptions/interrupts.  If nrips is exposed
--	 * to L1, take it verbatim from vmcb12.
--	 *
--	 * If nrips is supported in hardware but not exposed to L1, stuff the
--	 * actual L2 RIP to emulate what a nrips=0 CPU would do (L1 is
--	 * responsible for advancing RIP prior to injecting the event). This is
--	 * only the case for the first L2 run after VMRUN. After that (e.g.
--	 * during save/restore), NextRIP is updated by the CPU and/or KVM, and
--	 * the value of the L2 RIP from vmcb12 should not be used.
-+	 * If nrips is exposed to L1, take NextRIP as-is.  Otherwise, L1
-+	 * advances L2's RIP before VMRUN instead of using NextRIP. KVM will
-+	 * stuff the current RIP as vmcb02's NextRIP before L2 is run.  After
-+	 * the first run of L2 (e.g. after save+restore), NextRIP is updated by
-+	 * the CPU and/or KVM and should be used regardless of L1's support.
- 	 */
--	if (boot_cpu_has(X86_FEATURE_NRIPS)) {
--		if (guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS) ||
--		    !svm->nested.nested_run_pending)
--			vmcb02->control.next_rip    = svm->nested.ctl.next_rip;
--		else
--			vmcb02->control.next_rip    = vmcb12_rip;
--	}
-+	if (guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS) ||
-+	    !svm->nested.nested_run_pending)
-+		vmcb02->control.next_rip = svm->nested.ctl.next_rip;
- 
- 	svm->nmi_l1_to_l2 = is_evtinj_nmi(vmcb02->control.event_inj);
- 	if (is_evtinj_soft(vmcb02->control.event_inj)) {
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 07f096758f34f..ded4372f2d499 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3660,6 +3660,23 @@ static int pre_svm_run(struct kvm_vcpu *vcpu)
- 	if (svm->current_vmcb->asid_generation != sd->asid_generation)
- 		new_asid(svm, sd);
- 
-+	/*
-+	 * If nrips is supported in hardware but not exposed to L1, stuff the
-+	 * actual L2 RIP to emulate what a nrips=0 CPU would do (L1 is
-+	 * responsible for advancing RIP prior to injecting the event). Once L2
-+	 * runs after L1 executes VMRUN, NextRIP is updated by the CPU and/or
-+	 * KVM, and this is no longer needed.
-+	 *
-+	 * This is done here (as opposed to when preparing vmcb02) to use the
-+	 * most up-to-date value of RIP regardless of the order of restoring
-+	 * registers and nested state in the vCPU save+restore path.
-+	 */
-+	if (is_guest_mode(vcpu) && svm->nested.nested_run_pending) {
-+		if (boot_cpu_has(X86_FEATURE_NRIPS) &&
-+		    !guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS))
-+			svm->vmcb->control.next_rip = kvm_rip_read(vcpu);
-+	}
-+
- 	return 0;
+@@ -742,9 +742,7 @@ static bool is_evtinj_nmi(u32 evtinj)
+ 	return type == SVM_EVTINJ_TYPE_NMI;
  }
  
+-static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+-					  unsigned long vmcb12_rip,
+-					  unsigned long vmcb12_csbase)
++static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
+ {
+ 	u32 int_ctl_vmcb01_bits = V_INTR_MASKING_MASK;
+ 	u32 int_ctl_vmcb12_bits = V_TPR_MASK | V_IRQ_INJECTION_BITS_MASK;
+@@ -856,14 +854,15 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+ 		vmcb02->control.next_rip = svm->nested.ctl.next_rip;
+ 
+ 	svm->nmi_l1_to_l2 = is_evtinj_nmi(vmcb02->control.event_inj);
++
++	/*
++	 * soft_int_csbase, soft_int_old_rip, and soft_int_next_rip (if L1
++	 * doesn't have NRIPS)  are initialized later, before the vCPU is run.
++	 */
+ 	if (is_evtinj_soft(vmcb02->control.event_inj)) {
+ 		svm->soft_int_injected = true;
+-		svm->soft_int_csbase = vmcb12_csbase;
+-		svm->soft_int_old_rip = vmcb12_rip;
+ 		if (guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS))
+ 			svm->soft_int_next_rip = svm->nested.ctl.next_rip;
+-		else
+-			svm->soft_int_next_rip = vmcb12_rip;
+ 	}
+ 
+ 	/* LBR_CTL_ENABLE_MASK is controlled by svm_update_lbrv() */
+@@ -961,7 +960,7 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+ 	nested_svm_copy_common_state(svm->vmcb01.ptr, svm->nested.vmcb02.ptr);
+ 
+ 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
+-	nested_vmcb02_prepare_control(svm, vmcb12->save.rip, vmcb12->save.cs.base);
++	nested_vmcb02_prepare_control(svm);
+ 	nested_vmcb02_prepare_save(svm, vmcb12);
+ 
+ 	ret = nested_svm_load_cr3(&svm->vcpu, svm->nested.save.cr3,
+@@ -1906,7 +1905,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 	nested_copy_vmcb_control_to_cache(svm, ctl);
+ 
+ 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
+-	nested_vmcb02_prepare_control(svm, svm->vmcb->save.rip, svm->vmcb->save.cs.base);
++	nested_vmcb02_prepare_control(svm);
+ 
+ 	/*
+ 	 * While the nested guest CR3 is already checked and set by
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index ded4372f2d499..7948e601ea784 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3670,11 +3670,21 @@ static int pre_svm_run(struct kvm_vcpu *vcpu)
+ 	 * This is done here (as opposed to when preparing vmcb02) to use the
+ 	 * most up-to-date value of RIP regardless of the order of restoring
+ 	 * registers and nested state in the vCPU save+restore path.
++	 *
++	 * Simiarly, initialize svm->soft_int_* fields here to use the most
++	 * up-to-date values of RIP and CS base, regardless of restore order.
+ 	 */
+ 	if (is_guest_mode(vcpu) && svm->nested.nested_run_pending) {
+ 		if (boot_cpu_has(X86_FEATURE_NRIPS) &&
+ 		    !guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS))
+ 			svm->vmcb->control.next_rip = kvm_rip_read(vcpu);
++
++		if (svm->soft_int_injected) {
++			svm->soft_int_csbase = svm->vmcb->save.cs.base;
++			svm->soft_int_old_rip = kvm_rip_read(vcpu);
++			if (!guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS))
++				svm->soft_int_next_rip = kvm_rip_read(vcpu);
++		}
+ 	}
+ 
+ 	return 0;
 -- 
 2.53.0.414.gf7e9f6c205-goog
 
