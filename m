@@ -1,303 +1,216 @@
-Return-Path: <kvm+bounces-71743-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71744-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qHh7GLlPnmlIUgQAu9opvQ
-	(envelope-from <kvm+bounces-71743-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 02:26:17 +0100
+	id WEuvIF9QnmlIUgQAu9opvQ
+	(envelope-from <kvm+bounces-71744-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 02:29:03 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8478C18EA39
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 02:26:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 081D018EB9A
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 02:29:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0FD193085790
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 01:22:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EDB34304FFBF
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 01:25:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C687279DB3;
-	Wed, 25 Feb 2026 01:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31AB256C6C;
+	Wed, 25 Feb 2026 01:25:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BH2WDDCB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0EFQtS/K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4DC286D64
-	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 01:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29F61D5ABA
+	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 01:25:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771982480; cv=none; b=CamICrnQq+fhwA8YTP8LPkqgnntcB0XMExMTqx/sDslKeKe8WPL82f4LpKMsE6gZNaiKfon43/32o1YzQQ33+5lcjzZRUCoCzUg2helDq7osG+iGHDTe3KucGwcsZzfeBIyYQWQeZWQA0Mpde6RXz/AutOCnE9RmNPSP6lh5eC8=
+	t=1771982754; cv=none; b=IEojdKiRpzQ/KfcVRYc1/VHYHdz3Y9dQHSfKTGexWsCPEtgEsqZiExAvkn1CvJcFlTgZOdp0b87gZin7Ev8x2AbWrtR2OvJx+h0eTG8Kk2jUBW2aY18RxcPtnRGf29Dwrbrc0IIVY76d4LPbBCvlG/R3pPkKau7gcJFnz85jmlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771982480; c=relaxed/simple;
-	bh=IuDnIRUgFkFMGAUuxCS338MB/VHIWV/Tt1I66OqunQE=;
+	s=arc-20240116; t=1771982754; c=relaxed/simple;
+	bh=ryim3kBKfVpNClBm87uaeHeC28gK3jBN4xRGvEH2sTo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LY/wA3NwZADj5eWXMHGhigUEWu289LUyQhob+2H8iJnJvr7wBhFwmamXJWapSeHO8wLOMs9x4MsGqzC4y4pWtDIREan4zI2KEFRroyHzxm6jJInWfECBYn3+FzwJaQOlVz6HaODAN0cOpVL6OcUpV49mdOoO5ry1v5efaqGkEyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BH2WDDCB; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=Geffd/h+qhsR3E9+xlWyZq5ygXZXZiwx115RNe4B5crF0s06M2NmTZAQG/vhaM2wbAEv8r63Jrg1JaARNTGZ+x8NGcKAr7EiSuX899JNwHYOixQKb+8b5EZiqt+xjIYnoq4Syy5LtcOOI9IWmqlqVkmCPVux00aXKIefZlemTf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0EFQtS/K; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c6e24ee93a6so228291a12.0
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 17:21:19 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-35449510446so6100465a91.0
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 17:25:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771982479; x=1772587279; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=06Kr2IGpW9wlaU49L7FaC2EfLlqxR0kfrYYtwtYSIqY=;
-        b=BH2WDDCBdSTPYuywWHLI7FH7LB7c4yiB9eBtYCCMOsx8Y/Ue5MmmbBiwulwW6eTTzk
-         MczA0kws+5MaxIGhEH/eifdoy13BY4330sIM5kgfyGfaodGuxnGJwlgeyrlg6e9NUzdv
-         O8gH3rtGgDv4oCZZNq5mviSvkookc11ZvE2018R3eLA5+uPOeCCq13ucga57dzLFcgLz
-         ehOLVBHrlnnsNYI813oQcLnvottbzM1nrZlMzTO8SKpfCJEZtVCGeyGoMHA/H8u63WM7
-         GtZDD01Gy2yk8nQg9BXRmu2XfPDgStsWJ5kh7QtNgiLEc7YJg/QOrySmKqYYH2O7DRCy
-         EtGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771982479; x=1772587279;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=google.com; s=20230601; t=1771982752; x=1772587552; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=06Kr2IGpW9wlaU49L7FaC2EfLlqxR0kfrYYtwtYSIqY=;
-        b=phgZRwHNEhzU693paQ/pq7BCXTBQqykdCXWrfxA6aKrNayBN7i4ypeaWMFJTurO7L7
-         s7SInTdOc7K1IaF5oFYBFUI7jrD7hRgXvoDaAx6MFvMKxfc1iHMOkgcPoOxWm/evwltl
-         cK3KGfhGcuH4dlLfiGd1UGHV86HApiPyBBfbpQVtDmv0/fsnzUgDDnrQsQZ7iGcKavbK
-         xADwqdrCrrWPy51l0elluLWhtamq696Jx6ia+QpHTHbaGh9dDhe8r15IYaHO9ZD2EEIk
-         CUNpJrceymaw6s74+nlhmj6KhRQGbrh/kbCdpuuW4D85QnR+vNcJpH7mhx2D8J10cwhn
-         CH6Q==
-X-Gm-Message-State: AOJu0YwoKsLgFweXnGSkbmlVqqlhYtmhb7gNVjdKCmp8iK3Un9QJWKV5
-	IKxtkJJiy+Tn9noQFlxD6oRWMHw317eKJS+tKJXGKCNUtQ5GtdGUZJEeeEcXf8C/yursHd4kOmH
-	v7gZ5cw==
-X-Received: from pgeh5.prod.google.com ([2002:a05:6a02:53c5:b0:c6e:8a5c:a772])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7d9b:b0:37c:b74c:d8c7
- with SMTP id adf61e73a8af0-3959ac989c4mr1507787637.22.1771982478801; Tue, 24
- Feb 2026 17:21:18 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 24 Feb 2026 17:20:49 -0800
-In-Reply-To: <20260225012049.920665-1-seanjc@google.com>
+        bh=O/dMkWi/E0gzEc9xlKrxZrN+8RFKbCVIlfOl5w/8K8Y=;
+        b=0EFQtS/KT1thHFV9tfcvpczJxk3g5SeTrr0uSyDAJ3+UEMl4FdqYUuG/56DfZXI2S7
+         YZGap1Sfsqz/XclpY/JinY31UWfjnDjeEIeKPVdUEPOcV+K3hGd1ZMYsCpmmBoTuM7ro
+         jpJN5AaWg7WiHO+5PWvCL9MFpHagNIOQw6DEcUsStcHwTe9fYdEmWC5cHTnh6EXrZKe0
+         YZm7+4g9RZWuKLmu9PkLnhgfTbK2SdnQM/SE/gy2/aOKnJ0QhpAwxs1izgdfdMg5O0dv
+         fJv/WkCBSkItjo93dRV2HScnHjGGTxzs8XkMXhn8C2W7QsGxEZtgCAS/O7WnhK1h2gxk
+         RDEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771982752; x=1772587552;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=O/dMkWi/E0gzEc9xlKrxZrN+8RFKbCVIlfOl5w/8K8Y=;
+        b=nu0mH0VLqMYCY8AZFQj8i6QXG7/I7o1R58BuI6O+YzQ5e4RPYr0g7YAU2m7lvpsWjs
+         ygbWuXlKZFTn3sZLVEr43iJQFhoT5pCdppFSjNdSutsBI2vzX+vBZDvMxs/ZXVGtRQiM
+         YaAY+mJvtpYfLRAOW1OWLdKaOWJmulwrQ+nqttjgdontV5IV+0AFR10QLnYkGU9Wci6o
+         GhQCzbYzZQXtyk8vzwcgCNBf7UTf6SI3Anuehw5knVbwjifV9/tSY7wXps9MuwN0cvRV
+         JK7e1k/AvthXqBhSJra6JvYRihrNYGDGlU8xi0iXAb8ilutViJLSr6O0kcl2CAdknBxp
+         z98w==
+X-Forwarded-Encrypted: i=1; AJvYcCVfjr9XYjysc3XskZXbBEqCtZcHJm2DRVX3dObBq7K349/Y3g3XeutDKbK0JyUt+r6cwV4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyV1A3h4rcVzS/j5Y0QOz69cqhC3zwkDSNLQNjxPdTfH7HlO8V1
+	G0VL7jHX0xm1jfhw0jJO95S3B4DRrnX/EwimbvITlBPHkQibWVwt8wuOU9s+tQYVnLAlmAfX6Tq
+	xWBGbTg==
+X-Received: from pjbge3.prod.google.com ([2002:a17:90b:e03:b0:354:be64:d426])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2812:b0:354:a9f3:68bc
+ with SMTP id 98e67ed59e1d1-358ae8e8390mr10841719a91.30.1771982752378; Tue, 24
+ Feb 2026 17:25:52 -0800 (PST)
+Date: Tue, 24 Feb 2026 17:25:50 -0800
+In-Reply-To: <CAO9r8zO+Eej0AjzQt6dnELKLKHZ33DGLbDv=_sP1J1qLMVWpvw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260225012049.920665-1-seanjc@google.com>
-X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
-Message-ID: <20260225012049.920665-15-seanjc@google.com>
-Subject: [PATCH 14/14] KVM: x86: Add helpers to prepare kvm_run for userspace
- MMIO exit
+References: <20260223154636.116671-1-yosry@kernel.org> <20260223154636.116671-3-yosry@kernel.org>
+ <CAO9r8zPsAMaiU794xoXDso3sdAM0_EN2PyE13vR4NqqEh9e2=g@mail.gmail.com>
+ <aZ5ItfEUtIlVbzuQ@google.com> <CAO9r8zPbu1BsOsPU02YcCLDbRXZoDmVd8XiMHssSDnkjdDPC4g@mail.gmail.com>
+ <aZ5MF8_RK56C8B9Q@google.com> <CAO9r8zO+Eej0AjzQt6dnELKLKHZ33DGLbDv=_sP1J1qLMVWpvw@mail.gmail.com>
+Message-ID: <aZ5Pnvb4OAVWWtuR@google.com>
+Subject: Re: [PATCH v1 2/4] KVM: nSVM: Delay stuffing L2's current RIP into
+ NextRIP until vCPU run
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Kiryl Shutsemau <kas@kernel.org>
-Cc: kvm@vger.kernel.org, x86@kernel.org, linux-coco@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Yashu Zhang <zhangjiaji1@huawei.com>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
-	Xiaoyao Li <xiaoyao.li@intel.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	Michael Roth <michael.roth@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Yosry Ahmed <yosry@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-71744-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71743-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	HAS_REPLYTO(0.00)[seanjc@google.com];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: 8478C18EA39
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5]
+X-Rspamd-Queue-Id: 081D018EB9A
 X-Rspamd-Action: no action
 
-Add helpers to fill kvm_run for userspace MMIO exits to deduplicate a
-variety of code, and to allow for a cleaner return path in
-emulator_read_write().
+On Tue, Feb 24, 2026, Yosry Ahmed wrote:
+> On Tue, Feb 24, 2026 at 5:10=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > On Tue, Feb 24, 2026, Yosry Ahmed wrote:
+> > > > > Doing this in svm_prepare_switch_to_guest() is wrong, or at least
+> > > > > after the svm->guest_state_loaded check. It's possible to emulate=
+ the
+> > > > > nested VMRUN without doing a vcpu_put(), which means
+> > > > > svm->guest_state_loaded will remain true and this code will be
+> > > > > skipped.
+> > > > >
+> > > > > In fact, this breaks the svm_nested_soft_inject_test test. Funny
+> > > > > enough, I was only running it with my repro changes, which papere=
+d
+> > > > > over the bug because it forced an exit to userspace after VMRUN d=
+ue to
+> > > > > single-stepping, so svm->guest_state_loaded got cleared and the c=
+ode
+> > > > > was executed on the next KVM_RUN, before L2 runs.
+> > > > >
+> > > > > I can move it above the svm->guest_state_loaded check, but I thin=
+k I
+> > > > > will just put it in pre_svm_run() instead.
+> > > >
+> > > > I would rather not expand pre_svm_run(), and instead just open code=
+ it in
+> > > > svm_vcpu_run().  pre_svm_run() probably should never have been adde=
+d, because
+> > > > it's far from a generic "pre run" API.  E.g. if we want to keep the=
+ helper around,
+> > > > it should probably be named something something ASID.
+> > >
+> > > I sent a new version before I saw your response.. sorry.
+> > >
+> > > How strongly do you feel about this? :P
+> >
+> > Strong enough that I'll fix it up when applying, unless it's a sticking=
+ point on
+> > your end.
+>=20
+> It's just that 99% of the time someone is reading svm_vcpu_run(), they
+> won't care about this code, and it's also cognitive load to filter it
+> out. We can add a helper for this code (and the soft IRQ inject),
+> something like svm_fixup_nested_rips() or sth.
 
-No functional change intended.
+I don't entirely disagree, but at the same time, why is someome reading svm=
+_vcpu_run()
+if they don't want to look at the gory details?
 
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Michael Roth <michael.roth@amd.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/tdx.c | 14 ++++----------
- arch/x86/kvm/x86.c     | 42 ++++++++----------------------------------
- arch/x86/kvm/x86.h     | 24 ++++++++++++++++++++++++
- 3 files changed, 36 insertions(+), 44 deletions(-)
+> We discussed a helper before and you didn't like it, but that was in a
+> different context (a helper that combined normal and special cases).
+> WDYT?
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 5df9d32d2058..a813c502336c 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1467,17 +1467,11 @@ static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
- 
- 	/* Request the device emulation to userspace device model. */
- 	vcpu->mmio_is_write = write;
--	if (!write)
-+
-+	__kvm_prepare_emulated_mmio_exit(vcpu, gpa, size, &val, write);
-+
-+	if (!write) {
- 		vcpu->arch.complete_userspace_io = tdx_complete_mmio_read;
--
--	vcpu->run->mmio.phys_addr = gpa;
--	vcpu->run->mmio.len = size;
--	vcpu->run->mmio.is_write = write;
--	vcpu->run->exit_reason = KVM_EXIT_MMIO;
--
--	if (write) {
--		memcpy(vcpu->run->mmio.data, &val, size);
--	} else {
- 		vcpu->mmio_fragments[0].gpa = gpa;
- 		vcpu->mmio_fragments[0].len = size;
- 		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, size, gpa, NULL);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5376b370b4db..889a9098403c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8210,7 +8210,6 @@ static int emulator_read_write(struct x86_emulate_ctxt *ctxt,
- 			const struct read_write_emulator_ops *ops)
- {
- 	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
--	struct kvm_mmio_fragment *frag;
- 	int rc;
- 
- 	if (WARN_ON_ONCE((bytes > 8u || !ops->write) && object_is_on_stack(val)))
-@@ -8268,12 +8267,9 @@ static int emulator_read_write(struct x86_emulate_ctxt *ctxt,
- 
- 	vcpu->mmio_needed = 1;
- 	vcpu->mmio_cur_fragment = 0;
-+	vcpu->mmio_is_write = ops->write;
- 
--	frag = &vcpu->mmio_fragments[0];
--	vcpu->run->mmio.len = min(8u, frag->len);
--	vcpu->run->mmio.is_write = vcpu->mmio_is_write = ops->write;
--	vcpu->run->exit_reason = KVM_EXIT_MMIO;
--	vcpu->run->mmio.phys_addr = frag->gpa;
-+	kvm_prepare_emulated_mmio_exit(vcpu, &vcpu->mmio_fragments[0]);
- 
- 	/*
- 	 * For MMIO reads, stop emulating and immediately exit to userspace, as
-@@ -8283,11 +8279,7 @@ static int emulator_read_write(struct x86_emulate_ctxt *ctxt,
- 	 * after completing emulation (see the check on vcpu->mmio_needed in
- 	 * x86_emulate_instruction()).
- 	 */
--	if (!ops->write)
--		return X86EMUL_IO_NEEDED;
--
--	memcpy(vcpu->run->mmio.data, frag->data, min(8u, frag->len));
--	return X86EMUL_CONTINUE;
-+	return ops->write ? X86EMUL_CONTINUE : X86EMUL_IO_NEEDED;
- }
- 
- static int emulator_read_emulated(struct x86_emulate_ctxt *ctxt,
-@@ -11884,12 +11876,7 @@ static int complete_emulated_mmio(struct kvm_vcpu *vcpu)
- 		return complete_emulated_io(vcpu);
- 	}
- 
--	run->exit_reason = KVM_EXIT_MMIO;
--	run->mmio.phys_addr = frag->gpa;
--	if (vcpu->mmio_is_write)
--		memcpy(run->mmio.data, frag->data, min(8u, frag->len));
--	run->mmio.len = min(8u, frag->len);
--	run->mmio.is_write = vcpu->mmio_is_write;
-+	kvm_prepare_emulated_mmio_exit(vcpu, frag);
- 	vcpu->arch.complete_userspace_io = complete_emulated_mmio;
- 	return 0;
- }
-@@ -14296,15 +14283,8 @@ static int complete_sev_es_emulated_mmio(struct kvm_vcpu *vcpu)
- 	}
- 
- 	// More MMIO is needed
--	run->mmio.phys_addr = frag->gpa;
--	run->mmio.len = min(8u, frag->len);
--	run->mmio.is_write = vcpu->mmio_is_write;
--	if (run->mmio.is_write)
--		memcpy(run->mmio.data, frag->data, min(8u, frag->len));
--	run->exit_reason = KVM_EXIT_MMIO;
--
-+	kvm_prepare_emulated_mmio_exit(vcpu, frag);
- 	vcpu->arch.complete_userspace_io = complete_sev_es_emulated_mmio;
--
- 	return 0;
- }
- 
-@@ -14333,23 +14313,17 @@ int kvm_sev_es_mmio(struct kvm_vcpu *vcpu, bool is_write, gpa_t gpa,
- 	 *       requests that split a page boundary.
- 	 */
- 	frag = vcpu->mmio_fragments;
--	vcpu->mmio_nr_fragments = 1;
- 	frag->len = bytes;
- 	frag->gpa = gpa;
- 	frag->data = data;
- 
- 	vcpu->mmio_needed = 1;
- 	vcpu->mmio_cur_fragment = 0;
-+	vcpu->mmio_nr_fragments = 1;
-+	vcpu->mmio_is_write = is_write;
- 
--	vcpu->run->mmio.phys_addr = gpa;
--	vcpu->run->mmio.len = min(8u, frag->len);
--	vcpu->run->mmio.is_write = is_write;
--	if (is_write)
--		memcpy(vcpu->run->mmio.data, frag->data, min(8u, frag->len));
--	vcpu->run->exit_reason = KVM_EXIT_MMIO;
--
-+	kvm_prepare_emulated_mmio_exit(vcpu, frag);
- 	vcpu->arch.complete_userspace_io = complete_sev_es_emulated_mmio;
--
- 	return 0;
- }
- EXPORT_SYMBOL_FOR_KVM_INTERNAL(kvm_sev_es_mmio);
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 1d0f0edd31b3..d66f1c53d2b5 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -718,6 +718,30 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
- 			 unsigned int port, void *data,  unsigned int count,
- 			 int in);
- 
-+static inline void __kvm_prepare_emulated_mmio_exit(struct kvm_vcpu *vcpu,
-+						    gpa_t gpa, unsigned int len,
-+						    const void *data,
-+						    bool is_write)
-+{
-+	struct kvm_run *run = vcpu->run;
-+
-+	run->mmio.len = min(8u, len);
-+	run->mmio.is_write = is_write;
-+	run->exit_reason = KVM_EXIT_MMIO;
-+	run->mmio.phys_addr = gpa;
-+	if (is_write)
-+		memcpy(run->mmio.data, data, min(8u, len));
-+}
-+
-+static inline void kvm_prepare_emulated_mmio_exit(struct kvm_vcpu *vcpu,
-+						  struct kvm_mmio_fragment *frag)
-+{
-+	WARN_ON_ONCE(!vcpu->mmio_needed || !vcpu->mmio_nr_fragments);
-+
-+	__kvm_prepare_emulated_mmio_exit(vcpu, frag->gpa, frag->len, frag->data,
-+					 vcpu->mmio_is_write);
-+}
-+
- static inline bool user_exit_on_hypercall(struct kvm *kvm, unsigned long hc_nr)
- {
- 	return kvm->arch.hypercall_exit_enabled & BIT(hc_nr);
--- 
-2.53.0.414.gf7e9f6c205-goog
+A helper would work.  svm_fixup_nested_rips() is good, the only flaw is the=
+ CS.base
+chunk, but I'm not sure I care enough about 32-bit to reject the name just =
+because
+of that :-)
 
+That would make it easier to reduce indentation, e.g.
+
+static void svm_fixup_nested_rips(struct kvm_vcpu *vcpu)
+{
+	struct vcpu_svm *svm =3D to_svm(vcpu);
+
+	/*
+	 * If nrips is supported in hardware but not exposed to L1, stuff the
+	 * actual L2 RIP to emulate what a nrips=3D0 CPU would do (L1 is
+	 * responsible for advancing RIP prior to injecting the event). Once L2
+	 * runs after L1 executes VMRUN, NextRIP is updated by the CPU and/or
+	 * KVM, and this is no longer needed.
+	 *
+	 * This is done here (as opposed to when preparing vmcb02) to use the
+	 * most up-to-date value of RIP regardless of the order of restoring
+	 * registers and nested state in the vCPU save+restore path.
+	 *
+	 * Simiarly, initialize svm->soft_int_* fields here to use the most
+	 * up-to-date values of RIP and CS base, regardless of restore order.
+	 */
+	if (!is_guest_mode(vcpu) || !svm->nested.nested_run_pending)
+		return;
+
+	if (boot_cpu_has(X86_FEATURE_NRIPS) &&
+	    !guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS))
+		svm->vmcb->control.next_rip =3D kvm_rip_read(vcpu);
+
+	if (svm->soft_int_injected) {
+		svm->soft_int_csbase =3D svm->vmcb->save.cs.base;
+		svm->soft_int_old_rip =3D kvm_rip_read(vcpu);
+		if (!guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS))
+			svm->soft_int_next_rip =3D kvm_rip_read(vcpu);
+	}
+}
 
