@@ -1,139 +1,146 @@
-Return-Path: <kvm+bounces-71712-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71713-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sFCJIEo7nmkZUQQAu9opvQ
-	(envelope-from <kvm+bounces-71712-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 00:59:06 +0100
+	id 4PruJv49nmkrUQQAu9opvQ
+	(envelope-from <kvm+bounces-71713-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 01:10:38 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1644218E360
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 00:59:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F290B18E513
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 01:10:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F1649305A6C2
-	for <lists+kvm@lfdr.de>; Tue, 24 Feb 2026 23:58:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 31179308860C
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 00:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36254364036;
-	Tue, 24 Feb 2026 23:58:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E760C190473;
+	Wed, 25 Feb 2026 00:08:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dMeVcH4W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HmgnYt8c"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BCC34CFCB
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 23:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265E278F2F
+	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 00:08:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771977530; cv=none; b=G/0S9W9lIklSgcr26vHxBArZ/JkujBxKI90PxgIQ77+W2FAtNz4uiwyIqXPb5jpeFAgudQeI2iErmytld5SPkMOY/xIx4LE5dPXrnehtUR6056meBjsC1NJ+TCuU+p8BmxveHso7gFM4dFvH9rqIlQ19ZgB+jNKX/xf2GfTfUH8=
+	t=1771978083; cv=none; b=MBWZFz14M6ZG0kNX6PgEnUt+5ind6v+mYgP8Q0ZEdWE/+xp9icxANYFP708+DUg9XJgX9yVGxkXpgSxaOrce9QIhpzYm3IlhaJ/1W6OvjqtJFCOpEqb3XzHU8TCUgCGeZ/K5V201pw2loZ1PQtQH0Ql9VIrlVBjFKL2wv1wxw2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771977530; c=relaxed/simple;
-	bh=1hZ09gpBg3VxEVvQ/Q7NWvATkzz701KmBrmzFwCUlTg=;
+	s=arc-20240116; t=1771978083; c=relaxed/simple;
+	bh=t4OlGCajUJLiL4hjzQEmUeYGoH2v3yJnUwQ7oIfKBTE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s/VCf0k7gFViFRvnqAJZqlEhB3dakfbcFq0K3zaPVBCpmm8Ck/wpiaSD9aFIEG7r/cdBBfUxpK3fc1R+oWxqUJaMgGVLDcYpZwItCtGcb7VtzsH3hnkDREe9xbhqvDwSFyEFe2zPm7Ft6SOR62gh5YDdQbzqmaQA2DBBc5OrfoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dMeVcH4W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10751C116D0
-	for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 23:58:50 +0000 (UTC)
+	 To:Cc:Content-Type; b=QV4Apo/HOlaNVdDNm2i8W5rxmya3rdYZhBn4aRtjsYQVXKv/3DRfA70DDsOXSDFGbux/jbxjdwCEq3aKd2rOqGlKBSssTIdWw0zj9Hl6cCiOcUffs6ANeurj2edqqdtbFswjoQNtTdQ7LlNCL0uoj+wYTUsqmqZSyk7lJPONa+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HmgnYt8c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2AA8C2BC86
+	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 00:08:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771977530;
-	bh=1hZ09gpBg3VxEVvQ/Q7NWvATkzz701KmBrmzFwCUlTg=;
+	s=k20201202; t=1771978082;
+	bh=t4OlGCajUJLiL4hjzQEmUeYGoH2v3yJnUwQ7oIfKBTE=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=dMeVcH4WPUEvz+jpiMu20Z/UDAFQhvcGtGyOlowm/uju+HHN1ANEP6OhCf+jGOY/Z
-	 d+7g5ZvP9ZEkn+TAkDJPbO4Hlbsn/OL+TDhjvlXbEqKQ7JUMwd1jFZj+oS+LulJ82y
-	 iKkEsE/CFxfhWkR9p9R4WInBQQ8IizWa5PLvBvUPqhe4tRxDNxTAjwCU89rcBMghPX
-	 LzGzwLMDmrXxlmnb0ZsWHrMwyQ9Z8IvtWqMbd2yF2O5m38pn+zpWFIp8ibJW3xnLwT
-	 zajqYiJWSU52fWucWzZa4Xzj8LJ+JUV8GAF1DO71OXV5CtCRGpC61E8EP/E68NyHT/
-	 wNuryagFVfkFw==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b8f96f6956aso845381666b.3
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 15:58:49 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVTDz62aGM5IlZKWpetLu8PRfZJh5voxxIQYKdM6/WR7WHSTyXOQozwqfFCYw2hTs1oYSI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4RBQFshpB2AVzvSh/a/299BMhauWMyLZBTfyFi0vNJskk3dfI
-	frxIfW4oVKwjJ1vlMLAElc2AuejpL5O+lsh/ef5YyHhxsIrgWdbTgeYd4husYliF0OqrWYU8xca
-	j6PtJQN5UGB50BGX21Z0Umem10UAzRjI=
-X-Received: by 2002:a17:907:960c:b0:b8a:fa35:989f with SMTP id
- a640c23a62f3a-b9081b3e5f0mr837382666b.38.1771977528918; Tue, 24 Feb 2026
- 15:58:48 -0800 (PST)
+	b=HmgnYt8cDUerhw0jKwrAoTnKG3pLVMXeOx5sPwAkAHLD9xh5tXtzc2BjxyLrDPSoF
+	 Jpk4qbLip/0nAeOyJzmZT+xSOs6/lbPTlluMfxh9ZLnerz8UPUwM+pUZYIGXRrcAET
+	 91wbYXk4QeJ7VAFe89OOGf2HTgt2wtDhfF3up5d1cyWTTSCl5IFyjTTFz93CK1/BpM
+	 rdp8lAiau7X98IFONLGQC7ot38O8T/J9/cJvx14GipN8qOTJnt7jWwZXl2oqLBl2q3
+	 FERcNKWooaA18ou58SxNsLk/EhpJjIikWLQ2/8tpkwzO91/btA6ywR8XDYRHV/Modp
+	 n/71yX/TkzDgw==
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b90bc00578cso313942366b.0
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 16:08:02 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUePet514lVpMV9PF8p2+zo0PEke60xQFNPoEe7htaunqeS7Lj5QQ80VPEmJo6Wz+qAMV8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwImx8qozCaC78th95RZqoh+qWSHOtej5yFLkTQxucEIepM81Jq
+	V3WKrhhOMT0FGBFXy0JUOyJZKT8YjcnHt1zh32gZ2sowMjMJ6LCzcHT3OnJWVEbOkENE044y9vA
+	qs3IcDv6JZZIm2+hkWN70mkypbllqMG8=
+X-Received: by 2002:a17:907:3d12:b0:b86:e937:d097 with SMTP id
+ a640c23a62f3a-b9081b23ddemr951579166b.38.1771978081686; Tue, 24 Feb 2026
+ 16:08:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260224223405.3270433-1-yosry@kernel.org> <20260224223405.3270433-26-yosry@kernel.org>
-In-Reply-To: <20260224223405.3270433-26-yosry@kernel.org>
+References: <20260223154636.116671-1-yosry@kernel.org> <20260223154636.116671-3-yosry@kernel.org>
+In-Reply-To: <20260223154636.116671-3-yosry@kernel.org>
 From: Yosry Ahmed <yosry@kernel.org>
-Date: Tue, 24 Feb 2026 15:58:37 -0800
-X-Gmail-Original-Message-ID: <CAO9r8zMwNEkmt9+RKP34hpSSzavyL6CLGuWj=rx4R4i1kzhSgQ@mail.gmail.com>
-X-Gm-Features: AaiRm513oNEUi9hUjQRRXFADiAg2OnpP3oTeqyZEAPSTrOvGfUn9-7ZVNNDYW3s
-Message-ID: <CAO9r8zMwNEkmt9+RKP34hpSSzavyL6CLGuWj=rx4R4i1kzhSgQ@mail.gmail.com>
-Subject: Re: [PATCH v6 25/31] KVM: nSVM: Cache all used fields from VMCB12
+Date: Tue, 24 Feb 2026 16:07:50 -0800
+X-Gmail-Original-Message-ID: <CAO9r8zPsAMaiU794xoXDso3sdAM0_EN2PyE13vR4NqqEh9e2=g@mail.gmail.com>
+X-Gm-Features: AaiRm50Ohbq3rh9rPSXIa4y3k-mLYR9H54rq2fqUK-RemOOY9b7l8dkHpgP0CeY
+Message-ID: <CAO9r8zPsAMaiU794xoXDso3sdAM0_EN2PyE13vR4NqqEh9e2=g@mail.gmail.com>
+Subject: Re: [PATCH v1 2/4] KVM: nSVM: Delay stuffing L2's current RIP into
+ NextRIP until vCPU run
 To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	URIBL_MULTI_FAIL(0.00)[mail.gmail.com:server fail,sea.lore.kernel.org:server fail];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71713-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71712-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 1644218E360
+X-Rspamd-Queue-Id: F290B18E513
 X-Rspamd-Action: no action
 
-> @@ -715,48 +732,48 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
->                 svm->nested.force_msr_bitmap_recalc = true;
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 8f8bc863e2143..e084b9688f556 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1413,6 +1413,24 @@ static void svm_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
+>                 sd->bp_spec_reduce_set = true;
+>                 msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
 >         }
->
-> -       if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_SEG))) {
-> -               vmcb02->save.es = vmcb12->save.es;
-> -               vmcb02->save.cs = vmcb12->save.cs;
-> -               vmcb02->save.ss = vmcb12->save.ss;
-> -               vmcb02->save.ds = vmcb12->save.ds;
-> -               vmcb02->save.cpl = vmcb12->save.cpl;
-> +       if (unlikely(new_vmcb12 || vmcb12_is_dirty(control, VMCB_SEG))) {
+> +
+> +       /*
+> +        * If nrips is supported in hardware but not exposed to L1, stuff the
+> +        * actual L2 RIP to emulate what a nrips=0 CPU would do (L1 is
+> +        * responsible for advancing RIP prior to injecting the event). Once L2
+> +        * runs after L1 executes VMRUN, NextRIP is updated by the CPU and/or
+> +        * KVM, and this is no longer needed.
+> +        *
+> +        * This is done here (as opposed to when preparing vmcb02) to use the
+> +        * most up-to-date value of RIP regardless of the order of restoring
+> +        * registers and nested state in the vCPU save+restore path.
+> +        */
+> +       if (is_guest_mode(vcpu) && svm->nested.nested_run_pending) {
+> +               if (boot_cpu_has(X86_FEATURE_NRIPS) &&
+> +                   !guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS))
+> +                       svm->vmcb->control.next_rip = kvm_rip_read(vcpu);
+> +       }
+> +
 
-Internal AI review caught a bug here. We only copy clean bits in
-__nested_copy_vmcb_control_to_cache() if Hyper-V extensions are used,
-so this patch will treat everything as dirty. Not a correctness bug,
-but a perf one. Probably need the following:
+Doing this in svm_prepare_switch_to_guest() is wrong, or at least
+after the svm->guest_state_loaded check. It's possible to emulate the
+nested VMRUN without doing a vcpu_put(), which means
+svm->guest_state_loaded will remain true and this code will be
+skipped.
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 2159f5fbfc314..3c9643c03b1a4 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -524,11 +524,11 @@ void __nested_copy_vmcb_control_to_cache(struct
-kvm_vcpu *vcpu,
-        to->asid           = from->asid;
-        to->msrpm_base_pa &= ~0x0fffULL;
-        to->iopm_base_pa  &= ~0x0fffULL;
-+       to->clean = from->clean;
+In fact, this breaks the svm_nested_soft_inject_test test. Funny
+enough, I was only running it with my repro changes, which papered
+over the bug because it forced an exit to userspace after VMRUN due to
+single-stepping, so svm->guest_state_loaded got cleared and the code
+was executed on the next KVM_RUN, before L2 runs.
 
- #ifdef CONFIG_KVM_HYPERV
-        /* Hyper-V extensions (Enlightened VMCB) */
-        if (kvm_hv_hypercall_enabled(vcpu)) {
--               to->clean = from->clean;
-                memcpy(&to->hv_enlightenments, &from->hv_enlightenments,
-                       sizeof(to->hv_enlightenments));
-        }
+I can move it above the svm->guest_state_loaded check, but I think I
+will just put it in pre_svm_run() instead.
 
