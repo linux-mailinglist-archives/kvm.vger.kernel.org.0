@@ -1,152 +1,180 @@
-Return-Path: <kvm+bounces-71842-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71843-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YFIxA8wPn2neYgQAu9opvQ
-	(envelope-from <kvm+bounces-71842-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 16:05:48 +0100
+	id GMBsLkUTn2nWYwQAu9opvQ
+	(envelope-from <kvm+bounces-71843-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 16:20:37 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 992C41992E1
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 16:05:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36AC219978C
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 16:20:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B066313A39C
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 15:04:09 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ED00830158B4
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 15:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09EF3D522B;
-	Wed, 25 Feb 2026 15:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 337B33D3D0C;
+	Wed, 25 Feb 2026 15:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kn7uKfKu"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nGcpJM/L"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32573D4131;
-	Wed, 25 Feb 2026 15:04:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695833B530F;
+	Wed, 25 Feb 2026 15:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772031847; cv=none; b=OiG1CI6gfSWI3YXu11bSOMLicf7JZ6KMCwjkAvL1tMLqJq5Mx+Tjx4jlHjzCUJ+YMxlsCOL3U60hzcsPKJTgoNME3qIKoWBjxej86SS0tD5DEUoy1P/RosgB/i7Z4AAu7RniY9O2PC8cT8TMgRqHKg5YSDig+t4CmrcEM95zCzM=
+	t=1772032824; cv=none; b=jKJLTHIR3cYcRB9Y4ph+w+rC8e50WWSIEUkK1//C7bN2SopKoIxi3qlB350qhZ8sgrZYGSPirC27H0heySpkLUa4dCDp3gCD6qkjpvoTN1DgZw1KZJDr6bsCtgqbFvuSUfiJVwnjO6tXeymzjg3/4wqlLnsgCTF6PR6Z+dCiXpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772031847; c=relaxed/simple;
-	bh=l0QziCYpZZxVYpSpkG+yXWVu0Ga0YF3LnsMseBP+FtU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JjNK5JZGxj5WATQ0A5cPcXOIq9NRzht6ITx5I9U1UlsvCKj4EzBRQjkkmwDdMDBLza6m8MsLDEj2HvjM30zlpn/qdUMEHYRpsrpIYvhf4nvGbXn+RNKDksxubZMdf5Krf84lXP2YBPJNTTCd9x0ivuDx58JqDOz6DwFxmDXRdMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Kn7uKfKu; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772031846; x=1803567846;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=l0QziCYpZZxVYpSpkG+yXWVu0Ga0YF3LnsMseBP+FtU=;
-  b=Kn7uKfKuY/HOuoF5BHaxvRY+CNmR6dOJ8NK/Tf9BYir4MHrf6Uk17cb1
-   vNHQiCk7Zan1VqY+AM9mYqVZSp5XAzwcNM2zUEkudZ8ykn/cSlxHtNIpw
-   E8fchasVCsP0LLgmLoF0IhdI8xYq7M2II/d6+kUZwzt43jXzh3cHh1fQK
-   Yiqv7x5fLW+ckAUSr2qAYFXW3iPgwiTFUH67HJaC+gsLwXLRkwGXERJdT
-   xG1NB5HeQ6RgiPf4XCjYa62jy101cL2nKys8OeXyPmhe6q2nEDZtNXGbi
-   rib/W38laBytn6xjt6YPivIRU+iP63tbOYk+HJOTf5eaq639KrFhVmVGI
-   w==;
-X-CSE-ConnectionGUID: BBQVLmBdRRi04YUM4LPHZA==
-X-CSE-MsgGUID: xsr598HHQRWoayg2HbC8PA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11712"; a="76677756"
-X-IronPort-AV: E=Sophos;i="6.21,310,1763452800"; 
-   d="scan'208";a="76677756"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2026 07:04:05 -0800
-X-CSE-ConnectionGUID: q6MBpsdcTtmu0pn6w8pZlQ==
-X-CSE-MsgGUID: jMhwxDuPR/WwmEThn92WRw==
-X-ExtLoop1: 1
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.241.97]) ([10.124.241.97])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2026 07:04:00 -0800
-Message-ID: <291d582c-842e-4850-90b8-504f7ca35ec2@linux.intel.com>
-Date: Wed, 25 Feb 2026 23:03:58 +0800
+	s=arc-20240116; t=1772032824; c=relaxed/simple;
+	bh=mbPRfIADMFXCOwBrGT1FtQ/RpCEJwc12gWVyMWtoke4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kdRYwW5L2X7xmZsOrhmWJoVKTuk+qIjYBkzjfjK5zWRQJao7zM4L5dNSmBF81383i1kB/4Fija7E+vGV0jampOAr4+JoX7s+DnoY6oJNx3BntRGJ+4jrswmtO3rsLcGK/Py/rMoQ5OY2DVpafDPP1n0rtF3/6Jb+mK7BLrlZFrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nGcpJM/L; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61P3udXn961544;
+	Wed, 25 Feb 2026 15:20:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=ho/xAKzQ0HYa8cXr4tSN04W5Wri1Z34DLWAm5ZoLT
+	E4=; b=nGcpJM/LCczDSMhrSBKYhOvoACCAgqh5QcLdhLqPlz6tOSaAnsi7Q8IDg
+	rmqmQ+5JrCcX601YpGrjhj4VLo4po7Go0WMktRlOU1dbnKtrgYM04lipZ2MF1YA3
+	IAUnN6XJFqDWYG4yBwdGXboQw3OZpZtyjCU+55L7CMDhgk7tqSl6xh6L5oTcfUIE
+	/K0GpHlWr4cgDJbpUUep4JV5vghcDGgzJF5F7r62ep0yyHrZ/YU//yDUu4rATIhR
+	j9Zw+zjXVKr9c1ZZRGZ+WjEIEjGHlf8Pf/eyJhtJDEn8X0wnRx7LZQyNYHbc6e1F
+	N3Z2xCBwJmgYfvWmodVuQ2VJ6u/CA==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cf4cr0t71-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Feb 2026 15:20:20 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61PE2p0C003821;
+	Wed, 25 Feb 2026 15:20:19 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cfs8jwm96-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Feb 2026 15:20:19 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61PFKFUx48300358
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 25 Feb 2026 15:20:15 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 62CC52004E;
+	Wed, 25 Feb 2026 15:20:15 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3F22220043;
+	Wed, 25 Feb 2026 15:20:15 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Wed, 25 Feb 2026 15:20:15 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+	id 2560FE0BAA; Wed, 25 Feb 2026 16:20:15 +0100 (CET)
+From: Eric Farman <farman@linux.ibm.com>
+To: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Eric Farman <farman@linux.ibm.com>
+Subject: [PATCH] KVM: s390: only deliver service interrupt with payload
+Date: Wed, 25 Feb 2026 16:20:13 +0100
+Message-ID: <20260225152013.1108842-1-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: TDX: Set SIGNIFCANT_INDEX flag for supported CPUIDs
-To: Sean Christopherson <seanjc@google.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>,
- "changyuanl@google.com" <changyuanl@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, Binbin Wu
- <binbin.wu@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>,
- "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
- "kas@kernel.org" <kas@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "mingo@redhat.com" <mingo@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "tglx@kernel.org" <tglx@kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>
-References: <20260223214336.722463-1-changyuanl@google.com>
- <213d614fe73e183a230c8f4e0c8fa1cc3d45df39.camel@intel.com>
- <fd3b58fd-a450-471a-89a3-541c3f88c874@linux.intel.com>
- <aZ3LxD5XMepnU8jh@google.com>
- <66336533-8bee-4219-9936-3163c7ce06bb@linux.intel.com>
- <aZ8AKZQ4L5n7wVMT@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <aZ8AKZQ4L5n7wVMT@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 5pwhpV_ai7FAPzeEl26voGvZOcrAc7nd
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI1MDE0NSBTYWx0ZWRfX3ZhyemhbZivB
+ c/HJoExwPLm2tqUCGvFeLUnGjo4iwHWUORhs4LBfqlTv34OANafhyUJjNfqbsUau3KIwDkSHLcq
+ fHbgYxNl3/Jp/t3MJcfI6C/FN7WBNVOzsQE9U9Yo3Qymc+f8dobsDTEhK+l8SH2J5gFjWeK4gP5
+ cUxuS8QhB+fHxks0uHRlnJc7/yd6bKhLCyIld4Y1Kh3EHl59ticeWRSrjAaLypel0wZ3E/OLg+w
+ Y6Q0n9K8ENlZwEhumU3Mg59QtODPpzijLdWwTNzVhWs/kD2t+lMhCsFjeXYgqRjOZGsLJEj3NMn
+ OzhSx4RbceqTiRalZCzRMvKTefNWOmquQZqzUVynELDeHgwL7buvvSAjpSr2ONXXA1UKNw8615i
+ 9GWUW7Ju7pw1qXDoibwP+QQDqIjeKR62gsLBmKC2rQ6qmuQxJ2Hsdr0j94QRmLSkm2K8+zAYaWm
+ rhdBMBxDa1m4W3pb9ZA==
+X-Proofpoint-GUID: 5pwhpV_ai7FAPzeEl26voGvZOcrAc7nd
+X-Authority-Analysis: v=2.4 cv=bbBmkePB c=1 sm=1 tr=0 ts=699f1334 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22
+ a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8 a=25EaFSAiIRNNOV5pwi0A:9
+ a=NqO74GWdXPXpGKcKHaDJD/ajO6k=:19
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-25_01,2026-02-25_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 bulkscore=0 adultscore=0 impostorscore=0 lowpriorityscore=0
+ priorityscore=1501 suspectscore=0 clxscore=1015 phishscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602250145
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DKIM_TRACE(0.00)[intel.com:+];
-	TAGGED_FROM(0.00)[bounces-71842-lists,kvm=lfdr.de];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[binbin.wu@linux.intel.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[farman@linux.ibm.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71843-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_TWELVE(0.00)[12];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.intel.com:mid]
-X-Rspamd-Queue-Id: 992C41992E1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.ibm.com:mid]
+X-Rspamd-Queue-Id: 36AC219978C
 X-Rspamd-Action: no action
 
+Routine __inject_service() may set both the SERVICE and SERVICE_EV
+pending bits, and in the case of a pure service event the corresponding
+trip through __deliver_service_ev() will clear the SERVICE_EV bit only.
+This necessitates an additional trip through __deliver_service() for
+the other pending interrupt bit, however it is possible that the
+external interrupt parameters are zero and there is nothing to be
+delivered to the guest.
 
+To avoid sending empty data to the guest, let's only write out the SCLP
+data when there is something for the guest to do, otherwise bail out.
 
-On 2/25/2026 9:59 PM, Sean Christopherson wrote:
-> On Wed, Feb 25, 2026, Binbin Wu wrote:
->> Do we need to consider the panic_on_warn case? I guess the option will not be
->> enabled in a production environment?
-> 
-> Nope.  That's even explicitly called out in Documentation/process/coding-style.rst:
+Signed-off-by: Eric Farman <farman@linux.ibm.com>
+---
+ arch/s390/kvm/interrupt.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Thanks for the info, and sorry for not checking it before asking the question.
-
-> 
->   Do not worry about panic_on_warn users
->   **************************************
->   
->   A few more words about panic_on_warn: Remember that ``panic_on_warn`` is an
->   available kernel option, and that many users set this option. This is why
->   there is a "Do not WARN lightly" writeup, above. However, the existence of
->   panic_on_warn users is not a valid reason to avoid the judicious use
->   WARN*(). That is because, whoever enables panic_on_warn has explicitly
->   asked the kernel to crash if a WARN*() fires, and such users must be
->   prepared to deal with the consequences of a system that is somewhat more
->   likely to crash.
-> 
+diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+index 18932a65ca68..dd0413387a9e 100644
+--- a/arch/s390/kvm/interrupt.c
++++ b/arch/s390/kvm/interrupt.c
+@@ -956,6 +956,9 @@ static int __must_check __deliver_service(struct kvm_=
+vcpu *vcpu)
+ 		set_bit(IRQ_PEND_EXT_SERVICE, &fi->masked_irqs);
+ 	spin_unlock(&fi->lock);
+=20
++	if (!ext.ext_params)
++		return 0;
++
+ 	VCPU_EVENT(vcpu, 4, "deliver: sclp parameter 0x%x",
+ 		   ext.ext_params);
+ 	vcpu->stat.deliver_service_signal++;
+--=20
+2.51.0
 
 
