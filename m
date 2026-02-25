@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-71805-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71806-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iFUjIu+knmmrWgQAu9opvQ
-	(envelope-from <kvm+bounces-71805-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 08:29:51 +0100
+	id mIThEIWmnmmrWgQAu9opvQ
+	(envelope-from <kvm+bounces-71806-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 08:36:37 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04D0F19374A
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 08:29:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCAB51938C2
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 08:36:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 49EC2316F441
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 07:22:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EEF9331C38D3
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 07:23:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB197330D3B;
-	Wed, 25 Feb 2026 07:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F30B2D77FA;
+	Wed, 25 Feb 2026 07:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J8hvozdN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kl49/QXT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8CC31A807
-	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 07:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5E131B82B
+	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 07:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772004054; cv=none; b=VDhcUvkhWJ/wyTo3qL1hzTfCp6E1vMlm2qV4RTAo+HiJWswS8egpSrPyKoqE84AMPB3vVB8VcF22YpdU3g1zvBZ2MVyb5nAdjKbS8xd3fy+9SwyiicsDxIg7y35l25hcv+rTaKbhC+XM+EFYzZ4JqcyplcmeoWlLUtz8DEfRZwU=
+	t=1772004056; cv=none; b=B/z/zrqRFzdDw0kn3w/27lathR1uGPk6rd5vYexfDLIL+Pq8AAVjxg7hei6IXbzd2DzwFexYt5Uo3YnWz7Pdx81RvDnbRcRnQrdGCuqTeOpc1ClZO3PTNHTKqe44aLQZOVgxPRCeoWXmpRu0t/tPZpzyZm+ESk4eb2mHqXCIQRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772004054; c=relaxed/simple;
-	bh=qLKykmEADbn2/q4Ccup9gI+7j5uvqRK9sZMPeThKEJc=;
+	s=arc-20240116; t=1772004056; c=relaxed/simple;
+	bh=41+6neAL0d27ks2wQws7sEuDZgQjzT5nG62AnxD5qpc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Nt6FeAZtyQaa5Ov57TKpQRyMxZ4GwaUV7MAlmoiPF6EuwnKdksuWiavd+IvRAOqk+vqmd7JsFO5uG1fPRJ4QY0qomXmb39n08zfC6UjXkwOMskgHuWx8Pp6Plu94XUIsyiB2dMVhWBcai053cvWbf9BGViAjsxDXgwVLjpAUM4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J8hvozdN; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=jQ/s68dnCiqvLpHNjP89eBoT53s4mHQelipJlVAu+c20Tb7YjZPyn6++EZdlo/bOT4jWZL5FLmNWIMfdkgdI4xOTmXEp13PDs6BXWdUbBX5gt7SKUCrjuaGhpNxINqveI4V3ck/Rbi+WofL5zROYHdQfHZJlqRumgUNKcJKr6mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kl49/QXT; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2aaf0dbd073so77080475ad.3
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 23:20:52 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-358e95e81aeso6368691a91.0
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 23:20:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772004051; x=1772608851; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772004053; x=1772608853; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RDRU6RwH6vqwiVf/LjeEDphDyyED18VHPEr6YXDP6Vo=;
-        b=J8hvozdNtDA3NzVOs1KNUY/r7i+r3udah8KOFjQLlchj7a7IV5MessOrVuVPrF7y03
-         46SqF+Ukc5gNENA4d53VRu/Own3cYGNmYhPrvVV9h76jj3HA/Qm4/r9cP+CFjn812T9M
-         wvEZ/uq0JH7WJo7BR4emeyHFPs1s0gz35sQzKty3dEJVfOW5+8ggLDEYeg0SFcSkx9vJ
-         Vg5zcn4jEbwWtB+vJi16I0q1OHZ3aw+FEDhV4njHxGwOyi2CgPWNPZIitDGS98iQjIfd
-         fV6hcvGjedF4gtfCYRCmC92Z3HYVd9i68nrsIQrijJ4iEi2vuuylOMd7+TGbv/cwFoLt
-         U/4A==
+        bh=lmqeDy1YGPO6heAH4dtg7V9yIhQw7gZPhshB9Ud1SBU=;
+        b=kl49/QXTyHNtzK3awy/yDH8SdYKO5eimqBUQi+UII5h9a9SBFLxjantR3qhGW+uYd8
+         mYgQLJVaw0XA6/AV9emQXbYPTYlV4sNCnCj3XUCI8QdJcRtMWv3kYRCiSsZJ+1hV9Hcp
+         hBuwHtRnVIszSeYM465KYcCumfhasyjWMat+2JnYCcBAWI9Rl9AhupAbcrc5jdp6chno
+         TxlQX9RNq5CXzsQ72qm7LnUK7P286lheZHu9aVJULLBDqjMAokM6/p/U9zeINILNcUMH
+         2+ZPyG4CREVQWJ2erErVhEeUsY2SCnGFCAojzxw/ZLnUtQgiogxK004UD809ZrIm8z1j
+         b3+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772004051; x=1772608851;
+        d=1e100.net; s=20230601; t=1772004053; x=1772608853;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RDRU6RwH6vqwiVf/LjeEDphDyyED18VHPEr6YXDP6Vo=;
-        b=kPXo78Oy23TAY+UrAvhlssnxdG2XUECPNRHDBA9lN32lN/fgGDTsYxMDofdB0jPeDc
-         iXqKVFbFZvzLwSfpOwm88hKwPyCFZBkPQRsnJZIfDAYPRoWm3A6jCFaJ+zXAljTXXskv
-         4dh4WQpmkJ8k+5+qtJLQgZPHCHSWySxqW/aHe/xtQVcgAwas0TvvWkp6YzHIw/tcQEjO
-         MZ43idRY3aYNrZOYXYHTyDkokBIl33gi0Zp2DryhNh2LPMi08GHBsgV41YCBEDrKIZMi
-         0AcoDZByHijHnShO/STTuzkPTcmgnibJKYnKQej/peIzTWXjnQqAfLbC+3Lwo5T2uZOM
-         zwXw==
-X-Gm-Message-State: AOJu0YzrmtyESbv/TvArWmq0vz0oNA68KiCj4G23pj4m0O+THjw2gMaN
-	IC/uOMbLSfmMTed2NNXMdUAfHQ5B4Z3ifld1NNa4mBKftn9gIs/V5rH/ecN/KHGQT2rXu5tESMN
-	oVO1pUIcc6MzNRKpCfyV4qmCLyA==
-X-Received: from plgz12.prod.google.com ([2002:a17:903:18c:b0:2ad:ae4d:4a00])
+        bh=lmqeDy1YGPO6heAH4dtg7V9yIhQw7gZPhshB9Ud1SBU=;
+        b=s89ID+iI4lzK3qEmlTDuEVXJTbEiTHbRDoBR+94HZW5qhOKDRYd9vXLq71lFRw6HzW
+         LqZiLdUqnQjSAGVaqCQrqK4Utx1q60w8WOZEmvAJgp4H7C2vOAiRmVeLhYnoe8dJN9T4
+         ZQKrpejrMAXc7XweQXwq/mWXavnNqT8vQ9L8RA8riojq+K6hAwylBFkrvvNYJ7TPPSJ9
+         tNyFlBihapAP0wGXJ/uYFGOgOxPwcSeNMi6EYeaw5h0+wfoLIYgwv3q8WGIRtDJpwuL1
+         u2pgFPJ+GtfiMVDwICckSBSB5m2oksz6jWuA5mDF8WSP0yh8/lCaBZO/JCXjw/uXTsUN
+         s06g==
+X-Gm-Message-State: AOJu0YzJIKSghfOMn9aQtxy7uOs6geVxsOp7XDYrlYNSsX5Q/1ORu+a6
+	SZaysvIURZfdsmgmW1xrdVZ6Rlgw+WTk0JwDD6hpaHtWugPuc7kICJtyug7FmDpPydVUngn28ay
+	n8Qt+PewA7eKp9XxXNyZ7JW5XLA==
+X-Received: from pgbfp5.prod.google.com ([2002:a05:6a02:2ce5:b0:c0e:c1b4:51a5])
  (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:2c5:b0:2a0:c58c:fdd2 with SMTP id d9443c01a7336-2ad74516011mr136747995ad.26.1772004051111;
- Tue, 24 Feb 2026 23:20:51 -0800 (PST)
-Date: Wed, 25 Feb 2026 07:20:39 +0000
+ 2002:a05:6a20:7f89:b0:394:58eb:48fa with SMTP id adf61e73a8af0-39545dc0482mr14694770637.6.1772004052747;
+ Tue, 24 Feb 2026 23:20:52 -0800 (PST)
+Date: Wed, 25 Feb 2026 07:20:40 +0000
 In-Reply-To: <20260225-gmem-st-blocks-v2-0-87d7098119a9@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,14 +75,13 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260225-gmem-st-blocks-v2-0-87d7098119a9@google.com>
 X-Developer-Key: i=ackerleytng@google.com; a=ed25519; pk=sAZDYXdm6Iz8FHitpHeFlCMXwabodTm7p8/3/8xUxuU=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1772004043; l=1673;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1772004043; l=3022;
  i=ackerleytng@google.com; s=20260225; h=from:subject:message-id;
- bh=qLKykmEADbn2/q4Ccup9gI+7j5uvqRK9sZMPeThKEJc=; b=PxKzCcZpN4XBlCkb+5wYqal7atRqWZJGyLYGiwIgdVnxm+1x2H3IPSPZKe0CxJWfo9pjig1VC
- VIXLsNc8fL3CSev+ABXwmk1qEQrJyPu2C3V81bGGt4IF7QyCFliofNZ
+ bh=41+6neAL0d27ks2wQws7sEuDZgQjzT5nG62AnxD5qpc=; b=Qf0H2UQ2mVaGwE9fmA4IWjbnRJGJ7WGDq8UI2QM5uIsOM4kNu9y1rdgzh53H+jjev44oOi+/r
+ kT+aePH4Im8Br8uVg3C6xnPFChAqWmmulNjoE70K9V+ksKWXjrvsGjL
 X-Mailer: b4 0.14.3
-Message-ID: <20260225-gmem-st-blocks-v2-4-87d7098119a9@google.com>
-Subject: [PATCH RFC v2 4/6] KVM: guest_memfd: Track amount of memory allocated
- on inode
+Message-ID: <20260225-gmem-st-blocks-v2-5-87d7098119a9@google.com>
+Subject: [PATCH RFC v2 5/6] KVM: selftests: Wrap fstat() to assert success
 From: Ackerley Tng <ackerleytng@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, 
 	David Hildenbrand <david@kernel.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
@@ -104,78 +103,104 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71805-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71806-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[35];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 04D0F19374A
+	RCPT_COUNT_TWELVE(0.00)[35];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: DCAB51938C2
 X-Rspamd-Action: no action
 
-The guest memfd currently does not update the inode's i_blocks and i_bytes
-count when memory is allocated or freed. Hence, st_blocks returned from
-fstat() is always 0.
-
-Introduce byte accounting for guest memfd inodes.  When a new folio is
-added to the filemap, add the folio's size.  Conversely, when folios are
-truncated and removed from the mapping, deduct the folio's size.
-
-With this change, stat.st_blocks for a guest_memfd will correctly report
-the number of 512-byte blocks allocated to the file, consistent with other
-memory-based filesystems like tmpfs.
+Extend kvm_syscalls.h to wrap fstat() to assert success. This will be used
+in the next patch.
 
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 ---
- virt/kvm/guest_memfd.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ tools/testing/selftests/kvm/guest_memfd_test.c     | 15 +++++----------
+ tools/testing/selftests/kvm/include/kvm_syscalls.h |  2 ++
+ 2 files changed, 7 insertions(+), 10 deletions(-)
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 2488d7b8f2b0d..b31e6612d16a8 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -137,6 +137,8 @@ static struct folio *__kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
- 		return ERR_PTR(ret);
- 	}
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+index 618c937f3c90f..81387f06e770a 100644
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+@@ -212,10 +212,8 @@ static void test_mmap_not_supported(int fd, size_t total_size)
+ static void test_file_size(int fd, size_t total_size)
+ {
+ 	struct stat sb;
+-	int ret;
  
-+	inode_add_bytes(inode, folio_size(folio));
-+
- 	return folio;
+-	ret = fstat(fd, &sb);
+-	TEST_ASSERT(!ret, "fstat should succeed");
++	kvm_fstat(fd, &sb);
+ 	TEST_ASSERT_EQ(sb.st_size, total_size);
+ 	TEST_ASSERT_EQ(sb.st_blksize, page_size);
  }
+@@ -303,25 +301,22 @@ static void test_create_guest_memfd_invalid_sizes(struct kvm_vm *vm,
  
-@@ -553,10 +555,16 @@ static void kvm_gmem_free_folio(struct folio *folio)
- }
- #endif
+ static void test_create_guest_memfd_multiple(struct kvm_vm *vm)
+ {
+-	int fd1, fd2, ret;
++	int fd1, fd2;
+ 	struct stat st1, st2;
  
-+static void kvm_gmem_unaccount_folio(struct folio *folio)
-+{
-+	__inode_sub_bytes(folio_inode(folio), folio_size(folio));
-+}
-+
- static const struct address_space_operations kvm_gmem_aops = {
- 	.dirty_folio = noop_dirty_folio,
- 	.migrate_folio	= kvm_gmem_migrate_folio,
- 	.error_remove_folio = kvm_gmem_error_folio,
-+	.unaccount_folio = kvm_gmem_unaccount_folio,
- #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_INVALIDATE
- 	.free_folio = kvm_gmem_free_folio,
- #endif
+ 	fd1 = __vm_create_guest_memfd(vm, page_size, 0);
+ 	TEST_ASSERT(fd1 != -1, "memfd creation should succeed");
+ 
+-	ret = fstat(fd1, &st1);
+-	TEST_ASSERT(ret != -1, "memfd fstat should succeed");
++	kvm_fstat(fd1, &st1);
+ 	TEST_ASSERT(st1.st_size == page_size, "memfd st_size should match requested size");
+ 
+ 	fd2 = __vm_create_guest_memfd(vm, page_size * 2, 0);
+ 	TEST_ASSERT(fd2 != -1, "memfd creation should succeed");
+ 
+-	ret = fstat(fd2, &st2);
+-	TEST_ASSERT(ret != -1, "memfd fstat should succeed");
++	kvm_fstat(fd2, &st2);
+ 	TEST_ASSERT(st2.st_size == page_size * 2, "second memfd st_size should match requested size");
+ 
+-	ret = fstat(fd1, &st1);
+-	TEST_ASSERT(ret != -1, "memfd fstat should succeed");
++	kvm_fstat(fd1, &st1);
+ 	TEST_ASSERT(st1.st_size == page_size, "first memfd st_size should still match requested size");
+ 	TEST_ASSERT(st1.st_ino != st2.st_ino, "different memfd should have different inode numbers");
+ 
+diff --git a/tools/testing/selftests/kvm/include/kvm_syscalls.h b/tools/testing/selftests/kvm/include/kvm_syscalls.h
+index d4e613162bba9..3f039c34e12e0 100644
+--- a/tools/testing/selftests/kvm/include/kvm_syscalls.h
++++ b/tools/testing/selftests/kvm/include/kvm_syscalls.h
+@@ -2,6 +2,7 @@
+ #ifndef SELFTEST_KVM_SYSCALLS_H
+ #define SELFTEST_KVM_SYSCALLS_H
+ 
++#include <sys/stat.h>
+ #include <sys/syscall.h>
+ 
+ #define MAP_ARGS0(m,...)
+@@ -77,5 +78,6 @@ __KVM_SYSCALL_DEFINE(munmap, 2, void *, mem, size_t, size);
+ __KVM_SYSCALL_DEFINE(close, 1, int, fd);
+ __KVM_SYSCALL_DEFINE(fallocate, 4, int, fd, int, mode, loff_t, offset, loff_t, len);
+ __KVM_SYSCALL_DEFINE(ftruncate, 2, unsigned int, fd, off_t, length);
++__KVM_SYSCALL_DEFINE(fstat, 2, int, fd, struct stat *, buf);
+ 
+ #endif /* SELFTEST_KVM_SYSCALLS_H */
 
 -- 
 2.53.0.414.gf7e9f6c205-goog
