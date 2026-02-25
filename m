@@ -1,110 +1,111 @@
-Return-Path: <kvm+bounces-71758-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71759-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eIZKIK1xnmlqVQQAu9opvQ
-	(envelope-from <kvm+bounces-71758-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 04:51:09 +0100
+	id eO2cDLFxnml0VQQAu9opvQ
+	(envelope-from <kvm+bounces-71759-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 04:51:13 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30F191914F9
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 04:51:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BC8B191500
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 04:51:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5B8E9306B9CA
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 03:51:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2B3733025251
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 03:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC4429E0F7;
-	Wed, 25 Feb 2026 03:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29662263C7F;
+	Wed, 25 Feb 2026 03:51:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="czbsYpHG";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="IRvLYYzC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PjhRxiKI";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="FuJR4gjh"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0047021420B
-	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 03:51:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3A21BD9C9
+	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 03:51:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771991464; cv=none; b=DocHx1+iwJHg3UltCpBUcWj1s5n+BRc1O2zPQHnc/8hn8Efk0qtT5sQdTJU3fnLQAWi3cO/cMEIziMDBHg/acu7MOXDJqXAXYw4Nh+AmAWPmapFWXpdtHtu322wU7tHeyIdAhCW1cTi2jAGaTofflfLzK0qBISfPoLH24YtcLfg=
+	t=1771991468; cv=none; b=hipeg1CNwsIkx9Sl67nAhzApjgCJelVHUDDkOpW9mZSZP7tWtW0BujPUwVfg6cmBl8XGjLEmr4jzBI8jfSvXRPGmk+mhvZ5/7T/yqE9QVUxh0+CZWot+uvkwBOccBRfOeEBDwkSxHSj52TgfvAcAAF1a4ynyK72E2gD8I7jHJlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771991464; c=relaxed/simple;
-	bh=Cs02N7kjiZapYJkD7+u3Bj2uUy7XDPWKIqfr00KkQ/E=;
+	s=arc-20240116; t=1771991468; c=relaxed/simple;
+	bh=D/HcMH8qipGU081+wbDh7ZzNQ1av8MpUMvJwp4zTjnE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=He5Ihxw1SiyE+WKQx161iorfG2l6ccQbAABknj+47R2iwCwZBm8ISVWQQGzfWcbvU0/k4XOjxPynOUSvv0JblcoaOo224DB9rdI7QH61DgZteqw/3/NdKF1NpO42To9GB5wjySiIHD3j/g8obeBZOJ38c5Bo1XP3MTaSGVB+Olw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=czbsYpHG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=IRvLYYzC; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=U+UgQNiiPmf52bBFCjW9FoVjTcRExeaZENe5wia33ZINpt8VdqlPL5wrn46OEQUO2wa2etjLr71oOC0axKP1HJTBkOizbFg5R6A7s9thQXCRup4XIOMA3lynearedO6aOTW0rirozup/VpxuxRUKbze45+cGN3bbSsr4ouBqxzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PjhRxiKI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FuJR4gjh; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771991462;
+	s=mimecast20190719; t=1771991466;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/RPK8AZYmVrk+p/35E6Q/RhKlnBCZugmIfxMJDIXfQk=;
-	b=czbsYpHGQNodCXoJ6rAVQYrKYUenDDllwwm8ysuSTj6nfY+v0HfgyRJxWq/bkBXN8TuFs2
-	QSRXM+iUpJLsPdPuStPlTXsEtCn6YS/1CZZ2+05mcAUEFOK+3ldfRXENVLxizxaIGNfDwU
-	pIvTvKBH9ARvGavbLlcpSvQNWdzFrl8=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=r0oM0RRyjLelkT0G5RoaNy8SGcq/Mnkz7KKwnwr3WCA=;
+	b=PjhRxiKIOpvJPo1wtO4JZPwopfm8J1kFfxJl5lCI7cm4QEeGQBSPWQY0wrBEgRr3nKmzLj
+	L7TvdEzrz5SA21kRQjXFd2Af+TGV5o8YAnUPQHv1c8TJwFKIDrCvLIaw9Lop/WZ+nooOea
+	NcJ8sSjv01ytQA1kO21OeNEarleEA+M=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-513-fMcqrdYDOdux8fvL0VLW5g-1; Tue, 24 Feb 2026 22:51:00 -0500
-X-MC-Unique: fMcqrdYDOdux8fvL0VLW5g-1
-X-Mimecast-MFC-AGG-ID: fMcqrdYDOdux8fvL0VLW5g_1771991459
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3562bdba6f7so37445196a91.2
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 19:50:59 -0800 (PST)
+ us-mta-454-ABtiTqckMS2F1wFDH7BZRw-1; Tue, 24 Feb 2026 22:51:03 -0500
+X-MC-Unique: ABtiTqckMS2F1wFDH7BZRw-1
+X-Mimecast-MFC-AGG-ID: ABtiTqckMS2F1wFDH7BZRw_1771991462
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-354c7a38429so310383a91.0
+        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 19:51:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1771991459; x=1772596259; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1771991462; x=1772596262; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/RPK8AZYmVrk+p/35E6Q/RhKlnBCZugmIfxMJDIXfQk=;
-        b=IRvLYYzCh8Cf5g7PUU58xaibzzBWZmjW8dqaiNLKCVx5teo4sTQhXatg/D1TQEl1Zy
-         KY/hgOCNY76a8QGTS1n8y1wSjj4St9hYPHiD0O3xPNrz5YriGs0mavegv4K78XuWTFVq
-         csX3WBfTKs8gjh0uAAxpiC+0T6Lo1/zk8+CCQYI3uktROYox6lv8ZJddh9b2WghTa6Q1
-         BDLdIO+LTptVVonUfjaXmQhIWPGDlycC0BFHeILZLXrNdQTyTaFdUQiIg5uyfOoogRAT
-         Gsa4mR4CethTnVJwewM8LiDPuJmKE+WkmCBV9/1nTR9sRpkqkAzeVspTAIlhV/Oc+THF
-         /neg==
+        bh=r0oM0RRyjLelkT0G5RoaNy8SGcq/Mnkz7KKwnwr3WCA=;
+        b=FuJR4gjhBu/JQNgabnj7vrFxbNPU0hRkfQ+NC9bfAFRuKjQTdUSHAJL13LKQQN0WMp
+         gMG3Ygc1753Unw2eR8Au20hwnWoWZlc0VKP2KFsigeahafbVud8u+4Tl26xm5Cx8GsIH
+         cE55IT1NvF97UqjhcBNURnhpyoq5jIehHfInwQm18nnRl4UhzPfJNgIeroAsGp9UKgzA
+         YEqDTneRk8dDnpcwb/rAWs2Yq1vyenF5GxXUQwVwjZYQ1KnddTq52nU2CJbqvjpDKNIX
+         X4adF+f4pGV6T+dEqesBxxAFB6vFrJpNenw2u+h+Eu/NAn8Vk7l/p2+Jd33CCpdOgyzy
+         k3cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771991459; x=1772596259;
+        d=1e100.net; s=20230601; t=1771991462; x=1772596262;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=/RPK8AZYmVrk+p/35E6Q/RhKlnBCZugmIfxMJDIXfQk=;
-        b=YcrYp8CCTdxp1oYtv3WYzcqMdyDR+NvphIvpsPetR0MnvRBV5MiPf1HJCYwBdyuB/k
-         fiIxfAJCbgk7WR76KyqOfP5tYQfCWihJKrqQbQy/cctNsqNyvAeYTngyUUU6SYrG0Vtr
-         gj7Oa7QKrYGyGOT91BIuc6dorLpoxQ/WD2Vf3lvM/lbzCLmgCHQU9LXUCSMSzt5pgsRA
-         zJLhHwyZFvbFpLdzHGYAfI6dDJnuSm0vXaPVV0SZoACBaGSChsM/qBcStHP4/H8J7DOj
-         EUs7en6FB6UK+OnoGt9OSjEGiuDe3R1q8o2U02a8eRcprps2vr0ZG+dZ1SalYOv7Z1QQ
-         hBHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWnCTMLO2FZQwvTgk/8Cv8Ri0Fdk4quQ0946u9vWU6rd6MKRnkFZMSNtmTo4xGQzKyO7B8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzKJzQ4MfI+uldY1OvsbO4q3Mtdi7kVOHwv+voulUw6U1EDwHz
-	OtWlrPGvj6jN2wF6lmtcwY7Jn3UoE8ujMjUsVp6HDiwPnOiYQL8hxLVfGkDsceEha4H6VjFIbAN
-	IevTkwTwpiql14Ga9VxYfpPJ3U3s7oKRg0Oq16WvyTixgjVHoAGcyBw==
-X-Gm-Gg: ATEYQzy6rebWkeuI36Q9PLRe35XWle7yWW2McK29ui3vCzk5aO33dqzHoavDDHaUF6Z
-	wyFrvUEaDJK6o9RpjfzBC+XCHhd7vMzD9mtPD3MeKaoxEI8zXXWHKXB33zDtVU/2qbUt47MsH//
-	jwrWMa0MbUczubwLPpzSl3CqJReezj7rLH3d5vOs75w0xbKqAy+9vz6OoT2EAQZyKSPAu0Xq76U
-	YZsrB7I/ySyPaF9w8Ds9CdIgkORaIi5yVQTx118rFo9XCkNZ5wZL7vxI+Ex4/rZzgYhj7d+YShX
-	GDWpccelJ7jVO1pACS2pUpPnNy067XaAEmtukX5wcmzQyfBjipImYSdmew6L9j1CHruiOYV3WU7
-	MlmZ3TeqVOmD7NUffUEiepJCWv5GAj7mUTbvpf8obov9NpN8yS4VpZF8=
-X-Received: by 2002:a17:90b:4b8d:b0:352:ba0f:fb28 with SMTP id 98e67ed59e1d1-358ae7c84famr12398119a91.1.1771991458868;
-        Tue, 24 Feb 2026 19:50:58 -0800 (PST)
-X-Received: by 2002:a17:90b:4b8d:b0:352:ba0f:fb28 with SMTP id 98e67ed59e1d1-358ae7c84famr12398096a91.1.1771991458510;
-        Tue, 24 Feb 2026 19:50:58 -0800 (PST)
+        bh=r0oM0RRyjLelkT0G5RoaNy8SGcq/Mnkz7KKwnwr3WCA=;
+        b=P1jfM+WPTk8sOsvGQuqRfzXAGaBYHsTytp1zvGVly36SY8QHwAFtGh27PQDMhXKVeK
+         7lBBfgD5LeuD3RWfLTlUjDqPNpv3a9Oav6ZN+NgakWURkIzsvBUix4i8Gm/fWCblUPpx
+         Rv8qppsAzs0d8WQlLqcp9ue5SWOdtXZmktjw9ixL3mUH1KVEqJIxzAMJD/2/qIoTa5/u
+         /Xa8UvyXF3rznhyt55IHE47M0aFNwSe5mkmzMxYuX97FhCQfyk5DMFf0TeISUP96YzaE
+         7Z+tL9+YiLkwkxW6+PbQaVTecruw6acjFLPQKBD1s9QTxSvLA/v6tvz37B0WBwyi5LpE
+         QeMw==
+X-Forwarded-Encrypted: i=1; AJvYcCW9EbwlO8WWbcBisNeGDha3W692oL+Ki/n2JLR1sFxs41+taXJ/QfD3jg/teRdRGQSmzkw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAB+IrZW3VGGtTR7XAS5Wk+r1JvLDU49oVSl8tyeJWQoItEKYI
+	IorZvUZUzfsGms5kIn2I8g2hFUP5dESUW+gsyhvLzHUmSDPQ7+ZM0cjQbrY3DyzOyOv565shAfa
+	3dg2I7LJcpsePmGlwqfVDWxOQvU1CfSMT1gR680av++/+RCi/sbP6HQ==
+X-Gm-Gg: ATEYQzyyuKPeIxzArNIXg9O9PLqMaeDSqZ3rrBkk4ofSMJ6AArdRGso86yjiLggZThX
+	XCWxzLscJ6cMrczy03LYLRnmPEMobWXyvwzF8lV1YJw6cGO2ZiApBlLvtWqQvs69IHS5KkS0Fwa
+	Bszy8VawlsJ/2Pqmu2ehCeMl0bmvIqwqc8PHkfPKv+mBThFDeVWZ1quLZo2wM6dd5S5SOtwW9Ao
+	pz0mKmPazaDUWh/j0hwR3y4t2PBemaJSyUxhoF+9MFm4qR/e5VFZJMw+cMhGtH5rmyjpnFlaAif
+	UEXHRYE+Xge8HaATtkJJOkcU21QkzzawoJfxHUJhpsJemmHgPac0LidaWWdTwtI5TisfCPVrml5
+	wJOFlPerOAW9b1+eytGDbSLTE0IBJFvL2WsaycovD+EXWjgk8KHXUA4I=
+X-Received: by 2002:a17:90b:4a51:b0:356:24c8:2291 with SMTP id 98e67ed59e1d1-359008bd1e4mr1891315a91.0.1771991462093;
+        Tue, 24 Feb 2026 19:51:02 -0800 (PST)
+X-Received: by 2002:a17:90b:4a51:b0:356:24c8:2291 with SMTP id 98e67ed59e1d1-359008bd1e4mr1891299a91.0.1771991461744;
+        Tue, 24 Feb 2026 19:51:01 -0800 (PST)
 Received: from rhel9-box.lan ([122.176.129.56])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-359018838b2sm1186006a91.5.2026.02.24.19.50.56
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-359018838b2sm1186006a91.5.2026.02.24.19.50.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Feb 2026 19:50:58 -0800 (PST)
+        Tue, 24 Feb 2026 19:51:01 -0800 (PST)
 From: Ani Sinha <anisinha@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>
 Cc: Ani Sinha <anisinha@redhat.com>,
 	kraxel@redhat.com,
 	ani@anisinha.ca,
 	kvm@vger.kernel.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v6 15/35] accel/kvm: rebind current VCPUs to the new KVM VM file descriptor upon reset
-Date: Wed, 25 Feb 2026 09:19:20 +0530
-Message-ID: <20260225035000.385950-16-anisinha@redhat.com>
+Subject: [PATCH v6 16/35] i386/tdx: refactor TDX firmware memory initialization code into a new function
+Date: Wed, 25 Feb 2026 09:19:21 +0530
+Message-ID: <20260225035000.385950-17-anisinha@redhat.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20260225035000.385950-1-anisinha@redhat.com>
 References: <20260225035000.385950-1-anisinha@redhat.com>
@@ -126,338 +127,131 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71758-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anisinha@redhat.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
 	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71759-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anisinha@redhat.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 30F191914F9
+X-Rspamd-Queue-Id: 1BC8B191500
 X-Rspamd-Action: no action
 
-Confidential guests needs to generate a new KVM file descriptor upon virtual
-machine reset. Existing VCPUs needs to be reattached to this new
-KVM VM file descriptor. As a part of this, new VCPU file descriptors against
-this new KVM VM file descriptor needs to be created and re-initialized.
-Resources allocated against the old VCPU fds needs to be released. This change
-makes this happen.
+A new helper function is introduced that refactors all firmware memory
+initialization code into a separate function. No functional change.
 
 Signed-off-by: Ani Sinha <anisinha@redhat.com>
 ---
- accel/kvm/kvm-all.c    | 215 +++++++++++++++++++++++++++++++++--------
- accel/kvm/trace-events |   1 +
- 2 files changed, 174 insertions(+), 42 deletions(-)
+ target/i386/kvm/tdx.c | 73 ++++++++++++++++++++++++-------------------
+ 1 file changed, 40 insertions(+), 33 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index d244156f6f..a347a71a2e 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -127,6 +127,10 @@ static NotifierList kvm_irqchip_change_notifiers =
- static NotifierWithReturnList register_vmfd_changed_notifiers =
-     NOTIFIER_WITH_RETURN_LIST_INITIALIZER(register_vmfd_changed_notifiers);
- 
-+static int map_kvm_run(KVMState *s, CPUState *cpu, Error **errp);
-+static int map_kvm_dirty_gfns(KVMState *s, CPUState *cpu, Error **errp);
-+static int vcpu_unmap_regions(KVMState *s, CPUState *cpu);
-+
- struct KVMResampleFd {
-     int gsi;
-     EventNotifier *resample_event;
-@@ -420,6 +424,90 @@ err:
-     return ret;
+diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+index a3e81e1c0c..fd8e3de969 100644
+--- a/target/i386/kvm/tdx.c
++++ b/target/i386/kvm/tdx.c
+@@ -295,14 +295,51 @@ static void tdx_post_init_vcpus(void)
+     }
  }
  
-+static void kvm_create_vcpu_internal(CPUState *cpu, KVMState *s, int kvm_fd)
-+{
-+    cpu->kvm_fd = kvm_fd;
-+    cpu->kvm_state = s;
-+    if (!s->guest_state_protected) {
-+        cpu->vcpu_dirty = true;
-+    }
-+    cpu->dirty_pages = 0;
-+    cpu->throttle_us_per_full = 0;
-+
-+    return;
-+}
-+
-+static int kvm_rebind_vcpus(Error **errp)
-+{
-+    CPUState *cpu;
-+    unsigned long vcpu_id;
-+    KVMState *s = kvm_state;
-+    int kvm_fd, ret = 0;
-+
-+    CPU_FOREACH(cpu) {
-+        vcpu_id = kvm_arch_vcpu_id(cpu);
-+
-+        if (cpu->kvm_fd) {
-+            close(cpu->kvm_fd);
-+        }
-+
-+        ret = kvm_arch_destroy_vcpu(cpu);
-+        if (ret < 0) {
-+            goto err;
-+        }
-+
-+        if (s->coalesced_mmio_ring == (void *)cpu->kvm_run + PAGE_SIZE) {
-+            s->coalesced_mmio_ring = NULL;
-+        }
-+
-+        ret = vcpu_unmap_regions(s, cpu);
-+        if (ret < 0) {
-+            goto err;
-+        }
-+
-+        ret = kvm_arch_pre_create_vcpu(cpu, errp);
-+        if (ret < 0) {
-+            goto err;
-+        }
-+
-+        kvm_fd = kvm_vm_ioctl(s, KVM_CREATE_VCPU, vcpu_id);
-+        if (kvm_fd < 0) {
-+            error_report("KVM_CREATE_VCPU IOCTL failed for vCPU %lu (%s)",
-+                         vcpu_id, strerror(kvm_fd));
-+            return kvm_fd;
-+        }
-+
-+        kvm_create_vcpu_internal(cpu, s, kvm_fd);
-+
-+        ret = map_kvm_run(s, cpu, errp);
-+        if (ret < 0) {
-+            goto err;
-+        }
-+
-+        if (s->kvm_dirty_ring_size) {
-+            ret = map_kvm_dirty_gfns(s, cpu, errp);
-+            if (ret < 0) {
-+                goto err;
-+            }
-+        }
-+
-+        ret = kvm_arch_init_vcpu(cpu);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret,
-+                             "kvm_init_vcpu: kvm_arch_init_vcpu failed (%lu)",
-+                             vcpu_id);
-+        }
-+
-+        close(cpu->kvm_vcpu_stats_fd);
-+        cpu->kvm_vcpu_stats_fd = kvm_vcpu_ioctl(cpu, KVM_GET_STATS_FD, NULL);
-+        kvm_init_cpu_signals(cpu);
-+    }
-+    trace_kvm_rebind_vcpus();
-+
-+ err:
-+    return ret;
-+}
-+
- static void kvm_park_vcpu(CPUState *cpu)
+-static void tdx_finalize_vm(Notifier *notifier, void *unused)
++static void tdx_init_fw_mem_region(void)
  {
-     struct KVMParkedVcpu *vcpu;
-@@ -483,13 +571,7 @@ static int kvm_create_vcpu(CPUState *cpu)
-         }
-     }
+     TdxFirmware *tdvf = &tdx_guest->tdvf;
+     TdxFirmwareEntry *entry;
+-    RAMBlock *ram_block;
+     Error *local_err = NULL;
+     int r;
  
--    cpu->kvm_fd = kvm_fd;
--    cpu->kvm_state = s;
--    if (!s->guest_state_protected) {
--        cpu->vcpu_dirty = true;
--    }
--    cpu->dirty_pages = 0;
--    cpu->throttle_us_per_full = 0;
-+    kvm_create_vcpu_internal(cpu, s, kvm_fd);
++    for_each_tdx_fw_entry(tdvf, entry) {
++        struct kvm_tdx_init_mem_region region;
++        uint32_t flags;
++
++        region = (struct kvm_tdx_init_mem_region) {
++            .source_addr = (uintptr_t)entry->mem_ptr,
++            .gpa = entry->address,
++            .nr_pages = entry->size >> 12,
++        };
++
++        flags = entry->attributes & TDVF_SECTION_ATTRIBUTES_MR_EXTEND ?
++                KVM_TDX_MEASURE_MEMORY_REGION : 0;
++
++        do {
++            error_free(local_err);
++            local_err = NULL;
++            r = tdx_vcpu_ioctl(first_cpu, KVM_TDX_INIT_MEM_REGION, flags,
++                               &region, &local_err);
++        } while (r == -EAGAIN || r == -EINTR);
++        if (r < 0) {
++            error_report_err(local_err);
++            exit(1);
++        }
++
++        if (entry->type == TDVF_SECTION_TYPE_TD_HOB ||
++            entry->type == TDVF_SECTION_TYPE_TEMP_MEM) {
++            qemu_ram_munmap(-1, entry->mem_ptr, entry->size);
++            entry->mem_ptr = NULL;
++        }
++    }
++}
++
++static void tdx_finalize_vm(Notifier *notifier, void *unused)
++{
++    TdxFirmware *tdvf = &tdx_guest->tdvf;
++    TdxFirmwareEntry *entry;
++    RAMBlock *ram_block;
++
+     tdx_init_ram_entries();
  
-     trace_kvm_create_vcpu(cpu->cpu_index, vcpu_id, kvm_fd);
+     for_each_tdx_fw_entry(tdvf, entry) {
+@@ -339,37 +376,7 @@ static void tdx_finalize_vm(Notifier *notifier, void *unused)
+     tdvf_hob_create(tdx_guest, tdx_get_hob_entry(tdx_guest));
  
-@@ -508,19 +590,11 @@ int kvm_create_and_park_vcpu(CPUState *cpu)
-     return ret;
- }
- 
--static int do_kvm_destroy_vcpu(CPUState *cpu)
-+static int vcpu_unmap_regions(KVMState *s, CPUState *cpu)
- {
--    KVMState *s = kvm_state;
-     int mmap_size;
-     int ret = 0;
- 
--    trace_kvm_destroy_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
+     tdx_post_init_vcpus();
 -
--    ret = kvm_arch_destroy_vcpu(cpu);
--    if (ret < 0) {
--        goto err;
--    }
+-    for_each_tdx_fw_entry(tdvf, entry) {
+-        struct kvm_tdx_init_mem_region region;
+-        uint32_t flags;
 -
-     mmap_size = kvm_ioctl(s, KVM_GET_VCPU_MMAP_SIZE, 0);
-     if (mmap_size < 0) {
-         ret = mmap_size;
-@@ -548,39 +622,47 @@ static int do_kvm_destroy_vcpu(CPUState *cpu)
-         cpu->kvm_dirty_gfns = NULL;
-     }
- 
--    kvm_park_vcpu(cpu);
--err:
-+ err:
-     return ret;
- }
- 
--void kvm_destroy_vcpu(CPUState *cpu)
--{
--    if (do_kvm_destroy_vcpu(cpu) < 0) {
--        error_report("kvm_destroy_vcpu failed");
--        exit(EXIT_FAILURE);
--    }
--}
+-        region = (struct kvm_tdx_init_mem_region) {
+-            .source_addr = (uintptr_t)entry->mem_ptr,
+-            .gpa = entry->address,
+-            .nr_pages = entry->size >> 12,
+-        };
 -
--int kvm_init_vcpu(CPUState *cpu, Error **errp)
-+static int do_kvm_destroy_vcpu(CPUState *cpu)
- {
-     KVMState *s = kvm_state;
--    int mmap_size;
--    int ret;
-+    int ret = 0;
+-        flags = entry->attributes & TDVF_SECTION_ATTRIBUTES_MR_EXTEND ?
+-                KVM_TDX_MEASURE_MEMORY_REGION : 0;
+-
+-        do {
+-            error_free(local_err);
+-            local_err = NULL;
+-            r = tdx_vcpu_ioctl(first_cpu, KVM_TDX_INIT_MEM_REGION, flags,
+-                               &region, &local_err);
+-        } while (r == -EAGAIN || r == -EINTR);
+-        if (r < 0) {
+-            error_report_err(local_err);
+-            exit(1);
+-        }
+-
+-        if (entry->type == TDVF_SECTION_TYPE_TD_HOB ||
+-            entry->type == TDVF_SECTION_TYPE_TEMP_MEM) {
+-            qemu_ram_munmap(-1, entry->mem_ptr, entry->size);
+-            entry->mem_ptr = NULL;
+-        }
+-    }
++    tdx_init_fw_mem_region();
  
--    trace_kvm_init_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
-+    trace_kvm_destroy_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
- 
--    ret = kvm_arch_pre_create_vcpu(cpu, errp);
-+    ret = kvm_arch_destroy_vcpu(cpu);
-     if (ret < 0) {
-         goto err;
-     }
- 
--    ret = kvm_create_vcpu(cpu);
-+    /* If I am the CPU that created coalesced_mmio_ring, then discard it */
-+    if (s->coalesced_mmio_ring == (void *)cpu->kvm_run + PAGE_SIZE) {
-+        s->coalesced_mmio_ring = NULL;
-+    }
-+
-+    ret = vcpu_unmap_regions(s, cpu);
-     if (ret < 0) {
--        error_setg_errno(errp, -ret,
--                         "kvm_init_vcpu: kvm_create_vcpu failed (%lu)",
--                         kvm_arch_vcpu_id(cpu));
-         goto err;
-     }
-+    kvm_park_vcpu(cpu);
-+err:
-+    return ret;
-+}
-+
-+void kvm_destroy_vcpu(CPUState *cpu)
-+{
-+    if (do_kvm_destroy_vcpu(cpu) < 0) {
-+        error_report("kvm_destroy_vcpu failed");
-+        exit(EXIT_FAILURE);
-+    }
-+}
-+
-+static int map_kvm_run(KVMState *s, CPUState *cpu, Error **errp)
-+{
-+    int mmap_size, ret = 0;
- 
-     mmap_size = kvm_ioctl(s, KVM_GET_VCPU_MMAP_SIZE, 0);
-     if (mmap_size < 0) {
-@@ -605,14 +687,53 @@ int kvm_init_vcpu(CPUState *cpu, Error **errp)
-             (void *)cpu->kvm_run + s->coalesced_mmio * PAGE_SIZE;
-     }
- 
-+ err:
-+    return ret;
-+}
-+
-+static int map_kvm_dirty_gfns(KVMState *s, CPUState *cpu, Error **errp)
-+{
-+    int ret = 0;
-+    /* Use MAP_SHARED to share pages with the kernel */
-+    cpu->kvm_dirty_gfns = mmap(NULL, s->kvm_dirty_ring_bytes,
-+                               PROT_READ | PROT_WRITE, MAP_SHARED,
-+                               cpu->kvm_fd,
-+                               PAGE_SIZE * KVM_DIRTY_LOG_PAGE_OFFSET);
-+    if (cpu->kvm_dirty_gfns == MAP_FAILED) {
-+        ret = -errno;
-+    }
-+
-+    return ret;
-+}
-+
-+int kvm_init_vcpu(CPUState *cpu, Error **errp)
-+{
-+    KVMState *s = kvm_state;
-+    int ret;
-+
-+    trace_kvm_init_vcpu(cpu->cpu_index, kvm_arch_vcpu_id(cpu));
-+
-+    ret = kvm_arch_pre_create_vcpu(cpu, errp);
-+    if (ret < 0) {
-+        goto err;
-+    }
-+
-+    ret = kvm_create_vcpu(cpu);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret,
-+                         "kvm_init_vcpu: kvm_create_vcpu failed (%lu)",
-+                         kvm_arch_vcpu_id(cpu));
-+        goto err;
-+    }
-+
-+    ret = map_kvm_run(s, cpu, errp);
-+    if (ret < 0) {
-+        goto err;
-+    }
-+
-     if (s->kvm_dirty_ring_size) {
--        /* Use MAP_SHARED to share pages with the kernel */
--        cpu->kvm_dirty_gfns = mmap(NULL, s->kvm_dirty_ring_bytes,
--                                   PROT_READ | PROT_WRITE, MAP_SHARED,
--                                   cpu->kvm_fd,
--                                   PAGE_SIZE * KVM_DIRTY_LOG_PAGE_OFFSET);
--        if (cpu->kvm_dirty_gfns == MAP_FAILED) {
--            ret = -errno;
-+        ret = map_kvm_dirty_gfns(s, cpu, errp);
-+        if (ret < 0) {
-             goto err;
-         }
-     }
-@@ -2710,6 +2831,16 @@ static int kvm_reset_vmfd(MachineState *ms)
-     }
-     assert(!err);
- 
-+    /*
-+     * rebind new vcpu fds with the new kvm fds
-+     * These can only be called after kvm_arch_on_vmfd_change()
-+     */
-+    ret = kvm_rebind_vcpus(&err);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+    assert(!err);
-+
-     /* these can be only called after ram_block_rebind() */
-     memory_listener_register(&kml->listener, &address_space_memory);
-     memory_listener_register(&kvm_io_listener, &address_space_io);
-diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
-index e4beda0148..4a8921c632 100644
---- a/accel/kvm/trace-events
-+++ b/accel/kvm/trace-events
-@@ -15,6 +15,7 @@ kvm_park_vcpu(int cpu_index, unsigned long arch_cpu_id) "index: %d id: %lu"
- kvm_unpark_vcpu(unsigned long arch_cpu_id, const char *msg) "id: %lu %s"
- kvm_irqchip_commit_routes(void) ""
- kvm_reset_vmfd(void) ""
-+kvm_rebind_vcpus(void) ""
- kvm_irqchip_add_msi_route(char *name, int vector, int virq) "dev %s vector %d virq %d"
- kvm_irqchip_update_msi_route(int virq) "Updating MSI route virq=%d"
- kvm_irqchip_release_virq(int virq) "virq %d"
+     /*
+      * TDVF image has been copied into private region above via
 -- 
 2.42.0
 
