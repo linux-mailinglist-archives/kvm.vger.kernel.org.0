@@ -1,228 +1,168 @@
-Return-Path: <kvm+bounces-71857-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71858-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mCoAOKczn2lXZQQAu9opvQ
-	(envelope-from <kvm+bounces-71857-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 18:38:47 +0100
+	id KFSHOE80n2lXZQQAu9opvQ
+	(envelope-from <kvm+bounces-71858-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 18:41:35 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5577F19BA90
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 18:38:47 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4919919BB0A
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 18:41:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 12F6E303714E
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 17:38:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 54EED302D689
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 17:41:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B653D5238;
-	Wed, 25 Feb 2026 17:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7868C3921D7;
+	Wed, 25 Feb 2026 17:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qv7FTEZD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RFGlMuG+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
+Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459CE2E717B
-	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 17:38:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395DC3ED113
+	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 17:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772041117; cv=none; b=eQysAf1z2NxNiivqZCziJJ3xTnkJG4Bdvd3Q9wr0wff9nUUxeUeZKfRscUhVsmbbRvxm0b0SWCP7L9NEG1U0MlSJBWPxwa+6e7nmwTJG/FSfHFCu6iuHldm5QFVNwmDPTk0Lpwq9vD1tjs6JWK7H+D3YNjCkEmvtInwdg2yu2rQ=
+	t=1772041261; cv=none; b=t0zIrcr3gE4RAAw+/mHfDHA9DRD5p0yMEPab3hZsYAnucHwSqhfY/DX/U4l5J4ZysWSXAL/HnD2Sux8MLEH/uKLz8X7ynPQ/4lid6gQ+4uuERkMs7gu85uaDv0sW6baHPOds3xsFzjPoKpKAkZLD35s//1ruKyH2Vtze9DWEpZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772041117; c=relaxed/simple;
-	bh=R/R3DcLkOIdIezNwV80BfBol7Z25b9yKegEl4ZzQ0N0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gbGGKOWxWU/nv3WwmcUO0iiCMavQDObmW91zca8/sqo+FzYYS4QWvaEtdWqDwqEJfDXbVxgCfM5yRnmGPc9YMrYlKCMGCaxf1sVYhg8+5iJy9lbh/4pFeLTckfM2WvlDwisMBAKnWtXtrW6jNZmlE2eGicxfstRqYg0hehMEe4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qv7FTEZD; arc=none smtp.client-ip=209.85.210.73
+	s=arc-20240116; t=1772041261; c=relaxed/simple;
+	bh=vfPVzGsOpxFMqLnHbeOt97S7ASvz/dPPsmfURT55c2c=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=qLQDwv81N8XVWzwxqbxe1fnPP6Ny/2An9pkUweBLISNZLMJQ5fAyI0s8RLuGK2EtT//4n/aTqpHtbXwsl3vcF1adICUT6WczSsFSOtS6udchtnSiLV/MrXhhrMc0owHC3gfGXkr5Ogm8yuaLR7Bou2MFMwBE3A4MxEQFvFrKQLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RFGlMuG+; arc=none smtp.client-ip=209.85.210.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7d1950b48f3so76601939a34.0
-        for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 09:38:36 -0800 (PST)
+Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-7d4cb5810a0so46147046a34.1
+        for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 09:40:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772041115; x=1772645915; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FxE+A5J4HGPNO2s3hfVFIukZ/uILKNBM11tjPpp3P/Y=;
-        b=Qv7FTEZDdZoIh1Ud8GajKGxCa2se//sSsZKdpP4tDEMDKHSXGyt608CHyTr235l2xs
-         u3p2YA/TxPwkq/7a4udqlQ8BJQkNQSHCNee+6z+hu7pxm5wiqywW1LLI2YuXEA15RVbp
-         mM+2ScTViU7Gc/3MWj0AYCwwDJaq6iZLcNJGBOs69w/6ZdFpdzuz/9PgtrUisRYeSdLD
-         n5Z1yJnf6C+Z6SLSboL3nyNzk+uNIjuodKYcdxor0CNwMktJOCAjPQQmTZ/t69+pPN/4
-         B6xsaKCGIYdz98dOEWuop+rWb305vfwkPCJqlD29Ef7Fcy/Pconpk0D2BFBpjXah5g1W
-         4A2A==
+        d=google.com; s=20230601; t=1772041257; x=1772646057; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vfPVzGsOpxFMqLnHbeOt97S7ASvz/dPPsmfURT55c2c=;
+        b=RFGlMuG+RlBMZrbOsRHSvqyhEwvpeQcTEJJ6pxS/L1GkYKdprHSLNvn0+CqMjCdmq8
+         GJqB7lFXU3ZEixmIuTAQTT5v14RH9CUEiJ1bUNpeAJc8R4ox6Mz8r0qJAkicg4UvpHjJ
+         G8+VYutk2uWcIi4Z1R1Bo/M3ZoEBT0G7lNZ1MD+z4DDKpuM56Hm+Oirty558xOYgWXPp
+         BwbcJmqAS3hXfLbOKsMkUqMzhv7vY1tUBtG+hnKULyozp6sk+8LO6rnsPs6uDFAHZ2Ev
+         fqCcQkAHOMuFB4zx9KQkzYAJ+K5uFnNvV7M/Rom9vHhyv796wUcfJZDb9xWBfwo1hZd8
+         M4/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772041115; x=1772645915;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FxE+A5J4HGPNO2s3hfVFIukZ/uILKNBM11tjPpp3P/Y=;
-        b=QjBsOMXUIvhnubSEIEc5DjGH7jWdacGwCIpZkcPucRaCjegAd3M953cXleTLMgT830
-         lmYEcRzLMNXz/aM73RP4ON6jK9I684re8k1s0PMRXb49coTR+ogoh7c/TeyhoBX/uR+J
-         /r54luDivOY/tDQ2GxN3VHIKuMK97upEuIBKRUsmIA7nQYN9fDQ+oN5EyLDpuMOLfsWM
-         xaeMbO11jkpgL71T9pWfzGpjveT+LQdxDjQygrjWXPJnacg8E6uetzGDR6iWtzIKLtOm
-         nFQwuBannEbS1AV6zeU6KbSx3Ingc05rkIrYCgYDsxaOdV3HR4o3ww471bSG0TojMVJN
-         3u4Q==
-X-Gm-Message-State: AOJu0YyEk8ez6+2CG8X9z28o6Q3z5wG2JBlOmzUDtyag0cqtiZ8fJn++
-	HJK0x/dT7jmc8mmYDz2otNwuo1kZbGIkzfv7RbVj0MlCzMKtgAZ3oMKZ+Q9EWmMO4qtGkuc7oTT
-	IqDdBfserJdKxgXkgWzHTRL84Nris6gsfiuX9FJqkAyt1EHkPyNp0h0A0k8jelnXrwT+w1cumHo
-	OfWIq6PZhwZdZ4h3DzsgozdnLVHdBRCBHPFwbupH0NGPw6z8/F3qjsHZ16YBY=
-X-Received: from ilbcf6.prod.google.com ([2002:a05:6e02:2306:b0:447:81b5:ae34])
+        d=1e100.net; s=20230601; t=1772041257; x=1772646057;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vfPVzGsOpxFMqLnHbeOt97S7ASvz/dPPsmfURT55c2c=;
+        b=Rbc4WoWKHghgni8yUoikHfjpIgbRv5XWpfrNjZi1zdKmWeVoAF1R2xl/vs+mINqJVK
+         W97WwHxbaWG1BIRbfMwg71n8w4cd7/1qYYSeZW583137dQWd0km39RGbSv+L9fSFx6i7
+         2EuVhgghTFLRJndmL0tFzfU11dd3oO3BFqPnyc6hEH7RjiqJzgemlbUUOBWxQ6gR1NQD
+         0//SnGcpQoY0GxqPrnrNolHHj/Z52VA7+RNPbqj9eUpK1/RS+ReoDqOTypdMXmSqbSJ2
+         IqbVQI16Op/Z+Hugjb+i+AyknrxLQrC7lOp5lvg0sNXUnDD1Y9zgijDq3fHqSgnaFfiV
+         g0RA==
+X-Gm-Message-State: AOJu0YyRvGw0acYA10BHE7SpPqghjfl9Pn0GeatvizWTZl0R9cHEu29/
+	e8I1Dv9Y5/fcqSBDEQJeeIdnCKA2LGzzQ2mUloP5T7DgLbQIo+J/7zJ5Uei/62B/hCqCGmG63xc
+	fIPVHLE+ez39LSOgSk+DwgjfnXg==
+X-Received: from iluj15.prod.google.com ([2002:a05:6e02:154f:b0:4d2:8640:5d64])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a4a:b68a:0:b0:679:dcd7:fbe6 with SMTP id 006d021491bc7-679dcd80797mr3115611eaf.31.1772041114890;
- Wed, 25 Feb 2026 09:38:34 -0800 (PST)
-Date: Wed, 25 Feb 2026 17:37:32 +0000
+ 2002:a05:6820:2019:b0:672:e67a:96cf with SMTP id 006d021491bc7-679c4684cbcmr8062877eaf.16.1772041256681;
+ Wed, 25 Feb 2026 09:40:56 -0800 (PST)
+Date: Wed, 25 Feb 2026 17:40:55 +0000
+In-Reply-To: <86h5rlawru.wl-maz@kernel.org> (message from Marc Zyngier on Fri,
+ 13 Feb 2026 08:11:01 +0000)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
-Message-ID: <20260225173732.3135526-1-coltonlewis@google.com>
-Subject: [RFC PATCH] arm: enable PMU partitioning
+Message-ID: <gsnty0kgoh5k.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v6 00/19] ARM64 PMU Partitioning
 From: Colton Lewis <coltonlewis@google.com>
-To: kvm@vger.kernel.org
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Russell King <linux@armlinux.org.uk>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Mingwei Zhang <mizhang@google.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Shuah Khan <shuah@kernel.org>, Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
-	kvmarm@lists.linux.dev, qemu-arm@nongnu.org, 
-	Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, pbonzini@redhat.com, 
+	corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, 
+	will@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-71858-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71857-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[coltonlewis@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 5577F19BA90
+X-Rspamd-Queue-Id: 4919919BB0A
 X-Rspamd-Action: no action
 
-This sets the vCPU device attribute to unconditionally enable
-partitioning when a PMU is available on an ARM host.
+Marc Zyngier <maz@kernel.org> writes:
 
-Note that this patch is experimental to demonstrate the API. That is
-why it aborts immediately if the call does not succeed.
+> On Thu, 12 Feb 2026 21:08:36 +0000,
+> Colton Lewis <coltonlewis@google.com> wrote:
 
-For the call to succeed, the host must be running a kernel with the
-ARM64 PMU Partitioning feature [1] and set the kernel command line
-arm_pmuv3.reserved_host_counters=n where n is between 0 and the number
-of counters on the system, inclusive.
+>> Hey Marc, thanks for the review.
 
-[1] https://lore.kernel.org/kvmarm/20260209221414.2169465-1-coltonlewis@google.com/
+>> Marc Zyngier <maz@kernel.org> writes:
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- hw/arm/virt.c                 |  1 +
- linux-headers/asm-arm64/kvm.h |  2 ++
- target/arm/kvm-stub.c         |  5 +++++
- target/arm/kvm.c              | 18 ++++++++++++++++++
- target/arm/kvm_arm.h          |  1 +
- 5 files changed, 27 insertions(+)
+>> > On Mon, 09 Feb 2026 22:13:55 +0000,
+>> > Colton Lewis <coltonlewis@google.com> wrote:
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 50865e8115..29082df31c 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -2234,6 +2234,7 @@ static void virt_post_cpus_gic_realized(VirtMachineState *vms,
-                 if (kvm_irqchip_in_kernel()) {
-                     kvm_arm_pmu_set_irq(ARM_CPU(cpu), VIRTUAL_PMU_IRQ);
-                 }
-+                kvm_arm_pmu_set_partition(ARM_CPU(cpu), true);
-                 kvm_arm_pmu_init(ARM_CPU(cpu));
-             }
-             if (steal_time) {
-diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
-index 46ffbddab5..69309a182e 100644
---- a/linux-headers/asm-arm64/kvm.h
-+++ b/linux-headers/asm-arm64/kvm.h
-@@ -424,6 +424,8 @@ enum {
- #define   KVM_ARM_VCPU_PMU_V3_FILTER		2
- #define   KVM_ARM_VCPU_PMU_V3_SET_PMU		3
- #define   KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS	4
-+#define   KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION	5
-+
- #define KVM_ARM_VCPU_TIMER_CTRL		1
- #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
- #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-diff --git a/target/arm/kvm-stub.c b/target/arm/kvm-stub.c
-index ea67deea52..afbfffe2cd 100644
---- a/target/arm/kvm-stub.c
-+++ b/target/arm/kvm-stub.c
-@@ -80,6 +80,11 @@ void kvm_arm_pmu_set_irq(ARMCPU *cpu, int irq)
-     g_assert_not_reached();
- }
- 
-+void kvm_arm_pmu_set_partition(ARMCPU *cpu, bool partition)
-+{
-+    g_assert_not_reached();
-+}
-+
- void kvm_arm_pmu_init(ARMCPU *cpu)
- {
-     g_assert_not_reached();
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index ded582e0da..db1d564462 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -1817,6 +1817,24 @@ void kvm_arm_pmu_set_irq(ARMCPU *cpu, int irq)
-     }
- }
- 
-+void kvm_arm_pmu_set_partition(ARMCPU *cpu, bool partition)
-+{
-+    struct kvm_device_attr part_attr = {
-+        .group = KVM_ARM_VCPU_PMU_V3_CTRL,
-+        .attr = KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION,
-+        .addr = (uint64_t)&partition
-+    };
-+
-+    if (!cpu->has_pmu) {
-+        return;
-+    }
-+
-+    if (!kvm_arm_set_device_attr(cpu, &part_attr, "PMU partition")) {
-+        error_report("failed to set PMU partition");
-+        abort();
-+    }
-+}
-+
- void kvm_arm_pvtime_init(ARMCPU *cpu, uint64_t ipa)
- {
-     struct kvm_device_attr attr = {
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index cc0b374254..2b55f2956e 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -248,6 +248,7 @@ int kvm_arm_vgic_probe(void);
- 
- void kvm_arm_pmu_init(ARMCPU *cpu);
- void kvm_arm_pmu_set_irq(ARMCPU *cpu, int irq);
-+void kvm_arm_pmu_set_partition(ARMCPU *cpu, bool partition);
- 
- /**
-  * kvm_arm_pvtime_init:
+>> >> This series creates a new PMU scheme on ARM, a partitioned PMU that
+>> >> allows reserving a subset of counters for more direct guest access,
+>> >> significantly reducing overhead. More details, including performance
+>> >> benchmarks, can be read in the v1 cover letter linked below.
 
-base-commit: afe653676dc6dfd49f0390239ff90b2f0052c2b8
--- 
-2.53.0.414.gf7e9f6c205-goog
+>> >> An overview of what this series accomplishes was presented at KVM
+>> >> Forum 2025. Slides [1] and video [2] are linked below.
 
+>> >> IMPORTANT: This iteration does not yet implement the dynamic counter
+>> >> reservation approach suggested by Will Deacon in January [3]. I am
+>> >> working on it, but wanted to send this version first to keep momentum
+>> >> going and ensure I've addressed all issues besides that.
+
+>> > [...]
+
+>> > As I have asked before, this is missing an example of how userspace is
+>> > going to use this. Without it, it is impossible to correctly review
+>> > this series.
+
+>> > Please consider this as a blocker.
+
+>> Understood. I remember you asking for a QEMU patch specifically.
+
+> No. *any* VMM. QEMU, kvmtool, crosvm, firecrackpoter, whichever you want.
+
+>> I had hoped that the use in the selftest was sufficient to show how to
+>> use the uAPI.
+
+> The selftests are absolutely pointless, like 99% of all selftests.
+> They don't demonstrate how the userspace API works, now how
+> configuring the PMU is ordered with the rest of the save/restore flow.
+
+>> If not, I can send out an example QEMU patch to the QEMU ARM mailing
+>> list.
+
+Okay I sent one to you, qemu-arm, and everyone else I asked to review
+this series.
 
