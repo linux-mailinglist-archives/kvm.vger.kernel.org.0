@@ -1,238 +1,184 @@
-Return-Path: <kvm+bounces-71844-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71845-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AL5vBHIen2lcZAQAu9opvQ
-	(envelope-from <kvm+bounces-71844-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 17:08:18 +0100
+	id aHBdCykkn2mPZAQAu9opvQ
+	(envelope-from <kvm+bounces-71845-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 17:32:41 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A42BA19A42C
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 17:08:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDE8B19AB47
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 17:32:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 625EB3048D83
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 16:03:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5F1E9301D30E
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 16:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614923D6674;
-	Wed, 25 Feb 2026 16:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97773D5233;
+	Wed, 25 Feb 2026 16:27:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dPPZTnFz";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="R1DeGTkS"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sF3bpwcy"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EAC13AEF34
-	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 16:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA35A3D6462;
+	Wed, 25 Feb 2026 16:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772035382; cv=none; b=poicNFx0DUHutTrXTZWXIVoP6brlB8yYWiD4F7QlPsJ5VPafespu9MKsuDB+YVy9h5l9pxOHmpnH9rKsSysGnmjGu3uX1iKd0YUaVrEBKJNELVGp/OC2yybZU0kQwqIwIhUBvZxTJQStiddYndBJsMNkJPibJTr3X9ZiDzDfng0=
+	t=1772036836; cv=none; b=SBIv0NMAISntbonajXcOBDkIH/CRMKcxXhLEkorSm41QI2lAonwsZCf5WeRUsHASTfmb5Qk1M6PT9H/ihwCJYALZOqi1IYeUV7rcTl1IoUwGXC4MluQMHoqH7r7ukxCLfvxszPUir3E7EvFB0T5atFgdLciNs5WxyQYj8Wvevm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772035382; c=relaxed/simple;
-	bh=vOBdgb/4xxnB0k/8i8XLjCm3yLM1L1uiiQslDhNAEqc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=MnIaKkPDM2hh9bX7/JZK+KZPOgepSGqCMIvAF3KqapBsNmIVe1BF26YxuPvieKots3mWzg4w8zhjyUMWGOVpagPRn5LmtKgJJYhyc18YTOPbVoFxuc62V+CXlE1Uu5L1XAlYIjeBD54045NgJnmdZYZ7NCnFmgATFNBzTlOGt10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dPPZTnFz; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=R1DeGTkS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772035380;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KqzyfjoTd3ugvhhWlO5qZVx+bIqCO3FPWUdRI3E3aZ4=;
-	b=dPPZTnFzI5am86WgdXRqSg0W7L10sKDYC6pXutWrdUzWddGky0Pebc7TMdHUibyzL1VePZ
-	fQ2rce1mFKOvAkHrtw+15opmXh/Ucob2dgdMHTOVioXj7l/7Vn1R3M1b+DpYd71QpfdA31
-	MMmy9q/w05MRVp3liZCpKTBH9CI7iPo=
-Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
- [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-255-HTs-KeULOW2T_UhCnsLNJQ-1; Wed, 25 Feb 2026 11:02:51 -0500
-X-MC-Unique: HTs-KeULOW2T_UhCnsLNJQ-1
-X-Mimecast-MFC-AGG-ID: HTs-KeULOW2T_UhCnsLNJQ_1772035370
-Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-567677cdb20so72380216e0c.3
-        for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 08:02:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772035370; x=1772640170; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KqzyfjoTd3ugvhhWlO5qZVx+bIqCO3FPWUdRI3E3aZ4=;
-        b=R1DeGTkScCIr8PtfK+5d0K0d6VAI39ygeDOmwc4fj44ChXJ99qoafn3zufwRQ4kxJk
-         UgRQ1qOZBrl+r+jylE9/V3I8wup/U+jSUpO3etfXQ6A4uugh+bp7nBBSrMZOSmS31rPr
-         ZEioYKBgJjpcesjcZHM6Qgqa6kGV0v/J/oLoJRp+W9qYS8yEQ8vqENehSBASN9QjNWR5
-         cPG6iyo5qndhnZqGfm43kq8FVtE1Fv7fPssrKxdzRc6e0mFaXqHA6G67f/VzVjVsCccH
-         9yUTjdYFje6v4+OUPIe6vDFCEmuOYLmJSqPdEpMJBScL5s+fX0GxOmmDZNjVmDFN7amM
-         qTXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772035370; x=1772640170;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KqzyfjoTd3ugvhhWlO5qZVx+bIqCO3FPWUdRI3E3aZ4=;
-        b=npKqCxo2zA6E6Jthzu+QLHGBpgjltYqJxkTh7a8vpoqvye2k+aI56SV4xNXSTfeYPn
-         ZRainOARgDU0WPls+L5hcQNykVLZhJ4Wfb+M7cuHi86X4NuuMluSWeRDBzgnPT4GMbOJ
-         j1K4uFA+QtKgbIj7h35RareLwPRXuaT+zGL/wkBbOUOPH0X8xnHe69leAFoUYYtckmQT
-         3CzHvL/0k1n+ZKzH1zLMNUyZCUv94yllJSpAbWkuGhogRCnK2toklCIU7J4cCPdDblcv
-         CZ1KA5umNl9IS9uVK/JYtpdHAvk1X022i8R9gjN5MzzJn8+7eUP7Z0C2IStkvAqMKNo4
-         johQ==
-X-Gm-Message-State: AOJu0Yx2xZeS0kjCMBwMej8R4RjlpsGYi6NC0gyiqKFr0TMjk8kD1iAz
-	Yaqhm8WlAcC7Lva5aVf6kCzH1XZrgMBx2379TBaLr4J8PAjzD1e6rAqRidcn8QvytPc4QPr7E1W
-	8BnUcm6JAsba6ZXzWolWjMda2oxBse0Arfb9F3KulfbvnRBkUTaef1/1C7vRiBw==
-X-Gm-Gg: ATEYQzxhpVX3EhhZ2OaX/Nh3hcz/ewSZb3r6TXLmhI+V4mXjo0c/5a69DoOyBzSA7sc
-	VEzDQ1w0Bboxvh8JU3K9KJ4nR6eN/V15NoNbtBaI/SFZqf1fblak0pg3k7KFYMF4/m54CipFllq
-	gy5GFKdB1APmkstOK4fNWvF+ump9RfdON3D+QLGPq6u37Hoy258veMogF0EI7/WRYbP9KoiJz/1
-	5VemmZhTqhGmvmGp8gXm+ln24Y3HOgZI49ivPiMOJnZsShrDk28CPA7BrVNXUiCWsIm9LUEDNLh
-	ivkiT0uuK+rQ5K+pu3XAfOSw7Vohg7Vq86PYXxJHB4G5LQo9K6BqeGSRkK9Y1FCSoWQazIG32CV
-	XNhGJIC8i//lXtdyqiWOHKv5irqBY
-X-Received: by 2002:a05:6122:4701:b0:566:4689:46eb with SMTP id 71dfb90a1353d-568e455a597mr6239412e0c.0.1772035370361;
-        Wed, 25 Feb 2026 08:02:50 -0800 (PST)
-X-Received: by 2002:a05:6122:4701:b0:566:4689:46eb with SMTP id 71dfb90a1353d-568e455a597mr6239371e0c.0.1772035369893;
-        Wed, 25 Feb 2026 08:02:49 -0800 (PST)
-Received: from intellaptop.lan ([2607:fea8:fc01:88aa:f1de:f35:7935:804f])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cb8d04400asm1314919285a.10.2026.02.25.08.02.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Feb 2026 08:02:49 -0800 (PST)
-Message-ID: <46a82c25ef7781a5887f7d7722901611605380c0.camel@redhat.com>
-Subject: Re: Question: 'pmu' kvm unit test fails when run nested with NMI
- watchdog on the host
-From: mlevitsk@redhat.com
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org
-Date: Wed, 25 Feb 2026 11:02:47 -0500
-In-Reply-To: <aZ5LaBCiG2PFFXyG@google.com>
-References: <10d3f95717b7072e30576b7e3931ea277399fdf8.camel@redhat.com>
-	 <aZ5LaBCiG2PFFXyG@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	s=arc-20240116; t=1772036836; c=relaxed/simple;
+	bh=KkYVBO/6As3T5y3cUNvo3NyMGXxBzv7EPF5rfPY0P6s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZS7vPYc6oOoE+LG/A/D595Uyaor5ThvKezAVDaM0poYC6BF9oPqbThXhJKgMqiUoyfBu+Cju9LAoxWVROQoDrGNLUjndCT6rmTo5KJ770lV8yi78SyAY1eX22yLAvK7/73gKH+dKjGu/RptAd8hrh3L+PBWigspajyCabKUXKYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sF3bpwcy; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61PEijmV3015564;
+	Wed, 25 Feb 2026 16:27:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=nRrPhj
+	U47o4X91zItvqVwyVs6H8F1wG8S+K4S7XJ6sQ=; b=sF3bpwcyHIvHEcteBsjQW+
+	ETCSXuud4bF+sQEzKX7VvMCaRSTXi1mLf2227qbECdKZIue5Z4bHWpXCb6VV7CK2
+	bHENLLJ7lEhuLPcL/k/DzUiSrwXjWwxELIKJG8+ZY6IUcwr+kIErjqlYaeTxmF/l
+	BTfZ/rlHo705mQo9ECXI1Yljrd3pTqNaDCIak4lZ7WhEITvHART5PXp9u3/ch1v4
+	L19aBGBhg585u3nN7dKP+/5FoNkUTL0h/v9LChyfKpUyc/XnVE/lwpqKWG1ti5k+
+	RauP/Q9wtrPm8U4K67yqcxn0yspz2My9wETcV0tehA83Oevwe4zavGmlgc2pimXg
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cf4bs0c3k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Feb 2026 16:27:10 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61PCZ3Xt001659;
+	Wed, 25 Feb 2026 16:27:09 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cfr1n63pv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Feb 2026 16:27:09 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61PGR56845744538
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 25 Feb 2026 16:27:06 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D9CA02004B;
+	Wed, 25 Feb 2026 16:27:05 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1C81420040;
+	Wed, 25 Feb 2026 16:27:05 +0000 (GMT)
+Received: from [9.57.233.77] (unknown [9.57.233.77])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 25 Feb 2026 16:27:04 +0000 (GMT)
+Message-ID: <219c1772-f8ba-43bc-88ef-4c79b112cbee@linux.ibm.com>
+Date: Wed, 25 Feb 2026 11:27:04 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: s390: only deliver service interrupt with payload
+To: Eric Farman <farman@linux.ibm.com>, Janosch Frank
+ <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20260225152013.1108842-1-farman@linux.ibm.com>
+Content-Language: en-US
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20260225152013.1108842-1-farman@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: _WLH0TnptSEbGWAn4btYmhpDKFz5Yn6y
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI1MDE1NSBTYWx0ZWRfX+YadXMYIM80o
+ zoc2nT7UaHmdkgdBqkiHYfYWkrHSac0EKv4bslsIzgMbaK63TnZcBFHwXcYL5JzmFST1m+Fn62u
+ kshU+8NjR8Rd4ayc3B28HT9irDlAMq65yR+1bifmIy2F7hcdYEAl3ZL0Lu+YrTIw8UZPJCFt/Va
+ cadwWyqHimXkf50OtvxQxj5puOa+N7WIXgUdR79A0bNpDUbpfYiQ0/Qz3V2Wt/U9Z47alu6DQtc
+ P/FN89M8YZUmqqMxH5WZcVNsz/f5DAcIW8wjxvq1Uk8mPub4kPfd4+MiVuTpEaWrEHD1G8QVkSF
+ GM33Xx3LKcjJK6ChuImjznqQTV71P9Xq6JddZRcxROWRS7Lqic78N7n9S4E270KYTQtIg5CbQWP
+ Td4qvU/+VgBMjhUCmDjQMJKZ+QjgoQ9weWugCkS9t8ZKKiU9eja8fcQmVntfmqUIuYo430afM2S
+ FY4Z6CWaJN3Eb4ms58g==
+X-Authority-Analysis: v=2.4 cv=eNceTXp1 c=1 sm=1 tr=0 ts=699f22de cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8
+ a=gOxyaswGBdB1klpJvm0A:9 a=NqO74GWdXPXpGKcKHaDJD/ajO6k=:19 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: _WLH0TnptSEbGWAn4btYmhpDKFz5Yn6y
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-25_02,2026-02-25_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 priorityscore=1501 phishscore=0 suspectscore=0 adultscore=0
+ bulkscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602250155
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71844-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mlevitsk@redhat.com,kvm@vger.kernel.org];
-	RCPT_COUNT_TWO(0.00)[2];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-71845-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[borntraeger@linux.ibm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A42BA19A42C
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: BDE8B19AB47
 X-Rspamd-Action: no action
 
-On Tue, 2026-02-24 at 17:07 -0800, Sean Christopherson wrote:
-> On Wed, Nov 05, 2025, mlevitsk@redhat.com=C2=A0wrote:
-> > Hi,
-> >=20
-> > I have a small, a bit philosophical question about the pmu kvm unit tes=
-t:
->=20
-> The problem with philosophical questions is that they're never small :-)
->=20
-> > One of the subtests of this test, tests all GP counters at once, and it
-> > depends on the NMI watchdog being disabled, because it occupies one GP
-> > counter.
-> >=20
-> > This works fine, except when this test is run nested. In this case, ass=
-uming
-> > that the host has the NMI watchdog enabled, the L1 still can=E2=80=99t =
-use all
-> > counters and has no way of working this around.
-> >=20
-> > Since AFAIK the current long term direction is vPMU, which is especiall=
-y
-> > designed to address those kinds of issues, I am not sure it is worthy t=
-o
-> > attempt to fix this at L0 level (by reducing the number of counters tha=
-t the
-> > guest can see for example, which also won=E2=80=99t always fix the issu=
-e, since there
-> > could be more perf users on the host, and NMI watchdog can also get
-> > dynamically enabled and disabled).
->=20
-> Agreed.=C2=A0 For the emulated PMU, I think the only reasonable answer is=
- that the
-> admin needs to understand the ramifications of exposing a PMU to the gues=
-t.
->=20
-> > My question is: Since the test fails and since it interferes with CI, d=
-oes it
-> > make sense to add a workaround to the test, by making it use 1 counter =
-less
-> > if run nested?
->=20
-> Hrm.=C2=A0 I'd prefer not to?=C2=A0 Mainly because reducing the number of=
- used counters
-> seems fragile as it relies heavily on implementation details of pieces of=
- the
-> stack beyond the current environment (the VM).
-OK, then I'll leave it as is.
+Am 25.02.26 um 10:20 schrieb Eric Farman:
+> Routine __inject_service() may set both the SERVICE and SERVICE_EV
+> pending bits, and in the case of a pure service event the corresponding
+> trip through __deliver_service_ev() will clear the SERVICE_EV bit only.
+> This necessitates an additional trip through __deliver_service() for
+> the other pending interrupt bit, however it is possible that the
+> external interrupt parameters are zero and there is nothing to be
+> delivered to the guest.
+> 
+> To avoid sending empty data to the guest, let's only write out the SCLP
+> data when there is something for the guest to do, otherwise bail out.
+> 
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
 
->=20
-> I don't suppose there's any way to configure your CI pipeline to disable =
-the
-> host NMI watchdog?
-It is probably possible, I'll ask the CI people.
+Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
 
->=20
-> > As a bonus the test can also check the NMI watchdog state and also redu=
-ce the
-> > number of tested counters instead of being skipped, improving coverage.
->=20
-> I don't think I followed this part.=C2=A0 How would a test that runs nest=
-ed be able
-> to query the host's NMI watchdog state?
->=20
-> Oh, you're saying in a non-nested scenario to reduce the number of counte=
-rs.
-> For me personally, I prefer the SKIP, because it's noisier, i.e. tells me=
- pretty
-> loudly that I forgot to turn off the watchdog.=C2=A0 It's saved me from d=
-ebugging
-> false failures at least once when running tests in a VM on the same host.
-Yes, I am talking here about non nested scenario.
-
-
->=20
-> > Does all this make sense? If not, what about making the =E2=80=98all_co=
-unters=E2=80=99
-> > testcase optional (only print a warning) in case the test is run nested=
-?
->=20
-> Printing a warning would definitely be my least favorite option.=C2=A0 Te=
-sts that
-> print warns on failure inevitably get ignored. :-/
->=20
-
-OK, let it be as it is now.
-
-
-Thanks,
-Best regards,
-	Maxim Levitsky
+> ---
+>   arch/s390/kvm/interrupt.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index 18932a65ca68..dd0413387a9e 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -956,6 +956,9 @@ static int __must_check __deliver_service(struct kvm_vcpu *vcpu)
+>   		set_bit(IRQ_PEND_EXT_SERVICE, &fi->masked_irqs);
+>   	spin_unlock(&fi->lock);
+>   
+> +	if (!ext.ext_params)
+> +		return 0;
+> +
+>   	VCPU_EVENT(vcpu, 4, "deliver: sclp parameter 0x%x",
+>   		   ext.ext_params);
+>   	vcpu->stat.deliver_service_signal++;
 
 
