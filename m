@@ -1,153 +1,257 @@
-Return-Path: <kvm+bounces-71745-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71746-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eF/XFExUnmm3UgQAu9opvQ
-	(envelope-from <kvm+bounces-71745-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 02:45:48 +0100
+	id YHSKD1hpnmmzVAQAu9opvQ
+	(envelope-from <kvm+bounces-71746-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 04:15:36 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBDC518FC57
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 02:45:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB4A5191272
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 04:15:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2921A306A129
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 01:43:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4E591307A9D6
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 03:15:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688AA285066;
-	Wed, 25 Feb 2026 01:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D64F29D287;
+	Wed, 25 Feb 2026 03:15:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ObPThA8y"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="BkhKrpTt"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA5B283CB5
-	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 01:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6971E98E3;
+	Wed, 25 Feb 2026 03:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771983745; cv=none; b=UDW4akPvk9aqx1Dm0VAeKVszGflIFncOWdiKWPRGToWjxc9Np/ijA0jU/TB3C1OdAsLHCHJNsAsykfPqJ8YDvoPnSlmUyTR1lIoIX2o/AJCHH2HpWWfuQBOoEjinrxBrjcaVLmWAsot+a5hmtxxbz7TmkL729yF+akXT/17uTHM=
+	t=1771989328; cv=none; b=oVTHd1i7OIV0WnhXatMOHf3K7ABrQcySUWBFbI/grpVlH/5K9qPmzFzN6X7ZFDG+HUC06i66zyGCCK1IB//rBhjfbk+6jMXx/nm/MqW4jXf+tLDYWIDOShr03yrBgg6dNXVln1NYzchL8ziIBQREuj2M7h65KaKGPcpZC2lr7L8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771983745; c=relaxed/simple;
-	bh=R1GxnxBAq9BLjZ1c5K6TFLjX8vN3LYKcB1tpJ7YQdq8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mF89h9KKvFY/5k4PG9g/90daOTpn0+qTE9OQ89dSQparPDdkMxCRwMYQQHJgHRJPM9mRDQTXEb9QMbkdEVM+ororAFSF6b0695y0pHR+Z2DVT0KvU6lZQUZ/8MOkYfC4gOWwj1EFFpB7OseHik32KHPlPOM50hVSAMFvpqWIrCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ObPThA8y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7143CC2BCAF
-	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 01:42:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771983745;
-	bh=R1GxnxBAq9BLjZ1c5K6TFLjX8vN3LYKcB1tpJ7YQdq8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=ObPThA8y6QCn+jRFDSGLUouW9QoXW439TgnqkQbwHFyJaDiXGHITs5b24KlEu0Euj
-	 9vY1SZuJpVqpXuxsFhuaDVocJQewQJwe+MN6NzEYLMEJsLaaHbb2DAz1BEWKtrzc2B
-	 hXYGyffmkIQfoS8IZCho87tKNSb/WL5xiz9Eu/jElnU+n1SluI6fabY/jNGYCG4nW0
-	 35S+ZY77aQiFMUu/1gLzQ1XoKEhN2wQK+wxbD4sGwiI9OXQasfnutlh8HAmZzLGEuN
-	 kO8FG2qBviCIGCsMjiHWV9JAakAYPYHlWCM9Wm1AX71dimTf2VWA8hXB6XsN6OYI6E
-	 div5tfY3eOtzA==
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b8fbb24a9a9so59093666b.0
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 17:42:25 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCX37sUeucg6fCAsFjdfax0p4/i7bVWrCyrds8XvtOLTmRirWjgGanM5VLco+hF9UXX1Dh8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdhUtDnd67pYAOw1XQCz7GpfkvMp9q231IlqHeXrw0/8HPNZzZ
-	YldQf6rmAOo7HGDiVljw7CMF41GkURTPYGkM6WM0ANYPDZndo33tbjdiM5UmNXFTt91G+M6ria2
-	P0j0YjTS43NLqb8wxrWOionEZY2lNL/E=
-X-Received: by 2002:a17:907:3c8f:b0:b76:d8cc:dfd9 with SMTP id
- a640c23a62f3a-b933cd85c52mr133517266b.18.1771983744284; Tue, 24 Feb 2026
- 17:42:24 -0800 (PST)
+	s=arc-20240116; t=1771989328; c=relaxed/simple;
+	bh=YS8CVRAR/wuGQmUD9GT+TYsm5SI7xDV/gue/3uFNhyM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VwGSxA3TTvbMVMzFFvyjGOz9kD7zoXqMwRAe07aKSNF3RjJ8PDAIMJuMrQXbE4AsAevfMOFqOgsIX0bIiehr0v2nQnYrLZx98Syz8dbJkqG38op2q+DYD7p6vNUAco5FEtcxpClBBqaxmz88tunH7DpvpklzR+qBCY1EcNy4tao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=BkhKrpTt; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=Rh
+	WDxjhmHsYf04KJ7B2Su/Ud3Vk3NEr58LAY8SzPANU=; b=BkhKrpTta8Omc+wcfD
+	jryxzC/AjgLzxlPDYCShwMxMHY/ZYPchz3NaMriQ0WsvzcxWaijWqbqTPk16hIxg
+	ZUamHNhb3nR58BH8PZLEGJaN11a+J5h1VMt3jgTpPzvbM5fKhcBapiw+Nau83U4k
+	9447b4flkk5AH2XKUmmcyQMXo=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wD3v5z9aJ5pQV4DMg--.27870S2;
+	Wed, 25 Feb 2026 11:14:06 +0800 (CST)
+From: Jinyu Tang <tjytimi@163.com>
+To: Anup Patel <anup@brainfault.org>,
+	Atish Patra <atish.patra@linux.dev>,
+	Andrew Jones <andrew.jones@oss.qualcomm.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Yong-Xuan Wang <yongxuan.wang@sifive.com>,
+	Nutty Liu <nutty.liu@hotmail.com>,
+	Paul Walmsley <pjw@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>
+Cc: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Jinyu Tang <tjytimi@163.com>
+Subject: [PATCH v5] KVM: riscv: Skip CSR restore if VCPU is reloaded on the same core
+Date: Wed, 25 Feb 2026 11:14:02 +0800
+Message-ID: <20260225031402.841618-1-tjytimi@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260223154636.116671-1-yosry@kernel.org> <20260223154636.116671-3-yosry@kernel.org>
- <CAO9r8zPsAMaiU794xoXDso3sdAM0_EN2PyE13vR4NqqEh9e2=g@mail.gmail.com>
- <aZ5ItfEUtIlVbzuQ@google.com> <CAO9r8zPbu1BsOsPU02YcCLDbRXZoDmVd8XiMHssSDnkjdDPC4g@mail.gmail.com>
- <aZ5MF8_RK56C8B9Q@google.com> <CAO9r8zO+Eej0AjzQt6dnELKLKHZ33DGLbDv=_sP1J1qLMVWpvw@mail.gmail.com>
- <aZ5Pnvb4OAVWWtuR@google.com>
-In-Reply-To: <aZ5Pnvb4OAVWWtuR@google.com>
-From: Yosry Ahmed <yosry@kernel.org>
-Date: Tue, 24 Feb 2026 17:42:12 -0800
-X-Gmail-Original-Message-ID: <CAO9r8zO0tmJvddCknSM++jU8LBrRecByzzsSf3=J9LrGO2pmdQ@mail.gmail.com>
-X-Gm-Features: AaiRm53duMnuTyyD9bUO3MnZl3Mm0qAcWFLxL-WcJ3_D86On5FISLdFuFwbGZfI
-Message-ID: <CAO9r8zO0tmJvddCknSM++jU8LBrRecByzzsSf3=J9LrGO2pmdQ@mail.gmail.com>
-Subject: Re: [PATCH v1 2/4] KVM: nSVM: Delay stuffing L2's current RIP into
- NextRIP until vCPU run
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3v5z9aJ5pQV4DMg--.27870S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3WrWxurWxXr4xXr4xCw1UGFg_yoW7WFW5pF
+	ZrCrn5Ww48Gr1fG347Xr4v9r4Fg39Ygw13G34UX3yayr45try5AFs5KFyUAFZ8GrW8ZFyS
+	yF1DtFy0kFn8ZaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pR58nOUUUUU=
+X-CM-SenderInfo: xwm13xlpl6il2tof0z/xtbC8h5b02meaP4MAAAA3J
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71745-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[brainfault.org,linux.dev,oss.qualcomm.com,microchip.com,sifive.com,hotmail.com,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[163.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-71746-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[163.com:+];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[tjytimi@163.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,163.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,cs.base:url,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: EBDC518FC57
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[kvm];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AB4A5191272
 X-Rspamd-Action: no action
 
-> > We discussed a helper before and you didn't like it, but that was in a
-> > different context (a helper that combined normal and special cases).
-> > WDYT?
->
-> A helper would work.  svm_fixup_nested_rips() is good, the only flaw is the CS.base
-> chunk, but I'm not sure I care enough about 32-bit to reject the name just because
-> of that :-)
->
-> That would make it easier to reduce indentation, e.g.
->
-> static void svm_fixup_nested_rips(struct kvm_vcpu *vcpu)
-> {
->         struct vcpu_svm *svm = to_svm(vcpu);
->
->         /*
->          * If nrips is supported in hardware but not exposed to L1, stuff the
->          * actual L2 RIP to emulate what a nrips=0 CPU would do (L1 is
->          * responsible for advancing RIP prior to injecting the event). Once L2
->          * runs after L1 executes VMRUN, NextRIP is updated by the CPU and/or
->          * KVM, and this is no longer needed.
->          *
->          * This is done here (as opposed to when preparing vmcb02) to use the
->          * most up-to-date value of RIP regardless of the order of restoring
->          * registers and nested state in the vCPU save+restore path.
->          *
->          * Simiarly, initialize svm->soft_int_* fields here to use the most
->          * up-to-date values of RIP and CS base, regardless of restore order.
->          */
->         if (!is_guest_mode(vcpu) || !svm->nested.nested_run_pending)
->                 return;
->
->         if (boot_cpu_has(X86_FEATURE_NRIPS) &&
->             !guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS))
->                 svm->vmcb->control.next_rip = kvm_rip_read(vcpu);
->
->         if (svm->soft_int_injected) {
->                 svm->soft_int_csbase = svm->vmcb->save.cs.base;
->                 svm->soft_int_old_rip = kvm_rip_read(vcpu);
->                 if (!guest_cpu_cap_has(vcpu, X86_FEATURE_NRIPS))
->                         svm->soft_int_next_rip = kvm_rip_read(vcpu);
->         }
-> }
+Currently, kvm_arch_vcpu_load() unconditionally restores guest CSRs and
+HGATP. However, when a VCPU is loaded back on the same physical CPU, 
+and no other KVM VCPU has run on this CPU since it was last put,
+the hardware CSRs are still valid.
 
-Looks good, thanks Sean!
+This patch optimizes the vcpu_load path by skipping the expensive CSR
+writes if all the following conditions are met:
+1. It is being reloaded on the same CPU (vcpu->arch.last_exit_cpu == cpu).
+2. No other VCPU used this CPU (vcpu == __this_cpu_read(kvm_former_vcpu)).
+3. The CSRs are not dirty (!vcpu->arch.csr_dirty).
+
+To ensure this fast-path doesn't break corner cases:
+- Live migration and VCPU reset are naturally safe. KVM initializes
+  last_exit_cpu to -1, which guarantees the fast-path won't trigger.
+- A new 'csr_dirty' flag is introduced to track runtime userspace
+  interventions. If userspace modifies guest configurations (e.g.,
+  hedeleg via KVM_SET_GUEST_DEBUG, or CSRs via KVM_SET_ONE_REG) while
+  the VCPU is preempted, the flag is set to skip fast path.
+
+Note that kvm_riscv_vcpu_aia_load() is kept outside the skip logic
+to ensure IMSIC/AIA interrupt states are always properly
+synchronized.
+
+Signed-off-by: Jinyu Tang <tjytimi@163.com>
+---
+ v4 -> v5:
+ - Dropped the 'vcpu->scheduled_out' check as Andrew Jones pointed out,
+   relying on 'last_exit_cpu', 'former_vcpu', and '!csr_dirty'
+   is sufficient and safe. This expands the optimization to cover many
+   userspace exits (e.g., MMIO) as well.
+ - Added a block comment in kvm_arch_vcpu_load() to warn future
+   developers about maintaining the 'csr_dirty' dependency, as Andrew's
+   suggestion to reduce fragility.
+ - Removed unnecessary single-line comments and fixed indentation nits.
+
+ v3 -> v4:
+ - Addressed Anup Patel's review regarding hardware state inconsistency.
+ - Introduced 'csr_dirty' flag to track dynamic userspace CSR/CONFIG
+   modifications (KVM_SET_ONE_REG, KVM_SET_GUEST_DEBUG), forcing a full
+   restore when debugging or modifying states at userspace.
+ - Kept kvm_riscv_vcpu_aia_load() out of the skip block to resolve IMSIC
+   VS-file instability.
+
+ v2 -> v3:
+ v2 was missing a critical check because I generated the patch from my
+ wrong (experimental) branch. This is fixed in v3. Sorry for my trouble.
+
+ v1 -> v2:
+ Apply the logic to aia csr load. Thanks for Andrew Jones's advice.
+---
+ arch/riscv/include/asm/kvm_host.h |  3 +++
+ arch/riscv/kvm/vcpu.c             | 21 +++++++++++++++++++++
+ arch/riscv/kvm/vcpu_onereg.c      |  2 ++
+ 3 files changed, 26 insertions(+)
+
+diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+index 24585304c..7ee47b83c 100644
+--- a/arch/riscv/include/asm/kvm_host.h
++++ b/arch/riscv/include/asm/kvm_host.h
+@@ -273,6 +273,9 @@ struct kvm_vcpu_arch {
+ 	/* 'static' configurations which are set only once */
+ 	struct kvm_vcpu_config cfg;
+ 
++	/* Indicates modified guest CSRs */
++	bool csr_dirty;
++
+ 	/* SBI steal-time accounting */
+ 	struct {
+ 		gpa_t shmem;
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index a55a95da5..578f8693a 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -24,6 +24,8 @@
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
+ 
++static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_former_vcpu);
++
+ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+ 	KVM_GENERIC_VCPU_STATS(),
+ 	STATS_DESC_COUNTER(VCPU, ecall_exit_stat),
+@@ -537,6 +539,8 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+ 		vcpu->arch.cfg.hedeleg |= BIT(EXC_BREAKPOINT);
+ 	}
+ 
++	vcpu->arch.csr_dirty = true;
++
+ 	return 0;
+ }
+ 
+@@ -581,6 +585,20 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+ 	struct kvm_vcpu_config *cfg = &vcpu->arch.cfg;
+ 
++	/*
++	 * If VCPU is being reloaded on the same physical CPU and no
++	 * other KVM VCPU has run on this CPU since it was last put,
++	 * we can skip the expensive CSR and HGATP writes.
++	 *
++	 * Note: If a new CSR is added to this fast-path skip block,
++	 * make sure that 'csr_dirty' is set to true in any
++	 * ioctl (e.g., KVM_SET_ONE_REG) that modifies it.
++	 */
++	if (vcpu == __this_cpu_read(kvm_former_vcpu) &&
++	    vcpu->arch.last_exit_cpu == cpu && !vcpu->arch.csr_dirty)
++		goto csr_restore_done;
++
++	vcpu->arch.csr_dirty = false;
+ 	if (kvm_riscv_nacl_sync_csr_available()) {
+ 		nsh = nacl_shmem();
+ 		nacl_csr_write(nsh, CSR_VSSTATUS, csr->vsstatus);
+@@ -624,6 +642,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 
+ 	kvm_riscv_mmu_update_hgatp(vcpu);
+ 
++csr_restore_done:
+ 	kvm_riscv_vcpu_timer_restore(vcpu);
+ 
+ 	kvm_riscv_vcpu_host_fp_save(&vcpu->arch.host_context);
+@@ -645,6 +664,8 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ 	void *nsh;
+ 	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+ 
++	__this_cpu_write(kvm_former_vcpu, vcpu);
++
+ 	vcpu->cpu = -1;
+ 
+ 	kvm_riscv_vcpu_aia_put(vcpu);
+diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
+index e7ab6cb00..fc08bf833 100644
+--- a/arch/riscv/kvm/vcpu_onereg.c
++++ b/arch/riscv/kvm/vcpu_onereg.c
+@@ -652,6 +652,8 @@ static int kvm_riscv_vcpu_set_reg_csr(struct kvm_vcpu *vcpu,
+ 	if (rc)
+ 		return rc;
+ 
++	vcpu->arch.csr_dirty = true;
++
+ 	return 0;
+ }
+ 
+-- 
+2.43.0
+
 
