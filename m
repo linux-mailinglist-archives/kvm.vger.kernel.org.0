@@ -1,257 +1,422 @@
-Return-Path: <kvm+bounces-71808-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71809-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kGZEBm+mnmmrWgQAu9opvQ
-	(envelope-from <kvm+bounces-71808-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 08:36:15 +0100
+	id +PelBY6qnmntWgQAu9opvQ
+	(envelope-from <kvm+bounces-71809-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 08:53:50 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 829A619388C
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 08:36:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C689193C25
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 08:53:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0749730517C7
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 07:31:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 765C93045006
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 07:52:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F982E0B5C;
-	Wed, 25 Feb 2026 07:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B55306486;
+	Wed, 25 Feb 2026 07:52:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bWgpGrog"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="h45s57/C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011027.outbound.protection.outlook.com [52.101.62.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BD91DF75C
-	for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 07:31:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12D12FF170;
+	Wed, 25 Feb 2026 07:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.27
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772004687; cv=pass; b=CMhbn3bY6BaOBOcPozNIdbO4Ox3ecdQ+XVjhk2MJHEeKbJwN6r/HnAeJG+JzZPsbf9ZTl9V31SYVe+4/zGkf5xTtBmlKPLIYnXsOFJqcf5ASK+Qvg6FNVJ4BqhUfwWFrbz+8TLnXnEuPLc0bbZID5ejwp/jZhbMjoznjsTOxQWM=
+	t=1772005959; cv=fail; b=IaPOU1IhyFNssFcZsBBaJRwtcxMMwsDWnBUvZ7XJA3a7qqBUYa1VncWo9/oUupUACeTcj+ZtsPGrvHUHwFA2KHsHvc5GXRugujazfYw64RUXl7EaSnnZn+OfyaJb38fdUQEbBG8mdIBM0VwC93FC4mcB+NtKUuCKqEoP9WkgtyI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772004687; c=relaxed/simple;
-	bh=iGYGT1zAvQhLDodw/8tlbySDHlXg49Ntp6LeHdpPLsE=;
-	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jCwOt+7zPoj8OGXRYmndbbYKOQyC7qWOe7m9FkwajJ6IL18plld1sAewlESpe8IwIE5MEuhBbw+Cf0xCKB55FKtvy2fjpNshwOu6v2t9bcCxXNegn9zv4hh5G1R/TOG7D1LAkZtv2cIEJs0fjXoYoJ+jW9BUGz+inq2SVKZA+bY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bWgpGrog; arc=pass smtp.client-ip=209.85.222.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-94ac7f22d23so1731853241.3
-        for <kvm@vger.kernel.org>; Tue, 24 Feb 2026 23:31:26 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772004685; cv=none;
-        d=google.com; s=arc-20240605;
-        b=VArmTfcik1LiM5lYayTU8cJyNliT5FVPF+EZ646/kovAx+1XaaKF7BQvnOPCHbmfyN
-         F6JvjocCoZSOI8dncmFj2YbSjryTm5dLnZ1HkNR6+syasrKEH+P7ileHgiV+t4As+4Gn
-         YtQ2htyco9PL+PGvRQpoqFlES++cnMQ8tJ35KC4Sj8vkMnJq2zE8nCSS+KFKSM0N/5Yk
-         MfO7b/dhSrYRuzkS3vLcxo84CXUi1TY07iLSfPrZiYZxl9jEJdaugha6uXVMo/yknFd4
-         PRtlDfgiWtUxDDaDUE7YjIuQzkvI2bH4k3aAZqvhIt54C9TZAYFlCjz33798NJ7Gk2H6
-         ik9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:dkim-signature;
-        bh=XX8b+rtVnqMMtNp/ESqgVDIfe5eqIi9YcNK6m86bxSc=;
-        fh=RTA+JSvck0pEOhNFlf6AbXAmMajdd2ePveLy3P6+iro=;
-        b=Qt+80NAkFRtda/mKC6CaUcd9dzoW+CTiyCObYHygdiHFXnXPMTYj9y9QXsMlgK6Ol7
-         UD27amWArie4wpMrfuIVaCs5a8LP/8/R6qyQrcChyzkYGyaK7+c+B8AFR1n6ngflFSfa
-         C5RmkWpPje2Mjadw6tLG42kSGDzJT/Ffpp7Iq0/QdyXlyuHvMrZ5Xaiu6enSZq6zltnH
-         Yd+wmXac7p8QyNTnQGDDzmQyDpiw5UXmgMSv8/OpGOJyqEORH0LFY92OgXHrS/fj+KS4
-         EOA+T2kyxzGHsl7NAtZCatM0EMLlVfodRZ1I5qSFA/DrxUcQ4RPXjYGKaOMTQcTm6vNE
-         uqKg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772004685; x=1772609485; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XX8b+rtVnqMMtNp/ESqgVDIfe5eqIi9YcNK6m86bxSc=;
-        b=bWgpGrog6nsW6EOEHynnZAPGvkBcMVg/s1vfSpuzTZLe7e6t4gBUDAZXvOPcNuoT4S
-         pnzbstWM4T9iS1znGoiSjyIWvaDbKYN6o/o71Es5cgPT9w/4NB07oc6aITDq8PiOly4F
-         xok/UzWtqKvu4yXXY5lZ21DFx1gn5ouSN5c+mmA0GjPF7rDP6w2UD0Xsq70es5uw7quI
-         UQLR1wMKm2YWMNw/euHnkLXp0S93RtVNzISXX9HRBvcewdSLvPd+vkMQsjLDO4JrxF4L
-         t2XvIzRh00K4MwpOdL4+M+23Z7HHsUKzVeggTvCwSIHQqe9424kPa8W5KMBq5qWfogcF
-         7VbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772004685; x=1772609485;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XX8b+rtVnqMMtNp/ESqgVDIfe5eqIi9YcNK6m86bxSc=;
-        b=gd0hcvC25gR6D5FqHerrzooyYiSm9fOyeyy6o7CJux2zF+fN1p+Eojowlq9FCSQG/1
-         uOQ1CvMdTCgjWXoiiPf/sk0/Bd4Adv+azTO6RtSub4AlheevMf9gd3eIee8rfSvnQQht
-         YngSL+t98ArpJ9a3Hj/MosouM3ZWW+pp4vD0I5a5/sSoQ3Md/6+EJkoG4UOy8UIC8FWa
-         rWkqB+6RBsNHumsegMnQT2jTzsTbdN4ZN48OcMBvKD84qvpYovrPqmGf2RnLNGVcLjQ9
-         F5xthU/PBByYDBS4f9V0XIqiX0YJroLDCJaUhmEcm1LUSi32xAdZaUyNL3Yr1W1pySJR
-         53Yg==
-X-Forwarded-Encrypted: i=1; AJvYcCW3ryCe7OaBy4csavYNlXKWc9LSs/9hJoecmstloY9k/+uh5X+POdw4jRjOZ7nSYit8k9Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGTpBogGz6hb4SgJHYsiUQQcAcLB9GPpVTrzUaOlw7YVdMMMDx
-	osgU6GqRPuh8nxljdTpvfjkKtrHBVu5xSm+LfQPPiN31UIgdb9CIafg1mWzTr4QbzWZkUqdtA4V
-	ijGzL6OH1lgVEBNZKCM24pcW1S1gNMgLOVdYVOj5Z
-X-Gm-Gg: ATEYQzwuAuZ4nVoHNGP24rTgExY4ABISE4szTEsdY3Kegp1KVv+Hp712Qm2pH8IgYiC
-	9gtB9sF/OQagiCRAqBGvy1lCmvMie7BEED+AwUqvy0nvg2HGuz3CMZ7q21FI+wiemf25zIXpPg1
-	ndKsu9/2uYwyfpOKU6OACOM0+8GOcYfFaHxOPXlGvUee5xu71vS8XFk74wsZWyKacAHVm4bBF73
-	2FyJGy9ZnjSyhNGZzPsJ8KDhWdTd+UHSyDdohTt8QGCLPCSqiXJXNJ9pikAOt/6wRO0d954x8xU
-	NNdbgJb9GqfvOe2LaAomkg1onPEHkFFUDT7iapFy2OgH/eJ4ZqkE+8OsPSCKADkTPpkGaQ==
-X-Received: by 2002:a05:6102:3e84:b0:5dd:89af:459b with SMTP id
- ada2fe7eead31-5ff05d62336mr520728137.7.1772004684941; Tue, 24 Feb 2026
- 23:31:24 -0800 (PST)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 24 Feb 2026 23:31:24 -0800
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 24 Feb 2026 23:31:23 -0800
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <CAEvNRgESctVm9CcEyK36hY8Ta=DEDOS1oW5w0qRDoNfdd=470g@mail.gmail.com>
-References: <cover.1771826352.git.ackerleytng@google.com> <a97045a9-8866-40fe-aa15-d319cafa6f2c@kernel.org>
- <CAEvNRgFF0+g9pmp1yitX48ebK=fDpYKSOQDmRfOjzSHxM5UpeQ@mail.gmail.com>
- <9ef9a0bd-4cff-4518-b7fb-e65c9b761a5a@kernel.org> <CAEvNRgESctVm9CcEyK36hY8Ta=DEDOS1oW5w0qRDoNfdd=470g@mail.gmail.com>
+	s=arc-20240116; t=1772005959; c=relaxed/simple;
+	bh=iNPWfAbvNi0sSWa3slLyqgZmhtP9fIJo2CWwKvarGC4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NP2GG9nTO1hwVTg/zSQcri4YjUXWsigWL4yuVLmyaV28S0/t8l16YBgIAloFrUUBnTM2Z+IRI2VnJiexRnGsPVyCS0HHb61pRlUB45DYvdaXS47TSp0OxYp+6dPnqx+e7NtCNoergwpRxAWwnZWJKMj7TR6z46Oj3U7EccweC5I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=h45s57/C; arc=fail smtp.client-ip=52.101.62.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=S4+9O9iKrW6xB4kYsIP64D1wDNcDcIFKd3KbBt+hJtXq8Uandv3vLg9gT9nMsCENx1FYmACYrH6klbEoBoHSU77U5PZn84n/pDvS7NtSk4Ih/x//xYMKDEge/oLWjaW1nCX3FQXqxvW+vAWB54Asx/bYOASYfYFEQ5tLR/mqYv5bVBvhC5/oYETLIT2hack0a6QjlLXsC6R2K08Gy0Jby5r1dm2wCbLSLPuH4cgcx4+u9lRIX42JuRWA9OOH4sYkW3xZjCyj6jh6WCReXJX6t4pLaNDHkHic2FGPt03iOE5XWN9271Cyqc6y4RFwlxHs5cyvvn3m0/84338lo9WTrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W8uOaPMyzcf4fHALNlJb5qM9uxuSYoRNOmYbQ0BL2x0=;
+ b=M4toLzySierkFHzrdLVL7Dl4CuyEEH74fNx0Ybxin2wfrYypdjaS+A1uF5s2lnl5/1UYFgcP2D02ZhMCNFCaNIuSxzhdO26wmPlWvHQg+62dWObUiSu8dQU3VtcKrnha8nCUPPmDX9le1vLKWYC6JYICMW4Q8qs3ZnAbMx4PJiAnantWjwZGVRhW/sk4gNqZLt45fw19CksskmPFMwddA5NoM7Iy2xxvod1pZ3i3qVYR7ozbOeG/h4KYZJKI1WIS4qvWxa//2IujyEA30IiodbDVtGeIeoollqaeDIlUUR705/56LJKKgTCO+nLCZiAo7p8K5fqi+5Uzsruq8gocaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W8uOaPMyzcf4fHALNlJb5qM9uxuSYoRNOmYbQ0BL2x0=;
+ b=h45s57/Cg8/+1k5x44FBuGl6FTaREzsdBnLCDZ0vlnUkeBhdjTtqi5LpctrLMy/RpIRpGrjPFsGo7ov+vjzxVIA3y4etZKvaHvS5T9cAFreSBxpNwr/PyLohmeh8O8UQuVE/Bc9JwU6vqGkqbTQDBdPwSh+t1Ip4YF33tk8kz5M=
+Received: from BL0PR1501CA0013.namprd15.prod.outlook.com
+ (2603:10b6:207:17::26) by DS7PR12MB6166.namprd12.prod.outlook.com
+ (2603:10b6:8:99::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Wed, 25 Feb
+ 2026 07:52:32 +0000
+Received: from BL02EPF0001A106.namprd05.prod.outlook.com
+ (2603:10b6:207:17:cafe::c6) by BL0PR1501CA0013.outlook.office365.com
+ (2603:10b6:207:17::26) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.22 via Frontend Transport; Wed,
+ 25 Feb 2026 07:52:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ BL02EPF0001A106.mail.protection.outlook.com (10.167.241.139) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 07:52:31 +0000
+Received: from aiemdee.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 25 Feb
+ 2026 01:52:23 -0600
+From: Alexey Kardashevskiy <aik@amd.com>
+To: <linux-kernel@vger.kernel.org>
+CC: <kvm@vger.kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian
+	<kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>, Will Deacon
+	<will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, Steve Sistare <steven.sistare@oracle.com>, "Nicolin
+ Chen" <nicolinc@nvidia.com>, <iommu@lists.linux.dev>, Alexey Kardashevskiy
+	<aik@amd.com>, <linux-coco@lists.linux.dev>, Dan Williams
+	<dan.j.williams@intel.com>, Santosh Shukla <santosh.shukla@amd.com>, "Pratik
+ R . Sampat" <prsampat@amd.com>, Ackerley Tng <ackerleytng@google.com>, "Sean
+ Christopherson" <seanjc@google.com>, Fuad Tabba <tabba@google.com>, Xu Yilun
+	<yilun.xu@linux.intel.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: [RFC PATCH kernel] iommufd: Allow mapping from KVM's guest_memfd
+Date: Wed, 25 Feb 2026 18:52:11 +1100
+Message-ID: <20260225075211.3353194-1-aik@amd.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 24 Feb 2026 23:31:23 -0800
-X-Gm-Features: AaiRm51zoZaexsL8AgLT-NSu-LX5kDXX-7Kv8iZiX_RuOJxbA-22InSuIouRjL8
-Message-ID: <CAEvNRgFyRsqhv7CuuDARHTFSanzOHaudM6JMBLwxDwsrjTNCGQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v1 00/10] guest_memfd: Track amount of memory
- allocated on inode
-To: "David Hildenbrand (Arm)" <david@kernel.org>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Cc: akpm@linux-foundation.org, lorenzo.stoakes@oracle.com, 
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com, 
-	mhocko@suse.com, willy@infradead.org, pbonzini@redhat.com, shuah@kernel.org, 
-	seanjc@google.com, shivankg@amd.com, rick.p.edgecombe@intel.com, 
-	yan.y.zhao@intel.com, rientjes@google.com, fvdl@google.com, 
-	jthoughton@google.com, vannapurve@google.com, pratyush@kernel.org, 
-	pasha.tatashin@soleen.com, kalyazin@amazon.com, tabba@google.com, 
-	michael.roth@amd.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A106:EE_|DS7PR12MB6166:EE_
+X-MS-Office365-Filtering-Correlation-Id: 75a7f91a-71da-4a43-1515-08de7442d4c8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|376014|7416014|1800799024|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?JLPaNDMZYkzRYIGA0FeqorLKsDrRVoDCPbZcQ3FTovZVpUc/pV0ERfN9gBLX?=
+ =?us-ascii?Q?xo5EOnGPciPBBC9hWV0QNiN8LvQxUVz810j3bBYE00y2X2BchHR+ArnDJd4W?=
+ =?us-ascii?Q?P3TLSu5v2ZG8BNiudxq+F8+Qcc/53TixzTy2/EMt6kOgZZrMkVv15T4UG2GN?=
+ =?us-ascii?Q?MZWJsZg62cWvXy1ZpcMeT++lbVWs3VAQhnd00cQrAQe1Zf2TPJai0VxJxHBr?=
+ =?us-ascii?Q?LWCkPV6dvTcDeo02UvgYknM/sFD1+ykNc2ME8RQwE08irBy+03PKy/+X5xLw?=
+ =?us-ascii?Q?nXDKx9lG/JQ+EVtA1XyjwJrJi2adibVSF+FK39+6XEW3wNvq/71Y+upoToQV?=
+ =?us-ascii?Q?EchX8/knbzRIwQWmbAJB4bHsTOi2FSFLnFhI4yozAdRYK2cuyws3O0JpxJ4F?=
+ =?us-ascii?Q?/LN8dqKZPJWvlj5ltyXH82+/JcBtSRK/g1SYSooSG7eQFdAPTNT66qhD3uEP?=
+ =?us-ascii?Q?A/fqr/5kTB02hIPuh6PNGwjkqu/7go49b1MKxCmqKsH1d2P1zGPEOecg8jCC?=
+ =?us-ascii?Q?+gF/gSqozwEPX8g9ENeRSePJzEUCJcWBCQUfnjw+8hYhpDFFHEcgTVbkiPnT?=
+ =?us-ascii?Q?/cG7tW7meyPAumFlFqZ1qr9U+Qhf0kLbxr4L1pNOJLDPS/raakoHILsZAZMQ?=
+ =?us-ascii?Q?OS4nmFxmOxJJAJIqg8Zb4+tvGJd06UXBvj/gCI6F4rlFbyKz6toS1+vAJlLR?=
+ =?us-ascii?Q?SiL5OCS+OF/Fo6uCg/3BmXENjEdpXVnNrgJRwZFWZ0BIzy+KCWH2iKBZxXbc?=
+ =?us-ascii?Q?0N1P0ZU591WWQ8cCysd9Q+1qDr1mFO5GYsxL0SNBg8VC5rh6cRzNyPnsYCFY?=
+ =?us-ascii?Q?WcDRJdpW6g4wXF3Sz9jtJFg2tSnIgtJgv7e0ydMGiZENjZ+Ymx1sHqAV8TCl?=
+ =?us-ascii?Q?DzGFUU+J5KIbVEdaER4KmQaQk25JYOPx9OQAB9sjC9j/fAEcz8ybU4x2P3lk?=
+ =?us-ascii?Q?vSR97Bti0yukqkjrCu3F0ZZyni59nhGgfUABFm2WkaDk4i8ODwzxoQN66ZvF?=
+ =?us-ascii?Q?7qUhh1z9YFwol/woRJUIaict4XGcLQJpWgknUQRU0vgk5tWmzBNk00pfAMF3?=
+ =?us-ascii?Q?ZdJse20QmO4wOxIgSVrnKWClfTVr0q54hOetUIqVS3Fi6I1FalIhLziCkbHp?=
+ =?us-ascii?Q?EA38DZykthjgxn/eKLTdm355YthxEIn26gau0sCq7fdK+O2hiHhJ08Dd6iq9?=
+ =?us-ascii?Q?A32B1Cvfv3ev+wT6pQybgcH7Onb7zNJjdVOa32sInwh1fW6n7n/bQgkJHXzf?=
+ =?us-ascii?Q?iFcnVaT/rBQbwOsp73hvwX/wnqQQKYdH2U/rJS+fLjE/IGlkNUXm/NRfTCqn?=
+ =?us-ascii?Q?/fxAj36yJJeNoCY2dk5Jprs8aMEn7PuKya+pgLVuYntTzeq6xGbqgpEl3wna?=
+ =?us-ascii?Q?hf4/mdFaGduUEO00j32ZFolym8c63wGd4poP8xJtMGq2IMb1NVrkD16/6dqs?=
+ =?us-ascii?Q?idy2OUZjkskvj7Bt3n49SfVdhT31ifjC2W8I79BZ5XTKlkLhPD6k+gsjua/8?=
+ =?us-ascii?Q?dPxGG1hk2pE5B+OiOWXQz8V4pdDU8e0S+b9PTd/j6a9P+k4kNVZAvAOE+xGG?=
+ =?us-ascii?Q?wUK3PMaeBzqgpmmou0WCCW7nudtSTpS0gM/Osx3KzGXjqgoNzAouDVKnWD8Z?=
+ =?us-ascii?Q?RiwaFz0wmOqKR/InqZxD9YhpA06mp58jLXmGp6SbUuHdJQOtylA8bv1ycCMz?=
+ =?us-ascii?Q?W+tHoA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(7416014)(1800799024)(13003099007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	rCEYdvds6LZ3vctCvc1fjPi7ZBKiMSqhOdmHRyJ/bmHZcJexnQ6ONIu5/Z/8Tv0xNrJxSp993k/a6vPK2kDRt7alMPMZSIf2NZ5axUCF+LpU28/n0XEHNi05QXjaOFl4f9W6mXvUpRpaakqFRviQzjUf7lzcpZpiZyhWvjdMuw/NarQSc36EqCF1s6Ms9HfL5xz8Yh4lbRxm/H3LLZcyfkNmmGHSLyjGLJtOlvwo9HU6g8b/O2qw/rVQJ4OyolFJ/XghQGBLbNgLSegMVXVhMUwAoGyPeteLr2SxJXz+/mnXwHmzq1IDiVis887MK18MITJAFdJHwYHWgz3nT9oaGiAOl6hH47p348GrRA46/z4g1XXrmzdfoAq5siYdTogyAd+HovzuKXCZcJaftCi98IJE6GNx28IBXjzOtt6oZXjOIa0dyxLhbZoc1VUBuAoz
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 07:52:31.9362
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 75a7f91a-71da-4a43-1515-08de7442d4c8
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0001A106.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6166
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[29];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
-	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_FROM(0.00)[bounces-71809-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71808-lists,kvm=lfdr.de];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[google.com:+]
-X-Rspamd-Queue-Id: 829A619388C
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aik@amd.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 7C689193C25
 X-Rspamd-Action: no action
 
-Ackerley Tng <ackerleytng@google.com> writes:
+CoCo VMs get their private memory allocated from guest_memfd
+("gmemfd") which is a KVM facility similar to memfd.
+The gmemfds does not allow mapping private memory to the userspace
+so the IOMMU_IOAS_MAP ioctl does not work.
 
-> "David Hildenbrand (Arm)" <david@kernel.org> writes:
->
->>
->> [...snip...]
->>
->>>> Could we maybe have a
->>>> different callback (when the mapping is still guaranteed to be around)
->>>> from where we could update i_blocks on the freeing path?
->>>
->>> Do you mean that we should add a new callback to struct
->>> address_space_operations?
->>
->> If that avoids having to implement truncation completely ourselves, that might be one
->> option we could discuss, yes.
->>
->> Something like:
->>
->> diff --git a/Documentation/filesystems/vfs.rst b/Documentation/filesystems/vfs.rst
->> index 7c753148af88..94f8bb81f017 100644
->> --- a/Documentation/filesystems/vfs.rst
->> +++ b/Documentation/filesystems/vfs.rst
->> @@ -764,6 +764,7 @@ cache in your filesystem.  The following members are defined:
->>                 sector_t (*bmap)(struct address_space *, sector_t);
->>                 void (*invalidate_folio) (struct folio *, size_t start, size_t len);
->>                 bool (*release_folio)(struct folio *, gfp_t);
->> +               void (*remove_folio)(struct folio *folio);
->>                 void (*free_folio)(struct folio *);
->>                 ssize_t (*direct_IO)(struct kiocb *, struct iov_iter *iter);
->>                 int (*migrate_folio)(struct mapping *, struct folio *dst,
->> @@ -922,6 +923,11 @@ cache in your filesystem.  The following members are defined:
->>         its release_folio will need to ensure this.  Possibly it can
->>         clear the uptodate flag if it cannot free private data yet.
->>
->> +``remove_folio``
->> +       remove_folio is called just before the folio is removed from the
->> +       page cache in order to allow the cleanup of properties (e.g.,
->> +       accounting) that needs the address_space mapping.
->> +
->>  ``free_folio``
->>         free_folio is called once the folio is no longer visible in the
->>         page cache in order to allow the cleanup of any private data.
->> diff --git a/include/linux/fs.h b/include/linux/fs.h
->> index 8b3dd145b25e..f7f6930977a1 100644
->> --- a/include/linux/fs.h
->> +++ b/include/linux/fs.h
->> @@ -422,6 +422,7 @@ struct address_space_operations {
->>         sector_t (*bmap)(struct address_space *, sector_t);
->>         void (*invalidate_folio) (struct folio *, size_t offset, size_t len);
->>         bool (*release_folio)(struct folio *, gfp_t);
->> +       void (*remove_folio)(struct folio *folio);
->>         void (*free_folio)(struct folio *folio);
->>         ssize_t (*direct_IO)(struct kiocb *, struct iov_iter *iter);
->>         /*
->> diff --git a/mm/filemap.c b/mm/filemap.c
->> index 6cd7974d4ada..5a810eaacab2 100644
->> --- a/mm/filemap.c
->> +++ b/mm/filemap.c
->> @@ -250,8 +250,14 @@ void filemap_free_folio(struct address_space *mapping, struct folio *folio)
->>  void filemap_remove_folio(struct folio *folio)
->>  {
->>         struct address_space *mapping = folio->mapping;
->> +       void (*remove_folio)(struct folio *);
->>
->>         BUG_ON(!folio_test_locked(folio));
->> +
->> +       remove_folio = mapping->a_ops->remove_folio;
->> +       if (unlikely(remove_folio))
->> +               remove_folio(folio);
->> +
->>         spin_lock(&mapping->host->i_lock);
->>         xa_lock_irq(&mapping->i_pages);
->>         __filemap_remove_folio(folio, NULL);
->>
->
-> Thanks for this suggestion, I'll try this out and send another revision.
->
->>
->> Ideally we'd perform it under the lock just after clearing folio->mapping, but I guess that
->> might be more controversial.
->>
+Use the existing IOMMU_IOAS_MAP_FILE ioctl to allow mapping from
+fd + offset. Detect the gmemfd case in pfn_reader_user_pin().
 
-I'm not sure which lock you were referring to, I hope it's not the
-inode's i_lock? Why is calling the callback under lock frowned upon?
+For the new guest_memfd type, no additional reference is taken as
+pinning is guaranteed by the KVM guest_memfd library.
 
-I found .remove_folio also had to be called from
-delete_from_page_cache_batch() for it to work. Then I saw that both of
-those functions already use filemap_unaccount_folio(), and after all,
-like you said, guest_memfd will be using this callback for accounting,
-so in RFC v2 [1] I used .unaccount_folio instead, and it is called under
-the inode's i_lock from filemap_unaccount_folio().
+There is no KVM-GMEMFD->IOMMUFD direct notification mechanism as
+the assumption is that:
+1) page stage change events will be handled by VMM which is going
+to call IOMMUFD to remap pages;
+2) shrinking GMEMFD equals to VM memory unplug and VMM is going to
+handle it.
 
-[1] https://lore.kernel.org/all/20260225-gmem-st-blocks-v2-0-87d7098119a9@google.com/T/
+Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+---
 
->> For accounting you need the above might be good enough, but I am not sure for how many
->> other use cases there might be.
->>
->> --
->> Cheers,
->>
->> David
+This is for Trusted IO == TEE-IO == PCIe TDISP, etc.
+
+Previously posted here:
+https://lore.kernel.org/r/20250218111017.491719-13-aik@amd.com
+The main comment was "what is the lifetime of those folios()" and
+GMEMFD + QEMU should take care of it.
+
+And horrendous stuff like this is not really useful:
+https://github.com/AMDESE/linux-kvm/commit/7d73fd2cccb8489b1
+
+---
+ include/linux/kvm_host.h      |  4 +
+ drivers/iommu/iommufd/pages.c | 80 ++++++++++++++++++--
+ virt/kvm/guest_memfd.c        | 36 +++++++++
+ 3 files changed, 113 insertions(+), 7 deletions(-)
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 995db7a7ba57..9369cf22b24e 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2673,4 +2673,8 @@ unsigned long kvm_get_vm_memory_attributes(struct kvm *kvm, gfn_t gfn);
+ int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+ 					   struct kvm_memory_attributes2 *attrs);
+ 
++bool kvm_is_gmemfd(struct file *file);
++struct folio *kvm_gmemfd_get_pfn(struct file *file, unsigned long index,
++				 unsigned long *pfn, int *max_order);
++
+ #endif
+diff --git a/drivers/iommu/iommufd/pages.c b/drivers/iommu/iommufd/pages.c
+index dbe51ecb9a20..4c07e39e17d0 100644
+--- a/drivers/iommu/iommufd/pages.c
++++ b/drivers/iommu/iommufd/pages.c
+@@ -56,6 +56,9 @@
+ #include <linux/slab.h>
+ #include <linux/sched/mm.h>
+ #include <linux/vfio_pci_core.h>
++#include <linux/pagemap.h>
++#include <linux/memcontrol.h>
++#include <linux/kvm_host.h>
+ 
+ #include "double_span.h"
+ #include "io_pagetable.h"
+@@ -660,7 +663,8 @@ static void batch_from_pages(struct pfn_batch *batch, struct page **pages,
+ }
+ 
+ static int batch_from_folios(struct pfn_batch *batch, struct folio ***folios_p,
+-			     unsigned long *offset_p, unsigned long npages)
++			     unsigned long *offset_p, unsigned long npages,
++			     bool do_pin)
+ {
+ 	int rc = 0;
+ 	struct folio **folios = *folios_p;
+@@ -676,7 +680,7 @@ static int batch_from_folios(struct pfn_batch *batch, struct folio ***folios_p,
+ 
+ 		if (!batch_add_pfn_num(batch, pfn, nr, BATCH_CPU_MEMORY))
+ 			break;
+-		if (nr > 1) {
++		if (nr > 1 && do_pin) {
+ 			rc = folio_add_pins(folio, nr - 1);
+ 			if (rc) {
+ 				batch_remove_pfn_num(batch, nr);
+@@ -697,6 +701,7 @@ static int batch_from_folios(struct pfn_batch *batch, struct folio ***folios_p,
+ static void batch_unpin(struct pfn_batch *batch, struct iopt_pages *pages,
+ 			unsigned int first_page_off, size_t npages)
+ {
++	bool do_unpin = !kvm_is_gmemfd(pages->file);
+ 	unsigned int cur = 0;
+ 
+ 	while (first_page_off) {
+@@ -710,9 +715,12 @@ static void batch_unpin(struct pfn_batch *batch, struct iopt_pages *pages,
+ 		size_t to_unpin = min_t(size_t, npages,
+ 					batch->npfns[cur] - first_page_off);
+ 
+-		unpin_user_page_range_dirty_lock(
+-			pfn_to_page(batch->pfns[cur] + first_page_off),
+-			to_unpin, pages->writable);
++		/* Do nothing for guest_memfd */
++		if (do_unpin)
++			unpin_user_page_range_dirty_lock(
++				pfn_to_page(batch->pfns[cur] + first_page_off),
++				to_unpin, pages->writable);
++
+ 		iopt_pages_sub_npinned(pages, to_unpin);
+ 		cur++;
+ 		first_page_off = 0;
+@@ -872,6 +880,57 @@ static long pin_memfd_pages(struct pfn_reader_user *user, unsigned long start,
+ 	return npages_out;
+ }
+ 
++static long pin_guest_memfd_pages(struct pfn_reader_user *user, loff_t start, unsigned long npages)
++{
++	struct page **upages = user->upages;
++	unsigned long offset = 0;
++	loff_t uptr = start;
++	long rc = 0;
++
++	for (unsigned long i = 0; (uptr - start) < (npages << PAGE_SHIFT); ++i) {
++		unsigned long gfn = 0, pfn = 0;
++		int max_order = 0;
++		struct folio *folio;
++
++		folio = kvm_gmemfd_get_pfn(user->file, uptr >> PAGE_SHIFT, &pfn, &max_order);
++		if (IS_ERR(folio))
++			rc = PTR_ERR(folio);
++
++		if (rc == -EINVAL && i == 0) {
++			pr_err_once("Must be vfio mmio at gfn=%lx pfn=%lx, skipping\n", gfn, pfn);
++			return rc;
++		}
++
++		if (rc) {
++			pr_err("%s: %ld %ld %lx -> %lx\n", __func__,
++			       rc, i, (unsigned long) uptr, (unsigned long) pfn);
++			break;
++		}
++
++		if (i == 0)
++			offset = offset_in_folio(folio, start) >> PAGE_SHIFT;
++
++		user->ufolios[i] = folio;
++
++		if (upages) {
++			unsigned long np = (1UL << (max_order + PAGE_SHIFT)) - offset_in_folio(folio, uptr);
++
++			for (unsigned long j = 0; j < np; ++j)
++				*upages++ = folio_page(folio, offset + j);
++		}
++
++		uptr += (1UL << (max_order + PAGE_SHIFT)) - offset_in_folio(folio, uptr);
++	}
++
++	if (!rc) {
++		rc = npages;
++		user->ufolios_next = user->ufolios;
++		user->ufolios_offset = offset;
++	}
++
++	return rc;
++}
++
+ static int pfn_reader_user_pin(struct pfn_reader_user *user,
+ 			       struct iopt_pages *pages,
+ 			       unsigned long start_index,
+@@ -925,7 +984,13 @@ static int pfn_reader_user_pin(struct pfn_reader_user *user,
+ 
+ 	if (user->file) {
+ 		start = pages->start + (start_index * PAGE_SIZE);
+-		rc = pin_memfd_pages(user, start, npages);
++		if (kvm_is_gmemfd(pages->file)) {
++			rc = pin_guest_memfd_pages(user, start, npages);
++		} else {
++			pr_err("UNEXP PINFD start=%lx sz=%lx file=%lx",
++				start, npages << PAGE_SHIFT, (ulong) pages->file);
++			rc = pin_memfd_pages(user, start, npages);
++		}
+ 	} else if (!remote_mm) {
+ 		uptr = (uintptr_t)(pages->uptr + start_index * PAGE_SIZE);
+ 		rc = pin_user_pages_fast(uptr, npages, user->gup_flags,
+@@ -1221,7 +1286,8 @@ static int pfn_reader_fill_span(struct pfn_reader *pfns)
+ 				 npages);
+ 	else
+ 		rc = batch_from_folios(&pfns->batch, &user->ufolios_next,
+-				       &user->ufolios_offset, npages);
++				       &user->ufolios_offset, npages,
++				       !kvm_is_gmemfd(pfns->pages->file));
+ 	return rc;
+ }
+ 
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index e4e21068cf2a..2a313888c21b 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -1794,3 +1794,39 @@ void kvm_gmem_exit(void)
+ 	rcu_barrier();
+ 	kmem_cache_destroy(kvm_gmem_inode_cachep);
+ }
++
++bool kvm_is_gmemfd(struct file *file)
++{
++	if (!file)
++		return false;
++
++	if (file->f_op != &kvm_gmem_fops)
++		return false;
++
++	return true;
++}
++EXPORT_SYMBOL_GPL(kvm_is_gmemfd);
++
++struct folio *kvm_gmemfd_get_pfn(struct file *file, unsigned long index,
++				 unsigned long *pfn, int *max_order)
++{
++	struct inode *inode = file_inode(file);
++	struct folio *folio;
++
++	if (!inode || !kvm_is_gmemfd(file))
++		return NULL;
++
++	folio = kvm_gmem_get_folio(inode, index);
++	if (!folio)
++		return NULL;
++
++
++	*pfn = folio_pfn(folio) + (index & (folio_nr_pages(folio) - 1));
++	*max_order = folio_order(folio);
++
++	folio_put(folio);
++	folio_unlock(folio);
++
++	return folio;
++}
++EXPORT_SYMBOL_GPL(kvm_gmemfd_get_pfn);
+-- 
+2.52.0
+
 
