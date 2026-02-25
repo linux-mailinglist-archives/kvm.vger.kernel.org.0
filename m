@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-71793-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71794-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MKHqOSyMnmltWAQAu9opvQ
-	(envelope-from <kvm+bounces-71793-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 06:44:12 +0100
+	id mIaaAEeMnmltWAQAu9opvQ
+	(envelope-from <kvm+bounces-71794-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 06:44:39 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 623AB1921CA
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 06:44:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48F501921E0
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 06:44:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CDC8330BC586
-	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 05:43:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 99914305C289
+	for <lists+kvm@lfdr.de>; Wed, 25 Feb 2026 05:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1BAC2DF152;
-	Wed, 25 Feb 2026 05:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1550F2DEA75;
+	Wed, 25 Feb 2026 05:44:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lcFZrKuo"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="XLdoGDVo"
 X-Original-To: kvm@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010068.outbound.protection.outlook.com [52.101.85.68])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010001.outbound.protection.outlook.com [52.101.85.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CFE27FB2E;
-	Wed, 25 Feb 2026 05:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC38B2C0F75;
+	Wed, 25 Feb 2026 05:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.1
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771998225; cv=fail; b=MHIY71IfWn1Ryz6NdwU2vUmYv8Hn2LTSp+FQFoTOlhrHPw3QWPP5HApqH3IqnV5DFKTfnAiP1Tk6jpGtotz8WrT0Kxw1CrsHj1cRsfivnbySLoSHha8AQAcEbuheUAmRISV+C3HiC8Ue5rNBSA1J8SkiKTbAzpYaywugio8vEJ0=
+	t=1771998262; cv=fail; b=mk/Dz/j3WgFWYaqOODqCCTBcfaLOO/buYa0Kagt/X5rEvaFPvG9D7AOwHOby1Ic93LA42iQ2wYQbSPW9EEAtstYmG4cHZZjLvLozxsdNCVjUscs/ok6l8+D+uvhm6S/gMRL8htwB07g9lf6ahyInRiEam6rSvn/1dYXwq0VXcSc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771998225; c=relaxed/simple;
-	bh=yb+MB4JzhAMhVdHLfxAMWaWVrQJGAHR5qQjqp22EMwI=;
+	s=arc-20240116; t=1771998262; c=relaxed/simple;
+	bh=8m2UCofCjqGP3DwA71nzuh2GGX8dDRucPiL6PkCbKgQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rKXpiREQsfTXiBLi4swtHcYpKlTmpNjjcnEbzyuBHXMzIkje3trCBGmQlYy5iUIM8iiVRB+/8AfGPH9laptdwcIA7FFyX3zhu8LokQyEE4qSNqtEfe+DkRETodj3pbOw6I/BzjsnN8+4yBTdXw4pMiqt87koUhla4TU/FyLQBPA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=lcFZrKuo; arc=fail smtp.client-ip=52.101.85.68
+	 MIME-Version:Content-Type; b=cD2vVIsNBPH14+HFr8xo44GDgrgBu+hCWpVBuesowbbTUCY3ZsuUJcQfXQQW0rhRcBBBmKkzFKk+wDizxhDFb7VP/EEy+GeAZO6EAnOYmrQKrwdgO80jYd8aqLNxOPobcAdfJvtZeSrTJT41TZ//xMfd1YLsAKF3AM6a/0TZAqI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=XLdoGDVo; arc=fail smtp.client-ip=52.101.85.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OORH1PGraId+LkqXFEtOgT1V0w4gRarexRrvR3IS4QetaGiJTnD1cNXQzl6QyuRF+FNatuC9wSDW3aKtqVWPycpat/XDk9lYn00zc8RaEP80qnPiTrZTZqnDdoarUCdE7hyzbow74a1fRW5tKiqQXj1Ec3h/QuelTL/lRxFf6qLaZjoNN692ZmjXq5plHp+tV4ax+VJqnXfrUxt+iL+Dckb0M6kZpwVzAnlIBFpzzKDr1W35jCAa4nof/xZkrXfk+XCzY1qR00/q9XgCdfNM8NW4lhqAKn77IA0xFLtoxuadEXQIlnzegM01zVPxabrEhZqYHxtEz1OSTHTVyEeJig==
+ b=ir8+EW/TU44PhjQsbVbBeNbS9DMTynSnzYDWpETCcvnUtSR13h90wexlxyLolES9IILcpdK8RWsrg/XWwEVn6xlhy68VdUtJdTWx01CnOXHy1qBLLZJYh3SOmbc/Ig/xO1z+eX+ZKctC71o/xIET/lGTDEB027d7Q4GjB6KInBqjwucKuRg9MXAmm1icwsDmdXFkLEsSwPsrg649/hYD2xAmorOoLybixg+z7WU8xVCtpf1hbx/DPjC0GA29DrjtAT3cIxM/8MtYUI0dcDGwf14t+W7J5mlArh5loaAK9jtX+o093ehLXy2PHpNuZVHealrgQkFhPeiu661fBczGnw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z0qOHi1i3UZ/7j1ArEf84IuK+wfeGixTzmnjwaMbK/Q=;
- b=yNijtELPgNq530Ll7+plKaTneYUXdoyKmMgoRUu3enWaezALSinz/yFIBO4rVXZXrLXD5BTH8Lpr9h1lHbNsZHrxBG54CEOyRqPI3Y3oxiBZ/OqGBFpRLcr0NvqyRfeXAXzbpLPdRTv9WHKekiYODVFHlEMMt9CfWiRLfHcS0gBiWHOUvbbdG1zmnaXQejcjIfFyjIt+AgoEnxRzWK0XBBtbPlotOEyiRMTVljx4sm+yKzreobgAdyvQg0twXxcH85hi2vVUabalSp915EC9vOUyvIwDU21wOWFi5AIJlHQEs/cR9H9lweTMje32nSeIETpRbacHzkHVKpQTODLg9w==
+ bh=dIQnA54gnCTyjuh5Kmoe4u2mxRSnSQedBCtvanenEVs=;
+ b=ieN1ujKndc8HQ+30OK2JqxfViMRcBcu9vaxPwiI97aPTgD7POKbiMU9mnpbojrwvnf0IBo7rQvZP1l2sIen38xkyKaelSlwGcrh9sY/1F7axOWsdiecFV/PRY+DCBU59ZVCLAmaTDdvbirNS0SeKIbq4wPfB+pmIth3Az6Y58MTnif//eProU4uOPa3rlpDxvtrl+nykZFn6iqeL9OOjkRP08oHY9Ga7PPhWByQCugtv9F0+Dkht57s4aHvTbfdzndstX+nhiCBGM/4vHPVEiddg6j7cIYRxYuzKocDb0Nz+6Hg3oyLGuEokjXhXZKPYDpaqCHsiLdkOoRLijUpeew==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z0qOHi1i3UZ/7j1ArEf84IuK+wfeGixTzmnjwaMbK/Q=;
- b=lcFZrKuomFMWAjkGnx5KkgoIxIaGEkwayu7/4Pwdj2ZH5r2tEH1cATLSvnSaiFA2EznEXQ5QV2ye/aMY9J0HCZYsKG3y1Wk7TJy8aHTYeDHmOBhezBh+ONVvgVBQMN79VrC1iKsDpw6u/UTMrGatsyHbSB83jO5kTFefEseUuOw=
-Received: from BY3PR03CA0025.namprd03.prod.outlook.com (2603:10b6:a03:39a::30)
- by IA0PR12MB7627.namprd12.prod.outlook.com (2603:10b6:208:437::12) with
+ bh=dIQnA54gnCTyjuh5Kmoe4u2mxRSnSQedBCtvanenEVs=;
+ b=XLdoGDVoeHjfBpv5QhySrmfwsmB/B0deaI2z8LyYCnW/uyEVQ6xgvDdk6bpaJ9owghVxAKE0Fr4ZhF3y85pcOuunlRHSYAzUtJNkjc8uZNMTbyLzVlUIRtgIbSjZvyhlFA6IhIjo8B9sFJNXbtwl3a2ciQoWSsgP1jWtPmD5+uc=
+Received: from MW4PR03CA0213.namprd03.prod.outlook.com (2603:10b6:303:b9::8)
+ by BL1PR12MB5828.namprd12.prod.outlook.com (2603:10b6:208:397::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.22; Wed, 25 Feb
- 2026 05:43:38 +0000
-Received: from SJ5PEPF000001EE.namprd05.prod.outlook.com
- (2603:10b6:a03:39a:cafe::95) by BY3PR03CA0025.outlook.office365.com
- (2603:10b6:a03:39a::30) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.23 via Frontend Transport; Wed,
- 25 Feb 2026 05:43:30 +0000
+ 2026 05:44:13 +0000
+Received: from CO1PEPF00012E65.namprd05.prod.outlook.com
+ (2603:10b6:303:b9:cafe::41) by MW4PR03CA0213.outlook.office365.com
+ (2603:10b6:303:b9::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.22 via Frontend Transport; Wed,
+ 25 Feb 2026 05:43:50 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -66,13 +66,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ5PEPF000001EE.mail.protection.outlook.com (10.167.242.202) with Microsoft
+ CO1PEPF00012E65.mail.protection.outlook.com (10.167.249.74) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 05:43:38 +0000
+ 15.20.9632.12 via Frontend Transport; Wed, 25 Feb 2026 05:44:12 +0000
 Received: from aiemdee.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 24 Feb
- 2026 23:43:18 -0600
+ 2026 23:43:52 -0600
 From: Alexey Kardashevskiy <aik@amd.com>
 To: <x86@kernel.org>
 CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
@@ -108,9 +108,9 @@ CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
 	<sstabellini@kernel.org>, Claire Chang <tientzu@chromium.org>,
 	<linux-coco@lists.linux.dev>, <iommu@lists.linux.dev>, Alexey Kardashevskiy
 	<aik@amd.com>
-Subject: [PATCH kernel 8/9] RFC: PCI: Avoid needless touching of Command register
-Date: Wed, 25 Feb 2026 16:37:51 +1100
-Message-ID: <20260225053806.3311234-9-aik@amd.com>
+Subject: [PATCH kernel 9/9] pci: Allow encrypted MMIO mapping via sysfs
+Date: Wed, 25 Feb 2026 16:37:52 +1100
+Message-ID: <20260225053806.3311234-10-aik@amd.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260225053806.3311234-1-aik@amd.com>
 References: <20260225053806.3311234-1-aik@amd.com>
@@ -126,75 +126,75 @@ X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001EE:EE_|IA0PR12MB7627:EE_
-X-MS-Office365-Filtering-Correlation-Id: b9bcf4d3-61ce-4229-6331-08de7430d36c
+X-MS-TrafficTypeDiagnostic: CO1PEPF00012E65:EE_|BL1PR12MB5828:EE_
+X-MS-Office365-Filtering-Correlation-Id: fd8b043c-f391-48c9-216b-08de7430e78b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|82310400026|36860700013|1800799024;
+	BCL:0;ARA:13230040|376014|7416014|82310400026|1800799024|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?5ephTRnUL0djjIrbx71Io0FkSw4YQ8vqZTckhrWApKQcZYUa2c7aeW/jd/05?=
- =?us-ascii?Q?S5TISdFcZ9reCyJfCinNuFQOdfgEXCtFRuOH02ul0xkgIIs7tt50lKxXHc6A?=
- =?us-ascii?Q?//c28Iu/+oRUtlPliu55DwedGu5nsnnyhxTy+sR15plC5B2DE+gDD/ihxUEh?=
- =?us-ascii?Q?/Ux8BqtYqwwMXDkSq50Efa8q0TLOTwYWgXSPbp9X0ZBxmII1jMJmpTzFw3Fi?=
- =?us-ascii?Q?IDUZNoEpBNRbPv1TIRYtOAAjEbrxtyTVnOSLj5gQclFwlduGE20eMd/RQUnF?=
- =?us-ascii?Q?T0zeXbvgUH160cGT9c19anHejye5GxyoKwk25FR2rpZHXMXk1PENBtSR3cya?=
- =?us-ascii?Q?7YppKJS7C0xmy2SFchvwj1WpA2cMilrfok3982oTGX+Wq2BGJoQEPuiw5LWh?=
- =?us-ascii?Q?yZJw7ayPYNgXKKpMMeNBVaHx6Q9IGr7IYar454uUyI10xwGqaZUOqggFyLBS?=
- =?us-ascii?Q?Wey+xVwxLTeV5+5n/E7sf42YxK2ZTcg3kPj0mnPNPadZVKVKaIrgXda0DswZ?=
- =?us-ascii?Q?x8VEX7aklZjOoD5coGFjahSPTQjk8QlcFvzZCDBOBVMbhUPAiF4aOQgxpl/y?=
- =?us-ascii?Q?ESF5lkV9nluMnReDHZREGGBFVUpOJFrYXkzN5dGRnohj7p+ih9sKmcqodQVc?=
- =?us-ascii?Q?xQcV8bstgyn25FAVjAdbojbPHh51jsk5aLnhkGHBm4ACUwM8bcDmAdO/H6/k?=
- =?us-ascii?Q?rR9zvyzWNKbQEqY4+4ZSoSAmazw9l9PABYyjpVPH5cjhi6L+nGOGk6gNGluV?=
- =?us-ascii?Q?vf9YxTAfv9rjGr5bpJygK3ANg/ScNiQCD4cH13g5thCrLAV0aaW9fKbvWkGL?=
- =?us-ascii?Q?Zxt9WOkmOchNyCtd2NwdEr6cK4+1yiKA6Xb6yGs/owRRZR/HNw6gEZuPg8Wx?=
- =?us-ascii?Q?AS/mridDThCq9CpLX2JJEVtwdred4nIKn3QHb7qgy8/pS+TFVERpPbEqTt5Z?=
- =?us-ascii?Q?xT0elLNUJtFB/OoRSvIvoDM5J92WtbNNrbXq8qZ7Ylk23Lqf9E6kqErWYkyv?=
- =?us-ascii?Q?qCPywOCxkJZqhNTeezE3Xm/nvUmASQiMbdc/5xOYtlOg5Ds2pa+ZSBKWfRNu?=
- =?us-ascii?Q?Xs1lwpBuYNo7UBm26ZRfxSpXJ8N+L8QL0jPKkstNBrYSfckUs5Pzu6/Zb3zH?=
- =?us-ascii?Q?yIRnpba7p8/CEFZtB9PPxRawIzH4dIxyEV25V7C4Y6dGaQrs+NHHAnvzfBPp?=
- =?us-ascii?Q?5dZmzIpf5tBDn3toNwvOKtDk3g1MJ55vLl3EhDadoU+HeFHMBwEgDE7ctaPp?=
- =?us-ascii?Q?H4Cuapwr4IhJAjodEV1laQca+4+Roj7UVGm4Biyn1H+tVGnaVkAgg8ggQLYD?=
- =?us-ascii?Q?V/j/k7QOkfdk4AKNjNaVOnjNV7RWbRHoPGM5qnJODLoEA6v25VzCIQ6VQejX?=
- =?us-ascii?Q?BJSDX255pIEjnroETOvXeb2Dhz6aUlKqXP1LahHx6arxMfVgrL8GSAIKZqt9?=
- =?us-ascii?Q?ns1kbTnO/TZnoeC2Jx6DiZePTTJPynsFBWLWOsfVmLmsXBVXkhzIRIR2LWe8?=
- =?us-ascii?Q?8JiunfRdYllJ1+47P2zc5o1nfuQcY8xU187ZJIs7QTid9RubcR0ULTS4+lUM?=
- =?us-ascii?Q?gIJdv9n+OFtbp3HX18bxfd07EZlM2NZyE3BC6vGyniL6deKWWkUi70XhtVdB?=
- =?us-ascii?Q?nDazHwEtHoIEKYuhxiJnQwog8tzbAJuccGSrTzM69i3dsWza/gTBxgGOt3pu?=
- =?us-ascii?Q?UWCkxw=3D=3D?=
+	=?us-ascii?Q?FbfWWMs/iWpOxIrmuSTAvqxKMiwl6XCn6v1AO3+F4Vz48hHhOcQjffUI83zS?=
+ =?us-ascii?Q?hZmtVss6pFlibv/U3aBkdQqM2NLeHo3otGbdj5H2Zp91Z9rXjbExyLRVzo5I?=
+ =?us-ascii?Q?KIFfF6M8uNgMf0qJ6nkiESYcJvHKk2WnbpPTzq8NOroRnR8OviQSaZ9rcA1D?=
+ =?us-ascii?Q?Uu5XVF69Q4HSpmbx6RePoVATTj4h6iLrI4A8QXdAJ85fEx2omQi4iOZpOu/8?=
+ =?us-ascii?Q?drPb5/Tki7C878P9ENBQlQpocFQ0g89I1X55wi2tbw23/4Hh9FcFx/fkf34G?=
+ =?us-ascii?Q?rBtDDdzOhasMI7zRoI06DYk2cSNvJJSr89Z77RBCuQDAu7pLi8PnYU5x6fAd?=
+ =?us-ascii?Q?xqfQI5Q7CdCM2yT34U77BGCyC27nySCSMheA+aP0AzwrrlWjOkP1QEXtfwah?=
+ =?us-ascii?Q?63DoDq/K46QO8AJhzE0pc4z0sE9rb054QUXOvwD/TQW98e8PflnM5JoX9wLd?=
+ =?us-ascii?Q?xAN9u1w4VXUCDmYdhb0QnD9EqpHXbzXGCYn8JmO7TirSeAeyl/JzVWbmuVg6?=
+ =?us-ascii?Q?fbM9c1RITNyYiQh5escRTeBs3I/uvhWrlNV6abSG9zNLUMhc+ZsXuKNAwqR1?=
+ =?us-ascii?Q?nPklG6vprpUmQdK70m1SQR1hVEnFg3jhd+pE54FqAnhI7AJt9eRHhTq30uJR?=
+ =?us-ascii?Q?wikgOJAsC7Gj+0EeIxo4dsmHYjTGyg424BDU+CoOadnEYc+zJRtF90+4trq0?=
+ =?us-ascii?Q?uKKQBn6tHvyGVjspGORrzUu1aYai7kC1/JpGeiOxMWSFlvYYlV89zCu7cTTG?=
+ =?us-ascii?Q?Yp4lBaEmjU22kDoFogKAGac8eaWTwxDZvyi9AEqFaoKdJiMH9flgjS9ng9HQ?=
+ =?us-ascii?Q?pIcQgWhNO+KFpkIsMQIh4Boknn9RbmNU9y9QWJGf4xuBuL1lcTUPCmW6/iKX?=
+ =?us-ascii?Q?rSX877FEdGYiUmHE/HN/GTkSeg1dUu+kH84Kq1SqMST/LLbhqH/tZ6K9ZTg6?=
+ =?us-ascii?Q?1tZw/oXVgX8d/Z2EEb1bylQjBEN87Uf1Mc4lDAWNtGTWcpZsnD7wIJBQfV8b?=
+ =?us-ascii?Q?vX7+JCF/u0Z7oCPoa0fQQF32saFvhCzdDIGzWUqbSsiInMTL54obrYWt2vHs?=
+ =?us-ascii?Q?NC/8tnTaO7yZIBZXbojym33irugT6nxj4x8qkJGagxBgrJvnOKSPkuKAUMH9?=
+ =?us-ascii?Q?e3Su9xGVJLI3kQT6rho+nPOgj3sJ8yk7knYIHC8BYTvXhn5LmWh+1jKJRkY5?=
+ =?us-ascii?Q?SjHjEb+HfnAwXnyaZg6pHie4ergWv/iyCWckcYt2PMwncvCJaRiAPpsv0p5u?=
+ =?us-ascii?Q?17T99iaVULV/kUexGXnuDAX6ewdUm0vSQEjvf3dvuIBN4GSVPdVdyASExj2x?=
+ =?us-ascii?Q?aYSAQYfS34ow+YIgSZ1z/a669ypliOedxmAclhs2XfOWm66Mn4q0XzqHU9XL?=
+ =?us-ascii?Q?RYFJyyplF5yQjPAGgP2oRtaCYpImPfUJ0rjvvDWH8JLAH5nqsseHwvx/uvWX?=
+ =?us-ascii?Q?f7mVDlNx31C7Unhkp1NHz1RyjFKdpjSq/asUNpEmj6ub0vMk/op0zIDF6HNv?=
+ =?us-ascii?Q?n4REqymhvs+XXOxCDkooq9VGh11wI/epLbYQWMZRlINF/8EXoRaS8V/ntYTv?=
+ =?us-ascii?Q?/CTvgj7x93SpTWAwYDu47DaokPytvd/G4oAhUC433COoLb0RDR0DONpPYWQp?=
+ =?us-ascii?Q?pwMzuMeyN9e34fKdLfTp66WvAsTSOeMngw86dCes0vSWt5YEMRnCBme5l6bO?=
+ =?us-ascii?Q?YQBIcg=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	10g9krEdChxyQ4dRzEqmNVi1O9Qs6xiAm1ZmUw/F31lNKH2dLgnVZhGak+lhdlxMI7BBzKZb5iO5o6e0NIbZ+2z/UtHrtTP7pnIvjoLgP5Cizxv0PvNNdwUupJafxJJ3BP9+wFc7lOC2n/6y/0ajxRK1LAjSHgfUIjFMmeU2SEzBZBxqw/C3ljBfFyHn08yTsqC5M6KTvRBR17n6uBtd3oW3Qb8Bm7pA9DvYLW1fwr/ihN4s2zVEpX9tpm4ye9ijcaj41Jn95Um8ATI2adXfIEt93Jb0YLu831ucHLQeeLJlQUGz8k1zxfm6iG8h6HNwIwuJc0Gf0nY5Bf84m/g/IU7h0RoX2vXGjqYjrUTVDg7qXeSG/tR4VjB2mmQVbIjoEEIEaQhPPquZb0SMi8pVeKx6POU4RszOW5lkyYN9VVth42XzoXRsmugA3N9vVO6v
+	Ze1W3Kx9ZbDLgcj3QlovEw1KMHKpoNQIFsbsZdN+5tQb3Gj/BSjhQ7VRXKxXzksG8SmUw9o/2sl4BRn87J88TbRaVNGKQ1ucNiLjOMjaaNuMb+degFBjzqhG++2NrKI0Y0+0ISko9I0umX0Ol9+BURwq9KwbdGWu3tGtHgqSKPXupC4I+/d03wPzmy+M7Kxh8OsES4L6R3bqqzjd8r6ioTJ00PHy7rSpcgcrIH2P7MxnBtvJUs8slQaOtd5NKfAyNGhp0Xjh+h+4LYr2Yv30ZhhmgzAZNMkdekXIxsfOqHr2N4WYf+s2h7uRYB3vpWeGcfKgje7wCKgoD9Hzj4IWEJ5Db9zBkIY+32ZrxNM4oKgjpJ3iAMWwqs9KgfesxIB8jAwpfpWFGKvFMaI9gCM1xoXOEmKGYpaPKkLCokV/DulDZbSTyz3ym1XipW9ZQ0ov
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 05:43:38.6117
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2026 05:44:12.3745
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b9bcf4d3-61ce-4229-6331-08de7430d36c
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd8b043c-f391-48c9-216b-08de7430e78b
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001EE.namprd05.prod.outlook.com
+	CO1PEPF00012E65.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7627
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5828
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [1.34 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71793-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71794-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[aik@amd.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -204,73 +204,160 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	RCPT_COUNT_GT_50(0.00)[58];
 	TAGGED_RCPT(0.00)[kvm];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 623AB1921CA
+X-Rspamd-Queue-Id: 48F501921E0
 X-Rspamd-Action: no action
 
-Once locked, a TDI's MSE and BME are not allowed to be cleared.
+Add another resource#d_enc to allow mapping MMIO as
+an encrypted/private region.
 
-Skip INTx test as TEE-capable PCI functions are most likely IOV VFs
-anyway and those do not support INTx at all.
-
-Add a quirk preventing the probing code from disabling MSE when
-updating 64bit BAR (which cannot be done atomically).
-
-Note that normally this happens too early and likely not really
-needed for the device attestation happening long after PCI probing.
+Unlike resourceN_wc, the node is added always as ability to
+map MMIO as private depends on negotiation with the TSM which
+happens quite late.
 
 Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
 ---
+ include/linux/pci.h     |  2 +-
+ drivers/pci/mmap.c      | 11 +++++++-
+ drivers/pci/pci-sysfs.c | 27 +++++++++++++++-----
+ drivers/pci/proc.c      |  2 +-
+ 4 files changed, 32 insertions(+), 10 deletions(-)
 
-This is also handled in QEMU - it will block clearing BME and MSE
-(normally happening on modprobe/rmmod) as long as the TDI is
-CONFIG_LOCKED or RUN.
-
-This only patch is not enough but reduces the number of unwanted
-writes to MSE/BME.
-
-Also, SRIOV cannot have INTx so pci_intx_mask_broken() could skip
-VFs too, should it?
----
- drivers/pci/probe.c  | 5 +++++
- drivers/pci/quirks.c | 9 +++++++++
- 2 files changed, 14 insertions(+)
-
-diff --git a/drivers/pci/probe.c b/drivers/pci/probe.c
-index 4c3aec1fd53e..cc0613e7c905 100644
---- a/drivers/pci/probe.c
-+++ b/drivers/pci/probe.c
-@@ -1930,6 +1930,11 @@ static int pci_intx_mask_broken(struct pci_dev *dev)
+diff --git a/include/linux/pci.h b/include/linux/pci.h
+index 1a31353dc109..6e258b793278 100644
+--- a/include/linux/pci.h
++++ b/include/linux/pci.h
+@@ -2217,7 +2217,7 @@ pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
+  */
+ int pci_mmap_resource_range(struct pci_dev *dev, int bar,
+ 			    struct vm_area_struct *vma,
+-			    enum pci_mmap_state mmap_state, int write_combine);
++			    enum pci_mmap_state mmap_state, int write_combine, int enc);
+ 
+ #ifndef arch_can_pci_mmap_wc
+ #define arch_can_pci_mmap_wc()		0
+diff --git a/drivers/pci/mmap.c b/drivers/pci/mmap.c
+index 8da3347a95c4..90a8ab4753b8 100644
+--- a/drivers/pci/mmap.c
++++ b/drivers/pci/mmap.c
+@@ -23,7 +23,7 @@ static const struct vm_operations_struct pci_phys_vm_ops = {
+ 
+ int pci_mmap_resource_range(struct pci_dev *pdev, int bar,
+ 			    struct vm_area_struct *vma,
+-			    enum pci_mmap_state mmap_state, int write_combine)
++			    enum pci_mmap_state mmap_state, int write_combine, int enc)
  {
- 	u16 orig, toggle, new;
+ 	unsigned long size;
+ 	int ret;
+@@ -46,6 +46,15 @@ int pci_mmap_resource_range(struct pci_dev *pdev, int bar,
  
-+	if (dev->devcap & PCI_EXP_DEVCAP_TEE) {
-+		pci_warn_once(dev, "(TIO) Disable check for broken INTX");
-+		return 1;
-+	}
+ 	vma->vm_ops = &pci_phys_vm_ops;
+ 
++	/*
++	 * Calling remap_pfn_range() directly as io_remap_pfn_range()
++	 * enforces shared mapping.
++	 */
++	if (enc)
++		return remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
++				       vma->vm_end - vma->vm_start,
++				       pgprot_encrypted(vma->vm_page_prot));
 +
- 	pci_read_config_word(dev, PCI_COMMAND, &orig);
- 	toggle = orig ^ PCI_COMMAND_INTX_DISABLE;
- 	pci_write_config_word(dev, PCI_COMMAND, toggle);
-diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
-index 214ed060ca1b..b875859699ba 100644
---- a/drivers/pci/quirks.c
-+++ b/drivers/pci/quirks.c
-@@ -316,6 +316,15 @@ static void quirk_mmio_always_on(struct pci_dev *dev)
- DECLARE_PCI_FIXUP_CLASS_EARLY(PCI_ANY_ID, PCI_ANY_ID,
- 				PCI_CLASS_BRIDGE_HOST, 8, quirk_mmio_always_on);
+ 	return io_remap_pfn_range(vma, vma->vm_start, vma->vm_pgoff,
+ 				  vma->vm_end - vma->vm_start,
+ 				  vma->vm_page_prot);
+diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
+index 7f9237a926c2..715407eb8b15 100644
+--- a/drivers/pci/pci-sysfs.c
++++ b/drivers/pci/pci-sysfs.c
+@@ -1104,7 +1104,7 @@ void pci_remove_legacy_files(struct pci_bus *b)
+  * Use the regular PCI mapping routines to map a PCI resource into userspace.
+  */
+ static int pci_mmap_resource(struct kobject *kobj, const struct bin_attribute *attr,
+-			     struct vm_area_struct *vma, int write_combine)
++			     struct vm_area_struct *vma, int write_combine, int enc)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(kobj_to_dev(kobj));
+ 	int bar = (unsigned long)attr->private;
+@@ -1124,21 +1124,28 @@ static int pci_mmap_resource(struct kobject *kobj, const struct bin_attribute *a
  
-+static void quirk_mmio_tio_always_on(struct pci_dev *dev)
-+{
-+	if (dev->devcap & PCI_EXP_DEVCAP_TEE) {
-+		pci_info(dev, "(TIO) quirk: MMIO always On");
-+		dev->mmio_always_on = 1;
-+	}
+ 	mmap_type = res->flags & IORESOURCE_MEM ? pci_mmap_mem : pci_mmap_io;
+ 
+-	return pci_mmap_resource_range(pdev, bar, vma, mmap_type, write_combine);
++	return pci_mmap_resource_range(pdev, bar, vma, mmap_type, write_combine, enc);
+ }
+ 
+ static int pci_mmap_resource_uc(struct file *filp, struct kobject *kobj,
+ 				const struct bin_attribute *attr,
+ 				struct vm_area_struct *vma)
+ {
+-	return pci_mmap_resource(kobj, attr, vma, 0);
++	return pci_mmap_resource(kobj, attr, vma, 0, 0);
+ }
+ 
+ static int pci_mmap_resource_wc(struct file *filp, struct kobject *kobj,
+ 				const struct bin_attribute *attr,
+ 				struct vm_area_struct *vma)
+ {
+-	return pci_mmap_resource(kobj, attr, vma, 1);
++	return pci_mmap_resource(kobj, attr, vma, 1, 0);
 +}
-+DECLARE_PCI_FIXUP_EARLY(PCI_ANY_ID, PCI_ANY_ID, quirk_mmio_tio_always_on);
 +
- /*
-  * The Mellanox Tavor device gives false positive parity errors.  Disable
-  * parity error reporting.
++static int pci_mmap_resource_enc(struct file *filp, struct kobject *kobj,
++				 const struct bin_attribute *attr,
++				 struct vm_area_struct *vma)
++{
++	return pci_mmap_resource(kobj, attr, vma, 0, 1);
+ }
+ 
+ static ssize_t pci_resource_io(struct file *filp, struct kobject *kobj,
+@@ -1232,7 +1239,7 @@ static void pci_remove_resource_files(struct pci_dev *pdev)
+ 	}
+ }
+ 
+-static int pci_create_attr(struct pci_dev *pdev, int num, int write_combine)
++static int pci_create_attr(struct pci_dev *pdev, int num, int write_combine, int enc)
+ {
+ 	/* allocate attribute structure, piggyback attribute name */
+ 	int name_len = write_combine ? 13 : 10;
+@@ -1250,6 +1257,9 @@ static int pci_create_attr(struct pci_dev *pdev, int num, int write_combine)
+ 	if (write_combine) {
+ 		sprintf(res_attr_name, "resource%d_wc", num);
+ 		res_attr->mmap = pci_mmap_resource_wc;
++	} else if (enc) {
++		sprintf(res_attr_name, "resource%d_enc", num);
++		res_attr->mmap = pci_mmap_resource_enc;
+ 	} else {
+ 		sprintf(res_attr_name, "resource%d", num);
+ 		if (pci_resource_flags(pdev, num) & IORESOURCE_IO) {
+@@ -1310,11 +1320,14 @@ static int pci_create_resource_files(struct pci_dev *pdev)
+ 		if (!pci_resource_len(pdev, i))
+ 			continue;
+ 
+-		retval = pci_create_attr(pdev, i, 0);
++		retval = pci_create_attr(pdev, i, 0, 0);
+ 		/* for prefetchable resources, create a WC mappable file */
+ 		if (!retval && arch_can_pci_mmap_wc() &&
+ 		    pdev->resource[i].flags & IORESOURCE_PREFETCH)
+-			retval = pci_create_attr(pdev, i, 1);
++			retval = pci_create_attr(pdev, i, 1, 0);
++		/* Add node for private MMIO mapping */
++		if (!retval)
++			retval = pci_create_attr(pdev, i, 0, 1);
+ 		if (retval) {
+ 			pci_remove_resource_files(pdev);
+ 			return retval;
+diff --git a/drivers/pci/proc.c b/drivers/pci/proc.c
+index 9348a0fb8084..e0c0ece7f3f5 100644
+--- a/drivers/pci/proc.c
++++ b/drivers/pci/proc.c
+@@ -288,7 +288,7 @@ static int proc_bus_pci_mmap(struct file *file, struct vm_area_struct *vma)
+ 	/* Adjust vm_pgoff to be the offset within the resource */
+ 	vma->vm_pgoff -= start >> PAGE_SHIFT;
+ 	ret = pci_mmap_resource_range(dev, i, vma,
+-				  fpriv->mmap_state, write_combine);
++				  fpriv->mmap_state, write_combine, 0);
+ 	if (ret < 0)
+ 		return ret;
+ 
 -- 
 2.52.0
 
