@@ -1,246 +1,191 @@
-Return-Path: <kvm+bounces-71955-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71956-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EKsrChQjoGkdfwQAu9opvQ
-	(envelope-from <kvm+bounces-71955-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 11:40:20 +0100
+	id sGPtNbYloGkDfwQAu9opvQ
+	(envelope-from <kvm+bounces-71956-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 11:51:34 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 819F01A46BA
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 11:40:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F3A91A4924
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 11:51:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CB5BE31125B9
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 10:37:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 66498302BDEC
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 10:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68DBD3A7F4D;
-	Thu, 26 Feb 2026 10:37:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0581318EE6;
+	Thu, 26 Feb 2026 10:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g/zcpEmg";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="j91sDa6B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eq0N/CcV"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3738A3A8FF0
-	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 10:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FD1302750;
+	Thu, 26 Feb 2026 10:51:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772102257; cv=none; b=YY3ZTVY1yRsDQBfCzcvpQr6z3KClBkT0Ahe+1rUUJqVp1kVh2WzeK8R0T7GaUpCV/kv5e3Yx0FwXQXh8yw2qPcEDMC5OxIbvUnevUEt/93DaZxEs52zCyeGI2NLD9ZyJHGFpH+lpqGEtP2ZnkAjKLnWJdjkOK8GkRmrJl+wrIUQ=
+	t=1772103070; cv=none; b=ItdXLPyFHr6x3KbTRsLQFQtAPWvOxbEu4mqzbPzF4mLYVZsSoBNE3rDowVIHRb2mXqOnyNvx2ScAln6TYaswW2HW6/R821sCYQ/kJPU9n9alPZlSyObIKdOrr06dHpiXeOsZL/sj82T8OJttW1liDD/oHm8cK9isf9DbNy124yY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772102257; c=relaxed/simple;
-	bh=Tv5FZngxtUMObUyVSHDwXyUEFdvPoPb16IYzDb2fhqM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e5E6vpQV3aU8YWsCUHFqPeMwUzswugf8Jph36+Ph/5pIocYrZ/MV+eYBtskaIIbGv+mQEfarndaRRTxP9FvwB4MCCiK1XbrtIipIqJWrE/BQo1Dk5zP5/bkX6YXmrENSYbuLgRAAIhwO0YoTAV0ZkA9VuSpBzJ1oVbEOYsD2MD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g/zcpEmg; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=j91sDa6B; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772102251;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Sha0tlrmOYa0Rpb8cUAyArTKqhODwvWX97J3L8tcVRU=;
-	b=g/zcpEmgJbOInlMZs7FA00XKtJYPRCB06GianRCGtlF8vXCY5KIdrzIhHxTXAnUAls8wDh
-	plNfAj+YP3oSWP8rsE4Pa7sTIEAKQPNEBHEZhTNwTeHsrZloTFdDoGQAXgLNQ8HvbI18zX
-	sJIiBlp3an5K7ORn8liQhGX4lzkSTnQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-654-lcmFB1tjP3e3OwGToMYJsw-1; Thu, 26 Feb 2026 05:37:29 -0500
-X-MC-Unique: lcmFB1tjP3e3OwGToMYJsw-1
-X-Mimecast-MFC-AGG-ID: lcmFB1tjP3e3OwGToMYJsw_1772102248
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-43998727cdfso265868f8f.1
-        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 02:37:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772102248; x=1772707048; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Sha0tlrmOYa0Rpb8cUAyArTKqhODwvWX97J3L8tcVRU=;
-        b=j91sDa6ByH/ifBDkgnDoQGADvKf34CP+bHYah0o3h1INRfYVetczzb2LvnNB6bgd3N
-         fR1J/YSnVczWAe5AqY0y9d3I8hK0w6GQEyvTfJSI9eaWPYk7uQrpUo0//BHSLfjlRDFZ
-         nRDoiOsyqQ9qkdoAJohcP4/PxTCX+WJgMLZYSqynOX2kl9fd1EuMvye+4P4jcrnMIN4+
-         RF3log+vjkCBkhy4BwqJoVQ1u5xrkC0iwzYGBf8NGFbA31F7z4UOgCXuxo01Zxg9/2ri
-         55f7l48SBpBNqc2B7FBIqvMt/cmvNNw0XXRw3/5GLL6DKSToSZqg/3X2Q8HwG3liar23
-         CBlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772102248; x=1772707048;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Sha0tlrmOYa0Rpb8cUAyArTKqhODwvWX97J3L8tcVRU=;
-        b=GqIbzJ3U49wzSX/8xngtyKZSejgyE+kRHTGrHHfFZ73YGU9WVDGuEP6OvfKxSfUloo
-         i+n+yevcJYdDO94wrCW82FXUkdNRmgkXdk61goTi8V3UaM5Kvf0okaZev4KikE/2X+4u
-         q0qOCj8dn4XTeQLMpY5H70F+vn3IW6usfTstbU247ZEQ5Bte2gUDBVZU8R1hxnd0Al3x
-         Ob97y4N9GEHi8yjzEdrvbIa4ZYHAkPgcmS7jAj8hEkwZFBDuyDrmNYG6esA29s92otg3
-         KRJ/4lgxtw5ew2M0DPBk8DoCEsrIa2k3NUhGJ+oL8ybQnK8VWWA/heQBvPlbYP3cELbO
-         dmVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWsNv3vOWeeZ6cy4Mwp/sQPJtaN2owLicG+nRzfQNThXmA/0hkSgS5YMWY3PTDRaawVCi4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDKn3PhrsDXTmyz7KDr7A8D19MKmrDZH3W5X8bW8sa9LqJhZEq
-	Yfo6Sw3tT7pBmoNRBA5aNbJQpnnmGRiFcx91By5/PehfCsfmkMtPWohFmS+igZSZZTEadbuxgSu
-	PXTOPfvU19uYhfxP6sGA9V2OPe/3Vlxty9ET/2NGK5ymxmaqSGWCcWA==
-X-Gm-Gg: ATEYQzxvrOqoDy9A+gjkE/NnjAldvyj3buVzyLv2dNerBgJ1NA5ep0wFWR0NHI0VqP2
-	5v+1Avo61wstsGfL/cUl/vJhmlFJ1Z6fAvJYRZ/sR9xzmS/kXJf9ei+aRyebKgWgwlCG38W846N
-	Y7p6eSFiK0hgmeREE9+fdMyBy/NDWdfmsxrFpOg+2me6Q5K112EBOULCl0/9jPNymvZ6vuYTjiH
-	ETN7Kj1XglmTz1qA6MFj1LZBGNiEV0zP7B0Ne7ck7Fpkq6ipFCLs5Svta3NLsy4a/qE/xrkKD8L
-	gLRbWxaGmw7twQ0o7r/gkOU47ce3O+lLZ001NySGQcvBYq6lQyJtK87N4t2aMYi2LproNk6TaqO
-	w2zZUcyuLM30Ft2jxZtrej90u575oYVOUEuhMuToKZ3aT/fNT9MAD49NLQA==
-X-Received: by 2002:a05:600c:4f94:b0:480:4a4f:c36f with SMTP id 5b1f17b1804b1-483a95e2488mr313974305e9.21.1772102247938;
-        Thu, 26 Feb 2026 02:37:27 -0800 (PST)
-X-Received: by 2002:a05:600c:4f94:b0:480:4a4f:c36f with SMTP id 5b1f17b1804b1-483a95e2488mr313973765e9.21.1772102247443;
-        Thu, 26 Feb 2026 02:37:27 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:165:d60:2c1a:3780:4e49:dfcf? ([2a01:e0a:165:d60:2c1a:3780:4e49:dfcf])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd765604sm121443315e9.15.2026.02.26.02.37.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Feb 2026 02:37:27 -0800 (PST)
-Message-ID: <0acdccaa-33dd-424d-a206-e413971d23ce@redhat.com>
-Date: Thu, 26 Feb 2026 11:37:26 +0100
+	s=arc-20240116; t=1772103070; c=relaxed/simple;
+	bh=c2H9Qi49m5+C4KxTW0j8/WB4GcymfvOF1Dx3C8KYFFs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SJ8e9T9sIuH/GsrVD+OR0SHQbWjpcjzU7FyigCsVzWxCkJYCESaD+lBRME4hx5sd+562JNIG9NRKrF8Jt5MfZNtVPaxTM1yn9rkhwVePAc4H1WryN5orDQI/IPMVKvn4pHqEY0rNIySyrQVJWVV7H/ahANNQxQlo8iNMQGgUJ7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eq0N/CcV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C381FC2BC9E;
+	Thu, 26 Feb 2026 10:51:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772103069;
+	bh=c2H9Qi49m5+C4KxTW0j8/WB4GcymfvOF1Dx3C8KYFFs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Eq0N/CcVRqyeonDZJrXv9xf3VwFC3Mrxsw0GwBo1up49FgA9c+Wv+Vdo0yenwTCM/
+	 c7lUFm8KvlVKebR1w3mheBfxkQ+C9gadmCPvyhJg1KzY+CsACuJjyd7xR90llaFNnW
+	 o/YRAfhqXTXF44ytY4W/xynrOigplzqcDObe8xIgASJc02kex8sdfkwLnrungkIk2A
+	 tuVUBLKBur7cE+h9zRtE+6vzLKx+SHiEr3KtUyfiw2pKnDxyZIWXBNlqdjaQ0Si8aZ
+	 3WTxHdG3WZH9tK/MeC7b1jMxRBLovlNNY1XF+8XHWq7eJByIZ/D3EU5SZUUHppwGEN
+	 T6rX32Xvv4jIQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vvYxX-0000000E12u-3VQk;
+	Thu, 26 Feb 2026 10:51:07 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Jonathan Cameron <jonathan.cameron@huawei.com>,
+	Kees Cook <kees@kernel.org>,
+	Mark Brown <broonie@kernel.org>,
+	Sascha Bischoff <sascha.bischoff@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 fixes for 7.0, take #1
+Date: Thu, 26 Feb 2026 10:50:47 +0000
+Message-ID: <20260226105048.28066-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/14] Make RamDiscardManager work with multiple
- sources
-To: marcandre.lureau@redhat.com, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex@shazbot.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@kernel.org>,
- Mark Kanda <mark.kanda@oracle.com>, kvm@vger.kernel.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Peter Xu <peterx@redhat.com>, Ben Chaney <bchaney@akamai.com>,
- Fabiano Rosas <farosas@suse.de>
-References: <20260225120456.3170057-1-marcandre.lureau@redhat.com>
-Content-Language: en-US, fr
-From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
-Autocrypt: addr=clg@redhat.com; keydata=
- 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
- uVKe8BVz4atMOoktmt0GWTOC8P4=
-In-Reply-To: <20260225120456.3170057-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, tabba@google.com, joey.gouly@arm.com, jonathan.cameron@huawei.com, kees@kernel.org, broonie@kernel.org, sascha.bischoff@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-71955-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71956-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[clg@redhat.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ozlabs.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 819F01A46BA
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4F3A91A4924
 X-Rspamd-Action: no action
 
-On 2/25/26 13:04, marcandre.lureau@redhat.com wrote:
-> From: Marc-André Lureau <marcandre.lureau@redhat.com>
-> 
-> Hi,
-> 
-> This is an attempt to fix the incompatibility of virtio-mem with confidential
-> VMs. The solution implements what was discussed earlier with D. Hildenbrand:
-> https://patchwork.ozlabs.org/project/qemu-devel/patch/20250407074939.18657-5-chenyi.qiang@intel.com/#3502238
-> 
-> The first patches are misc cleanups. Then some code refactoring to have split a
-> manager/source. And finally, the manager learns to deal with multiple sources.
-> 
-> I haven't done thorough testing. I only launched a SEV guest with a virtio-mem
-> device. It would be nice to have more tests for those scenarios with
-> VFIO/virtio-mem/confvm.. In any case, review & testing needed!
-> 
-In a SEV-SNP guest (BIOS) with a VFIO device and virtio-mem device :
+Paolo,
 
-   -m 4G,maxmem=24G
-   -object '{"size": 4294967296, "id": "mem-vmem0", "qom-type": "memory-backend-ram"}'
-   -device '{"id": "pcie-root-port-1", "port": 1, "driver": "pcie-root-port", "bus": "pcie.0", "chassis": 2}'
-   -device '{"memdev": "mem-vmem0", "driver": "virtio-mem-pci", "id": "virtio_mem-vmem0", "bus": "pcie-root-port-1", "addr":  "0x0"}'
-   -object '{"size": 4294967296, "id": "mem-machine_mem", "qom-type": "memory-backend-ram"}'
-   ...
+Here's the first set of KVM/arm64 fixes for 7.0. Most of it affects
+pKVM (feature set, MMU), but we also have a GICv5 fix and a couple of
+small cleanups. Details in the tag below.
 
-   [    0.663227] Memory Encryption Features active: AMD SEV SEV-ES SEV-SNP
-   ...
-   [    3.199716] virtio_mem virtio2: start address: 0x180000000
-   [    3.200988] virtio_mem virtio2: region size: 0x100000000
-   [    3.202217] virtio_mem virtio2: device block size: 0x200000
-   [    3.203475] virtio_mem virtio2: nid: 0
-   [    3.204384] virtio_mem virtio2: memory block size: 0x8000000
-   [    3.205696] virtio_mem virtio2: subblock size: 0x200000
-   [    3.207193] virtio_mem virtio2: plugged size: 0x0
-   [    3.208282] virtio_mem virtio2: requested size: 0x0
+Note that there is a very minor conflict with Linus' tree due to Kees'
+patch having been applied to both trees. Whatever is in Linus' tree is
+the right thing.
 
-boot is fine.
+Please pull,
 
-Powerdown reveals an issue :
+	M.
 
-   [   25.054116] ACPI: PM: Preparing to enter system sleep state S5
-   [   25.055671] reboot: Power down
-   **
-   ERROR:../system/ram-discard-manager.c:459:ram_discard_manager_finalize: assertion failed: (QLIST_EMPTY(&rdm->source_list))
-   Aborted
+The following changes since commit 6316366129d2885fae07c2774f4b7ae0a45fb55d:
 
-Thanks,
+  Merge branch kvm-arm64/misc-6.20 into kvmarm-master/next (2026-02-05 09:17:58 +0000)
 
-C.
+are available in the Git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-7.0-1
+
+for you to fetch changes up to 54e367cb94d6bef941bbc1132d9959dc73bd4b6f:
+
+  KVM: arm64: Deduplicate ASID retrieval code (2026-02-25 12:19:33 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 7.0, take #1
+
+- Make sure we don't leak any S1POE state from guest to guest when
+  the feature is supported on the HW, but not enabled on the host
+
+- Propagate the ID registers from the host into non-protected VMs
+  managed by pKVM, ensuring that the guest sees the intended feature set
+
+- Drop double kern_hyp_va() from unpin_host_sve_state(), which could
+  bite us if we were to change kern_hyp_va() to not being idempotent
+
+- Don't leak stage-2 mappings in protected mode
+
+- Correctly align the faulting address when dealing with single page
+  stage-2 mappings for PAGE_SIZE > 4kB
+
+- Fix detection of virtualisation-capable GICv5 IRS, due to the
+  maintainer being obviously fat fingered...
+
+- Remove duplication of code retrieving the ASID for the purpose of
+  S1 PT handling
+
+- Fix slightly abusive const-ification in vgic_set_kvm_info()
+
+----------------------------------------------------------------
+Fuad Tabba (5):
+      KVM: arm64: Hide S1POE from guests when not supported by the host
+      KVM: arm64: Optimise away S1POE handling when not supported by host
+      KVM: arm64: Fix ID register initialization for non-protected pKVM guests
+      KVM: arm64: Remove redundant kern_hyp_va() in unpin_host_sve_state()
+      KVM: arm64: Revert accidental drop of kvm_uninit_stage2_mmu() for non-NV VMs
+
+Kees Cook (1):
+      KVM: arm64: vgic: Handle const qualifier from gic_kvm_info allocation type
+
+Marc Zyngier (2):
+      KVM: arm64: Fix protected mode handling of pages larger than 4kB
+      KVM: arm64: Deduplicate ASID retrieval code
+
+Sascha Bischoff (1):
+      irqchip/gic-v5: Fix inversion of IRS_IDR0.virt flag
+
+ arch/arm64/include/asm/kvm_host.h   |  3 +-
+ arch/arm64/include/asm/kvm_nested.h |  2 ++
+ arch/arm64/kvm/at.c                 | 27 ++--------------
+ arch/arm64/kvm/hyp/nvhe/pkvm.c      | 37 ++++++++++++++++++++--
+ arch/arm64/kvm/mmu.c                | 12 +++----
+ arch/arm64/kvm/nested.c             | 63 ++++++++++++++++++-------------------
+ arch/arm64/kvm/sys_regs.c           |  3 ++
+ arch/arm64/kvm/vgic/vgic-init.c     |  2 +-
+ drivers/irqchip/irq-gic-v5-irs.c    |  2 +-
+ 9 files changed, 81 insertions(+), 70 deletions(-)
 
