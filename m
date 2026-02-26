@@ -1,210 +1,205 @@
-Return-Path: <kvm+bounces-72109-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72110-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IARBEw/aoGk+ngQAu9opvQ
-	(envelope-from <kvm+bounces-72109-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 00:41:03 +0100
+	id UHeyHJPaoGk+ngQAu9opvQ
+	(envelope-from <kvm+bounces-72110-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 00:43:15 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA1011B0F73
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 00:41:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9A0D1B0FCC
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 00:43:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ED7EB3018596
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 23:40:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 508A03069001
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 23:43:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21CF033291B;
-	Thu, 26 Feb 2026 23:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD973314A4;
+	Thu, 26 Feb 2026 23:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hzfEJy+/"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="gLN0v/HG";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AVqkdu04"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow-b7-smtp.messagingengine.com (flow-b7-smtp.messagingengine.com [202.12.124.142])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9AC3314AC
-	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 23:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368F33328E7;
+	Thu, 26 Feb 2026 23:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772149250; cv=none; b=kXOVgofMXfEUwyVr41VnAukDjUPFM2Py3TJkWMytX6o7+Mj/X8gE4d73wrxFlkIAJ/S4G95sBkcOgxgmF2iHm5V09PqDJLbUUJ3RXjTAdv6iKSn1QRLqxRI2KSe12Zg0eGbXt8TPVXaxDJVV/j0supWkfmayL4nZXiulnIh6QyI=
+	t=1772149367; cv=none; b=cJQojp8PA804Fap0z1f1b/G6wkpLtLmEUrHSBySHlz44LmaJh+2D1Xgz9ND101ZAXJTSgIZ8CDr4gofJJKgahQpAw8E76Gio8IlEHmFtrtc68GNRICIfp8yzZx3rbVU8668MtNwJxS2LQIBdAY4ZrM3RV4jqAaZkxUNmcyixucc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772149250; c=relaxed/simple;
-	bh=773E1Qu3WZaNjUpNYslYsC6fIc6QMX05+z2A/JT5Lmg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ss40Qhcb0JyAon2v0hJ2LPWfLSTQy2RHzsp8P6TozkWo21c0qW/lGbV1Wsu00zw0Py6NsXZvFYenfI1PSWeyrfWuf5D0cLU3jSLviImonJJ1ab9AxqAPoDUbLw0nWiuTpULUPtq97Q6ITDWx6dLlQ4KmNKZrZHhmBNEIgk+hB/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hzfEJy+/; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-c70bc5b4e86so584393a12.0
-        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 15:40:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772149247; x=1772754047; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dweZEP9P9syIIaIBNbJewu0YbCAV1KvejPrlkY4pDLk=;
-        b=hzfEJy+/xVgMtXdTO18W8dd4TxjvUCU3ZO16mrYqOOWsNM3Cfj7xMKd7kOOeIqtHyO
-         Bo7rfUDvMguucNMGYkRu0SYWYxm+MXGm5jdnkFayBykV3x/0dvRIMYw8eWrh/6ym+JQU
-         rEZGESpNfJQUH/FKbTsOeOmFQ/XEsY4woCWZiBO5FSetVDJSUEZSkkvqG3JVZn8sWorh
-         sNEumiWGre3q7OVZGoTe1clgaEMhB8jOemrj69eWBC//eGPOtk//SWjUpJVRBrcjheGj
-         j6JSOvbi0iTH/nHPYjXvCtefKb9o7tw/8VOHqXWiZfdHoM0iS7dOZZI/UXh9pXMWiSN1
-         iZPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772149247; x=1772754047;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dweZEP9P9syIIaIBNbJewu0YbCAV1KvejPrlkY4pDLk=;
-        b=nF24TrSNj+tKxZEK1J2G71UC+48c8hlWVpB+U7w+MOGlNXnDj2iPFbiufomkd3YuU0
-         EcT2Oe+0FSxaKeArXJKWE3AGs5Xw6O6Bpz8xlaoOFO8d6A3wX8GR1wfzgtbRQaJ0ySuE
-         gmKMuGMCMZmFHcLVsC8t0/r+CrxEqahLZx1wB5PsylxeGddLwg83yThC+vMC6loTcJ9L
-         BmVEFaWk4pyyiI4VhGoQ0GMRXpU7t4f/wzb1pMZYDKBRrH2DXqm0TyOf7DfhyfdysuyZ
-         h0wmnFwQeix+AUb/XZeNhn6nViKmuSvXYjjJsRaSOX3JOHq2PyhxTxTp9JGrNKtTbJY7
-         mW1w==
-X-Forwarded-Encrypted: i=1; AJvYcCVXCuIlUhX2UfNF9wMD5N8z4A3mocopJf8UeWea0TP90xbr2meq4cwnkSAAC43UMxOwOv4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoITTvR4/VbTvebN0nESHY2tQKE0d91VFzFrpIeTrYzdKkjuEs
-	/NrvFuzQ5o3pD/WNn4W9ZBy2lbR1RyFvURdMphituQIwOenZvZK9Eiwqchs+gaAkHA==
-X-Gm-Gg: ATEYQzx/Q1r2L8M1s+qNFR7RSicfyDihDIEVJGEWs+Fts0SVV/3IcXSUPsi8ZS7Bfeb
-	nAjYGNLXUE8UCpd1uywMb8PBQFt1JZj1LXIaBZDwUifBCilgeXe/39pEnp4CqJUOKkBmnBPd8tQ
-	XC9gzr9k7OM0zTDVVV6EN7UxPVhX637mGsvv70tmuNdgKmbQYhE+Q+63dBNEYWELO8X9OIhB6Ui
-	ziejYExJhf8W4Pa4Vx03AxpxakVjqxQUhjuLfiVPZ4Nezb/rSaJ+hWPvrpspeTgbm6BXjE4NMHo
-	jYUxjhP0PSFRTTgT/tiIJ84b+DoPhr2vhbJVwOMbeqS4ZQdZkpwAiyNvHsLF/NB9wlT2gYDGmrq
-	Bh+nMa93uJc7iQc1tPECpNnk25BamjlkS0SkSDbAeiz/N/JYcWKzqouDkO0TkBCxD4cC4DCwsAU
-	9S23ReGRdWQt4qwWNwPcm/UWohj4dBMYcNYcU9SpHw2hzyM6eIkWwDxWnw+qrWNQ==
-X-Received: by 2002:a17:903:22c9:b0:2ad:cede:3a18 with SMTP id d9443c01a7336-2ae2e46bd8emr6748745ad.33.1772149246778;
-        Thu, 26 Feb 2026 15:40:46 -0800 (PST)
-Received: from google.com (239.23.105.34.bc.googleusercontent.com. [34.105.23.239])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb5b257esm36167495ad.4.2026.02.26.15.40.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Feb 2026 15:40:45 -0800 (PST)
-Date: Thu, 26 Feb 2026 23:40:41 +0000
-From: David Matlack <dmatlack@google.com>
-To: Alex Williamson <alex@shazbot.org>
+	s=arc-20240116; t=1772149367; c=relaxed/simple;
+	bh=IENANlu85/u2WVrzmqkEiDnGXgZ22/KDKpTypluMqyQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cJuNWLQHyOnanul1muIoYTlFhDiEWBo90B7DhTH6e3WaKmPjTDy/hDTBCctV1qk2HVXEtP30clN3ajAkGCafAGqaHjsy0/WPwQ5ZOjiWwpMYyD8wZ999zam8f2BtAV997687wWpaQR98bVk8XC51jxgXQ9d7ol9Y07Sd4ORw9K4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=gLN0v/HG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AVqkdu04; arc=none smtp.client-ip=202.12.124.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailflow.stl.internal (Postfix) with ESMTP id B11A81300CD7;
+	Thu, 26 Feb 2026 18:42:41 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Thu, 26 Feb 2026 18:42:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1772149361;
+	 x=1772156561; bh=du7fewflJTiy4RY4M9JcEhPtcfpcGR3V2HHqx7PYFdQ=; b=
+	gLN0v/HGUd/V0nfv+tewCC0psNtLQyjZbWvqVO9SniKU+XNel86qvzNsxsTS2rhP
+	+Sasie1tUUqBrpPWrS09obG6ygRmkANwrxgWOkCDM99YeG1dyTDlauIbYKRX8PE2
+	WMakPQx/cPdRv4HjyoQeOHuAIZTAsaIRiUHu3wpM4uMYzA7nCBVjEz06MLdEm41A
+	Sd4QgIB3SB6ZjLRB8hTA+mwlxHlwx7LRGMAhY+tlWeo8q2rfRxajhWY6qzz8WA9h
+	w990EEzbp4MIikkoNHGMBz72bsWhYPccOx4lL3iso06dObf9sebg+f59s/ouRF2H
+	bgZsfIzIQ8mNqjwY526TqA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1772149361; x=
+	1772156561; bh=du7fewflJTiy4RY4M9JcEhPtcfpcGR3V2HHqx7PYFdQ=; b=A
+	Vqkdu04ZkIyGghzqKCUsqcO0POg3Ui7ZMXshuBnxTI388SOk5n10HzYar+rqSDAe
+	C/6uGkhD0UC469ivtIUm6MMC5QT+s8RjGroeEQvOS7hXEzSI7hPHQ1ifklfb12AJ
+	PZd4rLcWNzS3UBm315m+HpVcQYcoJZ47S4md1oBQZBtfB/90epcrjjt5NDuahanp
+	yQ3OJeL9M9U+r3JPhk7hScLGNo3WIMaBA+LMuiOdPtSeCN+7DALf2bLoYs+W0zFh
+	vTB1GITGhgd6ioaYRTmpsF+ZbOVhD3SSJMh1OEJPx8/oaB0nIvL/n0pYvarZcmQ1
+	/SgJdlDJNbNiv4KcTcrxQ==
+X-ME-Sender: <xms:cNqgaXpMmxoB3kSOky1mjx1TJLbpYE_Q3lq2_z-dSIS4jA6vVHQ8qA>
+    <xme:cNqgaec7-4keVSCV7QvjAX8g0Bou_cq9lPLalblxCAnCUWGc4psij64v2CSOOGvJO
+    09nNikj6hf5yRVfrj5XEWa0utzNlcS8aA1clUFTK3T5w5NPDwIqAQ>
+X-ME-Received: <xmr:cNqgaYaQZ8vQYnZbKPuXo5gMhT_Lqft1yYIxjfNrQSAa3SsKG1FQ_U4-QlY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeejgeegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
+    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
+    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
+    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepgeehpdhmohguvgep
+    shhmthhpohhuthdprhgtphhtthhopegumhgrthhlrggtkhesghhoohhglhgvrdgtohhmpd
+    hrtghpthhtoheprghjrgihrggthhgrnhgurhgrsehnvhhiughirgdrtghomhdprhgtphht
+    thhopehgrhgrfhesrghmrgiiohhnrdgtohhmpdhrtghpthhtoheprghmrghsthhrohesfh
+    gsrdgtohhmpdhrtghpthhtoheprghpohhpphhlvgesnhhvihguihgrrdgtohhmpdhrtghp
+    thhtoheprghkphhmsehlihhnuhigqdhfohhunhgurghtihhonhdrohhrghdprhgtphhtth
+    hopegrnhhkihhtrgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepsghhvghlghgrrghs
+    sehgohhoghhlvgdrtghomhdprhgtphhtthhopegthhhrihhslheskhgvrhhnvghlrdhorh
+    hg
+X-ME-Proxy: <xmx:cNqgaZBWGEMBMo6wAeDnQPoMQ1RB3_FyXD2bgYUBYWWoy3Nil71WIQ>
+    <xmx:cNqgabDwuVEK97fr6qnquLcLxnx5_OEE9X7aEzrRhC22YMC0y9IyVw>
+    <xmx:cNqgabV1-aqR1IFCc4MWo42xThetUjXbFjeGkiZ1NoD4KZoSUHe_tw>
+    <xmx:cNqgaSC5ljiRgzmy6yv2HrPe3PYxrEU4Q8gCyruiHKSfRU2iM0Ohlw>
+    <xmx:cdqgadKScMQkDT3KYeKNbDm9q2hUFzCVi1EFn1C9LtAtHYSjWGZ0Cjjz>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 26 Feb 2026 18:42:37 -0500 (EST)
+Date: Thu, 26 Feb 2026 16:42:36 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: David Matlack <dmatlack@google.com>
 Cc: Adithya Jayachandran <ajayachandra@nvidia.com>,
-	Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>,
-	David Rientjes <rientjes@google.com>,
-	Jacob Pan <jacob.pan@linux.microsoft.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Jonathan Corbet <corbet@lwn.net>, Josh Hilke <jrhilke@google.com>,
-	Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org,
-	kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	Lukas Wunner <lukas@wunner.de>,
-	 =?utf-8?Q?Micha=C5=82?= Winiarski <michal.winiarski@intel.com>,
-	Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pranjal Shrivastava <praan@google.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Tomita Moeko <tomitamoeko@gmail.com>,
-	Vipin Sharma <vipinsh@google.com>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
-	Zhu Yanjun <yanjun.zhu@linux.dev>
-Subject: Re: [PATCH v2 06/22] vfio/pci: Retrieve preserved device files after
- Live Update
-Message-ID: <aaDZ-ffs4kiUo3GY@google.com>
+ Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>,
+ Alistair Popple <apopple@nvidia.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Ankit Agrawal <ankita@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Chris Li <chrisl@kernel.org>, David Rientjes <rientjes@google.com>,
+ Jacob Pan <jacob.pan@linux.microsoft.com>,
+ Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Jonathan Corbet <corbet@lwn.net>, Josh Hilke <jrhilke@google.com>,
+ Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org,
+ kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
+ Leon Romanovsky <leonro@nvidia.com>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ Lukas Wunner <lukas@wunner.de>,
+ =?UTF-8?B?TWlj?= =?UTF-8?B?aGHFgg==?= Winiarski
+ <michal.winiarski@intel.com>, Mike Rapoport <rppt@kernel.org>,
+ Parav Pandit <parav@nvidia.com>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>,
+ Pranjal Shrivastava <praan@google.com>,
+ Pratyush Yadav <pratyush@kernel.org>,
+ Raghavendra Rao Ananta <rananta@google.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Saeed Mahameed <saeedm@nvidia.com>,
+ Samiullah Khawaja <skhawaja@google.com>,
+ Shuah Khan <skhan@linuxfoundation.org>,
+ Thomas =?UTF-8?B?SGVsbHN0csO2bQ==?= <thomas.hellstrom@linux.intel.com>,
+ Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>,
+ William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
+ Zhu Yanjun <yanjun.zhu@linux.dev>, alex@shazbot.org
+Subject: Re: [PATCH v2 08/22] vfio: Enforce preserved devices are retrieved
+ via LIVEUPDATE_SESSION_RETRIEVE_FD
+Message-ID: <20260226164236.1d091ffe@shazbot.org>
+In-Reply-To: <aaDW86eWuQLZ3cfP@google.com>
 References: <20260129212510.967611-1-dmatlack@google.com>
- <20260129212510.967611-7-dmatlack@google.com>
- <20260226155222.5452a741@shazbot.org>
+	<20260129212510.967611-9-dmatlack@google.com>
+	<20260226161512.532609ec@shazbot.org>
+	<aaDW86eWuQLZ3cfP@google.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260226155222.5452a741@shazbot.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm3,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev];
-	TAGGED_FROM(0.00)[bounces-72109-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[45];
+	FREEMAIL_CC(0.00)[nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev,shazbot.org];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-72110-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,kvm@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DA1011B0F73
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: C9A0D1B0FCC
 X-Rspamd-Action: no action
 
-On 2026-02-26 03:52 PM, Alex Williamson wrote:
-> On Thu, 29 Jan 2026 21:24:53 +0000 David Matlack <dmatlack@google.com> wrote:
+On Thu, 26 Feb 2026 23:27:47 +0000
+David Matlack <dmatlack@google.com> wrote:
 
-> > diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
-> > index 8ceca24ac136..935f84a35875 100644
-> > --- a/drivers/vfio/device_cdev.c
-> > +++ b/drivers/vfio/device_cdev.c
-> > @@ -52,6 +46,19 @@ int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep)
-> >  	vfio_device_put_registration(device);
-> >  	return ret;
-> >  }
-> > +EXPORT_SYMBOL_GPL(__vfio_device_fops_cdev_open);
+> On 2026-02-26 04:15 PM, Alex Williamson wrote:
+> > On Thu, 29 Jan 2026 21:24:55 +0000 David Matlack <dmatlack@google.com> wrote:  
 > 
-> I really dislike that we're exporting the underscore variant, which
-> implies it's an internal function that the caller should understand the
-> constraints, without outlining any constraints.
+> > > +	/*
+> > > +	 * This device was preserved across a Live Update. Accessing it via
+> > > +	 * VFIO_GROUP_GET_DEVICE_FD is not allowed.
+> > > +	 */
+> > > +	if (vfio_liveupdate_incoming_is_preserved(device)) {
+> > > +		vfio_device_put_registration(device);
+> > > +		return -EBUSY;  
+> > 
+> > Is this an EPERM issue then?  
 > 
-> I'm not sure what a good alternative is.  We can drop fops since this
-> isn't called from file_operations.  Maybe vfio_device_cdev_open_file().
-
-Ack. Due to the bug you pointed out below, I think the changes in this
-file will look fairly different in the next version. But no matter what
-I'll avoid exporting a underscore variant without outlining the
-constraints.
-
-> > +	/*
-> > +	 * Simulate opening the character device using an anonymous inode. The
-> > +	 * returned file has the same properties as a cdev file (e.g. operations
-> > +	 * are blocked until BIND_IOMMUFD is called).
-> > +	 */
-> > +	file = anon_inode_getfile_fmode("[vfio-device-liveupdate]",
-> > +					&vfio_device_fops, NULL,
-> > +					O_RDWR, FMODE_PREAD | FMODE_PWRITE);
-> > +	if (IS_ERR(file)) {
-> > +		ret = PTR_ERR(file);
-> > +		goto out;
-> > +	}
-> > +
-> > +	ret = __vfio_device_fops_cdev_open(device, file);
-> > +	if (ret) {
-> > +		fput(file);
+> I was thinking EBUSY in the sense that the device is only temporarily
+> inaccesible through this interface due it being in a preserved state as
+> part of a Live Update. Once the preserved device file is retreived and
+> closed, the device can be accessed again through
+> VFIO_GROUP_GET_DEVICE_FD.
 > 
-> Don't we end up calling vfio_device_fops.release with NULL
-> file->private_data here with inevitable segfaults?  Thanks,
+> EPERM might lead to confusion that there is a filesystem permission
+> issue?
 
-Yes indeed. In that case I think we need to call
-vfio_device_try_get_registration() and vfio_allocate_device_file()
-before anon_inode_getfile_fmode(). We could play games with file->fops
-to avoid it calling vfio_device_fops.release here instead, but that
-feels hacky.
+Ok, fair explanation.  Thanks,
+
+Alex
 
