@@ -1,113 +1,113 @@
-Return-Path: <kvm+bounces-71912-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71913-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cKo3EuqXn2k9cwQAu9opvQ
-	(envelope-from <kvm+bounces-71912-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 01:46:34 +0100
+	id AE1lL16Zn2mucwQAu9opvQ
+	(envelope-from <kvm+bounces-71913-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 01:52:46 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD7B619F900
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 01:46:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B0F919FA1B
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 01:52:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8ADEF3033BD1
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 00:46:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 688B330416DB
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 00:52:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EABB36F415;
-	Thu, 26 Feb 2026 00:46:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C0531984E;
+	Thu, 26 Feb 2026 00:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RL7yH3su"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Isym9Zp4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470DF36215D
-	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 00:46:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218EE2E62B3
+	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 00:52:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.175
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772066784; cv=pass; b=qll/BMYE/1KZspthFQpPaivMLxUm07vqwbcG4HoMVYdro7GMB/sZswC4HEu+MPsVaCXVBpcHA1G1lHvTtzr8XxN4CCXdmxNRAQfor/pQpVR0eSC326fhWa0v4zpEfLfVf/Cz6UqRWwEgg/iCuXh6k5OLwp5XCWfb3Cj39xMUnBw=
+	t=1772067139; cv=pass; b=ng41OlrDf28jsdKfuk+DCwcUXJg7b2OGmCIm3nIJO2V/m5nYP8mRR+0dU3C4UpHvkI+w6yVKgDvZAPNanfkrP7h7fmAnkiSXQfFyCyKJ9nDM0/b5EgIxmQ665SvnVlHh0gXM2vQo0SKqbebu5a8RzRCJmrvmFg/WoOGxhWnQvNU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772066784; c=relaxed/simple;
-	bh=WPcUxRWIf+xdW3rZUp57loGNhqTLwpDKpkxUCRZJXnY=;
+	s=arc-20240116; t=1772067139; c=relaxed/simple;
+	bh=5UM3OPrEzy38BQ/z8lTr67s9jTiNGfLCQhFUKKuIZuE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=frQzNd7XbSIF+KNrYJnGb55tXlX1HAR1qulHFeX9We/YKFZ2jnipj4Wk1kSA31TIkFwvG9VG9v+Jby9nyt02zfWLfi49CqA3FbGwqtlnzBbbE1c+ARXS3EHkvvKBJPgOMsLFKsZRV8CMyJGURu9l+DL/5N8CrF5il1pZuToVsjA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RL7yH3su; arc=pass smtp.client-ip=209.85.222.42
+	 To:Cc:Content-Type; b=Ne8t0KZphlUtf2bX56nEN0Khvkp3SLwctyWJSqMISbd+DpMH2rlLr6kUMNYoYCI30HTFAPCFvh2wFQmZL4Xtej4sL8u2qyk1PEEQ4F0VxZ5SOL+GYeLzQJFz2JwihfrO5neCNFXrYZu4N2TtXz8pp0Jh7iuNwf7bQUnPFltzTyY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Isym9Zp4; arc=pass smtp.client-ip=209.85.221.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-94dd7178d63so173046241.3
-        for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 16:46:23 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772066782; cv=none;
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5688b639a19so153012e0c.2
+        for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 16:52:17 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772067137; cv=none;
         d=google.com; s=arc-20240605;
-        b=NZZiyqAbFdIXw1hIQQoDiwS9sbAOQ0ZO6eK9M3FDIf2hEHlmmiLcF5TlmaAxEHbtLY
-         Xj0vSRbAyMVusk99aHMmAEdnm0fyJu4pC6thTaZLm8STKFkFVI/0k+dfieqonA0t0hyY
-         VjqfZUJhVNCUVAoo2P46CpdO/v1ybvhsiO97H3yyjy3e/5zXHU9rJGx0yRaVFaIeAriT
-         sAF+SHfJrpw0LBf87oxejRs1YjOZc96cy/FluOmwYrD9AD+gCx/DgQJcOGL5drpxX8bq
-         J85Sfvf2KGctIA9VEs77kxIBsEWx/BJ8VNqxV1fAadNosjmk+rf1gRsEBfV7tHK+aOeq
-         BnLA==
+        b=igJpb0Nlkc7RIkZ6As+j0FaA8cAFMgJHm6/Iv+LwQmo1U7DnCFtzFhQozamUKOiAHL
+         2KU3aFHhqy8LkNc42EuA3NeqywXSCowAfbLwu/Cjh3L19Z5mVHGC0FYATILHKhRJfUxa
+         gfSxwvJWH77F8OYtNTRu/ejdREtN31107fRWSJQ6b+nzztW+5A5Ub/maINFfQnQ/TW2j
+         bV37pnaposeo3RTVTpaUeRaRhJy5UJKb8Su9qWV4oGonot5OUg0RnKlh6BKq5Wn188zh
+         Eko+T+jfkMU+ZWs8sWT/1m7LF7YIARKeRSIQMAERkDUE4dIaj+elted38r79W+TgRUIc
+         f8CQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=ACpb0o7E3VaAsC1KFvr2yXYuV7ohO1EROiDs9rJDa00=;
-        fh=fJmKhhXVDLacC1VKnOJk7LF/i9bA0Xs/YVbHjAmo0Mo=;
-        b=Hqh+itvuhmpDhe7KvbpQhUWXotDFKYLuh4YLx5PpUBnM4/mcp1XcZ3ULPdf++ou0uX
-         DdHp+0+yFsA3/JETKGHcomgVW9d8beASLRiD9X2gIzjMdMdfu11InnJD15ZuIqgTggah
-         988/SKN/XDxelt4niMgIN2H0NUbliCSU5xxD5KA5nEqDU4nAJ+djp1H7VgrMXkD6kc8d
-         K8hSTmomOs2D5oQs0cg9/znjVVPi3eopagZJlRxZ1lJKhXTnAPCsWkj51ph3n5OjjQwl
-         GCYFqSnu04K8y3MvHLkIDBXpiYxMdQd2ODvReyYbKUN5IoMAyGiGzQxLb6qrXCjVpyK6
-         2eVg==;
+        bh=tit/ZfajxqvE3xISUpVUeXJRv5DgJC6ZdqyR1I2SKAc=;
+        fh=k3DT/jwrnVohNlmGYOZTSKjqCcjJGX1GQ5Lm3153TOc=;
+        b=FTTlnGZPbeumLlkORj2jPcf2t7/SnrqnccH/QYqv2jXC1VkajvGsWPzUkSJ5oYoEI2
+         t9vBxr0dk5MjAaUKnObe8Lmyo6yrY214e+o0EDK0Oy3ZIRHId8+xP4OzKpneGYgnBalo
+         PEnztiF5tnBL02GbwFSMtmPPFynxdasPkNczWDmSPCHV9+2xyvk5ycJj1g9If5pYLEn0
+         CKHgXNiy34gIQcwmWs+7o7Z087W7FNhKbPNmTxQHMG+jCQ5K1l790O1E6+TEy0F7cn93
+         Ct7yTwEAnMZ5qcru1oPQozWORpBcb+OxZDC6SB3VIASk4v0F2rSBt9apCukP0UlBrhZJ
+         AU2w==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772066782; x=1772671582; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772067137; x=1772671937; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ACpb0o7E3VaAsC1KFvr2yXYuV7ohO1EROiDs9rJDa00=;
-        b=RL7yH3sudTnq/XClkaOpF3fuWXUwGuIqMamfzIbLqr7qujx2xZe0DcpkmcUC7pE3nU
-         ZlU5K692jKuZVitqPgrzLEDQZYQk0eJeIbWEkOb2MtLDwVBZ9oYbS0eXyTQ5FNLiAjwc
-         FdiVg+nwiFAqo1ov/dnoj5KWN1G6zF5SKeofg5TuwnHMu0KjGZYY/y7HEZdug/q91atJ
-         BM7ZNRkC9gUeRWYKt3P3ulTmom2i7kp+/uDLB/Sa8RPZYKUnERBZveY94zFkdLU1HwmJ
-         Wogt1NZL2yCAafNB320aJceTY/6MTXu8q5NR/zFWbXLqStgoCH3jMnSWvTD7p0w3ECa3
-         eppw==
+        bh=tit/ZfajxqvE3xISUpVUeXJRv5DgJC6ZdqyR1I2SKAc=;
+        b=Isym9Zp4jjzR+PC3c/BniSDPSxJbrLU8884r+rart9fG1ueJm/2EFzUZ54EEDwayeH
+         4TElbvJ6sEuwu2Q91jPlhwmiNC15kR69yqOPhVJPvW2wHKUiI3ZQuEvDaubPPR5D993m
+         Hnp/o4nbcJCA4D1/8p1P4oraDX5owxN0FTeHHx1eObgCadot88UiLgxyonvldRh4c++g
+         zxEIpMNtWGmkw4Kjsp4F1Pk6APFcQZ8azzng1d+4eZdwvQfMelhgLDii/TcG/monS+0f
+         1Zte2TRT8ls6qpt0pJKTAa4dnhta0PRjvHW754pcnzj+v1EdXGsgPbefOu4Ncl8P2vbY
+         cZMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772066782; x=1772671582;
+        d=1e100.net; s=20230601; t=1772067137; x=1772671937;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ACpb0o7E3VaAsC1KFvr2yXYuV7ohO1EROiDs9rJDa00=;
-        b=o3g9YibGIvF8DJfxH1PbXm/BDS7ZzTE2otA3zjooh9jUR9Flu/CDbYUL4rqW/pK56w
-         Zez1Nn1JBHx7JIkQza/D1BO/M3qZb1R/mcXw9e5nWM1oCo+YpajIW7hEc2MPXaGMG7aI
-         U6m82evdbtrd0GPgQHE8bRzDv88rvbCEQEIOUkCQigyog88MYqF9bJlhKAJgZ4CidmBu
-         Vk177RSWG7UO6vufx89HrRJs3pTlLW/Fltmocw1oRmTSuGKlGTuiqfKvJUxPtQ4PzB6T
-         7hvgmRichFML0lk25BBwi9Ecc48lKdmuPmMTJUHwxwV6p8cBql9Rx0lhhc+9ninarZbG
-         F1TA==
-X-Forwarded-Encrypted: i=1; AJvYcCXV1bSg4TZSUZZrpmgQTW8LWo7dlnkKTEgLuM14X6CmgIIlGPYIDErFiVwtzTfDYvACt6g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDOz3fulmpj1zHEC4X+YP+erl0zBdaM3RlWnG6z7Zfysl1pQcb
-	7D7BBsm7d4pUHJapq470BReEqZj/6j3yHSfcLiY99365kopPkR275lNkjJ0bZ8gHnb0+tFA0ozu
-	giWd3Mo2hIGBK0J7PhC4xHgbxzXEKt4HO0GsmHTi7
-X-Gm-Gg: ATEYQzzXha2gteHJ5YTMQOC6ZU48TRZjgz4xS4g7dDL25FagsXdibNN2nZmSZpg4W4u
-	Yf6wgVUs/xN+kyW/HO5U/nyGpJTEHoPxFl3ySPv128I4/UEl/5HfUOngVSL1slHMvly/3bdfid5
-	Ktcv5SP0TAGvaLDxH4/lTZhToYeeGCKR5iEBMEQWSAdSXyxnp499FbTVDtOkQRYMSEfvELiV47H
-	r4uBAVWfbfxJJbR7lLPbi9zgS7DcUvo2u7pfcM1fsEWbhebX0vxuVtpaZsxE0DgY3GsVOdU5LoA
-	KM0eXL4=
-X-Received: by 2002:a05:6102:94d:b0:5e5:6eee:8adb with SMTP id
- ada2fe7eead31-5feb2e8f35emr8956594137.4.1772066781725; Wed, 25 Feb 2026
- 16:46:21 -0800 (PST)
+        bh=tit/ZfajxqvE3xISUpVUeXJRv5DgJC6ZdqyR1I2SKAc=;
+        b=Z50tOhrVSZt+279EU59uFVRGqnqlvP00MDCL0GLvXRBgRUNpIhYi3xYWdLku4oKKPo
+         wnpcqo0tYMIfk5m+F2oOW1W3FJfxV2Q7SOpK06kthEezl5fvirII6uiulaJjbf754hbX
+         bq/5RR1Sr7+WHZyl4IzkzWh0J26EBnf2O1ZwhoAFNgwsiNE9pM3BChL1BABB6/YJ8fxj
+         V49ONS5XIU5EQEl2cl8k1UnJBgz/DPShZ8UgTYTIKrpvQKuBzbROt3vm+Ts+kC3B7M1a
+         spLi+4elegxPemGOhTVnC10TklglzHp1ZQVSB6RbdQk6TnM6392Um1xkMXSJBkkl13dW
+         zliQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWaPwC+Myrdwn1ivSYeVxCrDiq9bQUqYHlt8dTCHieBRbiZEHSpF5wMF0Y8KRkRc/NuLGc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySjmePJVFAYDb36VjhIydqYrpeFsXWcBqGKsYfNi++asz8k2nF
+	eoAs/WYwbSIyowFsnpjk2lyubJ2KU5KIvU5fwT/Dauppads185f2X6aRtRroVgOurWpqQUgEKFh
+	XhvsytDBBdp6868owveSBLZ8LBV+wdmtNEnGc3w9M
+X-Gm-Gg: ATEYQzxdFv8kXMexG2/bJJfPrkEa/YaDV84+tfG8vkFViYGxn5Y8zT/7SyKOqhJ/URO
+	eVSzzYm773CTxoZjXl39mA0jlyG6cVTdJqbtbzLF/BNwlUGkSTel+G6O5weZLubCclIUJ8Z4CEn
+	HoNGQe0w71sBwp70XYxfChwEfB5Rs19NAcbeuA5RfSxH1QoJV4o7tjeZxpvZQ82mBIRDTRiv4ja
+	bv3BCRxMFPa/XrZc8at71z6BEMycg1HGUsdvwWA0QXzaq9IfzvJ4G2knZR//ezgrA54HUiIE6A8
+	KK1zLzg=
+X-Received: by 2002:a05:6102:3f0d:b0:5ed:f13:e58a with SMTP id
+ ada2fe7eead31-5ff1419f7b6mr1037473137.37.1772067136513; Wed, 25 Feb 2026
+ 16:52:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260129212510.967611-1-dmatlack@google.com> <20260129212510.967611-8-dmatlack@google.com>
- <aZ6rB-zmpaR3RLB_@google.com>
-In-Reply-To: <aZ6rB-zmpaR3RLB_@google.com>
+References: <20260129212510.967611-1-dmatlack@google.com> <20260129212510.967611-10-dmatlack@google.com>
+ <aZ606sDJxtfNF6qW@google.com>
+In-Reply-To: <aZ606sDJxtfNF6qW@google.com>
 From: David Matlack <dmatlack@google.com>
-Date: Wed, 25 Feb 2026 16:45:52 -0800
-X-Gm-Features: AaiRm53bfmGZyNFLKGENFMQ0ksttnoZ823ayheFdxpLxg9pxKiAgxb_V1e66-JA
-Message-ID: <CALzav=fQtLd0DfWcVku1BDUzcvvYu7MBY+=G7rMMr-gjLUioAA@mail.gmail.com>
-Subject: Re: [PATCH v2 07/22] vfio/pci: Notify PCI subsystem about devices
- preserved across Live Update
+Date: Wed, 25 Feb 2026 16:51:47 -0800
+X-Gm-Features: AaiRm51I1tTdJRO5CbbBFYwdOmR4S6VSPvkujC59eyupuwvOv4iLZLnGYRmW3DQ
+Message-ID: <CALzav=cH0-qqQJTOjDD7pHzsFeZOir5DoC3f1hhDg=jqK7vdgw@mail.gmail.com>
+Subject: Re: [PATCH v2 09/22] vfio/pci: Store incoming Live Update state in
+ struct vfio_pci_core_device
 To: Pranjal Shrivastava <praan@google.com>
 Cc: Alex Williamson <alex@shazbot.org>, Adithya Jayachandran <ajayachandra@nvidia.com>, 
 	Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>, 
@@ -137,11 +137,11 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-71912-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-71913-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -155,33 +155,55 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DD7B619F900
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 6B0F919FA1B
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026 at 11:56=E2=80=AFPM Pranjal Shrivastava <praan@google.=
+On Wed, Feb 25, 2026 at 12:38=E2=80=AFAM Pranjal Shrivastava <praan@google.=
 com> wrote:
-> On Thu, Jan 29, 2026 at 09:24:54PM +0000, David Matlack wrote:
+> On Thu, Jan 29, 2026 at 09:24:56PM +0000, David Matlack wrote:
 
-> >  int __init vfio_pci_liveupdate_init(void)
+> >  static bool vfio_pci_liveupdate_can_finish(struct liveupdate_file_op_a=
+rgs *args)
 > >  {
-> > +     int ret;
+> > -     return args->retrieved;
+> > +     struct vfio_pci_core_device *vdev;
+> > +     struct vfio_device *device;
 > > +
-> >       if (!liveupdate_enabled())
-> >               return 0;
-> >
-> > -     return liveupdate_register_file_handler(&vfio_pci_liveupdate_fh);
-> > +     ret =3D liveupdate_register_file_handler(&vfio_pci_liveupdate_fh)=
-;
-> > +     if (ret)
-> > +             return ret;
+> > +     if (!args->retrieved)
+> > +             return false;
+> > +
+> > +     device =3D vfio_device_from_file(args->file);
+> > +     vdev =3D container_of(device, struct vfio_pci_core_device, vdev);
+> > +
+> > +     /* Check that vdev->liveupdate_incoming_state is no longer in use=
+. */
+> > +     guard(mutex)(&device->dev_set->lock);
+> > +     return !vdev->liveupdate_incoming_state;
 >
-> Nit: We might need to handle the retval here if we remove the
-> liveupdate_enabled() check above (as discussed in patch 2).
+> Since we set this to NULL in the success path of vfio_pci_core_enable()
+> I'm wondering if a failure in vfio_pci_core_enable could cause a
+> resource leak? Because vfio_pci_liveupdate_can_finish() returns false
+> as long as that pointer is valid, a single device failure will
+> perpetually block the LIVEUPDATE_SESSION_FINISH IOCTL for the entire
+> session preventing the LUO from reclaiming KHO memory.
+>
+> Shall we also set vdev->liveupdate_incoming_state =3D NULL on the error
+> paths of vfio_pci_core_enable() ?
 
-I think you mean for the below call to pci_liveupdate_register_fh(),
-but yes agreed :).
+LIVEUPDATE_SESSION_FINISH will also perpetually fail if userspace
+never calls ioctl(VFIO_DEVICE_BIND_IOMMUFD) (which is what triggers
+vfio_pci_core_enable()). Or if that ioctl fails before it gets to
+vfio_pci_core_enable().
+
+It's not a great situation to be in, but this is why can_finish()
+exists as a callback. Userspace must properly and correctly restore
+all of the state in the session before the session can be cleaned up.
+And the kernel is not going to handle every possible edge case (some
+files in a session are restored but some are not), at least not
+initially. If userspace gets stuck and cannot recover a resource then
+userspace will have to reboot the host to get back to a healthy state.
 
