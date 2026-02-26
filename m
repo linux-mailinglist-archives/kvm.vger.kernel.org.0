@@ -1,168 +1,191 @@
-Return-Path: <kvm+bounces-72069-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72070-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qOyFIamaoGlVlAQAu9opvQ
-	(envelope-from <kvm+bounces-72069-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:10:33 +0100
+	id wNsyCS6coGlVlAQAu9opvQ
+	(envelope-from <kvm+bounces-72070-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:17:02 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04B681AE365
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:10:32 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 293B31AE3F4
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:17:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5BCDA3029C28
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 19:02:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BB95B300517B
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 19:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1FFE44103B;
-	Thu, 26 Feb 2026 19:02:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F7D44B664;
+	Thu, 26 Feb 2026 19:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B8Xuygti"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="ENrf3Xmu"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DAA644A711;
-	Thu, 26 Feb 2026 19:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46690426D05
+	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 19:08:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772132534; cv=none; b=EJiImlwGX+ogIXbrF0zR435Lo2/D+EH/ttrWomAi83RTZEsRpNH0mBPt1qMkAXDPYIQt5kAe7hb1W4azb05r9r56+yd1qHWkQiHgrKVBTC0to69kI+M6DPrgpaxmOnzW0066bi3rsAVg8/aFl0MJSRZ6lDlJkVblKSZfQqQ7EwA=
+	t=1772132884; cv=none; b=idYAglzoTfWpxaXt9+/jYGqO0NamL3Do54VuqPjHWG1v8IOeI/4Z1gihipgnKTKdfHm+MFUzewsadbhLrdOXzDWz27c+X0XJg86brGuzeE0L+uGI/ysYohRkrm4EqoKCO7f+ZTIevl8eyy32THvwmEWfrYUnOU04+ZZGraINuGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772132534; c=relaxed/simple;
-	bh=8h/c/rmrI2gBor80ij92SCLTbObsozh42LUTt8FpIAg=;
+	s=arc-20240116; t=1772132884; c=relaxed/simple;
+	bh=TCV8SHxQHsXrYuGIcmh++Ac4sy1d4lzsmHPaj831Y4g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oeG2pQrVYlHHo6lngvIypDxxT6kAnCSb531KP4S+KRoQOvcA0Y+ITAgWjg8xJodRn44xmyHyEC3vCxFn6YrdjnsX+tIqRjXH++ouj1+u8MPq8FfaDyvUEPTrStZNqSGhjH7C7pgwE6P1mHOElcwIv2TOZfZAqow7geyM5nfqeJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B8Xuygti; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95A23C116C6;
-	Thu, 26 Feb 2026 19:02:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772132533;
-	bh=8h/c/rmrI2gBor80ij92SCLTbObsozh42LUTt8FpIAg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B8Xuygti9gTOBGt9jg3ZVz1ODZyaHsVTuIdvOXwKFL1NtTN+phpIijtg1zgL1R3SY
-	 3C8HqkP7cwnhbNl25Qg9hVGT/GmJsIYwH++pWvPgHLU8TwvaLjQN6w0q4yHwjfFW+h
-	 EgZM78ZttYN8YtFtgKPALonpiLqYqkKNrj9GivIi4OfrxCI4YVfmOy+yDs8L9FBVfN
-	 WYTkJZ05Cj44siyXaJ2OssEUsGETqFHimZuFjukHnGKfcwocG0nkx2rKj4oxCokqXU
-	 ocEZt9oPpwsrwp7HTian9lMVzKRAlgb7UaBPxeaiGsh7ruKv7qRkE3CLFOrp2gE8Kd
-	 aB2z+G2hxiVwg==
-Date: Thu, 26 Feb 2026 11:02:13 -0800
-From: Kees Cook <kees@kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>, daniel@iogearbox.net,
-	gustavoars@kernel.org, jgg@ziepe.ca, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=n9A01USbUrPv8AetXC+WpwyT396JpReAvSX/83+n3ICxEG+GX+WQrL7S35cAclGZzyrwZu7ChbdTxcjevTRcG01+B/dBri5pBQr3l3JKr5Qcyqk8vzmQVwCHQP+rDUcpKgoNbXkN0iyaXUeKpf2jVdTfw/N9OhAOhfh6f9P5Z7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=ENrf3Xmu; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-896f9397ecdso15967716d6.3
+        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 11:07:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1772132879; x=1772737679; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2JiPECMiS4IcPtH3bhy01xeh4Gb/Awq8dGQAxIHV6Bg=;
+        b=ENrf3XmuAu2uaEKbD/sbqd0bBJ1pGgUNkD7Ey1teIkpFnRsaBC7IET+HVov1PcmGdN
+         kqctIkApeAddD2aZNQ6iTizYIuEnmK3gHQQ9qB0PbxtM5LuixAIB2r0WwDfqisLWjcP9
+         ajAAi8eKj1yAuQUYx/tBOw6bD6ggByBetJ0reWLC7kBcwNVkG9/s9KHVt+JNMpXq+Hyw
+         SPHybM9gc4B0u2hvkB7vs67/TaU8S1BHVHYkWFrp5XAeBctGpEzLyI/5HlCtOCM/qbgJ
+         SpaMF/o7JGUmAmSlfAW/925bVpUzUIUNK5JguzN4JFx8/1Tu/fD2N4P5uNRpnpEAv+G4
+         Q6ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772132879; x=1772737679;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2JiPECMiS4IcPtH3bhy01xeh4Gb/Awq8dGQAxIHV6Bg=;
+        b=oo/PatkTH8nOfWyfyLpKUcFFpVbas/xtRx3gZZFjlJMIxOkpfxb0+gQY8RLg0kEX9T
+         NYroriE/Lg47i0x8KC/hz2OGwn3dQyNcHBlNyMO1yUpBdjlx4B4bi9mAnCo5exe8Gdfa
+         lDnQZfsCgY6sR3gJe7zAc/q4wr6SLs909ixQnO4bljOzSHF7zWX/ao2R1l0HFIzJmpVC
+         31yrV0PMMKLpYVRg/o/NzlDVeJYek0L1qP2U8edOkZtzXhVPAF7k1wLJkxBSrbCggLZU
+         zfunXzAfdZSbB6yPHy/ChK955WP04DU6EysRTRR+1VLDcD/5rpyCpoOyVUtx2hsWeBcc
+         SzEw==
+X-Forwarded-Encrypted: i=1; AJvYcCUWigZuAn8G4PjXilXENNhja34mfr9+oPs/SIHgqNUJIVlMxzkgUrg3Hu+xcbgUIoZwX80=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBjW0NAUaKJanaNUzEpkq+eOBKD6u0+aIEIuDp7Vq773WVREeZ
+	z3oG2ISspKrb0lCx7OfMctyqAm6yNnYI5FIkdyz+vcviUmtRj4ZphrbCastamRQaa1g=
+X-Gm-Gg: ATEYQzxnj/FKOt9dTQpBzWsSkzsdCZyLHMWpTQ2Y2MRLIQPO/HfQ2Fsc4r4QtHq8skZ
+	tIqfxHHI42DpYEMb0Fss8IdjTn+tyKrnW7lva4hWs/XCAD4E1/sfLSg65kbJiKub4Lxp13W83oc
+	VHb3M6H/4pY+omBEwtOCLpLi3EEhgSdvHPXhrRdR+Wj8jNrprrGQfGwbQbnH0V8RNRByBFqTSma
+	sXM7rOwPCPliR8HNZTaNZMDDdzr6mUJ7sT3csDJ6DixT9LkdFmHqcx385PDpFh6iW8aRPM5FXoo
+	xyvoFWIKqF0x1k3DgRnd+OpKST3tfSmU2cIrQAdDti6j3L7NF1K42ZtRlHl2In/qyww550hMx4w
+	gJWKjU8qlxgyFjwSB9BpCOyIKCczSv7ni+ZzkNEMG2pGAkOdv5H6nODYRHmDrCHXwAi9vxZSzpr
+	1GZZc2D77c2wbQ6CcuLZl46ZXE7r2Q+dYuGHWgwqW0H2X/HK908SKpnWm5X+zf9PqpYkfDdyVRb
+	GibX0CT
+X-Received: by 2002:a05:6214:252f:b0:882:3781:e29d with SMTP id 6a1803df08f44-899d1d7250dmr3034716d6.10.1772132878800;
+        Thu, 26 Feb 2026 11:07:58 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899c7376847sm24657116d6.28.2026.02.26.11.07.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Feb 2026 11:07:58 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vvgiL-00000000O8A-1yT1;
+	Thu, 26 Feb 2026 15:07:57 -0400
+Date: Thu, 26 Feb 2026 15:07:57 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Alexey Kardashevskiy <aik@amd.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH] KVM: x86: Fix C++ user API for structures with variable
- length arrays
-Message-ID: <202602261053.78753BF1C@keescook>
-References: <aaa7ac93db25459fa5a629d0da5abf13e93d8301.camel@infradead.org>
- <da02314c-e6da-4d9e-a2c8-cd3ee096bc0c@embeddedor.com>
- <97d40dd0e6abaf28f43d4d8ccf9c547a16c52e33.camel@infradead.org>
+	Steve Sistare <steven.sistare@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>, iommu@lists.linux.dev,
+	linux-coco@lists.linux.dev, Dan Williams <dan.j.williams@intel.com>,
+	Santosh Shukla <santosh.shukla@amd.com>,
+	"Pratik R . Sampat" <prsampat@amd.com>,
+	Fuad Tabba <tabba@google.com>, Xu Yilun <yilun.xu@linux.intel.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	michael.roth@amd.com, vannapurve@google.com
+Subject: Re: [RFC PATCH kernel] iommufd: Allow mapping from KVM's guest_memfd
+Message-ID: <20260226190757.GA44359@ziepe.ca>
+References: <20260225075211.3353194-1-aik@amd.com>
+ <aZ7-tTpobKiCFT5L@google.com>
+ <CAEvNRgEiod74cRoVQVC5LUbWDZf6Wwz1ssjQN0fveN=RBAjsTw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <97d40dd0e6abaf28f43d4d8ccf9c547a16c52e33.camel@infradead.org>
+In-Reply-To: <CAEvNRgEiod74cRoVQVC5LUbWDZf6Wwz1ssjQN0fveN=RBAjsTw@mail.gmail.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-72070-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[ziepe.ca:+];
+	DMARC_NA(0.00)[ziepe.ca];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72069-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kees@kernel.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	MIME_TRACE(0.00)[0:+];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amazon.co.uk:email]
-X-Rspamd-Queue-Id: 04B681AE365
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 293B31AE3F4
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 11:44:21AM +0000, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On Thu, Feb 26, 2026 at 12:19:52AM -0800, Ackerley Tng wrote:
+> Sean Christopherson <seanjc@google.com> writes:
 > 
-> Commit 94dfc73e7cf4 ("treewide: uapi: Replace zero-length arrays with
-> flexible-array members") broke the userspace API for C++. Not just in
-> the sense of 'userspace needs to be updated, but UAPI is supposed to be
-> stable", but broken in the sense that I can't actually see *how* the
-> structures can be used from C++ in the same way that they were usable
-> before.
+> > On Wed, Feb 25, 2026, Alexey Kardashevskiy wrote:
+> >> For the new guest_memfd type, no additional reference is taken as
+> >> pinning is guaranteed by the KVM guest_memfd library.
+> >>
+> >> There is no KVM-GMEMFD->IOMMUFD direct notification mechanism as
+> >> the assumption is that:
+> >> 1) page stage change events will be handled by VMM which is going
+> >> to call IOMMUFD to remap pages;
+> >> 2) shrinking GMEMFD equals to VM memory unplug and VMM is going to
+> >> handle it.
+> >
+> > The VMM is outside of the kernel's effective TCB.  Assuming the VMM will always
+> > do the right thing is a non-starter.
 > 
-> These structures ending in VLAs are typically a *header*, which can be
-> followed by an arbitrary number of entries. Userspace typically creates
-> a larger structure with some non-zero number of entries, for example in
-> QEMU's kvm_arch_get_supported_msr_feature():
-> 
->     struct {
->         struct kvm_msrs info;
->         struct kvm_msr_entry entries[1];
->     } msr_data = {};
-> 
-> While that works in C, it fails in C++ with an error like:
->  flexible array member ‘kvm_msrs::entries’ not at end of ‘struct msr_data’
-> 
-> Fix this by using __DECLARE_FLEX_ARRAY() for the VLA, which is a helper
-> provided by <linux/stddef.h> that already uses [0] for C++ compilation.
+> I think looking up the guest_memfd file from the userspace address
+> (uptr) is a good start
 
-This is likely the best plan for these cases. I had to do similar for
-ACPICA upstream, leaving these flex arrays as [0] for the non-GCC (and
-Clang) builds:
-https://github.com/acpica/acpica/commit/e73b227e8e475c20cc394f237ea35d592fdf9ec3
+Please no, if we need complicated things like notifiers then it is
+better to start directly with the struct file interface and get
+immediately into some guestmemfd API instead of trying to get their
+from a VMA. A VMA doesn't help in any way and just complicates things.
 
-> Also put the header fields into a struct_group() to provide (in C) a
-> separate struct (e.g 'struct kvm_msrs_hdr') without the trailing VLA.
+> I didn't think of this before LPC but forcing unmapping during
+> truncation (aka shrinking guest_memfd) is probably necessary for overall
+> system stability and correctness, so notifying and having guest_memfd
+> track where its pages were mapped in the IOMMU is necessary. Whether or
+> not to unmap during conversions could be a arch-specific thing, but all
+> architectures would want the memory unmapped if the memory is removed
+> from guest_memfd ownership.
 
-Right, my only worry is if C++ would want those header structs too. In
-that case, you'd probably want to use a macro to include them (since not
-all compilers are supporting transparent struct members yet):
+Things like truncate are a bit easier to handle, you do need a
+protective notifier, but if it detects truncate while an iommufd area
+still covers the truncated region it can just revoke the whole
+area. Userspace made a mistake and gets burned but the kernel is
+safe. We don't need something complicated kernel side to automatically
+handle removing just the slice of truncated guestmemfd, for example.
 
-#define __kvm_msrs_hdr	\
-	__u32 nmsrs; /* number of msrs in entries */	\
-	__u32 pad
+If guestmemfd is fully pinned and cannot free memory outside of
+truncate that may be good enough (though somehow I think that is not
+the case) - and I don't understand what issues Intel has with iommu
+access.
 
-struct kvm_msrs_hdr {
-	__kvm_msrs_hdr;
-};
-
-struct kvm_msrs {
-	__kvm_msrs_hdr;
-	__DECLARE_FLEX_ARRAY(struct kvm_msr_entry, entries);
-};
-
-> Fixes: 94dfc73e7cf4 ("treewide: uapi: Replace zero-length arrays with flexible-array members")
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-
-Regardless:
-
-Reviewed-by: Kees Cook <kees@kernel.org>
-
-
--- 
-Kees Cook
+Jason
 
