@@ -1,205 +1,184 @@
-Return-Path: <kvm+bounces-72110-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72111-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UHeyHJPaoGk+ngQAu9opvQ
-	(envelope-from <kvm+bounces-72110-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 00:43:15 +0100
+	id CD3EFJvaoGk+ngQAu9opvQ
+	(envelope-from <kvm+bounces-72111-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 00:43:23 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9A0D1B0FCC
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 00:43:14 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4FB71B0FD3
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 00:43:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 508A03069001
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 23:43:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 84F09304E7C4
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 23:43:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD973314A4;
-	Thu, 26 Feb 2026 23:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B603346AB;
+	Thu, 26 Feb 2026 23:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="gLN0v/HG";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AVqkdu04"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qCYTTfVl"
 X-Original-To: kvm@vger.kernel.org
-Received: from flow-b7-smtp.messagingengine.com (flow-b7-smtp.messagingengine.com [202.12.124.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368F33328E7;
-	Thu, 26 Feb 2026 23:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96521E5B63
+	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 23:43:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772149367; cv=none; b=cJQojp8PA804Fap0z1f1b/G6wkpLtLmEUrHSBySHlz44LmaJh+2D1Xgz9ND101ZAXJTSgIZ8CDr4gofJJKgahQpAw8E76Gio8IlEHmFtrtc68GNRICIfp8yzZx3rbVU8668MtNwJxS2LQIBdAY4ZrM3RV4jqAaZkxUNmcyixucc=
+	t=1772149389; cv=none; b=HkX0JdJxvs1EHJKvIJWhtSQtrrlklAMAdNrTxdkNIPDig7LkAh2J3CHgciHNew9X+VVjx+L7GNzf8ac5Qurg1ruPeya2PddqPzhIqOG2kjHAPZo8iiZ8yxsRTFNOKapsJcHsNR0Eszl93TqL9Uy6+ncP9uMRKG60zn13dIV8vug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772149367; c=relaxed/simple;
-	bh=IENANlu85/u2WVrzmqkEiDnGXgZ22/KDKpTypluMqyQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cJuNWLQHyOnanul1muIoYTlFhDiEWBo90B7DhTH6e3WaKmPjTDy/hDTBCctV1qk2HVXEtP30clN3ajAkGCafAGqaHjsy0/WPwQ5ZOjiWwpMYyD8wZ999zam8f2BtAV997687wWpaQR98bVk8XC51jxgXQ9d7ol9Y07Sd4ORw9K4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=gLN0v/HG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AVqkdu04; arc=none smtp.client-ip=202.12.124.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailflow.stl.internal (Postfix) with ESMTP id B11A81300CD7;
-	Thu, 26 Feb 2026 18:42:41 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Thu, 26 Feb 2026 18:42:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1772149361;
-	 x=1772156561; bh=du7fewflJTiy4RY4M9JcEhPtcfpcGR3V2HHqx7PYFdQ=; b=
-	gLN0v/HGUd/V0nfv+tewCC0psNtLQyjZbWvqVO9SniKU+XNel86qvzNsxsTS2rhP
-	+Sasie1tUUqBrpPWrS09obG6ygRmkANwrxgWOkCDM99YeG1dyTDlauIbYKRX8PE2
-	WMakPQx/cPdRv4HjyoQeOHuAIZTAsaIRiUHu3wpM4uMYzA7nCBVjEz06MLdEm41A
-	Sd4QgIB3SB6ZjLRB8hTA+mwlxHlwx7LRGMAhY+tlWeo8q2rfRxajhWY6qzz8WA9h
-	w990EEzbp4MIikkoNHGMBz72bsWhYPccOx4lL3iso06dObf9sebg+f59s/ouRF2H
-	bgZsfIzIQ8mNqjwY526TqA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1772149361; x=
-	1772156561; bh=du7fewflJTiy4RY4M9JcEhPtcfpcGR3V2HHqx7PYFdQ=; b=A
-	Vqkdu04ZkIyGghzqKCUsqcO0POg3Ui7ZMXshuBnxTI388SOk5n10HzYar+rqSDAe
-	C/6uGkhD0UC469ivtIUm6MMC5QT+s8RjGroeEQvOS7hXEzSI7hPHQ1ifklfb12AJ
-	PZd4rLcWNzS3UBm315m+HpVcQYcoJZ47S4md1oBQZBtfB/90epcrjjt5NDuahanp
-	yQ3OJeL9M9U+r3JPhk7hScLGNo3WIMaBA+LMuiOdPtSeCN+7DALf2bLoYs+W0zFh
-	vTB1GITGhgd6ioaYRTmpsF+ZbOVhD3SSJMh1OEJPx8/oaB0nIvL/n0pYvarZcmQ1
-	/SgJdlDJNbNiv4KcTcrxQ==
-X-ME-Sender: <xms:cNqgaXpMmxoB3kSOky1mjx1TJLbpYE_Q3lq2_z-dSIS4jA6vVHQ8qA>
-    <xme:cNqgaec7-4keVSCV7QvjAX8g0Bou_cq9lPLalblxCAnCUWGc4psij64v2CSOOGvJO
-    09nNikj6hf5yRVfrj5XEWa0utzNlcS8aA1clUFTK3T5w5NPDwIqAQ>
-X-ME-Received: <xmr:cNqgaYaQZ8vQYnZbKPuXo5gMhT_Lqft1yYIxjfNrQSAa3SsKG1FQ_U4-QlY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeejgeegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
-    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
-    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepgeehpdhmohguvgep
-    shhmthhpohhuthdprhgtphhtthhopegumhgrthhlrggtkhesghhoohhglhgvrdgtohhmpd
-    hrtghpthhtoheprghjrgihrggthhgrnhgurhgrsehnvhhiughirgdrtghomhdprhgtphht
-    thhopehgrhgrfhesrghmrgiiohhnrdgtohhmpdhrtghpthhtoheprghmrghsthhrohesfh
-    gsrdgtohhmpdhrtghpthhtoheprghpohhpphhlvgesnhhvihguihgrrdgtohhmpdhrtghp
-    thhtoheprghkphhmsehlihhnuhigqdhfohhunhgurghtihhonhdrohhrghdprhgtphhtth
-    hopegrnhhkihhtrgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepsghhvghlghgrrghs
-    sehgohhoghhlvgdrtghomhdprhgtphhtthhopegthhhrihhslheskhgvrhhnvghlrdhorh
-    hg
-X-ME-Proxy: <xmx:cNqgaZBWGEMBMo6wAeDnQPoMQ1RB3_FyXD2bgYUBYWWoy3Nil71WIQ>
-    <xmx:cNqgabDwuVEK97fr6qnquLcLxnx5_OEE9X7aEzrRhC22YMC0y9IyVw>
-    <xmx:cNqgabV1-aqR1IFCc4MWo42xThetUjXbFjeGkiZ1NoD4KZoSUHe_tw>
-    <xmx:cNqgaSC5ljiRgzmy6yv2HrPe3PYxrEU4Q8gCyruiHKSfRU2iM0Ohlw>
-    <xmx:cdqgadKScMQkDT3KYeKNbDm9q2hUFzCVi1EFn1C9LtAtHYSjWGZ0Cjjz>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 26 Feb 2026 18:42:37 -0500 (EST)
-Date: Thu, 26 Feb 2026 16:42:36 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: David Matlack <dmatlack@google.com>
-Cc: Adithya Jayachandran <ajayachandra@nvidia.com>,
- Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>,
- Alistair Popple <apopple@nvidia.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Ankit Agrawal <ankita@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Chris Li <chrisl@kernel.org>, David Rientjes <rientjes@google.com>,
- Jacob Pan <jacob.pan@linux.microsoft.com>,
- Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Jonathan Corbet <corbet@lwn.net>, Josh Hilke <jrhilke@google.com>,
- Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org,
- kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
- Leon Romanovsky <leonro@nvidia.com>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org,
- Lukas Wunner <lukas@wunner.de>,
- =?UTF-8?B?TWlj?= =?UTF-8?B?aGHFgg==?= Winiarski
- <michal.winiarski@intel.com>, Mike Rapoport <rppt@kernel.org>,
- Parav Pandit <parav@nvidia.com>,
- Pasha Tatashin <pasha.tatashin@soleen.com>,
- Pranjal Shrivastava <praan@google.com>,
- Pratyush Yadav <pratyush@kernel.org>,
- Raghavendra Rao Ananta <rananta@google.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Saeed Mahameed <saeedm@nvidia.com>,
- Samiullah Khawaja <skhawaja@google.com>,
- Shuah Khan <skhan@linuxfoundation.org>,
- Thomas =?UTF-8?B?SGVsbHN0csO2bQ==?= <thomas.hellstrom@linux.intel.com>,
- Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>,
- William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
- Zhu Yanjun <yanjun.zhu@linux.dev>, alex@shazbot.org
-Subject: Re: [PATCH v2 08/22] vfio: Enforce preserved devices are retrieved
- via LIVEUPDATE_SESSION_RETRIEVE_FD
-Message-ID: <20260226164236.1d091ffe@shazbot.org>
-In-Reply-To: <aaDW86eWuQLZ3cfP@google.com>
-References: <20260129212510.967611-1-dmatlack@google.com>
-	<20260129212510.967611-9-dmatlack@google.com>
-	<20260226161512.532609ec@shazbot.org>
-	<aaDW86eWuQLZ3cfP@google.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1772149389; c=relaxed/simple;
+	bh=nYT1y/hhQW/86aS4ZN4OJ957tRCJesbnqHhi2ZZK9B8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=pPXqMd7i7bnVn4hfFx+aiDw+qYB9gExXP/BvDaoujqe8QbSoj5Z+jjggMQTfuIGlLUS31lEASeWUKt24Qluo40tRCPcnucRSOrhi1Re696cOhGDeeKBWM8jeoRamWgN81XUXAb7f3MJpx9ASZpw3TH42b/Av8/lqgznQ9+oqQ6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qCYTTfVl; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35449510446so1196913a91.0
+        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 15:43:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772149385; x=1772754185; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5xV9Fp9Mp3wKt/HL2xKn2gAO+TqSS/NXayrdSUMZqB8=;
+        b=qCYTTfVlC5qn1oHz+Yt5dDM0Wbprkq41lljrj9akTAHgLb6cwitfub0zVDC9L3kQzd
+         j9cOt6j5Pcei1A3/pxH+yCYN1BUJSPH5/dradmt+e4N/exOmCCftjKWWzCE7S7s8ZlmC
+         ZS7hGiFTDwARJeczyDmkq58s/+FetZDp8wQQtYQbClPrtyHJjmZaXJl96OOnTh4GDH2H
+         X7daTeVOqlUpdv8wPsAg/NFhq3ocM46yHsRuUJGjmE6ziIGZTfBEZw9ZMj77TaDZ2td1
+         oOW8GGpbOdc+F2tA3lvrb2YjybB5aVCYfS4ok8pBvF14W1rpsXpUQ908VyAQ2VTea7QG
+         7X5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772149385; x=1772754185;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5xV9Fp9Mp3wKt/HL2xKn2gAO+TqSS/NXayrdSUMZqB8=;
+        b=dvV66HVotv81W4eV4RbD+WC9sEYROym2KYES08oZnkSJDH7dVAZRAN8A9qBcAIR+JC
+         5Kt1ykT4d36bD0co5ii5EycNMAicb9OI6H8cmHCkK3c4Cv897oWxqYTzBaCBev/WY9RZ
+         WsspYQ2T86AINGqp715lWJGMfU1MhCoKQtUWQIk37ROJdnRzipN0JloytDMK9R3rkzXw
+         vNaz/sbEbnZBFkJemUJiuCaheIPp5ggIbEzNW8NJh7+WL+6AR4dRJPyNJvKS0wlzZKSa
+         0oxXbsdZAo8vBHyOi+ScA6rDSW78a1ahrHWjk8GNpIvyeGqZoKKhBwkahRbuOXzuYOvD
+         aGQA==
+X-Forwarded-Encrypted: i=1; AJvYcCXUEQ4OOai4oVnijUfrHkEqzPDgLi57ZEbgUsEZ+Zy6xfW2O3XQ3bCe3vfgK9IzHQR67oU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRdjwFREOgGS+jTszhsduMTXRwFKFbDisoqpJcvJpuu6IOOsi8
+	PacjM1fqWFW/WBLAEU/TxtNKaKohrutiQXmlV37PCO7j+3F+toXXxCgMJ8XosejtHwgdftPZPRC
+	gvXaxjw==
+X-Received: from pjwo21.prod.google.com ([2002:a17:90a:d255:b0:356:213e:d56e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5710:b0:356:23be:7ecb
+ with SMTP id 98e67ed59e1d1-35965c34bc7mr627146a91.12.1772149384979; Thu, 26
+ Feb 2026 15:43:04 -0800 (PST)
+Date: Thu, 26 Feb 2026 15:43:03 -0800
+In-Reply-To: <aZ/5CDmCa8O5vrFZ@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20260214012702.2368778-1-seanjc@google.com> <20260214012702.2368778-8-seanjc@google.com>
+ <aZ/5CDmCa8O5vrFZ@intel.com>
+Message-ID: <aaDah8QSFqWpNvqY@google.com>
+Subject: Re: [PATCH v3 07/16] KVM: SVM: Move core EFER.SVME enablement to kernel
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	Kiryl Shutsemau <kas@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-coco@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, Xu Yilun <yilun.xu@linux.intel.com>, 
+	Dan Williams <dan.j.williams@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm3,messagingengine.com:s=fm3];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[45];
-	FREEMAIL_CC(0.00)[nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev,shazbot.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-72110-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72111-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: C9A0D1B0FCC
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C4FB71B0FD3
 X-Rspamd-Action: no action
 
-On Thu, 26 Feb 2026 23:27:47 +0000
-David Matlack <dmatlack@google.com> wrote:
-
-> On 2026-02-26 04:15 PM, Alex Williamson wrote:
-> > On Thu, 29 Jan 2026 21:24:55 +0000 David Matlack <dmatlack@google.com> wrote:  
-> 
-> > > +	/*
-> > > +	 * This device was preserved across a Live Update. Accessing it via
-> > > +	 * VFIO_GROUP_GET_DEVICE_FD is not allowed.
-> > > +	 */
-> > > +	if (vfio_liveupdate_incoming_is_preserved(device)) {
-> > > +		vfio_device_put_registration(device);
-> > > +		return -EBUSY;  
+On Thu, Feb 26, 2026, Chao Gao wrote:
+> >-static inline void kvm_cpu_svm_disable(void)
+> >-{
+> >-	uint64_t efer;
+> >-
+> >-	wrmsrq(MSR_VM_HSAVE_PA, 0);
+> >-	rdmsrq(MSR_EFER, efer);
+> >-	if (efer & EFER_SVME) {
+> >-		/*
+> >-		 * Force GIF=1 prior to disabling SVM, e.g. to ensure INIT and
+> >-		 * NMI aren't blocked.
+> >-		 */
+> >-		stgi();
+> >-		wrmsrq(MSR_EFER, efer & ~EFER_SVME);
+> >-	}
+> >-}
+> >-
+> > static void svm_emergency_disable_virtualization_cpu(void)
+> > {
+> >-	virt_rebooting = true;
+> >-
+> >-	kvm_cpu_svm_disable();
+> >+	wrmsrq(MSR_VM_HSAVE_PA, 0);
+> > }
 > > 
-> > Is this an EPERM issue then?  
+> > static void svm_disable_virtualization_cpu(void)
+> >@@ -507,7 +489,7 @@ static void svm_disable_virtualization_cpu(void)
+> > 	if (tsc_scaling)
+> > 		__svm_write_tsc_multiplier(SVM_TSC_RATIO_DEFAULT);
+> > 
+> >-	kvm_cpu_svm_disable();
+> >+	x86_svm_disable_virtualization_cpu();
 > 
-> I was thinking EBUSY in the sense that the device is only temporarily
-> inaccesible through this interface due it being in a preserved state as
-> part of a Live Update. Once the preserved device file is retreived and
-> closed, the device can be accessed again through
-> VFIO_GROUP_GET_DEVICE_FD.
-> 
-> EPERM might lead to confusion that there is a filesystem permission
-> issue?
+> There's a functional change here. The new x86_svm_disable_virtualization_cpu()
+> doesn't reset MSR_VM_HSAVE_PA, but the old kvm_cpu_svm_disable() does.
 
-Ok, fair explanation.  Thanks,
+Doh.  I'll squash this as fixup, assuming there are no other goofs:
 
-Alex
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 5f033bf3ba83..fc08450cb4b7 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -490,6 +490,7 @@ static void svm_disable_virtualization_cpu(void)
+                __svm_write_tsc_multiplier(SVM_TSC_RATIO_DEFAULT);
+ 
+        x86_svm_disable_virtualization_cpu();
++       wrmsrq(MSR_VM_HSAVE_PA, 0);
+ 
+        amd_pmu_disable_virt();
+ }
+
+Very nice catch!
+
+P.S. This reminded me that there's a lurking wart with __sev_snp_init_locked()
+where it forces MSR_VM_HSAVE_PA to '0' on all CPUs.  That's firmly a "hypervisor"
+thing so it doesn't really fit here (and code wise it's also kludgy), just thought
+I'd mention it in case someone has a brilliant idea and/or runs into problems with
+it.  IIRC, we ran into a problem where __sev_snp_init_locked() clobbered KVM's
+value, but I think the underlying problem was effectively fixed by commit
+6f1d5a3513c2 ("KVM: SVM: Add support to initialize SEV/SNP functionality in KVM").
+
 
