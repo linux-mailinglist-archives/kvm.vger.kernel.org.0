@@ -1,90 +1,89 @@
-Return-Path: <kvm+bounces-72070-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72071-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wNsyCS6coGlVlAQAu9opvQ
-	(envelope-from <kvm+bounces-72070-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:17:02 +0100
+	id UD1iJF6foGlVlAQAu9opvQ
+	(envelope-from <kvm+bounces-72071-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:30:38 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 293B31AE3F4
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:17:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A251AE5C1
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:30:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BB95B300517B
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 19:08:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BBB8B305A206
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 19:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F7D44B664;
-	Thu, 26 Feb 2026 19:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919AB44CF55;
+	Thu, 26 Feb 2026 19:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="ENrf3Xmu"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="hJ1eiqtB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46690426D05
-	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 19:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D192441045
+	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 19:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772132884; cv=none; b=idYAglzoTfWpxaXt9+/jYGqO0NamL3Do54VuqPjHWG1v8IOeI/4Z1gihipgnKTKdfHm+MFUzewsadbhLrdOXzDWz27c+X0XJg86brGuzeE0L+uGI/ysYohRkrm4EqoKCO7f+ZTIevl8eyy32THvwmEWfrYUnOU04+ZZGraINuGQ=
+	t=1772134028; cv=none; b=qH5QS41X06RjRfmzTnOlwc5PwH3tzZ29qSEF2lnE+4Xz1JHxtm+hfuCtrCHEqz9MlJ8FSAP9iORZ3+I/xq+Wx6HpMqsEd5DROlYT36TD/w8ooI+/o5cdVw+3Ej+cKu5ZL8oAuxEhb76Tq2Nw1fq4UugyOgRq/B9vCKLVzd4u/28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772132884; c=relaxed/simple;
-	bh=TCV8SHxQHsXrYuGIcmh++Ac4sy1d4lzsmHPaj831Y4g=;
+	s=arc-20240116; t=1772134028; c=relaxed/simple;
+	bh=pTOdXcn8havDpB/nGx2tDUoWLjBch4ocjJIaSDJa3XQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n9A01USbUrPv8AetXC+WpwyT396JpReAvSX/83+n3ICxEG+GX+WQrL7S35cAclGZzyrwZu7ChbdTxcjevTRcG01+B/dBri5pBQr3l3JKr5Qcyqk8vzmQVwCHQP+rDUcpKgoNbXkN0iyaXUeKpf2jVdTfw/N9OhAOhfh6f9P5Z7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=ENrf3Xmu; arc=none smtp.client-ip=209.85.219.48
+	 Content-Type:Content-Disposition:In-Reply-To; b=fVLM9wa5vDC+w3wPL6uTFk57Vuay7zdQ8+3txtd/BPfyFHPG9wEx2KOIKHFzCH/Yn3TErJ8z2d73LWZCDo5Sbgs60HkjgNhTsoKD7o9FWpelch+o+b9vQd2MqQlQDblImMdB94zywv18a5xa0ZNrHBbql90Z2gmo/a+o7nurNHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=hJ1eiqtB; arc=none smtp.client-ip=209.85.160.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-896f9397ecdso15967716d6.3
-        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 11:07:59 -0800 (PST)
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-506a747448dso10595341cf.0
+        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 11:27:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1772132879; x=1772737679; darn=vger.kernel.org;
+        d=ziepe.ca; s=google; t=1772134022; x=1772738822; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2JiPECMiS4IcPtH3bhy01xeh4Gb/Awq8dGQAxIHV6Bg=;
-        b=ENrf3XmuAu2uaEKbD/sbqd0bBJ1pGgUNkD7Ey1teIkpFnRsaBC7IET+HVov1PcmGdN
-         kqctIkApeAddD2aZNQ6iTizYIuEnmK3gHQQ9qB0PbxtM5LuixAIB2r0WwDfqisLWjcP9
-         ajAAi8eKj1yAuQUYx/tBOw6bD6ggByBetJ0reWLC7kBcwNVkG9/s9KHVt+JNMpXq+Hyw
-         SPHybM9gc4B0u2hvkB7vs67/TaU8S1BHVHYkWFrp5XAeBctGpEzLyI/5HlCtOCM/qbgJ
-         SpaMF/o7JGUmAmSlfAW/925bVpUzUIUNK5JguzN4JFx8/1Tu/fD2N4P5uNRpnpEAv+G4
-         Q6ng==
+        bh=ihQ/rPzUFVaXq5y8xpMnCIhxlDxECF6mdQTm7Xamdb4=;
+        b=hJ1eiqtBMluNLFzTzgOQwS6SoquoUsuMokHZ02Qts55k9h/bIQ6Si9pbTtn4nQw3ry
+         i0cpYT01wyhV1SZbUlZA1689k/gUP71L34IhTuHkjpvcvVdv17TRjKCPtJ+BpSN/sq1j
+         w0z3SbfAQeaoXaYWGyi3+yGaT1drR4Ni+IyX1zUPgQYmSTUc8+vLaRGlOsub98u/ugIu
+         cuDbDY55nPMsEkEfcXZpUFw1Dd7CT4dr+bG9UNbgZ+ftYD7yLahKs+D5r6bVK8eou05Q
+         5T8595G3JMobkYWuuz5q0DwP1qVaNKmK9/ORgRxGcrC3wF8ZD9XU/OlLnhTMwLK5dtnj
+         k+kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772132879; x=1772737679;
+        d=1e100.net; s=20230601; t=1772134022; x=1772738822;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2JiPECMiS4IcPtH3bhy01xeh4Gb/Awq8dGQAxIHV6Bg=;
-        b=oo/PatkTH8nOfWyfyLpKUcFFpVbas/xtRx3gZZFjlJMIxOkpfxb0+gQY8RLg0kEX9T
-         NYroriE/Lg47i0x8KC/hz2OGwn3dQyNcHBlNyMO1yUpBdjlx4B4bi9mAnCo5exe8Gdfa
-         lDnQZfsCgY6sR3gJe7zAc/q4wr6SLs909ixQnO4bljOzSHF7zWX/ao2R1l0HFIzJmpVC
-         31yrV0PMMKLpYVRg/o/NzlDVeJYek0L1qP2U8edOkZtzXhVPAF7k1wLJkxBSrbCggLZU
-         zfunXzAfdZSbB6yPHy/ChK955WP04DU6EysRTRR+1VLDcD/5rpyCpoOyVUtx2hsWeBcc
-         SzEw==
-X-Forwarded-Encrypted: i=1; AJvYcCUWigZuAn8G4PjXilXENNhja34mfr9+oPs/SIHgqNUJIVlMxzkgUrg3Hu+xcbgUIoZwX80=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBjW0NAUaKJanaNUzEpkq+eOBKD6u0+aIEIuDp7Vq773WVREeZ
-	z3oG2ISspKrb0lCx7OfMctyqAm6yNnYI5FIkdyz+vcviUmtRj4ZphrbCastamRQaa1g=
-X-Gm-Gg: ATEYQzxnj/FKOt9dTQpBzWsSkzsdCZyLHMWpTQ2Y2MRLIQPO/HfQ2Fsc4r4QtHq8skZ
-	tIqfxHHI42DpYEMb0Fss8IdjTn+tyKrnW7lva4hWs/XCAD4E1/sfLSg65kbJiKub4Lxp13W83oc
-	VHb3M6H/4pY+omBEwtOCLpLi3EEhgSdvHPXhrRdR+Wj8jNrprrGQfGwbQbnH0V8RNRByBFqTSma
-	sXM7rOwPCPliR8HNZTaNZMDDdzr6mUJ7sT3csDJ6DixT9LkdFmHqcx385PDpFh6iW8aRPM5FXoo
-	xyvoFWIKqF0x1k3DgRnd+OpKST3tfSmU2cIrQAdDti6j3L7NF1K42ZtRlHl2In/qyww550hMx4w
-	gJWKjU8qlxgyFjwSB9BpCOyIKCczSv7ni+ZzkNEMG2pGAkOdv5H6nODYRHmDrCHXwAi9vxZSzpr
-	1GZZc2D77c2wbQ6CcuLZl46ZXE7r2Q+dYuGHWgwqW0H2X/HK908SKpnWm5X+zf9PqpYkfDdyVRb
-	GibX0CT
-X-Received: by 2002:a05:6214:252f:b0:882:3781:e29d with SMTP id 6a1803df08f44-899d1d7250dmr3034716d6.10.1772132878800;
-        Thu, 26 Feb 2026 11:07:58 -0800 (PST)
+        bh=ihQ/rPzUFVaXq5y8xpMnCIhxlDxECF6mdQTm7Xamdb4=;
+        b=p0ONxSc8xpPRmAZpJI06UcgmH7NgERurScZq+9QVLjGWiSuDWDofFz2grAfKDC0yGp
+         /edDMIwltkGaKOn4nBr9mK3DGHgmmOv099wT7vAEH1K5nd+bKWEXEf3ryDT5zen1Bibk
+         gaMtgLmVVjXsGA6hqz9o8oTvRi3Y/m9+0JsdhBVttkK55xIhV9KwETYty05h6Z31+U7b
+         GIVOSHenFlAyGBBGB1rhXr/0Tnmtx/A+lMASdKMwdzdKNVShWOBr37dr6cNCqGNTHV4l
+         VSDpWyHv1vu+oyasxUo2URGt8709RgtAKQGGImJdnk9RUbxlR6Uk7diJw6w/lf6aHdkk
+         WLVw==
+X-Forwarded-Encrypted: i=1; AJvYcCXs6XM4y072No/Fus7/+Io553gk5cQ+zK5uvmI/42/lDuAhMLf/m5lRmTh/pBmaSUQPzIc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+eeVAIIPJXpU2rLmrADyEYDvunebiJolFCI7nBMLirXibz6fV
+	1vjZfk7kZdMhk3XdytcvZaYLHefoEk1MeCLyIIYLz+rhyifMhQ3N0CwFuwn/npJZcA4=
+X-Gm-Gg: ATEYQzyfFvHnxYz52jJysAtMjWVwqhek1ZnaxX7CmWfCvVo71tFBxBPTNNSUENQ0Yr4
+	Knpz68+kGWOMfo61c8W2p2fFx2S6b+V/GKitgJ/Cb2X0po5f/SUaqMYJrP58ZwClzn+ShWqnlC7
+	h/EeaW/3QBh40+uuyGVpJ98E6juHF7gmwkGITBRekBd7E7XpABEETeV5BrVbxuEko8Qwc6rMpXF
+	OiMvy1UdrSBvkChadN6+6inJkzM/+pZKcZ3tOIqiOKT3UU2X4BYpX3nj6spZzgBgxeWD0dCCUvT
+	UxR/pRDig5PGcz53JSDBn/+DRVOfmp50t6jJRgWLZE5FuHHgyXRTXCFb6YB4a1KFMgOVZBDFseu
+	UKvD8VhgtdG4QQQ4/FztuGBV3wZrU8kccz81dKmwu5g53cB6YT5DZcDBddVplRWQ0WAPZkaidMA
+	2O7ZprvhmkQc85m55bMWg7KHW5MaIYycoLxUGeb4AigNifKNUviE3J3uGkS4SZUAI1iq0/+g07+
+	R+9M0Wl
+X-Received: by 2002:ac8:7d90:0:b0:501:17a1:4ccf with SMTP id d75a77b69052e-50752714463mr1505241cf.3.1772134022105;
+        Thu, 26 Feb 2026 11:27:02 -0800 (PST)
 Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899c7376847sm24657116d6.28.2026.02.26.11.07.58
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899c73a25e4sm23606076d6.50.2026.02.26.11.27.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Feb 2026 11:07:58 -0800 (PST)
+        Thu, 26 Feb 2026 11:27:01 -0800 (PST)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1vvgiL-00000000O8A-1yT1;
-	Thu, 26 Feb 2026 15:07:57 -0400
-Date: Thu, 26 Feb 2026 15:07:57 -0400
+	id 1vvh0m-00000000ODe-3htA;
+	Thu, 26 Feb 2026 15:27:00 -0400
+Date: Thu, 26 Feb 2026 15:27:00 -0400
 From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Alexey Kardashevskiy <aik@amd.com>, linux-kernel@vger.kernel.org,
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>,
 	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
 	Robin Murphy <robin.murphy@arm.com>,
@@ -94,14 +93,14 @@ Cc: Sean Christopherson <seanjc@google.com>,
 	linux-coco@lists.linux.dev, Dan Williams <dan.j.williams@intel.com>,
 	Santosh Shukla <santosh.shukla@amd.com>,
 	"Pratik R . Sampat" <prsampat@amd.com>,
+	Ackerley Tng <ackerleytng@google.com>,
 	Fuad Tabba <tabba@google.com>, Xu Yilun <yilun.xu@linux.intel.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	michael.roth@amd.com, vannapurve@google.com
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
 Subject: Re: [RFC PATCH kernel] iommufd: Allow mapping from KVM's guest_memfd
-Message-ID: <20260226190757.GA44359@ziepe.ca>
+Message-ID: <20260226192700.GB44359@ziepe.ca>
 References: <20260225075211.3353194-1-aik@amd.com>
  <aZ7-tTpobKiCFT5L@google.com>
- <CAEvNRgEiod74cRoVQVC5LUbWDZf6Wwz1ssjQN0fveN=RBAjsTw@mail.gmail.com>
+ <fb10affb-40d5-4558-b64b-0ab22659ccf2@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -110,22 +109,22 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAEvNRgEiod74cRoVQVC5LUbWDZf6Wwz1ssjQN0fveN=RBAjsTw@mail.gmail.com>
+In-Reply-To: <fb10affb-40d5-4558-b64b-0ab22659ccf2@amd.com>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72070-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72071-lists,kvm=lfdr.de];
 	DKIM_TRACE(0.00)[ziepe.ca:+];
 	DMARC_NA(0.00)[ziepe.ca];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
 	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -133,59 +132,60 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 293B31AE3F4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ziepe.ca:mid,ziepe.ca:dkim]
+X-Rspamd-Queue-Id: 00A251AE5C1
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 12:19:52AM -0800, Ackerley Tng wrote:
-> Sean Christopherson <seanjc@google.com> writes:
+On Thu, Feb 26, 2026 at 05:47:50PM +1100, Alexey Kardashevskiy wrote:
 > 
+> 
+> On 26/2/26 00:55, Sean Christopherson wrote:
 > > On Wed, Feb 25, 2026, Alexey Kardashevskiy wrote:
-> >> For the new guest_memfd type, no additional reference is taken as
-> >> pinning is guaranteed by the KVM guest_memfd library.
-> >>
-> >> There is no KVM-GMEMFD->IOMMUFD direct notification mechanism as
-> >> the assumption is that:
-> >> 1) page stage change events will be handled by VMM which is going
-> >> to call IOMMUFD to remap pages;
-> >> 2) shrinking GMEMFD equals to VM memory unplug and VMM is going to
-> >> handle it.
-> >
+> > > For the new guest_memfd type, no additional reference is taken as
+> > > pinning is guaranteed by the KVM guest_memfd library.
+> > > 
+> > > There is no KVM-GMEMFD->IOMMUFD direct notification mechanism as
+> > > the assumption is that:
+> > > 1) page stage change events will be handled by VMM which is going
+> > > to call IOMMUFD to remap pages;
+> > > 2) shrinking GMEMFD equals to VM memory unplug and VMM is going to
+> > > handle it.
+> > 
 > > The VMM is outside of the kernel's effective TCB.  Assuming the VMM will always
 > > do the right thing is a non-starter.
 > 
-> I think looking up the guest_memfd file from the userspace address
-> (uptr) is a good start
+> Right.
+> 
+> But, say, for 1), VMM does not the right thing and skips on PSC -
+> the AMD host will observe IOMMU fault events - noisy but harmless. I
+> wonder if it is different for others though.
 
-Please no, if we need complicated things like notifiers then it is
-better to start directly with the struct file interface and get
-immediately into some guestmemfd API instead of trying to get their
-from a VMA. A VMA doesn't help in any way and just complicates things.
+ARM is also supposed to be safe as GPT faults are contained, IIRC.
 
-> I didn't think of this before LPC but forcing unmapping during
-> truncation (aka shrinking guest_memfd) is probably necessary for overall
-> system stability and correctness, so notifying and having guest_memfd
-> track where its pages were mapped in the IOMMU is necessary. Whether or
-> not to unmap during conversions could be a arch-specific thing, but all
-> architectures would want the memory unmapped if the memory is removed
-> from guest_memfd ownership.
+However, it is not like AMD in many important ways here. Critically ARM
+has a split guest physical space where the low addresses are all
+private and the upper addresses are all shared.
 
-Things like truncate are a bit easier to handle, you do need a
-protective notifier, but if it detects truncate while an iommufd area
-still covers the truncated region it can just revoke the whole
-area. Userspace made a mistake and gets burned but the kernel is
-safe. We don't need something complicated kernel side to automatically
-handle removing just the slice of truncated guestmemfd, for example.
+Thus on Linux the iommu should be programed with the shared pages
+mapped into the shared address range. It would be wasteful to program
+it with large amounts of IOPTEs that are already know to be private.
 
-If guestmemfd is fully pinned and cannot free memory outside of
-truncate that may be good enough (though somehow I think that is not
-the case) - and I don't understand what issues Intel has with iommu
-access.
+I think if you are fully doing in-place conversion then you could
+program the entire shared address range to point to the memory pool
+(eg with 1G huge pages) and rely entirely on the GPT to arbitrate
+access. I don't think that is implemented in Linux though?
+
+While on AMD, IIRC, the iommu should be programed with both the shared
+and private pages in the respective GPA locations, but due to the RMP
+matching insanity you have to keep restructuring the IOPTEs to exactly
+match the RMP layout.
+
+I have no idea what Intel needs.
 
 Jason
 
