@@ -1,175 +1,294 @@
-Return-Path: <kvm+bounces-72057-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72058-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6DIeEmWFoGkakgQAu9opvQ
-	(envelope-from <kvm+bounces-72057-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 18:39:49 +0100
+	id cC0eK0WFoGknkgQAu9opvQ
+	(envelope-from <kvm+bounces-72058-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 18:39:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE78D1ACA0D
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 18:39:48 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C7741AC9B1
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 18:39:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8FE40317BFB8
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 16:53:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 19A85334BD4C
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 16:58:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6D3426EBB;
-	Thu, 26 Feb 2026 16:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7107A368953;
+	Thu, 26 Feb 2026 16:43:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k424bkQP"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="j/mvkbUR";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ha2e9wfF"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6AF40FD9C;
-	Thu, 26 Feb 2026 16:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772123787; cv=none; b=cBfwR9HILUOHq5qHMWZ+sK01qbKt/yjIH5LvsaCDXRiDtJTjh9bReqONPskTbjArRPxv7P1ObMaHS0ra7hiNIfzH5T2TT40ssLdISVBLNu5jnF5ixBcmHNbmqbsb5HjMY3D6/8nihV+2QJwW+PewU61mahavbkxSGKlC2JiIqCA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772123787; c=relaxed/simple;
-	bh=v2kPCtvs4DuiDoqOgu+RK9gwVP8cHeKhzVZ4Rj4JAJY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Eb5p5b5KLBQETdHLiLMB+iU0EJkPAUp6AlzovydXw3HK2LpVAtcecUTq1eBKdT6qV6FYFdV3vQMhnO80DxjTrTFRv2OBgjsY4Tx9quNWHNOO6ffXE/xj/sW1FYixRLm/lxy3fcW1KP7R+mJk5mayd5uBeynLTDEovb2nIBtYGY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k424bkQP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44212C116C6;
-	Thu, 26 Feb 2026 16:36:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772123787;
-	bh=v2kPCtvs4DuiDoqOgu+RK9gwVP8cHeKhzVZ4Rj4JAJY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k424bkQPVtbYvPetNET1H8m9GM1yEbVMwlqJBrK6eEdMVajQ7W96PgnNZq4DckPQC
-	 0r0QZnK1ZvtkJgqniOtQsXUyM607i9+K+pNIeKuraco6vVPSkWJbpPzQWDBhkQljNt
-	 DsufcGssx62tT6vl5eIcYljfYZVp+niyhmL/348tEGx1N6sAHWtO/xZl6Uyh02XmBZ
-	 lr4OE2m+3kHoApNW1zlLZ7LT/SWOv2tjMI5tlEigouWWGOgYZLPCb6OKE0kiiVFEiP
-	 ANACetKdtnhHyy91Ab4udGVwWVarXMpU7qlA1RVrSFrUqQHresVvJ+Aecft+/aDaA8
-	 gvb827rKCepEQ==
-Date: Thu, 26 Feb 2026 16:36:25 +0000
-From: Yosry Ahmed <yosry@kernel.org>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] KVM: SVM: Triple fault L1 on unintercepted
- EFER.SVME clear by L2
-Message-ID: <txfn2izdpaavep6yrcujlxkqrqf2gwk2ccb6dplwcfnsstdnie@lgx74e27nus7>
-References: <20260209195142.2554532-1-yosry.ahmed@linux.dev>
- <20260209195142.2554532-2-yosry.ahmed@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7347A368946;
+	Thu, 26 Feb 2026 16:43:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772124220; cv=fail; b=sJpszmoU9Hh3dGMZVKZDFMPm1yUegt9KDvC45Jv//6Hfkc+bjiGOZEvIylSp23nSoIkz3IkZUfuzi6oOnD9lfa6XUfZ0coYIJkhKNkElYcwhmfdhKpxr+kmzu2FtsBiTF7Us1u0sb3apgn7HSjrSKuCUgoRH4W0kpgOhNAEMPk0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772124220; c=relaxed/simple;
+	bh=GJdX4glk9hLgVYZj/DQzWMNva3aZZ3d+j4AGHLBZj/U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=aIW8+eHg5eCUKfmZ1Qk4cTtVNf/oTUD1S1irOHwKY6igdx3TWc3ouWz6A36S8wBrLGmjIJmGYlPV+KpngRRwipdNAcFLrwlRvTQzzsdK4sXp/PbnTMVbS5OMJjMePFTx8K+DkN9wJuORY8K1R8+VmPWF492zUY+lIXyVILs5x58=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=j/mvkbUR; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=ha2e9wfF; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61QDNKnk561439;
+	Thu, 26 Feb 2026 16:42:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=ylS0Y8ByF4shbLizUh
+	BQFXe+zGp88pN7dpvBy2cMOsQ=; b=j/mvkbURLXXtN7ZTwWPNGIMBzii1Hn7HsW
+	cWcCj07fJRX4Oypw4GESw7jHL5doZC/uOHs50kf1hY/kNQJZ3Y5X1jI3ROO4DFc1
+	SoA1458HsAYZSWugkaPXuGof4JIhl9BWBmzssHAEgGRlfOLu4DwSjGhT9fJsjJJA
+	bBF6reEJ2zHWY/u6AVqOtM0woJFoNEc4ZOyJB0Ep204TzpWo5LVfEQbqxeb/kLvu
+	0RTHotbWmnRgjmEAFkll5luZ7dRHqqgKvGuNqCyq04glVdPdfLl9ezNCrKKM8vb9
+	K9zeYeM2bgXefQc6T1FHVaSOoM1YLTmo4/gBaFaq0J5ovEqA0wAg==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cjgjfrykt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 26 Feb 2026 16:42:38 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 61QF6N5a015758;
+	Thu, 26 Feb 2026 16:42:37 GMT
+Received: from sn4pr2101cu001.outbound.protection.outlook.com (mail-southcentralusazon11012013.outbound.protection.outlook.com [40.93.195.13])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4cf35cxdps-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 26 Feb 2026 16:42:37 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mDaxjgJDeRqLFUqSMrTQaQtzj48MAYeV6PRa8f5HUOWp6b+0XIG7MP/7dHIwm23QViGEQ40KW8Jul7TqW/nJod8ASIRT/7zi3mafjJe02aeK1v285qB83bsK13lgKWN//fUkisrGSFpvB08LeRgraEH6A53lrhdVDK7zvRNxBZluxouLXUXNiY9O4CIP+e+i47DP92/F0tTkiiA0ehRP9PgWx8fk5+2izm10pqeihQUB3OZO/r2p3cKB0W6ySCK2SCRPz+vBLXuYIDM7m2AfPN7CWW+5NKglaf1erDjujIobxefuEjMkghZB7QrqcUoIj7Uk2cAV+YsvpwrQlMjhig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ylS0Y8ByF4shbLizUhBQFXe+zGp88pN7dpvBy2cMOsQ=;
+ b=fWdOkKy8t19IDuddMfE/youALMUgtG0CbVUurF51YXaehzZf2HnZbCeIM7XvienDdfdnehRb0w+DRbyK6jtdbMMRF+zkN5+hdmWe0VoAdDpFSvtt3GIj+q6gKwOFf559XWw2cXTVha3J6enhRzB0+JR205lyogggSiMndC9mAnIkzsdp1djCUa0knud6XJLdpdqbj66BB9LkpVQB4PXNN9ih7F5bzU/33qv0/4cZS9ZyhrbdyeUP0D0JV+goiRR7fY5bR8NS3wWEUahla9svFXfC2iRwqQ0vNmF3YiaZ6+ZQGBqfwIFRtXoL0FuRZtuVEfOysWi9kU4mc6P1BqST7w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ylS0Y8ByF4shbLizUhBQFXe+zGp88pN7dpvBy2cMOsQ=;
+ b=ha2e9wfFnhSsva1m25m0bDiQuo/bvfhMcYDTxzCCgVxMZkwL+l81zvDhRPEUxpkquGfU2+lgDDa4ABzllLaFJ6Qk1nlaaCwzWVT0es72S6fDMaF+gKNL8keDdj92NJQB9ZzLJDCl/7zTap4CW1bsWmVnq0hnXitFcyjea1CLkck=
+Received: from PH0PR10MB5777.namprd10.prod.outlook.com (2603:10b6:510:128::16)
+ by LV3PR10MB7983.namprd10.prod.outlook.com (2603:10b6:408:218::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.14; Thu, 26 Feb
+ 2026 16:42:32 +0000
+Received: from PH0PR10MB5777.namprd10.prod.outlook.com
+ ([fe80::4b84:e58d:c708:c8ce]) by PH0PR10MB5777.namprd10.prod.outlook.com
+ ([fe80::4b84:e58d:c708:c8ce%4]) with mapi id 15.20.9654.014; Thu, 26 Feb 2026
+ 16:42:32 +0000
+Date: Thu, 26 Feb 2026 11:42:27 -0500
+From: "Liam R. Howlett" <Liam.Howlett@oracle.com>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: akpm@linux-foundation.org, willy@infradead.org, david@kernel.org,
+        ziy@nvidia.com, matthew.brost@intel.com, joshua.hahnjy@gmail.com,
+        rakie.kim@sk.com, byungchul@sk.com, gourry@gourry.net,
+        ying.huang@linux.alibaba.com, apopple@nvidia.com,
+        lorenzo.stoakes@oracle.com, baolin.wang@linux.alibaba.com,
+        npache@redhat.com, ryan.roberts@arm.com, dev.jain@arm.com,
+        baohua@kernel.org, lance.yang@linux.dev, vbabka@suse.cz,
+        jannh@google.com, rppt@kernel.org, mhocko@suse.com, pfalcato@suse.de,
+        kees@kernel.org, maddy@linux.ibm.com, npiggin@gmail.com,
+        mpe@ellerman.id.au, chleroy@kernel.org, borntraeger@linux.ibm.com,
+        frankja@linux.ibm.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, svens@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, linux-mm@kvack.org,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v3 1/3] mm/vma: cleanup error handling path in
+ vma_expand()
+Message-ID: <pifgesxxxcwcrarg3q7sgiybg6d6laaym2jcj2h44wqoaxopcv@idc7vavsmjsd>
+Mail-Followup-To: "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Suren Baghdasaryan <surenb@google.com>, akpm@linux-foundation.org, willy@infradead.org, david@kernel.org, 
+	ziy@nvidia.com, matthew.brost@intel.com, joshua.hahnjy@gmail.com, 
+	rakie.kim@sk.com, byungchul@sk.com, gourry@gourry.net, 
+	ying.huang@linux.alibaba.com, apopple@nvidia.com, lorenzo.stoakes@oracle.com, 
+	baolin.wang@linux.alibaba.com, npache@redhat.com, ryan.roberts@arm.com, dev.jain@arm.com, 
+	baohua@kernel.org, lance.yang@linux.dev, vbabka@suse.cz, jannh@google.com, 
+	rppt@kernel.org, mhocko@suse.com, pfalcato@suse.de, kees@kernel.org, 
+	maddy@linux.ibm.com, npiggin@gmail.com, mpe@ellerman.id.au, chleroy@kernel.org, 
+	borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, hca@linux.ibm.com, 
+	gor@linux.ibm.com, agordeev@linux.ibm.com, svens@linux.ibm.com, 
+	gerald.schaefer@linux.ibm.com, linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20260226070609.3072570-1-surenb@google.com>
+ <20260226070609.3072570-2-surenb@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260226070609.3072570-2-surenb@google.com>
+User-Agent: NeoMutt/20250510
+X-ClientProxiedBy: YT4PR01CA0387.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:108::12) To PH0PR10MB5777.namprd10.prod.outlook.com
+ (2603:10b6:510:128::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260209195142.2554532-2-yosry.ahmed@linux.dev>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR10MB5777:EE_|LV3PR10MB7983:EE_
+X-MS-Office365-Filtering-Correlation-Id: a60bf477-e990-404f-96dc-08de7556098c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	RCwDcntsy1Vq1mwYMAcjCzZUj+3W5YtmmYLT2/QTK+l5G4hHukY5u8Ss0V6cuxDQh/4upAI2C+BlHAibhl9efs51ScGbqzxZ8NlyJDk6AFttqcwk8ZflGs5DwygkF6cVD6dFTF39UaXVCjbCcMcXQ86dHgfh5KGDwZIYD9nUg97d3ZJJJ+QIULUzyaPgu7RPyNPiE7sc5fNPZjpQg2qERErZKG60bgEoZGfzDHrDHUD3b+qwCIRNXNpTsWymT5SW+MN5NRlLfZgBlRRbY916CcorXXR+mVa//rlPO4afbJCvrD/ldoQIkcqdZ5dVpcA9mliWX5B5Qizw8Ee1/zDgZbh44cFtk+gzwrW/sJQAGmwMkhEIgTYjrhoXA50DLUTl8BQyYmAuAPhWAC/4s7c41cF+xnBxbSDIJycO1uXwEzog7Ij912A/yoRmIIoyAhbqTJVKINJ+75DWJXNfOmNSBfxOcOr19C8TMPhgY0H5skxA8CRSP+VvvLpudRWkrcNlidbHv+YafNAdCMiQ6YHu2VfONKYVHv8TA601EUnsrAQrcRS6jnBDopsOTOqmvnz4mYB7SN5Y5SADfYeqCrJ4mF/RkN57jqdEanIWLZrrgASkgKGfuG/JlLwYGRXCfcU6e89wWULn438Qvrcv1bAJvMoWABIx3KqaaqgmKf87dIQkSi5jDBY8nARQN8kR2DjBe0ugUSOJuMpzVvf36XuU23L3bHV4EU0zc6cvMeMBgx8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB5777.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?sKQbYrhFj89g4NudD5w8vvIbYtn37weePxUqkxlHGiDQjCOPvITLgyDFzfPT?=
+ =?us-ascii?Q?wPRauOF10j6cMA6X5uuuahG0/5yE5YqaROgYVTnJPtYT492rh5v7+fwzxsuh?=
+ =?us-ascii?Q?4DE8Sf9/oQ9q2uME8kWtu9UvLcmXD/fM4ZJ7LOdZWT2qh6vskQFwrtCOFYXn?=
+ =?us-ascii?Q?DGE7UMfcFQwsqeNGN6dTcdzWzUbclRdglsYyZF75sF8CPSWsx/zBgK8aFIw9?=
+ =?us-ascii?Q?qx7b9mtzTCiT1b16EtSV1paskxa7zque5pqiFtz2ySdi3FJEhVWqiRS445JQ?=
+ =?us-ascii?Q?faFc752RKQMSXNWt+8Qa4e/vfX5PkJufKYLcV9p7LeRPrmARZmjfkGLeY5/V?=
+ =?us-ascii?Q?DpPgbXCr894ja+4tY8Wmr9ZaWrniCdqfFDdAj+QUaYPBYklh7xFlZI6QN//P?=
+ =?us-ascii?Q?cTWneOvfYwyVePPQFXFJZsm4yLm1eKOXkW6l1Jk7JlftXEARI2AvOy7aeW9R?=
+ =?us-ascii?Q?VKPgDKv5/zt8w4dClamNwFvgEL6fXMIodmGRtY0eedxwCTi8YUldLRDtlC56?=
+ =?us-ascii?Q?qYzr+Q/ciKSFoxODw+8c4U3ll4gwyMflYucgpA9gQ1MbVjClL1/egAi6sqdQ?=
+ =?us-ascii?Q?gcoynO+5C3VgEfvpZMX5XTQiKw9sglGuZshrfRC9WdXWynZvsBzmWItbA/Er?=
+ =?us-ascii?Q?tXnlc1dvvykxPAgkKAn/uwp7dvp6GBayNkLjxYvYFdvOj3xPZQqIbL8jc06a?=
+ =?us-ascii?Q?i3IMR5vJ99j/AlGnYEtlVDgAmuvAqFgPFn67vXyY4hqi+rIQ4507YxaFQK6e?=
+ =?us-ascii?Q?MILZP8k5YkWkcztUxszUNLPts+9jkVUU+OvKIedGYli66kkDJHY1WPcwBYcQ?=
+ =?us-ascii?Q?5Nz9PyBGfZXb8kHHNCDHFzZ1PVIP/odkuxFaLRjjlILfefyT2fYKF2LKZo3I?=
+ =?us-ascii?Q?8T1jzc+ahVbwsQl2Hoes+MhyXhAhyoKCF9mJzfsSvmiWjCXXZ3srNK2gVzrd?=
+ =?us-ascii?Q?yNFQpKwyB1jRr7WYvyhtAFktMn+GPPK3Tb2/VmILRE4Hi+/1yK9GpJHlEDQ/?=
+ =?us-ascii?Q?0/5Iix+nuvY0gvEHClT1ljG36OXB89QH77k8aRZCUsVj5aleCOM4/e8sLVs1?=
+ =?us-ascii?Q?d1UVkitZkgloIKoqFCPNSIYXt9x9usXAzRh0nq7UB1x7ie0Dp3jlRZr+XYLH?=
+ =?us-ascii?Q?CnnGXwKY0pTsmjBFmKiTu/8jIGA5cRaoq24Dy9ycTOWbEcQrPLgUfzCWHbEb?=
+ =?us-ascii?Q?L27UD4N9y7oUoQNtIfNm/ah3H9IeHyYV+WrmxfnnM6JQOENtLgSfKdlH0g4t?=
+ =?us-ascii?Q?ONw9QeU+kxAwPQ+xpO0ytP5JjvSH7/OHgIXWLdEFr/hcxKA57boOpmjf1byz?=
+ =?us-ascii?Q?pt8yacLfXpsMlT/R/4fctthg64Z/WLGDY0c9yDwnv+VRzxkepIx2OQZoCxzj?=
+ =?us-ascii?Q?XDFR3Ea54xjzJcb9OnfsYFmhGvMDpLeylflMs2/iX5aL/BmL+W8Qe7pMrWip?=
+ =?us-ascii?Q?DZRssTsUN3a45PJajDL5Y7CAN5RMXJWhldsfM+dd7WtYwh7hmVZIlcm9Waqh?=
+ =?us-ascii?Q?en3Wsz+IpHEl3trzI7sbTDoNSWHX5cviVv9OgK5vmYZr8LhBHUXZWsfOmZoc?=
+ =?us-ascii?Q?ofPBhGriPcyrGmZtPLzSt6iVB+r3ubae3C+4fCWki8pr7+HzBAIQ2dUR1X5o?=
+ =?us-ascii?Q?YDDyS1M3ni52AoSlcP54H+2TSu7co7luupE4t50JDyWLwuX/MPm86pG2R9E/?=
+ =?us-ascii?Q?7PztFg4wANK7JDJltcTCHI6lCWfyk8oaBsA5Vt6mK4Rfo5sJOtU+w9mX0C+K?=
+ =?us-ascii?Q?517n6qwAgg=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	XAI+oZG48NNcLI6j1b29yQAfrTDFzk29KYDHZuNZ0skTdhCqZA73k5d65zQjH1GYcM0313CI2a87QaOLG2aSYwilFZcFB6zhKVQFKyD68M+oRpzSdRt5UaL508WAXQmOghydyvX2Igy+n7jQoNEuv9vDtaxcjTHT6kkxaLvDWcP6lJtC+SVe0lpMZ6TrjG7MSLOC1Bf50UTv1yObkQwUpC2viH7DKPPF4ylLqPUz3WN0WFueY9Im2ljD7bafwSYDFuKyWqnCILEg8WeX5H3XktMmMmZlYYVhmcChdhVhndTy7xO3QbtksWFZmzx/2pABZagxkYjpww4wDj8HbQpEDKD223GRumG/umAni8ljW0ZYDiKGtirC+mU3BlqzqblqGKS6CiPJQ3HDGnAFgJDla1ZgvSZzPYc+Ba1xIsg1jqzfGvVKoJMvjZTuZQ4NdhpsDa/4SCWm/I70YG0V2of38S034pxbrfutWkDcB3tI2olOhJ+ojCW/a/WFlu96jYzD++Rgf9OGotC6YbsOMZbkLb/eQJTMHsI0eHLaq4HthBI47oV0I0vhEgwIO0SLQo4hZP5LDE/HG7Y6/2YynLGCOp0HLxaT4etAyRy5bP7KosM=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a60bf477-e990-404f-96dc-08de7556098c
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5777.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 16:42:32.3002
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4kUjJvOWippp3QffSWqA6iCMP0nRD1t1dcKkyLmIPJCi/8vShT7PWr8vv/DibeIB3LWX6EUwMtzk5bTn33M9ZQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR10MB7983
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-26_01,2026-02-26_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 malwarescore=0
+ spamscore=0 bulkscore=0 mlxlogscore=999 suspectscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2602130000
+ definitions=main-2602260150
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI2MDE1MCBTYWx0ZWRfX8DMw5HjRldAD
+ n53kmDVdh4u7GE+nONKdTiCmGxIF/LW7MWK2tnyUkp0HmiKtUo/nbfC8XPgMqorTRGyr/8DgVt5
+ fZay136omlqN+2CCcnSWw5RQVWLzg7BXsiZ1VZ+QdlV/WoDxpYUcwABnmvPQV4cv5TDx8meL6zD
+ HOrRj5iFcfIdsj1He/v+1/kTexFw1ng/i5dHFc3RvYCibBNIlMXMHvncEZIOPZxCfmqj44Ey1ZW
+ GKKB/nFk9HSA+E7b57pN2ymkSh09aYMXi/zF6u3Ob1YcDPdiTyGROTxtHlCduKFtnyD7qKR3zyJ
+ lCSztvoZAfkCOqTdkxD+5Qq07KwHLavRsQmpMu9H7PrOjzv/hrFTEbtzDvshVGE82vyZ//Yp3eg
+ Jh7IqZwuuYC5FMuxBt5mjSvu5UJMmYmrZ4wyY7fWgLuaVUlVZS2GR+xjYEQXO7CPmU1FC/bRGK9
+ S3ufHhQpxUXqJvkAzPQ==
+X-Proofpoint-ORIG-GUID: SPqe8PSjXTYii1yzS6tQ_Db5py0zQVY6
+X-Proofpoint-GUID: SPqe8PSjXTYii1yzS6tQ_Db5py0zQVY6
+X-Authority-Analysis: v=2.4 cv=L/oQguT8 c=1 sm=1 tr=0 ts=69a077fe cx=c_pps
+ a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=HzLeVaNsDn8A:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=1XWaLZrsAAAA:8
+ a=yPCof4ZbAAAA:8 a=OF6kxwJpqsOYwMMz9xMA:9 a=CjuIK1q_8ugA:10
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [1.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25,oracle.onmicrosoft.com:s=selector2-oracle-onmicrosoft-com];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-72058-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[42];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72057-lists,kvm=lfdr.de];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.onmicrosoft.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,oracle.com:email,oracle.com:dkim];
+	DKIM_TRACE(0.00)[oracle.com:+,oracle.onmicrosoft.com:+];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[Liam.Howlett@oracle.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[linux-foundation.org,infradead.org,kernel.org,nvidia.com,intel.com,gmail.com,sk.com,gourry.net,linux.alibaba.com,oracle.com,redhat.com,arm.com,linux.dev,suse.cz,google.com,suse.com,suse.de,linux.ibm.com,ellerman.id.au,kvack.org,lists.ozlabs.org,vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.992];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:email]
-X-Rspamd-Queue-Id: EE78D1ACA0D
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 6C7741AC9B1
 X-Rspamd-Action: no action
 
-On Mon, Feb 09, 2026 at 07:51:41PM +0000, Yosry Ahmed wrote:
-> KVM tracks when EFER.SVME is set and cleared to initialize and tear down
-> nested state. However, it doesn't differentiate if EFER.SVME is getting
-> toggled in L1 or L2+. If L2 clears EFER.SVME, and L1 does not intercept
-> the EFER write, KVM exits guest mode and tears down nested state while
-> L2 is running, executing L1 without injecting a proper #VMEXIT.
+* Suren Baghdasaryan <surenb@google.com> [260226 02:06]:
+> vma_expand() error handling is a bit confusing with "if (ret) return ret;"
+> mixed with "if (!ret && ...) ret = ...;". Simplify the code to check
+> for errors and return immediately after an operation that might fail.
+> This also makes later changes to this function more readable.
 > 
-> According to the APM:
+> No functional change intended.
 > 
->     The effect of turning off EFER.SVME while a guest is running is
->     undefined; therefore, the VMM should always prevent guests from
->     writing EFER.
-> 
-> Since the behavior is architecturally undefined, KVM gets to choose what
-> to do. Inject a triple fault into L1 as a more graceful option that
-> running L1 with corrupted state.
-> 
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> Suggested-by: Jann Horn <jannh@google.com>
+> Signed-off-by: Suren Baghdasaryan <surenb@google.com>
+
+This looks the same as v2, so I'll try again ;)
+
+Reviewed-by: Liam R. Howlett <Liam.Howlett@oracle.com>
+
 > ---
->  arch/x86/kvm/svm/svm.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+>  mm/vma.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 5f0136dbdde6..ccd73a3be3f9 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -216,6 +216,17 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+> diff --git a/mm/vma.c b/mm/vma.c
+> index be64f781a3aa..bb4d0326fecb 100644
+> --- a/mm/vma.c
+> +++ b/mm/vma.c
+> @@ -1186,12 +1186,16 @@ int vma_expand(struct vma_merge_struct *vmg)
+>  	 * Note that, by convention, callers ignore OOM for this case, so
+>  	 * we don't need to account for vmg->give_up_on_mm here.
+>  	 */
+> -	if (remove_next)
+> +	if (remove_next) {
+>  		ret = dup_anon_vma(target, next, &anon_dup);
+> -	if (!ret && vmg->copied_from)
+> +		if (ret)
+> +			return ret;
+> +	}
+> +	if (vmg->copied_from) {
+>  		ret = dup_anon_vma(target, vmg->copied_from, &anon_dup);
+> -	if (ret)
+> -		return ret;
+> +		if (ret)
+> +			return ret;
+> +	}
 >  
->  	if ((old_efer & EFER_SVME) != (efer & EFER_SVME)) {
->  		if (!(efer & EFER_SVME)) {
-> +			/*
-> +			 * Architecturally, clearing EFER.SVME while a guest is
-> +			 * running yields undefined behavior, i.e. KVM can do
-> +			 * literally anything.  Force the vCPU back into L1 as
-> +			 * that is the safest option for KVM, but synthesize a
-> +			 * triple fault (for L1!) so that KVM at least doesn't
-> +			 * run random L2 code in the context of L1.
-> +			 */
-> +			if (is_guest_mode(vcpu))
-> +				kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
-> +
-
-Sigh, I think this is not correct in all cases:
-
-1. If userspace restores a vCPU with EFER.SVME=0 to a vCPU with
-EFER.SVME=1 (e.g. restoring a vCPU running to a vCPU running L2).
-Typically KVM_SET_SREGS is done before KVM_SET_NESTED_STATE, so we may
-set EFER.SVME = 0 before leaving guest mode.
-
-2. On vCPU reset, we clear EFER. Hmm, this one is seemingly okay tho,
-looking at kvm_vcpu_reset(), we leave nested first:
-
-	/*
-	 * SVM doesn't unconditionally VM-Exit on INIT and SHUTDOWN, thus it's
-	 * possible to INIT the vCPU while L2 is active.  Force the vCPU back
-	 * into L1 as EFER.SVME is cleared on INIT (along with all other EFER
-	 * bits), i.e. virtualization is disabled.
-	 */
-	if (is_guest_mode(vcpu))
-		kvm_leave_nested(vcpu);
-
-	...
-
-	kvm_x86_call(set_efer)(vcpu, 0);
-
-So I think the only problematic case is (1). We can probably fix this by
-plumbing host_initiated through set_efer? This is getting more
-complicated than I would have liked..
-
-
->  			svm_leave_nested(vcpu);
->  			/* #GP intercept is still needed for vmware backdoor */
->  			if (!enable_vmware_backdoor)
+>  	if (remove_next) {
+>  		vma_start_write(next);
 > -- 
-> 2.53.0.rc2.204.g2597b5adb4-goog
+> 2.53.0.414.gf7e9f6c205-goog
+> 
 > 
 
