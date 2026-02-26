@@ -1,261 +1,171 @@
-Return-Path: <kvm+bounces-72092-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72093-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EHhSOebDoGnImQQAu9opvQ
-	(envelope-from <kvm+bounces-72092-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 23:06:30 +0100
+	id CFqlBxfJoGnImQQAu9opvQ
+	(envelope-from <kvm+bounces-72093-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 23:28:39 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F09E1B02EF
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 23:06:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 726951B06A4
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 23:28:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7055D30162AF
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 22:06:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2268530677AB
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 22:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93CD546AF25;
-	Thu, 26 Feb 2026 22:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F308244104E;
+	Thu, 26 Feb 2026 22:28:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J0LLDLGX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q6iM5Woa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8A53019C5;
-	Thu, 26 Feb 2026 22:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772143583; cv=fail; b=AsTlyAElQRt/s3fBFRMb54a2kYhpNZZ7BbHgJXHIpTlUTDy83XgJETWOsUzbKmXQBmcfiN7hz34UxAFtzWU3Lwx6/uj8+N68zDt/I9wyVD+GNXHO5yLCxDA1dINbuC/Q9f37yN+5ON/ww1fe+RkERpNL/X1jF0jPVA5dwxF4Bl0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772143583; c=relaxed/simple;
-	bh=gMXWJUaw4VjQCCVVx2PIKmaSuGrzVjGe1owS/SVcfNQ=;
-	h=From:Date:To:CC:Message-ID:In-Reply-To:References:Subject:
-	 Content-Type:MIME-Version; b=QAmC+0X3Tkz8H77bG0Zied/QkGcjNczPQoKJanSEyLSaokl3BM0sm2cIv3gUCKQwp55do1oImfk+pqAO44zVqXKJgb/ljTdBhO06XHFuMPwervQu1PmwtkK4ZP1HPWC40WZ4MUdcSKvpUQ7QYRis2TR76X3hjKJA41JcsnGWKu8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J0LLDLGX; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772143583; x=1803679583;
-  h=from:date:to:cc:message-id:in-reply-to:references:
-   subject:content-transfer-encoding:mime-version;
-  bh=gMXWJUaw4VjQCCVVx2PIKmaSuGrzVjGe1owS/SVcfNQ=;
-  b=J0LLDLGXkzaLh5fZkst+30C712ufDTH0DPQskTlt7fuEnUQQUK9hw8MR
-   x+uNssW5qqhXUTpBK1Toj5uMMWW7CRAwPviRIxEstLFcHqLXFYEj6YSLv
-   hXnwdstUfu4slWOgSOW79mzF2LB5pcxklw7uCFTnE5J0Vr33utbBA0lzW
-   ejj4ypR86cGZ2ayqar0Xk761aqA4fIp05guppfD6kGye9OOIdbmDKDzXY
-   q5WwLR104Y19ly4exHitfESUhnh4OhBz/PnkLYRTB0p9vdWPPL/9PQygk
-   gMFN/LY3IODaX2o13lsPQHgPZbDRehoeyCEyd+6Y5/3o8FFvj4PnHadmE
-   w==;
-X-CSE-ConnectionGUID: 8XocFpiASM6QOtjBw4t71g==
-X-CSE-MsgGUID: jwyEVpCLTOOr0QxbbhIyJQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11713"; a="73130071"
-X-IronPort-AV: E=Sophos;i="6.21,312,1763452800"; 
-   d="scan'208";a="73130071"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2026 14:06:16 -0800
-X-CSE-ConnectionGUID: 2v6L+cz8R9+H6hS9OgBeyA==
-X-CSE-MsgGUID: ZF6OkZioTEKxyYcXIDTkgQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,312,1763452800"; 
-   d="scan'208";a="216611205"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2026 14:06:15 -0800
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 26 Feb 2026 14:06:14 -0800
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Thu, 26 Feb 2026 14:06:14 -0800
-Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.19) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 26 Feb 2026 14:06:13 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pBouHDopX5zoFNx+JN9v/h1licmMDukluCAM8+Z1gnmc2VH5NUL/v3BAGYsQpgKk69O+yYodoDXHnJ2ZK9rF6ozX2jSVY6+XC7hE1uZHPwbZwB+LLAXoAAduDooJF7MFOd4tg/5HaRqvARWXt2yXUayQq1qp8ooI3f3a2QZoj7g9Z5Hc4773PXRozIsjWpZcs33UYNTR56TSPF5914ff41Xokq0GriSfXHqef2YKLcP2QLwrtrkI2WEf6VUK5nzIXmzDAJhjEAMHywggz3XITL/x4ECT8qcu95Egljw2f2cEpeUBviOOrlVjrOHGqYctKJAobZ9tik4YwKijW9PZew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FhZ0XYtPJWxdDLcdrX/PonlcZkOz9pK5XQ1KxL1nrQI=;
- b=kydBdeLFWtt59GVoPqY2ZVB8yeCFMmLXT35xYXoAWYf0PTHXo+dB45y20cOOcEZqRxmG+O/Gy3OlYUWYLYQXUiSyu8bs0N0Ap6YwXSHnQGpEcMPG9J9CZr0uq37D7jAk4rEfmVs4pAvNKfvgWU54xv7xbBL9Uj57TCQK0XgZmWFq3oWTDXvPs8UjoKA93jCIPrUK7mYwZ28Dbx8j4k7JvqBobag60UYSPXzV7AID6yEz1065gU2uGySZTEnAZmih17gqSSH18yCtOEs/BRu5+8Z25kfObdBJHxXP3YCjgczUn08NCoX7NUh9pfUeKtDPEDy/7ppfUktvFXFxC+orTg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
- by SJ5PPFC35D45AFD.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::853) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.17; Thu, 26 Feb
- 2026 22:06:11 +0000
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::1ff:1e09:994b:21ff]) by PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::1ff:1e09:994b:21ff%5]) with mapi id 15.20.9654.014; Thu, 26 Feb 2026
- 22:06:11 +0000
-From: <dan.j.williams@intel.com>
-Date: Thu, 26 Feb 2026 14:06:10 -0800
-To: Chao Gao <chao.gao@intel.com>, <dan.j.williams@intel.com>
-CC: "Huang, Kai" <kai.huang@intel.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
-	<linux-coco@lists.linux.dev>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "seanjc@google.com"
-	<seanjc@google.com>, "kas@kernel.org" <kas@kernel.org>, "Chatre, Reinette"
-	<reinette.chatre@intel.com>, "Verma, Vishal L" <vishal.l.verma@intel.com>,
-	"nik.borisov@suse.com" <nik.borisov@suse.com>, "mingo@redhat.com"
-	<mingo@redhat.com>, "Weiny, Ira" <ira.weiny@intel.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "hpa@zytor.com" <hpa@zytor.com>, "Annapurve, Vishal"
-	<vannapurve@google.com>, "sagis@google.com" <sagis@google.com>, "Duan,
- Zhenzhong" <zhenzhong.duan@intel.com>, "Edgecombe, Rick P"
-	<rick.p.edgecombe@intel.com>, "paulmck@kernel.org" <paulmck@kernel.org>,
-	"tglx@kernel.org" <tglx@kernel.org>, "yilun.xu@linux.intel.com"
-	<yilun.xu@linux.intel.com>, "bp@alien8.de" <bp@alien8.de>
-Message-ID: <69a0c3d24310_1cc5100d1@dwillia2-mobl4.notmuch>
-In-Reply-To: <aaBndinjh51R2wQU@intel.com>
-References: <20260212143606.534586-1-chao.gao@intel.com>
- <20260212143606.534586-22-chao.gao@intel.com>
- <a0a5301140be5a3d944b1c91914b93017af026fb.camel@intel.com>
- <aZ+31DJr0cI7v8C9@intel.com>
- <699fe97dc212f_2f4a100b@dwillia2-mobl4.notmuch>
- <aaBndinjh51R2wQU@intel.com>
-Subject: Re: [PATCH v4 21/24] x86/virt/tdx: Avoid updates during
- update-sensitive operations
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY1P220CA0022.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:a03:5c3::14) To PH8PR11MB8107.namprd11.prod.outlook.com
- (2603:10b6:510:256::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245C33A0B2A
+	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 22:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772144887; cv=none; b=dqcYi61YOYimf79YSRLOMg4DObWC4kUt/AZBTAwRYqdmj50DZ+ks2KaRnEb9mKo6F7+A5JkSCIgfEzK+jdV+TLH113tbKelY5bl/0e75ZqIgXCAsJdBkSyCK7KNJU+UHiLt8d6penGXUuZSNt8wB5yPWHfS2Zzpn0aff2XrxnGM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772144887; c=relaxed/simple;
+	bh=IgrG23jXKGivVbn7AQPcC0OLGqaf1C8vOPdQER9mxQs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ZRGV2kgw16DDs3C+SopDdhdykYfaZASVkuHYIaBrg+9MpQIeCwerUeybUMhYtZanU9SKARFJ3EmuPhUprwNHID9nD3j6iJfB9nBITslRUTJTzghGIKEt/QfgJSjfuP5D1Mp4a87RBmHunKHg2wE4cz6mTTOWZxf5w78sbI96awY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q6iM5Woa; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2adba04421eso72352885ad.3
+        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 14:28:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772144885; x=1772749685; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=W/j2ZyC9rj9YMlhwf1A/TlVZORUXpPQxiBPhNIX130A=;
+        b=Q6iM5WoaqSfDo5nilkSNnoNT7gxxET93zuUc4YVBmogTH6uxzjP3Gt7n/OLC5178PN
+         I93pbBrLMPUIjwJITpWv+E99f6lDOJXYAeKl1zreex5URAROSvSEHFKYlHUL8PuIEQ+A
+         Dgi+23KCkZOcm9XLkkVK0i0fvSXhZ/usjn9hJhTmq99YQKIvRT06YfwBHB3yQzX/A/+5
+         y8X3XI2YF1LllLWAOT1GC08wGuxTkqj4x8n5omsEYcWLHjpyCoB0srTyuFBMcvAB0t9J
+         L7qZRP0zIbmOovygpcNILvSYkGs++qIPmXsWuBXGTXgNZUT8A7lCI2T2lGjWMhINF6nD
+         isEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772144885; x=1772749685;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W/j2ZyC9rj9YMlhwf1A/TlVZORUXpPQxiBPhNIX130A=;
+        b=tEJ4nFUNcE3RqjBF6K55vkHcemnixzQBWAWS7ylMtCcKzIYVWBLaTHmbKtuaxPbp7A
+         i194dHQ6Ddd0qPW48qOzgbhq0zoJNZ/snu0vu0/intzz4evDliVwCM1C36B1R67LDcPU
+         FPZCMqC3v8CVKOxG02PSKnz25yNmVMIQ++YiCzy6329IInMb8Dqx0BOwjA9jMeTgyafW
+         E1bDvmigi/62n/1hoaShUILjYeT1D+uh0bmNLWWSuI45Yt04KeQn/8I4W8S7l0MqyFSM
+         Qx8jYJr5h2mDNV7KSssu3Sg6aypBIHUmIb8F1wGmPkxJpIcSykyNpvhjXTbKYp3DC6+S
+         7w9w==
+X-Forwarded-Encrypted: i=1; AJvYcCVhpvNw/cgnCM8wKnN104GjeZNhUEFv+YeZDseD+8D/mxbDuQZizFPInVHC9M2NFlqT5HM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWy2dzrIQ6XSzqKMnyz1FmEjeo0Vi/idQOiZX1WDw1HJ77Z4So
+	O6Q8b3uVIsnBC9qk7unv+Ht5V0MF9TlHthHTNav2Txy6aSV5aQiDY3ZISw5yZSlAVpg/brkxGIO
+	ydxUz/g==
+X-Received: from plbkb4.prod.google.com ([2002:a17:903:3384:b0:2a0:9439:b25b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3bac:b0:2aa:e6fa:2f6c
+ with SMTP id d9443c01a7336-2ae2e41a277mr4596915ad.24.1772144885217; Thu, 26
+ Feb 2026 14:28:05 -0800 (PST)
+Date: Thu, 26 Feb 2026 14:28:03 -0800
+In-Reply-To: <aaC0KGXmfhOMOrJ9@tycho.pizza>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|SJ5PPFC35D45AFD:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4e33f7c0-1e93-44d1-a25a-08de75834028
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: Iw3TwMBXiWCsuWyZjVqpiGdx52NVk4UGzFV2Cd9cTxLPDtOk5viJcreRbSqt/PeE08SXSZW/UU1Zpw4tlRQbkrWnVXERvBNii9mAvxXbqoc8ybqr2DR1eQxlc29Z+SfqEfpccdehe7Gpc8Xe2Hg4uK6ezpghYXlguEWiiUsGoUarLrcD6JyL+uZpz3FjDjlSCrCjyNusIMfYXEz8N3wTuLx9NrNvPGJpuhFxAL+Q2tNbr7KEJba+Z1KXh97XTxYj0r28BGXg0ivpvRluSuFD2xqwOn9qRhw43owC/YCq5XbLD/ruDZW1W/v0BPxOq5/ITLwgIprC3bSDE5CzaIs5ajJNVNW+8egGcHeSBF9xeva7vCyEoS4RJ7CFvpFbSu19xrRyMaCQz3z03ilgvIVXopIiBaG53vWOGuV1JFs3qU1UO7B03J9LSmJSeqcElIM9tY7FtlUQrBvrJzeF/QuSWvt/DLqxhjJhyoWzBHFoSxmjlvyVVDMc/Kg9P3zJ+kv23HGpLOBjFm0aokyDmMtX/yGBNzwdFsdKYw9b4v1L0vhla6Fo5K4ro5Unhnbm40FcZfyh4n/jUKaUfkYBXSNbTGut/fhYMyjFKzZKHrkwmcZx/IyndX9t+crrfEeyS77E8w6SG6KB7LD1VABta9nWF2zPmnlfFLD8lJgISzC5tgdtTEdH5CMJa2C3g+Y7DPgTLkR7VQnFp9+oFXMgC21PTabVlJ+VP94NjJdLvf2sulw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d2lRVGdKVGUxelowK3M1TmZOOHBvVU8zam9SMmhYRDErVUU5RHFzcFF2RzhX?=
- =?utf-8?B?MDhvZTFzNHAzNEVsNjBZYVRIYzg1b1NMQ0REenJTZmN5Wk5ZcmFRSVREQ1Zm?=
- =?utf-8?B?TUkrSEo5MG4wT0NGK2k2RnFqRGlqS3ZFMlNCbG9pZ0xtU0kxYS84aVpTdE1k?=
- =?utf-8?B?Ylo2VmllSUw0enBNbmNFbjRjQ1ZubmNOaHYwa0hDMjhMa1FuMkVGT3V4YThI?=
- =?utf-8?B?dEJvQVlKaG1UTjhXa2MvS3RqSXY1ZzVSaDdVWTRpc0RtR3cxdnJEU1pabXNn?=
- =?utf-8?B?VWZyUCtGNEZJakROQXgxN0VOODc1TVZSczhzWVRqK1JuVjhQU2JMUmsyaTNj?=
- =?utf-8?B?T0lheXIzZG44aHcwQ0E0V0djcFM5dk01VnB3OHAzdm50NkE5WGx4UUx5blRl?=
- =?utf-8?B?czcwOWc1Sm1KY0dZUE42Vlk3cXlJVitmdGFlaUpKc1VUUzNWZGRjUkoyWGtP?=
- =?utf-8?B?bnk3VVUrMndsUzBaNkhFTUYyeUtJeFhtU09DVy96QnFLZlhBbk52UHc5MU8y?=
- =?utf-8?B?SzNWNVhjaklXUnc2TkZ4dkJGMWZnSEVVSlJ1aEd1R2JYRVJFSzJVRXF1emdU?=
- =?utf-8?B?TGxtaTBkaC9hTGF3eTd5YkZKNmpNMGkzTVkxYmRwUGc5V3FjVHBydTMwbUxh?=
- =?utf-8?B?aEdYd0VNeDVROGdoNVZzZFpOd0tnM3RhZFJPanNjTzhDZ3ROdUdNT2dnRllx?=
- =?utf-8?B?cS9XMjZpNXNRdEtKbnNydlExQkRIMVcvWHFlSUJJNlRTU2I4UHc4Vi9DcVRH?=
- =?utf-8?B?Sm5MT2dLenY5ZlhYei8yUERRdVRwTmN6NlpQSXdIWG53am44eDlqUllrTkFQ?=
- =?utf-8?B?UlV6QURMT0FVZjBTVHk1VUVObTJaNlc3ajRKSVY0bWlLQlR1VDQwcURFMlU1?=
- =?utf-8?B?NmU0V3p4dXVkb0J2Vk4xa0d5U045ekc2elNMZUxZV3FDQVhUYi9TNjRRUnpr?=
- =?utf-8?B?WVAwNXpZMU9XdEVqZk4wTjVZZXA3SURqZjBFMzRuOTJOT01MeFc3RkozZU1O?=
- =?utf-8?B?UkJWdkpSL2dOOFQ4YnpVeWpxd2xXQjFWbmtqcTZYZzY2VkVzZUZ2SHhUU2VF?=
- =?utf-8?B?ZVlUQ2ZjV2dNVUgyZmdiek1PL2x1eTlUK0RLOXQ0YjRFWnNPaEowdFByT0pI?=
- =?utf-8?B?YjNWbTZGN0hzR1BsRUs2N2dOY1FHRU9tZGpVMFJSeHBSM095NVVKc2l3V01R?=
- =?utf-8?B?UDhWemk4Z2pySE9SaHo5M25WaUNFekR2SU11dGtzUnpwbXA4TnJoS296bmpm?=
- =?utf-8?B?TFNKelpkeGhhRW02UjFUKzJsakFHa2ZzTEp4elhzNzM0YjJJRFZOL0VoZGxO?=
- =?utf-8?B?TlI0V1ROVytXZkFRSU1SeEFNWFBrRlpjRXhscWlGNlkzS0lhOG9kZUlnWlI0?=
- =?utf-8?B?bmpMRDIrdTJpcVAraFpkVzFMazRaOVNTN3YrOUoyY1Vpc1Vib0JsQWl6SnlP?=
- =?utf-8?B?YlIwd1d1eXZBeUFYckN3MHZHWk4wcS83dVUwMmFWMk82RjdqMTJ2STFGNFF6?=
- =?utf-8?B?djVLdmF2SGpZWkRPNjhKUUlDZ1N0WFJuY1VGbjl0SWhFNVJDbkNlQXVxalVj?=
- =?utf-8?B?MndtQ0tVem1NbFFMMVMyWkFhN3VYbGsxN3UvNEFNWk84QmZXWG5hTW15NnRL?=
- =?utf-8?B?Z2J1WXA0N2k2S1hXWGxrK2E5M1Yra291UmZTb2lKRkFXeTBzakVnRWxXZUty?=
- =?utf-8?B?UjkwN1lraHBybVpQMms0Q2plelpWbEFHaGdyMVZiSXBuYkt3Kzg2NTV1M2tl?=
- =?utf-8?B?cTFQMURXbGY1c0crNmZsUENycmxSMXJsdGZRc0xVM2hTdzNuRUlsdUd3WU45?=
- =?utf-8?B?UFB5SWJHcHBuMVNJcE43M2RYalhIZ2h1bzhrU2RmcVFPMmlGT3o0clR2SE4x?=
- =?utf-8?B?cktnQURYemRlRUI5S2tuRm1uZHQveTRvQmtocnRHSjRyeExadTdrUGgwK3Rv?=
- =?utf-8?B?amhxV3dkUm1VNmRjRDlUd0FRampQVG41Zm5aMnlyb2FxeFc1elpuNFhVZXpi?=
- =?utf-8?B?ODBudWNGU1RPWkptMUU1YnRRU01OODlmVm5uN1RVVXhwRFgySXhvTjQ0cktW?=
- =?utf-8?B?WUNTK0hYUkhSbTlxaGsxd0Iyb3JuNDRIZTZMVExpclJKZndoWDNGbHZLUUND?=
- =?utf-8?B?TGk3NE5EbXJtWFd3R29ZdkxBQnkxT1hKZCtJZ1JpRHhGUzlsZjhYZjlpWldS?=
- =?utf-8?B?Y1hyS2VQck9tYjZwNzBNek01UEdjQzdWNi9TaWhENDBQVEszZm54VThxMkhk?=
- =?utf-8?B?a1RROWZjNkVOUTNtRVh2WGhJV1A2K1B1Qy9TVng2NS9CL0xsL1RXQlhEdGRS?=
- =?utf-8?B?c29JM2RZbFJCNEF0ZE9STUx2eDJxdzBPVkFoc3dvVnorL2g4YVJPUU1jVlRF?=
- =?utf-8?Q?JqJhRUxwDYKeNnwE=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e33f7c0-1e93-44d1-a25a-08de75834028
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 22:06:11.2574
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: p+IXidtWr0oHYlj48ZiwPclIOfy/gVNv8gbXLNvuysw1SPcOWjetKBsrieXn0S9z3mklhr4THnUjymW/33hhXWJ7FgoUxBAKGZ4oZqLP0q4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPFC35D45AFD
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+References: <20260223162900.772669-1-tycho@kernel.org> <20260223162900.772669-3-tycho@kernel.org>
+ <aZyCEBo07EHw2Prk@google.com> <aZyE4zvPtujZ4-6X@tycho.pizza>
+ <aZyLIWtffvEnmtYh@google.com> <aZzQy7c8VqCaZ_fE@tycho.pizza>
+ <aZ3ntHUPXNTNoyx2@google.com> <aZ8xje-iM0_9ACie@tycho.pizza>
+ <aZ8077EfpxRGmT-O@google.com> <aaC0KGXmfhOMOrJ9@tycho.pizza>
+Message-ID: <aaDI83LDFj9Be-sH@google.com>
+Subject: Re: [PATCH 2/4] selftests/kvm: check that SEV-ES VMs are allowed in
+ SEV-SNP mode
+From: Sean Christopherson <seanjc@google.com>
+To: Tycho Andersen <tycho@kernel.org>
+Cc: Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
+	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72092-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72093-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim,dwillia2-mobl4.notmuch:mid];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dan.j.williams@intel.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	FROM_NO_DN(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 8F09E1B02EF
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 726951B06A4
 X-Rspamd-Action: no action
 
-Chao Gao wrote:
-[..]
-> >Do not make Linux carry short lived one-off complexity. Make userspace
-> >do a "if $module_version < $min_module_version_for_compat_detect" and
-> >tell the user to update at their own risk if that minimum version is not
-> >met. Linux should be encouraging the module to be better, not
-> >accommodate every early generation miss like this with permanent hacks.
+On Thu, Feb 26, 2026, Tycho Andersen wrote:
+> On Wed, Feb 25, 2026 at 09:44:15AM -0800, Sean Christopherson wrote:
+> > Ya, I don't have a better idea.  Bleeding VM types into the CCP driver might be
+> > a bit wonky, though I guess it is uAPI so it's certainly not a KVM-internal detail.
 > 
-> I realize there's a potential issue with this update sequence:
+> Turns out this approach breaks the selftests, which is at least one
+> userspace:
 > 
-> old module (no compat detection) -> newer module (has compat detection) -> latest module
+> # ./sev_init2_tests
+> Random seed: 0x6b8b4567
+> ==== Test Assertion Failure ====
+>   x86/sev_init2_tests.c:141: have_sev_es == !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_ES_VM))
+>   pid=12498 tid=12498 errno=0 - Success
+>      1	0x0000000000402747: main at sev_init2_tests.c:141 (discriminator 2)
+>      2	0x00007f9adae2a1c9: ?? ??:0
+>      3	0x00007f9adae2a28a: ?? ??:0
+>      4	0x0000000000402934: _start at ??:?
+>   sev-es: KVM_CAP_VM_TYPES (15) does not match cpuid (checking 8)
 > 
-> The problem arises during the second update. Userspace checks the currently
-> loaded module version and sees it supports compatibility detection, so it
-> expects the kernel to perform these checks. However, the kernel still thinks
-> the module lacks this capability because it never refreshes the module's
-> features after the first update.
+> As near as I can tell qemu doesn't do the same anywhere. SNP guests
+> run fine, and SEV-ES says something reasonable:
 > 
-> Regarding disabling updates, I was thinking of an approach like the one below.
-> Do you think this is a workaround/hack?
+> qemu-system-x86_64: sev_launch_start: LAUNCH_START ret=1 fw_error=21 'Feature not supported'
+> qemu-system-x86_64: sev_common_kvm_init: failed to create encryption context
+> qemu-system-x86_64: failed to initialize kvm: Operation not permitted
+> 
+> Thoughts?
 
-Do not include logic to disable updates, document the expectation in the
-tool. The general Linux expectation is administrator does not need to be
-protected from themselves. The tool documentation can communicate best
-practices that "time begins with module version X, only loading a
-version X+ module from boot enables the safety protocol, runtime update
-to X is insufficient". Administrator always has the option to proceed
-and does not need the kernel to do extra hand holding.
+Breaking selftests is totally fine, they don't count as real users (the whole
+point is to validate KVM behavior; if we weren't allowed to break selftests, we
+literally couldn't fix a huge pile of KVM bugs).
 
-Presumably this gap in the ecosystem is short lived and the deployment
-of module versions < X drops precipitously and kernel does not need to
-carry "disable updates" logic in perpetuity.
+Even if a real VMM has a similar sanity check, I wouldn't consider an assertion
+firing to be a breaking flaw.  No matter what, the VMM won't be able to launch an
+SEV-ES guest.
+
+For selftests, something like this?
+
+	have_sev_es = kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_ES_VM);
+	TEST_ASSERT(!have_sev_es || kvm_cpu_has(X86_FEATURE_SEV_ES),
+		    "sev-es: SEV_ES_VM supported without SEV_ES in CPUID");
+
+	have_snp = kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SNP_VM);
+	TEST_ASSERT(!have_snp || kvm_cpu_has(X86_FEATURE_SEV_SNP),
+		    "sev-snp: SNP_VM supported with SEV_SNP in CPUID");
+
 
