@@ -1,272 +1,374 @@
-Return-Path: <kvm+bounces-71998-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71999-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UHzwFbNVoGlLiQQAu9opvQ
-	(envelope-from <kvm+bounces-71998-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 15:16:19 +0100
+	id uGJ8HflYoGlPigQAu9opvQ
+	(envelope-from <kvm+bounces-71999-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 15:30:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A6691A7559
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 15:16:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F1791A78F5
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 15:30:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2AEA230BE1F3
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 14:04:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 859D33054DF9
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 14:07:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9653A372B44;
-	Thu, 26 Feb 2026 14:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F6E372B4D;
+	Thu, 26 Feb 2026 14:07:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ccdIqG4u"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="W645n4vm";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="W645n4vm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010017.outbound.protection.outlook.com [52.101.84.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2027363C67;
-	Thu, 26 Feb 2026 14:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772114626; cv=none; b=nrYUzV8z6+pP6aadoAk4v2q2V+vGwgG881/o/HS5ARoGXHP56P5EcjxRwbnGrGuXqGKDWWDyI+Pvbk8RWeXhcwYQQkVzv9m80CFsfsv3WP80Zyhu/8coCbPc2Mik+h++l5up6X6lWeXTRKUmQo+hodqTEFxfAITS0cUxxHMWh6U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772114626; c=relaxed/simple;
-	bh=TGTc+iy5BrdlOPZCyDdQy2gTRrnVhB/7YQfvyKlN4xo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f3QN6uCXD9ECFKlD67GXd6AF7Y5cMhs8AoysAresld20ECKEgmnoEPulxHrU7/M9Cg7ezb0H4oVtuJC37ifr6ptCf/prHGYUpQIP8LhEcfChPYNgwbmEBplgGJllQHz6kwNqwsUokykn4qcZ9KaJJK29vZ3uLOr1mwGgrWWQL4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ccdIqG4u; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61Q9XHBi2347259;
-	Thu, 26 Feb 2026 14:03:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=YzKEkB
-	RpYafOP3d+slpakxYfL4C894NUmgnNRW74a2w=; b=ccdIqG4uVsfSzE8WeKt1Tp
-	3vP/qHZgedZgZxr+EdDpQZLWCZc8ZchYlwQJCpK/JMlH1MU6s19fsr+/q0fkz5P2
-	JUKf7Jy8xguiE/SnM+SNrkIWYFOCNBZo+K/yIu0k/dlvfqijvtnBTcQ2sgSU1x+2
-	vwQztgydaooTZi9MtEhJmX4l7asM2j7cLwogKekn9XqFCWBa7wuxLabcZkqc5l47
-	twMXbmUEhRYRXKuoH/suWLLWjLmGHJwJQVKZp/ziEAmurqNn/rJfKTknt6ePEnZU
-	VXcKO5yjUYrIMIf0ElZXFRccKjQwlIA4yoqpbJlcEB6wTcQLWG2KXK3M0cy43wLw
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ch858v7jw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Feb 2026 14:03:44 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61QCsjme013411;
-	Thu, 26 Feb 2026 14:03:43 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cfqdybwg5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Feb 2026 14:03:43 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61QE3dsD52035872
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 26 Feb 2026 14:03:39 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AFAAF2004E;
-	Thu, 26 Feb 2026 14:03:39 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 68F1220043;
-	Thu, 26 Feb 2026 14:03:39 +0000 (GMT)
-Received: from [9.111.63.198] (unknown [9.111.63.198])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 26 Feb 2026 14:03:39 +0000 (GMT)
-Message-ID: <8b146431-a45a-42ae-8b51-0856c0f3d038@linux.ibm.com>
-Date: Thu, 26 Feb 2026 15:03:39 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C555332902;
+	Thu, 26 Feb 2026 14:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.17
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772114819; cv=fail; b=WXaXZy1JO2gxqzj+RRvQx7IcyABo67dYH6IW9cHO3do6OEUwKx0u2WSppVgsaYptNNXbyucrdiH1mksojv3IbagO0H+q6IgIFqDf/hj5VEDhOm0PlltORiVwS3/bKpKA08zzsBq4jpwJIzZOOJ9mDmO5qAgAprwUlW9CH3VLUIc=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772114819; c=relaxed/simple;
+	bh=BQIv/00MyhEGiH372ByFJhgNgLeHG2Y8ZhzSxSSR6o8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=eSSr1SOUYY3SyymHKazfYp2NWw4J0Zj7qdKW8J/TECwOHGi8LrWtnFMJnRYbci97vuy8wm4IC61AHLsUtDIeTIzhD2Lhv4yzqvZ9z+xzkBgnb7XNuHAccetRrkLf6LxjtZuTppHAfcmldsX0vYiDnTLUL7hdFQGsMf5YNoQW0Zg=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=W645n4vm; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=W645n4vm; arc=fail smtp.client-ip=52.101.84.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=uu83RncXK0f9Ia27Z6PotNHxMwLBjpBGHZlLneuw4erTO4zK59l+sGWyAvuBaEMPMGvqvRZvOkxTTM521dP/GsVC6gfnp74UbaejdRqLLk/4g1NSMX2k0YxrZcL1rBgQQNfoyXDMpbAoa3a85xKtQp1So7MsjbeA0SF8pd6/a2xnsmMazoQertQLmobYP/i7FBeudMcIbUjxBomciwRP09JQE3R6onBT6GfzuShE0UqAz/agmfRw040AEyHLCEAxAedz+t4/e/k/wO2pt5YbkmVH3JlfnRstbjlimvb0RR13y1PuIpQgcrMA33rJpzB65e8Q+dYuFL/n4zoylU6/rg==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Tjj1GwNmvjc2glJANIeb9zv6834LqMESa/87e2HukZU=;
+ b=K32UeXrofq91ssTEUNmZHb/SHWFCB5W1Baliae3B/xmnyIVPons8aKgrQekhr33s0WTmAn68xh7WB9rY8/1V0szputljKGJBOIM51DYoES9nVKnZ3+7sBkuOcCPAQIlFQ7d8V1ozijUMym3KWADyUfwgZnkptUiien9ubcqM5x8l/ZbxJ9v5fQPde8bQhMR90CvW1ObAfVaSJiDdsDKqhpbhd6z8FVVfJUaL5DJyEMNPH+dKgMALrf3+phvHM6R+z+562L9Gxp3qxVUVCxSodd4ZG4fNab+8wIQgw02pGe68JMMfDJfVtMOMTpDYttxcN+Pb2tuI3d6GRQLf3hFaXw==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
+ (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
+ (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Tjj1GwNmvjc2glJANIeb9zv6834LqMESa/87e2HukZU=;
+ b=W645n4vmIUYw3sPZqZ8x5Fpo+hHToC8rV/nyE7PEAx+RLs1zqrQ+XMAnlslpDjdKmvibwByNHolUZ/j8TbaCBYTYhjRVB239eCEBXQvdnh5AoXF3dWQWRPFmUJpO8jR4cjyG4yNrIaH/5A58BBkEXp+d9sOS7gSD6xvip7BoYDk=
+Received: from DU7P195CA0010.EURP195.PROD.OUTLOOK.COM (2603:10a6:10:54d::13)
+ by AM8PR08MB5554.eurprd08.prod.outlook.com (2603:10a6:20b:1c5::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.23; Thu, 26 Feb
+ 2026 14:06:48 +0000
+Received: from DB1PEPF000509EB.eurprd03.prod.outlook.com
+ (2603:10a6:10:54d:cafe::c6) by DU7P195CA0010.outlook.office365.com
+ (2603:10a6:10:54d::13) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.25 via Frontend Transport; Thu,
+ 26 Feb 2026 14:06:47 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=arm.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
+ client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
+Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
+ DB1PEPF000509EB.mail.protection.outlook.com (10.167.242.69) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.12
+ via Frontend Transport; Thu, 26 Feb 2026 14:06:48 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=N4Nd/dTTqa7FeJgniF22doUtaqqhuzpDnZpcQZ2OCZYFOtnu4pXbRBclPfjFrfer/vpEDT/EFXxHreYL3lXybHaK6x1ETtGiGlr6c7V4+N3Bqwpv2tfpMsFVIaCl0bJhPygLzKI7OECtA6i52v/1Cu8xqZXn59Hoe3yz8vZrY7cTKHxf/t5qEqQQJhSkQFbGLAuMK61iA2177cLpWPDGm5HJA+xWxZYVaOrtwyW5BMNbgSYr3p5XEB4x67TMEGLo6suc4uF5aIk8mTRsSgpKgDp2lbCNNF2WcVWIYVgOtKNU1fYwk8cRHpXg+cAGEzgL9azgDg1e+0HGHlGux6bg5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Tjj1GwNmvjc2glJANIeb9zv6834LqMESa/87e2HukZU=;
+ b=dKPaFxDDWxayFwCBG8fTirVps7vN8r7ug8fcAqjBm6ECotEXEMBgqJvhNGtetTTxs2arHKHvnQM2qGPq6Hedu4cEPbq8DY/rPKEVHcE9IS2f4SoxQu8dHq0UB4buXkRREtZm8M2dbTefKhJpt4ZVydkWX6zHZMRPvZmg9XIK2Bh7OGnf7AvLpKHUFjNzTB8w2sCujqaJ47yP8XXO1IC5nDljUPCHZ3OgetIo8aiwMy8YgST2DSH8aPfY8M3mHiJkzfUw6aUe7EQy2j1zwZIMCfxYVqzfDyWaOKReYWEMdoKbOjPOS4PO9qBdha9mM/CbL6WiRCZAZzek9cAQLoPh+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Tjj1GwNmvjc2glJANIeb9zv6834LqMESa/87e2HukZU=;
+ b=W645n4vmIUYw3sPZqZ8x5Fpo+hHToC8rV/nyE7PEAx+RLs1zqrQ+XMAnlslpDjdKmvibwByNHolUZ/j8TbaCBYTYhjRVB239eCEBXQvdnh5AoXF3dWQWRPFmUJpO8jR4cjyG4yNrIaH/5A58BBkEXp+d9sOS7gSD6xvip7BoYDk=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
+ (2603:10a6:150:163::20) by AS1PR08MB7537.eurprd08.prod.outlook.com
+ (2603:10a6:20b:481::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.14; Thu, 26 Feb
+ 2026 14:05:42 +0000
+Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
+ ([fe80::8c9b:58d2:2080:eb98]) by GV1PR08MB10521.eurprd08.prod.outlook.com
+ ([fe80::8c9b:58d2:2080:eb98%3]) with mapi id 15.20.9654.014; Thu, 26 Feb 2026
+ 14:05:42 +0000
+Date: Thu, 26 Feb 2026 14:05:39 +0000
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, catalin.marinas@arm.com,
+	will@kernel.org, oupton@kernel.org, miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com, broonie@kernel.org, ardb@kernel.org,
+	suzuki.poulose@arm.com, lpieralisi@kernel.org, joey.gouly@arm.com,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH v14 7/8] KVM: arm64: use CASLT instruction for swapping
+ guest descriptor
+Message-ID: <aaBTM3C2MbIvtUn8@e129823.arm.com>
+References: <20260225182708.3225211-1-yeoreum.yun@arm.com>
+ <20260225182708.3225211-8-yeoreum.yun@arm.com>
+ <867brzah6g.wl-maz@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <867brzah6g.wl-maz@kernel.org>
+X-ClientProxiedBy: LO2P265CA0102.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:c::18) To GV1PR08MB10521.eurprd08.prod.outlook.com
+ (2603:10a6:150:163::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] KVM: s390: Limit adapter indicator access to mapped
- page
-To: Matthew Rosato <mjrosato@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        borntraeger@linux.ibm.com, freimuth@linux.ibm.com
-References: <20260217090230.8116-1-frankja@linux.ibm.com>
- <20260217090230.8116-2-frankja@linux.ibm.com>
- <67c8bb91-32ac-4e1e-8b97-9ff8f55a4e61@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <67c8bb91-32ac-4e1e-8b97-9ff8f55a4e61@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI2MDEyMyBTYWx0ZWRfXys7Nz1MD8ihE
- JXtgoVFoxK0do2Radci/0OUWx+vGDupvzSK9S5RAYGZpTxFpFwaksUNy+HWe07tQM2/Bih6hkDA
- dvgwCunX8ZkPQw3lMgCqgbs70+WXzP8ADjB3/rLeFZDpZzekqyED375Ufy0bVcv5fKxuCYFAwI7
- C3Rb53nr5sj00SwcpcLdNKMEuttR4mPf+Hv5Hqlv22H5jeEQWlRFAOH5unu0+SQeOlfVSkO/Tdz
- APyCYkpsvOd/VPD1ViVwPHqUiZ5e0pfAL6ORDUXbFljwNgjaaSzzcAlofW79qg9wLHtCn/x2MeQ
- Z+m5gP6O1506mKh7Gd9Gbss59+GTjvbNtoIjQG7eATxwqIl+8nWHCOpgMfQMa3FfWE190J7YGpO
- MTcaH5eMi9MREn4Tp2OLD7wd8NYEN7NbkZG6Nr66dP1IzCsaUiVPqB4bgn38+1OAZj7Ij/WhP8n
- CbrmsPcLv2QYZEUviQg==
-X-Proofpoint-GUID: 5H7hgd7Z5DO_OZ28YKctE4OEErHqWbyO
-X-Authority-Analysis: v=2.4 cv=S4HUAYsP c=1 sm=1 tr=0 ts=69a052c0 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VnNF1IyMAAAA:8
- a=l1inpYFEJG_sGDLN6k8A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 5H7hgd7Z5DO_OZ28YKctE4OEErHqWbyO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-25_04,2026-02-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 clxscore=1015 impostorscore=0 malwarescore=0 bulkscore=0
- phishscore=0 adultscore=0 lowpriorityscore=0 spamscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602260123
+X-MS-TrafficTypeDiagnostic:
+	GV1PR08MB10521:EE_|AS1PR08MB7537:EE_|DB1PEPF000509EB:EE_|AM8PR08MB5554:EE_
+X-MS-Office365-Filtering-Correlation-Id: e61ee321-230b-457d-c802-08de75404865
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info-Original:
+ Jv6qdiNMg0MFSuDz846flCcX7UGgbM1avS4YwLaD3uzmctjLWUz1VorqbCEbjjhQy29R012e5AsDPSH3Oxhdb2BIxR5o/zl3s+vCgMWFTCjYHpSxMVYCLZLO3rfmZJT0FiH5apdwq4faMSvHNckX76hzxOZVvn9d2s2qEFH20IVpPNCg6TNEGEXMpRWi/D2ZQ1yX6jgN3e4QYZKXmqK6aE4BYtWspVw4P3SrJz1ypjJxPnE0oK6hbBBm6PEm42GJRwwqvcN3dgJXk3Pu0CeGt5c55ldNjiw9maqPuQt8X8VnasPeXoIFvKuCRtve2nQLBKGe/EhgabesQNWuDXmKmjAnYaW7iGmDzH2g9kvAJsQIKw7XcYufdYkRUiabMJaZgvDBcI72XpbtR7pPK3dN7aCuBfDxcvjbVEVdORZabdqL+rQXrf1zA/6ruKW2Wduyxm3VfPGAHrgGQ6hKUmpOzH3kM2LjNiu/DFAyvf8nlmuZ4HCJ3/X3n8phXRFKg9yfOJjAuOjVbGX/Sy9RdwaKplag0nOliUko/AOUxfuxMKrxeFmUWyOUZjLyrSGW/pKh/LrDyyMk+ku1ZLfUgsgI+Z5dXCeNkmWBAzv9Ve1x+1GfELs9OYz8FoA/gNVK+GvsiCKFXOlrh4dMaUBdZa2cM6mtFXAq/k52O1Rg5nhz40XoR5bpPLwvRWkyQeOWp2P9
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB10521.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR08MB7537
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ DB1PEPF000509EB.eurprd03.prod.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	b292a5f2-e66e-420f-2abe-08de754020f4
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|35042699022|82310400026|36860700013|1800799024|376014|7416014|14060799003|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	AjN+2QJblqVsELNa2IvI5hdl9C4Z1FXKp+3U/m2lXrUxK40PbZyrpan5qQ+8cPxXpkbYkGXHtRMRFOvjyGeZHf0fUSf9H8dcYJzT/W9v8uBBULssF8e5a/Tp3ZHjtTkmFvGcXxaYEzkn8XydH80nJkfdgI0sVsymQ0xh9gQR9CBKgORxLYXU7NK4FgeWvlo9QV7RDoeOSgdJCS1/wXB6ptYVdyc+flpqoiVtKNx0uZKAvLQQoMhNJ314NnZ9lQHwkKw5mrQ86Two839bjiUjHpytA0zBiVFVoPCtp4t+xN7bWolmBPMYGHq4Ftq4CVFRKLt1uJoGkhAeHVB4f15dyUXPiIiEt5Wct0jkuea6ReejaavJzAnzPxnfGst3sHVT0x0nOl5LNZ8I/HrV0xEmgdlRzeqou681BtbLQ4qlYwRpKq6KZh50K/svq5JEn47s0E5pqzjIXEpMAB8vOBIVx2vY+KKqrho3WXkXiz4PPpYufMtdH2VaHi/7DitU5gT23ZKtxW1cVipDgYlo4xiE7E/vQT3koyg8hf/72L55WO1/uFiJyhX8Lc+7d1xn91xTOydj2cQql+k2Jzs3z//2FNDEBlBHkTKYXff6LfLjKa9fmjK6bHvA54Hvjf/XL2bTcg3KFOlNFTKmlHs06D6F42CY45XTSgyCgDqSwucA04J4GEuw/zvwY3BfSbpteHCyU1aNnUdwipH1lCxqLu44vJnMaD1X/WmfAeczxTIEDBXaFIoovpm3IXjxswvM6BSMcYJbT7nP7f1FF6CRoYdeQAqYF6rQvaH10UhRYJZ/ZRg=
+X-Forefront-Antispam-Report:
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(35042699022)(82310400026)(36860700013)(1800799024)(376014)(7416014)(14060799003)(13003099007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	BP7YjMq4QVuzqJmyz4BGjoT7Yv4II48uCtqk3B4DItMBhcXd6DKesBd5nk2WUUUjqf1XENtFTJhGRxCNBWVQ0nylFEgnq3l+0eh8TQxIH5p72mx1nfM4WB7D0M8EW5S9KKNM6NjBvNKb5HOowXU3eUxXHkl8K7OhQf2n1rSQ6B9pDizynJsxbdrKaggIpVazjg136U8iDHv40nJr49IYTtb2/ashymE6Q3ScJQy8S41xyetFCHiQaVa1e8oA3hcoz+l4oHQL/tItkqHngCgsLZQqc7w9jWE25ybw5yHj0r1F44rOWLA3x6t7W8xxqRNo90yfFF/7sWvW12do+h4FkEopqBVPcXCdGTPrh0oc7jaoAvD9sKz2bKROT3gWmfjeu8bEv94LEU4/wx8+XoV6hT64c5nIO4WfdbJF/TmCwileK97f/DSbCARdHyKv4Dvr
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2026 14:06:48.5136
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e61ee321-230b-457d-c802-08de75404865
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB1PEPF000509EB.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR08MB5554
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=3];
+	DMARC_POLICY_ALLOW(-0.50)[arm.com,none];
+	R_DKIM_ALLOW(-0.20)[arm.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71998-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71999-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[frankja@linux.ibm.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,arm.com:email,arm.com:dkim,e129823.arm.com:mid];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[arm.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yeoreum.yun@arm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 1A6691A7559
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 7F1791A78F5
 X-Rspamd-Action: no action
 
-On 2/26/26 00:42, Matthew Rosato wrote:
-> On 2/17/26 3:54 AM, Janosch Frank wrote:
->> While we check the address for errors, we don't seem to check the bit
->> offsets and since they are 32 and 64 bits a lot of memory can be
->> reached indirectly via those offsets.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Fixes: 84223598778b ("KVM: s390: irq routing for adapter interrupts.")
->> ---
->>   arch/s390/kvm/interrupt.c | 12 ++++++++++++
->>   1 file changed, 12 insertions(+)
->>
->> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
->> index 1c2bb5cd7e12..cd4851e33a5b 100644
->> --- a/arch/s390/kvm/interrupt.c
->> +++ b/arch/s390/kvm/interrupt.c
->> @@ -2724,6 +2724,9 @@ static unsigned long get_ind_bit(__u64 addr, unsigned long bit_nr, bool swap)
->>   
->>   	bit = bit_nr + (addr % PAGE_SIZE) * 8;
->>   
->> +	/* kvm_set_routing_entry() should never allow this to happen */
->> +	WARN_ON_ONCE(bit > (PAGE_SIZE * BITS_PER_BYTE - 1));
->> +
->>   	return swap ? (bit ^ (BITS_PER_LONG - 1)) : bit;
->>   }
->>   
->> @@ -2852,6 +2855,7 @@ int kvm_set_routing_entry(struct kvm *kvm,
->>   			  struct kvm_kernel_irq_routing_entry *e,
->>   			  const struct kvm_irq_routing_entry *ue)
->>   {
->> +	const struct kvm_irq_routing_s390_adapter *adapter;
->>   	u64 uaddr_s, uaddr_i;
->>   	int idx;
->>   
->> @@ -2862,6 +2866,14 @@ int kvm_set_routing_entry(struct kvm *kvm,
->>   			return -EINVAL;
->>   		e->set = set_adapter_int;
->>   
->> +		adapter = &ue->u.adapter;
->> +		if (adapter->summary_addr + BITS_TO_BYTES(adapter->summary_offset) >=
->> +		    (adapter->summary_addr & PAGE_MASK) + PAGE_SIZE)
->> +			return -EINVAL;
->> +		if (adapter->ind_addr + BITS_TO_BYTES(adapter->ind_offset) >=
->> +		    (adapter->ind_addr & PAGE_MASK) + PAGE_SIZE)
->> +			return -EINVAL;
->> +
-> 
-> 
-> I think this is slightly off.
-> 
-> The offset should indicate a bit offset from the beginning of the byte, so offsets 0-7 are all within the same byte as the specified address, 8-15 are in the next byte, etc.
-> 
-> I hacked QEMU and tested something like...
-> 1) addr 8126efff offset 7 -- this would be the very last bit in the page.
-> 2) addr 8126efff offset 8 -- this would be the very first bit in the next page.
-> 3) addr 8126efff offset 9 -- this would be the 2nd bit in the next page.
-> 
-> I expected (1) to pass while (2) and (3) were rejected, but all 3 were rejected by your check.
-> 
-> I think the problem is that BITS_TO_BYTES rounds up.  So:
-> BITS_TO_BYTES(0) = 0
+Hi Marc,
 
-ugh, right.
+> On Wed, 25 Feb 2026 18:27:07 +0000,
+> Yeoreum Yun <yeoreum.yun@arm.com> wrote:
+> >
+> > Use the CASLT instruction to swap the guest descriptor when FEAT_LSUI
+> > is enabled, avoiding the need to clear the PAN bit.
+> >
+> > Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> > ---
+> >  arch/arm64/include/asm/cpucaps.h |  2 ++
+> >  arch/arm64/include/asm/futex.h   | 17 +----------------
+> >  arch/arm64/include/asm/lsui.h    | 27 +++++++++++++++++++++++++++
+> >  arch/arm64/kvm/at.c              | 30 +++++++++++++++++++++++++++++-
+> >  4 files changed, 59 insertions(+), 17 deletions(-)
+> >  create mode 100644 arch/arm64/include/asm/lsui.h
+> >
+> > diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+> > index 177c691914f8..6e3da333442e 100644
+> > --- a/arch/arm64/include/asm/cpucaps.h
+> > +++ b/arch/arm64/include/asm/cpucaps.h
+> > @@ -71,6 +71,8 @@ cpucap_is_possible(const unsigned int cap)
+> >  		return true;
+> >  	case ARM64_HAS_PMUV3:
+> >  		return IS_ENABLED(CONFIG_HW_PERF_EVENTS);
+> > +	case ARM64_HAS_LSUI:
+> > +		return IS_ENABLED(CONFIG_ARM64_LSUI);
+> >  	}
+> >
+> >  	return true;
+>
+> It would make more sense to move this hunk to the first patch, where
+> you deal with features and capabilities, instead of having this in a
+> random KVM-specific patch.
 
+Okay. But as Suzuki mention, I think it seems to be redundant.
+I'll remove it.
 
-> BITS_TO_BYTES(1..8) = 1
-> BITS_TO_BYTES(9..16) = 2
-> and so on.
-> 
-> But your offset check expects
-> 0..7 = 0
-> 8..15 = 1
-> and so on.
-> 
-> AFAICT replacing BITS_TO_BYTES(offset) with (offset / 8) would work.
+>
+> > diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+> > index b579e9d0964d..6779c4ad927f 100644
+> > --- a/arch/arm64/include/asm/futex.h
+> > +++ b/arch/arm64/include/asm/futex.h
+> > @@ -7,11 +7,9 @@
+> >
+> >  #include <linux/futex.h>
+> >  #include <linux/uaccess.h>
+> > -#include <linux/stringify.h>
+> >
+> > -#include <asm/alternative.h>
+> > -#include <asm/alternative-macros.h>
+> >  #include <asm/errno.h>
+> > +#include <asm/lsui.h>
+> >
+> >  #define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
+> >
+> > @@ -91,8 +89,6 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+> >
+> >  #ifdef CONFIG_ARM64_LSUI
+> >
+> > -#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> > -
+> >  #define LSUI_FUTEX_ATOMIC_OP(op, asm_op)				\
+> >  static __always_inline int						\
+> >  __lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+> > @@ -235,17 +231,6 @@ __lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+> >  {
+> >  	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
+> >  }
+> > -
+> > -#define __lsui_llsc_body(op, ...)					\
+> > -({									\
+> > -	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
+> > -		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
+> > -})
+> > -
+> > -#else	/* CONFIG_ARM64_LSUI */
+> > -
+> > -#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
+> > -
+> >  #endif	/* CONFIG_ARM64_LSUI */
+> >
+> >
+> > diff --git a/arch/arm64/include/asm/lsui.h b/arch/arm64/include/asm/lsui.h
+> > new file mode 100644
+> > index 000000000000..8f0d81953eb6
+> > --- /dev/null
+> > +++ b/arch/arm64/include/asm/lsui.h
+> > @@ -0,0 +1,27 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#ifndef __ASM_LSUI_H
+> > +#define __ASM_LSUI_H
+> > +
+> > +#include <linux/compiler_types.h>
+> > +#include <linux/stringify.h>
+> > +#include <asm/alternative.h>
+> > +#include <asm/alternative-macros.h>
+> > +#include <asm/cpucaps.h>
+> > +
+> > +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> > +
+> > +#ifdef CONFIG_ARM64_LSUI
+> > +
+> > +#define __lsui_llsc_body(op, ...)					\
+> > +({									\
+> > +	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
+> > +		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
+> > +})
+> > +
+> > +#else	/* CONFIG_ARM64_LSUI */
+> > +
+> > +#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
+> > +
+> > +#endif	/* CONFIG_ARM64_LSUI */
+> > +
+> > +#endif	/* __ASM_LSUI_H */
+>
+> Similarly, fold this into the patch that introduces FEAT_LSUI support
+> for futexes (#5) so that the code is in its final position from the
+> beginning. This will avoid churn that makes the patches pointlessly
+> hard to follow, since this change is unrelated to KVM.
 
-Yeah, rounding down should work.
-I wanted to have a fancy macro but didn't work out...
+Okay. I'll fold it into #5.
 
-I'll re-spin and make sure the test will catch this problem as well as 
-the issue I'm trying to fix.
+>
+> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > index 885bd5bb2f41..fd3c5749e853 100644
+> > --- a/arch/arm64/kvm/at.c
+> > +++ b/arch/arm64/kvm/at.c
+> > @@ -9,6 +9,7 @@
+> >  #include <asm/esr.h>
+> >  #include <asm/kvm_hyp.h>
+> >  #include <asm/kvm_mmu.h>
+> > +#include <asm/lsui.h>
+> >
+> >  static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool s1ptw)
+> >  {
+> > @@ -1704,6 +1705,31 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
+> >  	}
+> >  }
+> >
+> > +static int __lsui_swap_desc(u64 __user *ptep, u64 old, u64 new)
+> > +{
+> > +	u64 tmp = old;
+> > +	int ret = 0;
+> > +
+> > +	uaccess_ttbr0_enable();
+>
+> Why do we need this? If FEAT_LSUI is present, than FEAT_PAN is also
+> present. And since PAN support not a compilation option anymore, we
+> should be able to rely on PAN being enabled.
+>
+> Or am I missing something? If so, please document why we require it.
+
+That was my origin thought but there was relevant discussion about this:
+  - https://lore.kernel.org/all/aW5dzb0ldp8u8Rdm@willie-the-truck/
+  - https://lore.kernel.org/all/aYtZfpWjRJ1r23nw@arm.com/
+
+In summary, I couldn't make that assumption --
+PAN always presents when LSUI presents for :
+
+   - CPU bugs happen all the time
+   - Virtualisation and idreg overrides mean illegal feature combinations
+    can show up
+
+So, uaccess_ttbr0_enable() is for when SW_PAN is enabled.
+
+I'll make a comment for this.
+
+[...]
+
+Thanks!
+
+--
+Sincerely,
+Yeoreum Yun
 
