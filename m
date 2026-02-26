@@ -1,189 +1,303 @@
-Return-Path: <kvm+bounces-72078-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72079-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iD/yDqKqoGlGlgQAu9opvQ
-	(envelope-from <kvm+bounces-72078-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 21:18:42 +0100
+	id mEgVCu2roGlulgQAu9opvQ
+	(envelope-from <kvm+bounces-72079-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 21:24:13 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D12BA1AF006
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 21:18:41 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A4191AF0EC
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 21:24:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1B2C230EF1FB
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:14:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 30A54301E72C
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8955645BD40;
-	Thu, 26 Feb 2026 20:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873BF4657D8;
+	Thu, 26 Feb 2026 20:22:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aBxUevVm"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="RROaW/RV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD9A38B7B4
-	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 20:14:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772136853; cv=pass; b=N26diONMpWfpuVYdz4v5JKIqSnEfIcBHLQQyNwv6FpL/fu2v5/CSAM1cQCLDCPw9CSWJFBwmK7k0aSiXIejV3yibe/TPKLaHWz19VfM5hZGf7f/WE0bSSAVXWKjWqB+HD0klFKPwkFfWBsjzw+CwI0tFXEM4lEyGcdehYB3Mdmw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772136853; c=relaxed/simple;
-	bh=Le3CCRs2YmUgLyN92lo7YhPPn3XSu/iya9OUAV8O3a0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EDDaAVUJK2zd2efeBwqKvnanf6/924BwZqrh8blcnehDd25/ACcSSvEbwvd5cE69HJHi0/OIG16d4jmTqWWYZ2rbizGh4pI1BqxM6E4R/+q6i96xjyl2HDDrHmsuS9iJ0KddJpchvqvoS86+j0j4rB9KsiugoVMk6n3+xaInAQE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aBxUevVm; arc=pass smtp.client-ip=74.125.82.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-1277e072e2dso1279867c88.0
-        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 12:14:12 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772136852; cv=none;
-        d=google.com; s=arc-20240605;
-        b=gYqI1DGWC7MyI2BesbUC1rcYDTfAUc/at1eHnFsMi3D9aTTIpdXRyo1mzoxAXjWP2m
-         HdW27Y0PZEeqshKnqJoBrG6IE+mxRXQA9xSmb3lJCJsbBzFJAxgZMt+QwpemsTX8eq8Q
-         +/amF170QkWFH29Xz7QNMicBW7pS9XkNG8X8ew19AUBkpFr10lkyCmDJDYvVVk3jF8CR
-         du9lV/4kGQT7snodvJJc5ffuQysJGbSn2el3dzQEjJW1DrPAOx/MOwYeWgWZsfwGb9Lw
-         8vEqgUTaWxHKVvINIydv6qVosgv6A8guEEh7GtFL/EryRGeF6VGIg6AonMA27gUZCX5W
-         BgFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=jY7Ps4YbjzVj1c5UVA5cFtTOvCYyRNgyNhaRqmcxtic=;
-        fh=sB4R9JgLUClfRDUTf7meRY4x7mUZTxds86VUjJs5klg=;
-        b=faOHe+n5hyontEDJESfu/vAOt0H0ZujbFjLffZZFmqLO41zZGe4cVl5u+dbnkdk/ME
-         67VB1eyLzchvBT3WfpT3zuutangmOHWgFBJcvSWm1rwFJeVaC05DKv70L8pcTLQslxpY
-         LIkBQQ/FZdfR/fmr+aHlwtscY2ivSYll1ihxBEVwm2LIVFV6Qj3/LcQ8fXH9A0MSqGFe
-         dPG+7hwvP6Vz6vV0UvCx40qqs/tTZDy3U8Y+tlxfAnquW+Vl9Mp6tYuXppNLTHUFtw09
-         3G3poVtZZ/tKd1S6XKEWEUIdEsXoWr4ZqXuFdX5vQdAo1gbYf5PMcIbSA3t/5zF7lCdH
-         daIw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772136852; x=1772741652; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jY7Ps4YbjzVj1c5UVA5cFtTOvCYyRNgyNhaRqmcxtic=;
-        b=aBxUevVmhvy17Y+UBZYxhDXZNAKJ7qrHtE1NlbQfsGTltfwNo621bxGSDILQ9ntfVN
-         O7Nz+2UA8/TL8hDcJQCnC2uTfQbLaP3F3ICErZsQJ4vQ0H7wmMhCdw/gV9E/o81mmdcr
-         TK1c90VPIxjBziX6dGyQtWDwQkTl3iKBU9KmkPXVcjVhp3cyu98S7kUQ3mgT7AGX6SCb
-         YH7YqYtP+ifXe9WfIAdn5dO0jiUhRI54eMphKSBY7rkphZeOUenUXN7SqSFh94c/DAqO
-         gJ1ovk+35Gm80AFb/xhl09ISS3/0nQ8jNcvudiUCml520Q1y4N4p0t2IiZ6fZI5kkSik
-         wdRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772136852; x=1772741652;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jY7Ps4YbjzVj1c5UVA5cFtTOvCYyRNgyNhaRqmcxtic=;
-        b=XdCVzTFeexKdg2qmPg62wFbQHfQUtkA0n0n1V1HP6cUMyvqT8mvzrxcddSgaJZbGiT
-         MJXJmcuAlGs2F+CzBQgmwFVvo1OmaiWsNSEhI5hk21m2SSsk3vu6ncfsh3kwtP/H7Xen
-         DGTUlf+v4YSsmM5m43jcW+PakkbogtLXdrM9olF1xkEUod5d63CVl8UjUhsxKBfpjN/I
-         5o7Kr1xCs3CdMcCx7MWO5Y2O8lvzYBCgIV5A+2RiT7k0ieO05EPcsCJoR7v7deSWU3dL
-         Gda+T4uvTkcpnalEpOKAA8cTl4Q6WGlPiHCfuSMkSfRWKPSEddVOGKhf+Xyt4u6KxWsG
-         C5zw==
-X-Forwarded-Encrypted: i=1; AJvYcCXPBINO0JnTkx1EKCX2CxQy/5+Ko7Rnk/2LtXB1ZfBr7uYFmAXfnvyHC9BG+VbOJ93oGQE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmAlyiU1MKpinhfKcr0Owfk+fSZprd8ONEioV5WsfiyPQvynCV
-	KkHfW1XE3e9Q7z4BMzlyF1uYH6E3Dl6Bm5dwBn9ocN4wmNOEiHQrh4QV2X4SPNicQMl5kaRaOox
-	sS47cajLf2+tKZ/Pk7WajSyh0XMltJPCOClHSonIB
-X-Gm-Gg: ATEYQzyEls3bwOd14YQo0PhgIM9zPfFvasFjnAtcYTkikU54jTbaNl8VThv+hZCj1yj
-	lfJ5uX+Lv0ig5uT/WoTmnNCeZ3q7340sZXRng8+JPBuu/IL3w3pvsvJR0NSNrXJ+vz2OBw95H4Q
-	5upbSg1ZGkdqmn+PTl3klOr44QS8tfxrhFYtdjZGo7SMW+pnhINgGWSLb3WeIHtQt6dyo3Kf7qk
-	Rg2Z/wEApBB7GRPxKvtbRgADywMl2ZKBIt6b72NPov475SvHFBw8k4MIa7AVQLAkZUOiC+tAzUp
-	wzZ7v4typBG11O5vtEKa1pwIdXZle9fzQonc2B0=
-X-Received: by 2002:a05:7022:108:b0:127:4da1:ed59 with SMTP id
- a92af1059eb24-1278906e107mr2012705c88.10.1772136851231; Thu, 26 Feb 2026
- 12:14:11 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE79B466B7D;
+	Thu, 26 Feb 2026 20:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772137377; cv=none; b=JnaXDcmhI36rouBNCVuPDQD2VPPNcMmngLSdO2fAA69o+9bDPW5G5tZiqgc5cBnGe3IXD7RQOyNLMhJOI0aaTpLgIb0CMkbJ0VfUOoIs4VQAVFwZpjG1Cw/eRykqlnK+UicHciYOYs3IRV8P/UaGYbSFCbaSiSX6YdgEB9jkR3A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772137377; c=relaxed/simple;
+	bh=CcGPeBG42UP2rnyboBds8Y7DlMDMrlC5RAeHln8YN6M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eZL7UFt8wEPOjKl+htOJ4RkuAaQwMdyg526z5dCYzRoduFtlqF5INly0JEbOmxs2uAgCvEhlhW+v/bRNwoi4vXPQbubSkQ32GQG9MhU/A8zQ9fhRPuOA/qU8sEosjXLP8pOehKih9PIAifO4Bu4nRHFo7sVD7rmNFi2ftFgZEho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=RROaW/RV; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+	by m0089730.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 61QHqVfg1068162;
+	Thu, 26 Feb 2026 12:22:40 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=IZiM70zfm7C3RbNIw1
+	5Xtxv/zgzm0pVY5jx3r3lSttA=; b=RROaW/RVt+7Y/kjneYboZVoldW4u5KfMMa
+	uG8In4NkuwMC7E0si/E0mP6iXbPVAa4nNbdWZaL3gCFV//6zk1YwPpEHZRNWimgS
+	gB9KkG93UM5yo66G6srgzjWnr2ON5LhiZ4IpsgmPkXzKmynJRHQu/2dK3JhDKTYT
+	tRPO/dwA789Mtg/ph9Dke3UpvyJTUeuOJ+9JtVoS3JswsMzJVsTMG4w6PHmQpDwk
+	g2HLPesV0t2TpP2kTmgpBjnfs7VI4pB3nU3ALfriYiyGs8xOJJTUfQH0R6jLd7GM
+	q2lJjdDPSNiVSH1xYWyIeK858vD4obhCERAxfqoVPwayNXdDJvOg==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by m0089730.ppops.net (PPS) with ESMTPS id 4cjnjmd8wv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Thu, 26 Feb 2026 12:22:40 -0800 (PST)
+Received: from localhost (2620:10d:c0a8:1c::11) by mail.thefacebook.com
+ (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.35; Thu, 26 Feb
+ 2026 20:22:39 +0000
+From: Matt Evans <mattev@meta.com>
+To: Alex Williamson <alex@shazbot.org>, Leon Romanovsky <leon@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>, Alex Mastro <amastro@fb.com>,
+        Mahmoud Adam
+	<mngyadam@amazon.de>,
+        David Matlack <dmatlack@google.com>
+CC: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+        Sumit Semwal
+	<sumit.semwal@linaro.org>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?=
+	<christian.koenig@amd.com>,
+        Kevin Tian <kevin.tian@intel.com>, Ankit Agrawal
+	<ankita@nvidia.com>,
+        Pranjal Shrivastava <praan@google.com>,
+        Alistair Popple
+	<apopple@nvidia.com>,
+        Vivek Kasireddy <vivek.kasireddy@intel.com>,
+        <linux-kernel@vger.kernel.org>, <linux-media@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <linaro-mm-sig@lists.linaro.org>,
+        <kvm@vger.kernel.org>
+Subject: [RFC PATCH 0/7] vfio/pci: Add mmap() for DMABUFs
+Date: Thu, 26 Feb 2026 12:21:56 -0800
+Message-ID: <20260226202211.929005-1-mattev@meta.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260223215118.2154194-1-bvanassche@acm.org> <20260223215118.2154194-2-bvanassche@acm.org>
- <aZ3r5_P74tUJm2oF@google.com> <7a22294b-1150-4c55-a95a-ea918cfb9b76@acm.org> <aaCHS5ZRuW-QJkK7@google.com>
-In-Reply-To: <aaCHS5ZRuW-QJkK7@google.com>
-From: Marco Elver <elver@google.com>
-Date: Thu, 26 Feb 2026 21:13:34 +0100
-X-Gm-Features: AaiRm53tFQdZWMWCGLDF7AFEHUZkrfZ39Te85LZ5HbhSU50DOaFQ1zSkLuk22sU
-Message-ID: <CANpmjNPKkFxg0gLu+n+PaGgkq0AQ70DdHi69D3iEwGFO-r-yiw@mail.gmail.com>
-Subject: Re: [PATCH 01/62] kvm: Make pi_enable_wakeup_handler() easier to analyze
-To: Sean Christopherson <seanjc@google.com>
-Cc: Bart Van Assche <bvanassche@acm.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Boqun Feng <boqun@kernel.org>, 
-	Waiman Long <longman@redhat.com>, linux-kernel@vger.kernel.org, 
-	Christoph Hellwig <hch@lst.de>, Steven Rostedt <rostedt@goodmis.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <nathan@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Jann Horn <jannh@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI2MDE4NiBTYWx0ZWRfX5h9s9Ky4ODAC
+ uK7iwKepqZbDWB9zNVY3+AX6ltHfKbj/relQzSOkL2/MgDwWoZ3ZW2VhkFQy3lSnEcDSFt8vD9m
+ GzsjlSYERzJ4axZgC2ZiBZ2uCmq45TGH7ukX6jBvnd/B+OWnP43+oWNi8aHTVcq2eNy+UxA68tT
+ jDj1fKEKc7NnuJc4J4jfUlicEhIz3jcwmQgpOM33VzWKmyTsuRwVMDxBYjbJm6FP+eKIe1KRunq
+ +br2DO9NDBwVRJgai/nvSdnObrKwXZ/ZM4AEwtuoD1XT8u/XXnnjmVn/HegEWKz9BHUBei1FCsA
+ Xj26Z+xPMut0QwS7TtAUvq8hhFzF+vXJEt6fzS5djZ6bxfUt6fWrIuFv6Q7JR+9BWhbOCkwroJp
+ fYaetFADM7ZsG653BtMwZf0EhrfIclEHAQ4eMmgi12qgKCdWa3jq/zlAUT87avzqN1h8oN8xMMc
+ YUuZj6qMN4zcbgMobzg==
+X-Proofpoint-ORIG-GUID: c_IRwxbK9RMEctVN9Z230XiPI5d-bVBW
+X-Authority-Analysis: v=2.4 cv=B/m0EetM c=1 sm=1 tr=0 ts=69a0ab90 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22
+ a=GgsMoib0sEa3-_RKJdDe:22 a=VwQbUJbxAAAA:8 a=FOH2dFAWAAAA:8
+ a=r96HxJact8T_fHbaSv8A:9
+X-Proofpoint-GUID: c_IRwxbK9RMEctVN9Z230XiPI5d-bVBW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-26_02,2026-02-26_01,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[meta.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[meta.com:s=s2048-2025-q2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-72079-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72078-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[elver@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[mattev@meta.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[meta.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: D12BA1AF006
+	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:mid,meta.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2A4191AF0EC
 X-Rspamd-Action: no action
 
-On Thu, 26 Feb 2026 at 18:48, Sean Christopherson <seanjc@google.com> wrote:
-> On Tue, Feb 24, 2026, Bart Van Assche wrote:
-[...]
-> > Regarding why the above patch is necessary, I don't think that it is
-> > fair to blame the compiler in this case. The macros that implement
-> > per_cpu() make it impossible for the compiler to conclude that the
-> > pointers passed to the raw_spin_lock_nested() and raw_spin_unlock()
-> > calls are identical:
->
-> Well rats, that pretty much makes it infeasible to solve the underlying problem.
->
-> > /*
-> >  * Add an offset to a pointer.  Use RELOC_HIDE() to prevent the compiler
-> >  * from making incorrect assumptions about the pointer value.
-> >  */
-> > #define SHIFT_PERCPU_PTR(__p, __offset)                               \
-> >       RELOC_HIDE(PERCPU_PTR(__p), (__offset))
-> >
-> > #define RELOC_HIDE(ptr, off)                                  \
-> > ({                                                            \
-> >       unsigned long __ptr;                                    \
-> >       __asm__ ("" : "=r"(__ptr) : "0"(ptr));                  \
-> >       (typeof(ptr)) (__ptr + (off));                          \
-> > })
+Hi all,
 
-There's a slim chance we can "fix" this with a similar approach as in:
-https://lore.kernel.org/all/20260216142436.2207937-2-elver@google.com/
-(specifically see patch 2/2)
 
-The goal of RELOC_HIDE is to make the optimizer be less aggressive.
-But the Thread Safety Analysis's alias analysis happens during
-semantic analysis and is completely detached from the optimizer, and
-we could potentially construct an expression that (a) lets Thread
-Safety Analysis figure out that __ptr is an alias to ptr, while (b)
-still hiding it from the optimizer. But I think we're sufficiently
-scared of breaking (b) that I'm not sure if this is feasible in a
-clean enough way that won't have other side-effects (e.g. worse
-codegen).
+There were various suggestions in the September 2025 thread "[TECH
+TOPIC] vfio, iommufd: Enabling user space drivers to vend more
+granular access to client processes" [0], and LPC discussions, around
+improving the situation for multi-process userspace driver designs.
+This RFC series implements some of these ideas.
 
-If I find time I'll have a think unless someone beats me to it.
+
+Background: Multi-process USDs
+==============================
+
+The userspace driver scenario discussed in that thread involves a
+primary process driving a PCIe function through VFIO/iommufd, which
+manages the function-wide ownership/lifecycle.  The function is
+designed to provide multiple distinct programming interfaces (for
+example, several independent MMIO register frames in one function),
+and the primary process delegates control of these interfaces to
+multiple independent client processes (which do the actual work).
+This scenario clearly relies on a HW design that provides appropriate
+isolation between the programming interfaces.
+
+The two key needs are:
+
+ 1.  Mechanisms to safely delegate a subset of the device MMIO
+     resources to a client process without over-sharing wider access
+     (or influence over whole-device activities, such as reset).
+
+ 2.  Mechanisms to allow a client process to do its own iommufd
+     management w.r.t. its address space, in a way that's isolated
+     from DMA relating to other clients.
+
+
+mmap() of VFIO DMABUFs
+======================
+
+First, this RFC addresses #1, implementing the proposals in [0] to add
+mmap() support to the existing VFIO DMABUF exporter.
+
+This enables a userspace driver to define DMABUF ranges corresponding
+to sub-ranges of a BAR, and grant a given client (via a shared fd)
+the capability to access (only) those sub-ranges.  The VFIO device fds
+would be kept private to the primary process.  All the client can do
+with that fd is map (or iomap via iommufd) that specific subset of
+resources, and the impact of bugs/malice is contained.
+
+ (We'll follow up on #2 separately, as a related-but-distinct problem.
+  PASIDs are one way to achieve per-client isolation of DMA; another
+  could be sharing of a single IOVA space via 'constrained' iommufds.)
+
+
+Revocation/reclaim
+==================
+
+That's useful as-is, but then the lifetime of access granted to a
+client needs to be managed well.  For example, a protocol between the
+primary process and the client can indicate when the client is done,
+and when it's safe to reuse the resources elsewhere.
+
+Resources could be released cooperatively, but it's much more robust
+to enable the driver to make the resources guaranteed-inaccessible
+when it chooses, so that it can re-assign them to other uses in
+future.
+
+So, second, I've suggested a PoC/example mechanism for reclaiming
+ranges shared with clients: a new DMABUF ioctl, DMA_BUF_IOCTL_REVOKE,
+is routed to a DMABUF exporter callback.  The VFIO DMABUF exporter's
+implementation permanently revokes a DMABUF (notifying importers, and
+zapping PTEs for any mappings).  This makes the DMABUF defunct and any
+client (or third party the client has shared the buffer onto!) cannot
+be used to access the BAR ranges, whether via DMABUF import or mmap().
+
+A primary driver process would do this operation when the client's
+tenure ends to reclaim "loaned-out" MMIO interfaces, at which point
+the interfaces could be safely re-used.
+
+This ioctl is one of several possible approaches to achieve buffer
+revocation, but I wanted to demonstrate something here as it's an
+important part of the buffer lifecycle in this driver scenario.  An
+alternative implementation could be some VFIO-specific operation to
+search for a DMABUF (by address?) and kill it, but if the server keeps
+hold of the DMABUF fd that's already a clean way to locate it later.
+
+
+BAR mapping access attributes
+=============================
+
+Third, inspired by Alex [Mastro] and Jason's comments in [0], and
+Mahmoud's work in [1] with the goal of controlling CPU access
+attributes for VFIO BAR mappings (e.g. WC) I noticed that once we can
+mmap() VFIO DMABUFs representing BAR sub-spans, it's straightforward
+to decorate them with access attributes for the VMA.
+
+I've proposed reserving a field in struct
+vfio_device_feature_dma_buf's flags to specify an attribute for its
+ranges.  Although that keeps the (UAPI) struct unchanged, it means all
+ranges in a DMABUF share the same attribute.  I feel a single
+attribute-to-mmap() relation is logical/reasonable.  An application
+can also create multiple DMABUFs to describe any BAR layout and mix of
+attributes.
+
+
+Tests
+=====
+
+I've included an [RFC ONLY] userspace test program which I am _not_
+proposing to merge, but am sharing for context.  It illustrates &
+tests various map/revoke cases, but doesn't use the existing VFIO
+selftests and relies on a (tweaked) QEMU EDU function.  I'm working on
+integrating the scenarios into the existing VFIO selftests.
+
+This code has been tested in mapping DMABUFs of single/multiple
+ranges, aliasing mmap()s, aliasing ranges across DMABUFs, vm_pgoff >
+0, revocation, shutdown/cleanup scenarios, and hugepage mappings seem
+to work correctly.  I've lightly tested WC mappings also (by observing
+resulting PTEs as having the correct attributes...).
+
+
+(The first two commits are a couple of tiny bugfixes which I can send
+separately, should reviewers prefer.)
+
+This series is based on v6.19 but I expect to rebase, at least onto
+Leon's recent work [2] ("vfio: Wait for dma-buf invalidation to
+complete").
+
+What are people's thoughts?  I'll respin to de-RFC and capture
+comments, if we think this approach is appropriate.
+
 
 Thanks,
--- Marco
+
+
+Matt
+
+
+References:
+
+[0]: https://lore.kernel.org/linux-iommu/20250918214425.2677057-1-amastro@fb.com/
+[1]: https://lore.kernel.org/all/20250804104012.87915-1-mngyadam@amazon.de/
+[2]: https://lore.kernel.org/linux-iommu/20260205-nocturnal-poetic-chamois-f566ad@houat/T/#m310cd07011e3a1461b6fda45e3f9b886ba76571a
+
+
+Matt Evans (7):
+  vfio/pci: Ensure VFIO barmap is set up before creating a DMABUF
+  vfio/pci: Clean up DMABUFs before disabling function
+  vfio/pci: Support mmap() of a DMABUF
+  dma-buf: uapi: Mechanism to revoke DMABUFs via ioctl()
+  vfio/pci: Permanently revoke a DMABUF on request
+  vfio/pci: Add mmap() attributes to DMABUF feature
+  [RFC ONLY] selftests: vfio: Add standalone vfio_dmabuf_mmap_test
+
+ drivers/dma-buf/dma-buf.c                     |   5 +
+ drivers/vfio/pci/vfio_pci_core.c              |   4 +-
+ drivers/vfio/pci/vfio_pci_dmabuf.c            | 300 ++++++-
+ include/linux/dma-buf.h                       |  22 +
+ include/uapi/linux/dma-buf.h                  |   1 +
+ include/uapi/linux/vfio.h                     |  12 +-
+ tools/testing/selftests/vfio/Makefile         |   1 +
+ .../vfio/standalone/vfio_dmabuf_mmap_test.c   | 822 ++++++++++++++++++
+ 8 files changed, 1153 insertions(+), 14 deletions(-)
+ create mode 100644 tools/testing/selftests/vfio/standalone/vfio_dmabuf_mmap_test.c
+
+-- 
+2.47.3
+
 
