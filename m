@@ -1,210 +1,253 @@
-Return-Path: <kvm+bounces-72072-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72073-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iJXXHhufoGlVlAQAu9opvQ
-	(envelope-from <kvm+bounces-72072-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:29:31 +0100
+	id sD/vDFOhoGlVlAQAu9opvQ
+	(envelope-from <kvm+bounces-72073-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:38:59 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FECA1AE57B
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:29:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 897F81AE7E0
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 20:38:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1D22F30087F6
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 19:29:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 36D8831AD5A0
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 19:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DECB02D249E;
-	Thu, 26 Feb 2026 19:29:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C201A44CF51;
+	Thu, 26 Feb 2026 19:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="h7PwIdWd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NpjF6RHt"
 X-Original-To: kvm@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010050.outbound.protection.outlook.com [52.101.61.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E4B44CF21;
-	Thu, 26 Feb 2026 19:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772134164; cv=fail; b=Uj+miisTEHMDcv3fXYAGUOSLfqcBBnK1ByOWwoVF4WaZtagOsmuwzkA7fbZXtRROnrRyfsWgbG2+sTlPqvu4+z5ucw1G5zoF+9+Us+CjQteOrYsxXd6ezAFsS/SAHpBS+bc0WxEyZKTRzC7hQBVkOoSmopdWylkUDWoRtllWHCk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772134164; c=relaxed/simple;
-	bh=QCH7mdGei3T8uGvGgfLd0FD92/S8V4GFYlF2VFBQR38=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=sO2RuF/xWIFN8DQY7CdyTERV+tbJu9cbeiPTOnU1uEYkUu6viGTxd0qpY7GfbiSl03Z/tsqQYoIWUVXb0hAcrMMfHpw/0DJC/6QGP1DZezWfE4zg22m+OILwlDC5FITQ75nuPBAM21jjV3Lb13MhnUI02iGDlpAr80JHAfuAl9A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=h7PwIdWd; arc=fail smtp.client-ip=52.101.61.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UnWkGj2KqXzwoVW/LsjTx9Y+05RuWL7fTmhl+hlXhKIk2TOXSa1deN7OGDnYzKLYvxiAZYxaFZ0+jgnFnBF4pflgqbNT5ygR/P3FYsDFI6Y+qC6DF8dsHN9tkJPUK0w3JN8zKJn7jzStNt0RThKqj9OGLRD7WP7mk9e/VYmgUXltrKfNQUsw4O8lSGwNXUsoYRpzqMZUbnsxh25PkwCkehDqlXSmpB1D+mKVm0ZiSnGXb1dzLP7kV3uYUL/Mzngxo7lvzTi3uuGwfMySGMb7SRfz56yJKk1mw7gb74h+2Kgu/KKeROAuP/vXq3xAEAElc+OE0C+8GLcrKJ/5D8LLPg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QCH7mdGei3T8uGvGgfLd0FD92/S8V4GFYlF2VFBQR38=;
- b=K3bncuwEWzr9oFo2uKyEBR8b/cRyQkcF/gcUw2sXz37u/AuLS8BOn1AaOniMLcUZLcYCBBE2qQ1ymZNm/t1wgWQvDCoBN8R0sgemDi4/xSFemINRlndX+ZKBvJv3Ve3wQVpAfczexk5gZ1qopBzrnywBiKztHu4HxwkZ+E/rZhfhwVUhr4TWsF3O0pNI1XILZZm+3HU/lJyPywkWK2h+DkZVZJxB8f2QtdZpV5NKfkrmKhkMTM14CXpaHGufkBSFFW87vaMYC/sXgGwNM4noHkrrAkZLNog99RfQF1jZiP9gTgalVYv+MXtgodY58picbc30rjueDJYubScMdgdBog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QCH7mdGei3T8uGvGgfLd0FD92/S8V4GFYlF2VFBQR38=;
- b=h7PwIdWdY73jzZdJXa8z7LY+H0eMJVoXTOXZZXUV/Gh7OV9dYtAtWwbNBsxGuwM1suR70O2i4BPWya5mAwM9i0Lxz8RwcrXqi/i0Atjo4AhCDvAk9f3DBloMJyPAgaXY7EKk32ifP0VLo48Cs3KtDOr8IC+YcKhE43NPZR1EHfsG9LMYXpzoiUKTf5IR36+xvlQ54m1DeibKwwGjgoTHn5XWD1kQXY0RrwAptiuI9ZVxBrb8vJMvpurMMnStSB4VEdRK+v7E55LOjpkGbR9qpoLHyJQuCqfHHyQpzTl3r+MsndL0L4AfetuiAph48JUMRCUF1Vs8/hAwfucTUTIzpA==
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
- by BN7PPF0D942FA9A.namprd12.prod.outlook.com (2603:10b6:40f:fc02::6c7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.19; Thu, 26 Feb
- 2026 19:29:19 +0000
-Received: from CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
- ([fe80::b710:d6a1:ab16:76de%5]) with mapi id 15.20.9654.007; Thu, 26 Feb 2026
- 19:29:19 +0000
-From: Shameer Kolothum Thodi <skolothumtho@nvidia.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: Ankit Agrawal <ankita@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>, Matt
- Ochs <mochs@nvidia.com>, "alex@shazbot.org" <alex@shazbot.org>, Neo Jia
-	<cjia@nvidia.com>, Zhi Wang <zhiw@nvidia.com>, Krishnakant Jaju
-	<kjaju@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>, "kevin.tian@intel.com"
-	<kevin.tian@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH RFC v2 10/15] vfio/nvgrace-egm: Clear Memory before
- handing out to VM
-Thread-Topic: [PATCH RFC v2 10/15] vfio/nvgrace-egm: Clear Memory before
- handing out to VM
-Thread-Index: AQHcpNzgjOBHgYQ9k0uXA/co5rrhHLWVSE7ggAART4CAAAf60A==
-Date: Thu, 26 Feb 2026 19:29:19 +0000
-Message-ID:
- <CH3PR12MB7548743B0502FC6BA53B8114AB72A@CH3PR12MB7548.namprd12.prod.outlook.com>
-References: <20260223155514.152435-1-ankita@nvidia.com>
- <20260223155514.152435-11-ankita@nvidia.com>
- <CH3PR12MB754812AD77FF9E02B0AB2F1DAB72A@CH3PR12MB7548.namprd12.prod.outlook.com>
- <20260226185653.GG5933@nvidia.com>
-In-Reply-To: <20260226185653.GG5933@nvidia.com>
-Accept-Language: en-US, en-GB
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH3PR12MB7548:EE_|BN7PPF0D942FA9A:EE_
-x-ms-office365-filtering-correlation-id: 67e9fa36-32e4-4138-b71e-08de756d564e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|376014|38070700021|7053199007;
-x-microsoft-antispam-message-info:
- quAVtcaO+YDEioTaNpOuHyrsvAsNPdn1vh/ixgs8h0TJI7gCY6WyxnQoL4tIYOYrlZus8xp3Vc4MD0Ee/1OAhGGLx8TXsQDFcQEVhluGMgNWhh3dzfFoJk9/WXsiwK2zOkBCK13kAWGc3qW+IcSwKDZMvzbnkj6G/sM4y8gSoqod443o+E2TDmhGrEiJpnFH5gINjsQt5+6L1kgxZqmrND3RGKeGqtxsykZUmH+y0e1cmGiE29mIqFXyiIaPpHX/eroRFcvttHdzucpLCdoYVrBp1frEt2+LrmrKayaxBblKS8CrKjVfosRbNqqzUN/UWbxWbkjktd4reGSAOzBcAkRhYK0eGOyeL15tVy7YdxYUFAAEcJ9ggHvFQjC9Esf+C6hmHqju5O+XiBMvX7ANhHnJP1BKbOyl6RjOlkDCTpgfuBgxgsSDelXYHwV2kgyAq4SngVyf3G8qus9l+OyxCDKuG2fxxpJuI3I4Z2C7j2UYbNZ85QgqnJKnA+GCEEGBo89Th4C1u20d3nwVwLg6KTJFkRGZHvjdI+a4est6woMK7oHWxbRgdomAv2Rj56dKMV8OT/u3Badj1y2M4drTKkr8F6kdeqIHiNoCuj8fZJ+6Hv5DL4SgpN0L+2y4bza5ans+meM02dcs80IAhhcK7lgx7GCbqHlb8pnhUPFrIutvb12UUs3TcaRtyc1sPjLVhcJPsBlDBJQDhb61Vd3j/bvinUhKM4rcm56tquzaLRawOzse2xqenw9WqpCAXLipvIDj6Wo5zyzYOm6pKfCVIRTJsLWmMKY2VMRvU850Eww=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?N00BqRyRU5rID4gxsu/ZGtYl/wGQJFvoC1BGllH1SN0CzhvMfLy0CZ6G480f?=
- =?us-ascii?Q?8XptLO5j+X0TLs+bY5D0lcBm59Ww10Uqd68c5Mz+ZwVfarzheWQ17o/Q+5i8?=
- =?us-ascii?Q?cbIdx0SA3QE3AX7qEyQmyPevYSrBBVaiKpE4Tkz8aO3zIaQQYTR3B5azOs67?=
- =?us-ascii?Q?rzIVepTBUG+wfA0sFSpF3ox0mLOU6H8vJN0PFGvhg8HxL7Wwi9MKgZwaDMFW?=
- =?us-ascii?Q?N4wyUboYHy/3/XF5F4DqRt9JscTjFDu7zKBIGoKW3Bhb/H1Y9umbGzUOmmC9?=
- =?us-ascii?Q?5J6lIDqqdQkn/Id4ArIIitOVeZ7wSYRTJ1na9RtB+PndHg0nZzTK5akgYRgP?=
- =?us-ascii?Q?8pRqypXbiXpPh0xcwSalUedWooqTUtzdtSBHISiWRRtxj/z/6dkY2ytTeoOY?=
- =?us-ascii?Q?YeehJJ0GLHu+PluAQbY5lExos5HJMYKLuDx8IsGWXQoK0FyZ7/so9Vb/m5Vj?=
- =?us-ascii?Q?s8fQufp2cbQ5HfOcn0CH2zIFt2+C9oj0oXoRKQ1ptZW+6OrQYCBk4n6FROek?=
- =?us-ascii?Q?RVQFzhYYwRiyk9SG9Aw+GVvhoJf88A8jO0zvvWU1FylrWWq57NHIlYvRyHfk?=
- =?us-ascii?Q?kdT+TrkYVM1rXOExJ6b0wGnU5HyTOnE3BBa0F57pmwHW3BADvi7oUvLg5ruL?=
- =?us-ascii?Q?K3PG3YdnDlwRxceGPWjWENWXyhL+dMlyf3PSmtJR3A1dyCz6wzHI361AOMHz?=
- =?us-ascii?Q?Uml8+fmHQs6X2q/33hPe0RjbE+HMBH6DIN1H9zQJrHB2Lb8IStBP4KNKfgh+?=
- =?us-ascii?Q?io1me7yQOyexG/GDdc0gxSFhDtREOa0R27k70wkTcntK+Zmsp30TQN41li/z?=
- =?us-ascii?Q?n0/rgZ5iE7dAztC58A7HN76XeBpV2fzVIrhYOZi5rLA7gNxlRGdReewbBGaA?=
- =?us-ascii?Q?/ayiO1YtXJ/2FKH/VbORSJWVtJroAUuwM2usudHGCmsrvYpWVqn4YNJAmqDf?=
- =?us-ascii?Q?LyGYEs0C3cGkRGLdfskhNU+m/b/bBt/ditB5uAHZCGrldPsfIuTL930L+UQQ?=
- =?us-ascii?Q?xWMClAv86nDy4T5kf+8PwKGSrYi7NNC9UIZcYN5KhOAGqzJgbwd4lcdMGnJm?=
- =?us-ascii?Q?k0XQCWgs5xbz/NaFJrYcxqo7h4UwhOIYKdtlGsflaC11fKWBhN7g0C0H/Qc0?=
- =?us-ascii?Q?d17vdNwnPo2z7oALBPUWpaMLwZw8x5ij0PEp6kbnW9iRW+EuJaMIwv1ba/ZC?=
- =?us-ascii?Q?0S5ERfu7gBn8CnOLS75aBWAnZ4Y/V0HILcweZXJgCjxbgLjkXsdaDKrgT3rQ?=
- =?us-ascii?Q?gYDLTfhNgpbin3Wni9SsepMwo1rKJ523+hcdhWxhkmBS+MxwRVgVblmVgdiV?=
- =?us-ascii?Q?Eg8XT+TX66vj7umbquFJLVDXClMJsd+N50vyX177XNa1yR8+NrMg9D2Zwcr+?=
- =?us-ascii?Q?VZTKRtld7hoJA7Xkn7CgL0Bc/qv+QGWoyfJnYT6lx5H5Z5DY0Oeod9qv0T3T?=
- =?us-ascii?Q?2BIm2ozQC3jKcsyTli8Ek5mLEs2uCEav3SHHhGaVydlpqwNudCHAwLWPdUE3?=
- =?us-ascii?Q?C0irRi2y72Bj8RE+GvQeuk8Nk8VsJUAuASETmBLiosV00rhgrdc74lHViyuj?=
- =?us-ascii?Q?ndLv9fxlebQwluTMu+ngT9aZr4KDT4CACV4mxobQ/jxAmnhDizqm2Gs5Tj0u?=
- =?us-ascii?Q?lbNPsOr+EyMZ7tq1sBvRh+fcI3Szw+o3fGuOu+y2BwEEjSZH/viq16Yaw4Ul?=
- =?us-ascii?Q?xldhSQddvnWgI+h5OZ1gpxa7WxeqtSWNF0eYFPQw2PqfD59Ydd13MJQ7pI9s?=
- =?us-ascii?Q?8k0GDKaoyQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8B144E02F
+	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 19:31:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772134269; cv=none; b=el2bNCAQIQUR+PA1IUYVcZotH9382iuX8h4mrL/DUrvaPgYs18yMCZTqzTfY3BeUDxKPqL/t69IVK9Rt6todULNql5nGbP/6Ji8P+5V3ve3QdIKqCw5e5UdMT2YKT3NcxMqME1bbbBM8Glo+/+vp260pP5/ylqaxT6doP7CkCUg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772134269; c=relaxed/simple;
+	bh=7npd9tyd1xyz0W3kxuTvPbP2Ku0X4fbvz4wieBxiuu4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=pXWb97LGfDRZGX5FXRrVWFUBJNQjM51lX81NRbHUQuuJ+ltNn7XJmDAeUxj+HT/2SjbpgGA85OVOkbp3N9kp1ITf54aoxDxE/EZ8bevV69GhR0xYNRjMx5oILOToDUpa1VxVTMM8uuB4U8VDQ6mBIXtPZDJyBB7BPa1QpxYsoIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NpjF6RHt; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c70f137aa4aso640935a12.2
+        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 11:31:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772134262; x=1772739062; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ce8oFKsmBFWAiBnyfUlbpaUHm9SVUDVrI9bHqHsCJH0=;
+        b=NpjF6RHtEUjZCXqyS5hxuRG7zDaNiGksgMPhLq5ZduB/L9WtkMFTS5yfXoHHmaevXf
+         EEp10lg7+/OYQXOkA/cNsIeUO5cORmkO+viDevH03vMDrfG9wJ9v5ml8RyGAJ+KOcj7b
+         b/cze09W7ZEFjAU0ffGl9vJic4Ib6TES4bDQJNlGyF/DlKeCie/Nxis5PwPjTOarD62U
+         pqvsFoDLlIV9ZQYgM0prPWZOwqvQJoo/Sqg0y+V2fhLJkdmzNoFib5CzgBY+eCXIp8yy
+         LH8+rrxJP8QturFqnDksutqAtcKHDj3ZfMFfPixXNcS7KAySN93yrNoWcUivUhUU3I6b
+         TDZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772134262; x=1772739062;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Ce8oFKsmBFWAiBnyfUlbpaUHm9SVUDVrI9bHqHsCJH0=;
+        b=fKMGp8n/Cm1/P+lYpFlnq6+eMqTyjebqahYI6XE5Gnzd04Mg9LDm4sU/78AUtPAfxW
+         nBKUJQjPq3AozJLLIuQm4m7aVuSbM3noBc5URrlulacyQRAcNum5Gk5bfuanXwQRH73I
+         W8GiC45HR0nDxa3AI7gDL8XuUVV7XJVojnYRzju+4lwF0vdxhUd0SGFu4tF+pVDi/Wnm
+         nEPfGzcQjZ/Ihl2Poks6bJyhHswynUMfQmIGitDHqdmrwRJ0eI2eOb5vjVIb+wiKHtrZ
+         yc2k9GhhLneUNI7IGH/I5p1ohFKR0sPrl/tGjTGn9DPJ2ByfHcEDe869NioJSvGjRT+I
+         N7IQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXQPjCU+/rNd7pLQ7dXxSVqL+y+9WB/3JaofbMkCEOgjCxElc+ILbsWEgSn3Dhxy9B5Cl8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLXOQ/oFvfNQXUiWO79e8GozvYA37399UUCp4o5zAQZse4gwgo
+	CTd+N3ff1/ntCrZaP+Ss8jRsifcl8346ICbpjUpAAP8DBzFHYle8CJc+Co4sd2up10kghSSvGbn
+	r3tyCkA==
+X-Received: from pgbdk13.prod.google.com ([2002:a05:6a02:c8d:b0:c6e:7278:d9e1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:e40a:b0:32d:a91a:7713
+ with SMTP id adf61e73a8af0-395c3af1f03mr327981637.40.1772134261378; Thu, 26
+ Feb 2026 11:31:01 -0800 (PST)
+Date: Thu, 26 Feb 2026 11:30:59 -0800
+In-Reply-To: <64a01647-2f99-44a8-a183-702d6eb6fd81@fortanix.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 67e9fa36-32e4-4138-b71e-08de756d564e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2026 19:29:19.2778
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: gTZ5D+XllHDqeuQpcTk2aZoy/HOhgAFB0tj6op/Sn/fRuUgKeREviKbsiui3KiDZg4qQmN5w7mbA6SmTsO0LDA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PPF0D942FA9A
+Mime-Version: 1.0
+References: <d98692e2-d96b-4c36-8089-4bc1e5cc3d57@fortanix.com>
+ <aZ9V_O5SGGKa-Vdn@google.com> <928a31e1-bb6f-44d4-b1de-654d6968fd55@fortanix.com>
+ <aZ9Zs0laC2p5W-OL@google.com> <64a01647-2f99-44a8-a183-702d6eb6fd81@fortanix.com>
+Message-ID: <aaCfcwdA1E4V5qgE@google.com>
+Subject: Re: [PATCH] KVM: SEV: Track SNP launch state and disallow invalid
+ userspace interactions
+From: Sean Christopherson <seanjc@google.com>
+To: Jethro Beekman <jethro@fortanix.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72072-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72073-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[skolothumtho@nvidia.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,Nvidia.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nvidia.com:email,CH3PR12MB7548.namprd12.prod.outlook.com:mid]
-X-Rspamd-Queue-Id: 1FECA1AE57B
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 897F81AE7E0
 X-Rspamd-Action: no action
 
-
-
-> -----Original Message-----
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: 26 February 2026 18:57
-> To: Shameer Kolothum Thodi <skolothumtho@nvidia.com>
-> Cc: Ankit Agrawal <ankita@nvidia.com>; Vikram Sethi <vsethi@nvidia.com>;
-> Matt Ochs <mochs@nvidia.com>; alex@shazbot.org; Neo Jia
-> <cjia@nvidia.com>; Zhi Wang <zhiw@nvidia.com>; Krishnakant Jaju
-> <kjaju@nvidia.com>; Yishai Hadas <yishaih@nvidia.com>;
-> kevin.tian@intel.com; kvm@vger.kernel.org; linux-kernel@vger.kernel.org
-> Subject: Re: [PATCH RFC v2 10/15] vfio/nvgrace-egm: Clear Memory before
-> handing out to VM
+On Wed, Feb 25, 2026, Jethro Beekman wrote:
+> On 2026-02-25 12:21, Sean Christopherson wrote:
+> > On Wed, Feb 25, 2026, Jethro Beekman wrote:
+> >> On 2026-02-25 12:05, Sean Christopherson wrote:
+> >>> On Mon, Jan 19, 2026, Jethro Beekman wrote:
+> >>>> Calling any of the SNP_LAUNCH_ ioctls after SNP_LAUNCH_FINISH result=
+s in a
+> >>>> kernel page fault due to RMP violation. Track SNP launch state and e=
+xit early.
+> >>>
+> >>> What exactly trips the RMP #PF?  A backtrace would be especially help=
+ful for
+> >>> posterity.
+> >>
+> >> Here's a backtrace for calling ioctl(KVM_SEV_SNP_LAUNCH_FINISH) twice.=
+ Note this is with a modified version of QEMU.
+> >=20
+> >> RIP: 0010:sev_es_sync_vmsa+0x54/0x4c0 [kvm_amd]
+> >>  snp_launch_update_vmsa+0x19d/0x290 [kvm_amd]
+> >>  snp_launch_finish+0xb6/0x380 [kvm_amd]
+> >>  sev_mem_enc_ioctl+0x14e/0x720 [kvm_amd]
+> >>  kvm_arch_vm_ioctl+0x837/0xcf0 [kvm]
+> >=20
+> > Ah, it's the VMSA that's being accessed.  Can't we just do?
+> >=20
+> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > index 723f4452302a..1e40ae592c93 100644
+> > --- a/arch/x86/kvm/svm/sev.c
+> > +++ b/arch/x86/kvm/svm/sev.c
+> > @@ -882,6 +882,9 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+> >         u8 *d;
+> >         int i;
+> > =20
+> > +       if (vcpu->arch.guest_state_protected)
+> > +               return -EINVAL;
+> > +
+> >         /* Check some debug related fields before encrypting the VMSA *=
+/
+> >         if (svm->vcpu.guest_debug || (svm->vmcb->save.dr7 & ~DR7_FIXED_=
+1))
+> >                 return -EINVAL;
 >=20
-> On Thu, Feb 26, 2026 at 06:15:33PM +0000, Shameer Kolothum Thodi wrote:
-> > The mmap mapping stays alive and accessible in userspace even after
-> > the close(). Since the release function decrements open_count on close(=
-),
-> > a second process could then call open() and wipe the mapping while it's
-> > still live.
->=20
-> fops release is not called until the mmap is closed too, the VMA holds
-> a struct file pointer as well. close does not call release, close
-> calls fput and fput calls release when the struct file refcount is 0.
+> I tried relying on guest_state_protected instead of creating new state bu=
+t I
+> don't think it's sufficient. In particular, your proposal may fix
+> snp_launch_finish()=20
 
-Ah..I wasn't sure about the release not being called until mmap is closed
-part. Thanks for that explanation.
+But it does fix that case, correct?  I don't want to complicate one fix jus=
+t
+because there are other bugs that are similar but yet distinct.
 
-Shameer
+> but I don't believe this addresses the issues in snp_launch_update() and
 
+Do you mean snp_launch_update_vmsa() here?  Or am I missing an interaction =
+with
+vCPUs in snp_launch_update()?
+
+> sev_vcpu_create().
+
+There are a pile of SEV lifecycle and locking issues, i.e. this is just one=
+ of
+several flaws.  Fixing the locking has been on my todo list for a few month=
+s (we
+found some "fun" bugs with an internal run of syzkaller), and I'm finally g=
+etting
+to it.  Hopefully I'll post a series early next week.
+
+Somewhat off the cuff, but I think the easiest way to close the race betwee=
+n
+KVM_CREATE_VCPU and KVM_SEV_SNP_LAUNCH_FINISH is to reject KVM_SEV_SNP_LAUN=
+CH_FINISH
+if a vCPU is being created.  Or did I misunderstand the race you're pointin=
+g out?
+
+Though unless there's a strong reason not to, I'd prefer to get greedy and =
+block
+all of sev_mem_enc_ioctl(), e.g.
+
+11:23:23 =E2=9C=94 ~/go/src/kernel.org/linux $ gdd
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index ea515cf41168..2b1033c0ec54 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2047,8 +2047,8 @@ static int sev_check_source_vcpus(struct kvm *dst, st=
+ruct kvm *src)
+        struct kvm_vcpu *src_vcpu;
+        unsigned long i;
+=20
+-       if (src->created_vcpus !=3D atomic_read(&src->online_vcpus) ||
+-           dst->created_vcpus !=3D atomic_read(&dst->online_vcpus))
++       if (kvm_is_vcpu_creation_in_progress(src) ||
++           kvm_is_vcpu_creation_in_progress(dst))
+                return -EBUSY;
+=20
+        if (!sev_es_guest(src))
+@@ -2596,6 +2596,11 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *=
+argp)
+                goto out;
+        }
+=20
++       if (kvm_is_vcpu_creation_in_progress(kvm)) {
++               r =3D -EBUSY;
++               goto out;
++       }
++
+        /*
+         * Once KVM_SEV_INIT2 initializes a KVM instance as an SNP guest, o=
+nly
+         * allow the use of SNP-specific commands.
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 2c7d76262898..60ca5222e1e5 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1032,6 +1032,13 @@ static inline struct kvm_vcpu *kvm_get_vcpu_by_id(st=
+ruct kvm *kvm, int id)
+        return NULL;
+ }
+=20
++static inline bool kvm_is_vcpu_creation_in_progress(struct kvm *kvm)
++{
++       lockdep_assert_held(&kvm->lock);
++
++       return kvm->created_vcpus !=3D atomic_read(&kvm->online_vcpus);
++}
++
+ void kvm_destroy_vcpus(struct kvm *kvm);
+=20
+ int kvm_trylock_all_vcpus(struct kvm *kvm);
 
