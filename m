@@ -1,322 +1,204 @@
-Return-Path: <kvm+bounces-72062-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72063-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AO2kJxiLoGnekgQAu9opvQ
-	(envelope-from <kvm+bounces-72062-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 19:04:08 +0100
+	id 4Ju7BBGPoGlZkwQAu9opvQ
+	(envelope-from <kvm+bounces-72063-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 19:21:05 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 182A41AD34F
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 19:04:08 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6E621AD806
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 19:21:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ACB8231EB142
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 17:48:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B8FCD306110B
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 18:11:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA869332909;
-	Thu, 26 Feb 2026 17:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA7E7364958;
+	Thu, 26 Feb 2026 18:11:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dhY4QFkx"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="A9XozN7y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B79B33262E
-	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 17:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90FF355F46;
+	Thu, 26 Feb 2026 18:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772128085; cv=none; b=hgD2Qt0zTa1oCXwawjM90aRJ2cMQmn8QCrnMfEubFtL2JBJodWqpIQ+EfoJ3jQh304qxUK6IMeqztFyFQJdG/7BfOA6tt2dHyqM2PiWXyKF5F/YZawf/QYAlSa1Th9PdOrsHKP9deQvBpL0SJOe3+YzTBVYI8tsO7J4BjMIHcjs=
+	t=1772129466; cv=none; b=TXLHQ8ETLtJSoMvLWEO1N9Vbs1mMmcSmWBmNSVY/efNo6cVyE2l3oJL1sCY+PC7N+6gQMgbFJ74t7dFtY+z5Xn9im+4oDDLXmgZ4wx+Min4+pHZTY8KzdR7CTtfmXe9y3kbs4Y8uN2pGgL8UjTcjIV5GVFXqHDfGbR+5JUj8FyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772128085; c=relaxed/simple;
-	bh=pLwlIYRVarPprriFd1+p91arq0phHaBROhJiNGtDzG4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HfzyuWCmIEhnZuGcHtBeKKR/Cop5YVbWIvGpS7LYlf0/3zv4AHqSh5DACYOMcRZdYak4ESo5fUnV1L7gcFp84zRP72CfICV0jNTW2M8e4jpILBk2VW76idEW9O2jqq4u8ATG6rpiW11sicqobmN1ElpKosowqbN2WZyY7oR/Vl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dhY4QFkx; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-359462377a1so493316a91.2
-        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 09:48:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772128082; x=1772732882; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YToQm8Rgx9xCen2GsgbKUz+NArcF+XV9oeQ/EMGpxps=;
-        b=dhY4QFkxzBwUinmUEU14gbGtZPV4pI4m4l4e1gqpvKhBloohu5f/bHTtIrbtOKZp6H
-         bmuW7rFOUnHc1ZU5vrJhTT2dKFHjysmCaZ3iQbuQ/My2j+irOwSUM6crfIinkSQfwg74
-         fJrBzJAbiGUS2VviDi032/KDYjmP0Y/YzdBWB90aowaVAU2cM7m/yeSkLYpTJ5Cj1D40
-         ufMDdbpWKDJ7Jtg9aL1IKh7DaBqyxgxEhEA8ovLtdaISgXcPMkd/a66cPb2D95aTmTp3
-         n9G+G8U2wb7kuMScxdRQC6hDXyew9nVJ8fv3pQkOw0bcf6J3Qe/ws42OIAmOCyUcI5bT
-         8FnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772128082; x=1772732882;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YToQm8Rgx9xCen2GsgbKUz+NArcF+XV9oeQ/EMGpxps=;
-        b=R7PMLmkn8LB657agRzyVbq0vTcgWDJQB8VGyt+tL3GZ/1ScwwAowmBn4Ng5x7mYhRH
-         6yMi3DgpCcQT4PUB0Ympy8yld/PrFPtEeqfS87IccIRA0wDw8RVqOg+/MHLakxsJG/11
-         I2AhFIi53sT3Y3eKohXj+pHJEsMc6ppsKlIGrwwM19AE6pKY80Mnwv3szmo3HAS4d7He
-         UKmJI2UxMRXIfwf00JbHF1AlmTY3U/kXh3/hEpER7AyvlubxbKb2PAtT2Km4jODd0XED
-         DXpiy2Xd3GBByLtTM4CVkB4LbtVFEuRzNAD2HQUPwTpc+iLh1afaOqvKIfCQeRmQikCh
-         loLw==
-X-Forwarded-Encrypted: i=1; AJvYcCXeenUQWOSxDLTIfeH6zIxIPzebopTczYRW6irUvHD+ijxrrp/Uf9Qg4yr64eoxiFFY+hU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNv60q/YAXOpadH6faETAA7p57VxVTkCxg7mXnnTfO1vTLC58j
-	icTPxxN/Sl2ptDopufniiQDMQVw7SUc2dOAkd+O5XSXRJLfI5OoimNVhu4Fe1lwAj3vnJYG0xW2
-	LSnEwvw==
-X-Received: from pjdn33.prod.google.com ([2002:a17:90a:2ca4:b0:358:eb1a:7aa])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d4f:b0:34a:47d0:9a82
- with SMTP id 98e67ed59e1d1-35965cdad17mr6039a91.23.1772128082258; Thu, 26 Feb
- 2026 09:48:02 -0800 (PST)
-Date: Thu, 26 Feb 2026 09:47:55 -0800
-In-Reply-To: <7a22294b-1150-4c55-a95a-ea918cfb9b76@acm.org>
+	s=arc-20240116; t=1772129466; c=relaxed/simple;
+	bh=ZVz9v8EprtYEbGjKzlng+vjKY69YdjRC5wngokZyTZ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lc8yT+58slAIF+q7OEQrmyCcSL1FCSUiStKuL1p8+awpgIT1W/xv8CBYyV/4krNTXcs32FuE6d5CaNYeUaLm/M0n+BLKfry5ozo3ap0AzMFKSnO1vdZTFBJwJIQRGOewAkTBGPjBr6fxp24c13bywX/SjPn3gaUFMj2KohYXwQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=A9XozN7y; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61QD6Faq2725309;
+	Thu, 26 Feb 2026 18:10:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=EiFUwG
+	lKvPHJc9AsU/Wqf2qX4SDWzVFk7B399xUfI9M=; b=A9XozN7yADv+w734KoqjJu
+	cmY5URUgJGXV1lciduLFTJDjuvpGVRXqNodjYvdRm6srQYfX+JKkyTzLJ6oO3lid
+	lt1246JIMpLXN60GlHCw78QYjEclm7RCJaIOga82zWCfa4xr6Hw2ZXeO4gOdxI2k
+	6cGeTcMHVR8xSwxLTb7kJhPH4UdNUh4NAQwmwLEeArGnHOukzh7fA7eMLi41cgrf
+	zls2ufrfHcFIcmaY9B7hUC5cvbachdn+mq5Qjb9CRIeULa45GKXoDkd7b6ZzEVRj
+	LMwmN48tEzzMzCMerpEr7STe88AIe245K5+3VGYVEOWTNTkEXCfDNPyeMNBSCygA
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cf4bs7aa8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 26 Feb 2026 18:10:15 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61QI2mNq001607;
+	Thu, 26 Feb 2026 18:10:14 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cfr1nd82t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 26 Feb 2026 18:10:14 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61QIAAwk42991898
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 26 Feb 2026 18:10:10 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2C5B620043;
+	Thu, 26 Feb 2026 18:10:10 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A613320040;
+	Thu, 26 Feb 2026 18:10:09 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.52.223.175])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu, 26 Feb 2026 18:10:09 +0000 (GMT)
+Date: Thu, 26 Feb 2026 19:10:07 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: akpm@linux-foundation.org, willy@infradead.org, david@kernel.org,
+        ziy@nvidia.com, matthew.brost@intel.com, joshua.hahnjy@gmail.com,
+        rakie.kim@sk.com, byungchul@sk.com, gourry@gourry.net,
+        ying.huang@linux.alibaba.com, apopple@nvidia.com,
+        lorenzo.stoakes@oracle.com, baolin.wang@linux.alibaba.com,
+        Liam.Howlett@oracle.com, npache@redhat.com, ryan.roberts@arm.com,
+        dev.jain@arm.com, baohua@kernel.org, lance.yang@linux.dev,
+        vbabka@suse.cz, jannh@google.com, rppt@kernel.org, mhocko@suse.com,
+        pfalcato@suse.de, kees@kernel.org, maddy@linux.ibm.com,
+        npiggin@gmail.com, mpe@ellerman.id.au, chleroy@kernel.org,
+        borntraeger@linux.ibm.com, frankja@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, svens@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, linux-mm@kvack.org,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] mm: use vma_start_write_killable() in
+ process_vma_walk_lock()
+Message-ID: <20260226191007.409a7a21@p-imbrenda>
+In-Reply-To: <20260226070609.3072570-4-surenb@google.com>
+References: <20260226070609.3072570-1-surenb@google.com>
+	<20260226070609.3072570-4-surenb@google.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260223215118.2154194-1-bvanassche@acm.org> <20260223215118.2154194-2-bvanassche@acm.org>
- <aZ3r5_P74tUJm2oF@google.com> <7a22294b-1150-4c55-a95a-ea918cfb9b76@acm.org>
-Message-ID: <aaCHS5ZRuW-QJkK7@google.com>
-Subject: Re: [PATCH 01/62] kvm: Make pi_enable_wakeup_handler() easier to analyze
-From: Sean Christopherson <seanjc@google.com>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Will Deacon <will@kernel.org>, Boqun Feng <boqun@kernel.org>, Waiman Long <longman@redhat.com>, 
-	linux-kernel@vger.kernel.org, Marco Elver <elver@google.com>, 
-	Christoph Hellwig <hch@lst.de>, Steven Rostedt <rostedt@goodmis.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <nathan@kernel.org>, Kees Cook <kees@kernel.org>, 
-	Jann Horn <jannh@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-ORIG-GUID: CtrnfnLFeGbNILvMxH4zz7_6vXcy1bo2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI2MDE2NSBTYWx0ZWRfX92/iJsyzGWX+
+ U7gNleqecboFJWTHpna/+exChG3YePLWbT7HIINpkqg0RRcbAghOgu83/JdENcOYjyMxHXyYS2J
+ vxq09Edt50L8rapeL1iGqQfXep6UdFtEScs6PLrjliHJTfK4HkCtLV1f5gYqnr4+oR+P/TmrBrJ
+ WHUPRr898gbzAFY0BpdSk4/GWwqKBJ07z/9d2A3JTukzTerEs7+5ySYw7XMrM/MTFa6foacNTwu
+ ZzwE1fe97JUOUH3DNbY21+30YHBz0ECn7fkHHJ4mRtDcI9n0YT/WOppk/oEf16FvL4+a4QS/5xY
+ UAk4/2ujObMmGbT5ewiKuYjsEYSWdCs29SxYLJCCj4/1z0zdDKNhZ7ATf/bTOCeEEIGocCE7sZy
+ PwQ4UxojBvq7LC4FCsLrkANEzgg4tXzL50hIzKkCGgm65w87ImnGgtlyXd+XZXRjtxPBhS5EBYQ
+ NQ7T/7hz36hqMdZ4aaw==
+X-Authority-Analysis: v=2.4 cv=eNceTXp1 c=1 sm=1 tr=0 ts=69a08c87 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=1XWaLZrsAAAA:8
+ a=8MrrMA2wyEC7cuUn5CwA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: 5vfp8VXyeBQAaEvJC7GasClW74sWeMkd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-26_02,2026-02-26_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 priorityscore=1501 phishscore=0 suspectscore=0 adultscore=0
+ bulkscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602260165
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72062-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72063-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[42];
+	FREEMAIL_CC(0.00)[linux-foundation.org,infradead.org,kernel.org,nvidia.com,intel.com,gmail.com,sk.com,gourry.net,linux.alibaba.com,oracle.com,redhat.com,arm.com,linux.dev,suse.cz,google.com,suse.com,suse.de,linux.ibm.com,ellerman.id.au,kvack.org,lists.ozlabs.org,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ycombinator.com:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,acm.org:email]
-X-Rspamd-Queue-Id: 182A41AD34F
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[imbrenda@linux.ibm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[11]
+X-Rspamd-Queue-Id: E6E621AD806
 X-Rspamd-Action: no action
 
-On Tue, Feb 24, 2026, Bart Van Assche wrote:
-> On 2/24/26 10:20 AM, Sean Christopherson wrote:
-> > For the scope, please use:
-> > 
-> >     KVM: VMX:
-> > 
-> > On Mon, Feb 23, 2026, Bart Van Assche wrote:
-> > > The Clang thread-safety analyzer does not support comparing expressions
-> > > that use per_cpu(). Hence introduce a new local variable to capture the
-> > > address of a per-cpu spinlock. This patch prepares for enabling the
-> > > Clang thread-safety analyzer.
-> > > 
-> > > Cc: Sean Christopherson <seanjc@google.com>
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Cc: kvm@vger.kernel.org
-> > > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> > > ---
-> > >   arch/x86/kvm/vmx/posted_intr.c | 7 ++++---
-> > >   1 file changed, 4 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> > > index 4a6d9a17da23..f8711b7b85a8 100644
-> > > --- a/arch/x86/kvm/vmx/posted_intr.c
-> > > +++ b/arch/x86/kvm/vmx/posted_intr.c
-> > > @@ -164,6 +164,7 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
-> > >   	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
-> > >   	struct vcpu_vt *vt = to_vt(vcpu);
-> > >   	struct pi_desc old, new;
-> > > +	raw_spinlock_t *wakeup_lock;
-> > >   	lockdep_assert_irqs_disabled();
-> > > @@ -179,11 +180,11 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
-> > >   	 * entirety of the sched_out critical section, i.e. the wakeup handler
-> > >   	 * can't run while the scheduler locks are held.
-> > >   	 */
-> > > -	raw_spin_lock_nested(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu),
-> > > -			     PI_LOCK_SCHED_OUT);
-> > > +	wakeup_lock = &per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu);
-> > 
-> > Addressing this piecemeal doesn't seem maintainable in the long term.  The odds
-> > of unintentionally regressing the coverage with a cleanup are rather high.  Or
-> > we'll end up with confused and/or grumpy developers because they're required to
-> > write code in a very specific way because of what are effectively shortcomings
-> > in the compiler.
+On Wed, 25 Feb 2026 23:06:09 -0800
+Suren Baghdasaryan <surenb@google.com> wrote:
+
+> Replace vma_start_write() with vma_start_write_killable() when
+> process_vma_walk_lock() is used with PGWALK_WRLOCK option.
+> Adjust its direct and indirect users to check for a possible error
+> and handle it. Ensure users handle EINTR correctly and do not ignore
+> it.
 > 
-> I think it's worth mentioning that the number of patches similar to the
-> above is small. If I remember correctly, I only encountered two similar
-> cases in the entire kernel tree.
-
-Yeah, it's definitely not a deal-breaker to work around this in KVM, especially
-if this is one of the few things blocking -Wthread-safety.
-
-> Regarding why the above patch is necessary, I don't think that it is
-> fair to blame the compiler in this case. The macros that implement
-> per_cpu() make it impossible for the compiler to conclude that the
-> pointers passed to the raw_spin_lock_nested() and raw_spin_unlock()
-> calls are identical:
-
-Well rats, that pretty much makes it infeasible to solve the underlying problem.
-
-> /*
->  * Add an offset to a pointer.  Use RELOC_HIDE() to prevent the compiler
->  * from making incorrect assumptions about the pointer value.
->  */
-> #define SHIFT_PERCPU_PTR(__p, __offset)				\
-> 	RELOC_HIDE(PERCPU_PTR(__p), (__offset))
+> Signed-off-by: Suren Baghdasaryan <surenb@google.com>
+> ---
+>  arch/s390/kvm/kvm-s390.c |  2 +-
+>  fs/proc/task_mmu.c       |  5 ++++-
+>  mm/mempolicy.c           | 14 +++++++++++---
+>  mm/pagewalk.c            | 20 ++++++++++++++------
+>  mm/vma.c                 | 22 ++++++++++++++--------
+>  mm/vma.h                 |  6 ++++++
+>  6 files changed, 50 insertions(+), 19 deletions(-)
 > 
-> #define RELOC_HIDE(ptr, off)					\
-> ({								\
-> 	unsigned long __ptr;					\
-> 	__asm__ ("" : "=r"(__ptr) : "0"(ptr));			\
-> 	(typeof(ptr)) (__ptr + (off));				\
-> })
-> 
-> By the way, the above patch is not the only possible solution for
-> addressing the thread-safety warning Clang reports for this function.
-> Another possibility is adding __no_context_analysis to the function
-> definition. Is the latter perhaps what you prefer?
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 7a175d86cef0..337e4f7db63a 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2948,7 +2948,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>  		}
+>  		/* must be called without kvm->lock */
+>  		r = kvm_s390_handle_pv(kvm, &args);
+> -		if (copy_to_user(argp, &args, sizeof(args))) {
+> +		if (r != -EINTR && copy_to_user(argp, &args, sizeof(args))) {
+>  			r = -EFAULT;
+>  			break;
+>  		}
 
-Hmm, I'd prefer to keep the analysis, even though it's a bit of a pain.  We already
-went through quite some effort to preserve lockdep for this lock; compared to that,
-forcing use of local variables is hardly anything.
+can you very briefly explain how we can end up with -EINTR here?
 
-My only concern is lack of enforcement and documentation.  I fiddled with a bunch
-of ideas, but mostly of them flamed out because of the aformentioned lockdep
-shenanigans.  E.g. forcing use of guard() or scoped_guard() doesn't Just Work.
+do I understand correctly that -EINTR is possible here only if the
+process is being killed?
 
-The best idea I came up with is to rename the global variable to something scary,
-and then define a CLASS() so that it's syntactically all but impossible to feed
-the the result of per_cpu() directly into lock() or unlock().
-
-What's your timeline for enabling -Wthread-safety?  E.g. are you trying to land
-it in 7.1?  7.2+?  I'd be happy to formally post the below and get it landed in
-the N-1 kernel (assuming Paolo is also comfortable landing the patch in 7.0 if
-you're targeting 7.1).
-
----
-From: Sean Christopherson <seanjc@google.com>
-Date: Thu, 26 Feb 2026 07:21:52 -0800
-Subject: [PATCH] KVM: VMX: Force wakeup_vcpus_on_cpu_lock to be captured in
- local variable
-
-Wrap wakeup_vcpus_on_cpu_lock in a CLASS() and append "do_not_use" to the
-per-CPU symbol to effectively force lock()+unlock() paths to capture the
-per-CPU lock in a local variable.  Clang's thread-safety analyzer doesn't
-support comparing lock() vs. unlock() expressions that use separate
-per_cpu() invocations (-Wthread-safety generates false-positves), as the
-kernel's per_cpu() implementation deliberately hides the resolved address
-from the compiler, specifically to prevent the compiler from reasoning
-about the symbol.  I.e. per_cpu() is a victim of its own success.
-
-Link: https://lore.kernel.org/all/a2ebde260608230500o3407b108hc03debb9da6e62c@mail.gmail.com
-Link: https://news.ycombinator.com/item?id=18050983
-Suggested-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/posted_intr.c | 30 +++++++++++++++++++++++-------
- 1 file changed, 23 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 4a6d9a17da23..e08faaeab12f 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -31,7 +31,21 @@ static DEFINE_PER_CPU(struct list_head, wakeup_vcpus_on_cpu);
-  * CPU.  IRQs must be disabled when taking this lock, otherwise deadlock will
-  * occur if a wakeup IRQ arrives and attempts to acquire the lock.
-  */
--static DEFINE_PER_CPU(raw_spinlock_t, wakeup_vcpus_on_cpu_lock);
-+static DEFINE_PER_CPU(raw_spinlock_t, wakeup_vcpus_on_cpu_lock__do_not_touch);
-+
-+/*
-+ * Route accesses to the lock through a CLASS() to effectively force users to
-+ * capture the lock in a local variable.  The kernel's per_cpu() implementation
-+ * deliberately obfuscates the address of the data to prevent the compiler from
-+ * making incorrect assumptions about the symbol.  However, hiding the address
-+ * triggers false-positive thread-safety warnings if lock() vs. unlock() are
-+ * called with different per_cpu() invocations, because the compiler can't tell
-+ * its the same lock under the hood.
-+ */
-+DEFINE_CLASS(pi_wakeup_vcpus_lock, raw_spinlock_t *,
-+	     lockdep_assert_not_held(_T),
-+	     &per_cpu(wakeup_vcpus_on_cpu_lock__do_not_touch, cpu),
-+	     int cpu);
- 
- #define PI_LOCK_SCHED_OUT SINGLE_DEPTH_NESTING
- 
-@@ -90,7 +104,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 	 * current pCPU if the task was migrated.
- 	 */
- 	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR) {
--		raw_spinlock_t *spinlock = &per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu);
-+		CLASS(pi_wakeup_vcpus_lock, spinlock)(cpu);
- 
- 		/*
- 		 * In addition to taking the wakeup lock for the regular/IRQ
-@@ -165,6 +179,8 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
- 	struct vcpu_vt *vt = to_vt(vcpu);
- 	struct pi_desc old, new;
- 
-+	CLASS(pi_wakeup_vcpus_lock, spinlock)(vcpu->cpu);
-+
- 	lockdep_assert_irqs_disabled();
- 
- 	/*
-@@ -179,11 +195,10 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
- 	 * entirety of the sched_out critical section, i.e. the wakeup handler
- 	 * can't run while the scheduler locks are held.
- 	 */
--	raw_spin_lock_nested(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu),
--			     PI_LOCK_SCHED_OUT);
-+	raw_spin_lock_nested(spinlock, PI_LOCK_SCHED_OUT);
- 	list_add_tail(&vt->pi_wakeup_list,
- 		      &per_cpu(wakeup_vcpus_on_cpu, vcpu->cpu));
--	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-+	raw_spin_unlock(spinlock);
- 
- 	WARN(pi_test_sn(pi_desc), "PI descriptor SN field set before blocking");
- 
-@@ -254,9 +269,10 @@ void pi_wakeup_handler(void)
- {
- 	int cpu = smp_processor_id();
- 	struct list_head *wakeup_list = &per_cpu(wakeup_vcpus_on_cpu, cpu);
--	raw_spinlock_t *spinlock = &per_cpu(wakeup_vcpus_on_cpu_lock, cpu);
- 	struct vcpu_vt *vt;
- 
-+	CLASS(pi_wakeup_vcpus_lock, spinlock)(cpu);
-+
- 	raw_spin_lock(spinlock);
- 	list_for_each_entry(vt, wakeup_list, pi_wakeup_list) {
- 
-@@ -269,7 +285,7 @@ void pi_wakeup_handler(void)
- void __init pi_init_cpu(int cpu)
- {
- 	INIT_LIST_HEAD(&per_cpu(wakeup_vcpus_on_cpu, cpu));
--	raw_spin_lock_init(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-+	raw_spin_lock_init(&per_cpu(wakeup_vcpus_on_cpu_lock__do_not_touch, cpu));
- }
- 
- void pi_apicv_pre_state_restore(struct kvm_vcpu *vcpu)
-
-base-commit: 183bb0ce8c77b0fd1fb25874112bc8751a461e49
---
+[...]
 
