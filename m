@@ -1,171 +1,179 @@
-Return-Path: <kvm+bounces-72093-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72094-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CFqlBxfJoGnImQQAu9opvQ
-	(envelope-from <kvm+bounces-72093-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 23:28:39 +0100
+	id oEUkNzDKoGmlmgQAu9opvQ
+	(envelope-from <kvm+bounces-72094-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 23:33:20 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 726951B06A4
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 23:28:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 878961B06DB
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 23:33:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2268530677AB
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 22:28:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6C85430692F1
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 22:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F308244104E;
-	Thu, 26 Feb 2026 22:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4C523A1CED;
+	Thu, 26 Feb 2026 22:33:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q6iM5Woa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B6mDArCV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245C33A0B2A
-	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 22:28:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CCC36EAB5;
+	Thu, 26 Feb 2026 22:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772144887; cv=none; b=dqcYi61YOYimf79YSRLOMg4DObWC4kUt/AZBTAwRYqdmj50DZ+ks2KaRnEb9mKo6F7+A5JkSCIgfEzK+jdV+TLH113tbKelY5bl/0e75ZqIgXCAsJdBkSyCK7KNJU+UHiLt8d6penGXUuZSNt8wB5yPWHfS2Zzpn0aff2XrxnGM=
+	t=1772145181; cv=none; b=i4F5ChiWfpdyur+j8XefQ/6J16Wy3HC2N/XOBuQ4bUJ4BQq+Ud2J1CASEAAenao6CWArl1ifiSV6OwcuUJFR/Rv69wrGwFFaN5I6mjNSxsdOoFb3RrT1Ro8DRKZZz+wtDcWRwRmj23BIBEEU196xuOmArqKzaUUlGgni64bZtm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772144887; c=relaxed/simple;
-	bh=IgrG23jXKGivVbn7AQPcC0OLGqaf1C8vOPdQER9mxQs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZRGV2kgw16DDs3C+SopDdhdykYfaZASVkuHYIaBrg+9MpQIeCwerUeybUMhYtZanU9SKARFJ3EmuPhUprwNHID9nD3j6iJfB9nBITslRUTJTzghGIKEt/QfgJSjfuP5D1Mp4a87RBmHunKHg2wE4cz6mTTOWZxf5w78sbI96awY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q6iM5Woa; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2adba04421eso72352885ad.3
-        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 14:28:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772144885; x=1772749685; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W/j2ZyC9rj9YMlhwf1A/TlVZORUXpPQxiBPhNIX130A=;
-        b=Q6iM5WoaqSfDo5nilkSNnoNT7gxxET93zuUc4YVBmogTH6uxzjP3Gt7n/OLC5178PN
-         I93pbBrLMPUIjwJITpWv+E99f6lDOJXYAeKl1zreex5URAROSvSEHFKYlHUL8PuIEQ+A
-         Dgi+23KCkZOcm9XLkkVK0i0fvSXhZ/usjn9hJhTmq99YQKIvRT06YfwBHB3yQzX/A/+5
-         y8X3XI2YF1LllLWAOT1GC08wGuxTkqj4x8n5omsEYcWLHjpyCoB0srTyuFBMcvAB0t9J
-         L7qZRP0zIbmOovygpcNILvSYkGs++qIPmXsWuBXGTXgNZUT8A7lCI2T2lGjWMhINF6nD
-         isEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772144885; x=1772749685;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W/j2ZyC9rj9YMlhwf1A/TlVZORUXpPQxiBPhNIX130A=;
-        b=tEJ4nFUNcE3RqjBF6K55vkHcemnixzQBWAWS7ylMtCcKzIYVWBLaTHmbKtuaxPbp7A
-         i194dHQ6Ddd0qPW48qOzgbhq0zoJNZ/snu0vu0/intzz4evDliVwCM1C36B1R67LDcPU
-         FPZCMqC3v8CVKOxG02PSKnz25yNmVMIQ++YiCzy6329IInMb8Dqx0BOwjA9jMeTgyafW
-         E1bDvmigi/62n/1hoaShUILjYeT1D+uh0bmNLWWSuI45Yt04KeQn/8I4W8S7l0MqyFSM
-         Qx8jYJr5h2mDNV7KSssu3Sg6aypBIHUmIb8F1wGmPkxJpIcSykyNpvhjXTbKYp3DC6+S
-         7w9w==
-X-Forwarded-Encrypted: i=1; AJvYcCVhpvNw/cgnCM8wKnN104GjeZNhUEFv+YeZDseD+8D/mxbDuQZizFPInVHC9M2NFlqT5HM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWy2dzrIQ6XSzqKMnyz1FmEjeo0Vi/idQOiZX1WDw1HJ77Z4So
-	O6Q8b3uVIsnBC9qk7unv+Ht5V0MF9TlHthHTNav2Txy6aSV5aQiDY3ZISw5yZSlAVpg/brkxGIO
-	ydxUz/g==
-X-Received: from plbkb4.prod.google.com ([2002:a17:903:3384:b0:2a0:9439:b25b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3bac:b0:2aa:e6fa:2f6c
- with SMTP id d9443c01a7336-2ae2e41a277mr4596915ad.24.1772144885217; Thu, 26
- Feb 2026 14:28:05 -0800 (PST)
-Date: Thu, 26 Feb 2026 14:28:03 -0800
-In-Reply-To: <aaC0KGXmfhOMOrJ9@tycho.pizza>
+	s=arc-20240116; t=1772145181; c=relaxed/simple;
+	bh=VzUGlCjSlt+1d0n+/DBJM8ZgcYnftHMK4SkGJqosuT4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LLu2WIqIEIhM8hxocLE+FS567Tl36ASd38yyBCzDOvMTFwLd2duQUWpyGMYnn9+QKbbFbzN7MyXqy8EujPX0DyGddBIs1PQFdPe74iprg4i39rA3ehF+sEI9dYQrCj6KwwgiSGfY4LbsHD6SoQAJv5xZeUhaSIEO2JMJ0/YY9Wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B6mDArCV; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772145179; x=1803681179;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=VzUGlCjSlt+1d0n+/DBJM8ZgcYnftHMK4SkGJqosuT4=;
+  b=B6mDArCVJ80XCdRRVD0J87lhNbRv5XeKOLK4qevaGrKxliI5gNL7SAZu
+   4I/kL+Wv+zXVuzgkQveZuBQWvfVPDyNS8Y8L4+Z8dZifaxzT3JAHRivC2
+   07yCO7q14aa47OjIAoxf5XV75vL1Tz4jWc/yeNw4Qv3FFWiC0nHxkGVJj
+   NjBMrzAvG9OQNCVo44CspM6CdpUEk5LQbfI5EXfF52sEdb5f+UXVdSs6G
+   EERII+HAwL19lszCRvIM4YFKp9HAaWVgHRKN0LOT+PSAYkgyBjxxzqsDv
+   PyGHCX6WZxrfPNvo5k/RSJt7R3cneFUuP8tocsZ5qRlVvLOdSjCk2/dMx
+   w==;
+X-CSE-ConnectionGUID: uVSo4VALSqCkv7K4Gzmy1A==
+X-CSE-MsgGUID: MmHMW0szQByNKweCukiCKg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11713"; a="73289986"
+X-IronPort-AV: E=Sophos;i="6.21,313,1763452800"; 
+   d="scan'208";a="73289986"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2026 14:32:58 -0800
+X-CSE-ConnectionGUID: osf04zZEQGCElXhHFq89nw==
+X-CSE-MsgGUID: gBRrumz4T42qLuwSBXwHVw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,313,1763452800"; 
+   d="scan'208";a="215839101"
+Received: from spandruv-mobl4.amr.corp.intel.com (HELO [10.125.111.172]) ([10.125.111.172])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2026 14:32:58 -0800
+Message-ID: <f81dc9d3-8ce8-408b-915c-35253d245b93@intel.com>
+Date: Thu, 26 Feb 2026 14:32:58 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260223162900.772669-1-tycho@kernel.org> <20260223162900.772669-3-tycho@kernel.org>
- <aZyCEBo07EHw2Prk@google.com> <aZyE4zvPtujZ4-6X@tycho.pizza>
- <aZyLIWtffvEnmtYh@google.com> <aZzQy7c8VqCaZ_fE@tycho.pizza>
- <aZ3ntHUPXNTNoyx2@google.com> <aZ8xje-iM0_9ACie@tycho.pizza>
- <aZ8077EfpxRGmT-O@google.com> <aaC0KGXmfhOMOrJ9@tycho.pizza>
-Message-ID: <aaDI83LDFj9Be-sH@google.com>
-Subject: Re: [PATCH 2/4] selftests/kvm: check that SEV-ES VMs are allowed in
- SEV-SNP mode
-From: Sean Christopherson <seanjc@google.com>
-To: Tycho Andersen <tycho@kernel.org>
-Cc: Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 06/16] KVM: VMX: Move core VMXON enablement to kernel
+To: Sean Christopherson <seanjc@google.com>, Thomas Gleixner
+ <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, Kiryl Shutsemau <kas@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-coco@lists.linux.dev,
+ kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ Chao Gao <chao.gao@intel.com>, Xu Yilun <yilun.xu@linux.intel.com>,
+ Dan Williams <dan.j.williams@intel.com>
+References: <20260214012702.2368778-1-seanjc@google.com>
+ <20260214012702.2368778-7-seanjc@google.com>
+Content-Language: en-US
+From: Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20260214012702.2368778-7-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72093-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-72094-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 726951B06A4
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:mid,intel.com:dkim,intel.com:email]
+X-Rspamd-Queue-Id: 878961B06DB
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026, Tycho Andersen wrote:
-> On Wed, Feb 25, 2026 at 09:44:15AM -0800, Sean Christopherson wrote:
-> > Ya, I don't have a better idea.  Bleeding VM types into the CCP driver might be
-> > a bit wonky, though I guess it is uAPI so it's certainly not a KVM-internal detail.
+On 2/13/26 17:26, Sean Christopherson wrote:
+> Move the innermost VMXON+VMXOFF logic out of KVM and into to core x86 so
+> that TDX can (eventually) force VMXON without having to rely on KVM being
+> loaded, e.g. to do SEAMCALLs during initialization.
 > 
-> Turns out this approach breaks the selftests, which is at least one
-> userspace:
-> 
-> # ./sev_init2_tests
-> Random seed: 0x6b8b4567
-> ==== Test Assertion Failure ====
->   x86/sev_init2_tests.c:141: have_sev_es == !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_ES_VM))
->   pid=12498 tid=12498 errno=0 - Success
->      1	0x0000000000402747: main at sev_init2_tests.c:141 (discriminator 2)
->      2	0x00007f9adae2a1c9: ?? ??:0
->      3	0x00007f9adae2a28a: ?? ??:0
->      4	0x0000000000402934: _start at ??:?
->   sev-es: KVM_CAP_VM_TYPES (15) does not match cpuid (checking 8)
-> 
-> As near as I can tell qemu doesn't do the same anywhere. SNP guests
-> run fine, and SEV-ES says something reasonable:
-> 
-> qemu-system-x86_64: sev_launch_start: LAUNCH_START ret=1 fw_error=21 'Feature not supported'
-> qemu-system-x86_64: sev_common_kvm_init: failed to create encryption context
-> qemu-system-x86_64: failed to initialize kvm: Operation not permitted
-> 
-> Thoughts?
+> Opportunistically update the comment regarding emergency disabling via NMI
+> to clarify that virt_rebooting will be set by _another_ emergency callback,
+> i.e. that virt_rebooting doesn't need to be set before VMCLEAR, only
+> before _this_ invocation does VMXOFF.
 
-Breaking selftests is totally fine, they don't count as real users (the whole
-point is to validate KVM behavior; if we weren't allowed to break selftests, we
-literally couldn't fix a huge pile of KVM bugs).
+For the x86 side:
 
-Even if a real VMM has a similar sanity check, I wouldn't consider an assertion
-firing to be a breaking flaw.  No matter what, the VMM won't be able to launch an
-SEV-ES guest.
+Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
 
-For selftests, something like this?
-
-	have_sev_es = kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SEV_ES_VM);
-	TEST_ASSERT(!have_sev_es || kvm_cpu_has(X86_FEATURE_SEV_ES),
-		    "sev-es: SEV_ES_VM supported without SEV_ES in CPUID");
-
-	have_snp = kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SNP_VM);
-	TEST_ASSERT(!have_snp || kvm_cpu_has(X86_FEATURE_SEV_SNP),
-		    "sev-snp: SNP_VM supported with SEV_SNP in CPUID");
-
+I'm also very much OK with this going through the KVM tree.
 
