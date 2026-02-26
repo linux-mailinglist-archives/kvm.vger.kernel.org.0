@@ -1,159 +1,302 @@
-Return-Path: <kvm+bounces-71920-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71921-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QClpCpnbn2nEeQQAu9opvQ
-	(envelope-from <kvm+bounces-71920-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 06:35:21 +0100
+	id 6GQ0Bo/en2kxegQAu9opvQ
+	(envelope-from <kvm+bounces-71921-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 06:47:59 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 936211A10DD
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 06:35:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D2FF1A118B
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 06:47:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A4DD9306AEC7
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 05:35:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B4D81305261E
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 05:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE1738A73F;
-	Thu, 26 Feb 2026 05:35:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 028D82C11F8;
+	Thu, 26 Feb 2026 05:47:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="phWNYzJq"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="Avc07ziP"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52ED92517AC;
-	Thu, 26 Feb 2026 05:35:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772084107; cv=none; b=n+WWTxbUDLNApRGufQjzmW/fycnHOYTfGUkc/CfbH61YJEDm0Qr2aoYlf2JHt7oW9b71tjRmtmw3jsit3lFhRI35mt3lQKnHwap7KaHNUmauhryfHkbGRClHTh0yttVjY2nwDIRcgSol7ARx1rmFJSRgjywLkCCMSXx+qNmfSs0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772084107; c=relaxed/simple;
-	bh=UKleEny1/JQ6LsxuyQpxUdj8aXwYqz05GSLHZOSrMOI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I92uzMOGUy88+VaeLP9io65lhhetH9j3o1SVkyCmkV6LB/MtDeDPPSOf5yIYodMMeoELhTyAYBg+c4lC6MQwXZfhTDjFp78yvueyGpGpmgrJ9oeQ2Iy3NkfYjY2L0fSDLrJ6YvIqZxPrh8dNSY+JObZ6N6Y7BzIht9NR0CfALBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=phWNYzJq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99077C19422;
-	Thu, 26 Feb 2026 05:35:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772084106;
-	bh=UKleEny1/JQ6LsxuyQpxUdj8aXwYqz05GSLHZOSrMOI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=phWNYzJqrDHO6GiHb/abuN7mVdvd7ta4HvBjTwv9NRh38ftAFXHWtKTa/HycaapEp
-	 0Op8LT3XHkLJgaPBmNAUpB+ShSJLAoVG2X0X5ja1McAwJ7z/a8p8chNM5Hy3JTf+av
-	 O9zKWbvUwaTt4MEFVEWrKMAChwQKTyljHAkn74hvjbYWIxxla98W1/BkhSs73moYWi
-	 Nh9KwiqBqrJ5Z+Uras2Kc2TUkYS7lW2PzaGGYcZYxBAnw7GSZqJo8XY/Nm7OAauOqV
-	 pNnwIBKYp6f3WJ2mjvwNCaul7M5WwsdmPAW3Z6KMexWF5BKVMl8c0mnlfjmy7JHA3x
-	 /LlbY1Thp/Orw==
-Date: Thu, 26 Feb 2026 11:05:01 +0530
-From: Naveen N Rao <naveen@kernel.org>
-To: Gal Pressman <gal@nvidia.com>
-Cc: Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [PATCH v2 1/2] KVM: SVM: Fix UBSAN warning when reading avic
- parameter
-Message-ID: <aZ_bb_1cSwqYn1W6@blrnaveerao1>
-References: <20260225145050.2350278-1-gal@nvidia.com>
- <20260225145050.2350278-2-gal@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F1042049
+	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 05:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772084865; cv=pass; b=gob4434D+c9vPDZD4bdjgdYxP3952Kkj4rGEGzBIL43aBpro9hcUwUiZtvXaPLQIinJzOkEaTzDyqWMKkFFoFTmyUDARGE/TFTQSLC5oOwq92bvW//pXVevWsdry56b9l2/Y4iWgdO1pJQfVYzPE9/3K9b/Db8ljxMJnBOxihzk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772084865; c=relaxed/simple;
+	bh=AMrEO+vtkO4rCyaBLY1x4K+Li2oIznquYtMoRe4jXKk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gHMo3VJ3VjXSKx6wMqzL8btFlJGt/hwzOm0Mj89NoSrmH27nJvbPPIN5ehDyXXiFBEu2Hgyf61nINk9iYs7K5LfeNdkrNgtQkEbplNNIzxXW5igIhckn+V89hV6VfdLszZjOM4ZVIn5U3Q0ud1bDOAKmiONA7lSqAqBC5zrQ6ng=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=Avc07ziP; arc=pass smtp.client-ip=209.85.161.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-6774d63d2e0so234390eaf.1
+        for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 21:47:43 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772084863; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JPgnTGiR3ru8R6FTHuzTfoxHC/yetQygGfYTkSNLhAfwlhB+Bo//DPAsdWNy1nichJ
+         QeqNXVVOtFdNn/nI9bBmh34xQinkey6JGsmQ9F2zNirB9oISpls0AgYi3j1vZwtmSF5R
+         wfP7GjXlOf4BsHnqAJ0//6+G3f2ftmLjQjL8wC5a3JXqkoB6q0kASw09BrCmpn9QdIQu
+         KlrNFF97fPNEewA3ravMhCrPa1FeGDgRA5eZ36ScAe3pVSWzMBVHFgHK2CYNbEJV83NU
+         TLAMOGgZw1hDIDi6LV9ph3C+gR2BPRmjZI6x96wssjRe4wAXHcNX9rCN0Uknir8qtBwc
+         nZLQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=b3GT5Na22u0rkZZPCLAOp9C1u+Nx1823EYWE29L6QxQ=;
+        fh=1WcvDPJ/CL5byE/mEfLxUUODBOIm+o/VzZ6oOTsBLcg=;
+        b=cQJg0+kgUAV+t83u8hXBvHTbOY5hpfnE8oa2/vkCQv7KkjjFrrM57eM6KBgJXe8hTS
+         vN3IDYPjWHxEUDw4yLxp8gYbmsLBCMF2JVhy6iTPH4KeqDZn4tSbfZcXrqZY3j7kIUve
+         Iq0xYkl4gXc/bYL7oUfEB4p3tsklgNCyYH5djAprk0UWZZUy3r/x9te52E4ibmwuYxUg
+         x+jp+TJ879nlSWmlHKgPAYX2UekmAXbjip0GACDR6s/OUGDQvLC3t0ZW8ZBaLSRMxklB
+         e4sPig1x/E6PwIKYOOhroV+weMoDauLhtcJjRAs9Oi+6I8kfZLA6LsVFeCLugsgOOUMB
+         9nyw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1772084863; x=1772689663; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b3GT5Na22u0rkZZPCLAOp9C1u+Nx1823EYWE29L6QxQ=;
+        b=Avc07ziPMHMLeVhDOoPKSiu8GNN5byJ3e9t/qC0yIj07Y6BjNttpsJmiuAth8MQtYY
+         36KhQkyCcWGljoHblBMvuHW39+Kg3TxgOLG2QzzCGmAhvDWJ3cHSvFHNzaNtTDVmXOIF
+         qeblZbz8GICCi4vYOp9bF8O3TumccuKoHSLdSJWzRWv+6cVgabUq/csU0KyKK5aCOQrT
+         E8JWGPExxqxhgiTS/ZOTAkdhTnaxczoqZJHXz12J2MPbSxCxrTJGiDDyyVGCANh5FnjQ
+         oJq0S43vEn0B84KTm7yzibkwj253TXUAlZ4yGD+Hob8plkNn8mNXU0SmkmO5096GZt+Y
+         1ptg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772084863; x=1772689663;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=b3GT5Na22u0rkZZPCLAOp9C1u+Nx1823EYWE29L6QxQ=;
+        b=R9jSWobPboqPHKI0eTD/56T+xnvVlATQmspkBMgJrLABnRAUghnDBjDopIUC+FR/MA
+         aWJsDtS4iq2QBQ9n6coeFWaTR12pI14KfPJpHnlvkrjQfq5xXL0wxBjIf3Qew0TWuTMn
+         6dcr1b2EuNkut2QZLrlXV8iRI/4dqMd9NeuAIJFc8gRBktFwlkxov4Lu43TW+tV4VVVS
+         WZ8uHH9Mubm0cKA8qHNgqTI73OQT57liyn5iu7wCaQHdT//Yz/VeQ3nlCTHxdYvjURvj
+         HwVE4BcwEcUYE7FFjL9JzEWP4TapjhnsG3/06MoiYDjxqz27uHVhLonOfsTNPVizeMno
+         i+AA==
+X-Forwarded-Encrypted: i=1; AJvYcCXzVkk2g57WoRPJBu94yC5cO2Zi8U9DJTgn7bzgWJiplZxS2+PS5Gjufvs4IhID30TxcKs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiFBRclZM6maHZ1mn7Y37VXFQ4RKcmDq4xD08vIam4DeW5mq0+
+	beYbo7wfnRPiswzcuwN3+/Armb3trVonj9uVtT5+2dmw7n4yKR7HGXaJiIurLFFtiZUHm8PdTGJ
+	NZJj8Hr1Cl7gkohqdZTWMad+NcWJfU/Xep+LSB0w/og==
+X-Gm-Gg: ATEYQzzno3E7DCyF6RwT25KF+J+VV2Uz6RpMi9NwYqOmGpwGoUgz7HfZ2/fy2dsAv9J
+	Pi7nDoLIER5wC40aoF/fraX4KHXcP3iK3mqnNWeI7hMZPf5am2YeMLxdKZdNZ/236eSghd21hag
+	12h7Y/fao/jsFho6ThjspmMj3jntoYEHcoLJrgS2BuCO4RjWWqKgYqji/BVMdC27EzBGDPydpFw
+	OVwshNVPA7argH9pHWK+qS7lewa2pDX8Hw525xV7gyqJQScoF5XTgORfZNv5RjlXAD4rA3MdOnK
+	i4RTs+chukHCr57JFL6jFMBkGpt3QT2xv24vDpfR2h9fN5Nio4GfYZyYi/Pwe3GSJaN7pk0+BPP
+	UXZQFJHtkW3rDHjqtXjHtt3ZulAY=
+X-Received: by 2002:a05:6820:1892:b0:679:a5d2:569b with SMTP id
+ 006d021491bc7-679ef97d50bmr1284924eaf.40.1772084862848; Wed, 25 Feb 2026
+ 21:47:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260225145050.2350278-2-gal@nvidia.com>
+References: <20260116095731.24555-1-lukas.gerlach@cispa.de>
+In-Reply-To: <20260116095731.24555-1-lukas.gerlach@cispa.de>
+From: Anup Patel <anup@brainfault.org>
+Date: Thu, 26 Feb 2026 11:17:31 +0530
+X-Gm-Features: AaiRm50VNfj9kpGvvhZpT9bmuFIeIxzxQ2bB45ExZQGoqQfOYd839ZCCNnG0AHA
+Message-ID: <CAAhSdy1g7pYoF5uXMx4L9zVkRHd8Fj2SMgsc3MS7sQkh74eELw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: riscv: Fix Spectre-v1 in APLIC interrupt handling
+To: Lukas Gerlach <lukas.gerlach@cispa.de>
+Cc: atish.patra@linux.dev, pjw@kernel.org, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, alex@ghiti.fr, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	daniel.weber@cispa.de, marton.bognar@kuleuven.be, jo.vanbulck@kuleuven.be, 
+	michael.schwarz@cispa.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[brainfault-org.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71920-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[brainfault.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-71921-lists,kvm=lfdr.de];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[naveen@kernel.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[anup@brainfault.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[brainfault-org.20230601.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email]
-X-Rspamd-Queue-Id: 936211A10DD
+	DBL_BLOCKED_OPENRESOLVER(0.00)[brainfault-org.20230601.gappssmtp.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 5D2FF1A118B
 X-Rspamd-Action: no action
 
-On Wed, Feb 25, 2026 at 04:50:49PM +0200, Gal Pressman wrote:
-> The avic parameter is stored as an int to support the special value -1
-> (AVIC_AUTO_MODE), but the cited commit changed it from bool to int while
-> keeping param_get_bool() as the getter function.
-> This causes UBSAN to report "load of value 255 is not a valid value for
-> type '_Bool'" when the parameter is read via sysfs.
-> 
-> The issue happens in two scenarios:
-> 
-> 1. During module load: There's a time window between when module
->    parameters are registered, and when avic_hardware_setup() runs to
->    resolve the value, where the value is -1.
-> 
-> 2. On non-AMD systems: On non-AMD hardware, the kvm_is_svm_supported()
->    check returns early. The avic_hardware_setup() function never runs,
->    so avic remains -1.
-> 
-> Fix that by implementing a getter function that properly reads and
-> converts the -1 value into a string.
-> 
-> Triggered by sos report:
->   UBSAN: invalid-load in kernel/params.c:323:33
->   load of value 255 is not a valid value for type '_Bool'
->   CPU: 0 UID: 0 PID: 4667 Comm: sos Not tainted 6.19.0-rc5net_mlx5_1e86836 #1 NONE
->   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
->   Call Trace:
->    <TASK>
->    dump_stack_lvl+0x69/0xa0
->    ubsan_epilogue+0x5/0x2b
->    __ubsan_handle_load_invalid_value.cold+0x47/0x4c
->    ? lock_acquire+0x219/0x2c0
->    param_get_bool.cold+0xf/0x14
->    param_attr_show+0x51/0x80
->    module_attr_show+0x19/0x30
->    sysfs_kf_seq_show+0xac/0xf0
->    seq_read_iter+0x100/0x410
->    copy_splice_read+0x1b4/0x360
->    splice_direct_to_actor+0xbd/0x270
->    ? wait_for_space+0xb0/0xb0
->    do_splice_direct+0x72/0xb0
->    ? propagate_umount+0x870/0x870
->    do_sendfile+0x3a3/0x470
->    __x64_sys_sendfile64+0x5e/0xe0
->    do_syscall_64+0x70/0x8c0
->    entry_SYSCALL_64_after_hwframe+0x4b/0x53
-> 
-> Fixes: ca2967de5a5b ("KVM: SVM: Enable AVIC by default for Zen4+ if x2AVIC is support")
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
-> ---
->  arch/x86/kvm/svm/avic.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
+On Fri, Jan 16, 2026 at 3:27=E2=80=AFPM Lukas Gerlach <lukas.gerlach@cispa.=
+de> wrote:
+>
+> Guests can control IRQ indices via MMIO. Sanitize them with
+> array_index_nospec() to prevent speculative out-of-bounds access
+> to the aplic->irqs[] array.
+>
+> Similar to arm64 commit 41b87599c743 ("KVM: arm/arm64: vgic: fix possible
+> spectre-v1 in vgic_get_irq()") and x86 commit 8c86405f606c ("KVM: x86:
+> Protect ioapic_read_indirect() from Spectre-v1/L1TF attacks").
+>
+> Fixes: 74967aa208e2 ("RISC-V: KVM: Add in-kernel emulation of AIA APLIC")
+> Signed-off-by: Lukas Gerlach <lukas.gerlach@cispa.de>
 
 LGTM.
-Reviewed-by: Naveen N Rao (AMD) <naveen@kernel.org>
 
-- Naveen
+Reviewed-by: Anup Patel <anup@brainfault.org>
 
+Queued this as fix for Linux-7.0-rcX
+
+Regards,
+Anup
+
+> ---
+>  arch/riscv/kvm/aia_aplic.c | 23 ++++++++++++-----------
+>  1 file changed, 12 insertions(+), 11 deletions(-)
+>
+> diff --git a/arch/riscv/kvm/aia_aplic.c b/arch/riscv/kvm/aia_aplic.c
+> index f59d1c0c8c43..a2b831e57ecd 100644
+> --- a/arch/riscv/kvm/aia_aplic.c
+> +++ b/arch/riscv/kvm/aia_aplic.c
+> @@ -10,6 +10,7 @@
+>  #include <linux/irqchip/riscv-aplic.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/math.h>
+> +#include <linux/nospec.h>
+>  #include <linux/spinlock.h>
+>  #include <linux/swab.h>
+>  #include <kvm/iodev.h>
+> @@ -45,7 +46,7 @@ static u32 aplic_read_sourcecfg(struct aplic *aplic, u3=
+2 irq)
+>
+>         if (!irq || aplic->nr_irqs <=3D irq)
+>                 return 0;
+> -       irqd =3D &aplic->irqs[irq];
+> +       irqd =3D &aplic->irqs[array_index_nospec(irq, aplic->nr_irqs)];
+>
+>         raw_spin_lock_irqsave(&irqd->lock, flags);
+>         ret =3D irqd->sourcecfg;
+> @@ -61,7 +62,7 @@ static void aplic_write_sourcecfg(struct aplic *aplic, =
+u32 irq, u32 val)
+>
+>         if (!irq || aplic->nr_irqs <=3D irq)
+>                 return;
+> -       irqd =3D &aplic->irqs[irq];
+> +       irqd =3D &aplic->irqs[array_index_nospec(irq, aplic->nr_irqs)];
+>
+>         if (val & APLIC_SOURCECFG_D)
+>                 val =3D 0;
+> @@ -81,7 +82,7 @@ static u32 aplic_read_target(struct aplic *aplic, u32 i=
+rq)
+>
+>         if (!irq || aplic->nr_irqs <=3D irq)
+>                 return 0;
+> -       irqd =3D &aplic->irqs[irq];
+> +       irqd =3D &aplic->irqs[array_index_nospec(irq, aplic->nr_irqs)];
+>
+>         raw_spin_lock_irqsave(&irqd->lock, flags);
+>         ret =3D irqd->target;
+> @@ -97,7 +98,7 @@ static void aplic_write_target(struct aplic *aplic, u32=
+ irq, u32 val)
+>
+>         if (!irq || aplic->nr_irqs <=3D irq)
+>                 return;
+> -       irqd =3D &aplic->irqs[irq];
+> +       irqd =3D &aplic->irqs[array_index_nospec(irq, aplic->nr_irqs)];
+>
+>         val &=3D APLIC_TARGET_EIID_MASK |
+>                (APLIC_TARGET_HART_IDX_MASK << APLIC_TARGET_HART_IDX_SHIFT=
+) |
+> @@ -116,7 +117,7 @@ static bool aplic_read_pending(struct aplic *aplic, u=
+32 irq)
+>
+>         if (!irq || aplic->nr_irqs <=3D irq)
+>                 return false;
+> -       irqd =3D &aplic->irqs[irq];
+> +       irqd =3D &aplic->irqs[array_index_nospec(irq, aplic->nr_irqs)];
+>
+>         raw_spin_lock_irqsave(&irqd->lock, flags);
+>         ret =3D (irqd->state & APLIC_IRQ_STATE_PENDING) ? true : false;
+> @@ -132,7 +133,7 @@ static void aplic_write_pending(struct aplic *aplic, =
+u32 irq, bool pending)
+>
+>         if (!irq || aplic->nr_irqs <=3D irq)
+>                 return;
+> -       irqd =3D &aplic->irqs[irq];
+> +       irqd =3D &aplic->irqs[array_index_nospec(irq, aplic->nr_irqs)];
+>
+>         raw_spin_lock_irqsave(&irqd->lock, flags);
+>
+> @@ -170,7 +171,7 @@ static bool aplic_read_enabled(struct aplic *aplic, u=
+32 irq)
+>
+>         if (!irq || aplic->nr_irqs <=3D irq)
+>                 return false;
+> -       irqd =3D &aplic->irqs[irq];
+> +       irqd =3D &aplic->irqs[array_index_nospec(irq, aplic->nr_irqs)];
+>
+>         raw_spin_lock_irqsave(&irqd->lock, flags);
+>         ret =3D (irqd->state & APLIC_IRQ_STATE_ENABLED) ? true : false;
+> @@ -186,7 +187,7 @@ static void aplic_write_enabled(struct aplic *aplic, =
+u32 irq, bool enabled)
+>
+>         if (!irq || aplic->nr_irqs <=3D irq)
+>                 return;
+> -       irqd =3D &aplic->irqs[irq];
+> +       irqd =3D &aplic->irqs[array_index_nospec(irq, aplic->nr_irqs)];
+>
+>         raw_spin_lock_irqsave(&irqd->lock, flags);
+>         if (enabled)
+> @@ -205,7 +206,7 @@ static bool aplic_read_input(struct aplic *aplic, u32=
+ irq)
+>
+>         if (!irq || aplic->nr_irqs <=3D irq)
+>                 return false;
+> -       irqd =3D &aplic->irqs[irq];
+> +       irqd =3D &aplic->irqs[array_index_nospec(irq, aplic->nr_irqs)];
+>
+>         raw_spin_lock_irqsave(&irqd->lock, flags);
+>
+> @@ -254,7 +255,7 @@ static void aplic_update_irq_range(struct kvm *kvm, u=
+32 first, u32 last)
+>         for (irq =3D first; irq <=3D last; irq++) {
+>                 if (!irq || aplic->nr_irqs <=3D irq)
+>                         continue;
+> -               irqd =3D &aplic->irqs[irq];
+> +               irqd =3D &aplic->irqs[array_index_nospec(irq, aplic->nr_i=
+rqs)];
+>
+>                 raw_spin_lock_irqsave(&irqd->lock, flags);
+>
+> @@ -283,7 +284,7 @@ int kvm_riscv_aia_aplic_inject(struct kvm *kvm, u32 s=
+ource, bool level)
+>
+>         if (!aplic || !source || (aplic->nr_irqs <=3D source))
+>                 return -ENODEV;
+> -       irqd =3D &aplic->irqs[source];
+> +       irqd =3D &aplic->irqs[array_index_nospec(source, aplic->nr_irqs)]=
+;
+>         ie =3D (aplic->domaincfg & APLIC_DOMAINCFG_IE) ? true : false;
+>
+>         raw_spin_lock_irqsave(&irqd->lock, flags);
+> --
+> 2.51.0
+>
 
