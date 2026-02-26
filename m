@@ -1,131 +1,306 @@
-Return-Path: <kvm+bounces-71958-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71959-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDa6FM0qoGlrfwQAu9opvQ
-	(envelope-from <kvm+bounces-71958-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 12:13:17 +0100
+	id KAsCKtQroGmLfwQAu9opvQ
+	(envelope-from <kvm+bounces-71959-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 12:17:40 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAD9C1A4E62
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 12:13:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2898D1A4F40
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 12:17:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 05912302E0D9
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 11:12:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 501A13090095
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 11:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79ED93385AB;
-	Thu, 26 Feb 2026 11:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0A834AB17;
+	Thu, 26 Feb 2026 11:16:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LioYTfak"
 X-Original-To: kvm@vger.kernel.org
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B9A2AE68;
-	Thu, 26 Feb 2026 11:12:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020D73624C5;
+	Thu, 26 Feb 2026 11:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772104363; cv=none; b=LBJRKgMrJEGX9JNFdQg0KDp21NblD7dd14DBXtwwmKItZNdPOtVKvNYc8XShslLehpYTApoDfXErzLkd1NPB1JrC24cKTaBOP9nag1WqYuY+zm9igwLklLPrHwON+6MYxW4jFwu0InNCuo2ZIlxiGstkAzg7eUxzT3mcCyq9Yko=
+	t=1772104587; cv=none; b=DzkaA3V2Q4Xh+puHeuRtoFYNtFLtLMAgtLxp2GgexkDAOMX37o9vYqpBqYUkG55KnbV5ZJE8HXEhDPVbTD9DRNkaUdlty7z6wvu0cgZjU9qWgmcM8JxhJnHMQ4+JNzffNiLERLyILHv1nNLnHueUIfDW6FSpqYK18cYoB6i38m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772104363; c=relaxed/simple;
-	bh=DjNpO2hAfKU/lwA0bOanMBB73d04jcQxi9kOKB0ci/U=;
-	h=Message-ID:Date:Mime-Version:From:To:Cc:Subject:Content-Type; b=QbB8Wl/5a5XEIvlcwZSgB15u9XeOT909F6O8n1woJzF1Wc6nP6jvRQppRnnEDtCOKobZTtN0CFAJnIJTIpZz9XlF2Jo+eecfAQ1giewnOlKjLDfXhTPG3tMB1m+KKRQeQsv/mQcZoJG0yz/MvCNJDC6scHhrCd0SJIem7gnc94Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4fM81r3FFGz5B12j;
-	Thu, 26 Feb 2026 19:12:32 +0800 (CST)
-Received: from szxlzmapp03.zte.com.cn ([10.5.231.207])
-	by mse-fl2.zte.com.cn with SMTP id 61QBCSIt045768;
-	Thu, 26 Feb 2026 19:12:28 +0800 (+08)
-	(envelope-from wang.yechao255@zte.com.cn)
-Received: from mapi (szxl2zmapp05[null])
-	by mapi (Zmail) with MAPI id mid12;
-	Thu, 26 Feb 2026 19:12:31 +0800 (CST)
-X-Zmail-TransId: 2b0769a02a9fca6-36487
-X-Mailer: Zmail v1.0
-Message-ID: <20260226191231140_X1Juus7s2kgVlc0ZyW_K@zte.com.cn>
-Date: Thu, 26 Feb 2026 19:12:31 +0800 (CST)
+	s=arc-20240116; t=1772104587; c=relaxed/simple;
+	bh=BmiUdp1yjHQOHLzyBPDc/jLay4qxquFXq5fevKQzS1Q=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lBYWJJMIl3LtktTEF9khQGx1SxRhQL9fgWAQHz39yjpXlIsKZA7O7eJ77vuaBx/rCwPIYL1okLtTSupSmsU2MU8eLVRqGfVV0Yu9UOY3cJ/Awwk/u0/nuL6bv7rHU/TOC9PQww085JVuZSfVddBFb5LU2YzSpK7HOZ2wOKv0WOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LioYTfak; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AD5EC116C6;
+	Thu, 26 Feb 2026 11:16:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772104586;
+	bh=BmiUdp1yjHQOHLzyBPDc/jLay4qxquFXq5fevKQzS1Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LioYTfakd0KydjQVkutzN9SEDqQwxpL+umiVtHwIy1DiM5qkzY+BfcXgzXPK1doXA
+	 7crbXNfrSnjGgbT7bgaosTc8hZJo9DZ17w55LrwsCk8pCvxuQ+aq2F0c+JVIBDfmkN
+	 wQLCIHgIYVm7NN4Mx2s/q1KCTy/Xg6GGig1OQ1tYuNQBjne1wI4GDZjqJHB7N0jiEK
+	 UpZem4RIC8qpP174n0N7Ll9mplFkQIX+VCuaUb8uzD9klyM3Q4bMf/70hzYqHcISlv
+	 R6FHUUrLkb/hdIK8EgkjkBXDtGYQj0zbP4QzL0aPSuzlbgBHOwWhNMORWpvSlz+nwb
+	 L0meo9DUpp1BA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vvZLz-0000000E1jC-3klj;
+	Thu, 26 Feb 2026 11:16:24 +0000
+Date: Thu, 26 Feb 2026 11:16:23 +0000
+Message-ID: <867brzah6g.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	oupton@kernel.org,
+	miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com,
+	broonie@kernel.org,
+	ardb@kernel.org,
+	suzuki.poulose@arm.com,
+	lpieralisi@kernel.org,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH v14 7/8] KVM: arm64: use CASLT instruction for swapping guest descriptor
+In-Reply-To: <20260225182708.3225211-8-yeoreum.yun@arm.com>
+References: <20260225182708.3225211-1-yeoreum.yun@arm.com>
+	<20260225182708.3225211-8-yeoreum.yun@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <wang.yechao255@zte.com.cn>
-To: <anup@brainfault.org>, <atish.patra@linux.dev>, <pjw@kernel.org>,
-        <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>, <alex@ghiti.fr>,
-        <liu.xuemei1@zte.com.cn>
-Cc: <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
-        <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: =?UTF-8?B?W1BBVENIXSBSSVNDLVY6IEtWTTogU2tpcCBUSFAgc3VwcG9ydCBjaGVjayBkdXJpbmcgZGlydHkgbG9nZ2luZw==?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl2.zte.com.cn 61QBCSIt045768
-X-TLS: YES
-X-SPF-DOMAIN: zte.com.cn
-X-ENVELOPE-SENDER: wang.yechao255@zte.com.cn
-X-SPF: None
-X-SOURCE-IP: 10.5.228.133 unknown Thu, 26 Feb 2026 19:12:32 +0800
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 69A02AA0.001/4fM81r3FFGz5B12j
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yeoreum.yun@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, oupton@kernel.org, miko.lenczewski@arm.com, kevin.brodsky@arm.com, broonie@kernel.org, ardb@kernel.org, suzuki.poulose@arm.com, lpieralisi@kernel.org, joey.gouly@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.64 / 15.00];
-	SUBJ_EXCESS_BASE64(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71959-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-71958-lists,kvm=lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[wang.yechao255@zte.com.cn,kvm@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[zte.com.cn:mid,zte.com.cn:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BAD9C1A4E62
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,arm.com:email]
+X-Rspamd-Queue-Id: 2898D1A4F40
 X-Rspamd-Action: no action
 
-From: Wang Yechao <wang.yechao255@zte.com.cn>
+On Wed, 25 Feb 2026 18:27:07 +0000,
+Yeoreum Yun <yeoreum.yun@arm.com> wrote:
+> 
+> Use the CASLT instruction to swap the guest descriptor when FEAT_LSUI
+> is enabled, avoiding the need to clear the PAN bit.
+> 
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> ---
+>  arch/arm64/include/asm/cpucaps.h |  2 ++
+>  arch/arm64/include/asm/futex.h   | 17 +----------------
+>  arch/arm64/include/asm/lsui.h    | 27 +++++++++++++++++++++++++++
+>  arch/arm64/kvm/at.c              | 30 +++++++++++++++++++++++++++++-
+>  4 files changed, 59 insertions(+), 17 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/lsui.h
+> 
+> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+> index 177c691914f8..6e3da333442e 100644
+> --- a/arch/arm64/include/asm/cpucaps.h
+> +++ b/arch/arm64/include/asm/cpucaps.h
+> @@ -71,6 +71,8 @@ cpucap_is_possible(const unsigned int cap)
+>  		return true;
+>  	case ARM64_HAS_PMUV3:
+>  		return IS_ENABLED(CONFIG_HW_PERF_EVENTS);
+> +	case ARM64_HAS_LSUI:
+> +		return IS_ENABLED(CONFIG_ARM64_LSUI);
+>  	}
+>  
+>  	return true;
 
-When dirty logging is enabled, guest stage mappings are forced to
-PAGE_SIZE granularity. Changing the mapping page size at this point
-is incorrect.
+It would make more sense to move this hunk to the first patch, where
+you deal with features and capabilities, instead of having this in a
+random KVM-specific patch.
 
-Fixes: ed7ae7a34bea ("RISC-V: KVM: Transparent huge page support")
-Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
----
- arch/riscv/kvm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+> index b579e9d0964d..6779c4ad927f 100644
+> --- a/arch/arm64/include/asm/futex.h
+> +++ b/arch/arm64/include/asm/futex.h
+> @@ -7,11 +7,9 @@
+>  
+>  #include <linux/futex.h>
+>  #include <linux/uaccess.h>
+> -#include <linux/stringify.h>
+>  
+> -#include <asm/alternative.h>
+> -#include <asm/alternative-macros.h>
+>  #include <asm/errno.h>
+> +#include <asm/lsui.h>
+>  
+>  #define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
+>  
+> @@ -91,8 +89,6 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+>  
+>  #ifdef CONFIG_ARM64_LSUI
+>  
+> -#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> -
+>  #define LSUI_FUTEX_ATOMIC_OP(op, asm_op)				\
+>  static __always_inline int						\
+>  __lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+> @@ -235,17 +231,6 @@ __lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+>  {
+>  	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
+>  }
+> -
+> -#define __lsui_llsc_body(op, ...)					\
+> -({									\
+> -	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
+> -		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
+> -})
+> -
+> -#else	/* CONFIG_ARM64_LSUI */
+> -
+> -#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
+> -
+>  #endif	/* CONFIG_ARM64_LSUI */
+>  
+>  
+> diff --git a/arch/arm64/include/asm/lsui.h b/arch/arm64/include/asm/lsui.h
+> new file mode 100644
+> index 000000000000..8f0d81953eb6
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/lsui.h
+> @@ -0,0 +1,27 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef __ASM_LSUI_H
+> +#define __ASM_LSUI_H
+> +
+> +#include <linux/compiler_types.h>
+> +#include <linux/stringify.h>
+> +#include <asm/alternative.h>
+> +#include <asm/alternative-macros.h>
+> +#include <asm/cpucaps.h>
+> +
+> +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> +
+> +#ifdef CONFIG_ARM64_LSUI
+> +
+> +#define __lsui_llsc_body(op, ...)					\
+> +({									\
+> +	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
+> +		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
+> +})
+> +
+> +#else	/* CONFIG_ARM64_LSUI */
+> +
+> +#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
+> +
+> +#endif	/* CONFIG_ARM64_LSUI */
+> +
+> +#endif	/* __ASM_LSUI_H */
 
-diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-index 0b75eb2a1820..c3539f660142 100644
---- a/arch/riscv/kvm/mmu.c
-+++ b/arch/riscv/kvm/mmu.c
-@@ -535,7 +535,7 @@ int kvm_riscv_mmu_map(struct kvm_vcpu *vcpu, struct kvm_memory_slot *memslot,
-                goto out_unlock;
+Similarly, fold this into the patch that introduces FEAT_LSUI support
+for futexes (#5) so that the code is in its final position from the
+beginning. This will avoid churn that makes the patches pointlessly
+hard to follow, since this change is unrelated to KVM.
 
-        /* Check if we are backed by a THP and thus use block mapping if possible */
--       if (vma_pagesize == PAGE_SIZE)
-+       if (!logging && (vma_pagesize == PAGE_SIZE))
-                vma_pagesize = transparent_hugepage_adjust(kvm, memslot, hva, &hfn, &gpa);
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 885bd5bb2f41..fd3c5749e853 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -9,6 +9,7 @@
+>  #include <asm/esr.h>
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+> +#include <asm/lsui.h>
+>  
+>  static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool s1ptw)
+>  {
+> @@ -1704,6 +1705,31 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
+>  	}
+>  }
+>  
+> +static int __lsui_swap_desc(u64 __user *ptep, u64 old, u64 new)
+> +{
+> +	u64 tmp = old;
+> +	int ret = 0;
+> +
+> +	uaccess_ttbr0_enable();
 
-        if (writable) {
+Why do we need this? If FEAT_LSUI is present, than FEAT_PAN is also
+present. And since PAN support not a compilation option anymore, we
+should be able to rely on PAN being enabled.
+
+Or am I missing something? If so, please document why we require it.
+
+> +
+> +	asm volatile(__LSUI_PREAMBLE
+> +		     "1: caslt	%[old], %[new], %[addr]\n"
+> +		     "2:\n"
+> +		     _ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w[ret])
+> +		     : [old] "+r" (old), [addr] "+Q" (*ptep), [ret] "+r" (ret)
+> +		     : [new] "r" (new)
+> +		     : "memory");
+> +
+> +	uaccess_ttbr0_disable();
+> +
+> +	if (ret)
+> +		return ret;
+> +	if (tmp != old)
+> +		return -EAGAIN;
+> +
+> +	return ret;
+> +}
+> +
+>  static int __lse_swap_desc(u64 __user *ptep, u64 old, u64 new)
+>  {
+>  	u64 tmp = old;
+> @@ -1779,7 +1805,9 @@ int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new)
+>  		return -EPERM;
+>  
+>  	ptep = (u64 __user *)hva + offset;
+> -	if (cpus_have_final_cap(ARM64_HAS_LSE_ATOMICS))
+> +	if (cpucap_is_possible(ARM64_HAS_LSUI) && cpus_have_final_cap(ARM64_HAS_LSUI))
+> +		r = __lsui_swap_desc(ptep, old, new);
+> +	else if (cpus_have_final_cap(ARM64_HAS_LSE_ATOMICS))
+>  		r = __lse_swap_desc(ptep, old, new);
+>  	else
+>  		r = __llsc_swap_desc(ptep, old, new);
+
+Thanks,
+
+	M.
+
 -- 
-2.27.0
+Without deviation from the norm, progress is not possible.
 
