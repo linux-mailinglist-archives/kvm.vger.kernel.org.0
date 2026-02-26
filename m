@@ -1,366 +1,262 @@
-Return-Path: <kvm+bounces-71931-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-71932-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eHsqNzzxn2lwfAQAu9opvQ
-	(envelope-from <kvm+bounces-71931-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 08:07:40 +0100
+	id 4JSNOQX0n2kyfAQAu9opvQ
+	(envelope-from <kvm+bounces-71932-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 08:19:33 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 134BD1A1A1B
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 08:07:40 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B35B1A1C20
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 08:19:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4D46630475AC
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 07:06:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B3A8B302512E
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 07:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2BA438F95B;
-	Thu, 26 Feb 2026 07:06:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3626938F92F;
+	Thu, 26 Feb 2026 07:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DlYyYPU/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UkVgGHqo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-dy1-f201.google.com (mail-dy1-f201.google.com [74.125.82.201])
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9229038E13F
-	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 07:06:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772089581; cv=none; b=F3kf/g/JDsfTPYpUtSCffT+4wEMraMD3HSHVTxyjnuabm8aoDPDK2EL5zmdSB8FkNJ7sHJZBnM66d2FcLe4qxL6Wpwk22jTfutxNiy7yNhFRFfiHbae+984hbUUnUaFdutPXlJ1DoKlHwEbaCcrXUs7D6MqpwgY/SYBSNsOUidI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772089581; c=relaxed/simple;
-	bh=d8fYsygIXZ64WgQWnqsTL8l3me4MDRp18/QFSjPvsTE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aswaeQwwBRrcHGvonX/4WRfk0IEad19KyQD5Uj9o0yot7sv1uX6hoLIYjladAbF0Z+A8GD0FUiNzrMvTCt43qMG7XBFGHDtPFqcNAbbo4wUZeWzC9065anZ7rv2BDX8nNhsrq7tNeN8Y28fA9wfbzE7cIkLntbUu0ghh05stn2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--surenb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DlYyYPU/; arc=none smtp.client-ip=74.125.82.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238D938F232
+	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 07:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772090341; cv=pass; b=paLhUVTUbQ7tWJeLppFo8IdbrSwrj+QAXUeMf+9sGMzfCfCBRRLFzFBPU5wMNg3X0sUlhatkUyzThj/mTIqCmilDsghW/AZtB0picqopOknlDPnSmdyrN2Uk4zA6s5axFuTq6IN2mKPqJtUoBgbK3veCHxGryGqIAq0aIJO30I4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772090341; c=relaxed/simple;
+	bh=5kZAYgXFbfkfi4UQTiPb13p2MazR2wn4poiXvnKgRZ4=;
+	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WG+Lhc4N1T9W/mj23exI7fXMJroVNIPxYYq3OXbm9mgQnMrndwl+dfceU8y62ufv/FGeHVN1eGV7zmqAu49PiotU5tabYye7LrNhMXR5eB2joX2K7m2OoO65z2o4w/QPPIL+KmdaRKfUu3807vnHn1TDUS9e0yAa1h4GWgNf3p0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UkVgGHqo; arc=pass smtp.client-ip=209.85.217.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--surenb.bounces.google.com
-Received: by mail-dy1-f201.google.com with SMTP id 5a478bee46e88-2bdbf9bb128so8009525eec.0
-        for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 23:06:20 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-5ff10630b18so122140137.3
+        for <kvm@vger.kernel.org>; Wed, 25 Feb 2026 23:19:00 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772090339; cv=none;
+        d=google.com; s=arc-20240605;
+        b=G08UO+12kjz1k8oLZ/fl7lYR18q2O7/bnBshUmXPnVAxcnjNSlwEqTn/zokTgip7ls
+         u+ELQ8X3MXN0owgC3pW61eOb4PiNwSOaMhNq0EYGdwwLGdNmlQiwxzVDURvcyNHZytDO
+         XQnn9Jlvz7l79hjcKVa3c3YLjvRetTscCTvKJf/lBk1Nf+cSAzfGXOfUCpEoQuW6H7jL
+         YXr0ACUoH4ebSnyrdMVtkOr1MayQrT9McV4k4uK2ih53HT2hAYw5n/m48KyzWl+XE0lG
+         WLG2toVLUsLlBq8f7fue8yxO6hwWvrSRshiUbHow5JrOC8zKd+sv9aJ/BpLwZjKQi3wW
+         7RuA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:dkim-signature;
+        bh=38TkFjWu/yMjVfuieCXSU8i+AJioChf0CvAqY9rgty4=;
+        fh=X98mRtsDGzrEsEo68vaV5c45lRAouWvaZnl2RTIrlg0=;
+        b=lNoAcD2sBN5dj723Z5voHeAhPMOpEoAGuW2V8FSfslp9U+VAZ65stinAUSrDqTvqm9
+         UMfXcD2095TuQLWDIzfHepNedZjO7JfDZQWItPXkXjrV6kt0TAYehGo8UwfbOUf6Gb2I
+         /ql+Qgusc+fx0iBz1Is0RPTHoBziojRLe12swWJkUckYztVFrBTDnJ8Vmu2aFfs70Xmm
+         8A7qCPqmQBl6xsEIpDlSpPFwf2YJehdvjOs1/0Ql2HjP9xPOoQndHoye2YFWCtk7jpY2
+         I6ibgK1ddepFjg/QrXfJSBwFx1T+2G35hRRHhoqY8DXL4IvBn1NCd1pTYdN4y37SVXp1
+         WzsQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772089580; x=1772694380; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5I1QOj3Vyf2nTpPPlemTkxt7qh7oWHe4YCv7YkUsRic=;
-        b=DlYyYPU/5ve63PQcxAhvOWJY3qhmtQ6HtMfAtBIpjSpjCmjGHAQSeoSBovLlpQtauT
-         gKy2vKyV656EJbcoZoXVg6gjKvU43zD0wzk225gE4bRzvyIW7SmRZPDXuBKzXTj5u4N+
-         3kpTFU3C+0y2rSLwe+5IYtA8BHKqL7VIl7tve70uJfpJEOgcbYYND1WPcia4JGgn4uOM
-         UjCouV+Is4bfJK85gSWuSK15AeRnk8Yu/RFXLq78IhxrpEIVjTHN9bNDSMQLb9gHlByW
-         jGuCDsyHbd8noSMxKXW0Hl++lKKRcht66R5JGjzSu8+pqwsXN4Wza88gqLNlv/j1Brmb
-         x17A==
+        d=google.com; s=20230601; t=1772090339; x=1772695139; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=38TkFjWu/yMjVfuieCXSU8i+AJioChf0CvAqY9rgty4=;
+        b=UkVgGHqohjH+9DegPTESkRCcW5GUEqXvHEODRmFWxtri5m9ThGxc4fKgZxf5Saqr8L
+         YJrx321iwCj2lurexXPSzZLRMuMfSLaeQ5XJwZpvWgrEsjqL6YSH3oI9aYCxLuciOV2h
+         Th3mtvnHTE3jibadRUa+/d1c3fLeqAjVIhgsNS7MDhAsuzKLu/kTjFW7wFk1pfE0UK89
+         rLmkznK+fNm1ZoxRdE2UwXAQWBk0B+shMZuOtjUKqb9gSdMWSDPA94hpuqoEAeCbC5Ws
+         /qtppmWA9nUOL4IdxWS/iQwOlrAUzPQIRiWQ0MavabJ8C/bh7UY+dLfjza95EZAGluFR
+         tEGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772089580; x=1772694380;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5I1QOj3Vyf2nTpPPlemTkxt7qh7oWHe4YCv7YkUsRic=;
-        b=LbaIoKNa9HjYsx+QzHOYEJxL41YqBXskmbswHLU8uVClG552U+QB/wqa37Ir+XSox3
-         IszeCLDDAfdgI6GH6BvSHM+XG1dim/zmD4k8TpldShRnZgT3svZaA0i4WtcLslFp8MQn
-         zAWCUAnyaTzN4T6me6ThlwVla0jz3+k+UBduFv0V9p71H8oNZvqp+cyMAMyIDfnf3jG0
-         2uT9zznhMifQYe+PqTv63544vhDU3Ch6qPwGOq99X72DzhTRKeVqAPGahUTKSNuGtF30
-         cEfSgYO+iDYCn/Ss9gJ62xFzplHmOL2Z/i51M11TRiOsxZH4EzhyzsDrN7u+dIsoXEAZ
-         4X9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVNMudf141qaSIa0DLKKexfGoKt7Ad5oomTCA2fNM+X2pfxKBq4/nC5DGhdLqX8AsLmZQo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqtvdNTaKj7lGEq6RBW46T3Eh8RPihUqBR3ISLCazMyEL6oLLw
-	XxjSKKRlazRd5SMHpobdUytBvTY9Fs8saVhASd8g1R8UN9TwO50XyubFiJprD6fSdm3dQl4njl4
-	d3zjEsQ==
-X-Received: from dybri2.prod.google.com ([2002:a05:7300:f082:b0:2bd:c0e6:3762])
- (user=surenb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7300:4348:b0:2b4:5b59:af52
- with SMTP id 5a478bee46e88-2bdd301cbc8mr527999eec.29.1772089579483; Wed, 25
- Feb 2026 23:06:19 -0800 (PST)
-Date: Wed, 25 Feb 2026 23:06:09 -0800
-In-Reply-To: <20260226070609.3072570-1-surenb@google.com>
+        d=1e100.net; s=20230601; t=1772090339; x=1772695139;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=38TkFjWu/yMjVfuieCXSU8i+AJioChf0CvAqY9rgty4=;
+        b=Umt/hH1Xq8boURdJiu+N8aNFGPf11piQmxJylNkWOU68AeLgHCRGc/KmrbPtffWA2A
+         sVPx0kIk5OTW3ug2Gz4sLejPenXRHe0D20T1Kh/bwZE/VpgnYyjSjo3h2jto0w5ttSze
+         RQkzpv6iCbrmBYuPF5XWpBBW6pkdgT8AwwwjJAcOVVPbNEm45VbLD2KwkZS1b0w7+/xQ
+         Ahp+RAJJauTTYyUNmUeakLSOKTUglcmAjytMnnXD3GJPyIAeYlP74hNfW+fRHlWgujqJ
+         tOS1e/xQlMgPlT+I081GHHMQTfwgxsQsaGzNenhINDNoRdeTdCBLYmZSpfZS4aVDvzxY
+         Twpg==
+X-Forwarded-Encrypted: i=1; AJvYcCX7cvUaqvtxs5IAUNMRP7jsFf95AtZ/PlxaYno8twtDuZTCiZIwO8W9EO9OVYhtEeP9CxQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMVf0ut6HCUHGDsc8KXQLi0EbXbQtrO7pEDQUcp/n+GwOgoJla
+	Q3HVzcWpganuCro5kMjK9k8TRQlD/kt3og/qYowmsmL0jbK+cNGcQiXopCnmyoLlPoAHk6O944d
+	fkblcz+XWeAEoC7a+2Slub8nHGABqWV11jZE545Ya
+X-Gm-Gg: ATEYQzzX5nFux2/frVztu27sreIqWPEZMquvMrqwifr7dzz/VBXyMPW3Tw2x3h1vVVd
+	8esoIkKcOzvrwIsn+5+XQnoW4ULQtx0CoCMNrfeZhA9oiegkRIeHV9jbNY4Nhpy5ehXzd4UxH4q
+	E7En189bTXl1xouBu672rwZjDtOReKOr4FH9/G5xvrzKoxsnDRBbA0yccaUcsTEGS6TCOVxAoIU
+	bpkmYY2V+BXu1v6IznvRCGUwY9byXUxOAPlikJH2j4Q656WRFS9vKZpV+jJc+zOe2lUxHM+1hpO
+	pTFg9IltY/GlgOUFGsCCpAQW1VfBogvHQ7SvVIY17x8oWp5wHvj1sL/ca8dOENWWnzs+KQ==
+X-Received: by 2002:a05:6102:3581:b0:5ef:2cb8:e9db with SMTP id
+ ada2fe7eead31-5ff13ef650bmr1386972137.18.1772090338420; Wed, 25 Feb 2026
+ 23:18:58 -0800 (PST)
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 25 Feb 2026 23:18:57 -0800
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 25 Feb 2026 23:18:57 -0800
+From: Ackerley Tng <ackerleytng@google.com>
+In-Reply-To: <f6649b09-aa64-4c91-bf3a-ba706f023180@kernel.org>
+References: <cover.1771826352.git.ackerleytng@google.com> <a97045a9-8866-40fe-aa15-d319cafa6f2c@kernel.org>
+ <CAEvNRgFF0+g9pmp1yitX48ebK=fDpYKSOQDmRfOjzSHxM5UpeQ@mail.gmail.com>
+ <9ef9a0bd-4cff-4518-b7fb-e65c9b761a5a@kernel.org> <CAEvNRgESctVm9CcEyK36hY8Ta=DEDOS1oW5w0qRDoNfdd=470g@mail.gmail.com>
+ <CAEvNRgFyRsqhv7CuuDARHTFSanzOHaudM6JMBLwxDwsrjTNCGQ@mail.gmail.com> <f6649b09-aa64-4c91-bf3a-ba706f023180@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260226070609.3072570-1-surenb@google.com>
-X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
-Message-ID: <20260226070609.3072570-4-surenb@google.com>
-Subject: [PATCH v3 3/3] mm: use vma_start_write_killable() in process_vma_walk_lock()
-From: Suren Baghdasaryan <surenb@google.com>
-To: akpm@linux-foundation.org
-Cc: willy@infradead.org, david@kernel.org, ziy@nvidia.com, 
-	matthew.brost@intel.com, joshua.hahnjy@gmail.com, rakie.kim@sk.com, 
-	byungchul@sk.com, gourry@gourry.net, ying.huang@linux.alibaba.com, 
-	apopple@nvidia.com, lorenzo.stoakes@oracle.com, baolin.wang@linux.alibaba.com, 
-	Liam.Howlett@oracle.com, npache@redhat.com, ryan.roberts@arm.com, 
-	dev.jain@arm.com, baohua@kernel.org, lance.yang@linux.dev, vbabka@suse.cz, 
-	jannh@google.com, rppt@kernel.org, mhocko@suse.com, pfalcato@suse.de, 
-	kees@kernel.org, maddy@linux.ibm.com, npiggin@gmail.com, mpe@ellerman.id.au, 
-	chleroy@kernel.org, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
-	imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com, 
-	agordeev@linux.ibm.com, svens@linux.ibm.com, gerald.schaefer@linux.ibm.com, 
-	linux-mm@kvack.org, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, surenb@google.com
+MIME-Version: 1.0
+Date: Wed, 25 Feb 2026 23:18:57 -0800
+X-Gm-Features: AaiRm51uhp_e3rB2FjbroD20Md18UNjoNkKYVi3b2D7VPNikPNLP_eyGmYzYmA4
+Message-ID: <CAEvNRgHaDDTW_CFT_91Rqzx=OErmiP1GvtuCYnAs_wNRWb-hZw@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 00/10] guest_memfd: Track amount of memory
+ allocated on inode
+To: "David Hildenbrand (Arm)" <david@kernel.org>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Cc: akpm@linux-foundation.org, lorenzo.stoakes@oracle.com, 
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com, 
+	mhocko@suse.com, willy@infradead.org, pbonzini@redhat.com, shuah@kernel.org, 
+	seanjc@google.com, shivankg@amd.com, rick.p.edgecombe@intel.com, 
+	yan.y.zhao@intel.com, rientjes@google.com, fvdl@google.com, 
+	jthoughton@google.com, vannapurve@google.com, pratyush@kernel.org, 
+	pasha.tatashin@soleen.com, kalyazin@amazon.com, tabba@google.com, 
+	michael.roth@amd.com
 Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[infradead.org,kernel.org,nvidia.com,intel.com,gmail.com,sk.com,gourry.net,linux.alibaba.com,oracle.com,redhat.com,arm.com,linux.dev,suse.cz,google.com,suse.com,suse.de,linux.ibm.com,ellerman.id.au,kvack.org,lists.ozlabs.org,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-71931-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-71932-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[43];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[surenb@google.com,kvm@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
 	DKIM_TRACE(0.00)[google.com:+];
-	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.944];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 134BD1A1A1B
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4B35B1A1C20
 X-Rspamd-Action: no action
 
-Replace vma_start_write() with vma_start_write_killable() when
-process_vma_walk_lock() is used with PGWALK_WRLOCK option.
-Adjust its direct and indirect users to check for a possible error
-and handle it. Ensure users handle EINTR correctly and do not ignore
-it.
+"David Hildenbrand (Arm)" <david@kernel.org> writes:
 
-Signed-off-by: Suren Baghdasaryan <surenb@google.com>
----
- arch/s390/kvm/kvm-s390.c |  2 +-
- fs/proc/task_mmu.c       |  5 ++++-
- mm/mempolicy.c           | 14 +++++++++++---
- mm/pagewalk.c            | 20 ++++++++++++++------
- mm/vma.c                 | 22 ++++++++++++++--------
- mm/vma.h                 |  6 ++++++
- 6 files changed, 50 insertions(+), 19 deletions(-)
+> On 2/25/26 08:31, Ackerley Tng wrote:
+>> Ackerley Tng <ackerleytng@google.com> writes:
+>>
+>>> "David Hildenbrand (Arm)" <david@kernel.org> writes:
+>>>
+>>>>
+>>>> [...snip...]
+>>>>
+>>>>
+>>>> If that avoids having to implement truncation completely ourselves, that might be one
+>>>> option we could discuss, yes.
+>>>>
+>>>> Something like:
+>>>>
+>>>> diff --git a/Documentation/filesystems/vfs.rst b/Documentation/filesystems/vfs.rst
+>>>> index 7c753148af88..94f8bb81f017 100644
+>>>> --- a/Documentation/filesystems/vfs.rst
+>>>> +++ b/Documentation/filesystems/vfs.rst
+>>>> @@ -764,6 +764,7 @@ cache in your filesystem.  The following members are defined:
+>>>>                 sector_t (*bmap)(struct address_space *, sector_t);
+>>>>                 void (*invalidate_folio) (struct folio *, size_t start, size_t len);
+>>>>                 bool (*release_folio)(struct folio *, gfp_t);
+>>>> +               void (*remove_folio)(struct folio *folio);
+>>>>                 void (*free_folio)(struct folio *);
+>>>>                 ssize_t (*direct_IO)(struct kiocb *, struct iov_iter *iter);
+>>>>                 int (*migrate_folio)(struct mapping *, struct folio *dst,
+>>>> @@ -922,6 +923,11 @@ cache in your filesystem.  The following members are defined:
+>>>>         its release_folio will need to ensure this.  Possibly it can
+>>>>         clear the uptodate flag if it cannot free private data yet.
+>>>>
+>>>> +``remove_folio``
+>>>> +       remove_folio is called just before the folio is removed from the
+>>>> +       page cache in order to allow the cleanup of properties (e.g.,
+>>>> +       accounting) that needs the address_space mapping.
+>>>> +
+>>>>  ``free_folio``
+>>>>         free_folio is called once the folio is no longer visible in the
+>>>>         page cache in order to allow the cleanup of any private data.
+>>>> diff --git a/include/linux/fs.h b/include/linux/fs.h
+>>>> index 8b3dd145b25e..f7f6930977a1 100644
+>>>> --- a/include/linux/fs.h
+>>>> +++ b/include/linux/fs.h
+>>>> @@ -422,6 +422,7 @@ struct address_space_operations {
+>>>>         sector_t (*bmap)(struct address_space *, sector_t);
+>>>>         void (*invalidate_folio) (struct folio *, size_t offset, size_t len);
+>>>>         bool (*release_folio)(struct folio *, gfp_t);
+>>>> +       void (*remove_folio)(struct folio *folio);
+>>>>         void (*free_folio)(struct folio *folio);
+>>>>         ssize_t (*direct_IO)(struct kiocb *, struct iov_iter *iter);
+>>>>         /*
+>>>> diff --git a/mm/filemap.c b/mm/filemap.c
+>>>> index 6cd7974d4ada..5a810eaacab2 100644
+>>>> --- a/mm/filemap.c
+>>>> +++ b/mm/filemap.c
+>>>> @@ -250,8 +250,14 @@ void filemap_free_folio(struct address_space *mapping, struct folio *folio)
+>>>>  void filemap_remove_folio(struct folio *folio)
+>>>>  {
+>>>>         struct address_space *mapping = folio->mapping;
+>>>> +       void (*remove_folio)(struct folio *);
+>>>>
+>>>>         BUG_ON(!folio_test_locked(folio));
+>>>> +
+>>>> +       remove_folio = mapping->a_ops->remove_folio;
+>>>> +       if (unlikely(remove_folio))
+>>>> +               remove_folio(folio);
+>>>> +
+>>>>         spin_lock(&mapping->host->i_lock);
+>>>>         xa_lock_irq(&mapping->i_pages);
+>>>>         __filemap_remove_folio(folio, NULL);
+>>>>
+>>>
+>>> Thanks for this suggestion, I'll try this out and send another revision.
+>>>
+>>>>
+>>>> Ideally we'd perform it under the lock just after clearing folio->mapping, but I guess that
+>>>> might be more controversial.
+>>>>
+>>
+>> I'm not sure which lock you were referring to, I hope it's not the
+>> inode's i_lock? Why is calling the callback under lock frowned upon?
+>
+> I meant the two locks: mapping->host->i_lock and mapping->i_pages.
+>
+> I'd assume new callbacks that might result in holding these precious
+> locks longer might be a problem for some people. Well, maybe, maybe not.
+>
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 7a175d86cef0..337e4f7db63a 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -2948,7 +2948,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- 		}
- 		/* must be called without kvm->lock */
- 		r = kvm_s390_handle_pv(kvm, &args);
--		if (copy_to_user(argp, &args, sizeof(args))) {
-+		if (r != -EINTR && copy_to_user(argp, &args, sizeof(args))) {
- 			r = -EFAULT;
- 			break;
- 		}
-diff --git a/fs/proc/task_mmu.c b/fs/proc/task_mmu.c
-index e091931d7ca1..1238a2988eb6 100644
---- a/fs/proc/task_mmu.c
-+++ b/fs/proc/task_mmu.c
-@@ -1797,6 +1797,7 @@ static ssize_t clear_refs_write(struct file *file, const char __user *buf,
- 		struct clear_refs_private cp = {
- 			.type = type,
- 		};
-+		int err;
- 
- 		if (mmap_write_lock_killable(mm)) {
- 			count = -EINTR;
-@@ -1824,7 +1825,9 @@ static ssize_t clear_refs_write(struct file *file, const char __user *buf,
- 						0, mm, 0, -1UL);
- 			mmu_notifier_invalidate_range_start(&range);
- 		}
--		walk_page_range(mm, 0, -1, &clear_refs_walk_ops, &cp);
-+		err = walk_page_range(mm, 0, -1, &clear_refs_walk_ops, &cp);
-+		if (err < 0)
-+			count = err;
- 		if (type == CLEAR_REFS_SOFT_DIRTY) {
- 			mmu_notifier_invalidate_range_end(&range);
- 			flush_tlb_mm(mm);
-diff --git a/mm/mempolicy.c b/mm/mempolicy.c
-index 90939f5bde02..3c8b3dfc9c56 100644
---- a/mm/mempolicy.c
-+++ b/mm/mempolicy.c
-@@ -988,6 +988,8 @@ queue_pages_range(struct mm_struct *mm, unsigned long start, unsigned long end,
- 			&queue_pages_lock_vma_walk_ops : &queue_pages_walk_ops;
- 
- 	err = walk_page_range(mm, start, end, ops, &qp);
-+	if (err == -EINTR)
-+		return err;
- 
- 	if (!qp.first)
- 		/* whole range in hole */
-@@ -1309,9 +1311,14 @@ static long migrate_to_node(struct mm_struct *mm, int source, int dest,
- 				      flags | MPOL_MF_DISCONTIG_OK, &pagelist);
- 	mmap_read_unlock(mm);
- 
-+	if (nr_failed == -EINTR)
-+		err = nr_failed;
-+
- 	if (!list_empty(&pagelist)) {
--		err = migrate_pages(&pagelist, alloc_migration_target, NULL,
--			(unsigned long)&mtc, MIGRATE_SYNC, MR_SYSCALL, NULL);
-+		if (!err)
-+			err = migrate_pages(&pagelist, alloc_migration_target,
-+					    NULL, (unsigned long)&mtc,
-+					    MIGRATE_SYNC, MR_SYSCALL, NULL);
- 		if (err)
- 			putback_movable_pages(&pagelist);
- 	}
-@@ -1611,7 +1618,8 @@ static long do_mbind(unsigned long start, unsigned long len,
- 				MR_MEMPOLICY_MBIND, NULL);
- 	}
- 
--	if (nr_failed && (flags & MPOL_MF_STRICT))
-+	/* Do not mask EINTR */
-+	if ((err != -EINTR) && (nr_failed && (flags & MPOL_MF_STRICT)))
- 		err = -EIO;
- 	if (!list_empty(&pagelist))
- 		putback_movable_pages(&pagelist);
-diff --git a/mm/pagewalk.c b/mm/pagewalk.c
-index a94c401ab2cf..dc9f7a7709c6 100644
---- a/mm/pagewalk.c
-+++ b/mm/pagewalk.c
-@@ -425,14 +425,13 @@ static inline void process_mm_walk_lock(struct mm_struct *mm,
- 		mmap_assert_write_locked(mm);
- }
- 
--static inline void process_vma_walk_lock(struct vm_area_struct *vma,
-+static inline int process_vma_walk_lock(struct vm_area_struct *vma,
- 					 enum page_walk_lock walk_lock)
- {
- #ifdef CONFIG_PER_VMA_LOCK
- 	switch (walk_lock) {
- 	case PGWALK_WRLOCK:
--		vma_start_write(vma);
--		break;
-+		return vma_start_write_killable(vma);
- 	case PGWALK_WRLOCK_VERIFY:
- 		vma_assert_write_locked(vma);
- 		break;
-@@ -444,6 +443,7 @@ static inline void process_vma_walk_lock(struct vm_area_struct *vma,
- 		break;
- 	}
- #endif
-+	return 0;
- }
- 
- /*
-@@ -487,7 +487,9 @@ int walk_page_range_mm_unsafe(struct mm_struct *mm, unsigned long start,
- 			if (ops->pte_hole)
- 				err = ops->pte_hole(start, next, -1, &walk);
- 		} else { /* inside vma */
--			process_vma_walk_lock(vma, ops->walk_lock);
-+			err = process_vma_walk_lock(vma, ops->walk_lock);
-+			if (err)
-+				break;
- 			walk.vma = vma;
- 			next = min(end, vma->vm_end);
- 			vma = find_vma(mm, vma->vm_end);
-@@ -704,6 +706,7 @@ int walk_page_range_vma_unsafe(struct vm_area_struct *vma, unsigned long start,
- 		.vma		= vma,
- 		.private	= private,
- 	};
-+	int err;
- 
- 	if (start >= end || !walk.mm)
- 		return -EINVAL;
-@@ -711,7 +714,9 @@ int walk_page_range_vma_unsafe(struct vm_area_struct *vma, unsigned long start,
- 		return -EINVAL;
- 
- 	process_mm_walk_lock(walk.mm, ops->walk_lock);
--	process_vma_walk_lock(vma, ops->walk_lock);
-+	err = process_vma_walk_lock(vma, ops->walk_lock);
-+	if (err)
-+		return err;
- 	return __walk_page_range(start, end, &walk);
- }
- 
-@@ -734,6 +739,7 @@ int walk_page_vma(struct vm_area_struct *vma, const struct mm_walk_ops *ops,
- 		.vma		= vma,
- 		.private	= private,
- 	};
-+	int err;
- 
- 	if (!walk.mm)
- 		return -EINVAL;
-@@ -741,7 +747,9 @@ int walk_page_vma(struct vm_area_struct *vma, const struct mm_walk_ops *ops,
- 		return -EINVAL;
- 
- 	process_mm_walk_lock(walk.mm, ops->walk_lock);
--	process_vma_walk_lock(vma, ops->walk_lock);
-+	err = process_vma_walk_lock(vma, ops->walk_lock);
-+	if (err)
-+		return err;
- 	return __walk_page_range(vma->vm_start, vma->vm_end, &walk);
- }
- 
-diff --git a/mm/vma.c b/mm/vma.c
-index 9f2664f1d078..46bbad6e64a4 100644
---- a/mm/vma.c
-+++ b/mm/vma.c
-@@ -998,14 +998,18 @@ static __must_check struct vm_area_struct *vma_merge_existing_range(
- 	if (anon_dup)
- 		unlink_anon_vmas(anon_dup);
- 
--	/*
--	 * This means we have failed to clone anon_vma's correctly, but no
--	 * actual changes to VMAs have occurred, so no harm no foul - if the
--	 * user doesn't want this reported and instead just wants to give up on
--	 * the merge, allow it.
--	 */
--	if (!vmg->give_up_on_oom)
--		vmg->state = VMA_MERGE_ERROR_NOMEM;
-+	if (err == -EINTR) {
-+		vmg->state = VMA_MERGE_ERROR_INTR;
-+	} else {
-+		/*
-+		 * This means we have failed to clone anon_vma's correctly,
-+		 * but no actual changes to VMAs have occurred, so no harm no
-+		 * foul - if the user doesn't want this reported and instead
-+		 * just wants to give up on the merge, allow it.
-+		 */
-+		if (!vmg->give_up_on_oom)
-+			vmg->state = VMA_MERGE_ERROR_NOMEM;
-+	}
- 	return NULL;
- }
- 
-@@ -1681,6 +1685,8 @@ static struct vm_area_struct *vma_modify(struct vma_merge_struct *vmg)
- 	merged = vma_merge_existing_range(vmg);
- 	if (merged)
- 		return merged;
-+	if (vmg_intr(vmg))
-+		return ERR_PTR(-EINTR);
- 	if (vmg_nomem(vmg))
- 		return ERR_PTR(-ENOMEM);
- 
-diff --git a/mm/vma.h b/mm/vma.h
-index eba388c61ef4..fe4560f81f4f 100644
---- a/mm/vma.h
-+++ b/mm/vma.h
-@@ -56,6 +56,7 @@ struct vma_munmap_struct {
- enum vma_merge_state {
- 	VMA_MERGE_START,
- 	VMA_MERGE_ERROR_NOMEM,
-+	VMA_MERGE_ERROR_INTR,
- 	VMA_MERGE_NOMERGE,
- 	VMA_MERGE_SUCCESS,
- };
-@@ -226,6 +227,11 @@ static inline bool vmg_nomem(struct vma_merge_struct *vmg)
- 	return vmg->state == VMA_MERGE_ERROR_NOMEM;
- }
- 
-+static inline bool vmg_intr(struct vma_merge_struct *vmg)
-+{
-+	return vmg->state == VMA_MERGE_ERROR_INTR;
-+}
-+
- /* Assumes addr >= vma->vm_start. */
- static inline pgoff_t vma_pgoff_offset(struct vm_area_struct *vma,
- 				       unsigned long addr)
--- 
-2.53.0.414.gf7e9f6c205-goog
+The extra time (for guest_memfd, and almost no extra time for other
+filesystems) is on the truncation path, hopefully that isn't a hot path!
 
+> I guess .free_folio() is called outside the lock because it's assumed to
+> possibly do more expensive operations.
+>
+
+I thought .free_folio() was called outside of the lock because after the
+folio is removed from the filemap, there should be no more inode/filemap
+related contention, so any cleanup can definitely be done outside the
+inode/filemap locks.
+
+> --
+> Cheers,
+>
+> David
 
