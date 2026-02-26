@@ -1,262 +1,319 @@
-Return-Path: <kvm+bounces-72012-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72013-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id INS/FIVhoGk0jAQAu9opvQ
-	(envelope-from <kvm+bounces-72012-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 16:06:45 +0100
+	id MNqeEIdnoGkejQQAu9opvQ
+	(envelope-from <kvm+bounces-72013-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 16:32:23 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A66F1A83E1
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 16:06:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A0C51A8C1E
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 16:32:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AD413309B24E
-	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 15:04:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9949732DCC9B
+	for <lists+kvm@lfdr.de>; Thu, 26 Feb 2026 15:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3144D3E9F65;
-	Thu, 26 Feb 2026 15:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64FBC3ED120;
+	Thu, 26 Feb 2026 15:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="GzGEF53S";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="C/0BXgCQ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cBEApV/N"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010023.outbound.protection.outlook.com [52.101.201.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE973A640F
-	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 15:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772118290; cv=none; b=qCBbkr8TsIpWdsWv5f2MChuHoiEoBrSN3H/1zpgnEwLu9ghX3aVqSdbRZwURpqudaE0MAn5jK4pdcgchs1aEt5PZVqfLrjoGXENUpaQcMzl1LK/clAuQVHffS5OVl1IfdlHO6dq96+uO4uTM2Y8snDh+rBrg/cIeu87Gl6M0dfE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772118290; c=relaxed/simple;
-	bh=pYLIuNl20p7tOmh7vf2ZBTy44J0MNJ0SA/EEn65HWbQ=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:From:Subject:Cc:
-	 References:In-Reply-To; b=snZkuPMscssUkxOJsNjTIxIE19BA1ZmYPVuQbtU2qHZIoMi4GdzfnSsa2Cl6GbZ/85KJk72rzXIo2Pw+6kyvFM0Vm5hiNPyWGHW182qQ2OrqB2qjMUtoCKRq0Wzablmaekq85wqn2ZZKj/TTflgHgCNpXzrAV4pHG1w+h4cTpJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=GzGEF53S; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=C/0BXgCQ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61QAKm5B906848
-	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 15:04:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	qp3TU7bzUr1B0vZ7uPapTlnahGO7pQVMf5jftO4wjJI=; b=GzGEF53SIu6p5rL2
-	FSzlRnRl/1ny7hdPTi7cfN1pijd2a8AUO4dm00PcTez3Uq4OMf1cO2K4EigAUEJm
-	9oZ5mw1R+zCmREzqwxByTbrKpVLrDX8UtHagBJ4JjNSHczqKXEK+L9aRfz5s8c/e
-	PXNZKU6e8gR/51X5T0nwNyiO2/GLfVpML2nvU/DEE3kv3Z6TNeSX/OaoXVw8ZQu5
-	3W9Cz5+M/wN6wq62tYf91lyVqwlmfyV7C8qyZ3ePUzRjlx5CkB4XsYEYFD7VneQy
-	JvelPj8eN/8bsDXt/swz/lt7ZUFonpXnhSvP+Pp3mr6p1N2is5u3j8ECBgfC/XOY
-	QmSXEA==
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cjk2v14hw-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 15:04:48 +0000 (GMT)
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-679c5fde4c7so21058215eaf.0
-        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 07:04:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1772118288; x=1772723088; darn=vger.kernel.org;
-        h=in-reply-to:references:cc:subject:from:to:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qp3TU7bzUr1B0vZ7uPapTlnahGO7pQVMf5jftO4wjJI=;
-        b=C/0BXgCQwe8loJ3Sq60vQGPsgnxiNjJ0wX+CIQajtoFnUafLWAlyb+/cIO94ml91F1
-         QHW/4vExbqG3lHexWBba3t35Gcd084UINuBVaWc+iACtH/X+bqnT4Z1Q0GBM56mnqRJP
-         30SArFJ7MHb1WEmx1g2Q+YRPUxiWUP21GoiW5QrwHwwU0Tr7NYI9hdDIK7ZtvROp268d
-         TljSIuO9p53iL+8M5zPu65awVmAp203xjuKccW+s4+/GZ0sMJ6+TlvQASC+xsMgg3PFr
-         95crB68LGNk2Ytf+WeCLI/qN/Juj5lfI1N2AGtPMHgEv+QdyaSWseYLmbd/TQ54+x7V+
-         /Qsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772118288; x=1772723088;
-        h=in-reply-to:references:cc:subject:from:to:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qp3TU7bzUr1B0vZ7uPapTlnahGO7pQVMf5jftO4wjJI=;
-        b=kz8BJT2fpo/b5wJQUyvJCO4PosI/0juu24ULaCTKVuI1ki0fbHu8s2QsKST+TuyEQn
-         5qLsMk2k5D3EdKwwnKxLRJhCpV5+ZjY96NMStvKWP+5VSlLD1SN7Hieit/eZIxmZzaom
-         bFtSj6HRiwI+kTYlZWhqUq4K7c+vg9llbnMZvW8sIttP12ILInQEjTqqO7VrWJ9QKdAx
-         N/JlC58M/qk+BcuRM2icGIe6wBUqDh52CqnhLJxiaL1yiNtQQGld8JN8+EA5wAHpANSB
-         OnGAmHcT02hqo1L4ISYUXUsIC3gaPUNuK9fHZ2P5kLNEi1C9uDzKBLqTUYn02bHaCZa4
-         8iPA==
-X-Gm-Message-State: AOJu0YyesCzXxnmxDjReBO3KIAEck2JXTlsXGnXvFuLWiP78F6xbs6S+
-	z1oNpm5wKonS8P8q6eqxeZc/3zfP+W2zjilMLaZvDQREzfrMtgQ2pwpd+I3NmN0x/8jU2IP7eYz
-	UWZOAs0MD0uNAkaGM/rWBpW6erDw9qSr279ORQZOCWXGZbs0DZGQiBYo=
-X-Gm-Gg: ATEYQzx6stihzmV5XKVJjg99mKCbdwaGdBr7KTXl5XixYBIG1B2e5sM8UAz85aeS7N/
-	+Ccoz6aTqFIlDLPRt40/JToB9QltL22qJIAS1n1FcErHY7wF7CXSBtLTJFqR832JlLUcPecZlKW
-	qDEkyATK0bJhXnYcNWSGQM84CXRjrau8hGGuMJdRgt8G3+KnMtlSCZasqyAseifH3WyzxO3lN0/
-	qD1RgyYCXyTAt4n7Vk3Bqhgb/1Ci4BOj+beAba5rXbnpwTmbp0qT5z64v8w6CqN6JQ0POeqR5aM
-	ZO1hFYJJdlQ+7DclZShkkYdB7ZiUfLhs8K8CaInPbak6Vm0hE2YGBZQ86nM+HhnllMRnamoX73E
-	EDkaJeUV2u+1gRF56jEzhcFWuLWDY6a7UrzAhRP+6Tij7Yg4GbYO1akC2X5ap
-X-Received: by 2002:a4a:ee84:0:b0:663:3c7:421d with SMTP id 006d021491bc7-679ef9b9587mr2113794eaf.75.1772118286068;
-        Thu, 26 Feb 2026 07:04:46 -0800 (PST)
-X-Received: by 2002:a4a:ee84:0:b0:663:3c7:421d with SMTP id 006d021491bc7-679ef9b9587mr2113774eaf.75.1772118285481;
-        Thu, 26 Feb 2026 07:04:45 -0800 (PST)
-Received: from localhost (ip-86-49-242-13.bb.vodafone.cz. [86.49.242.13])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b935ae6131fsm65716166b.40.2026.02.26.07.04.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Feb 2026 07:04:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380363ED139;
+	Thu, 26 Feb 2026 15:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.23
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772118759; cv=fail; b=EfgeOsUbdXqJALqPlxRw3NxJnnoG4aa0Lhn+FDNIUwQNcq+Fs0Ges1PWqVDXEIAn0JPyhh+Lc2J9Nyn1rxapW0h22MG9SB9LjqlWfOQmk4O2cjrw+ECLjSi7bwTZU/G7FgMHXObA8Rm2tZtzYhz3bOKEudyHrMuvFK64hffxoDQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772118759; c=relaxed/simple;
+	bh=b9XlDulS1K/PvHtsx+sf6Cs+WdRS1/gC0rbWZIwPU1I=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=IMAORk75tjSa8gAr9rae6FueO97kpHhjKs7QSkx/YS6J8lXuQRVEZCw/ZKk1VaEOVCgM5D/XXipdT5dfia8iroLFgsvpbwr2bUAkLEfaU2uvkakFUudkKXXt7P6JzDUdWnEeqoxNQnsEz80gUC78b2gLH765E6EXnb04ttY7x8E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cBEApV/N; arc=fail smtp.client-ip=52.101.201.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UgJkxCrpChvxDt+c6yD8uGT+ioQKUt5S8vFEiYD//k39DOC/iDPW/RuB4kpAQUn5DwkfYEFJpP4cqCDcrWK2oXKYTTq+8PjgSgb9ZEqw2iZIKn7ppeVEdJCZfGBWay1oQwSIFgIHVQ5KMl1JfKIzS92y7FsClHzdw3zn++/LIroEbkxXUSM6Mok1f0qzdaflw0xQstXJOtT+RIvNR4mXTXHfJ/n+rloPyVvQfdSIwiOji6sWXz/mXQwUxMUmqcJSbaGudauHDJsoO68+k3rFguc6osrhh5fbBuPxCecv/7wJu1Sf7ssRqbTIjp3oEnMfSpCwTFVNKb9LBdrheRBvhg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gR+3sR+Jg0AwKEx/jxv6rnbPlGDZo4iKx1uGFGVUgvg=;
+ b=AHFZ1XIUzjXrxmzTl6TsVp+Tcfh0Hcmi6bgpnAKnO32xnireS4eooZbdHFXBaL655tT7PQPwvB8VWCAwC9NI02hofylC+brwyIlafo/OwlD8OwHUPRxTReMkOA9ePx9QMAcdpgukG36UdmY8gzsIv6q2j+7A8rcx3LAk/cMZjeoUKAJDXPX0mubNIh8C7/lyXOWKpvlJP3R3xTW4hn1joPtpUDSOMO4ri4BFy63sw56+ratJW8nwTq9fewM+fY8Ovdq4PBq+uVy/drAIqVX/6u5gmY8AOwqfSUptjGJONZYBMqVZB6uXa0xzZuZdqqDQLNg0SqFfgH0uJa3SX7OhjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gR+3sR+Jg0AwKEx/jxv6rnbPlGDZo4iKx1uGFGVUgvg=;
+ b=cBEApV/NjhNHoXjCTbP8YZQAK7zIReZEmtEMmDFbs0MCg4Pgz4PMcz0r+1hAnoPsiAIgMc5pv4H8xbO0F0OyBFxqI0LxENhsJ8uFaomM1YGkOqvEDiMmbu8O/xNAN94aMDTlYD8/syLihWv+2F078zfIk3ePBhzJp5Kyw1R40UFTykLIMRoV05/2Aws4MZVpdpgGSTWhLNjq08B2Lw1WTce/5gq/iHXg7mqkJs8z1lHfeBEZaLnU3X3T/vB99EOMMnuH4dBeoI+t6VlGltUOGF4zMOIFbyYc+p6Zqe3six5FhOcUKn3MZpFHk4SxPV4ICnP+hySqeIy2oWvfUUXAIw==
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com (2603:10b6:610:144::12)
+ by DS7PR12MB9528.namprd12.prod.outlook.com (2603:10b6:8:252::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.14; Thu, 26 Feb
+ 2026 15:12:32 +0000
+Received: from CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::b710:d6a1:ab16:76de]) by CH3PR12MB7548.namprd12.prod.outlook.com
+ ([fe80::b710:d6a1:ab16:76de%5]) with mapi id 15.20.9654.007; Thu, 26 Feb 2026
+ 15:12:32 +0000
+From: Shameer Kolothum Thodi <skolothumtho@nvidia.com>
+To: Ankit Agrawal <ankita@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>, Jason
+ Gunthorpe <jgg@nvidia.com>, Matt Ochs <mochs@nvidia.com>, "jgg@ziepe.ca"
+	<jgg@ziepe.ca>, "alex@shazbot.org" <alex@shazbot.org>
+CC: Neo Jia <cjia@nvidia.com>, Zhi Wang <zhiw@nvidia.com>, Krishnakant Jaju
+	<kjaju@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>, "kevin.tian@intel.com"
+	<kevin.tian@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH RFC v2 04/15] vfio/nvgrace-gpu: Introduce functions to
+ fetch and save EGM info
+Thread-Topic: [PATCH RFC v2 04/15] vfio/nvgrace-gpu: Introduce functions to
+ fetch and save EGM info
+Thread-Index: AQHcpNzzWVAkt0yYckOOMDwYfQT4gLWVGL8w
+Date: Thu, 26 Feb 2026 15:12:32 +0000
+Message-ID:
+ <CH3PR12MB754847015699056ABBACD441AB72A@CH3PR12MB7548.namprd12.prod.outlook.com>
+References: <20260223155514.152435-1-ankita@nvidia.com>
+ <20260223155514.152435-5-ankita@nvidia.com>
+In-Reply-To: <20260223155514.152435-5-ankita@nvidia.com>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH3PR12MB7548:EE_|DS7PR12MB9528:EE_
+x-ms-office365-filtering-correlation-id: 8abb68ff-caf2-4767-39c7-08de7549770c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|38070700021|7053199007;
+x-microsoft-antispam-message-info:
+ bO1dbjvYjS3OJkQjUQgGcnDrZTCpVz0NxoUR25ipT1P67LGXzsjGb2aTT2xeV6wa3PoquIXDzwId5haSNIGg3Bx69O9/AcqYR0TfvTGZ+gVli+nK+jABSFJ61ooLSkmxMtHqM2MPIhIqu1MYizGj//iotG5Z5PJitPLu1WLd1SYYCaovCmgBZb74ZXUwRH55NwcmyKi6RMgBVIaNGuN+cGJTN021zBkvZ/byW8HOQ74D3Onnd+ivS2KyV+sGizDPcaTZoXksIqT7WpEa8WMBePTvRLJMczWMRFmyjD6UC1akaLrce/goJrWTZe5kxU3hlel/LjfON/8ipFmCVscb00C+9sSmLDlLx3GbtoOFK1f76I2mSoVRR9oGupH8RllQdaGFlSAN3hUG5tM4kw8tNAOxuJNkuDqebJPmqmP+exE4QkD+cS67lK/bdN9hHf/54JCxLihjoBjIAOqoWo8GqREQD1sMKV8KY2+vmecnd1dxtaM9Ro8LeuT/WLgtpGzRrYQaNXv6QYBtzHYGiCczASWoyKBfWI1d7ihtn+CpQdYuSJh6XV6bkka8Zk2KUZl91RhPuXv424w/oA9B2HgKAdd61DE7yvJX9Zw320eMekGfhBc+ixSkZptw/kShxjeAxSsC2HQaA8jQhXGZ4uVC/sMB4vx0D+fM07rMBl98AFl2tjoMBBRQnOKyU20WIegZpd1q4yeH/UlQQisbPGK8ikPnQGThWXRKXJQJ7fEWi5vPP0H99jsgJLBVNRWN0lSnxZe3eYpJAybPyTq5MXZuGdjFryEfv3EP2foAYkHjYGk=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7548.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?ihMxLp4gXikM8Ar5pEOvwHlShQUMW+vh2Z2T2tg56L47vTqx3e5d8WexRFLv?=
+ =?us-ascii?Q?JB6tyn6BH2hgPffpleAWirf2wQiYsddPWWXv/G0Yhnpno52x9dZn8aWsMZiT?=
+ =?us-ascii?Q?DJg4XzHZIW4uyLn5ef7zyMzq/nYsyYMedYtc7QCC7a9bnfZJjQN/o3zG/Q/M?=
+ =?us-ascii?Q?P45rB+C0i5NscY5WAD/D5VPhNp1vjEAvm15I4g/6/Y94hBl8NmD51ZTiYGnp?=
+ =?us-ascii?Q?L992eMsNXkFHdAJit2G/WPGwdsIa2XWueFQj91sHdnIjyFIgQOqVUjlrui+V?=
+ =?us-ascii?Q?Sk6Cj/y2HBl1q8FIoDeWQ7a/LGPaWOzR+xUyOLXxaEzHq+xltXmG9sRf1QlE?=
+ =?us-ascii?Q?ejp1VtZ1zUf6Mm9rS1ja2Jwx6Vmxf1YyVaw++DAkfObWZH13kKw0KM7k1jZR?=
+ =?us-ascii?Q?nvROE0ABl05EHH7RJmVF+yX0mh5FsvHqVlF/fIc+Txs3xaLaTIOjRA70ofvS?=
+ =?us-ascii?Q?JWxVu2MMikx4tTEM0VA+coo3LULUOX4gWxILodNCC+RyDCEsqI1Qzw13aHj6?=
+ =?us-ascii?Q?MFYYudgNcAp2I/QyDNeureg9klA50Z42RvTAoemi7ULSrJytQv5AFJ4EwwFR?=
+ =?us-ascii?Q?/YeqVCBT/ZcXpI2lE2rKWZi7YVFUbtJ5eQFL9f+T594zDibep8SHHF1gaILT?=
+ =?us-ascii?Q?+WJ5HM++qp+WTGRlzkbVgCoN/zrhSgBOJY97wijNTnEkrSeAc2bzCRwBb2JA?=
+ =?us-ascii?Q?v77vhgtzz9LSBSXwvS2tkauNUd0Mnqj0T2a+ZDmlw3I+WhUqtrjJdOz5Smo2?=
+ =?us-ascii?Q?WL2Pp8k5Mzn7szko9VEQMQ92/dhyHP+EvccOvOsr6EWW7SaS2X4vBttYzNwi?=
+ =?us-ascii?Q?UA7NvGHUbrMzkfYLSArJ5INeQKeELiqjgmHoRmAiHtOn3P6bF4+seS0CTDrt?=
+ =?us-ascii?Q?AbFJrA+3Yv0Uz5LMEEcR5KMquqTaVif2k7BSw/KW2UUwsOTqBuSRkuCs209u?=
+ =?us-ascii?Q?bYlxDNHoPHMz9DtGO573Bavhj+r7mRr/DZC3LQcRqSVN41vpwg//JhY8mxf0?=
+ =?us-ascii?Q?JgB1YgRcBhn867p+B6SfSIQ53zUQgVfL+zJ16PhheSdQOW3MKgpDcLcN7gWb?=
+ =?us-ascii?Q?GPf/dHRAkmBxcSpZPB74dav+kTIirMYy5WwV7pUFeiat8N6PiMF+Ix5YfFRF?=
+ =?us-ascii?Q?X8pCBzyCcfsD7n7c1SwMxd/ofKuGGz9iz5+pJi4xvz/RGV2LnKtwzftzzmWa?=
+ =?us-ascii?Q?3GSKy/vLWYWj/GaaInf57bewpyMXtfsIG1kyROEDT3NSvyYA/zwS4Pv36L2F?=
+ =?us-ascii?Q?0wtEWV7iH8StKRrg790jJaPdKpK48AqOJk1ev9ajh7WtDGxZ/q+njDUxZjnV?=
+ =?us-ascii?Q?qzMMle7nQydEN/fOvHWVykWZ78RmA8tC2ulBGbrj3nHBfIkNjiawKmWwZvNw?=
+ =?us-ascii?Q?CrMVQ8lsZnmtRgSo9Hy3K0tBIxVw15Up2jBwupw0CkDrOw3Ik4oP5xQ3OEmp?=
+ =?us-ascii?Q?RRw1QZ8Xd3QHXcw++JDpuE0OLOgjRJSot3P6NP/et6QCkxYAFDQZaicVFPpU?=
+ =?us-ascii?Q?aJCfxByf7sYmGsX+1ZJ7U7x20mqfCHg3QPhElJGlpiOk3hofd4gwTGMPVcZ2?=
+ =?us-ascii?Q?CqyIWaSF/Rm2oxmAUrXPZoFgXBlSgMm2pD6sR2Na3z8q8rDx2XJZRSBUzwPs?=
+ =?us-ascii?Q?gik61puUWVi5KO2ijx9JMvjZ+8YCIsD6sdAKHCrwyXEiye4EcHEaV9py4u7k?=
+ =?us-ascii?Q?5dVmPlFs8z5MLCx1Ghe65U7Mta38dc8GZ1A7MTdj1l3BIbxpeQFrqyf825N5?=
+ =?us-ascii?Q?XIt+kItC4w=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 26 Feb 2026 15:04:43 +0000
-Message-Id: <DGOZI4Q6NSDS.7AQVQ7TEK9QH@oss.qualcomm.com>
-To: "Jinyu Tang" <tjytimi@163.com>, "Anup Patel" <anup@brainfault.org>,
-        "Atish Patra" <atish.patra@linux.dev>,
-        "Andrew Jones"
- <andrew.jones@oss.qualcomm.com>,
-        "Conor Dooley"
- <conor.dooley@microchip.com>,
-        "Yong-Xuan Wang" <yongxuan.wang@sifive.com>,
-        "Nutty Liu" <nutty.liu@hotmail.com>, "Paul Walmsley" <pjw@kernel.org>,
-        "Paul Walmsley" <paul.walmsley@sifive.com>,
-        "Palmer Dabbelt"
- <palmer@dabbelt.com>,
-        "Albert Ou" <aou@eecs.berkeley.edu>,
-        "Alexandre
- Ghiti" <alex@ghiti.fr>
-From: =?utf-8?q?Radim_Kr=C4=8Dm=C3=A1=C5=99?=
- <radim.krcmar@oss.qualcomm.com>
-Subject: Re: [PATCH v6] KVM: riscv: Skip CSR restore if VCPU is reloaded on
- the same core
-Cc: <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
-        <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20260226123802.154855-1-tjytimi@163.com>
-In-Reply-To: <20260226123802.154855-1-tjytimi@163.com>
-X-Proofpoint-ORIG-GUID: xoCcsQhTgHtBbF4ERCqqJZ7b7Xs3fJoF
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI2MDEzNiBTYWx0ZWRfX79UB20w6fqGT
- xCBECY9sANurgOKD4XUSrae9FqcWrghqS3wD3o66ZWlMp705Jc+X9gz+VN9LApt0MJ4jalYMkQj
- H7hDr2wD+5vykHSaqHrzg3LaEXjxKnlCR8VysjvXMQIMK2fIRdOPSfWqqKzT/o+VeQuy73C6m7i
- EWKXvCGQGChF1fOYAyy5yTEyesH5ufwBQHbhKZiq7TpAsEhiAZ4VX6IoSLzOy2EGdXMdW/rT5Bs
- YrcNeUExUOTR3IWkXAfq/ItH8mLIZhPvIb1bfpUoF7uZHjVisL6CkIFJWfMZ22rYIsusZO8UFg4
- vWkG2j7rISF/dcpZIDyn9UiVFa4TrwL8u88IuTBa0MM1TbscemEIOqOySLcQFQxBJQB0vIGu6RJ
- R2dWZUbsEqnOqMYuSpwccAgt4qPnIiGOb6SEI4PQApbwmAxnDvGJlCqhyDensMGWcCE003EDdO5
- Rg7cedrc7H0vQKETfLA==
-X-Authority-Analysis: v=2.4 cv=PO8COPqC c=1 sm=1 tr=0 ts=69a06110 cx=c_pps
- a=lkkFf9KBb43tY3aOjL++dA==:117 a=9tUHzIdeCh+UoOnba06Qjw==:17
- a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=M51BFTxLslgA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22
- a=Byx-y9mGAAAA:8 a=E61YY4l4AmgQ4UnPY0gA:9 a=QEXdDO2ut3YA:10
- a=k4UEASGLJojhI9HsvVT1:22
-X-Proofpoint-GUID: xoCcsQhTgHtBbF4ERCqqJZ7b7Xs3fJoF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-26_01,2026-02-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 spamscore=0 phishscore=0 lowpriorityscore=0
- clxscore=1015 priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2602260136
+MIME-Version: 1.0
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7548.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8abb68ff-caf2-4767-39c7-08de7549770c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2026 15:12:32.3239
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Q/dEgzUwpWQf4Y2yaE1R62tHBjEffcbhPSPc6iyN4YbX2FgBFeHzlqQKyhywQpqBH2pEnW/w8v980q9ourE5JQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB9528
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.87 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MIXED_CHARSET(0.79)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-72013-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-72012-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[163.com,brainfault.org,linux.dev,oss.qualcomm.com,microchip.com,sifive.com,hotmail.com,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,oss.qualcomm.com:mid,oss.qualcomm.com:dkim,qualcomm.com:dkim];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[radim.krcmar@oss.qualcomm.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[skolothumtho@nvidia.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 8A66F1A83E1
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,Nvidia.com:dkim,shazbot.org:email]
+X-Rspamd-Queue-Id: 9A0C51A8C1E
 X-Rspamd-Action: no action
 
-2026-02-26T20:38:02+08:00, Jinyu Tang <tjytimi@163.com>:
-> Currently, kvm_arch_vcpu_load() unconditionally restores guest CSRs and
-> HGATP. However, when a VCPU is loaded back on the same physical CPU,
-> and no other KVM VCPU has run on this CPU since it was last put,
-> the hardware CSRs are still valid.
->
-> This patch optimizes the vcpu_load path by skipping the expensive CSR
-> writes if all the following conditions are met:
-> 1. It is being reloaded on the same CPU (vcpu->arch.last_exit_cpu =3D=3D =
-cpu).
-> 2. The CSRs are not dirty (!vcpu->arch.csr_dirty).
-> 3. No other VCPU used this CPU (vcpu =3D=3D __this_cpu_read(kvm_former_vc=
-pu)).
->
-> To ensure this fast-path doesn't break corner cases:
-> - Live migration and VCPU reset are naturally safe. KVM initializes
->   last_exit_cpu to -1, which guarantees the fast-path won't trigger.
-> - A new 'csr_dirty' flag is introduced to track runtime userspace
->   interventions. If userspace modifies guest configurations (e.g.,
->   hedeleg via KVM_SET_GUEST_DEBUG, or CSRs via KVM_SET_ONE_REG) while
->   the VCPU is preempted, the flag is set to skip fast path.
->
-> Note that kvm_riscv_vcpu_aia_load() is kept outside the skip logic
-> to ensure IMSIC/AIA interrupt states are always properly
-> synchronized.
->
-> Signed-off-by: Jinyu Tang <tjytimi@163.com>
+
+
+> -----Original Message-----
+> From: Ankit Agrawal <ankita@nvidia.com>
+> Sent: 23 February 2026 15:55
+> To: Ankit Agrawal <ankita@nvidia.com>; Vikram Sethi <vsethi@nvidia.com>;
+> Jason Gunthorpe <jgg@nvidia.com>; Matt Ochs <mochs@nvidia.com>;
+> jgg@ziepe.ca; Shameer Kolothum Thodi <skolothumtho@nvidia.com>;
+> alex@shazbot.org
+> Cc: Neo Jia <cjia@nvidia.com>; Zhi Wang <zhiw@nvidia.com>; Krishnakant
+> Jaju <kjaju@nvidia.com>; Yishai Hadas <yishaih@nvidia.com>;
+> kevin.tian@intel.com; kvm@vger.kernel.org; linux-kernel@vger.kernel.org
+> Subject: [PATCH RFC v2 04/15] vfio/nvgrace-gpu: Introduce functions to fe=
+tch
+> and save EGM info
+>=20
+> From: Ankit Agrawal <ankita@nvidia.com>
+>=20
+> The nvgrace-gpu module tracks the various EGM regions on the system.
+> The EGM region information - Base SPA and size - are part of the ACPI
+> tables. This can be fetched from the DSD table using the GPU handle.
+>=20
+> When the GPUs are bound to the nvgrace-gpu module, it fetches the EGM
+> region information from the ACPI table using the GPU's pci_dev. The
+> EGM regions are tracked in a list and the information per region is
+> maintained in the nvgrace_egm_dev.
+>=20
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 > ---
->  v3 -> v4:
->  - Introduced 'csr_dirty' flag to track dynamic userspace CSR/CONFIG
->    modifications (KVM_SET_ONE_REG, KVM_SET_GUEST_DEBUG), forcing a full
->    restore when debugging or modifying states at userspace.
->  - Kept kvm_riscv_vcpu_aia_load() out of the skip block to resolve IMSIC
->    VS-file instability.
-
-Excluding AIA is disturbing as we're writing only vsiselect, hviprio1,
-and hviprio2...  It seems to me that it should be fine to optimize the
-AIA CSRs too.
-
-Wasn't the issue that you originally didn't track csr_dirty, and the bug
-just manifested through IMSICs?
-
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> @@ -581,6 +585,20 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int c=
-pu)
->  	struct kvm_vcpu_csr *csr =3D &vcpu->arch.guest_csr;
->  	struct kvm_vcpu_config *cfg =3D &vcpu->arch.cfg;
-> =20
+>  drivers/vfio/pci/nvgrace-gpu/egm_dev.c | 24 +++++++++++++++++++++++-
+>  drivers/vfio/pci/nvgrace-gpu/egm_dev.h |  4 +++-
+>  drivers/vfio/pci/nvgrace-gpu/main.c    |  8 ++++++--
+>  include/linux/nvgrace-egm.h            |  2 ++
+>  4 files changed, 34 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/egm_dev.c
+> b/drivers/vfio/pci/nvgrace-gpu/egm_dev.c
+> index 0bf95688a486..20291504aca8 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/egm_dev.c
+> +++ b/drivers/vfio/pci/nvgrace-gpu/egm_dev.c
+> @@ -17,6 +17,26 @@ int nvgrace_gpu_has_egm_property(struct pci_dev
+> *pdev, u64 *pegmpxm)
+>  					pegmpxm);
+>  }
+>=20
+> +int nvgrace_gpu_fetch_egm_property(struct pci_dev *pdev, u64 *pegmphys,
+> +				   u64 *pegmlength)
+> +{
+> +	int ret;
+> +
 > +	/*
-> +	 * If VCPU is being reloaded on the same physical CPU and no
-> +	 * other KVM VCPU has run on this CPU since it was last put,
-> +	 * we can skip the expensive CSR and HGATP writes.
-> +	 *
-> +	 * Note: If a new CSR is added to this fast-path skip block,
-> +	 * make sure that 'csr_dirty' is set to true in any
-> +	 * ioctl (e.g., KVM_SET_ONE_REG) that modifies it.
+> +	 * The memory information is present in the system ACPI tables as DSD
+> +	 * properties nvidia,egm-base-pa and nvidia,egm-size.
 > +	 */
-> +	if (vcpu->arch.last_exit_cpu =3D=3D cpu && !vcpu->arch.csr_dirty &&
-> +	    vcpu =3D=3D __this_cpu_read(kvm_former_vcpu))
-> +		goto csr_restore_done;
+> +	ret =3D device_property_read_u64(&pdev->dev, "nvidia,egm-size",
+> +				       pegmlength);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret =3D device_property_read_u64(&pdev->dev, "nvidia,egm-base-pa",
+> +				       pegmphys);
+> +
+> +	return ret;
+> +}
+> +
+>  int add_gpu(struct nvgrace_egm_dev *egm_dev, struct pci_dev *pdev)
+>  {
+>  	struct gpu_node *node;
+> @@ -54,7 +74,7 @@ static void nvgrace_gpu_release_aux_device(struct
+> device *device)
+>=20
+>  struct nvgrace_egm_dev *
+>  nvgrace_gpu_create_aux_device(struct pci_dev *pdev, const char *name,
+> -			      u64 egmpxm)
+> +			      u64 egmphys, u64 egmlength, u64 egmpxm)
+>  {
+>  	struct nvgrace_egm_dev *egm_dev;
+>  	int ret;
+> @@ -64,6 +84,8 @@ nvgrace_gpu_create_aux_device(struct pci_dev *pdev,
+> const char *name,
+>  		goto create_err;
+>=20
+>  	egm_dev->egmpxm =3D egmpxm;
+> +	egm_dev->egmphys =3D egmphys;
+> +	egm_dev->egmlength =3D egmlength;
+>  	INIT_LIST_HEAD(&egm_dev->gpus);
+>=20
+>  	egm_dev->aux_dev.id =3D egmpxm;
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/egm_dev.h
+> b/drivers/vfio/pci/nvgrace-gpu/egm_dev.h
+> index 1635753c9e50..2e1612445898 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/egm_dev.h
+> +++ b/drivers/vfio/pci/nvgrace-gpu/egm_dev.h
+> @@ -16,6 +16,8 @@ void remove_gpu(struct nvgrace_egm_dev *egm_dev,
+> struct pci_dev *pdev);
+>=20
+>  struct nvgrace_egm_dev *
+>  nvgrace_gpu_create_aux_device(struct pci_dev *pdev, const char *name,
+> -			      u64 egmphys);
+> +			      u64 egmphys, u64 egmlength, u64 egmpxm);
+>=20
+> +int nvgrace_gpu_fetch_egm_property(struct pci_dev *pdev, u64 *pegmphys,
+> +				   u64 *pegmlength);
+>  #endif /* EGM_DEV_H */
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgra=
+ce-
+> gpu/main.c
+> index 3dd0c57e5789..b356e941340a 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
+> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+> @@ -78,7 +78,7 @@ static struct list_head egm_dev_list;
+>  static int nvgrace_gpu_create_egm_aux_device(struct pci_dev *pdev)
+>  {
+>  	struct nvgrace_egm_dev_entry *egm_entry =3D NULL;
+> -	u64 egmpxm;
+> +	u64 egmphys, egmlength, egmpxm;
+>  	int ret =3D 0;
+>  	bool is_new_region =3D false;
+>=20
+> @@ -91,6 +91,10 @@ static int nvgrace_gpu_create_egm_aux_device(struct
+> pci_dev *pdev)
+>  	if (nvgrace_gpu_has_egm_property(pdev, &egmpxm))
+>  		goto exit;
+>=20
+> +	ret =3D nvgrace_gpu_fetch_egm_property(pdev, &egmphys,
+> &egmlength);
+> +	if (ret)
+> +		goto exit;
+> +
 
-I see a small optimization if we set the per-cpu variable here, instead
-of doing that in kvm_arch_vcpu_put:
+This should only be done if this is not the add_gpu case below
 
-	if (vcpu !=3D __this_cpu_read(kvm_former_vcpu))
-		__this_cpu_write(kvm_former_vcpu, vcpu);
-	else if (vcpu->arch.last_exit_cpu =3D=3D cpu && !vcpu->arch.csr_dirty)
-		goto csr_restore_done;
+Also, patch #3 has a comment:
+" Skip the EGM region information fetch if=20
+ * already done through a differnt GPU on the same socket."
 
-This means we never have to read the per-cpu twice in the get/put
-sequence: faster put at the cost of slightly slower get.
+That probably belongs here instead.
 
-Thanks.
+Thanks,
+Shameer
+
 
