@@ -1,211 +1,290 @@
-Return-Path: <kvm+bounces-72170-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72171-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sL3HJHnDoWkVwQQAu9opvQ
-	(envelope-from <kvm+bounces-72170-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 17:16:57 +0100
+	id AO1vG8fCoWkVwQQAu9opvQ
+	(envelope-from <kvm+bounces-72171-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 17:13:59 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2B411BAB10
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 17:16:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7BBE1BAA29
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 17:13:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 877D630B5D28
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 16:05:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A82F331EC357
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 16:06:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA7D44BCBD;
-	Fri, 27 Feb 2026 16:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEBCA44BC8B;
+	Fri, 27 Feb 2026 16:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="jr3vgegU";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tvscZopf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4U5oaeTo"
 X-Original-To: kvm@vger.kernel.org
-Received: from flow-b1-smtp.messagingengine.com (flow-b1-smtp.messagingengine.com [202.12.124.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81CDE220F2D;
-	Fri, 27 Feb 2026 16:04:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C61243D51A
+	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 16:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772208300; cv=none; b=PHLCkQZDlnZ+s5E8b8ByZ+nsWVIS9VJQfTQ45cUF2B1UCDBfsnohkHYc9f0n7G0APke03NamkneRlvnhd69Y0BI5F1Wa4eTqD5zcJ5vxDfqYUXjub02pLrwvpVQAJuo6dMi7w0Im4u/dZa1vYwYg8zxlv2/GSseBqlvxIdUOmVs=
+	t=1772208385; cv=none; b=quSG+ZEC3w/G7346jbtpATsvn5DZaP4SMwRRZBB6gCacHcQR/tTTIzFonMt9nNBgycm1pmBfxa1o9kf41JQO1TSGjqCqz5eun583exOYIYVcdpSBT2mIXPnPoJimbw/dzlRkQGZNDsyXIFoeMGTOvgDO9Ts2x3LLwGpFdL9/2JA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772208300; c=relaxed/simple;
-	bh=6xT3Dztb8MKL9P9vHsdzESwQNyYayz+saDCeiG7j2O0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GP/cj+RfjBfkv1o6k3OmWclIxzwqq8TuI7TkuAyH9QL2+uzHuLQn5k6Kc5yDPWG/0tsaqA0fnLKs/3PtIBMLrRDbTPOPinCzacCuMv5RAMImNb0cY2U3NuxYq6LmJZ7osAnmmSqHtL7n08pFsXUt9rQy/kcoMCyeInv+NokYwyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=jr3vgegU; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tvscZopf; arc=none smtp.client-ip=202.12.124.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailflow.stl.internal (Postfix) with ESMTP id 43E3B1301495;
-	Fri, 27 Feb 2026 11:04:56 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Fri, 27 Feb 2026 11:04:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1772208296;
-	 x=1772215496; bh=9iPiw6U5zQK+rw2Kav/sKN2Hf6ijXsHI7/gXVV2UUoE=; b=
-	jr3vgegUcdiHcY8N3v9Ti9WcEJ5nINZ1LAG8Tq0MP7dsOTevP5c791I1/P/v4BsQ
-	7iHi6zv1sNVSXsUMC/t5FLaK2xSmrbpAOfmmZb18i1xzVnDp580eWMO6P/vu8J3V
-	vwZdKbbp158lxye+S/hdnWtDfgurN6NArNK1wHg5kvh2T7k9D3Dl5AgSBo/Oh063
-	rgZYEdUC4Z0rqwhPIHKhe/hnwRs9kCtNTpjS0BXScOr88+CNoLHwIpSo9mo5OTMx
-	Ry2YwDsNycGr97KOYjlMny2hy9bIhPG3Yt5lw1qqv/D2fwpmZLUn6Ho2FM7GyIHc
-	aGqnwznkm0tYuPiEISOBZg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1772208296; x=
-	1772215496; bh=9iPiw6U5zQK+rw2Kav/sKN2Hf6ijXsHI7/gXVV2UUoE=; b=t
-	vscZopf+ZIEohHyAEDRhsH6FvskiqkAmDpcbJ929YOc16kdoaID3AUqA/A2BuUaN
-	T3NQnehlYy2NHaHOZTy905uPUXQvza+V1dfuXki/6uhpvSoc2L0RtungWGT1jrO7
-	ZwCT4v71GqF8Lb2j9Wa5pO6iFsAT82AWVVzzfP6i5qBkN/NLD16OpXnsU9Um2Yit
-	tqax0ePNsklBpO7D28r+WHWyEsyEB3dBdPzILFtuFeTep/W/txwnLoEbTm6byCiM
-	ZyFo3GtCDe1fofD17VNEpSy38yMrZStnH4Y7exMTr87u2ozA0C9IAtaYmIuUOHGo
-	++gnE/qKKaOXz+R9EfRlQ==
-X-ME-Sender: <xms:psChaT2sM4Kvl-4-ynL2eVnQMEX39TidibWISnlH_elJUGQErX3wTA>
-    <xme:psChae4zqe00s2rW3dmgGMuGnyWrupYFD0bGCo76dIRjuimHTSYe2q3WCJjvWTKjx
-    4PzQz43jg2I0fHfbjnTERQhWe1Q9ptrfVZgA1EPP6ANrtJPb8-JHw>
-X-ME-Received: <xmr:psChaYF1xEFxlqB1AHJOkAbJUOmtbZjtLf3IJgp5hsYNQFhKllAj9SiL1qw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeelgeefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
-    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
-    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepgeehpdhmohguvgep
-    shhmthhpohhuthdprhgtphhtthhopehjghhgsehnvhhiughirgdrtghomhdprhgtphhtth
-    hopegumhgrthhlrggtkhesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhgvlhhgrggr
-    sheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghjrgihrggthhgrnhgurhgrsehnvh
-    hiughirgdrtghomhdprhgtphhtthhopehgrhgrfhesrghmrgiiohhnrdgtohhmpdhrtghp
-    thhtoheprghmrghsthhrohesfhgsrdgtohhmpdhrtghpthhtoheprghpohhpphhlvgesnh
-    hvihguihgrrdgtohhmpdhrtghpthhtoheprghkphhmsehlihhnuhigqdhfohhunhgurght
-    ihhonhdrohhrghdprhgtphhtthhopegrnhhkihhtrgesnhhvihguihgrrdgtohhm
-X-ME-Proxy: <xmx:psChaW9Xw982ojlJdwBELBg5nUtIzvooVbtsR4EkEMCm_xurJFXzrg>
-    <xmx:psChaaOp5diDrMTGhRQmY7BQEtexZqnvTbnjvKx4-4ezrSFwxx9F2Q>
-    <xmx:psChaSyHxbqDw7kNVUBcF1TzS8IrpR_G2LRBbhhRg_GGFr9lHV0HNg>
-    <xmx:psChacsS35VypjDMtowdC17AE2t6OJySB2L9fCOTFIyvV5HWrXnqKQ>
-    <xmx:qMChac02xKCLa1txMJHJVVZiONFn_n7mbt_yHes_8ALNfR1pvZwQrzfN>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 27 Feb 2026 11:04:50 -0500 (EST)
-Date: Fri, 27 Feb 2026 09:04:49 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: David Matlack <dmatlack@google.com>, Bjorn Helgaas <helgaas@kernel.org>,
- Adithya Jayachandran <ajayachandra@nvidia.com>,
- Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>,
- Alistair Popple <apopple@nvidia.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Ankit Agrawal <ankita@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Chris Li <chrisl@kernel.org>, David Rientjes <rientjes@google.com>,
- Jacob Pan <jacob.pan@linux.microsoft.com>,
- Jonathan Corbet <corbet@lwn.net>, Josh Hilke <jrhilke@google.com>,
- Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org,
- kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
- Leon Romanovsky <leonro@nvidia.com>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org,
- Lukas Wunner <lukas@wunner.de>,
- =?UTF-8?B?TWlj?= =?UTF-8?B?aGHFgg==?= Winiarski
- <michal.winiarski@intel.com>, Mike Rapoport <rppt@kernel.org>,
- Parav Pandit <parav@nvidia.com>,
- Pasha Tatashin <pasha.tatashin@soleen.com>,
- Pranjal Shrivastava <praan@google.com>,
- Pratyush Yadav <pratyush@kernel.org>,
- Raghavendra Rao Ananta <rananta@google.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Saeed Mahameed <saeedm@nvidia.com>,
- Samiullah Khawaja <skhawaja@google.com>,
- Shuah Khan <skhan@linuxfoundation.org>,
- Thomas =?UTF-8?B?SGVsbHN0csO2bQ==?= <thomas.hellstrom@linux.intel.com>,
- Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>,
- William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
- Zhu Yanjun <yanjun.zhu@linux.dev>, alex@shazbot.org
-Subject: Re: [PATCH v2 03/22] PCI: Inherit bus numbers from previous kernel
- during Live Update
-Message-ID: <20260227090449.2a23d06d@shazbot.org>
-In-Reply-To: <20260226144057.GA5933@nvidia.com>
-References: <20260129212510.967611-4-dmatlack@google.com>
-	<20260225224746.GA3714478@bhelgaas>
-	<aZ-Dqi782aafiE_-@google.com>
-	<20260226144057.GA5933@nvidia.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1772208385; c=relaxed/simple;
+	bh=YxsXvIvfh76VzhK6UXSp7c2YfOWFOfSgaHE4CY/huLc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sejyJTrZy336T7Nx4U6VDuWnuT1Zl+jnmZ7XxHuE8NO2PvxSVrcCpwubYbtSqL7N+l3H8RbXtPNtqeagQVO2Vj4/IpV8jBjr2uYIfnLWDUAIpH9hKFsEXYB/Tg07+kSI03SVGksE32DnJ7ns9YqZ23GK8RwA3kmlQNyTq1CKEfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4U5oaeTo; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3568090851aso11407991a91.1
+        for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 08:06:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772208383; x=1772813183; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dLi6oTrN62qdRvWLksa/GdFl3MRGUGFNAoGOySxgx7k=;
+        b=4U5oaeToYfkWk0d6gzPreNxI1WFMZ9ygUR94p2MyI9kMkeuW5MclSNzVCEcyP9TNxr
+         xY5aZvc/I1w7MsiMxE3Lpolo8z7BG89orpad7vJynep1h5hDq6YTA3p0bMXPbJgcDMWW
+         61sdpbHRLlvL11FTpANuqiu8VE8YXBVSwmJ8xNTYCBJWBVJF9iaOkZ1uImVsoWEaImco
+         xLn43kHUQqvYd7w+oCP+TxfSCsTEHo496BYk5qg+4rCRy/KLyd51dgxV5w+GEa6GnKyU
+         vyK0uLLpJQepplAF5xjMUNNu2cN3hkMpfSBVjMVKTEFCCFcfhv4M1RHjPr5C299ugyxE
+         r7Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772208383; x=1772813183;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dLi6oTrN62qdRvWLksa/GdFl3MRGUGFNAoGOySxgx7k=;
+        b=DOowFT/Q7sgbTrVqD9Wj+CZwrMAM5IwvXNx+XLwgeu3mHxHKVVTJ5Km3UbJZimhlVC
+         6QP17j+g1xsm4psQ1Udq+cFwoOxnrM3I1ppPJqdaHa8I1jocKYay6Uw2WA5Ffj9DO9ct
+         unMU897w14XQPXyRmj629MGiKEb1y4zk0X00HsPBRrGFP5eIGfKCYlvfBb4blv1se3oL
+         BY7Xj+ZhM4QDE6tUdcKLe+aGX95H8ewIaj3vZYOzxT8H+kxc/LwauXbZg/mjaYXvXMiw
+         THmjq61iTi6pkWY0tgRdi5WxqXbnVUt7qqF3Gp82EeCwyoRTbXbYrg+3UB+RRzzoEuiY
+         g2zA==
+X-Forwarded-Encrypted: i=1; AJvYcCWnI5bkRIuq7HU/j4mh3EKY532Th0fr0vQG6l757l2OheGTe8rnboatCe922yAx7q9qOMw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxD8sj86jJrcD0mae0Mbh0/Lol7ONPRkkjnY4h2S+xePeWsk3SQ
+	xJLuPWBi71CAchqM3Vb3Qxg6GPszW+OLVZYvwn170ogYVGXHG22tSzcG7R7+vzt9zuTKirOi671
+	LpZ73NA==
+X-Received: from pjuz24.prod.google.com ([2002:a17:90a:d798:b0:358:f5eb:36b3])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:558d:b0:335:2eef:4ca8
+ with SMTP id 98e67ed59e1d1-35965cfbad1mr3744854a91.33.1772208382843; Fri, 27
+ Feb 2026 08:06:22 -0800 (PST)
+Date: Fri, 27 Feb 2026 08:06:21 -0800
+In-Reply-To: <20260227011306.3111731-4-yosry@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20260227011306.3111731-1-yosry@kernel.org> <20260227011306.3111731-4-yosry@kernel.org>
+Message-ID: <aaG_o58_0aHT8Xjg@google.com>
+Subject: Re: [PATCH 3/3] KVM: x86: Check for injected exceptions before
+ queuing a debug exception
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm3,messagingengine.com:s=fm3];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[45];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,linux.microsoft.com,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev,shazbot.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-72170-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72171-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[messagingengine.com:dkim,shazbot.org:mid,shazbot.org:dkim,nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E2B411BAB10
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C7BBE1BAA29
 X-Rspamd-Action: no action
 
-On Thu, 26 Feb 2026 10:40:57 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Fri, Feb 27, 2026, Yosry Ahmed wrote:
+> On KVM_SET_GUEST_DEBUG, if a #DB or #BP is injected with
+> KVM_GUESTDBG_INJECT_DB or KVM_GUESTDBG_INJECT_BP, KVM fails with -EBUSY
+> if there is an existing pending exception. This was introduced in
+> commit 4f926bf29186 ("KVM: x86: Polish exception injection via
+> KVM_SET_GUEST_DEBUG") to avoid a warning in kvm_queue_exception(),
+> presumably to avoid overriding a pending exception.
+> 
+> This added another (arguably nice) property, if there's a pending
+> exception, KVM_SET_GUEST_DEBUG cannot cause a #DF or triple fault.
+> However, if an exception is injected, KVM_SET_GUEST_DEBUG will cause
+> a #DF or triple fault in the guest, as kvm_multiple_exception() combines
+> them.
 
-> On Wed, Feb 25, 2026 at 11:20:10PM +0000, David Matlack wrote:
-> > On 2026-02-25 04:47 PM, Bjorn Helgaas wrote:  
-> > > On Thu, Jan 29, 2026 at 09:24:50PM +0000, David Matlack wrote:  
-> > > > Inherit bus numbers from the previous kernel during a Live Update when
-> > > > one or more PCI devices are being preserved. This is necessary so that
-> > > > preserved devices can DMA through the IOMMU during a Live Update
-> > > > (changing bus numbers would break IOMMU translation).  
-> > > 
-> > > I think changing bus numbers would break DMA regardless of whether an
-> > > IOMMU is involved.  Completions carrying the data for DMA reads are
-> > > routed back to the Requester ID of the read.  
-> > 
-> > Ahh, makes sense. I'll clarify the commit message in the next
-> > version.  
-> 
-> More broadly you can't shouldn't the fabric topology while Memory
-> Enable is active.
-> 
-> Renumbering or readdressing the fabric requires disabling and flushing
-> any memory transactions.
-> 
-> From that reasoning it is clearer that you can't do that if the device
-> is expected to hitlesslly continue performing memory operations.
-> 
-> That may be a clearer long term basis for describing the requirements
-> here.
+First off, this patch looks good irrespective of nested crud.  Disallowing injection
+of #DB/#BP while there's already an injected exception aligns with architectural
+behavior; KVM needs to finish delivering the exception and thus "complete" the
+instruction before queueing a new exception.
 
-Not only fabric topology, but also routing.  ACS overrides on the
-command line would need to be enforced between the original and kexec
-kernel such that IOMMU groups are deterministic.  Thanks,
+As for nested, I _was_ going to say that, assuming the original motivation for
+this patch is to avoid triggering a nested VM-Exit while nested_run_pending=1,
+this is incomplete.  E.g. if the #BP or #DB itself is being intercepted by L1,
+then queueing the exception will incorrectly deliver the nested VM-Exit before
+nested VM-Enter completes.  I.e. I _thought_ we would also need:
 
-Alex
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index db3f393192d9..fdbd272027ed 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12526,6 +12526,9 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+        if (vcpu->arch.guest_state_protected)
+                return -EINVAL;
+ 
++       if (vcpu->arch.nested_run_pending)
++               return -EBUSY;
++
+        vcpu_load(vcpu);
+ 
+        if (dbg->control & (KVM_GUESTDBG_INJECT_DB | KVM_GUESTDBG_INJECT_BP)) {
+
+But that isn't actually the case, because {svm,vmx}_check_nested_events() blocks
+exceptions and VM-Exits while nested_run_pending=1.  Off-list, I had rejected
+modifying nested_vmx_triple_fault() to drop the triple fault like so:
+
+@@ -5191,6 +5191,9 @@ void __nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 
+ static void nested_vmx_triple_fault(struct kvm_vcpu *vcpu)
+ {
++       if (to_vmx(vcpu)->nested.nested_run_pending)
++               return;
++
+        kvm_clear_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+        nested_vmx_vmexit(vcpu, EXIT_REASON_TRIPLE_FAULT, 0, 0);
+ }
+
+because "That would largely defeat the entire purpose of the WARN. The whole point
+is to detect bugs where KVM synthesizes a VM-Exit before completing nested VM-Enter.
+It should be impossible for nested_{vmx,svm}_triple_fault() to be called with
+nested_run_pending=true."
+
+Given the above, that argument doesn't hold up at first glance, because blocking
+the triple fault if nested_run_pending=1 would be consistent with how other "synchronous"
+events are handled by nVMX and nSVM.  But after staring at this a bit, unless I'm
+forgetting something (entirely possible), I actually think {svm,vmx}_check_nested_events()
+are wrong, because I stand behind my quoted statement: it should be impossible for
+KVM to synthesize a synchronous event before completing nested VM-Enter.
+
+Blocking pending and injected exceptions was added by bfcf83b1444d ("KVM: nVMX:
+Fix trying to cancel vmlauch/vmresume"), and unfortunately neither the changelog
+nor Lore[1] provides any details as to what exactly prompted the fix.  I _suspect_
+it was either syzkaller induced, or the manifestation of other bugs in KVM's
+exception handling.
+
+Finally getting to the point, in theory, I _think_ KVM should actually WARN on
+all cases where it temporarily blocks a synchronous event due to a pending nested
+VM-Enter (see below diff for the basic gist).  However, that would open the
+floodgates to syzkaller, because KVM_SET_VCPU_EVENTS can obviously stuff events,
+KVM_X86_SET_MCE can queue a #MC, etc.
+
+I _think_ we might be able to get away with rejecting KVM_SET_VCPU_EVENTS if
+nested_run_pending=1, without breaking userspace?  Google's VMM is insane and does
+KVM_SET_VCPU_EVENTS before KVM_SET_NESTED_STATE, but in real usage, i.e. outside
+of selftests, (I hope) no VMM will restore into a "live" vCPU.
+
+So instead of patch 1, I want to try either (a) blocking KVM_SET_VCPU_EVENTS,
+KVM_X86_SET_MCE, and KVM_SET_GUEST_DEBUG if nested_run_pending=1, *and* follow-up
+with the below WARN-spree, or (b) add a separate flag, e.g. nested_run_in_progress
+or so, that is set with nested_run_pending, but cleared on an exit to userspace,
+and then WARN on _that_, i.e. so that we can detect KVM bugs (the whole point of
+the WARN) and hopefully stop playing this losing game of whack-a-mole with syzkaller.
+
+I think I'm leaning toward (b)?  Except for KVM_SET_GUEST_DEBUG, where userspace
+is trying to interpose on the guest, restricting ioctls doesn't really add any
+value in practice.  Yeah, in theory it could _maybe_ prevent userspace from shooting
+itself in the foot, but practically speaking, if userspace is restoring state into
+a vCPU with nested_run_pending=1, it's either playing on expert mode or is already
+completely broken.
+
+My only hesitation with (b) is that KVM wouldn't be entirely consistent, since
+vmx_unhandleable_emulation_required() _does_ explicitly reject a "userspace did
+something stupid with nested_run_pending=1" case.  So from that perspective, part
+of me wants to get greedy and try for (a).
+
+[1] https://lore.kernel.org/all/?q=%22KVM:%20nVMX:%20Fix%20trying%20to%20cancel%20vmlauch%22
+
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index de90b104a0dd..d624e4db704a 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -1605,14 +1605,14 @@ static int svm_check_nested_events(struct kvm_vcpu *vcpu)
+        }
+ 
+        if (vcpu->arch.exception_vmexit.pending) {
+-               if (block_nested_exceptions)
++               if (WARN_ON_ONCE(block_nested_exceptions))
+                         return -EBUSY;
+                nested_svm_inject_exception_vmexit(vcpu);
+                return 0;
+        }
+ 
+        if (vcpu->arch.exception.pending) {
+-               if (block_nested_exceptions)
++               if (WARN_ON_ONCE(block_nested_exceptions))
+                        return -EBUSY;
+                return 0;
+        }
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 248635da6766..a223c5e86188 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -4336,7 +4336,7 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+         */
+        if (vcpu->arch.exception_vmexit.pending &&
+            !vmx_is_low_priority_db_trap(&vcpu->arch.exception_vmexit)) {
+-               if (block_nested_exceptions)
++               if (WARN_ON_ONCE(block_nested_exceptions))
+                        return -EBUSY;
+ 
+                nested_vmx_inject_exception_vmexit(vcpu);
+@@ -4345,13 +4345,13 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+ 
+        if (vcpu->arch.exception.pending &&
+            !vmx_is_low_priority_db_trap(&vcpu->arch.exception)) {
+-               if (block_nested_exceptions)
++               if (WARN_ON_ONCE(block_nested_exceptions))
+                        return -EBUSY;
+                goto no_vmexit;
+        }
+ 
+        if (vmx->nested.mtf_pending) {
+-               if (block_nested_events)
++               if (WARN_ON_ONCE(block_nested_exceptions))
+                        return -EBUSY;
+                nested_vmx_update_pending_dbg(vcpu);
+                nested_vmx_vmexit(vcpu, EXIT_REASON_MONITOR_TRAP_FLAG, 0, 0);
+@@ -4359,7 +4359,7 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+        }
+ 
+        if (vcpu->arch.exception_vmexit.pending) {
+-               if (block_nested_exceptions)
++               if (WARN_ON_ONCE(block_nested_exceptions))
+                        return -EBUSY;
+ 
+                nested_vmx_inject_exception_vmexit(vcpu);
+@@ -4367,7 +4367,7 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+        }
+ 
+        if (vcpu->arch.exception.pending) {
+-               if (block_nested_exceptions)
++               if (WARN_ON_ONCE(block_nested_exceptions))
+                        return -EBUSY;
+                goto no_vmexit;
+        }
+
 
