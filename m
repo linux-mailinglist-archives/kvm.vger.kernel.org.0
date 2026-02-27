@@ -1,89 +1,89 @@
-Return-Path: <kvm+bounces-72138-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72146-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KO/oJ8RyoWkPtQQAu9opvQ
-	(envelope-from <kvm+bounces-72138-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 11:32:36 +0100
+	id 4BPnOLyNoWnouAQAu9opvQ
+	(envelope-from <kvm+bounces-72146-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 13:27:40 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06D271B604F
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 11:32:35 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 625401B70F9
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 13:27:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E337530514B4
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 10:32:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 03B8630451F9
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 12:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BF94395274;
-	Fri, 27 Feb 2026 10:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99693F074B;
+	Fri, 27 Feb 2026 12:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GupWZKbh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b7kdlOl1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7635F38F24D
-	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 10:32:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9DAE30CD81
+	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 12:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772188334; cv=none; b=l1OcicFB8aUi7vUDUZo3BsyVon6VCLDlCRCGRdtGYlgqI5YDYDiqrg9HO4iXL1am9tcTBj7kbjbpclZj1oqkNzv/qMMoMZpiEl51NrkUXXMyIvTojbY+8aPF3y8pmBnE2eQ0aWeEe1aui1XDGAYTkxKIpgLIc5XiZN+9msvSyxI=
+	t=1772195257; cv=none; b=JZyzVq5q2BVEyKb+y6XY0hDSxHsBlhmeZNVVEFKCTby7JtKinkbHWhYksZ7AbystKx+4oA54XtUOHR5DKraFmSE2+1k91+wZu5HkYrH9isjqOtPA67yDQ0UiS+jyJ4NJEjM9IXxSTzDJ6H/iR4KSmW8f28cM7SXja5lAlv534Jc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772188334; c=relaxed/simple;
-	bh=bbOe/GfMU2fCLJ9kswN1atfFqEWPs7QDcdUvH+JI4cc=;
+	s=arc-20240116; t=1772195257; c=relaxed/simple;
+	bh=PzpkNLsWIGHZiCrOjhr7MHI8LKyh0/MD9t8kysr1W78=;
 	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-version:Content-type; b=RVDwVxCYkJnc7gDreyMrIjGieCyqsOCgMeNTcgfy/UZYf1Dq2gYV60JF2SHjt5fgBLiN5T3mMpehleelq8pnQutFkgDJrlgpSV1pIZ2LbSGTGHdk/L11se9Nl+NxX+byLLYxrLlxbyfpiYvq+P0SExPqWpkB98e/koUrtorR49A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GupWZKbh; arc=none smtp.client-ip=209.85.216.47
+	 MIME-version:Content-type; b=c07ERLCRnRtj2PBHrCdOTpb9sxz2D+Bq7IxZooaEmpBorTrJw29xasrG+n7TsgZIEXnS7ob/uS575Gzhbhnn0jP6OQkyW0tcIEMEn+8xgljSKJmGpDG6WSxsJA7l6J+QCDtxlvE8JnzWh10dC3yALlmHrEhiWH5Gxr3daZiTn3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b7kdlOl1; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-3590c295150so714062a91.1
-        for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 02:32:13 -0800 (PST)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-824adc96ad2so1981957b3a.3
+        for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 04:27:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772188333; x=1772793133; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1772195255; x=1772800055; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:message-id:date
          :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=LT1HXP6ImCtKkrDGFwhhoLVXorV0oXPyJhBSmf51vOA=;
-        b=GupWZKbhK2ZICHYLy0iFLAHzaBl8Xe/NgnnfKqIWd1x3Qr0gJ9yFsIhCXcVwkjek7v
-         VdVpL2QRGNa9BeT2o4Lst27XgtNAjL5+cq6qaxtV9VzH1hyZfLbsc/bORLUEbMzs0axS
-         IDwVzTFZqIQrtFaTiUWZ3yC4TcOMUfbhlJ9o4Q7Lm/PhO5KOKZODAO/RyEaWrKzz2ROV
-         bXvaVhqv7PEPq8lnhM5uoVwg9THOsg/rLpFaEXeoLp5oH9JhO9i1EoB2dgWjrfsLVtbc
-         sswdADC2qvf6od2Iyd7GDBHe9SqgilfUVCYFbFugYrXmvFul8pf+x5nHr+Ehoq+QhCzL
-         0y7A==
+        bh=BBCa2Iq0/hu0sJwRb681qcL3bM1nOatkl9qB4gJ48xY=;
+        b=b7kdlOl11DaWcjhxH3Kr45UGFQV02XThQ2j/a8JNFy1tpKfHXM42zt21uMRXpz+E9Z
+         wctsYmvCaBCPeKu6v/9/bQzCOSYX92H++u8banen8T0mR1SO4S9SgyZvCsCeqM+Lbyev
+         K/NyrENhIOFzQ5qJNsHPXSa0IZOiprIhZpDjb1YRHFv62jbGk13ZDZ/pnzD2CR4iKPst
+         FQ5ZY62jgKfdAFe4u1m6dWygMFhro8SLr8N/rEbiPmI8AYnGR9WwV/Enn3utwxH7CNsu
+         u1pWkKE5fSiUDbpYrCjrtvqRmTMOSWlUNx2jVsOxDGXKfYpi1miTvsj7SDVyNOAc2Ue6
+         WHGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772188333; x=1772793133;
+        d=1e100.net; s=20230601; t=1772195255; x=1772800055;
         h=content-transfer-encoding:mime-version:references:message-id:date
          :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=LT1HXP6ImCtKkrDGFwhhoLVXorV0oXPyJhBSmf51vOA=;
-        b=DVrqioH+/HkjZh5tLKBxhKszj7OJ6Ib+DR1ANMjgRYmr93fpfyXsMj+HqG0OI1jSgd
-         XMRqDsN6yp1tCF/zVPY63m7LNFGAIWnnfDW2errObrHa9aWkRDl/9GVwsV62L76GP8+c
-         B1wjonjGyHCt35N2LsAkSE5irs2MkNmJsEDgyE1kVYeqzW+vCazkcOYkFcVkl7LiA6DY
-         zIcCRmYDh6dA8cwuPAjcJULdj4EdHWDmncc7Wu2xN186Jq9fQ3h69TIKzT5/BO4LZv5u
-         WTdm+SYj3Ey7FI8iDUgCTVqjAXL7UJELdmc0i0sy+BL5lJpDa/4a9iaV/MpWQ5FgYS+k
-         kQ2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWJWPS/PIuKfhK8ws0Zv+2g2ojOYmqxFM5qtzDuhE30R9ZVnb/4FE2oxLPjn/xPty70jiI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmE1RSHh060vzZym+DRj2uydyO3RkYdUOOUIuwOtDg7DPsr4YS
-	Yx3mNA/r80W2dGb/Z3R43qwzLF/edoiSVAC0ouCb60HbFGq7J087wXFl
-X-Gm-Gg: ATEYQzzOYHkV2j7rj1qs1Kg7iTwlteNDODhmNl4e5tHn6sa0kmu0dti3Z8nOefYgPbp
-	ymocW6SLw0XhCW4FEDRBmTWPQLjEJDzNz+ZY9GKKy6LnL00OOsBG/oz+mC67sKunxDhxldMOWRx
-	nYWSzuJ6RTEs6IzLFyxR23qk3UINVuX6+lZ2eMRVa/uDr9Mg4gX82MeFk8c3Jepfrft+4aQZEt/
-	45xZaoecqv6PpCGUqZEU+02Kb9fZq06nLwa/fKHp8rcxZLGB/XGm3h6Gwo0M5ao2PIQPeQJBigq
-	HpqS2W7P4QYLZ7dV935tmakyMTktefLbIwovWEGCjbWWtcNU5+DSwpJAJd45kdnSqOmflawIVJC
-	mtJ+zIID+MFsgmuMixNwFhawXYSRyiYZwK8Z8gEQ/S/TAdSb7/tfTlOrp8Iow3Koh5/tmvNJRFE
-	dpD18Y1VCxpphf28G+tA==
-X-Received: by 2002:a17:90b:2884:b0:356:4ea0:e9e2 with SMTP id 98e67ed59e1d1-35965d074afmr2219544a91.34.1772188332691;
-        Fri, 27 Feb 2026 02:32:12 -0800 (PST)
+        bh=BBCa2Iq0/hu0sJwRb681qcL3bM1nOatkl9qB4gJ48xY=;
+        b=LZY2ZqqbH2z1EQ98F3P1S22D4ftZY5VhwmdbXxd26hp0nw4lgCyueDD2bMjIiWBBvI
+         UjCR70frqY1KuO/usB34nDLNq0kDz4yrA5hnAoMNs0CpKuqDc3TstljJpwnRP4s6aLRY
+         Paa4xhgZAqFu0fOFDkjKlq1xJ1udwrHhYx7gWBgzUG1U2yHlVbHvL5kVD5x0k/NtTGr1
+         Wg1ndWtqDGAkrhDaWqI5ptgQBLgzL9l3VvnhNw3MeKQdAF2fvfVIR3Iskt+0Z2ApzOt4
+         DsPBxTjnm2QkpGfpdVZLAiQYah7wS3yja+lSsCBQdZbw6ID1Opga+9RIEzeU036x5O2G
+         Bxxw==
+X-Forwarded-Encrypted: i=1; AJvYcCUxVtMImumRIhvRA7DNaKlqMfms72BIm55I3E/V6UqSj2CsQxU1/fCCoVjACVItnelzs8Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBqJYCJndmbW6vAjRSgli9UPNbYk9kNcKpuPxmOkH1kNolb8dA
+	hjEx6fdf1ElfUNyS0SIDLWaQJh/2c4U/pD33kzwjTPmve5m5NuTpSZBy
+X-Gm-Gg: ATEYQzwxYvTZL4djS2DnWgNsrJ8wr7TZ3ff9NMKpBz2TDITje6YuruCboDBXsLkfTRg
+	byiiPWSugtz3xM0zKnjYqiL8oDfONwuUjXHxBBKbP+BOpskuSKC4JEOqmF2f9P3u08nfg7MoO9u
+	5lxuS9A7S87EVMx6GPTWM3e1rGRgOg4cJYXrdpXsGSZIc2ylLGuVC98SJDNmbw0rlf3DyKpfohU
+	drT1hkhIgEjDLqpYc66iq7jGfPoYTmEC+aBPF2OZUeL8gr1NeqwY7cdVbqYbq6RfevqTOCLTGlC
+	aWw/OXPAnPUtAktkqoHAtxQCQFvdH9QcpBai/Zv+s692Y/hhV1pp6m/JC3QbNg2f+CGp1+gwzJM
+	5+4FkVzDqBZzwsq4Ej3jpR+q63dgO495TQKGnGsVOrxSKdaXIacJALEbt7dQ+LixqaJ46pe93/w
+	ZozrUj5kErSUgm1xwXNw==
+X-Received: by 2002:a05:6a00:4c81:b0:81f:3ae9:3f71 with SMTP id d2e1a72fcca58-8274d9d0704mr2242350b3a.28.1772195255179;
+        Fri, 27 Feb 2026 04:27:35 -0800 (PST)
 Received: from dw-tp ([203.81.240.187])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359134a0a2asm3170713a91.14.2026.02.27.02.32.09
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82739ff1c9esm5479908b3a.32.2026.02.27.04.27.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Feb 2026 02:32:11 -0800 (PST)
+        Fri, 27 Feb 2026 04:27:34 -0800 (PST)
 From: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
 To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, linuxppc-dev@lists.ozlabs.org
 Cc: linux-mm@kvack.org, kvm@vger.kernel.org, Alex Williamson <alex@shazbot.org>, Peter Xu <peterx@redhat.com>
-Subject: Re: [RFC v1 1/2] drivers/vfio_pci_core: Change PXD_ORDER check from switch case to if/else block
-In-Reply-To: <a864b2ed-1a77-4aac-b0e8-d97b4bf8be47@kernel.org>
-Date: Fri, 27 Feb 2026 16:00:54 +0530
-Message-ID: <87qzq6h40x.ritesh.list@gmail.com>
-References: <0b8fce7a61561640634317a5e287cdb4794715fd.1772170860.git.ritesh.list@gmail.com> <a864b2ed-1a77-4aac-b0e8-d97b4bf8be47@kernel.org>
+Subject: Re: [RFC v1 2/2] powerpc/64s: Add support for huge pfnmaps
+In-Reply-To: <abfbe83b-23fb-400d-9069-b8bf4ad21d95@kernel.org>
+Date: Fri, 27 Feb 2026 16:02:25 +0530
+Message-ID: <87pl5qh3ye.ritesh.list@gmail.com>
+References: <0b8fce7a61561640634317a5e287cdb4794715fd.1772170860.git.ritesh.list@gmail.com> <d159058a45ac5e225f2e64cc7c8bbbd1583e51f3.1772170860.git.ritesh.list@gmail.com> <abfbe83b-23fb-400d-9069-b8bf4ad21d95@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -96,13 +96,13 @@ X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72138-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72146-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -110,7 +110,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -120,111 +120,55 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 06D271B604F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 625401B70F9
 X-Rspamd-Action: no action
 
 "Christophe Leroy (CS GROUP)" <chleroy@kernel.org> writes:
 
 > Le 27/02/2026 à 07:16, Ritesh Harjani (IBM) a écrit :
->> Architectures like PowerPC uses runtime defined values for
->> PMD_ORDER/PUD_ORDER. This is because it can use either RADIX or HASH MMU
->> at runtime using kernel cmdline. So the pXd_index_size is not known at
->> compile time. Without this fix, when we add huge pfn support on powerpc
->> in the next patch, vfio_pci_core driver compilation can fail with the
->> following errors.
+>> This uses _RPAGE_SW2 bit for the PMD and PUDs similar to PTEs.
+>> This also adds support for {pte,pmd,pud}_pgprot helpers needed for
+>> follow_pfnmap APIs.
 >> 
->>    CC [M]  drivers/vfio/vfio_main.o
->>    CC [M]  drivers/vfio/group.o
->>    CC [M]  drivers/vfio/container.o
->>    CC [M]  drivers/vfio/virqfd.o
->>    CC [M]  drivers/vfio/vfio_iommu_spapr_tce.o
->>    CC [M]  drivers/vfio/pci/vfio_pci_core.o
->>    CC [M]  drivers/vfio/pci/vfio_pci_intrs.o
->>    CC [M]  drivers/vfio/pci/vfio_pci_rdwr.o
->>    CC [M]  drivers/vfio/pci/vfio_pci_config.o
->>    CC [M]  drivers/vfio/pci/vfio_pci.o
->>    AR      kernel/built-in.a
->> ../drivers/vfio/pci/vfio_pci_core.c: In function ‘vfio_pci_vmf_insert_pfn’:
->> ../drivers/vfio/pci/vfio_pci_core.c:1678:9: error: case label does not reduce to an integer constant
->>   1678 |         case PMD_ORDER:
->>        |         ^~~~
->> ../drivers/vfio/pci/vfio_pci_core.c:1682:9: error: case label does not reduce to an integer constant
->>   1682 |         case PUD_ORDER:
->>        |         ^~~~
->> make[6]: *** [../scripts/Makefile.build:289: drivers/vfio/pci/vfio_pci_core.o] Error 1
->> make[6]: *** Waiting for unfinished jobs....
->> make[5]: *** [../scripts/Makefile.build:546: drivers/vfio/pci] Error 2
->> make[5]: *** Waiting for unfinished jobs....
->> make[4]: *** [../scripts/Makefile.build:546: drivers/vfio] Error 2
->> make[3]: *** [../scripts/Makefile.build:546: drivers] Error 2
+>> This allows us to extend the PFN mappings, e.g. PCI MMIO bars where
+>> it can grow as large as 8GB or even bigger, to map at PMD / PUD level.
+>> VFIO PCI core driver already supports fault handling at PMD / PUD level
+>> for more efficient BAR mappings.
 >> 
->> Fixes: f9e54c3a2f5b7 ("vfio/pci: implement huge_fault support")
 >> Signed-off-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
->> ---
->>   drivers/vfio/pci/vfio_pci_core.c | 15 +++++++--------
->>   1 file changed, 7 insertions(+), 8 deletions(-)
->> 
->> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
->> index d43745fe4c84..5395a6f30904 100644
->> --- a/drivers/vfio/pci/vfio_pci_core.c
->> +++ b/drivers/vfio/pci/vfio_pci_core.c
->> @@ -1670,21 +1670,20 @@ vm_fault_t vfio_pci_vmf_insert_pfn(struct vfio_pci_core_device *vdev,
->>   	if (vdev->pm_runtime_engaged || !__vfio_pci_memory_enabled(vdev))
->>   		return VM_FAULT_SIGBUS;
->> 
->> -	switch (order) {
->> -	case 0:
->> +	if (order == 0) {
->>   		return vmf_insert_pfn(vmf->vma, vmf->address, pfn);
->> +	}
 >
-> Those braces are unneeded as all legs of the if/else are single lines
->
->>   #ifdef CONFIG_ARCH_SUPPORTS_PMD_PFNMAP
->
-> ifdef could be replaced by IS_ENABLED() because PxD_ORDER and 
-> vmf_insert_pfn_xxx() are declared all the time
->
->> -	case PMD_ORDER:
->> +	 else if (order == PMD_ORDER) {
->
-> 'else' is not needed because every 'if' leads to a return statement
->
->>   		return vmf_insert_pfn_pmd(vmf, pfn, false);
->> +	 }
->>   #endif
->>   #ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
->> -	case PUD_ORDER:
->> +	 else if (order == PUD_ORDER) {
->>   		return vmf_insert_pfn_pud(vmf, pfn, false);
->> -		break;
->> +	 }
->>   #endif
->> -	default:
->> -		return VM_FAULT_FALLBACK;
->> -	}
->> +	return VM_FAULT_FALLBACK;
->
-> So at the end we should get something like:
->
-> 	if (!order)
-> 		return vmf_insert_pfn(vmf->vma, vmf->address, pfn);
->
-> 	if (IS_ENABLED(CONFIG_ARCH_SUPPORTS_PMD_PFNMAP) && order == PMD_ORDER)
-> 		return vmf_insert_pfn_pmd(vmf, pfn, false);
->
-> 	if (IS_ENABLED(CONFIG_ARCH_SUPPORTS_PUD_PFNMAP) && order == PMD_ORDER)
-                                                                ^^^ PUD_ORDER
-
-> 		return vmf_insert_pfn_pud(vmf, pfn, false);
->
-> 	return VM_FAULT_FALLBACK;
+> Reviewed-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
 >
 >
 
-Looks a lot cleaner. Thanks!
-I will make that change in v2.
+Thanks for the review!
+
+>>   #define __HAVE_ARCH_PMDP_SET_ACCESS_FLAGS
+>>   extern int pmdp_set_access_flags(struct vm_area_struct *vma,
+>> diff --git a/arch/powerpc/include/asm/pgtable.h b/arch/powerpc/include/asm/pgtable.h
+>> index dcd3a88caaf6..2d27cb1c2334 100644
+>> --- a/arch/powerpc/include/asm/pgtable.h
+>> +++ b/arch/powerpc/include/asm/pgtable.h
+>> @@ -63,6 +63,18 @@ static inline pgprot_t pte_pgprot(pte_t pte)
+>>   	return __pgprot(pte_flags);
+>>   }
+>> 
+>> +#define pmd_pgprot pmd_pgprot
+>> +static inline pgprot_t pmd_pgprot(pmd_t pmd)
+>> +{
+>> +	return pte_pgprot(pmd_pte(pmd));
+>> +}
+>> +
+>> +#define pud_pgprot pud_pgprot
+>> +static inline pgprot_t pud_pgprot(pud_t pud)
+>> +{
+>> +	return pte_pgprot(pud_pte(pud));
+>> +}
+>> +
+
+In v2 - I will add above under #ifdef CONFIG_PPC_BOOK3S_64 
+to avoid build issues with 32-bit PPC.
 
 -ritesh
 
