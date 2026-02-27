@@ -1,230 +1,257 @@
-Return-Path: <kvm+bounces-72198-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72199-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UA6wAPrboWlcwgQAu9opvQ
-	(envelope-from <kvm+bounces-72198-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 19:01:30 +0100
+	id MJrqEwrgoWlcwgQAu9opvQ
+	(envelope-from <kvm+bounces-72199-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 19:18:50 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AC961BBBB9
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 19:01:29 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8F0D1BBE72
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 19:18:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A922D308D37E
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 17:58:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E6362306ACF6
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 18:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CA84364053;
-	Fri, 27 Feb 2026 17:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5C537647A;
+	Fri, 27 Feb 2026 18:18:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="aat5WdRO";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WxqmtJcO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eyD0q3Z4"
 X-Original-To: kvm@vger.kernel.org
-Received: from flow-b3-smtp.messagingengine.com (flow-b3-smtp.messagingengine.com [202.12.124.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F417F36E46D;
-	Fri, 27 Feb 2026 17:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64048374170
+	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 18:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772215053; cv=none; b=BlAd+/fKVrt1GNCRMITffY3iUqSSFSowNFDnqPa+nBKEF95AbXr4QN2h1K6KKXmiJL1//TJaMZx3mLqlE9xGJ92+cEIAlKAZRNNj6eVmYp8D6F1UpcI07GomIfouJMIZno3Q6CdnEj23sp9kNvKHDbHzfyMgF4q7DQGFPy6n9XI=
+	t=1772216311; cv=none; b=X8xPObLzjCSN5QwhBSFQmZxvBFH5pBcTq9vc/AviWT6qN5P+HTg9ns6awF3D9OnJbVbNZWgtn+YkqdmqseYbwpCeDcsUThdVe2XaMTZkZ9T8X6Ii05zkFSl9mpXI/yXGRfcgmTDDfRlcNeMbmsdiUyabj/SXjFau95EALxQeQUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772215053; c=relaxed/simple;
-	bh=S6KawJbtcVXw3+duC5lB0oRS2LBKKrK2JTZCmWJ4tlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n8zaMWsNC3JLgh/tx3+GopSZ2E8mO3hu9/w4SHQpBo7px9p/Z2sgWUZ3R8j+fRDrwxD361+emvQIgDZhg/s1Lprp1kXn5/Gd61BdcReQnFBj5w1Yp15ZcTRpvz+BynJxIWINmBNTW4qPb3bmQEJWfQp/YJaXxTebcVO15Or5nmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=aat5WdRO; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WxqmtJcO; arc=none smtp.client-ip=202.12.124.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailflow.stl.internal (Postfix) with ESMTP id 3F62C1300E62;
-	Fri, 27 Feb 2026 12:57:27 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Fri, 27 Feb 2026 12:57:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1772215047;
-	 x=1772222247; bh=K2yQm0oOGTcRJfhcrEhEmD0poePPSAOAfmgoK4/aZLQ=; b=
-	aat5WdROMFK4MIAhDBYWwdq0MIcDck8De3aplVKiAQDST6EhMB5PcW5tdYpMASS+
-	Lwzt8PZ2t/Vks2Gz4X5ZD6pdN26+IdzlXQZqudjRIN25E+9WKMhgqSWnxhjoWCuU
-	Vvy+OwWxDo/e5yr0fnLuFRHymkkXqvE8y6wWzNE3Ojj+EoITsFc3+feRRhqKx7uw
-	QCtWIHCyzSB2nG8tHB3q5wtWzmKHRV3bhThUKDX8lSL5eLjDzt9Ltx1XWwPicyHc
-	gBFcO+3nfj61Pc3XM1/KVRAyL71hj680c6ci4mtUugl5CjPxlzT1d41uQ+cB3Kjw
-	/SxMAZO1OqzqUyUmadPSPw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1772215047; x=
-	1772222247; bh=K2yQm0oOGTcRJfhcrEhEmD0poePPSAOAfmgoK4/aZLQ=; b=W
-	xqmtJcO9/vYtHkLC8ry/T0H4riRZtlEP84tsZsbvOF7uyDV2DhRDT9EFxWz8XiZ3
-	5YimAM/blxiy5DiQdzLbwfFBeoCdw5gLmTW9CVQOea7C3zb0AyB1sf1XS+wmfv3Q
-	Ds3c8w7JL5YsaMfC5Al7JyE92WwHtRZLH8a0uMk94qa9MVsfoP6yhSuvimDw6m7/
-	0Vz8KIDNfDn+zdyVaa/tMTWGIwc8UccFyxqFQglgrsg4CseIls3XRYZIDO4ePIei
-	HCyVzy589uVArJ51VYsNvO/jUSHwDM0rW/z2eNUHdq2EX5myg0+WDdo9RdMlxi0o
-	IsS6cWHKbOS2VNTCGTGUw==
-X-ME-Sender: <xms:BtuhaeIZ2jS2UzpJd553k8XHA1Sp13wdZhBu7QQZtWIcByVOCp_UKg>
-    <xme:BtuhaS8hJK-hkPnFru1C9zc1y9z6dwFIhx7qBKUOL3_IP1aZ0UeNjHLjD_ZPtaIJb
-    Ap74DRRikSk2ywtNYvGEudDqP4xYKNin3E1E33BFNp5CKHwOsAWgQ>
-X-ME-Received: <xmr:BtuhaS7gLyrUe-l3rxzVCz0cLdnzfbW-UmoTkvJBStG9ul5e7o1ztrntfSw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeelieeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpeetlhgvgicu
-    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpeegudevhfejueefveduieeuueeifeettdekveekhffgvdetfeelueehgfdt
-    heffhfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepgeehpdhmohguvgep
-    shhmthhpohhuthdprhgtphhtthhopegumhgrthhlrggtkhesghhoohhglhgvrdgtohhmpd
-    hrtghpthhtoheprghjrgihrggthhgrnhgurhgrsehnvhhiughirgdrtghomhdprhgtphht
-    thhopehgrhgrfhesrghmrgiiohhnrdgtohhmpdhrtghpthhtoheprghmrghsthhrohesfh
-    gsrdgtohhmpdhrtghpthhtoheprghpohhpphhlvgesnhhvihguihgrrdgtohhmpdhrtghp
-    thhtoheprghkphhmsehlihhnuhigqdhfohhunhgurghtihhonhdrohhrghdprhgtphhtth
-    hopegrnhhkihhtrgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepsghhvghlghgrrghs
-    sehgohhoghhlvgdrtghomhdprhgtphhtthhopegthhhrihhslheskhgvrhhnvghlrdhorh
-    hg
-X-ME-Proxy: <xmx:BtuhaRgx07S3OQW05vQUdMULcKyIxw-lTak2T16g5_r3LQCchEXMMw>
-    <xmx:BtuhaZgs_wOwuGV3uCTzdlPxPYWSRXfna-r2yxAr8x8ogV-5YZqCiQ>
-    <xmx:BtuhaX1nJjDQ-xPKXDYD3-xh--mPBEI78fmknqtRndSlh83yiY3kdg>
-    <xmx:BtuhaUhbU6JSFEpTI_Y42gSPmoFE2aI-6lqMPTHvgr6MwH-vurp96w>
-    <xmx:B9uhaXpqlDvWlnCcYlLipLPhEwUJg3Efvxe_E5IjWKRMOlvzQntJDuNL>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 27 Feb 2026 12:57:22 -0500 (EST)
-Date: Fri, 27 Feb 2026 10:57:20 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: David Matlack <dmatlack@google.com>
-Cc: Adithya Jayachandran <ajayachandra@nvidia.com>,
- Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>,
- Alistair Popple <apopple@nvidia.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Ankit Agrawal <ankita@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Chris Li <chrisl@kernel.org>, David Rientjes <rientjes@google.com>,
- Jacob Pan <jacob.pan@linux.microsoft.com>,
- Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Jonathan Corbet <corbet@lwn.net>, Josh Hilke <jrhilke@google.com>,
- Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org,
- kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
- Leon Romanovsky <leonro@nvidia.com>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org,
- Lukas Wunner <lukas@wunner.de>,
- =?UTF-8?B?TWlj?= =?UTF-8?B?aGHFgg==?= Winiarski
- <michal.winiarski@intel.com>, Mike Rapoport <rppt@kernel.org>,
- Parav Pandit <parav@nvidia.com>,
- Pasha Tatashin <pasha.tatashin@soleen.com>,
- Pranjal Shrivastava <praan@google.com>,
- Pratyush Yadav <pratyush@kernel.org>,
- Raghavendra Rao Ananta <rananta@google.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Saeed Mahameed <saeedm@nvidia.com>,
- Samiullah Khawaja <skhawaja@google.com>,
- Shuah Khan <skhan@linuxfoundation.org>,
- Thomas =?UTF-8?B?SGVsbHN0csO2bQ==?= <thomas.hellstrom@linux.intel.com>,
- Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>,
- William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
- Zhu Yanjun <yanjun.zhu@linux.dev>, alex@shazbot.org
-Subject: Re: [PATCH v2 10/22] vfio/pci: Skip reset of preserved device after
- Live Update
-Message-ID: <20260227105720.522ca97f@shazbot.org>
-In-Reply-To: <CALzav=fHy23RAzhgkdaL+JA5T2tL9FT6aPgRfXUh7i9zvYCGPA@mail.gmail.com>
-References: <20260129212510.967611-1-dmatlack@google.com>
-	<20260129212510.967611-11-dmatlack@google.com>
-	<20260226170030.5a938c74@shazbot.org>
-	<aaDqhjdLyf1qSTSh@google.com>
-	<20260227084658.3767d801@shazbot.org>
-	<CALzav=fHy23RAzhgkdaL+JA5T2tL9FT6aPgRfXUh7i9zvYCGPA@mail.gmail.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1772216311; c=relaxed/simple;
+	bh=dL2lED0H4Vh+DQX2gfoN9cduNziRZausggYZg05Rrec=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gDaGEvmfNoP8wx5jl08lWKP+9/glZPktA1nS4CHIXdPAlx7YWA/LhVQHAjjlRK5wKx3SkaX/pyjI8DTMWSEC31fJ/xFc1AB107+ZSjJwPrufpeOhVFNyXvVkHX9qCX3LU72HSxwqYAKIz5Pm9C79+4cBRzvcQeZp/PUje16Y9sY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eyD0q3Z4; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35658758045so1597082a91.3
+        for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 10:18:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772216310; x=1772821110; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VjtrC6wXSkKwjHrwny4zHfiltbsgu7d4FOLycr3Qios=;
+        b=eyD0q3Z4CQsszQM0RhVrsgWsXgEOkj/VMpUrQk7/OsrFILNQKNmazxvTsQCZ/S90oL
+         6MLWgTGOYGCYnSfDuo4Cqb5pXjpGdmBCK/N6LjtCnJ5e9CVxIfieGhyQDJDT4jj7FsUk
+         R389cPHmRZjCeYOU7W1tCnX+GFdFvT4cFGPm0yGvDvW8txVNs6vRhWAgK4z1R1QzYQyt
+         Nek2JzIFtZzbg7hzRweG7q2Evy88AWXnD6x1brXDepqm5Cj0Ofd/vDO5GWjSznDyPIql
+         qVlcRD05cYXbIbYlCWPacuTq+rrv6Dhiu5Z8EJ7WDkuOn7BI6pMG/t64FJDc5Eknrnta
+         SApg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772216310; x=1772821110;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VjtrC6wXSkKwjHrwny4zHfiltbsgu7d4FOLycr3Qios=;
+        b=BjU97ZQSV88suh+AZ5+9npBzZ6+6qT0qYBsDVgTJLcsjSDfuUW9O0BNiKfm3k2frdr
+         zedp9go7Iz7PjHZ9q3F+5E3Yj3GacrV4uJt4haI76xEbONsekjI2qmspsVQw9ow8cM73
+         R96Uovp2/WFBaK/ZreSDGdOUCJwIogjRHkQhDh/Wdbpei1ez6uYX+qr2mxD+zgbk5LyL
+         pJNDDqp9u1zX0p9BGQUaHeNA9gFs35LuGJrYrvlRDQpOhQ5oBsnE0Ba9VYs9jFlcSjl/
+         V45bvD7L8W6vUwktAXTXXlbaYrkd4wqP7wjUUsngfAMqPPcXz/wlVuM7QSkbeH8JEjR4
+         H4ug==
+X-Forwarded-Encrypted: i=1; AJvYcCX4os7ElPG41KTMy7Bgj4owy1YSvh9XcwL9uSfWOQlKcIpX7xJwj2/kEW2Myb7IrfNuN3Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkIpgr14zk/JTdyc2tW9ThpBoYx2m1PDAQ+9Eo4PE9/mMQ4KHR
+	izKtqiywXGnZP5Um2jE4m6oRETNtLzZWgt1jLL6o0doT5XkeWhHkTZUeu1VKobvxg5zaXKRuV9P
+	YW27hvw==
+X-Received: from pjqh24.prod.google.com ([2002:a17:90a:a898:b0:358:e428:f935])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3852:b0:356:2132:67bf
+ with SMTP id 98e67ed59e1d1-35965c9c995mr3815276a91.18.1772216309531; Fri, 27
+ Feb 2026 10:18:29 -0800 (PST)
+Date: Fri, 27 Feb 2026 10:18:28 -0800
+In-Reply-To: <CAO9r8zMdyvAJUvnxH0Scb6z3L51Djb1qpMAzX3M9g7hOkB=ZOQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+References: <20260227011306.3111731-1-yosry@kernel.org> <20260227011306.3111731-4-yosry@kernel.org>
+ <aaG_o58_0aHT8Xjg@google.com> <aaHHg2-lcpvkejB8@google.com> <CAO9r8zMdyvAJUvnxH0Scb6z3L51Djb1qpMAzX3M9g7hOkB=ZOQ@mail.gmail.com>
+Message-ID: <aaHf9Lxx8ap_3DRI@google.com>
+Subject: Re: [PATCH 3/3] KVM: x86: Check for injected exceptions before
+ queuing a debug exception
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm3,messagingengine.com:s=fm3];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[45];
-	FREEMAIL_CC(0.00)[nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev,shazbot.org];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-72198-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72199-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,shazbot.org:mid,shazbot.org:dkim,shazbot.org:email,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: 9AC961BBBB9
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D8F0D1BBE72
 X-Rspamd-Action: no action
 
-On Fri, 27 Feb 2026 09:07:48 -0800
-David Matlack <dmatlack@google.com> wrote:
-
-> On Fri, Feb 27, 2026 at 7:47=E2=80=AFAM Alex Williamson <alex@shazbot.org=
-> wrote:
+On Fri, Feb 27, 2026, Yosry Ahmed wrote:
+> On Fri, Feb 27, 2026 at 8:34=E2=80=AFAM Sean Christopherson <seanjc@googl=
+e.com> wrote:
 > >
-> > On Fri, 27 Feb 2026 00:51:18 +0000
-> > David Matlack <dmatlack@google.com> wrote:
-> > =20
-> > > On 2026-02-26 05:00 PM, Alex Williamson wrote: =20
-> > > > On Thu, 29 Jan 2026 21:24:57 +0000
-> > > > David Matlack <dmatlack@google.com> wrote: =20
-> > > > >
-> > > > > - vdev->reset_works =3D !ret;
-> > > > >   pci_save_state(pdev);
-> > > > >   vdev->pci_saved_state =3D pci_store_saved_state(pdev); =20
-> > > >
-> > > > Isn't this a problem too?  In the first kernel we store the initial,
-> > > > post reset state of the device, now we're storing some arbitrary st=
-ate.
-> > > > This is the state we're restore when the device is closed. =20
-> > >
-> > > The previous kernel resets the device and restores it back to its
-> > > post reset state in vfio_pci_liveupdate_freeze() before handing off
-> > > control to the next kernel. So my intention here is that VFIO will
-> > > receive the device in that state, allowing it to call
-> > > pci_store_saved_state() here to capture the post reset state of the
-> > > device again.
-> > >
-> > > Eventually we want to drop the reset in vfio_pci_liveupdate_freeze() =
-and
-> > > preserve vdev->pci_saved_state across the Live Update. But I was hopi=
-ng
-> > > to add that in a follow up series to avoid this one getting too long.=
- =20
-> >
-> > I appreciate reviewing this in smaller chunks, but how does userspace
-> > know whether the kernel contains a stub implementation of liveupdate or
-> > behaves according to the end goal? =20
+> > On Fri, Feb 27, 2026, Sean Christopherson wrote:
+> > > So instead of patch 1, I want to try either (a) blocking KVM_SET_VCPU=
+_EVENTS,
+> > > KVM_X86_SET_MCE, and KVM_SET_GUEST_DEBUG if nested_run_pending=3D1, *=
+and* follow-up
+> > > with the below WARN-spree, or (b) add a separate flag, e.g. nested_ru=
+n_in_progress
+> > > or so, that is set with nested_run_pending, but cleared on an exit to=
+ userspace,
+> > > and then WARN on _that_, i.e. so that we can detect KVM bugs (the who=
+le point of
+> > > the WARN) and hopefully stop playing this losing game of whack-a-mole=
+ with syzkaller.
 >=20
-> Would a new VFIO_DEVICE_INFO_CAP be a good way to communicate this
-> information to userspace?
+> I like the idea of the WARN there, although something in the back of
+> my mind tells me I went through this code before with an exception in
+> mind that could be injected with nested_run_pending=3D1, but I can't
+> remember it. Maybe it was injected by userspace and all is good.
 
-Sorry if I don't have the whole model in my head yet, but is exposing
-the restriction to the vfio user of the device sufficient to manage the
-liveupdate orchestration?  For example, a VFIO_DEVICE_INFO_CAP pushes
-the knowledge to QEMU... what does QEMU do with that knowledge?  Who
-imposes the policy decision to decide what support is sufficient?
-Thanks,
+If there is such a flow, it's likely a bug, i.e. we'd want the WARN.  AFAIK=
+,
+every single time the WARN has been hit in the last ~2-3 years has been due=
+ to
+syzkaller.
 
-Alex
+> That being said, I hate nested_run_in_progress. It's too close to
+> nested_run_pending and I am pretty sure they will be mixed up.
+
+Agreed, though the fact that name is _too_ close means that, aside from the
+potential for disaster (minor detail), it's accurate.
+
+One thought is to hide nested_run_in_progress beyond a KConfig, so that att=
+empts
+to use it for anything but the sanity check(s) would fail the build.  I don=
+'t
+really want to create yet another KVM_PROVE_xxx though, but unlike KVM_PROV=
+E_MMU,
+I think we want to this enabled in production.
+
+I'll chew on this a bit...
+
+> exception_from_userspace's name made me think this is something we
+> could key off to WARN, but it's meant to morph queued exceptions from
+> userspace into an "exception_vmexit" if needed. The field name is
+> generic but its functionality isn't, maybe it should have been called
+> exception_check_vmexit or something. Anyway..
+
+No?  It's not a "check", it's literally an pending exception that has been =
+morphed
+to a VM-Exit.
+
+Hmm, though looking at all that code again, I bet we can dedup a _lot_ code=
+ by
+adding kvm_queued_exception.is_vmexit instead of tracking a completely sepa=
+rate
+exception.  The only potential hiccup I can think of is if there's some wri=
+nkle
+with the interaction with already pending/injected exceptions.  Pending sho=
+uld be
+fine, as the VM-Exit has priority.
+
+Ah, scratch that idea, injected exceptions need to be tracked separate, e.g=
+. see
+vmcs12_save_pending_event().  It's correct for vmx_check_nested_events() to
+deliver a VM-Exit even if there is an already-injected exception, e.g. if a=
+n EPT
+Violation in L1's purview triggers when vectoring an injected exception, bu=
+t in
+that case, KVM needs to save the injected exception information into vmc{b,=
+s}12.
+
+> That gave me an idea though, can we add a field to
+> kvm_queued_exception to identify the origin of the exception
+> (userspace vs. KVM)? Then we can key the warning off of that.
+
+That would incur non-trivial maintenance costs, and it would be tricky to g=
+et the
+broader protection of the existing WARNing "right".  E.g. how would KVM kno=
+w that
+the VM-Exit was originally induced by an exception that was queued by users=
+pace?
+
+> We can potentially also avoid adding the field and just plumb the
+> argument through to kvm_multiple_exception(), and WARN there if
+> nested_run_pending is set and the origin is not userspace?
+
+Not really, because kvm_vcpu_ioctl_x86_set_vcpu_events() doesn't use
+kvm_queued_exception(), it stuffs things directly.
+
+That said, if you want to try and code it up, I say go for it.  Worst case =
+scenario
+you'll have wasted a bit of time.
+
+> > > I think I'm leaning toward (b)?  Except for KVM_SET_GUEST_DEBUG, wher=
+e userspace
+> > > is trying to interpose on the guest, restricting ioctls doesn't reall=
+y add any
+> > > value in practice.  Yeah, in theory it could _maybe_ prevent userspac=
+e from shooting
+> > > itself in the foot, but practically speaking, if userspace is restori=
+ng state into
+> > > a vCPU with nested_run_pending=3D1, it's either playing on expert mod=
+e or is already
+> > > completely broken.
+> > >
+> > > My only hesitation with (b) is that KVM wouldn't be entirely consiste=
+nt, since
+> > > vmx_unhandleable_emulation_required() _does_ explicitly reject a "use=
+rspace did
+> > > something stupid with nested_run_pending=3D1" case.  So from that per=
+spective, part
+> > > of me wants to get greedy and try for (a).
+> >
+> > On second (fifth?) thought, I don't think (a) is a good idea.  In addit=
+ion to
+> > potentially breaking userspace, it also risks preventing genuinely usef=
+ul sequences.
+> > E.g. even if no VMM does so today, it's entirely plausible that a VMM c=
+ould want
+> > to asynchronously inject an #MC to mimic a broadcast, and that the inje=
+ction could
+> > collide with a pending nested VM-Enter.
+> >
+> > I'll send a separate (maybe RFC?) series for (b) using patch 1 as a sta=
+rting point.
+> > I want to fiddle around with some ideas, and it'll be faster to sketch =
+things out
+> > in code versus trying to describe things in text.
+>=20
+> So you'll apply patch 3 as-is, drop patch 2, and (potentially) take
+> patch 1 and build another series on top of it?
+
+Yeah, that's where I'm trending.
 
