@@ -1,116 +1,116 @@
-Return-Path: <kvm+bounces-72194-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72195-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QAFXHMrQoWkfwgQAu9opvQ
-	(envelope-from <kvm+bounces-72194-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 18:13:46 +0100
+	id oCHfBErSoWlLwgQAu9opvQ
+	(envelope-from <kvm+bounces-72195-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 18:20:10 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D4F01BB453
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 18:13:46 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A67951BB5D3
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 18:20:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 303C7311B865
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 17:08:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 487F63028B5B
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 17:20:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6FC361DA1;
-	Fri, 27 Feb 2026 17:08:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4198A361DC5;
+	Fri, 27 Feb 2026 17:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PgPiHSvB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HHFpTT3c"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296A3389E18
-	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 17:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455783F23AA
+	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 17:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.171
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772212100; cv=pass; b=BTuWGXVPSs82Uh/0stT+snyYnVz38C4ePLs4LZ+4GLXkKo270FpFJU8M0LvT2ml8cHloQLc9pUb3JhqkY0XbfpXX6ChuDjtUM88Gr/mlHNdDIgnYifsM4wOCWs7BRtYGfrff8MhbbhDMWs3dAd7Vti7mK2HUVF1F2JNYMlNoKUA=
+	t=1772212803; cv=pass; b=kTPuxsipPUv8ulubhRVZ5OUcuebdYQtFJZcNYx/gEoLLzi5T3IHesFgUelX9Cw/MeRoVn9lZl5ONkBhutcRv6As4eyFoEcb7D5lwDG9kcNpMSAqPlUL+LvCm1PngF+lNoHt8xrBJk1SHftFkwkEuXm1w1ryOo5TJddJUCV4d+hM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772212100; c=relaxed/simple;
-	bh=hgtMP8VUtY9P76ez7WKUM8aE1sgvg9AP+19rjG+g6HA=;
+	s=arc-20240116; t=1772212803; c=relaxed/simple;
+	bh=SSENmwLLmfNwcsRg3YsbfFMJCVOVJDpYAbDWxLRiUJo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EKcMMW92lSEfB96jV7Fds29kafD+jg+zzdft937YZZTArRTP/BczCA2MLq553xqjomAoocXUwW+oTHk3gpuP2VPLdAMahxdm5/NZbhGxaPuxHCj1RfYDHmcXqzJKIRTVsLPaeemaGjnaaEIhhYpdlGsV5qyM1KzhjW5opjGTWn0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PgPiHSvB; arc=pass smtp.client-ip=209.85.208.171
+	 To:Cc:Content-Type; b=WNjBG7GAiUCWlPkxPG3PoY/SydWRvjQLOcHmuLLcRZFbaSwkGhLdJvQcfveyP1gr6ZYbpma4W9m26fEsb/Phhr8IJouek/8t++V9bJhh8gAev1FsDebvdOtqtyfMj+UZmsD8UXM4HgeMswWeQwOIo/nypie2vDVf53jrXBlAN1w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HHFpTT3c; arc=pass smtp.client-ip=209.85.208.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-3870902760cso28679541fa.3
-        for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 09:08:18 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772212097; cv=none;
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-3870acaf78eso1363571fa.2
+        for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 09:20:00 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772212798; cv=none;
         d=google.com; s=arc-20240605;
-        b=Dbv7ltYmnKmXa6sNeMaoqygyRhBiiXO+KOqwmKWFUlZ5ZU7HH4G27I1vSLH926YnGB
-         Dl60I+VGbEJ71tz4aUGoMp++THhkX6tV/Vls2wTtWVS2tWC8oluSJDUxoMCJxqmNMBFC
-         /SIVN3FFOh/9D7K2B4kw7ILtkUbKZ7inJFDUshKmUBliAA8/hrnviAXLmq1UT6xXKohG
-         cmj8MduQJOGEtMxHvUJ37xAel3/M9a4oI3FMoTctypqfcSov/i246ZR9SqnBedMYRL4K
-         Mz8s5v0NXRbWh7gK95XkMdPOZC9l26gZit2nA6/EfYmTBNQi/1ZyrLXnNI3Iah4UR0fv
-         XEUA==
+        b=k081M/I1NibZGIj/kq/Zt2uuYGkjjQWuV6sGeY2rC9AaBl0H9guBQY51Sw05qfYDPZ
+         Mf2/IwR2bsydoHgMhNJ2tYz8aym3ktDCAHDhLadiTsY+ECa7zk/ZUpU+HKIEJEjqVxzQ
+         ZUesiItoT84IAvIMnlnfgu9YIChePLifVl7vZndK4AQ1FT2/hVaWGmK6upwKJckr3/pO
+         hCYtZRdJ+gv10icNEWr06MXFeHbvLplZKAV7MxLvbEVtUZtPUSdPnLkYmoqyrRXqazxg
+         FV9aIs/c1yYwkU6wdGXGd4BimqGpvSd7GIe6cximZIOsaoBTV9Ko3mUjOGCx6BR+mO+z
+         TkAw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=Y7MEfERrDZZYp0c3EO05mpNNZJ5XP1zAqLXvGoyft2Y=;
-        fh=1qPBDeWGpI2e6U5ZXz6MVrTCT7l3hr9vALpROwQlmqM=;
-        b=JhXsvGnis+d5tgh0Y7YVwNDypuJp18Nk1xNsUYNbKbiIm7gN6B5dzEm9IP4emp2/1v
-         FYdazQeekaYG/RACB0hlyn0YtlQLNHzEj7VekayTdCguLYos5Yoady3mDFrNiTVpD0dE
-         Ib13tXvLaWSma4dhqGCWysCkm3Ju88MJOAV9TdHEyrRgxay2IfgPKVdonDGokzlmxc13
-         YduDRJ0JA1dTYzy57c7PNShXplXAVOsheXPs7NGK7/uJQU9JPb4no/HFw2uBxu0Yhlxn
-         NdLPZQuqFsd/9b9YYYnyPpxMK4Ob+jjw+tZdcluqpYeOrEx0ECDPUROpSELwwUeMJQHV
-         WpSA==;
+        bh=TlM+Kfuyp7z6KhXNl7/hdctuf7el0QWvoUeGk1mQs2Q=;
+        fh=BA8kaqfhMqcWbhLF6vRY1eoV1xvd8GEMEInLQ5t/Ztc=;
+        b=BSFBQ4/Nju+m0sSKiTCXKGyvbBs7aYilev+ZG+fHGVo20IIL7ibW3M01FmpXA34OUX
+         bDXzzD30jp/fR1vx04vngvpOC69D86TyJas9CuBv5hFTvjjchzJkLZHV0ed6DVH+Qqf/
+         SBAULIekdLg/PHU5BoiKEQzCFG79JFHOSCeP42hHsrpun2Pgl8JejwNzHWN7DRHBdtTQ
+         N7k3odEoBEvnxxcFPLqducMtD0lHDj+rnM7c4Hq0f7jX1ceVWsoIlY1LJu5O/pFcvBim
+         ZWNhayZOBYQCTBouOUr/CJ/ZC98cnPTK6ibTa9xYKxWX9DMnWxs9LP8t8YYkoyOrOLuw
+         Vp2A==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772212097; x=1772816897; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772212798; x=1772817598; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Y7MEfERrDZZYp0c3EO05mpNNZJ5XP1zAqLXvGoyft2Y=;
-        b=PgPiHSvBUI+6gG4LIWdV1P8tP+hFkKXk+TFFDvSHQY50WokDZVU56YMWiqXkadzDvF
-         dmtlcfNCGrEBiqCje044yvDu+SRSRfiletzn5UHk6aDk5+045qCqDx9KZIhw/o27OQyt
-         UCKQGipmAhUvcb93PWkufu6jfbdDWWfD7jV0cQTUEWeMstaBqGManjqzjqQYtybdqa4L
-         pEO1bYIczqigj3PY5FSg2rMiDk5C7w1QRrnXsEnaAKPLDJTj6pp3XYC4Ydv2DCasxQxQ
-         uDX642xnkksbRVZwr1quu0e2bw6oAYru6aoEG0ikwUHlNxPLSG690KLg3C8rSaGWmiey
-         vDTw==
+        bh=TlM+Kfuyp7z6KhXNl7/hdctuf7el0QWvoUeGk1mQs2Q=;
+        b=HHFpTT3c9vcvzJ3vVCMKu7JawFYgDIREzI+Q/pn48bejMi8S305zspNJdAZhTcixqt
+         ORuLPealSeMmf7TSqbFA+Y3jHgipjhOsfgImPNTkWoxuekKsmaBHFF7KJ7ROyAHHJs8x
+         UqNFbkk4dBP54X3yDV1ktfH+gaoQ7dxdNmvVov/DrCkPw/orQrQ2SWpYWQwKbQY+h69c
+         8swnMFVs7FafFJfAClz0HhRXDlerQjO4rLhG7QXIwcKFjsJEj9owe/5unM0+qOdZYBsJ
+         RhNt8ZD6lCoXGlSkQRNf/GU3UQVOLxTzRh2AdkKAtgrtqLdgEVUkryPPbxSlU5tQIdBh
+         A5rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772212097; x=1772816897;
+        d=1e100.net; s=20230601; t=1772212798; x=1772817598;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Y7MEfERrDZZYp0c3EO05mpNNZJ5XP1zAqLXvGoyft2Y=;
-        b=LLc1xaB/UzURdYrkzXPreNL0gLEY18Jk5n+5RLS0LTnnmuflbs+wra5twEahQh7K/y
-         QPpPMiGgjpmWCt7ECubyuAYyHpn0+oKrgoyCkG0fXk3V20O8DvaMFpnh7ksTHctdFTNf
-         L32rQj7hvVZWZWkC90Gh/pmem/9jbAu5Ik2bMjycmKPUVdUgATLYQsPgIJLA1tjNy7DS
-         ckDo5JRAREKmBNoUI5n4y/9ojrLvJFU+kfbXTv60nJUYykreooOlVzEwttPVSyVgCbQB
-         7HVCmr4cNPpBe3s9tWq5Xq8vzHqBSuugpYZb2UDnLdMjGz3cHCDRk+GMogY7hE3ZmNmf
-         JCDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWrGM3uZ3IX9b9YHzdonZz907p9jYfrlj2XaVpmgVMqYcSYj4MJEmynf/+LSgjh6ogkZCA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxd7TNja2zw5TGq5E9ggZDj2ENbFmHcW1bpkjbzOuX+7EFXx2KY
-	IrfKYwR/4HGSKLJ6Gitt+LvAUDfGzt8Fb4WYkD3+7xoiuRq2/bBC5JIT27ybieRHbH0p44/ZCNi
-	mT7HF5PGlq+xTyFJu6V/OomOKecYJ9oCM8+UyPkkN
-X-Gm-Gg: ATEYQzzlLxkgDhr/O+FBSug2K70eOPs4ls0PYdpTDOBjpuWCNEqpVQhcqy3wnB2tPII
-	kn0Jr/nVKzNovoDawrjkZijvHDBUHMpyYof/Ug05X3zp2srHhmLTxOf6FI4VTQh0U6IXNjd11WT
-	Kbd//LeO/sLqB2ib7EIMaNqDTUIKQIMwiCLZ1kBB2bnvoifwVo9ICnNf56v6fFFAY4O3vN9lzmJ
-	19RyOA6XyZyUxd/tJSCT+Nrb8TzoomvIcLLNcy2adgFSJ2YHLDtg/cl+1RvAeseUu4oSJS68aLF
-	bDBYJBwRXAKuKStwqQ==
-X-Received: by 2002:a05:651c:50f:b0:385:f7ce:f321 with SMTP id
- 38308e7fff4ca-389ff15f271mr19911451fa.26.1772212096622; Fri, 27 Feb 2026
- 09:08:16 -0800 (PST)
+        bh=TlM+Kfuyp7z6KhXNl7/hdctuf7el0QWvoUeGk1mQs2Q=;
+        b=Vp7W5KeImKY6saRmo76NIQrwDzBQZ4pbAduAo9OASlQiwMz+3AY/6JAZ7OVnMXv60g
+         MgkrsNf2tg1Q7PQxQ4a6977tul7cRPkztOA50bpSKVMkidaMO7VPvYtqC3S3snwjd440
+         Bexs+nNk+fQEY4rJ1Z+/lTdpZ/XFEdNduT1FuL7ubuvn0mFXq1Z2EH4bU08YPwe3qRw3
+         +lYb1TbOInJAjHICcZLJZHVcJa1SXZ0EokoA3tiikv/gFlFpqTGN/84aNQDyFWll3RvX
+         Am/mjpS0msErYNTQRxMZNvKz/81s62Z1T+GA0jJGOFZg6cEciAs4GGx0v9YOVQaRKiwm
+         flKA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1oXyRYoJje3RXSnOxBUmldLM5HhvHDs5eTXO+0dIRozV1c4FndUK15HBGFYboo7cdIVQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxFDQey4NZWE/nwCpk/LjPhwDm3QX88uaLMkt1V2unmh0hOAcr
+	DRjie5/72uXG+v09OpGewclcauuky2Ul01w2A3fuY9W9Mcn+wcsYxfx4EBrl9Cf0kJrpMEozMlr
+	vvkM2KLnkggWPVEKzTFbjMhGcfs1UuXFMMtgCjK8W
+X-Gm-Gg: ATEYQzyLatkzbecjQhEkh/A8tI2a+Gxpd0Et94JubCHCuOL4WzsTfYhkqj24NK7ILdV
+	yrlg8KqX+dSZlSoxNG+/3gsewEVeb+e0rsRvO42/BcAbEksUtC0P1A9NOAayv+CppiKqJ+l0sUG
+	UQ5r/OqciV6EwuxRZmUrw7Nv8IBhc+mPGmmaX9yQ6DCuEVae2hUyUkbbIo2xK6UGhUia4ZwxMXQ
+	VlyA+/3gDroUxbg1nAH0PE+kDPA9Bm9vUvXoOGAW9d+d4gKp8ME+9+8if1M/5NSi3OTDd2UpATh
+	juFuC44=
+X-Received: by 2002:a05:651c:f17:b0:385:d0b6:6c44 with SMTP id
+ 38308e7fff4ca-389ff14567amr23252321fa.18.1772212798094; Fri, 27 Feb 2026
+ 09:19:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260129212510.967611-1-dmatlack@google.com> <20260129212510.967611-11-dmatlack@google.com>
- <20260226170030.5a938c74@shazbot.org> <aaDqhjdLyf1qSTSh@google.com> <20260227084658.3767d801@shazbot.org>
-In-Reply-To: <20260227084658.3767d801@shazbot.org>
+References: <20260129212510.967611-3-dmatlack@google.com> <20260225224651.GA3711085@bhelgaas>
+ <aZ-TrC8P0tLYhxXO@google.com> <20260227093233.45891424@shazbot.org>
+In-Reply-To: <20260227093233.45891424@shazbot.org>
 From: David Matlack <dmatlack@google.com>
-Date: Fri, 27 Feb 2026 09:07:48 -0800
-X-Gm-Features: AaiRm519T9RurPcNiWyO80VEVhcFvT0_H9lBfATMd1KVW4QtGFBpubzCvVI4oqQ
-Message-ID: <CALzav=fHy23RAzhgkdaL+JA5T2tL9FT6aPgRfXUh7i9zvYCGPA@mail.gmail.com>
-Subject: Re: [PATCH v2 10/22] vfio/pci: Skip reset of preserved device after
- Live Update
+Date: Fri, 27 Feb 2026 09:19:28 -0800
+X-Gm-Features: AaiRm514TJvedInAnynD285P6RuOXX1FfRIbxiQr5Hc2znqJUuMLjDSPlZjM6yI
+Message-ID: <CALzav=dxthSXYo13rOjY710uNbu=6UjzD-OJKm-Xt=wR7oc0mg@mail.gmail.com>
+Subject: Re: [PATCH v2 02/22] PCI: Add API to track PCI devices preserved
+ across Live Update
 To: Alex Williamson <alex@shazbot.org>
-Cc: Adithya Jayachandran <ajayachandra@nvidia.com>, Alexander Graf <graf@amazon.com>, 
-	Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>, 
+Cc: Bjorn Helgaas <helgaas@kernel.org>, Adithya Jayachandran <ajayachandra@nvidia.com>, 
+	Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>, 
 	Andrew Morton <akpm@linux-foundation.org>, Ankit Agrawal <ankita@nvidia.com>, 
 	Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>, 
 	David Rientjes <rientjes@google.com>, Jacob Pan <jacob.pan@linux.microsoft.com>, 
@@ -137,16 +137,16 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72194-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72195-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[44];
+	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[45];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -155,54 +155,79 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shazbot.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 0D4F01BB453
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,shazbot.org:email,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: A67951BB5D3
 X-Rspamd-Action: no action
 
-On Fri, Feb 27, 2026 at 7:47=E2=80=AFAM Alex Williamson <alex@shazbot.org> =
+On Fri, Feb 27, 2026 at 8:32=E2=80=AFAM Alex Williamson <alex@shazbot.org> =
 wrote:
 >
-> On Fri, 27 Feb 2026 00:51:18 +0000
+> On Thu, 26 Feb 2026 00:28:28 +0000
 > David Matlack <dmatlack@google.com> wrote:
->
-> > On 2026-02-26 05:00 PM, Alex Williamson wrote:
-> > > On Thu, 29 Jan 2026 21:24:57 +0000
-> > > David Matlack <dmatlack@google.com> wrote:
-> > > >
-> > > > - vdev->reset_works =3D !ret;
-> > > >   pci_save_state(pdev);
-> > > >   vdev->pci_saved_state =3D pci_store_saved_state(pdev);
+> > > > +static int pci_flb_preserve(struct liveupdate_flb_op_args *args)
+> > > > +{
+> > > > + struct pci_dev *dev =3D NULL;
+> > > > + int max_nr_devices =3D 0;
+> > > > + struct pci_ser *ser;
+> > > > + unsigned long size;
+> > > > +
+> > > > + for_each_pci_dev(dev)
+> > > > +         max_nr_devices++;
 > > >
-> > > Isn't this a problem too?  In the first kernel we store the initial,
-> > > post reset state of the device, now we're storing some arbitrary stat=
-e.
-> > > This is the state we're restore when the device is closed.
+> > > How is this protected against hotplug?
 > >
-> > The previous kernel resets the device and restores it back to its
-> > post reset state in vfio_pci_liveupdate_freeze() before handing off
-> > control to the next kernel. So my intention here is that VFIO will
-> > receive the device in that state, allowing it to call
-> > pci_store_saved_state() here to capture the post reset state of the
-> > device again.
+> > Pranjal raised this as well. Here was my reply:
 > >
-> > Eventually we want to drop the reset in vfio_pci_liveupdate_freeze() an=
-d
-> > preserve vdev->pci_saved_state across the Live Update. But I was hoping
-> > to add that in a follow up series to avoid this one getting too long.
+> > .  Yes, it's possible to run out space to preserve devices if devices a=
+re
+> > .  hot-plugged and then preserved. But I think it's better to defer
+> > .  handling such a use-case exists (unless you see an obvious simple
+> > .  solution). So far I am not seeing preserving hot-plugged devices
+> > .  across Live Update as a high priority use-case to support.
+> >
+> > I am going to add a comment here in the next revision to clarify that.
+> > I will also add a comment clarifying why this code doesn't bother to
+> > account for VFs created after this call (preserving VFs are explicitly
+> > disallowed to be preserved in this patch since they require additional
+> > support).
 >
-> I appreciate reviewing this in smaller chunks, but how does userspace
-> know whether the kernel contains a stub implementation of liveupdate or
-> behaves according to the end goal?
+> TBH, without SR-IOV support and some examples of in-kernel PF
+> preservation in support of vfio-pci VFs, it seems like this only
+> supports a very niche use case.
 
-Would a new VFIO_DEVICE_INFO_CAP be a good way to communicate this
-information to userspace?
+The intent is to start by supporting a simple use-case and expand to
+more complex scenarios over time, including preserving VFs. Full GPU
+passthrough is common at cloud providers so even non-VF preservation
+support is valuable.
 
-> Also, didn't we violate our own contract in this patch by adding the
-> reset_works field to the serialization data without updating the
-> compatibility string?  Thanks,
+> I expect the majority of vfio-pci
+> devices are VFs and I don't think we want to present a solution where
+> the requirement is to move the PF driver to userspace.
 
-Yes, I will fix that in v3.
+JasonG recommended the upstream support for VF preservation be limited
+to cases where the PF is also bound to VFIO:
+
+  https://lore.kernel.org/lkml/20251003120358.GL3195829@ziepe.ca/
+
+Within Google we have a way to support in-kernel PF drivers but we are
+trying to focus on simpler use-cases first upstream.
+
+> It's not clear,
+> for example, how we can have vfio-pci variant drivers relying on
+> in-kernel channels to PF drivers to support migration in this model.
+
+Agree this still needs to be fleshed out and designed. I think the
+roadmap will be something like:
+
+ 1. Get non-VF preservation working end-to-end (device fully preserved
+and doing DMA continuously during Live Update).
+ 2. Extend to support VF preservation where the PF is also bound to vfio-pc=
+i.
+ 3. (Maybe) Extend to support in-kernel PF drivers.
+
+This series is the first step of #1. I have line of sight to how #2
+could work since it's all VFIO.
 
