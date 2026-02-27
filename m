@@ -1,289 +1,278 @@
-Return-Path: <kvm+bounces-72134-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72135-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gLwwM29moWkJsgQAu9opvQ
-	(envelope-from <kvm+bounces-72134-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 10:39:59 +0100
+	id 6DNRBt9toWm6swQAu9opvQ
+	(envelope-from <kvm+bounces-72135-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 11:11:43 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A0DC1B576C
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 10:39:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B7C11B5DD2
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 11:11:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 029BC310C4A5
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 09:36:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9EBBA31ADC40
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 10:05:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22843B5315;
-	Fri, 27 Feb 2026 09:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9C83D410C;
+	Fri, 27 Feb 2026 10:05:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="s5jjOGFr"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="bA/BA7HU"
 X-Original-To: kvm@vger.kernel.org
-Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012054.outbound.protection.outlook.com [40.107.209.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE3B372B36;
-	Fri, 27 Feb 2026 09:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772184972; cv=none; b=pMxAfZADkvsiT79tgNr1KshAJcP85GDXxmWM7aWrlLvi4lcUxBC8YwZ/9nmzzF8Ixd3i5pESiMCqWe74dZrgDIVMweannXC2nQ5hsOYxWjQSMm9ldbzttT2pchC24IacbXVFtDvJuN3lJQuF74xToc0E5qld0MU8//U287uUpwA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772184972; c=relaxed/simple;
-	bh=JatrjCh9rXYX1jXJ8diwK86Ywvjtzzka6onpEElf6Vk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fECZsDR/shQBRzuH56YJ3EWQ+BQETGKg7QWmqYcbeapuOw38A/u9mmp1KyfjTWr8Sbi/dcmC+w47BqD8vV7wkUDOBwcdkJCQQ7oMzTBa9CdR7sd4vbyfh7cncploo+hRyjoWf/UFa2p1xLgyQimbH7aCPekSDPPfe1ZI8EWUmk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=s5jjOGFr reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
-Received: from [133.11.54.205] (h205.csg.ci.i.u-tokyo.ac.jp [133.11.54.205])
-	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 61R9YgsP068326
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 27 Feb 2026 18:35:18 +0900 (JST)
-	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=px5XieEPKmbuo9CrIiuS5zCR9teM+ZDzb7WZFA/ue1Q=;
-        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20250326; t=1772184918; v=1;
-        b=s5jjOGFrW9QHij3qAVZnKPHOFsghNeaW8zQT6IuwDs7t2PShZEQeXy33VCPfziRT
-         6+JLSEU28wP8EP+nDfodCUc7u0vjTX8JvWrUn7LjgiiAnrf2awCPPJ4igZ9E9R2u
-         EzJUyQp1USQYoeFg8Br9VmnI+LJ6k7aYUW0ouGDfIFavAUjllPQacOyDX5G7DkoZ
-         lYsPFUHKC4JAv4XTVx+zXs/TdwawYCujbocHIZMdP+UYxMwmL6t4OlqONRmNB6T+
-         LYR9C0XdtF0IdswVYWd/1UoXymFJy4NRNlQukRqsUNDU8239NEk5KQ7SxiYqV/Tk
-         F5cf5t2Hjd8Rd5pxcreQew==
-Message-ID: <c5e5d2b2-ee47-4241-b0c8-3099cd8e73cb@rsg.ci.i.u-tokyo.ac.jp>
-Date: Fri, 27 Feb 2026 18:34:40 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9093A7F63;
+	Fri, 27 Feb 2026 10:05:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772186738; cv=fail; b=Oh5Yey1pAL5Vv0FYCrdDv4ODbg+bW5fqXtUOqbruwCa8iRGqWiHaezjCjqkCWQDe0zRXbL2ceaTkEano0H1TIij4ePJcRmiJ14Pc8zzkUdDmpCcCiR5ckklP/Jvs4NPkExxHCDl1GhnL0ecL222xhYlex+giPYgvXPI7QTxQsZk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772186738; c=relaxed/simple;
+	bh=uGbIBYaqYOk3yRLyan84KjZ9jFFfpH/i/snS2n/++d4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=VkDd+GyEWDK3YRIsNCE0q2mNeE2xgsBsdEJ5Mw3CtoJR10KzgTKexOm2UsK9ZYUvn/Muu2LEXU/p/qhEhS0+Pu3aKxbdL8pBoBdiSaiXanxeVraAWvsqZveNK2YO89knbEFupKNgiXYZsc6fiV3B4Nh+Xpuy3769nFhxMue3EmE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=bA/BA7HU; arc=fail smtp.client-ip=40.107.209.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wqcMN/ivMj1km2uuThlSyfuoDmP84juJqbOrcaZUzQ8+YK4iHYYQnJva1Lhe4QDv0BEg95ffGtwViNB+sBzRLqmhidKCxvQFT5x1+KonOnc9BXD2fT+IsIs5GxsaMxpJyV6C3ejUY+8fkp5jV4eNuREnaP3SP9ihex42miudKm9UaFGkwaOzLXgeShsIT/D7TDRxmVhZmXlTfvp8EUIYqjtZyvlM9rRy8ddOSwzqjECgJYlmMbe6yVX2YhXo/nq7lSCsmIdqO39ndVQwpCOrYKgEhGKZfa0SKw3kWJyFjjPn7XiK492aUWxVc/4sxqL3LrObpvMlxGNdxvnZkPwy5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YlxmKmuDeIDjHL9kwblbR4uINzVEeovOWU4h1/4ROaA=;
+ b=SfNr3zSSHb2HamFcSSZ/HDp42OliTeSpE/o4cAJKHMBK3uT7yW0IPiaCW9XvHTWdBQzUGTx540j5XeZklIyFLMeQVWgBQze8pxLMIz1Jal0wyCEbccWdUmkc6YnGMjfPsQ/30gkZABw2haaWJ11MGkf8O4gmTtE+mh5C8cnEVqZXI671q94XBtlwhDR+/9FwlwZ3bbam/RT7AAQke63bJKdStNUjeXKwUckRLoVOv6n4EGQf2qpOo0pahbQV7q2SDLxDaN2UqMkkqZN4zFf0a3ZRbMTJgXn/HeqnD70q89CU+5i43T6XjY/lexB+nz7Z5UATV71trlapyShw+STiyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YlxmKmuDeIDjHL9kwblbR4uINzVEeovOWU4h1/4ROaA=;
+ b=bA/BA7HUQoR23zTx1Oj0e4S1UeLgsJSd86zKB4tnJsJygD+cI1rv+ASIsAYFfFYxyksBp7nCr8L29wkka7h2I8z70Sjc+LdblaTNSoBIB8fwnTwpz5ZmS/pmtn3VI9C+Qecry/so4IngMUPhKzoxo+g04Dt1Qy/I5Hw2JGpvwB0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by MW4PR12MB5628.namprd12.prod.outlook.com (2603:10b6:303:185::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.16; Fri, 27 Feb
+ 2026 10:05:34 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.20.9632.017; Fri, 27 Feb 2026
+ 10:05:33 +0000
+Message-ID: <f75088c6-5795-49cc-8932-ea46c2223d74@amd.com>
+Date: Fri, 27 Feb 2026 11:05:24 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 4/7] dma-buf: uapi: Mechanism to revoke DMABUFs via
+ ioctl()
+To: Matt Evans <mattev@meta.com>, Alex Williamson <alex@shazbot.org>,
+ Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
+ Alex Mastro <amastro@fb.com>, Mahmoud Adam <mngyadam@amazon.de>,
+ David Matlack <dmatlack@google.com>
+Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Kevin Tian <kevin.tian@intel.com>,
+ Ankit Agrawal <ankita@nvidia.com>, Pranjal Shrivastava <praan@google.com>,
+ Alistair Popple <apopple@nvidia.com>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>, linux-kernel@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org
+References: <20260226202211.929005-1-mattev@meta.com>
+ <20260226202211.929005-5-mattev@meta.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <20260226202211.929005-5-mattev@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: YT4PR01CA0291.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:10e::15) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/2] KVM: arm64: PMU: Introduce FIXED_COUNTERS_ONLY
-To: Oliver Upton <oupton@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu
- <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org, devel@daynix.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20260225-hybrid-v3-0-46e8fe220880@rsg.ci.i.u-tokyo.ac.jp>
- <20260225-hybrid-v3-1-46e8fe220880@rsg.ci.i.u-tokyo.ac.jp>
- <aaA0gn9O8QAf9Gpu@kernel.org>
- <fbcadab4-676b-44e4-8afa-b8bd095f8981@rsg.ci.i.u-tokyo.ac.jp>
- <b81cbeb7-6541-4a1f-b08e-2b5c9ee66b69@rsg.ci.i.u-tokyo.ac.jp>
- <aaDRtkdU85kULqwm@kernel.org>
-Content-Language: en-US
-From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-In-Reply-To: <aaDRtkdU85kULqwm@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|MW4PR12MB5628:EE_
+X-MS-Office365-Filtering-Correlation-Id: f874b616-714c-46c9-7f12-08de75e7be79
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	buk4rNddqrtQSpIqSVI4x0wPIR/a1qezMGO5SQayFZZLt4CCRvbRdEKIxRvHube9leP9esMMLApYEpclXfNtq9Ths2JAjdahcxS++A6lcIShK5sdhOHSU4CTWMjh2y8Y32X4/1NlIO6LPxKCyeQZuGGHBgyJfnazT2jh2AwWET1nqU3Avf81KYwH5vYr3d5fkJdgfe/rnDYH5C3iGG7L20lFCrBnCEEf/q3SMhuux1KzjmTJ0GaXNNuhKY5I0/RAxqLXS0u1UI2ZuIOlV1qKBgsPb62USbG/FCiPLLTLGtfZARSo5bSsgEqcGxmhyvAPCZ8oOWrg96f3T3tu0HXKeHXijGbjw/rPIE0Mcc7rMvYraQcZ+YbPbXkNpPy+dyGGEeZeV4r8j1mO3ROI7M/CiTKjM/+6VOsiA2cabAZClCOi/X4flckdvlJBYvySNYHO6FVCTSMsWRflMWWOzFSGj2Q2X23a6TRaZQgT4H3FBymU6+ZWK67XcHijynTpAN527da44YTIHb2ON1J7kPYajNadDhCcl2bCO/SU4cLoV+qwiRrOVEOF6DSH7GDf0y1dM1aTTPCnkrdt9rGOw6BwmxuzfsB1aDQLgUZ36bRmYtoj3+uG5Os/0cRHT1z6XLCa+zHF4pwGQpOBD5S8tvFGdb0IIVq+k1y0CEoXaOWhRbAlP9QgN508D5EKC5p+t9+yyuiArGZzfl3O8NPc1nWHeDEMqUWfV/UKDm2oZUguhOE=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TkI3YmVqaUYxdks2eUtFMWppSFNuUlhSZ2h0cXBYczhzWHhERWZJNHVUb1Jj?=
+ =?utf-8?B?ZTRtcG5oemQ3djJJdlg4N2toNTN6bkZTTTJrbFYzOVNXYlRPSXVQRitURTRR?=
+ =?utf-8?B?WXNjTHJwQk1KcjhOZkZ1RnZOcHpOckQ2QnhXajAreGZrdHQ1eWwwaGpmdGZo?=
+ =?utf-8?B?ODl4aURGMldxcHUzeTl5aUVkZ2hsVENLcmJqOFhMSDJ5U1EzczBqazg1bXNZ?=
+ =?utf-8?B?NGlSYkUxM0RaSXE0ejgzaUNXVkVCWkszQ3FSUWdmQ1B2cFdRdGd3QUdmSWsv?=
+ =?utf-8?B?S25mSUJIUDNnYUpodVdpYXNyeEoxOW95TElFQnJsNGVtRU1VaDZGVXZncFY4?=
+ =?utf-8?B?bWpYa1diMnkzcXBmOEhjdmQxTzNkQWVrRmtVaTl6dC9OTmNuOU84UTNOYU1u?=
+ =?utf-8?B?d0NZR2VLZDJ1R0xtaDFmcklabDY0a1BVaU5FbWorOEVtdDRSNDB5UVd1S21m?=
+ =?utf-8?B?UG5rL0ZRQ0Rpa3BsTVhZRGw4aWwrejBMOG5LdUZoSmhOQWduUHB2Zks4YXlQ?=
+ =?utf-8?B?WElCSUp6RVYyWTRwU211RWdTa0g0cHJUUHV4dy9vT092ZFNBNGdjdU9TUEly?=
+ =?utf-8?B?YUtrZjllbGdJQmIyeU5MMVNtUkRZR2JBQ3BnTDArbXRldEsyei92d2N6d2p0?=
+ =?utf-8?B?K3kyY21BQlhvVWFEQ0djZ0VOcHlEREpvWm0zeXZVMXNqOG9uUE1MTmtBY3Ex?=
+ =?utf-8?B?TEd4Q2U3V21YU3ZORXh2UWxBc2FnS2NFb1AzVDlwekZzeWJmd0xrTElrVVBl?=
+ =?utf-8?B?c0U1SStvUlZiRlhISlpsYVZvTFUxdGVabEtVWks5UkxSdTFpYzQyNEprczRm?=
+ =?utf-8?B?WnhrTVE0UHVML0xaRDlpdFRXY1FKa2VRUFJIM0pVNGpyNTFpNEVBYUtWY1Y3?=
+ =?utf-8?B?bVZCUUExVFlqQnRhSm00SjJYMEZVZXhSUmdXUWROQ1hselFkdlM2aHpHL2Vz?=
+ =?utf-8?B?bGNJWUxyaXJGalZFdG5VdndzRHR0bVVrQm9QUHFvM0JSYVE3U0NRMUFqN2V3?=
+ =?utf-8?B?WW1DLzM3VW51dmU2cGQ5eFlsVEp2WGFaYW4xN2RXRDFucHd0Q3RuYUVRNFlR?=
+ =?utf-8?B?L3NsWG42Y0ZEUHFWc1R3UGxsWmg4OEZHdlFaVUtnYzZoMzJwQytUT2JIMXZJ?=
+ =?utf-8?B?WVBLSW91MFUySlFBTk9HeHpwdHY4WTRXN2dJMHRyTU4vY3Vwa0hSMHQzZ2JU?=
+ =?utf-8?B?aUVDcmJjNTVrZUgyVnRBNUZKYktuNGprUndLbW5QckRYUUVJNFdsN2o2ZXRU?=
+ =?utf-8?B?N0dRZWlaWUVCcE5lWC84eHdVblVGMFVmaEREMTJXL29MaGcyd1NaVXNsVkhK?=
+ =?utf-8?B?OS9nb00ySDBzdjhiVm9zRGtRTXcvZnBaSHNKamhGUHBCY3lFRnFWQy80dmFD?=
+ =?utf-8?B?dzRxdS92eGhqeWpMY1dSUHBhblBRYXhmK1VJKzVFdkdiMGFQamNncW15MHha?=
+ =?utf-8?B?VUUrUmVSd3hzQlhRS1hhOHY1dEhmZDZJNzVVQ0c1QkNtbXlDTjVMTmZrR2FK?=
+ =?utf-8?B?VWU1MFFrOFNOd1Q2d3FXOStndm9vY0swN2M1dFJURUlFVW5nMlZTbGtrTHEz?=
+ =?utf-8?B?STRESElhbkU3S2pOdVhsMmRIaXZ6QnplTkxzbk5mM29FMjAyTDdVOS9YSjhP?=
+ =?utf-8?B?MXU2VXF2MXhTMWhENXY2cDNFQWZ0VHVmdDFiTkJrSE5UOXFXekJtNVJwT3lz?=
+ =?utf-8?B?TllGVDNTL3hSQWR2a2NOZ0FRNW1oMXlCZVF6LzJIaUpGT3NpQlFIZjFYQ3Rq?=
+ =?utf-8?B?a0dMTmtOR2hLN1NUTWRpWWhqQzg1MDhoUVhkam1jUDhqM004VVhKVE41djNv?=
+ =?utf-8?B?VXF3TGNwZU5xVXNjNTdnOUsyZllpVExpMlY4RDNrRDduVHhyTDJSaUI0VjhL?=
+ =?utf-8?B?UWR4QXpLdHl5dHhUSkY2em5qaHdVSEtMYjVTMUlXelBtT2Q0V0J1cGxyZUV6?=
+ =?utf-8?B?UmhCTHFHOEVKektHTE1aVDh6QVRpTGpnSGpYQlZ4RHVEV0QrU0Z1U0QwNTNX?=
+ =?utf-8?B?TDJlOGR1SXA4K2xtWHF2aGxncHBJV1BDVDJPVGR3WkVvSURlWHFwNWZZbGxn?=
+ =?utf-8?B?NDRHaGVCQ2owTDRGSjZCbElKTDA5MTBueDQzTGI0UlhCb3lRMFh6Um5ONUdL?=
+ =?utf-8?B?LzZhc2JNK3lxQm9iOHdMaFJwK01vQk11OFIvTkh0dW5CYXBibGljQzNtbzhC?=
+ =?utf-8?B?MDBFTXI5UDNaOE1lRVZaeVA0ZzRPQjM2SjZpWE5QSUk4TmZoeFhHN3IwWmI0?=
+ =?utf-8?B?RU02NDFaUW56UUtLMGMrc29UVFdldWpSYTRvRGtQdDNrOWxKU2V1QXJ6S0hB?=
+ =?utf-8?Q?cmUXtQZGRD600YRkEr?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f874b616-714c-46c9-7f12-08de75e7be79
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2026 10:05:33.0887
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /5pIozMZIUIGUR2ZxLVc9Gdc6arNylA+fwGXwVAJ86ZVsE2Hr44w1+bRp3xhrOKb
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5628
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[u-tokyo.ac.jp : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	TAGGED_FROM(0.00)[bounces-72134-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72135-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	R_DKIM_PERMFAIL(0.00)[rsg.ci.i.u-tokyo.ac.jp:s=rs20250326];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[rsg.ci.i.u-tokyo.ac.jp:~];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DKIM_TRACE(0.00)[amd.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[odaki@rsg.ci.i.u-tokyo.ac.jp,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.906];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[christian.koenig@amd.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rsg.ci.i.u-tokyo.ac.jp:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2A0DC1B576C
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:mid,amd.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:email]
+X-Rspamd-Queue-Id: 8B7C11B5DD2
 X-Rspamd-Action: no action
 
+On 2/26/26 21:22, Matt Evans wrote:
+> Add a new dma-buf ioctl() op, DMA_BUF_IOCTL_REVOKE, connected to a new
+> (optional) dma_buf_ops callback, revoke().  An exporter receiving this
+> will _permanently_ revoke the DMABUF, meaning it can no longer be
+> mapped/attached/mmap()ed.  It also guarantees that existing
+> importers have been detached (e.g. via move_notify) and all mappings
+> made inaccessible.
+> 
+> This is useful for lifecycle management in scenarios where a process
+> has created a DMABUF representing a resource, then delegated it to
+> a client process; access to the resource is revoked when the client is
+> deemed "done", and the resource can be safely re-used elsewhere.
 
+Well that means revoking from the importer side. That absolutely doesn't make sense to me.
 
-On 2026/02/27 8:05, Oliver Upton wrote:
-> On Thu, Feb 26, 2026 at 11:47:54PM +0900, Akihiko Odaki wrote:
->> On 2026/02/26 23:43, Akihiko Odaki wrote:
->>> On 2026/02/26 20:54, Oliver Upton wrote:
->>>> Hi Akihiko,
->>>>
->>>> On Wed, Feb 25, 2026 at 01:31:15PM +0900, Akihiko Odaki wrote:
->>>>> @@ -629,6 +629,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu
->>>>> *vcpu, int cpu)
->>>>>            kvm_vcpu_load_vhe(vcpu);
->>>>>        kvm_arch_vcpu_load_fp(vcpu);
->>>>>        kvm_vcpu_pmu_restore_guest(vcpu);
->>>>> +    if (test_bit(KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY,
->>>>> &vcpu- >kvm->arch.flags))
->>>>> +        kvm_make_request(KVM_REQ_CREATE_PMU, vcpu);
->>>>
->>>> We only need to set the request if the vCPU has migrated to a different
->>>> PMU implementation, no?
->>>
->>> Indeed. I was too lazy to implement such a check since it won't affect
->>> performance unless the new feature is requested, but having one may be
->>> still nice.
-> 
-> I'd definitely like to see this.
-> 
->>>>
->>>>>        if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
->>>>>            kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
->>>>> @@ -1056,6 +1058,9 @@ static int check_vcpu_requests(struct
->>>>> kvm_vcpu *vcpu)
->>>>>            if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
->>>>>                kvm_vcpu_reload_pmu(vcpu);
->>>>> +        if (kvm_check_request(KVM_REQ_CREATE_PMU, vcpu))
->>>>> +            kvm_vcpu_create_pmu(vcpu);
->>>>> +
->>>>
->>>> My strong preference would be to squash the migration handling into
->>>> kvm_vcpu_reload_pmu(). It is already reprogramming PMU events in
->>>> response to other things.
->>>
->>> Can you share a reason for that?
->>>
->>> In terms of complexity, I don't think it will help reducing complexity
->>> since the only common things between kvm_vcpu_reload_pmu() and
->>> kvm_vcpu_create_pmu() are the enumeration of enabled counters, which is
->>> simple enough.
-> 
-> I prefer it in terms of code organization. We should have a single
-> helper that refreshes the backing perf events when something has
-> globally changed for the vPMU.
-> 
-> Besides this, "create" is confusing since the vPMU has already been
-> instantiated.
-> 
->>> In terms of performance, I guess it is better to keep
->>> kvm_vcpu_create_pmu() small since it is triggered for each migration.
-> 
-> I think the surrounding KVM code for iterating over the counters is
-> inconsequential compared to the overheads of calling into perf to
-> recreate the PMU events. Since we expect this to be slow, we should only
-> set the request when absolutely necessary.
-
-I see. I'll squash it into kvm_vcpu_reload_pmu().
-
-> 
->>>>> +static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc)
->>>>> +{
->>>>> +    struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
->>>>> +
->>>>> +    return kvm_pmu_enabled_counter_mask(vcpu) & BIT(pmc->idx);
->>>>>    }
->>>>
->>>> You're churning a good bit of code, this needs to happen in a separate
->>>> patch (if at all).
->>>
->>> It makes sense. The next version will have a separate patch for this.
-> 
-> If I have the full picture right, you may not need it with a common
-> request handler.
-
-I think I'm going to use it to check if the vCPU is covered by the perf 
-events currently enabled before requesting KVM_REQ_RELOAD_PMU.
-
-> 
->>>>
->>>>> @@ -689,6 +710,14 @@ static void
->>>>> kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
->>>>>        int eventsel;
->>>>>        u64 evtreg;
->>>>> +    if (!arm_pmu) {
->>>>> +        arm_pmu = kvm_pmu_probe_armpmu(vcpu->cpu);
->>>>
->>>> kvm_pmu_probe_armpmu() takes a global mutex, I'm not sure that's what we
->>>> want.
->>>>
->>>> What prevents us from opening a PERF_TYPE_RAW event and allowing perf to
->>>> work out the right PMU for this CPU?
->>>
->>> Unfortunately perf does not seem to have a capability to switch to the
->>> right PMU. tools/perf/Documentation/intel-hybrid.txt says the perf tool
->>> creates events for each PMU in a hybird configuration, for example.
->>
->> I think I misunderstood what you meant. Letting
->> perf_event_create_kernel_counter() to figure out what a PMU to use may be a
->> good idea. I'll give a try with the next version.
-> 
-> Yep, this is what I was alluding to.
-
-I tried this, but unfortunately it didn't work well. Simply using 
-PERF_TYPE_RAW let perf_event_create_kernel_counter() choose an arbitrary 
-PMU, potentially not covering the current PCPU.
-
-We can change the cpu parameter of the function to fix this, but it 
-binds the perf event to that particular PCPU and requires recreating 
-perf event when migrating to another PCPU covered by the same PMU.
-
-I think I'm going to use RCU to avoid locking a global mutex.
-
-> 
->>>
->>>>
->>>>> +        if (!arm_pmu) {
->>>>> +            vcpu_set_on_unsupported_cpu(vcpu);
->>>>
->>>> At this point it seems pretty late to flag the CPU as unsupported. Maybe
->>>> instead we can compute the union cpumask for all the PMU implemetations
->>>> the VM may schedule on.
->>>
->>> This is just a safe guard and it is a responsibility of the userspace to
->>> schedule the VCPU properly. It is conceptually same with what
->>> kvm_arch_vcpu_load() does when migrating to an unsupported CPU.
-> 
-> I agree with you that we need to have some handling for this situation.
-> 
-> What I don't like about this is userspace doesn't discover its mistake
-> until the guest actually programs a PMC. I'd much rather preserve the
-> existing ABI where KVM proactively rejects running a vCPU on an
-> unsupported CPU.
-
-Thanks for explanation. I'll change this with the next version.
-
-> 
->>>>> +    case KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY:
->>>>> +        lockdep_assert_held(&vcpu->kvm->arch.config_lock);
->>>>> +        if (test_bit(KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY,
->>>>> &vcpu->kvm->arch.flags))
->>>>> +            return 0;
->>>>
->>>> We don't need a getter for this, userspace should remember how it
->>>> provisioned the VM.
->>>
->>> The getter is useful for debugging and testing. The selftest will use it
->>> to query the current state.
-> 
-> That's fine for debugging this on your own kernel but we don't need it
-> upstream. There's several other vPMU attributes that are write-only,
-> like KVM_ARM_VCPU_PMU_V3_SET_PMU.
-
-Not just for debugging kernel, but it will be useful for userspace 
-debugging.
-
-Indeed there are other readonly attributes, but there is also an 
-attribute with getter: KVM_ARM_VCPU_PMU_V3_IRQ. I think there are more 
-if you look at a scope broader than the KVM_ARM_VCPU_PMU_V3_CTRL group, 
-and such existing getters for read/write attributes are probably only 
-useful for kernel/userspace debugging either. I think having a getter 
-can be justified, given that these preexisting examples.
+Why would you do that?
 
 Regards,
-Akihiko Odaki
+Christian.
+
+> 
+> Signed-off-by: Matt Evans <mattev@meta.com>
+> ---
+>  drivers/dma-buf/dma-buf.c    |  5 +++++
+>  include/linux/dma-buf.h      | 22 ++++++++++++++++++++++
+>  include/uapi/linux/dma-buf.h |  1 +
+>  3 files changed, 28 insertions(+)
+> 
+> diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
+> index edaa9e4ee4ae..b9b315317f2d 100644
+> --- a/drivers/dma-buf/dma-buf.c
+> +++ b/drivers/dma-buf/dma-buf.c
+> @@ -561,6 +561,11 @@ static long dma_buf_ioctl(struct file *file,
+>         case DMA_BUF_IOCTL_IMPORT_SYNC_FILE:
+>                 return dma_buf_import_sync_file(dmabuf, (const void __user *)arg);
+>  #endif
+> +       case DMA_BUF_IOCTL_REVOKE:
+> +               if (dmabuf->ops->revoke)
+> +                       return dmabuf->ops->revoke(dmabuf);
+> +               else
+> +                       return -EINVAL;
+> 
+>         default:
+>                 return -ENOTTY;
+> diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
+> index 0bc492090237..a68c9ad7aebd 100644
+> --- a/include/linux/dma-buf.h
+> +++ b/include/linux/dma-buf.h
+> @@ -277,6 +277,28 @@ struct dma_buf_ops {
+> 
+>         int (*vmap)(struct dma_buf *dmabuf, struct iosys_map *map);
+>         void (*vunmap)(struct dma_buf *dmabuf, struct iosys_map *map);
+> +
+> +       /**
+> +        * @revoke:
+> +        *
+> +        * This callback is invoked from a userspace
+> +        * DMA_BUF_IOCTL_REVOKE operation, and requests that access to
+> +        * the buffer is immediately and permanently revoked.  On
+> +        * successful return, the buffer is not accessible through any
+> +        * mmap() or dma-buf import.  The request fails if the buffer
+> +        * is pinned; otherwise, the exporter marks the buffer as
+> +        * inaccessible and uses the move_notify callback to inform
+> +        * importers of the change.  The buffer is permanently
+> +        * disabled, and the exporter must refuse all map, mmap,
+> +        * attach, etc. requests.
+> +        *
+> +        * Returns:
+> +        *
+> +        * 0 on success, or a negative error code on failure:
+> +        * -ENODEV if the associated device no longer exists/is closed.
+> +        * -EBADFD if the buffer has already been revoked.
+> +        */
+> +       int (*revoke)(struct dma_buf *dmabuf);
+>  };
+> 
+>  /**
+> diff --git a/include/uapi/linux/dma-buf.h b/include/uapi/linux/dma-buf.h
+> index 5a6fda66d9ad..84bf2dd2d0f3 100644
+> --- a/include/uapi/linux/dma-buf.h
+> +++ b/include/uapi/linux/dma-buf.h
+> @@ -178,5 +178,6 @@ struct dma_buf_import_sync_file {
+>  #define DMA_BUF_SET_NAME_B     _IOW(DMA_BUF_BASE, 1, __u64)
+>  #define DMA_BUF_IOCTL_EXPORT_SYNC_FILE _IOWR(DMA_BUF_BASE, 2, struct dma_buf_export_sync_file)
+>  #define DMA_BUF_IOCTL_IMPORT_SYNC_FILE _IOW(DMA_BUF_BASE, 3, struct dma_buf_import_sync_file)
+> +#define DMA_BUF_IOCTL_REVOKE   _IO(DMA_BUF_BASE, 4)
+> 
+>  #endif
+> --
+> 2.47.3
+> 
+
 
