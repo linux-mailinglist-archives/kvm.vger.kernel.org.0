@@ -1,233 +1,184 @@
-Return-Path: <kvm+bounces-72195-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72196-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oCHfBErSoWlLwgQAu9opvQ
-	(envelope-from <kvm+bounces-72195-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 18:20:10 +0100
+	id GNHTC/rUoWlcwgQAu9opvQ
+	(envelope-from <kvm+bounces-72196-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 18:31:38 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A67951BB5D3
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 18:20:09 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 460E41BB7BE
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 18:31:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 487F63028B5B
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 17:20:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 09BFB301EA06
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 17:31:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4198A361DC5;
-	Fri, 27 Feb 2026 17:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69DD43E4AE;
+	Fri, 27 Feb 2026 17:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HHFpTT3c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oph6hK87"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455783F23AA
-	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 17:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772212803; cv=pass; b=kTPuxsipPUv8ulubhRVZ5OUcuebdYQtFJZcNYx/gEoLLzi5T3IHesFgUelX9Cw/MeRoVn9lZl5ONkBhutcRv6As4eyFoEcb7D5lwDG9kcNpMSAqPlUL+LvCm1PngF+lNoHt8xrBJk1SHftFkwkEuXm1w1ryOo5TJddJUCV4d+hM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772212803; c=relaxed/simple;
-	bh=SSENmwLLmfNwcsRg3YsbfFMJCVOVJDpYAbDWxLRiUJo=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E0641323A
+	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 17:31:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772213489; cv=none; b=totJIHeoWcU1tAlRC6Chw4bmzFYdEht7kyOTyD1K2kVjPTwzjyepSDphrEEZSfxU2gUx2dNpGheujM5VjgwzmJiAdChQRWY4WoyPKeFE9xNZcm4IBACsypsG8CQTf7csRH/ivvFhlOjhGTPy+b8jBJqEzrIX6w2wZ5rzrm03Yyk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772213489; c=relaxed/simple;
+	bh=C6T8tz1soUsu6cnsTKtI/JKwGT41nE+6WjgOze/17EM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WNjBG7GAiUCWlPkxPG3PoY/SydWRvjQLOcHmuLLcRZFbaSwkGhLdJvQcfveyP1gr6ZYbpma4W9m26fEsb/Phhr8IJouek/8t++V9bJhh8gAev1FsDebvdOtqtyfMj+UZmsD8UXM4HgeMswWeQwOIo/nypie2vDVf53jrXBlAN1w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HHFpTT3c; arc=pass smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-3870acaf78eso1363571fa.2
-        for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 09:20:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772212798; cv=none;
-        d=google.com; s=arc-20240605;
-        b=k081M/I1NibZGIj/kq/Zt2uuYGkjjQWuV6sGeY2rC9AaBl0H9guBQY51Sw05qfYDPZ
-         Mf2/IwR2bsydoHgMhNJ2tYz8aym3ktDCAHDhLadiTsY+ECa7zk/ZUpU+HKIEJEjqVxzQ
-         ZUesiItoT84IAvIMnlnfgu9YIChePLifVl7vZndK4AQ1FT2/hVaWGmK6upwKJckr3/pO
-         hCYtZRdJ+gv10icNEWr06MXFeHbvLplZKAV7MxLvbEVtUZtPUSdPnLkYmoqyrRXqazxg
-         FV9aIs/c1yYwkU6wdGXGd4BimqGpvSd7GIe6cximZIOsaoBTV9Ko3mUjOGCx6BR+mO+z
-         TkAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=TlM+Kfuyp7z6KhXNl7/hdctuf7el0QWvoUeGk1mQs2Q=;
-        fh=BA8kaqfhMqcWbhLF6vRY1eoV1xvd8GEMEInLQ5t/Ztc=;
-        b=BSFBQ4/Nju+m0sSKiTCXKGyvbBs7aYilev+ZG+fHGVo20IIL7ibW3M01FmpXA34OUX
-         bDXzzD30jp/fR1vx04vngvpOC69D86TyJas9CuBv5hFTvjjchzJkLZHV0ed6DVH+Qqf/
-         SBAULIekdLg/PHU5BoiKEQzCFG79JFHOSCeP42hHsrpun2Pgl8JejwNzHWN7DRHBdtTQ
-         N7k3odEoBEvnxxcFPLqducMtD0lHDj+rnM7c4Hq0f7jX1ceVWsoIlY1LJu5O/pFcvBim
-         ZWNhayZOBYQCTBouOUr/CJ/ZC98cnPTK6ibTa9xYKxWX9DMnWxs9LP8t8YYkoyOrOLuw
-         Vp2A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772212798; x=1772817598; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TlM+Kfuyp7z6KhXNl7/hdctuf7el0QWvoUeGk1mQs2Q=;
-        b=HHFpTT3c9vcvzJ3vVCMKu7JawFYgDIREzI+Q/pn48bejMi8S305zspNJdAZhTcixqt
-         ORuLPealSeMmf7TSqbFA+Y3jHgipjhOsfgImPNTkWoxuekKsmaBHFF7KJ7ROyAHHJs8x
-         UqNFbkk4dBP54X3yDV1ktfH+gaoQ7dxdNmvVov/DrCkPw/orQrQ2SWpYWQwKbQY+h69c
-         8swnMFVs7FafFJfAClz0HhRXDlerQjO4rLhG7QXIwcKFjsJEj9owe/5unM0+qOdZYBsJ
-         RhNt8ZD6lCoXGlSkQRNf/GU3UQVOLxTzRh2AdkKAtgrtqLdgEVUkryPPbxSlU5tQIdBh
-         A5rQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772212798; x=1772817598;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=TlM+Kfuyp7z6KhXNl7/hdctuf7el0QWvoUeGk1mQs2Q=;
-        b=Vp7W5KeImKY6saRmo76NIQrwDzBQZ4pbAduAo9OASlQiwMz+3AY/6JAZ7OVnMXv60g
-         MgkrsNf2tg1Q7PQxQ4a6977tul7cRPkztOA50bpSKVMkidaMO7VPvYtqC3S3snwjd440
-         Bexs+nNk+fQEY4rJ1Z+/lTdpZ/XFEdNduT1FuL7ubuvn0mFXq1Z2EH4bU08YPwe3qRw3
-         +lYb1TbOInJAjHICcZLJZHVcJa1SXZ0EokoA3tiikv/gFlFpqTGN/84aNQDyFWll3RvX
-         Am/mjpS0msErYNTQRxMZNvKz/81s62Z1T+GA0jJGOFZg6cEciAs4GGx0v9YOVQaRKiwm
-         flKA==
-X-Forwarded-Encrypted: i=1; AJvYcCU1oXyRYoJje3RXSnOxBUmldLM5HhvHDs5eTXO+0dIRozV1c4FndUK15HBGFYboo7cdIVQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxFDQey4NZWE/nwCpk/LjPhwDm3QX88uaLMkt1V2unmh0hOAcr
-	DRjie5/72uXG+v09OpGewclcauuky2Ul01w2A3fuY9W9Mcn+wcsYxfx4EBrl9Cf0kJrpMEozMlr
-	vvkM2KLnkggWPVEKzTFbjMhGcfs1UuXFMMtgCjK8W
-X-Gm-Gg: ATEYQzyLatkzbecjQhEkh/A8tI2a+Gxpd0Et94JubCHCuOL4WzsTfYhkqj24NK7ILdV
-	yrlg8KqX+dSZlSoxNG+/3gsewEVeb+e0rsRvO42/BcAbEksUtC0P1A9NOAayv+CppiKqJ+l0sUG
-	UQ5r/OqciV6EwuxRZmUrw7Nv8IBhc+mPGmmaX9yQ6DCuEVae2hUyUkbbIo2xK6UGhUia4ZwxMXQ
-	VlyA+/3gDroUxbg1nAH0PE+kDPA9Bm9vUvXoOGAW9d+d4gKp8ME+9+8if1M/5NSi3OTDd2UpATh
-	juFuC44=
-X-Received: by 2002:a05:651c:f17:b0:385:d0b6:6c44 with SMTP id
- 38308e7fff4ca-389ff14567amr23252321fa.18.1772212798094; Fri, 27 Feb 2026
- 09:19:58 -0800 (PST)
+	 To:Cc:Content-Type; b=edvP/5mIh3s0dQdA8TRPxUR8xg9NOTLQ33J5K/NQ44XK0IdSUsDLP1rPvz1+kfRPqoJJfTIX2Bxm5lD5GkMFDkXLnJZPLddIaOnP7w8AlCcjjURGMkpOjd4xXo3FTIiKds3eR0y2mAXwiMVKk+2M9fF9LUwLhphwG+XFNeGJqgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oph6hK87; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD8BCC2BC86
+	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 17:31:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772213488;
+	bh=C6T8tz1soUsu6cnsTKtI/JKwGT41nE+6WjgOze/17EM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=oph6hK87oJSuPRhD/qUxpe/b8Lj/Mjg3hvrURczorg8UiIb5X+noxwcBNrzTmvSJc
+	 J6IBgcQP8hgUKkd+dqopg3BLZlqldP+GFOqcpSt7m3UIZ2y4WTl9qyAtLHfdH32tJq
+	 /Ve3hDPgTCdOW9W207+5Bi1JWnC9ib6wjdtLWRmH4SsaQDVy8WjTACjhMpRhCUmZhC
+	 qUBWozLga+9KYHQYAq9gVk4X66xdcerZchkKh2nG6nLMPt/55q6J2PHczsd70fEr2G
+	 92y5mo45jewe2uU4xDU22tTBWIxwt+DhOzeLmJx4x/aP1cv5EBh7V1N904dTFHlNw7
+	 W43ZzmuJsJSxA==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b8f8d80faebso552151366b.1
+        for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 09:31:28 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU91loO7+pHK/X2BhVl6Wltmkc4goBDEwothWBqqXf63MejxvcNJ6AVpmMGWhMxb0KC0BA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzitnjjjbozahK8CSeaIeqHOKihJ88L3pUzwE5MpXnNdhqmbSLI
+	d3ODUcWXeybmmb0Y99y272OxJ/uE6G8m6oOSzRf1K7Tt5aQF0L6tY3fJJYKV8gkmQjfuhYDMK+H
+	yERfGF1N6wjui8b9PrRHf314RheJgl6Y=
+X-Received: by 2002:a17:907:78e:b0:b8f:dec3:6606 with SMTP id
+ a640c23a62f3a-b937595fe4bmr211466366b.23.1772213487650; Fri, 27 Feb 2026
+ 09:31:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260129212510.967611-3-dmatlack@google.com> <20260225224651.GA3711085@bhelgaas>
- <aZ-TrC8P0tLYhxXO@google.com> <20260227093233.45891424@shazbot.org>
-In-Reply-To: <20260227093233.45891424@shazbot.org>
-From: David Matlack <dmatlack@google.com>
-Date: Fri, 27 Feb 2026 09:19:28 -0800
-X-Gm-Features: AaiRm514TJvedInAnynD285P6RuOXX1FfRIbxiQr5Hc2znqJUuMLjDSPlZjM6yI
-Message-ID: <CALzav=dxthSXYo13rOjY710uNbu=6UjzD-OJKm-Xt=wR7oc0mg@mail.gmail.com>
-Subject: Re: [PATCH v2 02/22] PCI: Add API to track PCI devices preserved
- across Live Update
-To: Alex Williamson <alex@shazbot.org>
-Cc: Bjorn Helgaas <helgaas@kernel.org>, Adithya Jayachandran <ajayachandra@nvidia.com>, 
-	Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>, Alistair Popple <apopple@nvidia.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Ankit Agrawal <ankita@nvidia.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>, 
-	David Rientjes <rientjes@google.com>, Jacob Pan <jacob.pan@linux.microsoft.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, 
-	Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org, 
-	kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, 
-	linux-pci@vger.kernel.org, Lukas Wunner <lukas@wunner.de>, 
-	=?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>, 
-	Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>, 
-	Pasha Tatashin <pasha.tatashin@soleen.com>, Pranjal Shrivastava <praan@google.com>, 
-	Pratyush Yadav <pratyush@kernel.org>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Rodrigo Vivi <rodrigo.vivi@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, Shuah Khan <skhan@linuxfoundation.org>, 
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
-	Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>, 
-	Vivek Kasireddy <vivek.kasireddy@intel.com>, William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>, 
-	Zhu Yanjun <yanjun.zhu@linux.dev>
+References: <20260227011306.3111731-1-yosry@kernel.org> <20260227011306.3111731-4-yosry@kernel.org>
+ <aaG_o58_0aHT8Xjg@google.com> <aaHHg2-lcpvkejB8@google.com>
+In-Reply-To: <aaHHg2-lcpvkejB8@google.com>
+From: Yosry Ahmed <yosry@kernel.org>
+Date: Fri, 27 Feb 2026 09:31:16 -0800
+X-Gmail-Original-Message-ID: <CAO9r8zMdyvAJUvnxH0Scb6z3L51Djb1qpMAzX3M9g7hOkB=ZOQ@mail.gmail.com>
+X-Gm-Features: AaiRm50LdGDBRhphUfqO8tjiam6xc4hFPaBeXGbA_XGXTLbFbW6mNF4UMfTipAg
+Message-ID: <CAO9r8zMdyvAJUvnxH0Scb6z3L51Djb1qpMAzX3M9g7hOkB=ZOQ@mail.gmail.com>
+Subject: Re: [PATCH 3/3] KVM: x86: Check for injected exceptions before
+ queuing a debug exception
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72195-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[45];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-72196-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,shazbot.org:email,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: A67951BB5D3
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 460E41BB7BE
 X-Rspamd-Action: no action
 
-On Fri, Feb 27, 2026 at 8:32=E2=80=AFAM Alex Williamson <alex@shazbot.org> =
-wrote:
+On Fri, Feb 27, 2026 at 8:34=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
-> On Thu, 26 Feb 2026 00:28:28 +0000
-> David Matlack <dmatlack@google.com> wrote:
-> > > > +static int pci_flb_preserve(struct liveupdate_flb_op_args *args)
-> > > > +{
-> > > > + struct pci_dev *dev =3D NULL;
-> > > > + int max_nr_devices =3D 0;
-> > > > + struct pci_ser *ser;
-> > > > + unsigned long size;
-> > > > +
-> > > > + for_each_pci_dev(dev)
-> > > > +         max_nr_devices++;
-> > >
-> > > How is this protected against hotplug?
+> On Fri, Feb 27, 2026, Sean Christopherson wrote:
+> > So instead of patch 1, I want to try either (a) blocking KVM_SET_VCPU_E=
+VENTS,
+> > KVM_X86_SET_MCE, and KVM_SET_GUEST_DEBUG if nested_run_pending=3D1, *an=
+d* follow-up
+> > with the below WARN-spree, or (b) add a separate flag, e.g. nested_run_=
+in_progress
+> > or so, that is set with nested_run_pending, but cleared on an exit to u=
+serspace,
+> > and then WARN on _that_, i.e. so that we can detect KVM bugs (the whole=
+ point of
+> > the WARN) and hopefully stop playing this losing game of whack-a-mole w=
+ith syzkaller.
+
+I like the idea of the WARN there, although something in the back of
+my mind tells me I went through this code before with an exception in
+mind that could be injected with nested_run_pending=3D1, but I can't
+remember it. Maybe it was injected by userspace and all is good.
+
+That being said, I hate nested_run_in_progress. It's too close to
+nested_run_pending and I am pretty sure they will be mixed up.
+
+exception_from_userspace's name made me think this is something we
+could key off to WARN, but it's meant to morph queued exceptions from
+userspace into an "exception_vmexit" if needed. The field name is
+generic but its functionality isn't, maybe it should have been called
+exception_check_vmexit or something. Anyway..
+
+That gave me an idea though, can we add a field to
+kvm_queued_exception to identify the origin of the exception
+(userspace vs. KVM)? Then we can key the warning off of that.
+
+We can potentially also avoid adding the field and just plumb the
+argument through to kvm_multiple_exception(), and WARN there if
+nested_run_pending is set and the origin is not userspace?
+
 > >
-> > Pranjal raised this as well. Here was my reply:
+> > I think I'm leaning toward (b)?  Except for KVM_SET_GUEST_DEBUG, where =
+userspace
+> > is trying to interpose on the guest, restricting ioctls doesn't really =
+add any
+> > value in practice.  Yeah, in theory it could _maybe_ prevent userspace =
+from shooting
+> > itself in the foot, but practically speaking, if userspace is restoring=
+ state into
+> > a vCPU with nested_run_pending=3D1, it's either playing on expert mode =
+or is already
+> > completely broken.
 > >
-> > .  Yes, it's possible to run out space to preserve devices if devices a=
-re
-> > .  hot-plugged and then preserved. But I think it's better to defer
-> > .  handling such a use-case exists (unless you see an obvious simple
-> > .  solution). So far I am not seeing preserving hot-plugged devices
-> > .  across Live Update as a high priority use-case to support.
-> >
-> > I am going to add a comment here in the next revision to clarify that.
-> > I will also add a comment clarifying why this code doesn't bother to
-> > account for VFs created after this call (preserving VFs are explicitly
-> > disallowed to be preserved in this patch since they require additional
-> > support).
+> > My only hesitation with (b) is that KVM wouldn't be entirely consistent=
+, since
+> > vmx_unhandleable_emulation_required() _does_ explicitly reject a "users=
+pace did
+> > something stupid with nested_run_pending=3D1" case.  So from that persp=
+ective, part
+> > of me wants to get greedy and try for (a).
 >
-> TBH, without SR-IOV support and some examples of in-kernel PF
-> preservation in support of vfio-pci VFs, it seems like this only
-> supports a very niche use case.
+> On second (fifth?) thought, I don't think (a) is a good idea.  In additio=
+n to
+> potentially breaking userspace, it also risks preventing genuinely useful=
+ sequences.
+> E.g. even if no VMM does so today, it's entirely plausible that a VMM cou=
+ld want
+> to asynchronously inject an #MC to mimic a broadcast, and that the inject=
+ion could
+> collide with a pending nested VM-Enter.
+>
+> I'll send a separate (maybe RFC?) series for (b) using patch 1 as a start=
+ing point.
+> I want to fiddle around with some ideas, and it'll be faster to sketch th=
+ings out
+> in code versus trying to describe things in text.
 
-The intent is to start by supporting a simple use-case and expand to
-more complex scenarios over time, including preserving VFs. Full GPU
-passthrough is common at cloud providers so even non-VF preservation
-support is valuable.
-
-> I expect the majority of vfio-pci
-> devices are VFs and I don't think we want to present a solution where
-> the requirement is to move the PF driver to userspace.
-
-JasonG recommended the upstream support for VF preservation be limited
-to cases where the PF is also bound to VFIO:
-
-  https://lore.kernel.org/lkml/20251003120358.GL3195829@ziepe.ca/
-
-Within Google we have a way to support in-kernel PF drivers but we are
-trying to focus on simpler use-cases first upstream.
-
-> It's not clear,
-> for example, how we can have vfio-pci variant drivers relying on
-> in-kernel channels to PF drivers to support migration in this model.
-
-Agree this still needs to be fleshed out and designed. I think the
-roadmap will be something like:
-
- 1. Get non-VF preservation working end-to-end (device fully preserved
-and doing DMA continuously during Live Update).
- 2. Extend to support VF preservation where the PF is also bound to vfio-pc=
-i.
- 3. (Maybe) Extend to support in-kernel PF drivers.
-
-This series is the first step of #1. I have line of sight to how #2
-could work since it's all VFIO.
+So you'll apply patch 3 as-is, drop patch 2, and (potentially) take
+patch 1 and build another series on top of it?
 
