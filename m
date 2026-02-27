@@ -1,155 +1,164 @@
-Return-Path: <kvm+bounces-72116-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72117-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4MBQO1XloGm/nwQAu9opvQ
-	(envelope-from <kvm+bounces-72116-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 01:29:09 +0100
+	id IPG+AoPooGndnwQAu9opvQ
+	(envelope-from <kvm+bounces-72117-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 01:42:43 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B32B31B1387
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 01:29:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50EB31B144C
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 01:42:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1BD5A3052456
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 00:29:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8AE353046538
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 00:42:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B579262FFC;
-	Fri, 27 Feb 2026 00:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 163B327381E;
+	Fri, 27 Feb 2026 00:42:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cFt612R7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b8NZluiR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E7C23D283
-	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 00:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E9026B2D2
+	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 00:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772152136; cv=none; b=GprN8l5FvsGvbSQ/2WHaHyj0O0OBpTHtYVkSy0BkLUr68oJjxFQsZ7ekCN121DCD+3GjFFjlbPCcJZ4ntb/30vuab68PvtDEZAVxjrpW70W60pZTAlQgvYtRreWFfkEa+dxBGwMbswM9dHtcyB1uDp/QfMALli/YJ480c6BTwGc=
+	t=1772152954; cv=none; b=WybUzzcsPu/tIk285WFaQfnlOq6Kyqp+8Mm4jl+N0dJlB58rdADOA3Qdjsu5ttp6wGdHiO2Ujz8lVH0tJDKDbyEHTZnHqeydZyb3yDUqgjeoNFV65/tsmSRRGEdVZTysOBXaHRYPNGy3+I15NziUIceg0Io/VZ3+Dx8X3Iz+yHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772152136; c=relaxed/simple;
-	bh=lEB97ADOecWVEVe02PkREEzKIO4xAqb815Ec9Z1vUj8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bnBCD9VLjaxpIxIwMZqcTc2KseLHIkGTtlX4LM42LpZeKoc8k8ou5keGdUWYFme4P7hGHJsowdn6Ntxz5DwgG7K6QEYxjN+DLVfO1oxznacJEBy8so31hOoeDhs80vDzZVmYobUi+s49/B1wty6tvVy3d/wv2D9WT/YiK9QH8gE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cFt612R7; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2adb1bdf778so14023575ad.3
-        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 16:28:55 -0800 (PST)
+	s=arc-20240116; t=1772152954; c=relaxed/simple;
+	bh=MVhpYkWxt+UA+IFF0kimPBU094n6yJhh4+GeSctGQJ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ny1IZyPd7QJgTglL39EEPjdyorzfcIBMzJluhl8EXt0AY6+zbXUz7MmaRJs1ivlvWn+Lq2Vl4ejjuYfT4wyh5NAXmkd6s1JMF+ZNhhGP9cOZWjXjTEd7gvrwAki2d6d1LzzwAQvGcoeE3ToHvd3QF2omUj5izza6i6rnTrRIr3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b8NZluiR; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-8274843810cso443023b3a.3
+        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 16:42:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772152135; x=1772756935; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=F6kmoc5vi0J5hNeqO/ZaE6q23lfiWCinIzXvzDb0g9U=;
-        b=cFt612R7C/SZiD5tQXAgw9gu2vWba6CiFLQXAUjRWAVoz9hvwZNcxqRDNZcjwyQjtl
-         uzsFkWY0ZqNnSsdyU/4QsFaH7J8idPV/m99ZcxRgZNW9yXQcEILZ3RejQY+uNcd6hfB1
-         ybU2w/qO212e5zAepgo1yp9y5WBtWY9KC+cYJRvnRz7GwbJxfpvoxw0iNCOqmm/ZY3id
-         3Flllr5e6uh+aTlPvZxmUx9CzLeLpUXuigQheR2K6NBHzgkuL0/YGc9/f1IkC7iCaVix
-         JB7wIg68IrJGrrhdCvphuc6cRLh386NTafgIAaN0XgSwv3FKBuzMH6wWNLa3xat0/PAY
-         h1rg==
+        d=gmail.com; s=20230601; t=1772152952; x=1772757752; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CivCSSXjOn0EK8t0pg9P9WXCoBW641fvR8TqbUzXcro=;
+        b=b8NZluiRIpU7flFgTvh/j7hKMm9T8QDwUvOkWugJwb3aU8rfijKHry+eKlovVr2zwD
+         Y1wBdb19Iu+ZbfkSu6wj1Ru5BoJMYaLLoPbExHi21mfGRxcGKj8EtPYcn0HLKS4LrDd0
+         h9SS/V8N1yQD7ebf1Y8dC0nY7Wqq8jZr2DSIVgO6Hf8MBgxZhpwfpYHGdwROSfFPTwI3
+         uNparyofTz2vQ8Vtj6bxA1MpTeDnwThMdpIKMYHd+2kHO6k6xfbK69E/bUlSBIlZrTt2
+         uXQlEAIE3czLOzw8+YPGDNy8yYKSCn4ynI5F4d0UJoiHrw3sUPtTYJ7nBZUSWvik72OF
+         Xm1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772152135; x=1772756935;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F6kmoc5vi0J5hNeqO/ZaE6q23lfiWCinIzXvzDb0g9U=;
-        b=kIewkmwDgIWwTZ5ILUBUrVkNGtR6hzT9ENeNu+UlJq6RWYNa2O3rWXOKPSQMIO/S1p
-         glob8r5Gq1MipaLfN+bC6gSeDelTA+XE994OJ1Ot2R1y2378gKUgMWJfEvvIYJ9y1B/c
-         e8DWqGSfRd0dbyyBty/SHLgANydpQ5Wrtn4PJLyOm89HOlJc0v1chzwjiGhY3Daf2n9f
-         pNe72AH2EKZUbX9LQrbJaq6Beivwxu7E9V8jr52yAqIgkkPlIAHipHtjTVnRYWNg1ss3
-         dhkICCLQBnMWsuTO+mMTeSG5XIC/9iyT9mnz+k4+5OOjGVXecT+MhOdfqN0agi9s09/H
-         vGAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVOJPljislKY1A1cf1tgnkLhkNrO39uo4xbWPFNNqC5B9FzrzZnWavDA5rop4cpRnGaE0w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVvnTD+IJ4KqCZILtRgZJixUhCSNiULTJw86LKohyl+iIc1J/Z
-	PeFIlPWU2xY/Ea78W0RGAgzN/eV1wtnKtW3IOdMRea4X+dUofCN2MJDavMsiniz8Ea39D8OqiG8
-	guFW6cw==
-X-Received: from plbmp13.prod.google.com ([2002:a17:902:fd0d:b0:2ad:c29c:618a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:22c2:b0:2a9:5c0b:e5d3
- with SMTP id d9443c01a7336-2ae2e40a0d8mr7490925ad.20.1772152134981; Thu, 26
- Feb 2026 16:28:54 -0800 (PST)
-Date: Thu, 26 Feb 2026 16:28:53 -0800
-In-Reply-To: <20260227002105.GC44359@ziepe.ca>
+        d=1e100.net; s=20230601; t=1772152952; x=1772757752;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CivCSSXjOn0EK8t0pg9P9WXCoBW641fvR8TqbUzXcro=;
+        b=NwjrdGYyGPrDgEK4ofB1P9qE7bSq5PyhitwfF5hcoQOkOitu3o2KEt349OQR14b1DU
+         gDMSEr1EjrQbXk5F2IjbpXIiESYKvSwR3dx/nq4/xSBfG2yMhu9F7a2XeTKt3R80spNp
+         02XCevHW/94pHCB85HYQ8INPJbqLsrIvhv3CCAnPoD/qWhzQSjd9hL3j8cWXf02A5c7L
+         hgngciwbLg3j09S5F7o8d8k2CQeNrW5l5+3xmwSD7WkrrWp/tGKC4dul8DDsZP5utnZJ
+         YppgCKnS5RFMPoXCfY6PBCp2LrXT7Su1vLICo891YKcJBvmth2slw6Ldn0LcSOZIsCb5
+         usPQ==
+X-Gm-Message-State: AOJu0YwytOplq3v/OZNP2ixXKl/0ayo/yYfroD4ur10XAx6bvQciXcL4
+	Q/1oQBpIfaGI6IKi5BgyL7Gp5Wg3KPe8qdWM8Ut6WYkBz4e6gcYrQYe9uWvk1X9yebfrLw==
+X-Gm-Gg: ATEYQzxi+txa9u/dFTjOpMO7+Bg4XLx6SlqAcdm6XvcG+5XQpBAtDQIjeJo9eUl32/p
+	2koqGJLdfKQ122IxIZPkE3N3u9Zog60d8mhITDP65u/r5q+YVgJj/271W3QnwV8wBNda2d+pTjA
+	u5mXRv7fYonxpAtOLHdJDU7vY/XcpK6Ep0gtie2faML8dzB4fKQ4LLPMrpR5mcM2PMia+GYSvH9
+	Fhqr/pUjgSt5dplDIRneNdfIzbx+XqyW4kSji3QVnsQm4+6y13qR6lc04X1Ge8SAb2DYD1tWYGK
+	xVJ/+XIMxYur/2bnI20K0emj8bH5yJIsTUU1eEDmSHbaGjxxYG727Pc9dwTgQMR2cfWc6gLNG5S
+	6uZ7QghCvLTWgph6KiOq0fvTT5eC1CSbT5fGL6rsb8N6q1VMGBPRG8tstWYYsR7HFKw5pom6sNK
+	UoyHhS0gTdz25uWRPlIUtQ38PRTYkOsaU9SYwTGw==
+X-Received: by 2002:a05:6a00:a85:b0:823:1c2f:e9d5 with SMTP id d2e1a72fcca58-8274d97acf5mr1056684b3a.26.1772152952308;
+        Thu, 26 Feb 2026 16:42:32 -0800 (PST)
+Received: from localhost.localdomain ([101.201.173.233])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82739ff372fsm3501030b3a.31.2026.02.26.16.42.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Feb 2026 16:42:31 -0800 (PST)
+From: hbuxiaofei <hbuxiaofei@gmail.com>
+To: kvm@vger.kernel.org
+Cc: will@kernel.org,
+	julien.thierry.kdev@gmail.com,
+	hbuxiaofei <hbuxiaofei@gmail.com>
+Subject: [PATCH kvmtool 1/1] linux/virtio_pci.h: Include kernel.h to provide the __KERNEL_DIV_ROUND_UP define
+Date: Fri, 27 Feb 2026 08:42:24 +0800
+Message-ID: <20260227004224.269441-1-hbuxiaofei@gmail.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260225075211.3353194-1-aik@amd.com> <aZ7-tTpobKiCFT5L@google.com>
- <CAEvNRgEiod74cRoVQVC5LUbWDZf6Wwz1ssjQN0fveN=RBAjsTw@mail.gmail.com>
- <20260226190757.GA44359@ziepe.ca> <aaDL8tYrVCWlQg79@google.com> <20260227002105.GC44359@ziepe.ca>
-Message-ID: <aaDlRdnhIqRXEbPZ@google.com>
-Subject: Re: [RFC PATCH kernel] iommufd: Allow mapping from KVM's guest_memfd
-From: Sean Christopherson <seanjc@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Ackerley Tng <ackerleytng@google.com>, Alexey Kardashevskiy <aik@amd.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>, Joerg Roedel <joro@8bytes.org>, 
-	Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Steve Sistare <steven.sistare@oracle.com>, 
-	Nicolin Chen <nicolinc@nvidia.com>, iommu@lists.linux.dev, linux-coco@lists.linux.dev, 
-	Dan Williams <dan.j.williams@intel.com>, Santosh Shukla <santosh.shukla@amd.com>, 
-	"Pratik R . Sampat" <prsampat@amd.com>, Fuad Tabba <tabba@google.com>, Xu Yilun <yilun.xu@linux.intel.com>, 
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, michael.roth@amd.com, vannapurve@google.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72116-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-72117-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B32B31B1387
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hbuxiaofei@gmail.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 50EB31B144C
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026, Jason Gunthorpe wrote:
-> On Thu, Feb 26, 2026 at 02:40:50PM -0800, Sean Christopherson wrote:
-> 
-> > > If guestmemfd is fully pinned and cannot free memory outside of
-> > > truncate that may be good enough (though somehow I think that is not
-> > > the case)
-> > 
-> > With in-place conversion, PUNCH_HOLE and private=>shared conversions are the only
-> > two ways to partial "remove" memory from guest_memfd, so it may really be that
-> > simple.
-> 
-> PUNCH_HOLE can be treated like truncate right?
+GCC Version:
+  gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-44)
 
-Yep.  Tomato, tomato.  I called out PUNCH_HOLE because guest_memfd doesn't support
-a pure truncate, the size is immutable (ignoring that destroying the inode is kinda
-sorta a truncate).
+CC       builtin-balloon.o
+In file included from include/kvm/pci.h:7:0,
+                 from include/kvm/vfio.h:6,
+                 from include/kvm/kvm-config.h:5,
+                 from include/kvm/kvm.h:6,
+                 from builtin-balloon.c:9:
+include/linux/virtio_pci.h:326:2: error: implicit declaration of function ‘__KERNEL_DIV_ROUND_UP’ [-Werror=implicit-function-declaration]
+  __le64 supported_caps[MAX_CAP_ID];
+  ^
+include/linux/virtio_pci.h:326:9: error: variably modified ‘supported_caps’ at file scope
+  __le64 supported_caps[MAX_CAP_ID];
+         ^
+cc1: all warnings being treated as errors
+make: *** [builtin-balloon.o] Error 1
 
-> I'm confused though - I thought in-place conversion ment that
-> private<->shared re-used the existing memory allocation? Why does it
-> "remove" memory?
-> 
-> Or perhaps more broadly, where is the shared memory kept/accessed in
-> these guest memfd systems?
+Signed-off-by: hbuxiaofei <hbuxiaofei@gmail.com>
+---
+ include/linux/virtio_pci.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Oh, the physical memory doesn't change, but the IOMMU might care that memory is
-being converted from private<=>shared.  AMD IOMMU probably doesn't?  But unless
-Intel IOMMU reuses S-EPT from the VM itself, the IOMMU page tables will need to
-be updated.
+diff --git a/include/linux/virtio_pci.h b/include/linux/virtio_pci.h
+index e732e34..fb2f66a 100644
+--- a/include/linux/virtio_pci.h
++++ b/include/linux/virtio_pci.h
+@@ -39,6 +39,7 @@
+ #ifndef _LINUX_VIRTIO_PCI_H
+ #define _LINUX_VIRTIO_PCI_H
+ 
++#include <linux/kernel.h>
+ #include <linux/types.h>
+ #include <linux/const.h>
+ 
+-- 
+2.43.7
 
-FWIW, conceptually, we're basically treating private=>shared in particular as
-"free() + alloc()" that just so happens to guarantee the allocated page is the same.
 
