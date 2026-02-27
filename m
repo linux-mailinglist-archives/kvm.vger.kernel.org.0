@@ -1,113 +1,162 @@
-Return-Path: <kvm+bounces-72231-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72232-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UPp7JeEQomkmywQAu9opvQ
-	(envelope-from <kvm+bounces-72231-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 22:47:13 +0100
+	id 6Ld6OjYSomnQywQAu9opvQ
+	(envelope-from <kvm+bounces-72232-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 22:52:54 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFA0A1BE465
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 22:47:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EB1F1BE4CF
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 22:52:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9D7973001A56
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 21:46:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1F369306DFE6
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 21:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A420472791;
-	Fri, 27 Feb 2026 21:46:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17C0C47A0C3;
+	Fri, 27 Feb 2026 21:52:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bKfXHw78"
+	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="lOEJPYrF"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC3123644C9;
-	Fri, 27 Feb 2026 21:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB8A2D73A7;
+	Fri, 27 Feb 2026 21:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772228811; cv=none; b=rkDxens3ryG4A5NpHm4U+Y3E7q8J2IGBLihOQVtXP0W7oz2m55Hbc6sGJtT7N+b/mbu2pj+eB4jnP5oVg5UMW0ctwzNp+RAceSOEdKtf6qXyhYhggWKrNKCQe0VM3GTpoFqZNtOD1+Vw42a8ug+//0HxwViMlXBvwjABh2Z6izo=
+	t=1772229157; cv=none; b=iJsN1YQw+V6Qtk/3dsTXk0tnV9uaOcGDMfH4biSlBUTNaVeQm+mDWqVzc4JmAimHTV75+lnImPm6Woyf9M/IWy0WRT+Q/35vtjNUYglVtWuALYI52aIJ5v/mmxpvfJ9/vBd2IAeYRuUrskB2r3LK7zRGPT8LK7TuLAfwTtgL5PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772228811; c=relaxed/simple;
-	bh=bfFqfg34JQ70oKrrmSHJMW1lQghTvl7YQD/EXhTg5Ao=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=fZzzHNjSXbt4XjY+7R5uWVnT1gQjxJRdn3y7Y3r/xxsDq1KyTjIRzlGT7b9Rw3Y2iBgj5oqyk5By58pDSdAFeyDWI+4nQUJmsuzdN6ad+pTSXk8/0MFe3AeYsgAEZamQ8/a3lq9vozJxTMU8cuk+dHj/UpiRIsVUrDntBuYgar0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bKfXHw78; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EDB8C116C6;
-	Fri, 27 Feb 2026 21:46:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772228811;
-	bh=bfFqfg34JQ70oKrrmSHJMW1lQghTvl7YQD/EXhTg5Ao=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=bKfXHw781Yqs+cfxkGwre/AFKhoEOAnOqcCk0mFJ5DgBeFqhs7sQv7euoryHUlSOb
-	 w0Md1KhUdHozHv9AaYW0leuDNj2pXJGbVHq9ALCAmk8ykR2IJWxCNPGkSL5ge+ZcVf
-	 ccQeFv3/1l/AXg9qaWSBShgx2lpxxQJn/y6XFL2cqBUbD9xllgwwhc3esVT7txw4Sx
-	 0g5bVwLM79NBZw8jKDBAjrBPAOJBYgLEI0Awj/JVoawNPaH4RbBE970gT9Evdat09t
-	 kmm0mWqCSP3FdJ9zE5LnaoLPxgXn4IJtd87BRmAaa4SRxZzdNwJmQV71CcOTO5oLcy
-	 AUdVqVfMch4yg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7D06F39E961E;
-	Fri, 27 Feb 2026 21:46:56 +0000 (UTC)
-Subject: Re: [GIT PULL] PCI fixes for v7.0
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20260227200859.GA3913790@bhelgaas>
-References: <20260227200859.GA3913790@bhelgaas>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20260227200859.GA3913790@bhelgaas>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git tags/pci-v7.0-fixes-2
-X-PR-Tracked-Commit-Id: 39195990e4c093c9eecf88f29811c6de29265214
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 1c63df24be5f06f61b94e63cbe01aa852e463438
-Message-Id: <177222881540.2772866.14710365594855540486.pr-tracker-bot@kernel.org>
-Date: Fri, 27 Feb 2026 21:46:55 +0000
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, David Woodhouse <dwmw2@infradead.org>, Baruch Siach <baruch@tkos.co.il>, Alex Williamson <alex@shazbot.org>, Niklas Cassel <cassel@kernel.org>, Frank Li <Frank.Li@nxp.com>, Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, Koichiro Den <den@valinux.co.jp>, Shawn Guo <shawnguo@kernel.org>, kvm@vger.kernel.org
+	s=arc-20240116; t=1772229157; c=relaxed/simple;
+	bh=o0/c+M7R4sVUMrkOw52aHa7Z/zv7HP1nqlFhRyi2LyI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mN1fPNltvLmpcbIVOd8o+6z4QRLxIv2d4qPAQE8oK/jBnSIcO3700pg58RvCTvv0qNnJBj3LSx+2Qh9yV8qSZHPVSh393PsL22L+Gd9dkjCpRjySm/TuZHMtIaOm5OYNgWu4TLjMcArix8EHdBb32nzY+MNFCzWT1vD57Kia+wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=lOEJPYrF; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61RLG1FX2026789;
+	Fri, 27 Feb 2026 13:52:21 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=s2048-2025-q2; bh=5tvzMNgRyjYeXUbWEgOr
+	QCHGvdINQmVReqV33VO1vYg=; b=lOEJPYrFJfKPOl8EdQ0RmD6bms+WDShmruWF
+	VnyoOrNZQG/H2KdhWY4lAJmoOWuqGhB1UvaPydl1MA3rW1Ey26Zhjz2gMXeJGEjh
+	XTm6vLYGCuypDkWiMH4pRyCvDhlFQFjB7sQXIACKMD9yWCH64p+8wLwrVMnFWiQF
+	oK5VIYWONtSXjLGoiYAHSqGVqRSdsPNOetlncfMZxQnNcb1NlbTIptP9TKIk7ymV
+	IYplEsA5GHv3hXDm5vTFbHhDoGSKRqKUobAEhhNuEthR7SnXKj5Bh5Us2pblegt2
+	ZZXaLosgNZ1KrvaHQS3fL7Wwt4/mxDE/4t6uECFPW7gG2EiMjQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ckfq3js3j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Fri, 27 Feb 2026 13:52:20 -0800 (PST)
+Received: from devgpu015.cco6.facebook.com (2620:10d:c085:108::150d) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Fri, 27 Feb 2026 21:52:19 +0000
+Date: Fri, 27 Feb 2026 13:52:15 -0800
+From: Alex Mastro <amastro@fb.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Matt Evans <mattev@meta.com>,
+        Christian =?iso-8859-1?Q?K=F6nig?=
+	<christian.koenig@amd.com>,
+        Alex Williamson <alex@shazbot.org>,
+        "Leon
+ Romanovsky" <leon@kernel.org>,
+        Mahmoud Adam <mngyadam@amazon.de>,
+        "David
+ Matlack" <dmatlack@google.com>,
+        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?=
+	<bjorn@kernel.org>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Kevin Tian
+	<kevin.tian@intel.com>, Ankit Agrawal <ankita@nvidia.com>,
+        "Pranjal
+ Shrivastava" <praan@google.com>,
+        Alistair Popple <apopple@nvidia.com>,
+        "Vivek
+ Kasireddy" <vivek.kasireddy@intel.com>,
+        <linux-kernel@vger.kernel.org>, <linux-media@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <linaro-mm-sig@lists.linaro.org>,
+        <kvm@vger.kernel.org>
+Subject: Re: [RFC PATCH 3/7] vfio/pci: Support mmap() of a DMABUF
+Message-ID: <aaISD4mw1XzQl1S8@devgpu015.cco6.facebook.com>
+References: <20260226202211.929005-1-mattev@meta.com>
+ <20260226202211.929005-4-mattev@meta.com>
+ <90bd4185-1e87-4393-b9e1-1318a656a7d9@amd.com>
+ <20260227125109.GH5933@nvidia.com>
+ <c5a8f318-20af-4d80-a279-2393192108c3@meta.com>
+ <20260227194807.GL5933@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260227194807.GL5933@nvidia.com>
+X-Proofpoint-ORIG-GUID: 9CjaaW2uuX_U6ybXFihlTHjBbB__gpks
+X-Authority-Analysis: v=2.4 cv=OuJCCi/t c=1 sm=1 tr=0 ts=69a21214 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=kj9zAlcOel0A:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=VwQbUJbxAAAA:8
+ a=9jRdOu3wAAAA:8 a=5gW12rAjPW6ZUhMuABQA:9 a=CjuIK1q_8ugA:10 a=zZCYzV9kfG8A:10
+ a=ZE6KLimJVUuLrTuGpvhn:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjI3MDE5NCBTYWx0ZWRfXyqdREz8O3V5t
+ qlIto6yFmGf5tmYJHZjF+7puY4thZCaydDYsQ7U433LREt9hGqMLq59FcP1iNrkulf7fKNFdMnV
+ d5i8vdC+Y+IJLjNm81qE+aLEo95cVryoQtPo/mWo4ojQ829BFivVpIkdr2DjIwQyH3uMyJlTtGZ
+ VbeLzgzfi4Krv0i8QKNFq6up+wbHjX2MB+d/LeSG5ILKqghLDaSCQipBIxQ65Qx6IpU4IpnZjq+
+ O/t0STrz7g/j7ZnyQlOEgPg4hBBVYK3JdymylpUYxjHNQKGbFL0AYiSI5LCGKPEQCv6LIyomPDH
+ 11vskgelQfR0TtO+Qh7At9I8sUzvpsnc6x7pegybIFwXHoH42mokfv/caUxaTeXS4sT2lkXpPBw
+ kAatiNldR1FIY384IpHJa4mtnAJeat2dDsLEDI5jUgNGkbBKLVOjssIxQTSbuT4Ooxtmgn0I1Io
+ kBoBqWltTCvjSUVlMFQ==
+X-Proofpoint-GUID: 9CjaaW2uuX_U6ybXFihlTHjBbB__gpks
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-27_04,2026-02-27_03,2025-10-01_01
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[fb.com,reject];
+	R_DKIM_ALLOW(-0.20)[fb.com:s=s2048-2025-q2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72231-lists,kvm=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-72232-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pr-tracker-bot@kernel.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DKIM_TRACE(0.00)[fb.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[amastro@fb.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BFA0A1BE465
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[devgpu015.cco6.facebook.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6EB1F1BE4CF
 X-Rspamd-Action: no action
 
-The pull request you sent on Fri, 27 Feb 2026 14:08:59 -0600:
+On Fri, Feb 27, 2026 at 03:48:07PM -0400, Jason Gunthorpe wrote:
+> > > I actually would like to go the other way and have VFIO always have a
+> > > DMABUF under the VMA's it mmaps because that will make it easy to
+> > > finish the type1 emulation which requires finding dmabufs for the
+> > > VMAs.
+> 
+> This is a still better idea since it avoid duplicating the VMA flow
+> into two parts..
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git tags/pci-v7.0-fixes-2
+I suppose this would also compose with your idea to use dma-buf for
+iommufd_compat support of VFIO_IOMMU_MAP_DMA of vfio device fd-backed mmap()s
+[1]? Instead of needing to materialize a new dma-buf, you could use the existing
+backing one?
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/1c63df24be5f06f61b94e63cbe01aa852e463438
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+[1] https://lore.kernel.org/all/20260108141044.GC545276@ziepe.ca/
 
