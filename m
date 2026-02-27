@@ -1,203 +1,146 @@
-Return-Path: <kvm+bounces-72224-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72207-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IJdDGcb9oWl4yAQAu9opvQ
-	(envelope-from <kvm+bounces-72224-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 21:25:42 +0100
+	id WFSlF+P5oWlkyAQAu9opvQ
+	(envelope-from <kvm+bounces-72207-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 21:09:07 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C64801BD99D
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 21:25:41 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE46B1BD3A6
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 21:09:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7102831D2C6F
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 20:15:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2A3B23019115
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 20:09:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A36847D95E;
-	Fri, 27 Feb 2026 20:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7775146AF14;
+	Fri, 27 Feb 2026 20:09:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BsV4ULrX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YG0tEJJT"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 782FE3346BF;
-	Fri, 27 Feb 2026 20:13:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0A82D73BC;
+	Fri, 27 Feb 2026 20:09:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772223212; cv=none; b=XSfpR8w6iljlMWjs/4jVfOL6T70JqxNl2bWIEyj+eM9WRVgH45jTLOanBy9mh7WZ7nGP1KoMH5j2KosdRKQ6SSCb7ZxhAi9o0jbZsIp8tDmLWijo/9erHOgNhLCM2mtlGf3pSOTtuHEcwVQ4ZtjDy1jj+Ps0TDa5Jzhu9zWObko=
+	t=1772222941; cv=none; b=Qzvebvq6hMxmKM/4JSbZeiICI4xPiTRsZDttk9t0/DHrp1a/G+0pK4JQrm2PX/Z0SUtYq7UkufhB0GEUtKIxMEWICFIp6Y0wWDhxaIN/7GAivpKhDbfgVZfuZa+oDpxJ4sdO5s9kjO3O6oOOPYFOfTxUcn/9AmknFWHuUZZfAJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772223212; c=relaxed/simple;
-	bh=8DjODQ9JTo8rNPBCTFGX0cqEx7ur/z2XYX0+HQB8juc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=io7prNS5LG0/MeavSg9xCiOYpZ4eKw/B43ZJENnijM/gf5fumu5pDX6zPrqgJc9mxdjSXjXy2Aweb/7Gh2FhxPPJ364cm4rIRULU/f6WJJdyAx2BFPok5//hf4AXHx3THpR8SSpsxt1RAnXMiqDOpBOHOFb+GQjKmdTgCfecWCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BsV4ULrX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C5BFC116C6;
-	Fri, 27 Feb 2026 20:13:15 +0000 (UTC)
+	s=arc-20240116; t=1772222941; c=relaxed/simple;
+	bh=+0xJWv0Lt6lH8XeECmzMB5rMfZrGfkXmNV493TaaUhs=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=b94Vyzbh2Jyi7bhx9gejjytztVmLY4giKVi3xctZriq/PjKsVbMFMhRv2wgjFSInzC2vfObryNsE+F0P8mBTCpyAainC9o+2z3AXUi0xtrTFBsgll03Fsb7JwdADdAnTu+pAX2ZFSuc8VYMsqVlFDW0kG2L+bWpMjHhocYjbd34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YG0tEJJT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 080CAC19421;
+	Fri, 27 Feb 2026 20:09:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772223212;
-	bh=8DjODQ9JTo8rNPBCTFGX0cqEx7ur/z2XYX0+HQB8juc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BsV4ULrXcf69csyHSuGqVHkErg/TmBz0CXhzBZuPFMOJEd58YYsV9GY3LYfW2rxUB
-	 B/Bd+jNerrYiWu/dHQ4j9aEcpp/k/BLY3TOUIcBEDZazpW4Qb1rlsg807wAQftoetu
-	 oKHzBMSDxjv/CxuvG+QWIc4cPfrDOfwX0D5SZxDFnYn2LED/gYiKa1XwK/OgvUaDiQ
-	 wgo5tEx/CUq90wHpk0NTCoqjaz2e0NS8iGFwY2Tc6jUxOCGeEWKQQpTGNJBMzS+gGd
-	 d3N1RDyJOeuPtak0u7xYeGcKnNxHOOxKOC4LpkDRwUfoXIisyM7oV5jLZ/g+BGM9tD
-	 tmtukJMtnncfA==
-From: "David Hildenbrand (Arm)" <david@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: "linux-mm @ kvack . org" <linux-mm@kvack.org>,
-	"David Hildenbrand (Arm)" <david@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Vlastimil Babka <vbabka@kernel.org>,
-	Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Jann Horn <jannh@google.com>,
-	Pedro Falcato <pfalcato@suse.de>,
-	David Rientjes <rientjes@google.com>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	=?UTF-8?q?Arve=20Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
-	Todd Kjos <tkjos@android.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Carlos Llamas <cmllamas@google.com>,
-	Ian Abbott <abbotti@mev.co.uk>,
-	H Hartley Sweeten <hsweeten@visionengravers.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Dimitri Sivanich <dimitri.sivanich@hpe.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Andy Lutomirski <luto@kernel.org>,
-	Vincenzo Frascino <vincenzo.frascino@arm.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-sgx@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org,
-	linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	x86@kernel.org
-Subject: [PATCH v1 16/16] mm/memory: support VM_MIXEDMAP in zap_special_vma_range()
-Date: Fri, 27 Feb 2026 21:08:47 +0100
-Message-ID: <20260227200848.114019-17-david@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260227200848.114019-1-david@kernel.org>
-References: <20260227200848.114019-1-david@kernel.org>
+	s=k20201202; t=1772222941;
+	bh=+0xJWv0Lt6lH8XeECmzMB5rMfZrGfkXmNV493TaaUhs=;
+	h=Date:From:To:Cc:Subject:From;
+	b=YG0tEJJTJfoLj6ARnOgB1bTSgSNKqd8i442WohX7dinOs7axJ3xEjwyfREcddRfF3
+	 MZSI3F783bSmwApK0YGKE1/NKNdhkpFQLAyzjyKAqoJXV0TFSR2Law8HRKHrsNODN1
+	 zbPNCJ1yzcjAf7NPH0anptpYdWJIXJ2O3V7xJm2hR2M7tC4F1UXQxZ3lqo5dtVFtrL
+	 syewUm609N0x38TT4CCAcQcGvd7bFhkfSiyexqLs86QBUuH0Ro4j5wSpjlbUNOoItT
+	 YEzsegr316MDzW5LuHEeVwX3p8mvHiFlVh9zwxXL6Q7iY/soq4PdRFYoxh1z6fSsZS
+	 snsd6askwgy0w==
+Date: Fri, 27 Feb 2026 14:08:59 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Baruch Siach <baruch@tkos.co.il>,
+	Alex Williamson <alex@shazbot.org>,
+	Niklas Cassel <cassel@kernel.org>, Frank Li <Frank.Li@nxp.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Koichiro Den <den@valinux.co.jp>, Shawn Guo <shawnguo@kernel.org>,
+	kvm@vger.kernel.org
+Subject: [GIT PULL] PCI fixes for v7.0
+Message-ID: <20260227200859.GA3913790@bhelgaas>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kvack.org,kernel.org,linux-foundation.org,oracle.com,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,vger.kernel.org,lists.freedesktop.org];
-	TAGGED_FROM(0.00)[bounces-72224-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,kvm@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72207-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[74];
-	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[helgaas@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[kvm];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C64801BD99D
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CE46B1BD3A6
 X-Rspamd-Action: no action
 
-There is demand for also zapping page table entries by drivers in
-VM_MIXEDMAP VMAs[1].
+The following changes since commit 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f:
 
-Nothing really speaks against supporting VM_MIXEDMAP for driver use. We
-just don't want arbitrary drivers to zap in ordinary (non-special) VMAs.
+  Linux 7.0-rc1 (2026-02-22 13:18:59 -0800)
 
-[1] https://lore.kernel.org/r/aYSKyr7StGpGKNqW@google.com
+are available in the Git repository at:
 
-Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
----
- mm/memory.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+  git://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git tags/pci-v7.0-fixes-2
 
-diff --git a/mm/memory.c b/mm/memory.c
-index f3b7b7e16138..3fe30dc2f179 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -2239,13 +2239,13 @@ void zap_vma_range(struct vm_area_struct *vma, unsigned long address,
-  * @size: number of bytes to zap
-  *
-  * This function does nothing when the provided address range is not fully
-- * contained in @vma, or when the @vma is not VM_PFNMAP.
-+ * contained in @vma, or when the @vma is not VM_PFNMAP or VM_MIXEDMAP.
-  */
- void zap_special_vma_range(struct vm_area_struct *vma, unsigned long address,
- 		unsigned long size)
- {
- 	if (!range_in_vma(vma, address, address + size) ||
--	    		!(vma->vm_flags & VM_PFNMAP))
-+	   !(vma->vm_flags & (VM_PFNMAP | VM_MIXEDMAP)))
- 		return;
- 
- 	zap_vma_range(vma, address, size);
--- 
-2.43.0
+for you to fetch changes up to 39195990e4c093c9eecf88f29811c6de29265214:
 
+  PCI: Correct PCI_CAP_EXP_ENDPOINT_SIZEOF_V2 value (2026-02-27 10:24:25 -0600)
+
+The last two commits fix issues that are quite old, but I think they're
+worth including in v7.0.
+
+----------------------------------------------------------------
+
+- Update MAINTAINERS email address (Shawn Guo)
+
+- Refresh cached Endpoint driver MSI Message Address to fix a v7.0
+  regression when kernel changes the address after firmware has configured
+  it (Niklas Cassel)
+
+- Flush Endpoint MSI-X writes so they complete before the outbound ATU
+  entry is unmapped (Niklas Cassel)
+
+- Correct the PCI_CAP_EXP_ENDPOINT_SIZEOF_V2 value, which broke VMM use of
+  PCI capabilities (Bjorn Helgaas)
+
+----------------------------------------------------------------
+Bjorn Helgaas (1):
+      PCI: Correct PCI_CAP_EXP_ENDPOINT_SIZEOF_V2 value
+
+Niklas Cassel (2):
+      PCI: dwc: ep: Refresh MSI Message Address cache on change
+      PCI: dwc: ep: Flush MSI-X write before unmapping its ATU entry
+
+Shawn Guo (1):
+      MAINTAINERS: Update Shawn Guo's address for HiSilicon PCIe controller driver
+
+ MAINTAINERS                                     |  2 +-
+ drivers/pci/controller/dwc/pcie-designware-ep.c | 25 ++++++++++++++++---------
+ include/uapi/linux/pci_regs.h                   |  2 +-
+ 3 files changed, 18 insertions(+), 11 deletions(-)
 
