@@ -1,236 +1,262 @@
-Return-Path: <kvm+bounces-72229-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72230-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wHzBGvIDomkGyQQAu9opvQ
-	(envelope-from <kvm+bounces-72229-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 21:52:02 +0100
+	id SLbeIgIPomniygQAu9opvQ
+	(envelope-from <kvm+bounces-72230-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 22:39:14 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C13A91BDF8F
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 21:52:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E76B41BE3A8
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 22:39:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D12CE30514A0
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 20:51:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E0ACA30AD8BD
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 21:39:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DAF146AF1D;
-	Fri, 27 Feb 2026 20:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC85C47A0B8;
+	Fri, 27 Feb 2026 21:39:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="Wls0viGZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="evdJ60kj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JCCjqxC7"
 X-Original-To: kvm@vger.kernel.org
-Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78FE233A9EF;
-	Fri, 27 Feb 2026 20:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32DC37BE9B
+	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 21:39:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772225493; cv=none; b=tQZ5CNMHhtwornifFBBWfu/njDGBztXgu+4mVAOI1r1HFaeszePWXEAAXMtVTSihMA7NS7zWr9l1hJ254XxWwXBciKoZEYJsU8HQiBG3eGkypA463/zXxMAVLULcA+GTt5A9qnOGybE+DCGo0tPSKECL+bzSPe0a7yCRgK7w0eg=
+	t=1772228345; cv=none; b=GY2cyUPSbvrjx5Vpb082JI0M/GT1QLEcFAFRFBq+Oo8vGGvC1U6Dvy79pFwl0Q4d8JL6eCBV25iYJdsPufyfk9uFU0Cw4M5kXC96zxh5TBpZ4APyQ9HxG3eU5u7hwZz75gMD73k4uc3sRHX8goQ8pHI4Fv/V3wvSzyMtmIrBq5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772225493; c=relaxed/simple;
-	bh=pFL2OtyE4IwOTsf9kwlnN+dSmcMsyT2KLzxsCrSFL/A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QTrvg9Vfyb82tlVcYGu4ghUYbxBTN7zPvAYo8t3fa1fjS7Q/lfS5BAclcLEGlcVLJqjSLTXagCq0o3SlENQGoNanBSR9XuinK/NjjjXVZS4Q5o6Ht+67gfknIWtCCEuarak8k15vqPPH0OXoqJx2UWy7/o42tZbjtwfdIE4cZ7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=Wls0viGZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=evdJ60kj; arc=none smtp.client-ip=202.12.124.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 4F6E57A022D;
-	Fri, 27 Feb 2026 15:51:30 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Fri, 27 Feb 2026 15:51:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1772225490;
-	 x=1772311890; bh=dHAFARK9/GwC5LQVntwuJiI1ujfKXWQd1sCvWsn3DKQ=; b=
-	Wls0viGZdTxV4f0VHZGAnusVmS0dWD9tsEKznd9w8f6q07APE1d/HXZK/cd+Gbqe
-	qg9sW5sBV3Ap0QaaFrUkAtzN2G387XhMEq4xAo9eHs39FqQ2ijzO9HX6zK/bguFD
-	cTz7lQ3R/7z2eNHmymYe5Bo0E8tokQPdGRNrFrSuZI/ZaO9dEwWy5n2AeSanjM16
-	md8kmCO1jGFGLZ/rBwDqiDyCMCyFrQqUbCilon567kffjkoFtD3EDC/LkzaAXbBP
-	KnuzI2DyOPm28ghRO2Tkfiqf1zjHCk4kK/ux66eD976bqm/gycDvSCzxIiISsBXH
-	sWWuvfxsWtv3ewwtlfAuvw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1772225490; x=
-	1772311890; bh=dHAFARK9/GwC5LQVntwuJiI1ujfKXWQd1sCvWsn3DKQ=; b=e
-	vdJ60kjug1ypkrrxjJD+oJQGsOvd+9BzpglO9Jl/mOmEvB/u+M10tZhUB1a9NN5d
-	dUkzgDgcA1xqcFkpUuPJVVXZ+LrLhlM9Ld+a1DZu+RWyd70y9LSMrVpMFVm3saB2
-	pwZi7oDVkLMBADf6jihMCqbJzqIjGj+czbjMa4rHKvknWFbfC3Z1R50RvZYp4Lg9
-	FiXx8Ow65I+I/XLbEFJzpUvgbqOOUAuHTZLCUzjvZlLTVfP8Up9pSZ61zy8nzRmT
-	42AxXxdV1aJi9A9LWjuHzLNEFNPqnIR3bvEPmY3+ygXZlwekHgc28bgDGssj/zHz
-	i0dyPga7WBzSMt1US+iWw==
-X-ME-Sender: <xms:0QOiafKNmSksLs9RRvcYRMSiJfF-CAc2VNSupAXKA_Nz_S30UcXWdA>
-    <xme:0QOiafQKo7u5vRTJKVKucqpP1OOcVVucf1o6ORECQxjvjTQAwnupHjmuOgXnsOhhD
-    WR2H2aXGyPpBnz9_Y8LMPLt8zrwA-pp6yIYLhcp7kaIpEmoiOG95g>
-X-ME-Received: <xmr:0QOiaTgufTnF0o8RDtH_metnpmvq3iQr2ohCfmg2j2__c924wQhvuBKOi-4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvhedttdduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpeetlhgvgicu
-    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
-    htthgvrhhnpeegudevhfejueefveduieeuueeifeettdekveekhffgvdetfeelueehgfdt
-    heffhfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepvddupdhmohguvgep
-    shhmthhpohhuthdprhgtphhtthhopehjuhhlihgrnhhrsehlihhnuhigrdhisghmrdgtoh
-    hmpdhrtghpthhtohepshgthhhnvghllhgvsehlihhnuhigrdhisghmrdgtohhmpdhrtghp
-    thhtohepfihinhhtvghrrgeslhhinhhugidrihgsmhdrtghomhdprhgtphhtthhopehtsh
-    eslhhinhhugidrihgsmhdrtghomhdprhgtphhtthhopehosggvrhhprghrsehlihhnuhig
-    rdhisghmrdgtohhmpdhrtghpthhtohepghgsrgihvghrsehlihhnuhigrdhisghmrdgtoh
-    hmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpdhrtghpthhtohephihishhhrghi
-    hhesnhhvihguihgrrdgtohhmpdhrtghpthhtohepshhkohhlohhthhhumhhthhhosehnvh
-    hiughirgdrtghomh
-X-ME-Proxy: <xmx:0QOiaRuZz7B8FOz0_CdgRF47jJWtOrVH-jX9mPBUdB7SimpUUuARAg>
-    <xmx:0QOiaWgj1VcsIWrLw0abfi9FBEvt5HlgEuUugninJp8nc8Yhk8dlpg>
-    <xmx:0QOiaQF53hA9phQjeNeZQf_Dvgwav6ItStXXEuOkB2dry6OPCWy_pw>
-    <xmx:0QOiaXLIyH6u0Ynv55of7SFS1D5_-oiXgFi1AT8F_Bjga0x0hLxCYg>
-    <xmx:0gOiae-xMQFXE4geg7TQA75jVkGgt_VsmrSfr2xjEPfv0b0sfoGk1Rmf>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 27 Feb 2026 15:51:28 -0500 (EST)
-Date: Fri, 27 Feb 2026 13:51:26 -0700
-From: Alex Williamson <alex@shazbot.org>
-To: Julian Ruess <julianr@linux.ibm.com>
-Cc: schnelle@linux.ibm.com, wintera@linux.ibm.com, ts@linux.ibm.com,
- oberpar@linux.ibm.com, gbayer@linux.ibm.com, Jason Gunthorpe
- <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>, Shameer Kolothum
- <skolothumtho@nvidia.com>, Kevin Tian <kevin.tian@intel.com>,
- mjrosato@linux.ibm.com, alifm@linux.ibm.com, raspl@linux.ibm.com,
- hca@linux.ibm.com, agordeev@linux.ibm.com, gor@linux.ibm.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-pci@vger.kernel.org, alex@shazbot.org
-Subject: Re: [PATCH v2 1/3] vfio/pci: Rename vfio_config_do_rw() to
- vfio_pci_config_rw_single() and export it
-Message-ID: <20260227135126.5f3c900f@shazbot.org>
-In-Reply-To: <20260224-vfio_pci_ism-v2-1-f010945373fa@linux.ibm.com>
-References: <20260224-vfio_pci_ism-v2-0-f010945373fa@linux.ibm.com>
-	<20260224-vfio_pci_ism-v2-1-f010945373fa@linux.ibm.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1772228345; c=relaxed/simple;
+	bh=cviVU3xD6JxK/FECVBz2YduYX59/TYXzSINjJm6njME=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=M2vK/Pt5vUvpUT7ftCZbFNmTfeTFsgUQ0Tsh5g557RpqJxsMpLwArEtS1jBsADfxg6jXz5UGN+JCepSF8z3jovLvOISupqTKl+kLSfKPKQJo1/1uk/8YRSwyjkssUfZ+U2edYgqGmEzNdReGEgRZhcLPhj+pAQiXjBkuCljk0iA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JCCjqxC7; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2aad6045810so24700825ad.3
+        for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 13:39:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772228343; x=1772833143; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nwdvBKl3gxteFLUbmJgO0ss76jgFGjRI1irykTmvd8E=;
+        b=JCCjqxC7Klk/6EiU2UKLoGoUTp9MF8NnZyidExJsHlwWl0/pTl0ibfdtwcj3g5+Ani
+         8pTspfjvbwI0AogntsukOeiLdHm1h16G7EBzo5796ASeAxjudcojFaOr9DHaSdvFfw5k
+         kRvgIobhIabVkp8+D1eYIKHUB1KdyqI23THJHGx71c7/YtfdRuok3/ADBfKBe8F1udrh
+         m1+tvBjk1Iqdc15d8fRTLl+jdgklws4vV34qq9MkKopCuOtcutjG/I5DjvpjGti4uEzH
+         hHj5GZM5Fc29brmEbGqMjAdIbP6o4T49icAicgdo+ZiBH/0gYd/d2tni8pj9IAgrFJ48
+         T0Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772228343; x=1772833143;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nwdvBKl3gxteFLUbmJgO0ss76jgFGjRI1irykTmvd8E=;
+        b=KPMfsMYyGBSX5Cpu0puZMT35Lb0oDd6pROqoyHclBux5YOZTYjAxigQotmSJ3TfVjU
+         XxnOa74xIjOircotksINyOerGHFbsPd4TqHcyrK05y8jaSE9PMji4a0uRMeEk0lnd5Ef
+         e1y/nYFd+d3a/FfpJG/I4XCPO/LDp2xQE9Uy+UGMmmV+rdxxCV5c5h0ILvCTlzCH6M+i
+         FWNKrPvGNs9cMdYrgI43dDMqNZOk9sGsK+cqgQcHVrBT3ZMJpW3XqIEuBwyw8FvS7Gc8
+         GRY4jMegH2/0Jks2YkvHkq6WVeaIAuXOYsBuTvCV835JTrlH2j7FrEBM+FKi2OXjyuin
+         4XKg==
+X-Gm-Message-State: AOJu0YwrDCtRG2hF3t36PjhzaEab5N8ZpdXNSu4DCva+ClwClO6bfsL9
+	06F3+jAQsZpDVOR8Agbru41j+kTxi186bsRHRbg853rrbMVoESlB7v9YUEaw3XnH3GGah6Uv7T/
+	SlI6fPRxqNXgM3RTUYs7P8RxLfzHUwo4JlxRP6PSOZpBH8XbZnrbqz7/YDupxTv60CeTucX53tm
+	8c/JDJk5/5MiFS51WYsQH0Ro4D31smJ7Vi9fhEl5Jb+14=
+X-Received: from pltf9.prod.google.com ([2002:a17:902:74c9:b0:2ae:3a4e:20cf])
+ (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:4b27:b0:2a3:628d:dbea with SMTP id d9443c01a7336-2ae2e417736mr42682645ad.24.1772228342796;
+ Fri, 27 Feb 2026 13:39:02 -0800 (PST)
+Date: Fri, 27 Feb 2026 13:38:34 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260227213849.3653331-1-jmattson@google.com>
+Subject: [kvm-unit-tests PATCH] x86: nVMX: Add retry loop to advanced RTM
+ debugging subtest
+From: Jim Mattson <jmattson@google.com>
+To: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Yosry Ahmed <yosry@kernel.org>
+Cc: Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm3,messagingengine.com:s=fm3];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	TAGGED_FROM(0.00)[bounces-72229-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72230-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,messagingengine.com:dkim,shazbot.org:mid,shazbot.org:dkim]
-X-Rspamd-Queue-Id: C13A91BDF8F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E76B41BE3A8
 X-Rspamd-Action: no action
 
-On Tue, 24 Feb 2026 13:34:32 +0100
-Julian Ruess <julianr@linux.ibm.com> wrote:
+Linux commit 400816f60c54 ("perf/x86/intel: Implement support for TSX Force
+Abort") introduced a feature that temporarily disables RTM on Skylake and
+similar CPUs (06_55H stepping <= 5, 06_4EH, 06_5EH, 06_8EH stepping <= 0BH,
+and 06_9EH stepping <= 0CH) via the TSX_FORCE_ABORT MSR, so that all four
+general purpose PMCs can be used by perf. This feature is on by default,
+but can be disabled by writing 0 to /sys/devices/cpu/allow_tsx_force_abort.
 
-> A follow-up patch adds a new variant driver for s390 ISM devices. Since
-> this device uses a 256=E2=80=AFTiB BAR 0 that is never mapped, the variant
-> driver needs its own ISM_VFIO_PCI_OFFSET_MASK. To minimally mirror the
-> functionality of vfio_pci_config_rw() with such a custom mask, export
-> vfio_config_do_rw(). To better distinguish the now exported function
-> from vfio_pci_config_rw(), rename it to vfio_pci_config_rw_single()
-> emphasizing that it does a single config space read or write.
->=20
-> Signed-off-by: Julian Ruess <julianr@linux.ibm.com>
-> ---
->  drivers/vfio/pci/vfio_pci_config.c | 8 +++++---
->  drivers/vfio/pci/vfio_pci_priv.h   | 4 ++++
->  2 files changed, 9 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_p=
-ci_config.c
-> index b4e39253f98da61a5e2b6dd0089b2f6aef4b85a0..a724fdd8f4860bd529c5c7501=
-beb1f7156fae9b0 100644
-> --- a/drivers/vfio/pci/vfio_pci_config.c
-> +++ b/drivers/vfio/pci/vfio_pci_config.c
-> @@ -1880,8 +1880,9 @@ static size_t vfio_pci_cap_remaining_dword(struct v=
-fio_pci_core_device *vdev,
->  	return i;
->  }
-> =20
-> -static ssize_t vfio_config_do_rw(struct vfio_pci_core_device *vdev, char=
- __user *buf,
-> -				 size_t count, loff_t *ppos, bool iswrite)
-> +ssize_t vfio_pci_config_rw_single(struct vfio_pci_core_device *vdev,
-> +			      char __user *buf, size_t count, loff_t *ppos,
-> +			      bool iswrite)
->  {
->  	struct pci_dev *pdev =3D vdev->pdev;
->  	struct perm_bits *perm;
-> @@ -1970,6 +1971,7 @@ static ssize_t vfio_config_do_rw(struct vfio_pci_co=
-re_device *vdev, char __user
-> =20
->  	return ret;
->  }
-> +EXPORT_SYMBOL(vfio_pci_config_rw_single);
+When TSX_FORCE_ABORT.RTM_FORCE_ABORT[bit 0] is set, all RTM transactions
+will immediately abort, before the xbegin instruction retires.
 
-EXPORT_SYMBOL_GPL.  Thanks,
+The test of a single-step #DB delivered in a transactional region,
+introduced in commit 414bd9d5ebd7 ("x86: nVMX: Basic test of #DB intercept
+in L1"), does not handle this scenario.
 
-Alex
+Modify the test to identify an immediate RTM transaction abort and to try
+up to 30 times before giving up. If the xbegin instruction never retires,
+report the test as skipped.
 
+Note that when an RTM transaction aborts, the CPU state is rolled back to
+before the xbegin instruction, but the RIP is modified to point to the
+fallback code address. Hence, if the transaction aborts before the
+single-step #DB trap is delivered, the first instruction of the fallback
+code will retire before the single-step #DB trap is delivered.
 
-> =20
->  ssize_t vfio_pci_config_rw(struct vfio_pci_core_device *vdev, char __use=
-r *buf,
->  			   size_t count, loff_t *ppos, bool iswrite)
-> @@ -1981,7 +1983,7 @@ ssize_t vfio_pci_config_rw(struct vfio_pci_core_dev=
-ice *vdev, char __user *buf,
->  	pos &=3D VFIO_PCI_OFFSET_MASK;
-> =20
->  	while (count) {
-> -		ret =3D vfio_config_do_rw(vdev, buf, count, &pos, iswrite);
-> +		ret =3D vfio_pci_config_rw_single(vdev, buf, count, &pos, iswrite);
->  		if (ret < 0)
->  			return ret;
-> =20
-> diff --git a/drivers/vfio/pci/vfio_pci_priv.h b/drivers/vfio/pci/vfio_pci=
-_priv.h
-> index 27ac280f00b975989f6cbc02c11aaca01f9badf3..28a3edf65aeecfa06cd185663=
-7cd33eec1fa3006 100644
-> --- a/drivers/vfio/pci/vfio_pci_priv.h
-> +++ b/drivers/vfio/pci/vfio_pci_priv.h
-> @@ -37,6 +37,10 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_core_devic=
-e *vdev, uint32_t flags,
->  ssize_t vfio_pci_config_rw(struct vfio_pci_core_device *vdev, char __use=
-r *buf,
->  			   size_t count, loff_t *ppos, bool iswrite);
-> =20
-> +ssize_t vfio_pci_config_rw_single(struct vfio_pci_core_device *vdev,
-> +			      char __user *buf, size_t count, loff_t *ppos,
-> +			      bool iswrite);
-> +
->  ssize_t vfio_pci_bar_rw(struct vfio_pci_core_device *vdev, char __user *=
-buf,
->  			size_t count, loff_t *ppos, bool iswrite);
-> =20
->=20
+Fixes: 414bd9d5ebd7 ("x86: nVMX: Basic test of #DB intercept in L1")
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ lib/x86/msr.h   |  1 +
+ x86/vmx_tests.c | 56 ++++++++++++++++++++++++++++++++-----------------
+ 2 files changed, 38 insertions(+), 19 deletions(-)
+
+diff --git a/lib/x86/msr.h b/lib/x86/msr.h
+index 7397809c07cd..97f52bb5bb4e 100644
+--- a/lib/x86/msr.h
++++ b/lib/x86/msr.h
+@@ -109,6 +109,7 @@
+ #define DEBUGCTLMSR_BTS_OFF_OS		(1UL <<  9)
+ #define DEBUGCTLMSR_BTS_OFF_USR		(1UL << 10)
+ #define DEBUGCTLMSR_FREEZE_LBRS_ON_PMI	(1UL << 11)
++#define DEBUGCTLMSR_RTM_DEBUG		(1UL << 15)
+ 
+ #define MSR_LBR_NHM_FROM	0x00000680
+ #define MSR_LBR_NHM_TO		0x000006c0
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 5ffb80a3d866..2094a0d3ec57 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -9217,9 +9217,10 @@ static void vmx_db_test_guest(void)
+ 	 * For a hardware generated single-step #DB in a transactional region.
+ 	 */
+ 	asm volatile("vmcall;"
+-		     ".Lxbegin: xbegin .Lskip_rtm;"
++		     ".Lrtm_begin: xbegin .Lrtm_fallback;"
+ 		     "xend;"
+-		     ".Lskip_rtm:");
++		     ".Lrtm_fallback: nop;"
++		     ".Lpost_rtm:");
+ }
+ 
+ /*
+@@ -9295,6 +9296,10 @@ static void single_step_guest(const char *test_name, u64 starting_dr6,
+  * exception bits are properly accumulated into the exit qualification
+  * field.
+  */
++
++#define RTM_RETRIES 30
++#define ONE_BILLION 1000000000ul
++
+ static void vmx_db_test(void)
+ {
+ 	/*
+@@ -9308,8 +9313,8 @@ static void vmx_db_test(void)
+ 	extern char post_movss_nop asm(".Lpost_movss_nop");
+ 	extern char post_wbinvd asm(".Lpost_wbinvd");
+ 	extern char post_movss_wbinvd asm(".Lpost_movss_wbinvd");
+-	extern char xbegin asm(".Lxbegin");
+-	extern char skip_rtm asm(".Lskip_rtm");
++	extern char rtm_begin asm(".Lrtm_begin");
++	extern char post_rtm asm(".Lpost_rtm");
+ 
+ 	/*
+ 	 * L1 wants to intercept #DB exceptions encountered in L2.
+@@ -9362,30 +9367,43 @@ static void vmx_db_test(void)
+ 		      starting_dr6);
+ 
+ 	/*
+-	 * Optional RTM test for hardware that supports RTM, to
+-	 * demonstrate that the current volume 3 of the SDM
+-	 * (325384-067US), table 27-1 is incorrect. Bit 16 of the exit
+-	 * qualification for debug exceptions is not reserved. It is
+-	 * set to 1 if a debug exception (#DB) or a breakpoint
+-	 * exception (#BP) occurs inside an RTM region while advanced
+-	 * debugging of RTM transactional regions is enabled.
++	 * Optional RTM test for hardware that supports RTM, to verify that
++	 * bit 16 of the exit qualification for debug exceptions is set to
++	 * 1 if a #DB occurs inside an RTM region while advanced debugging
++	 * of RTM transactional regions is enabled.
+ 	 */
+ 	if (this_cpu_has(X86_FEATURE_RTM)) {
++		int i = RTM_RETRIES;
++
+ 		vmcs_write(ENT_CONTROLS,
+ 			   vmcs_read(ENT_CONTROLS) | ENT_LOAD_DBGCTLS);
+ 		/*
+-		 * Set DR7.RTM[bit 11] and IA32_DEBUGCTL.RTM[bit 15]
+-		 * in the guest to enable advanced debugging of RTM
+-		 * transactional regions.
++		 * Set DR7.RTM and IA32_DEBUGCTL.RTM to enable advanced
++		 * debugging of RTM transactional regions. See "RTM-Enabled
++		 * Debugger Support" in the SDM, volume 1.
+ 		 */
+-		vmcs_write(GUEST_DR7, BIT(11));
+-		vmcs_write(GUEST_DEBUGCTL, BIT(15));
++		vmcs_write(GUEST_DR7, DR7_RTM);
++		vmcs_write(GUEST_DEBUGCTL, DEBUGCTLMSR_RTM_DEBUG);
++
+ 		single_step_guest("Hardware delivered single-step in "
+ 				  "transactional region", starting_dr6, 0);
+-		check_db_exit(false, false, false, &xbegin, BIT(16),
+-			      starting_dr6);
++
++		while (--i && vmcs_read(GUEST_RIP) == (u64)&post_rtm) {
++			delay(ONE_BILLION);
++			vmcs_write(GUEST_RIP, (u64)&rtm_begin);
++			enter_guest();
++		}
++
++		if (vmcs_read(GUEST_RIP) == (u64)&post_rtm) {
++			report_skip("Transaction always aborted before xbegin "
++				    "retired (%d attempts)", RTM_RETRIES);
++			dismiss_db();
++		} else {
++			check_db_exit(false, false, false, &rtm_begin, DR6_RTM,
++				      starting_dr6);
++		}
+ 	} else {
+-		vmcs_write(GUEST_RIP, (u64)&skip_rtm);
++		vmcs_write(GUEST_RIP, (u64)&post_rtm);
+ 		enter_guest();
+ 	}
+ }
+
+base-commit: 86e53277ac80dabb04f4fa5fa6a6cc7649392bdc
+prerequisite-patch-id: 177e49d1b63609e5b421ea64fe7490a4906617a9
+prerequisite-patch-id: 7e71aa35841be5d72bf543e4f332554d12e83cc0
+-- 
+2.53.0.473.g4a7958ca14-goog
 
 
