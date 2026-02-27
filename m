@@ -1,81 +1,63 @@
-Return-Path: <kvm+bounces-72157-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72158-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IFhKJMK0oWmMvgQAu9opvQ
-	(envelope-from <kvm+bounces-72157-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 16:14:10 +0100
+	id ILLVNBm2oWm+vwQAu9opvQ
+	(envelope-from <kvm+bounces-72158-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 16:19:53 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E8D01B9833
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 16:14:10 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7738A1B9A01
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 16:19:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B9DB8303D69A
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 15:13:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 11B0D303D6BF
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 15:17:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBBC441B342;
-	Fri, 27 Feb 2026 15:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cispa.de header.i=@cispa.de header.b="VBFZUizv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6965439007;
+	Fri, 27 Feb 2026 15:17:39 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx-2023-1.gwdg.de (mx-2023-1.gwdg.de [134.76.10.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54A12BD5A7;
-	Fri, 27 Feb 2026 15:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.76.10.21
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E9C2BEC57;
+	Fri, 27 Feb 2026 15:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772205206; cv=none; b=DGljaH8gV4bsZj0UTr4PPE5Gn8B+uexmM6pk2v9SCN6rPFZYxamBKPe28hITzKujXslzMoj3T1gJEb0R/VzCXd7Tr84qMKNwfzx7SBEzJvVnS2hH0XD9iY8MyPjXMIMp2zxGyy5+eroE8SQ14cZ4SGAoFkv06/D0di/WFfT+ZrQ=
+	t=1772205459; cv=none; b=CJwUXVzGPYYfQFJoTQzWdMh8rTrSQ8APpPahaWf2GJ1dG51xSm3Gl5eNDUcp4Z84O3gdYHVBm+VHiLSFK5pekE632NSpNIpY3HrEEhnwh+mbPoeYreu2apjDxMASIhbOeJgkvuOWNFEQUYZsskp29A8oyFTrZLObcpwmVziEhuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772205206; c=relaxed/simple;
-	bh=U/AYMtm3HcMBARqjsqpovNKCJYz+YkgFM5S2Dw1nT34=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kYUKUyF2zxLRjEtvTfrokw4zARXWT5/EtNjTMmVbfyy1Xbx3y+NUBsKR1TJ11hrJnL15PTWfV/IIVSsnqf4ACQWLRqcf0UDbpXghccqyagExHFqkDiSa9XKmpkItm/MbDFzx/MI+96kt+1OPQiwwJ3ErqLrOVCxe+aR1mAM4OmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cispa.de; spf=pass smtp.mailfrom=cispa.de; dkim=pass (2048-bit key) header.d=cispa.de header.i=@cispa.de header.b=VBFZUizv; arc=none smtp.client-ip=134.76.10.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cispa.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cispa.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cispa.de;
-	s=2023-rsa; h=Content-Type:Content-Transfer-Encoding:MIME-Version:References:
-	In-Reply-To:Message-ID:Date:Subject:CC:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=FWU+AoGX9eH3mCsh3LQUgdVuyGEg7A83/ykl1w+gkCQ=; b=VBFZUizvgZG78Youf4F+MeuRT2
-	zri9gJa8VJVZ5M6To8Tru9dkJszT42T+HnSu3Linjj54Cre1zTBIRISI2Y2bBBZzcBR/QsOFFXhxq
-	ta5/gvMUNi5XaBlqWdwXys81LGEl8Oq15xR6bbzo73PtB/vmOYhPpEzvtDSHj3E/dCyCXg4Uxjop+
-	EBWg04SLhWki8tp+QNbFBzkK7dcpZKPpKVvBo0Oqhd5LaipYyIaq5LE0HzdnTqy17Hd1BQ9M9+lVd
-	MMJ7Y72wIevZWLffmLfqJs7PD9o/ZNjE4Ebo4POqVfrCG9pLNOS0pQGM5R8OtCzT8ulNWsHGzN35Y
-	jsDMgJfQ==;
-Received: from mailer.gwdg.de ([134.76.10.26]:56296)
-	by mailer.gwdg.de with esmtp (GWDG Mailer)
-	(envelope-from <lukas.gerlach@cispa.de>)
-	id 1vvzWi-006hGu-0F;
-	Fri, 27 Feb 2026 16:13:12 +0100
-Received: from mbx19-sub-05.um.gwdg.de ([10.108.142.70] helo=email.gwdg.de)
-	by mailer.gwdg.de with esmtps (TLS1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-	(GWDG Mailer)
-	(envelope-from <lukas.gerlach@cispa.de>)
-	id 1vvzWi-000PaN-2i;
-	Fri, 27 Feb 2026 16:13:12 +0100
-Received: from localhost.localdomain (10.250.9.200) by MBX19-SUB-05.um.gwdg.de
- (10.108.142.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.37; Fri, 27 Feb
- 2026 16:13:10 +0100
-From: Lukas Gerlach <lukas.gerlach@cispa.de>
-To: <radim.krcmar@oss.qualcomm.com>
-CC: <ajones@ventanamicro.com>, <alex@ghiti.fr>, <anup@brainfault.org>,
-	<aou@eecs.berkeley.edu>, <atish.patra@linux.dev>, <daniel.weber@cispa.de>,
-	<jo.vanbulck@kuleuven.be>, <kvm-riscv@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-riscv@lists.infradead.org>, <lukas.gerlach@cispa.de>,
-	<marton.bognar@kuleuven.be>, <michael.schwarz@cispa.de>,
-	<palmer@dabbelt.com>, <pjw@kernel.org>
-Subject: Re: [PATCH 4/4] KVM: riscv: Fix Spectre-v1 in PMU counter access
-Date: Fri, 27 Feb 2026 16:12:47 +0100
-Message-ID: <20260227151247.18602-1-lukas.gerlach@cispa.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <DGPS39X0VRTU.3ATPEH33LUF1G@oss.qualcomm.com>
-References: <DGPS39X0VRTU.3ATPEH33LUF1G@oss.qualcomm.com>
+	s=arc-20240116; t=1772205459; c=relaxed/simple;
+	bh=+cvhupLeIzGnbQkHzqaS12YAv7Idy5KaVcIPM9XJiuE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BhMKH3uW8LgP1CHyqk3j4V3sDdOPjxzLJHqKLydRRxxDuuA8GwyeIwMc3ATsm/CaKaPp38NMFRkzqxCl3PH1E/rad7ZiGwnVjxZ7MxOKSLJ0OYaxnnSg6h61qNCmSI9pKRWNOJGmyULE06tUfERImQ4RV/W3eoyHcWyApk1bCtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 56095339;
+	Fri, 27 Feb 2026 07:17:29 -0800 (PST)
+Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B18213F73B;
+	Fri, 27 Feb 2026 07:17:32 -0800 (PST)
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: catalin.marinas@arm.com,
+	will@kernel.org,
+	maz@kernel.org,
+	oupton@kernel.org,
+	miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com,
+	broonie@kernel.org,
+	ardb@kernel.org,
+	suzuki.poulose@arm.com,
+	lpieralisi@kernel.org,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	yeoreum.yun@arm.com
+Subject: [PATCH v15 0/8] support FEAT_LSUI
+Date: Fri, 27 Feb 2026 15:16:57 +0000
+Message-Id: <20260227151705.1275328-1-yeoreum.yun@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,53 +65,153 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MBX19-FMZ-06.um.gwdg.de (10.108.142.65) To
- MBX19-SUB-05.um.gwdg.de (10.108.142.70)
-X-Virus-Scanned: (clean) by clamav
-X-Spam-Level: -
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[cispa.de:s=2023-rsa];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[cispa.de : SPF not aligned (relaxed),none];
+	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72157-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72158-lists,kvm=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lukas.gerlach@cispa.de,kvm@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.995];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[yeoreum.yun@arm.com,kvm@vger.kernel.org];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.971];
 	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[cispa.de:-];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[cispa.de:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7E8D01B9833
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,arm.com:mid]
+X-Rspamd-Queue-Id: 7738A1B9A01
 X-Rspamd-Action: no action
 
-Thanks for the review!
+Since Armv9.6, FEAT_LSUI supplies the load/store instructions for
+previleged level to access to access user memory without clearing
+PSTATE.PAN bit.
 
-> This one also covers a non-speculation bug, since the previous condition
-> used cidx > RISCV_KVM_MAX_COUNTER. :)  I'll send a patch for that.
+This patchset support FEAT_LSUI and applies it mainly in
+futex atomic operation and others.
 
-Nice catch, thanks for sending the fix.
+This patch based on v7.0-rc1
 
-> I noticed a few other places where mis-speculation is possible,
-> see below; can you explain why they don't need protection?
 
-They do, I missed those. Will send a v2 incorporating all four sites.
+Patch History
+==============
+from v14 to v15:
+  - replace caslt to cast
+  - cleanup the patch
+  - https://lore.kernel.org/all/20260225182708.3225211-1-yeoreum.yun@arm.com/
 
-Thanks,
-Lukas
+from v13 to v14:
+  - add LSUI config check in cpucap_is_possible()
+  - fix build failure with clang-19
+  - https://lore.kernel.org/all/20260223174802.458411-1-yeoreum.yun@arm.com/
+
+from v12 to v13:
+  - rebase to v7.0-rc1
+  - apply CASLT for swapping guest descriptor
+  - remove has_lsui() for checking cpu feature.
+  - simplify __lsui_cmpxchg32() according to @Catalin's suggestion.
+  - use uaccess_ttbr0_enable()/disable() for LSUI instructions.
+  - https://lore.kernel.org/all/aYWuqTqM5MvudI5V@e129823.arm.com/
+
+from v11 to v12:
+  - rebase to v6.19-rc6
+  - add CONFIG_ARM64_LSUI
+  - enable LSUI when !CPU_BIG_ENDIAN and PAN presents.
+  - drop the swp emulation with LSUI insns instead, disable it
+    when LSUI presents.
+  - some of small fixes (useless prefix and suffix and etc).
+  - https://lore.kernel.org/all/20251214112248.901769-1-yeoreum.yun@arm.com/
+
+from v10 to v11:
+  - rebase to v6.19-rc1
+  - use cast instruction to emulate deprecated swpb instruction
+  - https://lore.kernel.org/all/20251103163224.818353-1-yeoreum.yun@arm.com/
+
+from v9 to v10:
+  - apply FEAT_LSUI to user_swpX emulation.
+  - add test coverage for LSUI bit in ID_AA64ISAR3_EL1
+  - rebase to v6.18-rc4
+  - https://lore.kernel.org/all/20250922102244.2068414-1-yeoreum.yun@arm.com/
+
+from v8 to v9:
+  - refotoring __lsui_cmpxchg64()
+  - rebase to v6.17-rc7
+  - https://lore.kernel.org/all/20250917110838.917281-1-yeoreum.yun@arm.com/
+
+from v7 to v8:
+  - implements futex_atomic_eor() and futex_atomic_cmpxchg() with casalt
+    with C helper.
+  - Drop the small optimisation on ll/sc futex_atomic_set operation.
+  - modify some commit message.
+  - https://lore.kernel.org/all/20250816151929.197589-1-yeoreum.yun@arm.com/
+
+from v6 to v7:
+  - wrap FEAT_LSUI with CONFIG_AS_HAS_LSUI in cpufeature
+  - remove unnecessary addition of indentation.
+  - remove unnecessary mte_tco_enable()/disable() on LSUI operation.
+  - https://lore.kernel.org/all/20250811163635.1562145-1-yeoreum.yun@arm.com/
+
+from v5 to v6:
+  - rebase to v6.17-rc1
+  - https://lore.kernel.org/all/20250722121956.1509403-1-yeoreum.yun@arm.com/
+
+from v4 to v5:
+  - remove futex_ll_sc.h futext_lsui and lsui.h and move them to futex.h
+  - reorganize the patches.
+  - https://lore.kernel.org/all/20250721083618.2743569-1-yeoreum.yun@arm.com/
+
+from v3 to v4:
+  - rebase to v6.16-rc7
+  - modify some patch's title.
+  - https://lore.kernel.org/all/20250617183635.1266015-1-yeoreum.yun@arm.com/
+
+from v2 to v3:
+  - expose FEAT_LSUI to guest
+  - add help section for LSUI Kconfig
+  - https://lore.kernel.org/all/20250611151154.46362-1-yeoreum.yun@arm.com/
+
+from v1 to v2:
+  - remove empty v9.6 menu entry
+  - locate HAS_LSUI in cpucaps in order
+  - https://lore.kernel.org/all/20250611104916.10636-1-yeoreum.yun@arm.com/
+
+
+Yeoreum Yun (8):
+  arm64: cpufeature: add FEAT_LSUI
+  KVM: arm64: expose FEAT_LSUI to guest
+  KVM: arm64: kselftest: set_id_regs: add test for FEAT_LSUI
+  arm64: futex: refactor futex atomic operation
+  arm64: futex: support futex with FEAT_LSUI
+  arm64: armv8_deprecated: disable swp emulation when FEAT_LSUI present
+  KVM: arm64: use CAST instruction for swapping guest descriptor
+  arm64: Kconfig: add support for LSUI
+
+ arch/arm64/Kconfig                            |  20 ++
+ arch/arm64/include/asm/cpucaps.h              |   2 +
+ arch/arm64/include/asm/futex.h                | 297 +++++++++++++++---
+ arch/arm64/include/asm/lsui.h                 |  27 ++
+ arch/arm64/kernel/armv8_deprecated.c          |  16 +
+ arch/arm64/kernel/cpufeature.c                |  10 +
+ arch/arm64/kvm/at.c                           |  42 ++-
+ arch/arm64/kvm/sys_regs.c                     |   3 +-
+ arch/arm64/tools/cpucaps                      |   1 +
+ .../testing/selftests/kvm/arm64/set_id_regs.c |   1 +
+ 10 files changed, 367 insertions(+), 52 deletions(-)
+ create mode 100644 arch/arm64/include/asm/lsui.h
+
+--
+LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
+
 
