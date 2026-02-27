@@ -1,165 +1,203 @@
-Return-Path: <kvm+bounces-72126-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72127-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id URFPG/4joWkyqgQAu9opvQ
-	(envelope-from <kvm+bounces-72126-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 05:56:30 +0100
+	id 0M1bFVk4oWkbrQQAu9opvQ
+	(envelope-from <kvm+bounces-72127-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 07:23:21 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 239F01B2C23
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 05:56:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB4F11B334C
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 07:23:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6ACBF30774F7
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 04:56:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5246030C8283
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 06:17:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5233936213D;
-	Fri, 27 Feb 2026 04:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92693E958E;
+	Fri, 27 Feb 2026 06:16:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gQHObmNa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fVjxCfjr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2E9362123;
-	Fri, 27 Feb 2026 04:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4F53E9F78
+	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 06:16:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772168184; cv=none; b=tXBSRbfXFHhHNrQKTQha1DNW6IjGdA/QXmYnlGyfyVIiRsnw8JSPsg5Tj3OPhqfGeh4OZ8c0x2vJ9ci5DI9JkcbwVsHWn0TNsRmEiuuIAk+4Ldoszu9ike1ZaWaR3n2x8xfR2scuCZah/Ubfbc4D33VdmLuCNx32vOBs4Ru09vo=
+	t=1772173018; cv=none; b=gyKigqRApe8bQBYUe8uB3yYr6eBIMABBVlf4pt6iZMG/cSm2hicsC60xJz9W5VoeY5rThQA2qeT/tCqyA9IHyGMYUF7gUa02p0subRyUM9Fe2llV01HLAUevXwL5uMQ7/B4Q9vBvXDQF7RtPjKXaKE7+pDAfExSyXoLcFMnh3AA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772168184; c=relaxed/simple;
-	bh=nDeaw38rPshT03jjkT3uQl/RqQdQkYbrxWEtJ1hFdCg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gMAlsO8OGQGpr5qoa2LcUccz6bp7CuvQLgOYCQYeng9FuFCRDfFLqBWBaIOe2f+0FNn6iiu3Rw0uPjN3zFNQ+MCmw6ixSBjtPRFWMaPscWAtM8MCGuVeZmd5w7g3HczYE+ofocyq+r6zGGcegS1iQRjxaJjp0WLV0Me3chzdwGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gQHObmNa; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772168183; x=1803704183;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nDeaw38rPshT03jjkT3uQl/RqQdQkYbrxWEtJ1hFdCg=;
-  b=gQHObmNaTm4UKp8OgCxJLQpIP2+xh01he6xdaYiosHDpLh+lu3QzUvVc
-   hCy7fsERDYwPSP9EUNDkdNdY9zaM5SQQtGBLXNmabXkQcN5aB2ydFGyxB
-   GdVHkwsAPmryu02dN1zQGLtevHyaAgpfLsv6F4qSdmz5Xvgw5f5Ceo62Q
-   TGjpT0+/ky+CaBbfhkSyNL1x+Y02o0n98AVty2EZkVVB+P0Sc08EBdOzE
-   r99lJStrUTUfaUoNU3XO1xti34u9ge80WmuC7PGpyEBSxmVyXIrDeE9NV
-   8AYpWTBJFQ6lq36PjJxM8YHxIRDVMfoyObfhCNFccYEXTC+PKSp9yT1g7
-   w==;
-X-CSE-ConnectionGUID: ghPkxYpPR069ZEg9yC2zWA==
-X-CSE-MsgGUID: BFF1P5CpSx28qhA/Fa740g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11713"; a="73352075"
-X-IronPort-AV: E=Sophos;i="6.21,313,1763452800"; 
-   d="scan'208";a="73352075"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2026 20:56:23 -0800
-X-CSE-ConnectionGUID: tcggdKxdQ7K4+emj77fcQQ==
-X-CSE-MsgGUID: xhtfEnvlR4+ufl+nCKapxg==
-X-ExtLoop1: 1
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa003.fm.intel.com with ESMTP; 26 Feb 2026 20:56:17 -0800
-Date: Fri, 27 Feb 2026 12:36:41 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, x86@kernel.org, reinette.chatre@intel.com,
-	ira.weiny@intel.com, kai.huang@intel.com, dan.j.williams@intel.com,
-	sagis@google.com, vannapurve@google.com, paulmck@kernel.org,
-	nik.borisov@suse.com, zhenzhong.duan@intel.com, seanjc@google.com,
-	rick.p.edgecombe@intel.com, kas@kernel.org,
-	dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
-	binbin.wu@linux.intel.com, tony.lindgren@linux.intel.com,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v4 07/24] coco/tdx-host: Implement firmware upload sysfs
- ABI for TDX Module updates
-Message-ID: <aaEfWZ8cO+NvNAOI@yilunxu-OptiPlex-7050>
-References: <20260212143606.534586-1-chao.gao@intel.com>
- <20260212143606.534586-8-chao.gao@intel.com>
+	s=arc-20240116; t=1772173018; c=relaxed/simple;
+	bh=MdLOpx/IWf/OKaXN2DbeVdGINITywi9y78eO/a2PMrY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=quB7fxudvKpGXrRkCHjFp9sDb9cUeBUncBg+DAU8d3t7hfwTETfNa05iTgvlhtNtVl2DA668r795/e3nH1QDuzo2MCqPWovCq/X5fut5KkXyj8WJR6dkLvbsafy25ljfiHgD5/cc6n2HRIjyQdUn0MQaoxIw//MgVdoEe62RI+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fVjxCfjr; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2aad1bb5058so16151745ad.0
+        for <kvm@vger.kernel.org>; Thu, 26 Feb 2026 22:16:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1772173016; x=1772777816; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TBQTSZoZ8QpZw8gStM3hrWmhO0sM5dIUkdb0CVPsHZ4=;
+        b=fVjxCfjrLRY+/zllukQdLwdAkHtcNX+5n9ZM0T8hU+WIAV23MkUHB0EouTwXXhblag
+         JRwhHUzW7I8k76ZVk6V8+foyR2KGnP/41nD3wa9P9Q3f5yNvwvn7+mdLgyy94BiSqVtP
+         lqgPPd+aS9q2whpeIhWbX7N59arx5WAu2Ae+5L5Po8TY/aqt+tUAS/S8IFiLgAolNm4t
+         xjeuG2oW8U1DTgFmC50CHe00X0H5ael822fu74fU4Z2sgho6D2fx9WH5GZHvfH2ghNHG
+         KC3F212HYHEHZmv4Dii5N12TSB91pZUNgLw+8bKBQWvRLUrTu7Bq7lbh2EtQFUoyJwsF
+         fWjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772173016; x=1772777816;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TBQTSZoZ8QpZw8gStM3hrWmhO0sM5dIUkdb0CVPsHZ4=;
+        b=oEtzjxIlrN3C9vym00uvXgyRN4VgUTm9I7gCrc+lh7FCL7lSS2IUMjTq8VNK2knBD4
+         Xssc3hXRLTD9vguwFrY36gymg++366L/1ZcW7szNORRFr5KcSjSTM0z4Bi3O7oSfromd
+         YfDFwHxl9z8Pl+NzFhmIoy6gKRPJiMw5dZQit338vGJIbb8xu8hQIXoclpCUsQ4Zj/R4
+         XLCxjUp/XFLr37AxLZ6O9q3oDd+JEC/B7UNxvctf5/T2gNDorEvv4DtPNg8dYhpkaCkW
+         yIWoTNeXyXyX5lswU9A9UCcOMvff/LcXpvc13+dAzJ4KF2RLFzTjo9NkLa3LkJL+mgAm
+         No+w==
+X-Forwarded-Encrypted: i=1; AJvYcCUZDcaFXpDK/VhX043eSUvyNMKYR3dIskYlc0Kxx/E8JYC1dIWLPaguFMQFVKa8uRXHGHI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxS6c/qZPbtMKuCQwx6HAt799Q9/R6KRU9MUvMgwy7i8jqGBy1b
+	k7ajlt0fkRndJRvol7d6zAUxM5o39ArPfQygPKN95QbrUaixy7BCHXeI
+X-Gm-Gg: ATEYQzxGPBZ3VGV6ljmSo9z3BUeDZwQwTL1Pv1oQHtzvL84tHVpG5s7YthuA337Fnu3
+	Z/n2ffIdzXC26RoMIDnFqc72jU9KnM6oFQMPX9t9cOPokP8FKlbv3d8r9ZGfcPxn4m3klE1xJjD
+	H3whdJuJBi+lnF2MYVaaUUZByvEvhOcJbNFORE0tUZgeS4YeCG3FFrMva6hEzZMitgBWEKzPSAr
+	Qxe3xWYSZjtIkoI4TiCDCnjHjdhqSBkUcNLS5/ETw9TV/MOWI9TQ2LRajqlkY23FGVVDvlq3VXM
+	KWJC8jp8qMvrFN8LIjx8cT15uIEL4Qh7fnb2eSKXsRk1sNQwqKNgh3/91B+qwaUb1YXwiSm/9V7
+	thkGby02vYYZJmLeWtJZse85FBnz0a9f42FJ7aP/JJSDdDGU2CIMGkg05QTEGWWATyC2LB8LoXJ
+	VzA4R3gnbazTmDAsMDvw==
+X-Received: by 2002:a17:902:d2c1:b0:2ad:9edf:7fe5 with SMTP id d9443c01a7336-2ae2e4bce9dmr19427245ad.42.1772173016250;
+        Thu, 26 Feb 2026 22:16:56 -0800 (PST)
+Received: from dw-tp ([203.81.243.177])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb6d1913sm57837485ad.77.2026.02.26.22.16.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Feb 2026 22:16:55 -0800 (PST)
+From: "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
+To: linuxppc-dev@lists.ozlabs.org
+Cc: linux-mm@kvack.org,
+	kvm@vger.kernel.org,
+	Alex Williamson <alex@shazbot.org>,
+	Peter Xu <peterx@redhat.com>,
+	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
+Subject: [RFC v1 1/2] drivers/vfio_pci_core: Change PXD_ORDER check from switch case to if/else block
+Date: Fri, 27 Feb 2026 11:46:36 +0530
+Message-ID: <0b8fce7a61561640634317a5e287cdb4794715fd.1772170860.git.ritesh.list@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260212143606.534586-8-chao.gao@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72126-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72127-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yilun.xu@linux.intel.com,kvm@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kvack.org,vger.kernel.org,shazbot.org,redhat.com,gmail.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[riteshlist@gmail.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 239F01B2C23
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EB4F11B334C
 X-Rspamd-Action: no action
 
-> +static void seamldr_init(struct device *dev)
-> +{
-> +	const struct tdx_sys_info *tdx_sysinfo = tdx_get_sysinfo();
-> +	int ret;
-> +
-> +	if (WARN_ON_ONCE(!tdx_sysinfo))
-> +		return;
-> +
-> +	if (!tdx_supports_runtime_update(tdx_sysinfo)) {
-> +		pr_info("Current TDX Module cannot be updated. Consider BIOS updates\n");
-> +		return;
-> +	}
-> +
-> +	tdx_fwl = firmware_upload_register(THIS_MODULE, dev, "tdx_module",
-> +					   &tdx_fw_ops, NULL);
-> +	ret = PTR_ERR_OR_ZERO(tdx_fwl);
-> +	if (ret)
-> +		pr_err("failed to register module uploader %d\n", ret);
-> +}
-> +
-> +static void seamldr_deinit(void)
-> +{
-> +	if (tdx_fwl)
-> +		firmware_upload_unregister(tdx_fwl);
-> +}
+Architectures like PowerPC uses runtime defined values for
+PMD_ORDER/PUD_ORDER. This is because it can use either RADIX or HASH MMU
+at runtime using kernel cmdline. So the pXd_index_size is not known at
+compile time. Without this fix, when we add huge pfn support on powerpc
+in the next patch, vfio_pci_core driver compilation can fail with the
+following errors.
 
-You could use devm_add_action_or_reset() in seamldr_init():
+  CC [M]  drivers/vfio/vfio_main.o
+  CC [M]  drivers/vfio/group.o
+  CC [M]  drivers/vfio/container.o
+  CC [M]  drivers/vfio/virqfd.o
+  CC [M]  drivers/vfio/vfio_iommu_spapr_tce.o
+  CC [M]  drivers/vfio/pci/vfio_pci_core.o
+  CC [M]  drivers/vfio/pci/vfio_pci_intrs.o
+  CC [M]  drivers/vfio/pci/vfio_pci_rdwr.o
+  CC [M]  drivers/vfio/pci/vfio_pci_config.o
+  CC [M]  drivers/vfio/pci/vfio_pci.o
+  AR      kernel/built-in.a
+../drivers/vfio/pci/vfio_pci_core.c: In function ‘vfio_pci_vmf_insert_pfn’:
+../drivers/vfio/pci/vfio_pci_core.c:1678:9: error: case label does not reduce to an integer constant
+ 1678 |         case PMD_ORDER:
+      |         ^~~~
+../drivers/vfio/pci/vfio_pci_core.c:1682:9: error: case label does not reduce to an integer constant
+ 1682 |         case PUD_ORDER:
+      |         ^~~~
+make[6]: *** [../scripts/Makefile.build:289: drivers/vfio/pci/vfio_pci_core.o] Error 1
+make[6]: *** Waiting for unfinished jobs....
+make[5]: *** [../scripts/Makefile.build:546: drivers/vfio/pci] Error 2
+make[5]: *** Waiting for unfinished jobs....
+make[4]: *** [../scripts/Makefile.build:546: drivers/vfio] Error 2
+make[3]: *** [../scripts/Makefile.build:546: drivers] Error 2
 
- 1. to delete tdx_host_remove().
- 2. to delete the global tdx_fwl;
+Fixes: f9e54c3a2f5b7 ("vfio/pci: implement huge_fault support")
+Signed-off-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+---
+ drivers/vfio/pci/vfio_pci_core.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-> +
-> +static int tdx_host_probe(struct faux_device *fdev)
-> +{
-> +	/*
-> +	 * P-SEAMLDR capabilities are optional. Don't fail the entire
-> +	 * device probe if initialization fails.
-> +	 */
-> +	seamldr_init(&fdev->dev);
-> +
-> +	return 0;
-> +}
-> +
-> +static void tdx_host_remove(struct faux_device *fdev)
-> +{
-> +	seamldr_deinit();
-> +}
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index d43745fe4c84..5395a6f30904 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -1670,21 +1670,20 @@ vm_fault_t vfio_pci_vmf_insert_pfn(struct vfio_pci_core_device *vdev,
+ 	if (vdev->pm_runtime_engaged || !__vfio_pci_memory_enabled(vdev))
+ 		return VM_FAULT_SIGBUS;
+
+-	switch (order) {
+-	case 0:
++	if (order == 0) {
+ 		return vmf_insert_pfn(vmf->vma, vmf->address, pfn);
++	}
+ #ifdef CONFIG_ARCH_SUPPORTS_PMD_PFNMAP
+-	case PMD_ORDER:
++	 else if (order == PMD_ORDER) {
+ 		return vmf_insert_pfn_pmd(vmf, pfn, false);
++	 }
+ #endif
+ #ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
+-	case PUD_ORDER:
++	 else if (order == PUD_ORDER) {
+ 		return vmf_insert_pfn_pud(vmf, pfn, false);
+-		break;
++	 }
+ #endif
+-	default:
+-		return VM_FAULT_FALLBACK;
+-	}
++	return VM_FAULT_FALLBACK;
+ }
+ EXPORT_SYMBOL_GPL(vfio_pci_vmf_insert_pfn);
+
+--
+2.53.0
+
 
