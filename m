@@ -1,135 +1,185 @@
-Return-Path: <kvm+bounces-72123-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72124-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IFGtLNjvoGmOoAQAu9opvQ
-	(envelope-from <kvm+bounces-72123-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 02:14:00 +0100
+	id 0M+KG50UoWnoqAQAu9opvQ
+	(envelope-from <kvm+bounces-72124-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 04:50:53 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C281B1702
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 02:13:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B6AC1B265D
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 04:50:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0BDA0303CDA2
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 01:13:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C076C303D5DF
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 03:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C218D2DA74C;
-	Fri, 27 Feb 2026 01:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4953396E6;
+	Fri, 27 Feb 2026 03:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="diPjXSwK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b5cMLeKB"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF0E2BE029;
-	Fri, 27 Feb 2026 01:13:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE403382E6;
+	Fri, 27 Feb 2026 03:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772154796; cv=none; b=gr6tLZulydnpprhxp1JhyLJt5XdtAu/17b9et4itPHC5yR0jazGJ17wWr4jlCmJ7SbnLEqYuWL4xn6XvtEu3GGX2ee7OjCme6/oDBiboZaCy6buvb+xks9uj0FTtFSlcFj35gaxypECYJMigNEt2oxkTHSaG575nj8I/ZvyBW4Q=
+	t=1772164239; cv=none; b=E/I9WLNpiArAoz/K6UPZCX3jNZyqPbuDOMGK0nkLITioJAOL2mbR/9U3T7ipVXbu2qE7eQyR88ShmdHqJ4xAjES2twjp48wvtzs49wWYu8uWbeEp8j7j3PHcRvtL0U4QYp6w+lb7z6raqvLOGQ3AGbVy43PtW+soZqVgMvHh6/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772154796; c=relaxed/simple;
-	bh=Ah+TuB1lDeYw4IsZuvO/0JPF614zpFT8QTl4uDoQUMY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CGObGqCbpce5cyKx0BlqjMo4BBWCDnvlnBPs3iK9kSxqNjXopeL4aT3viGQlIJgJa8ATcdfgKrAQLPjnLx5IrSoo9IU8bHUxCBRe1ne/YWSgBf1i+ywnl6dUEL4d8WSRVyEDFkbkv5/MRm0FvGaw7WS+7FrBxCX+uPNI4PYHO2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=diPjXSwK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BBB9C2BC86;
-	Fri, 27 Feb 2026 01:13:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772154796;
-	bh=Ah+TuB1lDeYw4IsZuvO/0JPF614zpFT8QTl4uDoQUMY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=diPjXSwK8TqqAFrIVbGRa/dGVkWStJjy8IIiHdsqnXu32unVIIvjH2504h5usT+IT
-	 8J3xbQ++j49iOTp38bv7e6m5N+X9k/CJpquUtMfZsLMjckHJ74rGIOOwmDx8GGVnQu
-	 wbfvgNeullqvEPkz1ieAQa0x59SMnERq8FL+OTlkrUbaBfU/ZvtIqqu2AT7/NPkM96
-	 mai44Zu8cSqmXYNYmYuOeDCTpdqX9eXUfDMhuCRx8eiM6xV611ZSPHfEU6EcnqM3pM
-	 Trrn/pATkMyZBYt1fljkpijm7aa1Rul9zWhem6EM6KDILUUBdqwpcnmdxfoO9prxgp
-	 1t5lBCPUJ8gSg==
-From: Yosry Ahmed <yosry@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yosry Ahmed <yosry@kernel.org>
-Subject: [PATCH 3/3] KVM: x86: Check for injected exceptions before queuing a debug exception
-Date: Fri, 27 Feb 2026 01:13:06 +0000
-Message-ID: <20260227011306.3111731-4-yosry@kernel.org>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-In-Reply-To: <20260227011306.3111731-1-yosry@kernel.org>
-References: <20260227011306.3111731-1-yosry@kernel.org>
+	s=arc-20240116; t=1772164239; c=relaxed/simple;
+	bh=Fp3Af9sC3U/2ejHXeORnJoS925f6JSqgvZ0AyURYhck=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fwkXcSfsRLeMeeMqrHygXi+QbnW+L3P3z6TmS8Dde8S2PoIqx/qJpv1Soff/kU4R9fGkMWPiQShoCB6mVXlYWaCq/xqaHKUC8g3SN+YcyIq+J1sObsabmgPfXYnekJmlTTkY4InrcsmzOV2fxQeU8ZcWGXOQeQH8tgQgJ4tjJPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b5cMLeKB; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772164238; x=1803700238;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Fp3Af9sC3U/2ejHXeORnJoS925f6JSqgvZ0AyURYhck=;
+  b=b5cMLeKBrudLrClH7pt/LkhQIMk5Aw4DSpJX4D3tFiyAPmSCwu28HIcS
+   O3l7vF0N+xKEqbG/pDS/CtPePAW5lZTHKA88qnibHHXNCfGnkO5j/u+lE
+   PrpNBW0doYYARSMOZukVdyK+5Txe2B9EXxYjDPz/Ck6aBeUUzlCWwLhEW
+   wWDpWYVtvhTqAL3N+1uMABWdg7C879Sbxbl/AGGWZtM4pdaGGDxW3tmos
+   JpaKQyWYHEJIMs1pdaYrRo2NMUWbx+wOAbML+vMvpqZyle1Ea3c3lcVNv
+   QecXm1nRJdF71faurcduuKy0fVf7zSbEVBBZvmlK0bTtHn4zvxrE/uGT3
+   A==;
+X-CSE-ConnectionGUID: eO1y/V2FT1CJu0zNxU52RQ==
+X-CSE-MsgGUID: iIAoSyjWTReTocaddWlMmw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11713"; a="83574403"
+X-IronPort-AV: E=Sophos;i="6.21,313,1763452800"; 
+   d="scan'208";a="83574403"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2026 19:50:37 -0800
+X-CSE-ConnectionGUID: BhfJntGqTVmGurXBbTRGEQ==
+X-CSE-MsgGUID: 6NkLl7A1SauITZsPHxHccQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,313,1763452800"; 
+   d="scan'208";a="214671628"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa010.fm.intel.com with ESMTP; 26 Feb 2026 19:50:32 -0800
+Date: Fri, 27 Feb 2026 11:30:56 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, x86@kernel.org, reinette.chatre@intel.com,
+	ira.weiny@intel.com, kai.huang@intel.com, dan.j.williams@intel.com,
+	sagis@google.com, vannapurve@google.com, paulmck@kernel.org,
+	nik.borisov@suse.com, zhenzhong.duan@intel.com, seanjc@google.com,
+	rick.p.edgecombe@intel.com, kas@kernel.org,
+	dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
+	binbin.wu@linux.intel.com, tony.lindgren@linux.intel.com,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH v4 07/24] coco/tdx-host: Implement firmware upload sysfs
+ ABI for TDX Module updates
+Message-ID: <aaEP8CbLCc69U45Z@yilunxu-OptiPlex-7050>
+References: <20260212143606.534586-1-chao.gao@intel.com>
+ <20260212143606.534586-8-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260212143606.534586-8-chao.gao@intel.com>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72123-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72124-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RBL_SEM_FAIL(0.00)[172.232.135.74:query timed out];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[yilun.xu@linux.intel.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A5C281B1702
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim]
+X-Rspamd-Queue-Id: 5B6AC1B265D
 X-Rspamd-Action: no action
 
-On KVM_SET_GUEST_DEBUG, if a #DB or #BP is injected with
-KVM_GUESTDBG_INJECT_DB or KVM_GUESTDBG_INJECT_BP, KVM fails with -EBUSY
-if there is an existing pending exception. This was introduced in
-commit 4f926bf29186 ("KVM: x86: Polish exception injection via
-KVM_SET_GUEST_DEBUG") to avoid a warning in kvm_queue_exception(),
-presumably to avoid overriding a pending exception.
+> v3:
+>  - clear "cancel_request" in the "prepare" phase [Binbin]
+>  - Don't fail the whole tdx-host device if seamldr_init() met an error
+>  [Yilun]
 
-This added another (arguably nice) property, if there's a pending
-exception, KVM_SET_GUEST_DEBUG cannot cause a #DF or triple fault.
-However, if an exception is injected, KVM_SET_GUEST_DEBUG will cause
-a #DF or triple fault in the guest, as kvm_multiple_exception() combines
-them.
+Sorry I didn't continue the discussion in that thread, but I meant to
+just skip -EOPNOTSUPP, but not hide real problems.
 
-Check for both pending and injected exceptions for
-KVM_GUESTDBG_INJECT_DB and KVM_GUESTDBG_INJECT_BP, to avoid accidentally
-injecting a #DB or triple fault.
+Not sure if it makes sense to other people, if yes, some changes below:
 
-Signed-off-by: Yosry Ahmed <yosry@kernel.org>
----
- arch/x86/kvm/x86.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+...
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e39c5faf94230..0c8aacf1fa67f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12543,7 +12543,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
- 
- 	if (dbg->control & (KVM_GUESTDBG_INJECT_DB | KVM_GUESTDBG_INJECT_BP)) {
- 		r = -EBUSY;
--		if (kvm_is_exception_pending(vcpu))
-+		if (kvm_is_exception_pending(vcpu) || vcpu->arch.exception.injected)
- 			goto out;
- 		if (dbg->control & KVM_GUESTDBG_INJECT_DB)
- 			kvm_queue_exception(vcpu, DB_VECTOR);
--- 
-2.53.0.473.g4a7958ca14-goog
+> +static void seamldr_init(struct device *dev)
+> +{
+> +	const struct tdx_sys_info *tdx_sysinfo = tdx_get_sysinfo();
+> +	int ret;
+> +
+> +	if (WARN_ON_ONCE(!tdx_sysinfo))
+> +		return;
+                return -ENXIO;
 
+> +
+> +	if (!tdx_supports_runtime_update(tdx_sysinfo)) {
+> +		pr_info("Current TDX Module cannot be updated. Consider BIOS updates\n");
+> +		return;
+                return -EOPNOTSUPP;
+
+> +	}
+> +
+> +	tdx_fwl = firmware_upload_register(THIS_MODULE, dev, "tdx_module",
+> +					   &tdx_fw_ops, NULL);
+> +	ret = PTR_ERR_OR_ZERO(tdx_fwl);
+> +	if (ret)
+> +		pr_err("failed to register module uploader %d\n", ret);
+
+        return ret;
+> +}
+
+...
+
+> +
+> +static int tdx_host_probe(struct faux_device *fdev)
+> +{
+> +	/*
+> +	 * P-SEAMLDR capabilities are optional. Don't fail the entire
+> +	 * device probe if initialization fails.
+
+I think no need the comments, all features are optional unless
+explicitly required. So only exceptions need comments. Instead the code
+may explain better.
+
+> +	 */
+> +	seamldr_init(&fdev->dev);
+
+	ret = seamldr_init(&fdev->dev);
+	if (ret && ret != -EOPNOTSUPP)
+		return ret;
+
+I imagine TDX Connect could follow the same pattern right below.
+
+> +
+> +	return 0;
+> +}
 
