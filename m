@@ -1,41 +1,41 @@
-Return-Path: <kvm+bounces-72181-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72182-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iEhZCJfOoWn3wQQAu9opvQ
-	(envelope-from <kvm+bounces-72181-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 18:04:23 +0100
+	id 8D+6LrHOoWn3wQQAu9opvQ
+	(envelope-from <kvm+bounces-72182-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 18:04:49 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8B321BB2AD
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 18:04:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 159BF1BB2C3
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 18:04:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 62E513198A01
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 16:59:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 667BA31A16D5
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 16:59:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEE735A39F;
-	Fri, 27 Feb 2026 16:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BFB135BDBC;
+	Fri, 27 Feb 2026 16:59:52 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4650A3596E3
-	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 16:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B16D33563C2
+	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 16:59:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772211588; cv=none; b=STBWgsAG8qZ8EdaqcDpJlKnBtppav87ZdlzX0YrBj7pW0FHqWYz205XgxN4+rHCPYMbqhp/hz1yZjIf+2jM/V0OM7OyiBwIQrYj/raITt+KqNk1C9M8tXZGhrklwIfZuuyz9X3mw7WOZys7K/0e6ly9CFp3dx6fpnqRn27sPL94=
+	t=1772211591; cv=none; b=T86ybIkQlJCzk12nCt5PyLGNLyM20hBfG13RRzTg/BCsEb3/58SvD8rcbtqmnuz+G1PAvvvlMSL4AEHkx8f3KOoVlqqg9xqIJGbnVSMdkPHdnDcts7jETr1CztHVz4UoBOkOOjcp6m+jvDnzgyPwuObr6xcp0/Laz+t9IepL1Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772211588; c=relaxed/simple;
-	bh=OCfOi3YUX4a2/GxBNM+Exfvx0QRZUDYfs9dG8gcGRE8=;
+	s=arc-20240116; t=1772211591; c=relaxed/simple;
+	bh=6b0zJDeQI/mbOPSyGjHdpqic3c0brlYOlSZEyHUzqMg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QNPbXJh2xPzRMfBzS4q9m5LdgKWoz0JO184LjLOD+H/QMPVBx0aO+2HaPJ8Z0eBVBEKHtRyqs8ojDBbq0yblhzBNqtNTQFX6S9tU+3AfnafelVJBqNH1lq51T0JNUZplnELDT0iD7dmKco3sB15/+/c9GSpo9i6nqpESeWrcDFw=
+	 MIME-Version; b=uEhPQmQmyJ4ydjby5fgrJNeTX1bxecxXU4DxlBSzEzzjCPhvMCd1rDz5yetR4q2hd+wjiQ14rpPl068KHVIRsqGlKZEuWKj/bzuBex43cDOgXxCgeoiQMCQ9H8JRg7Rbp8stT0FIBzyKb3dGZ3qIaPixBVDDfCgpJVKPfa9Jt6c=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6EE3114BF;
-	Fri, 27 Feb 2026 08:59:39 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0E3011516;
+	Fri, 27 Feb 2026 08:59:41 -0800 (PST)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 8125A3F73B;
-	Fri, 27 Feb 2026 08:59:44 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 047E43F73B;
+	Fri, 27 Feb 2026 08:59:45 -0800 (PST)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org
 Cc: kvmarm@lists.linux.dev,
@@ -46,10 +46,11 @@ Cc: kvmarm@lists.linux.dev,
 	aneesh.kumar@kernel.org,
 	alexandru.elisei@arm.com,
 	oupton@kernel.org,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvmtool PATCH v6 05/17] arm64: Sync headers from Linux v6.19 for psci.h
-Date: Fri, 27 Feb 2026 16:56:12 +0000
-Message-ID: <20260227165624.1519865-6-suzuki.poulose@arm.com>
+Subject: [kvmtool PATCH v6 06/17] Import arm-smccc.h from Linux v6.19
+Date: Fri, 27 Feb 2026 16:56:13 +0000
+Message-ID: <20260227165624.1519865-7-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260227165624.1519865-1-suzuki.poulose@arm.com>
 References: <20260227165624.1519865-1-suzuki.poulose@arm.com>
@@ -70,7 +71,7 @@ X-Spamd-Result: default: False [0.14 / 15.00];
 	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72181-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72182-lists,kvm=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -81,116 +82,340 @@ X-Spamd-Result: default: False [0.14 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[suzuki.poulose@arm.com,kvm@vger.kernel.org];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.936];
+	NEURAL_HAM(-0.00)[-0.471];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arm.com:mid,arm.com:email]
-X-Rspamd-Queue-Id: A8B321BB2AD
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,arm.com:mid,arm.com:url,arm.com:email,linux.dev:email]
+X-Rspamd-Queue-Id: 159BF1BB2C3
 X-Rspamd-Action: no action
 
-Update headers to sync the newly added psci.h for arm64
+From: Oliver Upton <oliver.upton@linux.dev>
 
+Copy in the SMCCC definitions from the kernel, which will be used to
+implement SMCCC handling in userspace. Strip off unnecessary kernel specific
+bits (thus we can't add it to the update_headers script).
+
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- include/linux/psci.h | 52 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ include/linux/arm-smccc.h | 305 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 305 insertions(+)
+ create mode 100644 include/linux/arm-smccc.h
 
-diff --git a/include/linux/psci.h b/include/linux/psci.h
-index 310d83e0..81759ff3 100644
---- a/include/linux/psci.h
-+++ b/include/linux/psci.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
- /*
-  * ARM Power State and Coordination Interface (PSCI) header
-  *
-@@ -46,6 +47,30 @@
- #define PSCI_0_2_FN64_MIGRATE			PSCI_0_2_FN64(5)
- #define PSCI_0_2_FN64_MIGRATE_INFO_UP_CPU	PSCI_0_2_FN64(7)
- 
-+#define PSCI_1_0_FN_PSCI_FEATURES		PSCI_0_2_FN(10)
-+#define PSCI_1_0_FN_CPU_FREEZE			PSCI_0_2_FN(11)
-+#define PSCI_1_0_FN_CPU_DEFAULT_SUSPEND		PSCI_0_2_FN(12)
-+#define PSCI_1_0_FN_NODE_HW_STATE		PSCI_0_2_FN(13)
-+#define PSCI_1_0_FN_SYSTEM_SUSPEND		PSCI_0_2_FN(14)
-+#define PSCI_1_0_FN_SET_SUSPEND_MODE		PSCI_0_2_FN(15)
-+#define PSCI_1_0_FN_STAT_RESIDENCY		PSCI_0_2_FN(16)
-+#define PSCI_1_0_FN_STAT_COUNT			PSCI_0_2_FN(17)
+diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+new file mode 100644
+index 00000000..121a9608
+--- /dev/null
++++ b/include/linux/arm-smccc.h
+@@ -0,0 +1,305 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (c) 2015, Linaro Limited
++ * Copied from $linux/include/linux/arm-smccc.h
++ */
++#ifndef __LINUX_ARM_SMCCC_H
++#define __LINUX_ARM_SMCCC_H
 +
-+#define PSCI_1_1_FN_SYSTEM_RESET2		PSCI_0_2_FN(18)
-+#define PSCI_1_1_FN_MEM_PROTECT			PSCI_0_2_FN(19)
-+#define PSCI_1_1_FN_MEM_PROTECT_CHECK_RANGE	PSCI_0_2_FN(20)
-+#define PSCI_1_3_FN_SYSTEM_OFF2			PSCI_0_2_FN(21)
++#include <linux/const.h>
 +
-+#define PSCI_1_0_FN64_CPU_DEFAULT_SUSPEND	PSCI_0_2_FN64(12)
-+#define PSCI_1_0_FN64_NODE_HW_STATE		PSCI_0_2_FN64(13)
-+#define PSCI_1_0_FN64_SYSTEM_SUSPEND		PSCI_0_2_FN64(14)
-+#define PSCI_1_0_FN64_STAT_RESIDENCY		PSCI_0_2_FN64(16)
-+#define PSCI_1_0_FN64_STAT_COUNT		PSCI_0_2_FN64(17)
++/*
++ * This file provides common defines for ARM SMC Calling Convention as
++ * specified in
++ * https://developer.arm.com/docs/den0028/latest
++ *
++ * This code is up-to-date with version DEN 0028 C
++ */
 +
-+#define PSCI_1_1_FN64_SYSTEM_RESET2		PSCI_0_2_FN64(18)
-+#define PSCI_1_1_FN64_MEM_PROTECT_CHECK_RANGE	PSCI_0_2_FN64(20)
-+#define PSCI_1_3_FN64_SYSTEM_OFF2		PSCI_0_2_FN64(21)
++#define ARM_SMCCC_STD_CALL	        _AC(0,U)
++#define ARM_SMCCC_FAST_CALL	        _AC(1,U)
++#define ARM_SMCCC_TYPE_SHIFT		31
 +
- /* PSCI v0.2 power state encoding for CPU_SUSPEND function */
- #define PSCI_0_2_POWER_STATE_ID_MASK		0xffff
- #define PSCI_0_2_POWER_STATE_ID_SHIFT		0
-@@ -56,6 +81,13 @@
- #define PSCI_0_2_POWER_STATE_AFFL_MASK		\
- 				(0x3 << PSCI_0_2_POWER_STATE_AFFL_SHIFT)
- 
-+/* PSCI extended power state encoding for CPU_SUSPEND function */
-+#define PSCI_1_0_EXT_POWER_STATE_ID_MASK	0xfffffff
-+#define PSCI_1_0_EXT_POWER_STATE_ID_SHIFT	0
-+#define PSCI_1_0_EXT_POWER_STATE_TYPE_SHIFT	30
-+#define PSCI_1_0_EXT_POWER_STATE_TYPE_MASK	\
-+				(0x1 << PSCI_1_0_EXT_POWER_STATE_TYPE_SHIFT)
++#define ARM_SMCCC_SMC_32		0
++#define ARM_SMCCC_SMC_64		1
++#define ARM_SMCCC_CALL_CONV_SHIFT	30
 +
- /* PSCI v0.2 affinity level state returned by AFFINITY_INFO */
- #define PSCI_0_2_AFFINITY_LEVEL_ON		0
- #define PSCI_0_2_AFFINITY_LEVEL_OFF		1
-@@ -66,6 +98,13 @@
- #define PSCI_0_2_TOS_UP_NO_MIGRATE		1
- #define PSCI_0_2_TOS_MP				2
- 
-+/* PSCI v1.1 reset type encoding for SYSTEM_RESET2 */
-+#define PSCI_1_1_RESET_TYPE_SYSTEM_WARM_RESET	0
-+#define PSCI_1_1_RESET_TYPE_VENDOR_START	0x80000000U
++#define ARM_SMCCC_OWNER_MASK		0x3F
++#define ARM_SMCCC_OWNER_SHIFT		24
 +
-+/* PSCI v1.3 hibernate type for SYSTEM_OFF2 */
-+#define PSCI_1_3_OFF_TYPE_HIBERNATE_OFF		BIT(0)
++#define ARM_SMCCC_FUNC_MASK		0xFFFF
 +
- /* PSCI version decoding (independent of PSCI version) */
- #define PSCI_VERSION_MAJOR_SHIFT		16
- #define PSCI_VERSION_MINOR_MASK			\
-@@ -75,6 +114,18 @@
- 		(((ver) & PSCI_VERSION_MAJOR_MASK) >> PSCI_VERSION_MAJOR_SHIFT)
- #define PSCI_VERSION_MINOR(ver)			\
- 		((ver) & PSCI_VERSION_MINOR_MASK)
-+#define PSCI_VERSION(maj, min)						\
-+	((((maj) << PSCI_VERSION_MAJOR_SHIFT) & PSCI_VERSION_MAJOR_MASK) | \
-+	 ((min) & PSCI_VERSION_MINOR_MASK))
++#define ARM_SMCCC_IS_FAST_CALL(smc_val)	\
++	((smc_val) & (ARM_SMCCC_FAST_CALL << ARM_SMCCC_TYPE_SHIFT))
++#define ARM_SMCCC_IS_64(smc_val) \
++	((smc_val) & (ARM_SMCCC_SMC_64 << ARM_SMCCC_CALL_CONV_SHIFT))
++#define ARM_SMCCC_FUNC_NUM(smc_val)	((smc_val) & ARM_SMCCC_FUNC_MASK)
++#define ARM_SMCCC_OWNER_NUM(smc_val) \
++	(((smc_val) >> ARM_SMCCC_OWNER_SHIFT) & ARM_SMCCC_OWNER_MASK)
 +
-+/* PSCI features decoding (>=1.0) */
-+#define PSCI_1_0_FEATURES_CPU_SUSPEND_PF_SHIFT	1
-+#define PSCI_1_0_FEATURES_CPU_SUSPEND_PF_MASK	\
-+			(0x1 << PSCI_1_0_FEATURES_CPU_SUSPEND_PF_SHIFT)
++#define ARM_SMCCC_CALL_VAL(type, calling_convention, owner, func_num) \
++	(((type) << ARM_SMCCC_TYPE_SHIFT) | \
++	((calling_convention) << ARM_SMCCC_CALL_CONV_SHIFT) | \
++	(((owner) & ARM_SMCCC_OWNER_MASK) << ARM_SMCCC_OWNER_SHIFT) | \
++	((func_num) & ARM_SMCCC_FUNC_MASK))
 +
-+#define PSCI_1_0_OS_INITIATED			BIT(0)
-+#define PSCI_1_0_SUSPEND_MODE_PC		0
-+#define PSCI_1_0_SUSPEND_MODE_OSI		1
- 
- /* PSCI return values (inclusive of all PSCI versions) */
- #define PSCI_RET_SUCCESS			0
-@@ -86,5 +137,6 @@
- #define PSCI_RET_INTERNAL_FAILURE		-6
- #define PSCI_RET_NOT_PRESENT			-7
- #define PSCI_RET_DISABLED			-8
-+#define PSCI_RET_INVALID_ADDRESS		-9
- 
- #endif /* _UAPI_LINUX_PSCI_H */
++#define ARM_SMCCC_OWNER_ARCH		0
++#define ARM_SMCCC_OWNER_CPU		1
++#define ARM_SMCCC_OWNER_SIP		2
++#define ARM_SMCCC_OWNER_OEM		3
++#define ARM_SMCCC_OWNER_STANDARD	4
++#define ARM_SMCCC_OWNER_STANDARD_HYP	5
++#define ARM_SMCCC_OWNER_VENDOR_HYP	6
++#define ARM_SMCCC_OWNER_TRUSTED_APP	48
++#define ARM_SMCCC_OWNER_TRUSTED_APP_END	49
++#define ARM_SMCCC_OWNER_TRUSTED_OS	50
++#define ARM_SMCCC_OWNER_TRUSTED_OS_END	63
++
++#define ARM_SMCCC_FUNC_QUERY_CALL_UID  0xff01
++
++#define ARM_SMCCC_QUIRK_NONE		0
++#define ARM_SMCCC_QUIRK_QCOM_A6		1 /* Save/restore register a6 */
++
++#define ARM_SMCCC_VERSION_1_0		0x10000
++#define ARM_SMCCC_VERSION_1_1		0x10001
++#define ARM_SMCCC_VERSION_1_2		0x10002
++#define ARM_SMCCC_VERSION_1_3		0x10003
++
++#define ARM_SMCCC_1_3_SVE_HINT		0x10000
++#define ARM_SMCCC_CALL_HINTS		ARM_SMCCC_1_3_SVE_HINT
++
++
++#define ARM_SMCCC_VERSION_FUNC_ID					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   0, 0)
++
++#define ARM_SMCCC_ARCH_FEATURES_FUNC_ID					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   0, 1)
++
++#define ARM_SMCCC_ARCH_SOC_ID						\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   0, 2)
++
++#define ARM_SMCCC_ARCH_WORKAROUND_1					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   0, 0x8000)
++
++#define ARM_SMCCC_ARCH_WORKAROUND_2					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   0, 0x7fff)
++
++#define ARM_SMCCC_ARCH_WORKAROUND_3					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   0, 0x3fff)
++
++#define ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID				\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
++
++
++/* KVM "vendor specific" services */
++#define ARM_SMCCC_KVM_FUNC_FEATURES		0
++#define ARM_SMCCC_KVM_FUNC_PTP			1
++/* Start of pKVM hypercall range */
++#define ARM_SMCCC_KVM_FUNC_HYP_MEMINFO		2
++#define ARM_SMCCC_KVM_FUNC_MEM_SHARE		3
++#define ARM_SMCCC_KVM_FUNC_MEM_UNSHARE		4
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_5		5
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_6		6
++#define ARM_SMCCC_KVM_FUNC_MMIO_GUARD		7
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_8		8
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_9		9
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_10		10
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_11		11
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_12		12
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_13		13
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_14		14
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_15		15
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_16		16
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_17		17
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_18		18
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_19		19
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_20		20
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_21		21
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_22		22
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_23		23
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_24		24
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_25		25
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_26		26
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_27		27
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_28		28
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_29		29
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_30		30
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_31		31
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_32		32
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_33		33
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_34		34
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_35		35
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_36		36
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_37		37
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_38		38
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_39		39
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_40		40
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_41		41
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_42		42
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_43		43
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_44		44
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_45		45
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_46		46
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_47		47
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_48		48
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_49		49
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_50		50
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_51		51
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_52		52
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_53		53
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_54		54
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_55		55
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_56		56
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_57		57
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_58		58
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_59		59
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_60		60
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_61		61
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_62		62
++#define ARM_SMCCC_KVM_FUNC_PKVM_RESV_63		63
++/* End of pKVM hypercall range */
++#define ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_VER	64
++#define ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_CPUS	65
++
++#define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
++#define ARM_SMCCC_KVM_NUM_FUNCS			128
++
++#define ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID			\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_FEATURES)
++
++#define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
++
++/*
++ * ptp_kvm is a feature used for time sync between vm and host.
++ * ptp_kvm module in guest kernel will get service from host using
++ * this hypercall ID.
++ */
++#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID				\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_PTP)
++
++#define ARM_SMCCC_VENDOR_HYP_KVM_HYP_MEMINFO_FUNC_ID			\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_64,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_HYP_MEMINFO)
++
++#define ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID			\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_64,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_MEM_SHARE)
++
++#define ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID			\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_64,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_MEM_UNSHARE)
++
++#define ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_FUNC_ID			\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_64,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_MMIO_GUARD)
++
++#define ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_VER_FUNC_ID		\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_64,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_VER)
++
++#define ARM_SMCCC_VENDOR_HYP_KVM_DISCOVER_IMPL_CPUS_FUNC_ID		\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_64,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_DISCOVER_IMPL_CPUS)
++
++/* ptp_kvm counter type ID */
++#define KVM_PTP_VIRT_COUNTER			0
++#define KVM_PTP_PHYS_COUNTER			1
++
++/* Paravirtualised time calls (defined by ARM DEN0057A) */
++#define ARM_SMCCC_HV_PV_TIME_FEATURES				\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_64,			\
++			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
++			   0x20)
++
++#define ARM_SMCCC_HV_PV_TIME_ST					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_64,			\
++			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
++			   0x21)
++
++/* TRNG entropy source calls (defined by ARM DEN0098) */
++#define ARM_SMCCC_TRNG_VERSION					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x50)
++
++#define ARM_SMCCC_TRNG_FEATURES					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x51)
++
++#define ARM_SMCCC_TRNG_GET_UUID					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x52)
++
++#define ARM_SMCCC_TRNG_RND32					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x53)
++
++#define ARM_SMCCC_TRNG_RND64					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_64,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x53)
++
++/*
++ * Return codes defined in ARM DEN 0070A
++ * ARM DEN 0070A is now merged/consolidated into ARM DEN 0028 C
++ */
++#define SMCCC_RET_SUCCESS			0
++#define SMCCC_RET_NOT_SUPPORTED			-1
++#define SMCCC_RET_NOT_REQUIRED			-2
++#define SMCCC_RET_INVALID_PARAMETER		-3
++
++/**
++ * struct arm_smccc_res - Result from SMC/HVC call
++ * @a0-a3 result values from registers 0 to 3
++ */
++struct arm_smccc_res {
++	unsigned long a0;
++	unsigned long a1;
++	unsigned long a2;
++	unsigned long a3;
++};
++
++#endif /*__LINUX_ARM_SMCCC_H*/
 -- 
 2.43.0
 
