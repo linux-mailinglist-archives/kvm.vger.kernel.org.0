@@ -1,69 +1,68 @@
-Return-Path: <kvm+bounces-72135-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72136-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6DNRBt9toWm6swQAu9opvQ
-	(envelope-from <kvm+bounces-72135-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 11:11:43 +0100
+	id oFoHHI1toWm6swQAu9opvQ
+	(envelope-from <kvm+bounces-72136-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 11:10:21 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B7C11B5DD2
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 11:11:42 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE5551B5D6D
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 11:10:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9EBBA31ADC40
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 10:05:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B819C30B173A
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 10:09:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9C83D410C;
-	Fri, 27 Feb 2026 10:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2874B313537;
+	Fri, 27 Feb 2026 10:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="bA/BA7HU"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="knsPf/M7"
 X-Original-To: kvm@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012054.outbound.protection.outlook.com [40.107.209.54])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011030.outbound.protection.outlook.com [52.101.62.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9093A7F63;
-	Fri, 27 Feb 2026 10:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7FA36EAAD;
+	Fri, 27 Feb 2026 10:09:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.30
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772186738; cv=fail; b=Oh5Yey1pAL5Vv0FYCrdDv4ODbg+bW5fqXtUOqbruwCa8iRGqWiHaezjCjqkCWQDe0zRXbL2ceaTkEano0H1TIij4ePJcRmiJ14Pc8zzkUdDmpCcCiR5ckklP/Jvs4NPkExxHCDl1GhnL0ecL222xhYlex+giPYgvXPI7QTxQsZk=
+	t=1772186984; cv=fail; b=bW5IhdJtEjqJWH30mq+iKs2NDxoxEo7QdUdZly6XXtYKCdk9P38Hrwn9KYbBlQMOMbHgbeGelPDyjvP9YOR1cJC0rNZvc/8HaVf8E8d5GqVKB5hsYKDIdFnd9i62PeKvxF1twAOtnM/sMVD9U4F4zOdfdCkB0AOFPIWuQ7fMyaI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772186738; c=relaxed/simple;
-	bh=uGbIBYaqYOk3yRLyan84KjZ9jFFfpH/i/snS2n/++d4=;
+	s=arc-20240116; t=1772186984; c=relaxed/simple;
+	bh=Q9xZru2UJi1weGWQ2tGaRmvviMVwfBOU2uq6tDuGlBE=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=VkDd+GyEWDK3YRIsNCE0q2mNeE2xgsBsdEJ5Mw3CtoJR10KzgTKexOm2UsK9ZYUvn/Muu2LEXU/p/qhEhS0+Pu3aKxbdL8pBoBdiSaiXanxeVraAWvsqZveNK2YO89knbEFupKNgiXYZsc6fiV3B4Nh+Xpuy3769nFhxMue3EmE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=bA/BA7HU; arc=fail smtp.client-ip=40.107.209.54
+	 Content-Type:MIME-Version; b=ETdQY/yGw+U2r9zL+X2OeT3YlMfXT9ZIQCIDiKRmBPAeycOQqedNp+G0FPibZmEzz5OVI/uFM17ggDt+aVgFHtFB110ZTDn5r+UDQ4tMU9Wxa32F7HsMwANOZod6fEVR4cHN/tcfuUIpYZOA/L1I/JNK+qp8e4dThS67Q95/HBc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=knsPf/M7; arc=fail smtp.client-ip=52.101.62.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wqcMN/ivMj1km2uuThlSyfuoDmP84juJqbOrcaZUzQ8+YK4iHYYQnJva1Lhe4QDv0BEg95ffGtwViNB+sBzRLqmhidKCxvQFT5x1+KonOnc9BXD2fT+IsIs5GxsaMxpJyV6C3ejUY+8fkp5jV4eNuREnaP3SP9ihex42miudKm9UaFGkwaOzLXgeShsIT/D7TDRxmVhZmXlTfvp8EUIYqjtZyvlM9rRy8ddOSwzqjECgJYlmMbe6yVX2YhXo/nq7lSCsmIdqO39ndVQwpCOrYKgEhGKZfa0SKw3kWJyFjjPn7XiK492aUWxVc/4sxqL3LrObpvMlxGNdxvnZkPwy5w==
+ b=HcbZMuxvShHE0YtGWiU6xNKM0gy64xXFEh+FWf20Ty+21JKkqpZwnErhC6rzohkHwmL8JwgDYjkgKQ43VK2EqtYt/VSSxHTuADpnFqy6Hkj7eG3Z40CisOWS+o2vq8AqMjYdgW8NezqjQ4gVzlBLfL854RQVLRBIBBvqlkIjti1lKubUYiajSxkRjKd5ng0UAaHKAjxEra9teMew4yGHpKNEVf7bN5pd0gAIwS6J1jFo2BxVe0s0rAmLOlGXoFVDRcCUUCQUTexgaHbqjWPuUUjTAx7TBSJUhqU2f7wVrrY6c3dpy58h9K8j62YU1c+mF8HkNkA0J8jKPESJh0xnNg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YlxmKmuDeIDjHL9kwblbR4uINzVEeovOWU4h1/4ROaA=;
- b=SfNr3zSSHb2HamFcSSZ/HDp42OliTeSpE/o4cAJKHMBK3uT7yW0IPiaCW9XvHTWdBQzUGTx540j5XeZklIyFLMeQVWgBQze8pxLMIz1Jal0wyCEbccWdUmkc6YnGMjfPsQ/30gkZABw2haaWJ11MGkf8O4gmTtE+mh5C8cnEVqZXI671q94XBtlwhDR+/9FwlwZ3bbam/RT7AAQke63bJKdStNUjeXKwUckRLoVOv6n4EGQf2qpOo0pahbQV7q2SDLxDaN2UqMkkqZN4zFf0a3ZRbMTJgXn/HeqnD70q89CU+5i43T6XjY/lexB+nz7Z5UATV71trlapyShw+STiyg==
+ bh=XO0nk2qeix7x9SiH3FMMtxKxqLkx562bztrsPlIU84U=;
+ b=txh3hWUqp73IgHWIS2yxY0ze5tDdpC9hao18yQKV0Sqo6vZeAAsUqkrshKUJK9IGbd532o0U5BXvoBzLz9Evk8BNPhMBTz8FX2SHtJeg4urwlCT475lHn1/NU0cLb6IdbBbSqvXfFlQat1ZkkT+XhXYfL4EHhQOY7u36DbC91O3gCOx9KXPxa9ChrMP9BEzsPAt5INd1RxT1/GNPfGuJdPEVxyCYe0xXfpEWEdfzDuXIJgGbtYr8AS47EzqSk+yDGJ8MFzpW3PwdSFjAJRd+IyjpULcTAEZnAPyulZbxo1O9469L4rrqLySO4X2LXeD3zcNeb/xCY/L0q9yQs8b4/w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YlxmKmuDeIDjHL9kwblbR4uINzVEeovOWU4h1/4ROaA=;
- b=bA/BA7HUQoR23zTx1Oj0e4S1UeLgsJSd86zKB4tnJsJygD+cI1rv+ASIsAYFfFYxyksBp7nCr8L29wkka7h2I8z70Sjc+LdblaTNSoBIB8fwnTwpz5ZmS/pmtn3VI9C+Qecry/so4IngMUPhKzoxo+g04Dt1Qy/I5Hw2JGpvwB0=
+ bh=XO0nk2qeix7x9SiH3FMMtxKxqLkx562bztrsPlIU84U=;
+ b=knsPf/M7HB8e4kEnusNtRA/aPyUUKSQIZaEHqVksPpjNKJRaqPc+1YIs99gXvABbkQMygy66ukNgivLfheDTANugIxisFxGN3sEnrJYXo5eOIp/4mMF0UzkmJDfxDbyBUeeyxsEJLHh8FkEFOz4jkZrdCzy9YztWd9LxY9X9Yng=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
  by MW4PR12MB5628.namprd12.prod.outlook.com (2603:10b6:303:185::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.16; Fri, 27 Feb
- 2026 10:05:34 +0000
+ 2026 10:09:40 +0000
 Received: from PH7PR12MB5685.namprd12.prod.outlook.com
  ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
  ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.20.9632.017; Fri, 27 Feb 2026
- 10:05:33 +0000
-Message-ID: <f75088c6-5795-49cc-8932-ea46c2223d74@amd.com>
-Date: Fri, 27 Feb 2026 11:05:24 +0100
+ 10:09:40 +0000
+Message-ID: <90bd4185-1e87-4393-b9e1-1318a656a7d9@amd.com>
+Date: Fri, 27 Feb 2026 11:09:31 +0100
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 4/7] dma-buf: uapi: Mechanism to revoke DMABUFs via
- ioctl()
+Subject: Re: [RFC PATCH 3/7] vfio/pci: Support mmap() of a DMABUF
 To: Matt Evans <mattev@meta.com>, Alex Williamson <alex@shazbot.org>,
  Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
  Alex Mastro <amastro@fb.com>, Mahmoud Adam <mngyadam@amazon.de>,
@@ -76,14 +75,14 @@ Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
  linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
  linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org
 References: <20260226202211.929005-1-mattev@meta.com>
- <20260226202211.929005-5-mattev@meta.com>
+ <20260226202211.929005-4-mattev@meta.com>
 Content-Language: en-US
 From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <20260226202211.929005-5-mattev@meta.com>
+In-Reply-To: <20260226202211.929005-4-mattev@meta.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: YT4PR01CA0291.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:10e::15) To PH7PR12MB5685.namprd12.prod.outlook.com
+X-ClientProxiedBy: YT4PR01CA0088.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:ff::21) To PH7PR12MB5685.namprd12.prod.outlook.com
  (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -93,84 +92,83 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|MW4PR12MB5628:EE_
-X-MS-Office365-Filtering-Correlation-Id: f874b616-714c-46c9-7f12-08de75e7be79
+X-MS-Office365-Filtering-Correlation-Id: 446a5cca-dc2e-4a7c-9bb1-08de75e851ee
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|7053199007;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
 X-Microsoft-Antispam-Message-Info:
-	buk4rNddqrtQSpIqSVI4x0wPIR/a1qezMGO5SQayFZZLt4CCRvbRdEKIxRvHube9leP9esMMLApYEpclXfNtq9Ths2JAjdahcxS++A6lcIShK5sdhOHSU4CTWMjh2y8Y32X4/1NlIO6LPxKCyeQZuGGHBgyJfnazT2jh2AwWET1nqU3Avf81KYwH5vYr3d5fkJdgfe/rnDYH5C3iGG7L20lFCrBnCEEf/q3SMhuux1KzjmTJ0GaXNNuhKY5I0/RAxqLXS0u1UI2ZuIOlV1qKBgsPb62USbG/FCiPLLTLGtfZARSo5bSsgEqcGxmhyvAPCZ8oOWrg96f3T3tu0HXKeHXijGbjw/rPIE0Mcc7rMvYraQcZ+YbPbXkNpPy+dyGGEeZeV4r8j1mO3ROI7M/CiTKjM/+6VOsiA2cabAZClCOi/X4flckdvlJBYvySNYHO6FVCTSMsWRflMWWOzFSGj2Q2X23a6TRaZQgT4H3FBymU6+ZWK67XcHijynTpAN527da44YTIHb2ON1J7kPYajNadDhCcl2bCO/SU4cLoV+qwiRrOVEOF6DSH7GDf0y1dM1aTTPCnkrdt9rGOw6BwmxuzfsB1aDQLgUZ36bRmYtoj3+uG5Os/0cRHT1z6XLCa+zHF4pwGQpOBD5S8tvFGdb0IIVq+k1y0CEoXaOWhRbAlP9QgN508D5EKC5p+t9+yyuiArGZzfl3O8NPc1nWHeDEMqUWfV/UKDm2oZUguhOE=
+	Pg2vvtpoSMgH75bcls5Ds5PYUN1PoewR2NHOEQsmijnyI4lxJ/AAj8+oIcnv5iQS1EjydP+SbZYwHtQu3MAmdZF83vAUStb1W7Nf69SAa8wLzrsHJ+WfxUQj5g6Jr9Uy5CHOUuduwsxGMQAc9vIY0TRWuKatodxNa3TWi9/mZbAOeQalOOhDV+8rtaZh3TNM/KxtKsE/GWQ3Wj04sgOgIC/lpeIr2771pAvg2l4UffmgOpW/wWyVd3LlgbG+oUHQjiAyXtxBpCIe0Ekm1310UlONJ5Z+zNt26yD5pMWkOq147Qv9n/vdeP4iBGdT/28BA3Aml2TMPCDscD4fRNqkXwXnQFxQ6CQ403Io8DkD5On2tlhP7nUKVHY20Y3KMvHmz9m04Z35EKOZKFXw7di8zL8U8YFW1EPjXxrmad8+FEkqt3F8CU6CCNgalLl+w4FnZF91b8unaKwc1zwnod/+1xes6VWfo9dFRAy+rt0Z0OI3oFgvISlT9ns0uUTTLuhBbIoSRu4vh2T/tpOSFUMKn+WqADFVUIY82KmkKa32zPf7oCc0S4byRLkY7u7kelKW9n/87Udb5fsEkzgkNlFI2yP/BIvAjq+ebCsKqJpE5KVLzqb6pTLFMn/4xWm2M8rzNq4uIYse2VE6YKctsFs2HHog851dXvwwYaXMqTaH1H2HRJlKHJrGkS8PFjc8P34NYd4AJxZUKmABnmRKAzodC3sMTKY9HSXJZFgv6OjB0p4=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TkI3YmVqaUYxdks2eUtFMWppSFNuUlhSZ2h0cXBYczhzWHhERWZJNHVUb1Jj?=
- =?utf-8?B?ZTRtcG5oemQ3djJJdlg4N2toNTN6bkZTTTJrbFYzOVNXYlRPSXVQRitURTRR?=
- =?utf-8?B?WXNjTHJwQk1KcjhOZkZ1RnZOcHpOckQ2QnhXajAreGZrdHQ1eWwwaGpmdGZo?=
- =?utf-8?B?ODl4aURGMldxcHUzeTl5aUVkZ2hsVENLcmJqOFhMSDJ5U1EzczBqazg1bXNZ?=
- =?utf-8?B?NGlSYkUxM0RaSXE0ejgzaUNXVkVCWkszQ3FSUWdmQ1B2cFdRdGd3QUdmSWsv?=
- =?utf-8?B?S25mSUJIUDNnYUpodVdpYXNyeEoxOW95TElFQnJsNGVtRU1VaDZGVXZncFY4?=
- =?utf-8?B?bWpYa1diMnkzcXBmOEhjdmQxTzNkQWVrRmtVaTl6dC9OTmNuOU84UTNOYU1u?=
- =?utf-8?B?d0NZR2VLZDJ1R0xtaDFmcklabDY0a1BVaU5FbWorOEVtdDRSNDB5UVd1S21m?=
- =?utf-8?B?UG5rL0ZRQ0Rpa3BsTVhZRGw4aWwrejBMOG5LdUZoSmhOQWduUHB2Zks4YXlQ?=
- =?utf-8?B?WElCSUp6RVYyWTRwU211RWdTa0g0cHJUUHV4dy9vT092ZFNBNGdjdU9TUEly?=
- =?utf-8?B?YUtrZjllbGdJQmIyeU5MMVNtUkRZR2JBQ3BnTDArbXRldEsyei92d2N6d2p0?=
- =?utf-8?B?K3kyY21BQlhvVWFEQ0djZ0VOcHlEREpvWm0zeXZVMXNqOG9uUE1MTmtBY3Ex?=
- =?utf-8?B?TEd4Q2U3V21YU3ZORXh2UWxBc2FnS2NFb1AzVDlwekZzeWJmd0xrTElrVVBl?=
- =?utf-8?B?c0U1SStvUlZiRlhISlpsYVZvTFUxdGVabEtVWks5UkxSdTFpYzQyNEprczRm?=
- =?utf-8?B?WnhrTVE0UHVML0xaRDlpdFRXY1FKa2VRUFJIM0pVNGpyNTFpNEVBYUtWY1Y3?=
- =?utf-8?B?bVZCUUExVFlqQnRhSm00SjJYMEZVZXhSUmdXUWROQ1hselFkdlM2aHpHL2Vz?=
- =?utf-8?B?bGNJWUxyaXJGalZFdG5VdndzRHR0bVVrQm9QUHFvM0JSYVE3U0NRMUFqN2V3?=
- =?utf-8?B?WW1DLzM3VW51dmU2cGQ5eFlsVEp2WGFaYW4xN2RXRDFucHd0Q3RuYUVRNFlR?=
- =?utf-8?B?L3NsWG42Y0ZEUHFWc1R3UGxsWmg4OEZHdlFaVUtnYzZoMzJwQytUT2JIMXZJ?=
- =?utf-8?B?WVBLSW91MFUySlFBTk9HeHpwdHY4WTRXN2dJMHRyTU4vY3Vwa0hSMHQzZ2JU?=
- =?utf-8?B?aUVDcmJjNTVrZUgyVnRBNUZKYktuNGprUndLbW5QckRYUUVJNFdsN2o2ZXRU?=
- =?utf-8?B?N0dRZWlaWUVCcE5lWC84eHdVblVGMFVmaEREMTJXL29MaGcyd1NaVXNsVkhK?=
- =?utf-8?B?OS9nb00ySDBzdjhiVm9zRGtRTXcvZnBaSHNKamhGUHBCY3lFRnFWQy80dmFD?=
- =?utf-8?B?dzRxdS92eGhqeWpMY1dSUHBhblBRYXhmK1VJKzVFdkdiMGFQamNncW15MHha?=
- =?utf-8?B?VUUrUmVSd3hzQlhRS1hhOHY1dEhmZDZJNzVVQ0c1QkNtbXlDTjVMTmZrR2FK?=
- =?utf-8?B?VWU1MFFrOFNOd1Q2d3FXOStndm9vY0swN2M1dFJURUlFVW5nMlZTbGtrTHEz?=
- =?utf-8?B?STRESElhbkU3S2pOdVhsMmRIaXZ6QnplTkxzbk5mM29FMjAyTDdVOS9YSjhP?=
- =?utf-8?B?MXU2VXF2MXhTMWhENXY2cDNFQWZ0VHVmdDFiTkJrSE5UOXFXekJtNVJwT3lz?=
- =?utf-8?B?TllGVDNTL3hSQWR2a2NOZ0FRNW1oMXlCZVF6LzJIaUpGT3NpQlFIZjFYQ3Rq?=
- =?utf-8?B?a0dMTmtOR2hLN1NUTWRpWWhqQzg1MDhoUVhkam1jUDhqM004VVhKVE41djNv?=
- =?utf-8?B?VXF3TGNwZU5xVXNjNTdnOUsyZllpVExpMlY4RDNrRDduVHhyTDJSaUI0VjhL?=
- =?utf-8?B?UWR4QXpLdHl5dHhUSkY2em5qaHdVSEtMYjVTMUlXelBtT2Q0V0J1cGxyZUV6?=
- =?utf-8?B?UmhCTHFHOEVKektHTE1aVDh6QVRpTGpnSGpYQlZ4RHVEV0QrU0Z1U0QwNTNX?=
- =?utf-8?B?TDJlOGR1SXA4K2xtWHF2aGxncHBJV1BDVDJPVGR3WkVvSURlWHFwNWZZbGxn?=
- =?utf-8?B?NDRHaGVCQ2owTDRGSjZCbElKTDA5MTBueDQzTGI0UlhCb3lRMFh6Um5ONUdL?=
- =?utf-8?B?LzZhc2JNK3lxQm9iOHdMaFJwK01vQk11OFIvTkh0dW5CYXBibGljQzNtbzhC?=
- =?utf-8?B?MDBFTXI5UDNaOE1lRVZaeVA0ZzRPQjM2SjZpWE5QSUk4TmZoeFhHN3IwWmI0?=
- =?utf-8?B?RU02NDFaUW56UUtLMGMrc29UVFdldWpSYTRvRGtQdDNrOWxKU2V1QXJ6S0hB?=
- =?utf-8?Q?cmUXtQZGRD600YRkEr?=
+	=?utf-8?B?WGgvWTIreE9aOEp5NW5KV3FwaTZxL1MvRDhrTFhkVUJBUnVRREQySEVIUWVs?=
+ =?utf-8?B?RzZ5TXVsaUtUZEpMT1hQanVPTUJuMVVFUzdaT1NJV0VLUS9Wa09kVEw3QUY5?=
+ =?utf-8?B?aWEybDlNZHQ4Uk1GeFBzWTdiOUVkRGdzTnBxSmIvamt5TWlmMytUNG1DdVlH?=
+ =?utf-8?B?aXNiM1NTYm5OSHMvTUgxSFZWdXljM3g4VWhNVEZ3VlAzMU9JSStpYWVtNnBw?=
+ =?utf-8?B?RlFvbmgrMW13T0Fmd09oZmxqYndOeHRaT2l5Tm96V2FObmtTSU5sSnJ6Qm9L?=
+ =?utf-8?B?UWgva21uOTMyVU5GSmlNMmdpQW51T21jVVVoSXlhSTBLeWQ0TnlhMkR4R25V?=
+ =?utf-8?B?dWphVEtkd0JETWpqQmp4UjZXNzVVSnZiNDFQYXBoSjFNMzlNWWN4cERlME9o?=
+ =?utf-8?B?M1BFb0VrWlZCYWhQb0hyNU1LSlBJOUdKbEhGR01BVzJ0UGhaRm1aVG01Nm9z?=
+ =?utf-8?B?ZlVMQ0psb1NRTFVYV0hUREQyUnBWTjlaWUhLVVRuTnBUOEN3VWFHbFVQTEln?=
+ =?utf-8?B?T3oxK29jQ2NDUnYyU000OU9DQ3F3YUhDdDVvWUFKS25JOFBVWWNpKzRwNDBl?=
+ =?utf-8?B?TlhUTmRiajlZaGxEeEVUT0drTnIyNzZUUTVSVlJOc1ZMMEl0ak9XVXQ4N1pE?=
+ =?utf-8?B?SlVKd21aeFFSdk53YWRLbDhOZkJMcWIzZG1UbklpUENudTAzQW40YVowbXZM?=
+ =?utf-8?B?NEZya1dnWkdpYXRoVUkwc2JhNk0vQUFqYTZDNXRnaFBUaUx6aDkzSHR2RCtF?=
+ =?utf-8?B?Y1diRXlYeml0U1NHZVUwcy9nN0FYTlhtWmIyemh4dlRFcVQ4YkU4ZHR2WUtr?=
+ =?utf-8?B?cUt4c0VPQktDYVVwVk5FUk95M0pVOTE5cGhCZmdwZEF6aXgwZW9LVmhYWXpi?=
+ =?utf-8?B?L1lvNkxBQ2FrQU5EZUdpMmJoRDJOKzNSQTZ5Y3hLVGFPMVVjZTUvdDVYeDJk?=
+ =?utf-8?B?amtOYmZSRnNpeHZUWWNRRGZkYTRNQ1VTNTFkRTlmL1RYemZxNTFXaG1yZzNH?=
+ =?utf-8?B?U2UxdUZoNjNKQ3Z0Ukd4TlZTYUo0YjN5WmFsaGhVUjNHaWpzV3IvT0NNdGhm?=
+ =?utf-8?B?elg1dEh1MlpPZXpDTlJheXJlK0pBS0hwK0xmVno1aFlqV0VIY2dIcEtscTF6?=
+ =?utf-8?B?MkFNY1h3NVo2aGgzUTdGWWJVcTRrSUpDN2NRQ2xHeUwxSGl2bTNGVXI5SkFP?=
+ =?utf-8?B?MEhTMTJkbkk0dWxNKzVDQTV1WllBYklnNDZwa2pWK2o0ZXAwZTl6bW94WVRC?=
+ =?utf-8?B?M2pjbmpOSTRqSjl5ZkhvTTArbWxSbmFPd2ZFbWtCcDdESnowQ3E1ZHRDVDFQ?=
+ =?utf-8?B?ZGVNS1VZTzJKWVU2UURIWTVzdnlNM2NkQStseG5ZZ1Btc0hGQVdDNVpQUUhJ?=
+ =?utf-8?B?ZXZUemkrVCsvZmFrVnFaMUhoTlVHTEl4V2VQbGttbUpxb0NLVzVEc3QxcVgw?=
+ =?utf-8?B?MW95RTBGQmtLdVBzcVF5alNmV2loZ1ZtaHRBYW1vT3pCWHF3ZVVreGdlUmM0?=
+ =?utf-8?B?ODFuMFZnT05aQlF1U1F1c01lRGwyNGg5eEszaUN2dnhPL0c2bEMzZEw0ZU1P?=
+ =?utf-8?B?ay9WMFJ0VStabzhzbWZVYVFNV09OaUhkNWg3UUFxWnRoNmZleVJ2WU1LY3lS?=
+ =?utf-8?B?MnpiSEhQTHhZb1UxL3F5QlZScEdaWTZBREZONElabmU2Y3lkeitzQ1VvL1BF?=
+ =?utf-8?B?WEZSQk5RM3dMbVRaQ0lsaFVsZVVjUVhQNmsvMFZpdHFuVVpRa0VPUnhBNWJm?=
+ =?utf-8?B?amVjOEpnSkpYRDVxeWIxQm1XL1FuRlUrMmhmb2hrbzQ3UXlieWN6TnVoOXhJ?=
+ =?utf-8?B?RWJ6R09kbGU1VVh1Q0FtWk5EUXBGcEVwSTRpS05zQWI0b0lZSGtwODF6Z0tw?=
+ =?utf-8?B?d24yazJYUlA1UmVLbHoyK3lEKzVTaFJDZWNvMmJSYzBDeS96TUpJRk4wY1Jy?=
+ =?utf-8?B?KzJ1b3dwMFRqQjhDMzNQNEpBWGZtODNPQUYwSVhYYW51YjFFNG9NWm1jS1kw?=
+ =?utf-8?B?dk02S0cxTHlVUTJoSFNzV0NTWjB6Zm1PRWc0c2N5TC9zZGRpT2I2aUVQY09C?=
+ =?utf-8?B?bER1SWhWT1RWWUdtV2plOWd2c1V1OVRsZ0pJTS9VQXpYMHhsSEttMFlrdlYr?=
+ =?utf-8?B?SGJ2Q1J3c3hVQVE1TXBsaTJ0UGl4YUYzRElGaFNRdmdrbWk1RDQ5ZVAwMDF5?=
+ =?utf-8?B?bFh5UlpldWVhT0ovbXp4VFM3ckwyN0lNV3hVVnFzU3cyTEVIZVVrR0k3cFB2?=
+ =?utf-8?B?enJRMExvWklDZDFSdCtaelRzQ2FmMU1jQUVPL3hwVVdKMThYaCtnTzRsK3Rv?=
+ =?utf-8?Q?HHWlWk4Eb/JdrLsT62?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f874b616-714c-46c9-7f12-08de75e7be79
+X-MS-Exchange-CrossTenant-Network-Message-Id: 446a5cca-dc2e-4a7c-9bb1-08de75e851ee
 X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2026 10:05:33.0887
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2026 10:09:40.2727
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /5pIozMZIUIGUR2ZxLVc9Gdc6arNylA+fwGXwVAJ86ZVsE2Hr44w1+bRp3xhrOKb
+X-MS-Exchange-CrossTenant-UserPrincipalName: EYHPsmhhCvtJC4kFOoPHF/5Xjf0eZJQx7qcHgnHOANsqa2hyXpYhj9A9HWbGsr3a
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5628
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72135-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72136-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[19];
 	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[christian.koenig@amd.com,kvm@vger.kernel.org];
@@ -179,100 +177,85 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:mid,amd.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,meta.com:email]
-X-Rspamd-Queue-Id: 8B7C11B5DD2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amd.com:mid,amd.com:dkim]
+X-Rspamd-Queue-Id: DE5551B5D6D
 X-Rspamd-Action: no action
 
-On 2/26/26 21:22, Matt Evans wrote:
-> Add a new dma-buf ioctl() op, DMA_BUF_IOCTL_REVOKE, connected to a new
-> (optional) dma_buf_ops callback, revoke().  An exporter receiving this
-> will _permanently_ revoke the DMABUF, meaning it can no longer be
-> mapped/attached/mmap()ed.  It also guarantees that existing
-> importers have been detached (e.g. via move_notify) and all mappings
-> made inaccessible.
+On 2/26/26 21:21, Matt Evans wrote:
+> A VFIO DMABUF can export a subset of a BAR to userspace by fd; add
+> support for mmap() of this fd.  This provides another route for a
+> process to map BARs, except one where the process can only map a specific
+> subset of a BAR represented by the exported DMABUF.
 > 
-> This is useful for lifecycle management in scenarios where a process
-> has created a DMABUF representing a resource, then delegated it to
-> a client process; access to the resource is revoked when the client is
-> deemed "done", and the resource can be safely re-used elsewhere.
+> mmap() support enables userspace driver designs that safely delegate
+> access to BAR sub-ranges to other client processes by sharing a DMABUF
+> fd, without having to share the (omnipotent) VFIO device fd with them.
+> 
+> The mmap callback installs vm_ops callbacks for .fault and .huge_fault;
+> they find a PFN by searching the DMABUF's physical ranges.  That is,
+> DMABUFs with multiple ranges are supported for mmap().
 
-Well that means revoking from the importer side. That absolutely doesn't make sense to me.
+In general sounds like a good idea but this approach here doesn't looks good at all.
 
-Why would you do that?
+Especially how you call unmap_mapping_range() from your DMA-buf cleanup path looks extremely questionable.
+
+...
+
+> +/*
+> + * Similar to vfio_pci_core_mmap() for a regular VFIO device fd, but
+> + * differs by pre-checks performed and ultimately the vm_ops installed.
+> + */
+> +static int vfio_pci_dma_buf_mmap(struct dma_buf *dmabuf, struct vm_area_struct *vma)
+> +{
+> +       struct vfio_pci_dma_buf *priv = dmabuf->priv;
+> +       u64 req_len, req_start;
+> +
+> +       if (!vfio_pci_dma_buf_is_mappable(dmabuf))
+> +               return -ENODEV;
+> +       if ((vma->vm_flags & VM_SHARED) == 0)
+> +               return -EINVAL;
+> +
+> +       req_len = vma->vm_end - vma->vm_start;
+> +       req_start = vma->vm_pgoff << PAGE_SHIFT;
+> +
+> +       if (req_start + req_len > priv->size)
+> +               return -EINVAL;
+> +
+> +       vma->vm_private_data = priv;
+> +       vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> +       vma->vm_page_prot = pgprot_decrypted(vma->vm_page_prot);
+> +
+> +       /*
+> +        * See comments in vfio_pci_core_mmap() re VM_ALLOW_ANY_UNCACHED.
+> +        *
+> +        * FIXME: get mapping attributes from dmabuf?
+> +        */
+> +       vm_flags_set(vma, VM_ALLOW_ANY_UNCACHED | VM_IO | VM_PFNMAP |
+> +                    VM_DONTEXPAND | VM_DONTDUMP);
+> +       vma->vm_ops = &vfio_pci_dma_buf_mmap_ops;
+> +
+> +       return 0;
+
+Let's start with this here, it just looks horrible over complicated.
+
+When a DMA-buf just represents a linear piece of BAR which is map-able through the VFIO FD anyway then the right approach is to just re-direct the mapping to this VFIO FD.
+
+Roughly something like this here should do it:
+
+	vma->vm_pgoff += offset_which_your_dma_buf_represents;
+	vma_set_file(vma, core_dev->file);
+	vfio_pci_core_mmap(core_dev, vma);
+
+It can be that you want additional checks (e.g. if the DMA-buf is revoked) in which case you would need to override the vma->vm_ops, but then just do the access checks and call the vfio_pci_mmap_ops to get the actually page fault handling done.
+
+
+>+               unmap_mapping_range(priv->dmabuf->file->f_mapping,
+>+                                   0, priv->size, 1);
+
+When you need to use unmap_mapping_range() then you usually share the address space object between the file descriptor exporting the DMA-buf and the DMA-buf fd itself.
+
+Otherwise functions like vfio_pci_zap_bars() doesn't work correctly any more and that usually creates a huge bunch of problems.
 
 Regards,
 Christian.
-
-> 
-> Signed-off-by: Matt Evans <mattev@meta.com>
-> ---
->  drivers/dma-buf/dma-buf.c    |  5 +++++
->  include/linux/dma-buf.h      | 22 ++++++++++++++++++++++
->  include/uapi/linux/dma-buf.h |  1 +
->  3 files changed, 28 insertions(+)
-> 
-> diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
-> index edaa9e4ee4ae..b9b315317f2d 100644
-> --- a/drivers/dma-buf/dma-buf.c
-> +++ b/drivers/dma-buf/dma-buf.c
-> @@ -561,6 +561,11 @@ static long dma_buf_ioctl(struct file *file,
->         case DMA_BUF_IOCTL_IMPORT_SYNC_FILE:
->                 return dma_buf_import_sync_file(dmabuf, (const void __user *)arg);
->  #endif
-> +       case DMA_BUF_IOCTL_REVOKE:
-> +               if (dmabuf->ops->revoke)
-> +                       return dmabuf->ops->revoke(dmabuf);
-> +               else
-> +                       return -EINVAL;
-> 
->         default:
->                 return -ENOTTY;
-> diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
-> index 0bc492090237..a68c9ad7aebd 100644
-> --- a/include/linux/dma-buf.h
-> +++ b/include/linux/dma-buf.h
-> @@ -277,6 +277,28 @@ struct dma_buf_ops {
-> 
->         int (*vmap)(struct dma_buf *dmabuf, struct iosys_map *map);
->         void (*vunmap)(struct dma_buf *dmabuf, struct iosys_map *map);
-> +
-> +       /**
-> +        * @revoke:
-> +        *
-> +        * This callback is invoked from a userspace
-> +        * DMA_BUF_IOCTL_REVOKE operation, and requests that access to
-> +        * the buffer is immediately and permanently revoked.  On
-> +        * successful return, the buffer is not accessible through any
-> +        * mmap() or dma-buf import.  The request fails if the buffer
-> +        * is pinned; otherwise, the exporter marks the buffer as
-> +        * inaccessible and uses the move_notify callback to inform
-> +        * importers of the change.  The buffer is permanently
-> +        * disabled, and the exporter must refuse all map, mmap,
-> +        * attach, etc. requests.
-> +        *
-> +        * Returns:
-> +        *
-> +        * 0 on success, or a negative error code on failure:
-> +        * -ENODEV if the associated device no longer exists/is closed.
-> +        * -EBADFD if the buffer has already been revoked.
-> +        */
-> +       int (*revoke)(struct dma_buf *dmabuf);
->  };
-> 
->  /**
-> diff --git a/include/uapi/linux/dma-buf.h b/include/uapi/linux/dma-buf.h
-> index 5a6fda66d9ad..84bf2dd2d0f3 100644
-> --- a/include/uapi/linux/dma-buf.h
-> +++ b/include/uapi/linux/dma-buf.h
-> @@ -178,5 +178,6 @@ struct dma_buf_import_sync_file {
->  #define DMA_BUF_SET_NAME_B     _IOW(DMA_BUF_BASE, 1, __u64)
->  #define DMA_BUF_IOCTL_EXPORT_SYNC_FILE _IOWR(DMA_BUF_BASE, 2, struct dma_buf_export_sync_file)
->  #define DMA_BUF_IOCTL_IMPORT_SYNC_FILE _IOW(DMA_BUF_BASE, 3, struct dma_buf_import_sync_file)
-> +#define DMA_BUF_IOCTL_REVOKE   _IO(DMA_BUF_BASE, 4)
-> 
->  #endif
-> --
-> 2.47.3
-> 
-
 
