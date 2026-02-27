@@ -1,163 +1,140 @@
-Return-Path: <kvm+bounces-72205-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72206-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sBU9FsX4oWknyAQAu9opvQ
-	(envelope-from <kvm+bounces-72205-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 21:04:21 +0100
+	id MLCfEY75oWlkyAQAu9opvQ
+	(envelope-from <kvm+bounces-72206-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 21:07:42 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B20701BD2EE
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 21:04:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DED91BD366
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 21:07:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 76E9C304997E
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 20:04:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A6036309178A
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 20:06:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4292645BD7C;
-	Fri, 27 Feb 2026 20:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 048F345349F;
+	Fri, 27 Feb 2026 20:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IXL+km9v"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="PQdNdYk5"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 772303451AB
-	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 20:04:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF982D73BC;
+	Fri, 27 Feb 2026 20:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772222646; cv=none; b=EvnkYZBuSLjPGsHKzAMo/V65aLgZXN4JNxL/3wb5+v+vyiE0tojIYq5RS5kptjPGz7bYJAVVTyKd9w2GqiY8+C45webqsNaSIRiTnxXwv6yjz8j/xxMur6n1GEt72SjOmIyr+0OPjMigMEXQ33bmceYPgi9oUZq9SrkoLr7u6Us=
+	t=1772222792; cv=none; b=DSM3ziyjrA5r7XXsVAvZRJT28T7RlZn015njHjuJjfsmekK+Zihk+ce9fceEp0qvvl8DIHEY7PhpgXitKNqQUf8trfhS9fnXweMkW6aKZRuycOcoYLAlOk253tFOTSV+BMSTRpEoypZG7o1n4yKnj1QYWSwxCrZopj9eADDLkSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772222646; c=relaxed/simple;
-	bh=og54QudXPuFmQTZMNOTjb9RiAH0J5DA30/PQNOFIUm0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OYOJD92WkAXBcmC9WU8IQ0IT3TSF2Um3S4AhONxYR4dAhV9xHzhzX5q5om46omiQfYh2qieCam/DCY8cHXdAOHg86S6In8pNzt9+ai+9ajDOVIJ2Vn8hnmQ7UormTQ+QUqT3fcSk4sogErZLNcEytte7XQEaqMPZhUno6P9t2kY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IXL+km9v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B818C2BC87
-	for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 20:04:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772222646;
-	bh=og54QudXPuFmQTZMNOTjb9RiAH0J5DA30/PQNOFIUm0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=IXL+km9v1PvWlO/6/vuNy5XdNEZa/U6nc3wXJlq1h1UQ8/adIlxYQKYYKyb/maq9S
-	 QUzR3qKA5ef7DRiIg4BRNr2N4s0YjsufHyxKWBjqUbd6KU1hHmQVmZjVF2oLTDWldG
-	 18RYXDW9fkDJnytmrBiHvwCXhGf33qK17TXhM2Lj7K8bkIhpUMaVURJhMKXnkwng8T
-	 3Ov7zghPfGbv4Zie5r3hjMBuJJH4QBYpeNrFftRsFRU3Bxkq+dWG3w/xw5zNqrZ2WJ
-	 tqCfPKCjWph6lTYU8rZWftdxhUngzQYxxmCrw0adOX207nBHeowWOvM31pSkJeoArj
-	 4tE9JmgJ3TZpQ==
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b9359c0ec47so260706766b.0
-        for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 12:04:06 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU/MGQ7QHCETwcVD/DSRPlIGxv6rdT2h6m/qsj5vyYbEWyyNpD3196PI2fV0we6B4P3MC8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNPDKEgjljW7UP0uubddH/Su0hruk9nnjPHfS2pCEFIgiPFwGf
-	8LttFFOQNNVt9VrOhEnomSlCVaWIGkRC4LsdgwkwEb3qAh3G4mF8SFalb2wznGJxjGrHyE9bc9i
-	QpRmrxu1hlF69WXvLW6mlM/+6U/uW8l4=
-X-Received: by 2002:a17:907:6d0b:b0:b8f:deff:a019 with SMTP id
- a640c23a62f3a-b937615c4a5mr239003466b.0.1772222644883; Fri, 27 Feb 2026
- 12:04:04 -0800 (PST)
+	s=arc-20240116; t=1772222792; c=relaxed/simple;
+	bh=rzB214xGCqD3xv4mmMmHeRsaLlWaJqiFq7PjvbJrxVY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FpXH2X6/WrCjYvXAn2F8tGCXgmaSeDwCOHhSBqlp5j3GzAjeSgN6cpXYGzy7KhCtWTpoLXgU4B3YvTSXS4Sv6W3YF00yF0khWMga1tBsQNTBE9UUAx8mxvIC5vv0mK6YOA78jCUrF4DfZOleUa/tKo0we5kDjSWQL47lh+LOC/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=PQdNdYk5; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [192.168.0.88] (192-184-212-33.fiber.dynamic.sonic.net [192.184.212.33])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 96F8920B6F02;
+	Fri, 27 Feb 2026 12:06:30 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 96F8920B6F02
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1772222790;
+	bh=Lgc0xTJY6n96ZqmNpJBXHUF+t6nBKy6gbV8xtTVGovc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=PQdNdYk58FNrxwz9wt1xzJqO13MT8WXHPbe8sPcoMZ8b4HD4EgohHJnndrhftyyFp
+	 avTKsPsEOehVmOf5Hn5X+50n5XftixLe77/oP01dSXDLJgdIWcr94dqgVSc7bZwvme
+	 rp7ZotNw7oLvV12UU+mcrB0VPNkXIf3BPAegTvF8=
+Message-ID: <68f419eb-2f0f-e747-762a-45bd8181e819@linux.microsoft.com>
+Date: Fri, 27 Feb 2026 12:06:29 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260209195142.2554532-1-yosry.ahmed@linux.dev>
- <20260209195142.2554532-2-yosry.ahmed@linux.dev> <txfn2izdpaavep6yrcujlxkqrqf2gwk2ccb6dplwcfnsstdnie@lgx74e27nus7>
- <aaCO62eQiZX5pvSk@google.com>
-In-Reply-To: <aaCO62eQiZX5pvSk@google.com>
-From: Yosry Ahmed <yosry@kernel.org>
-Date: Fri, 27 Feb 2026 12:03:53 -0800
-X-Gmail-Original-Message-ID: <CAO9r8zOcBbgtNzy6FizPe8Xm8W=jg3CR8pmdByfszfEM3rqzsA@mail.gmail.com>
-X-Gm-Features: AaiRm53OsienD7rPNs2oKD-h8V5YxISqMIOTYz7g2mCS9es2uFKwbgY2cs_Vj9E
-Message-ID: <CAO9r8zOcBbgtNzy6FizPe8Xm8W=jg3CR8pmdByfszfEM3rqzsA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] KVM: SVM: Triple fault L1 on unintercepted
- EFER.SVME clear by L2
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: VFIO support on hyperv (vfio_pci_core_ioctl())
+Content-Language: en-US
+To: Alex Williamson <alex@shazbot.org>
+Cc: kvm@vger.kernel.org, "wei.liu@kernel.org" <wei.liu@kernel.org>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
+References: <1f50dae2-ec4a-7914-a14f-2ada803eb0e3@linux.microsoft.com>
+ <20260227122957.1e555024@shazbot.org>
+From: Mukesh R <mrathor@linux.microsoft.com>
+In-Reply-To: <20260227122957.1e555024@shazbot.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72205-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-72206-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_THREE(0.00)[4];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mrathor@linux.microsoft.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: B20701BD2EE
+	TAGGED_RCPT(0.00)[kvm];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.microsoft.com:mid,linux.microsoft.com:dkim]
+X-Rspamd-Queue-Id: 9DED91BD366
 X-Rspamd-Action: no action
 
-> > > @@ -216,6 +216,17 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
-> > >
-> > >     if ((old_efer & EFER_SVME) != (efer & EFER_SVME)) {
-> > >             if (!(efer & EFER_SVME)) {
-> > > +                   /*
-> > > +                    * Architecturally, clearing EFER.SVME while a guest is
-> > > +                    * running yields undefined behavior, i.e. KVM can do
-> > > +                    * literally anything.  Force the vCPU back into L1 as
-> > > +                    * that is the safest option for KVM, but synthesize a
-> > > +                    * triple fault (for L1!) so that KVM at least doesn't
-> > > +                    * run random L2 code in the context of L1.
-> > > +                    */
-> > > +                   if (is_guest_mode(vcpu))
-> > > +                           kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
-> > > +
-> >
-> > Sigh, I think this is not correct in all cases:
-> >
-> > 1. If userspace restores a vCPU with EFER.SVME=0 to a vCPU with
-> > EFER.SVME=1 (e.g. restoring a vCPU running to a vCPU running L2).
-> > Typically KVM_SET_SREGS is done before KVM_SET_NESTED_STATE, so we may
-> > set EFER.SVME = 0 before leaving guest mode.
-> >
-> > 2. On vCPU reset, we clear EFER. Hmm, this one is seemingly okay tho,
-> > looking at kvm_vcpu_reset(), we leave nested first:
-> >
-> >       /*
-> >        * SVM doesn't unconditionally VM-Exit on INIT and SHUTDOWN, thus it's
-> >        * possible to INIT the vCPU while L2 is active.  Force the vCPU back
-> >        * into L1 as EFER.SVME is cleared on INIT (along with all other EFER
-> >        * bits), i.e. virtualization is disabled.
-> >        */
-> >       if (is_guest_mode(vcpu))
-> >               kvm_leave_nested(vcpu);
-> >
-> >       ...
-> >
-> >       kvm_x86_call(set_efer)(vcpu, 0);
-> >
-> > So I think the only problematic case is (1). We can probably fix this by
-> > plumbing host_initiated through set_efer? This is getting more
-> > complicated than I would have liked..
->
-> What if we instead hook WRMSR interception?  A little fugly (well, more than a
-> little), but I think it would minimize the chances of a false-positive.  The
-> biggest potential flaw I see is that this will incorrectly triple fault if KVM
-> synthesizes a #VMEXIT while emulating the WRMSR.  But that really shouldn't
-> happen, because even a #GP=>#VMEXIT needs to be queued but not synthesized until
-> the emulation sequence completes (any other behavior would risk confusing KVM).
+On 2/27/26 11:29, Alex Williamson wrote:
+> On Wed, 25 Feb 2026 14:04:49 -0800
+> Mukesh R <mrathor@linux.microsoft.com> wrote:
+> 
+>> Hi Alex et al:
+>>
+>> I've been looking at making pci passthru irq setup/remap work on hyperv
+>> for the latest (6.19) version using vfio core. Unfortunately, it's just
+>> not fitting well because in case of hyperv the irq remap is done by
+>> the hypervisor. Specifically, for a robust and proper solution, we need
+>> to override vfio_pci_set_msi_trigger(). As such, for the best way forward
+>> I am trying to figure how much flexibility there is to modify
+>> vfio_pci_intrs.c with "if (running_on_hyperv())" branches (putting hyperv
+>> code in separate file).
+>>
+>> If none, then the alternative would be to create vfio-hyperv.c with
+>> vfio_device_ops.ioctl = hyperv_vfio_pci_core_ioctl(). But, then I'd
+>> be replicating code for other sub ioctls like vfio_pci_ioctl_get_info(),
+>> vfio_pci_ioctl_get_irq_info(), etc. Would it be acceptable to make them
+>> non static in this case?
+>>
+>> Please let me know your thoughts or if you have other suggestions.
+> 
+> Hi Mukesh,
+> 
+> In general, littering the code with running_on_hyperv() tests is not
+> acceptable, but the presented alternative isn't really accurate either.
+> If you want to substitute in your own ioctl callback, you can still
+> call vfio_pci_core_ioctl() for all the unhandled ioctls, without extra
 
-What if we key off vcpu->wants_to_run?
+Yes, I realized that after looking at how other callers were using it.
 
-It's less protection against false positives from things like
-kvm_vcpu_reset() if it didn't leave nested before clearing EFER, but
-more protection against the #VMEXIT case you mentioned. Also should be
-much lower on the fugliness scale imo.
+> exports.  We can also look at whether vfio_pci_device_ops could have a
+> callback specifically addressing an alternative set_msi_trigger
+> handler.  Thanks,
+
+Sounds good. thanks as always,
+-Mukesh
+
+
+> Alex
+
 
