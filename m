@@ -1,351 +1,212 @@
-Return-Path: <kvm+bounces-72167-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72168-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GK2pEzO4oWkYwAQAu9opvQ
-	(envelope-from <kvm+bounces-72167-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 16:28:51 +0100
+	id MFIxH5+9oWnCwAQAu9opvQ
+	(envelope-from <kvm+bounces-72168-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 16:51:59 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA93A1B9C5C
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 16:28:50 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E17F1BA51C
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 16:51:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9DF603088621
-	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 15:21:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0DC6F306E211
+	for <lists+kvm@lfdr.de>; Fri, 27 Feb 2026 15:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 722AC43636C;
-	Fri, 27 Feb 2026 15:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD13441053;
+	Fri, 27 Feb 2026 15:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="IywS8lKy"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="nSbeJn09";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="A7cma9dB"
 X-Original-To: kvm@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012006.outbound.protection.outlook.com [40.107.200.6])
+Received: from flow-b1-smtp.messagingengine.com (flow-b1-smtp.messagingengine.com [202.12.124.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0622280CE0;
-	Fri, 27 Feb 2026 15:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.6
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772205667; cv=fail; b=W6uMCrh5NYwXQVa5VjlGK0i8Ti1Hvu2mCauI5GooPcaQXrugzI5z+Hp9hRmm8ECXjgSXCx4eVBSWi8IGbRkjQ/sf9CDjA4MMzBjdB8soR8yfaxMbhJKGWriz8QYCeHGg5x2uVea2j8+8ioYH2sZXKuaj695NFxVLBnbBELrTBJg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772205667; c=relaxed/simple;
-	bh=iV1T/RUwz8r56wOnbTUJIC3//ltEqtUUup4xD1fviwo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=LKI9Q3G+JyQ0TDYU9Qh5CnY8aVLqKYMDW8G5B50hRFhcWjMNoQqEnSrY17YcwWHIdS/27lTduijOAEoc0na2671Qq0G/wvmkkOTlyKeDczk1SxY0usP3d7AAdZ02u6lHfFFSbtHPvx20bXpz6Y/lb1/Vu7eMwmMS2sxde1U7xF0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=IywS8lKy; arc=fail smtp.client-ip=40.107.200.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OKhZVOloECsNntNsaTeVwA4s3UNx77xAj7wqIIJxbzbpEOktRK3xETqYcZyJJfR5FHG+nWoIkbkMMm9xBzpaodzmBAxMcefIDhlEa0VNcWCtm+uiSg2W3NSCv1GJAVKc91zGNKq/9wu15In7VSVs2+sbYCANFyBc2ChvLMyjwLf0ZsqjF0gz5Jw1Nf6MOfUGFPEGGQ8pTiz6A8EMYmBk1WjpB41slBtt6MqSN2OJK2TWxLcCvPx4kNWk3z80nmW2XKG10LQpPYnwfgPHwAtnezM/dALKuvdTOeH4R4oXcZVjAaGN4nuhf9SbStRt16bq0/ejzsj1FBKOrkluengbuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=b3tDzevO92hFp0MiTb2w4uy5SBTIBEUoPh9az88rqkA=;
- b=JBF5cwAnOgGnsf7x8eyn8jjS+9B0AbmShkowMQEK9HR/34FDnEEVjMk5gDX425VQunHnWnAe+X0U5eu0rkNqw3WYZs7HyTeNTPWWVMCE1W7KZ5ZWkptFlYwKg+BnxdgJqbPAlWc293CUeKCLGeRU/kn+VF1g8flU2A7DQsaKkZ2pRdRGlyEZH5AKbnzOGcZXB3jHMWwFJCZPXMjbcVXIf/t33HpPdA5EPQOjREUTsNhgnlmlqXmlSJwolpDc0j1Sjwg+bJKflgOofLKGCTl5UohU+XAHMrwyIO/CFAXQg+YX3pXoC++7VYy9zprjMPvY+hO2112r7HozYBg4COrmtw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b3tDzevO92hFp0MiTb2w4uy5SBTIBEUoPh9az88rqkA=;
- b=IywS8lKyKUyyl4LRWHODtXN+eh0nvGFLjq74oWMN6WVyGcp1BvkRKRanRm+wR/tS1U4iOtqUEpeDBnDBv3MBykwDZD7af+4631BGiJ/0ptdchBzmG3HayLxVHyyw/C8TvSOCGaHyZtxnP5IQ9x2bLnQ2Kqp+o4SQWGbxn35lxZo=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by SN7PR12MB8172.namprd12.prod.outlook.com (2603:10b6:806:352::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9632.16; Fri, 27 Feb
- 2026 15:21:01 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.20.9632.017; Fri, 27 Feb 2026
- 15:21:01 +0000
-Message-ID: <a006b938-cd53-4c56-8131-30f557919ec6@amd.com>
-Date: Fri, 27 Feb 2026 16:20:54 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 4/7] dma-buf: uapi: Mechanism to revoke DMABUFs via
- ioctl()
-To: Matt Evans <mattev@meta.com>, Alex Williamson <alex@shazbot.org>,
- Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
- Alex Mastro <amastro@fb.com>, Mahmoud Adam <mngyadam@amazon.de>,
- David Matlack <dmatlack@google.com>
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Sumit Semwal <sumit.semwal@linaro.org>, Kevin Tian <kevin.tian@intel.com>,
- Ankit Agrawal <ankita@nvidia.com>, Pranjal Shrivastava <praan@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180F33624D2;
+	Fri, 27 Feb 2026 15:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.136
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772207232; cv=none; b=ikzB0v/ow4l1qX5mVQBVfQB+0g5dWDDmPPNinL5B5ilST95rLL56mWrAGad66F51OWaeD2ZTbOY0V0o2M8OYTrmS4Jy6uqgWteML10BoI1kTBKdmBmLEyPm3yhw6PvQvTliJ9O+yskYbtkU2zTs63A3DYbGeWAGiJkCXA5xbl80=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772207232; c=relaxed/simple;
+	bh=UgSApk6Vz42Cpkj7RvGNFPFj/GJVlPPsed5rfjh7CB4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VX8w4FVfb6Tr6R20AvKz+j5VU+BdU94jzazsKJQea2qr3Ht487wraRMVu5iSIeKnA4B9/CItG5SnDI13GYUjov9LtQSyHh3+H+45yFuz1kgKX+zcD5Z40vbiYGO5M0TJx82osZIbsHo2GBvpXYy3OvZ3OJfu8m++pFMkk/p8WP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=nSbeJn09; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=A7cma9dB; arc=none smtp.client-ip=202.12.124.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailflow.stl.internal (Postfix) with ESMTP id 1409613013DF;
+	Fri, 27 Feb 2026 10:47:06 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Fri, 27 Feb 2026 10:47:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1772207225;
+	 x=1772214425; bh=P3lrzFyQElxBxtWsP+osjrtrIRj/rA3HI8aIxSL+eHc=; b=
+	nSbeJn091CVUD7FTBlfHAGofIbMFpGvhhKPN5P+AXxi2R6g+zB9bTzPy8M7zKOX9
+	190koYZVQtOhErFW5Nk2ZXp3dvbyl6UiMLVn8Vdws7SsR0yodwKy9wHBllJkNGeA
+	AsGuDTTDeNXhDKsH6A+ttPLVwAgWN6I/IDfUUfKYIDL7djAhXluESe2mDgoVuE/0
+	H5H5lmhuaO4ap/bK0tc8OziXtOlDMPcxvZ9+r+b71xqQG/wIdKjH1rs6QDjOCkRk
+	NLaqv5GEjMIEAoVWLHqK6FLBpxQhya3L1m/31iVG+OzOLBESOmuKD7/FN0SBI+f3
+	94CVvMVtttES7JAOlQJp3g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1772207225; x=
+	1772214425; bh=P3lrzFyQElxBxtWsP+osjrtrIRj/rA3HI8aIxSL+eHc=; b=A
+	7cma9dBosB0GIWXa1m7+Lm/GchbRtgqA/xwo85CSUbQlkjtuGWtWnsFqnFaEz26K
+	XIjU47rn+BcT8PvTsqtvovSTHPoqwmFxcttdD8BqQeCdzm/9K2blLDhKqWUl3idP
+	wIyeWR3wYpc5y+VTOnLFWijeVmHt3I48Wf5E5jBf3bfwmmPzfIEl5Uiq1ztEtCUb
+	TtxChaiXmQlGbcnDqB0XuSPH9RUPouePhNnHw66TqOLnqCXBdIR+BZZwgl/mePTT
+	2Ndu2PcdwnDMxOAC1MaII1xlSg8Ocgn1jc3idGiGtiMejdDwaHcAThhlfyHUQ01U
+	YmEbEKrgFw3TDqLvqVi1A==
+X-ME-Sender: <xms:eLyhae8NLfiHQAfvFbwIf5yfJxGrx7KxbtT7pspvJckoKaT9zcfsGw>
+    <xme:eLyhae4tsQgypPwTHo2DeWnsQy7bTLUs3VcUPfd9RrYRFV5seJeMAhrG_sP3LC7Is
+    d9Lnz9eMprZ9jmWg9vNexMWxYMBNR85faQxljPC31hLURgUua9RsQ>
+X-ME-Received: <xmr:eLyhadjLu8rkkCiD9LuU-gLeXJaelMWBSD-DAgNH5GYD2MjN3YfraFIWVNQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvgeelfeelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpeetlhgvgicu
+    hghilhhlihgrmhhsohhnuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtffrrg
+    htthgvrhhnpedvkeefjeekvdduhfduhfetkedugfduieettedvueekvdehtedvkefgudeg
+    veeuueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepgeehpdhmohguvgep
+    shhmthhpohhuthdprhgtphhtthhopegumhgrthhlrggtkhesghhoohhglhgvrdgtohhmpd
+    hrtghpthhtoheprghjrgihrggthhgrnhgurhgrsehnvhhiughirgdrtghomhdprhgtphht
+    thhopehgrhgrfhesrghmrgiiohhnrdgtohhmpdhrtghpthhtoheprghmrghsthhrohesfh
+    gsrdgtohhmpdhrtghpthhtoheprghpohhpphhlvgesnhhvihguihgrrdgtohhmpdhrtghp
+    thhtoheprghkphhmsehlihhnuhigqdhfohhunhgurghtihhonhdrohhrghdprhgtphhtth
+    hopegrnhhkihhtrgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepsghhvghlghgrrghs
+    sehgohhoghhlvgdrtghomhdprhgtphhtthhopegthhhrihhslheskhgvrhhnvghlrdhorh
+    hg
+X-ME-Proxy: <xmx:eLyhaViQEXxZhGRPLBgx3cIxwcB6BJldmDuFBveN-s3uybKGEg4BVQ>
+    <xmx:eLyhaT1gmUrj3pS2nastletXexcegngkRYpkqQAlCWEUiBVKvt_8Uw>
+    <xmx:eLyhaQjFwwGVa8eE3K-VjdGUDc_gumNbDo92PQ-hmX33aTYcusuheg>
+    <xmx:eLyhaWqfdVOxky2hgCGNQH7N4KhqFKsCvw6Ruxq0xBQwJyfcQ9Ociw>
+    <xmx:ebyhaTuRNv-HWsJCaeyQT_E-CL0vqudE11keKbVebqGUMZseVXYpmczH>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 27 Feb 2026 10:47:00 -0500 (EST)
+Date: Fri, 27 Feb 2026 08:46:58 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: David Matlack <dmatlack@google.com>
+Cc: Adithya Jayachandran <ajayachandra@nvidia.com>,
+ Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>,
  Alistair Popple <apopple@nvidia.com>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org
-References: <20260226202211.929005-1-mattev@meta.com>
- <20260226202211.929005-5-mattev@meta.com>
- <f75088c6-5795-49cc-8932-ea46c2223d74@amd.com>
- <ad614dc4-0fd3-4897-b879-5d78a22b534f@meta.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <ad614dc4-0fd3-4897-b879-5d78a22b534f@meta.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR4P281CA0395.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:cf::19) To PH7PR12MB5685.namprd12.prod.outlook.com
- (2603:10b6:510:13c::22)
+ Andrew Morton <akpm@linux-foundation.org>,
+ Ankit Agrawal <ankita@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Chris Li <chrisl@kernel.org>, David Rientjes <rientjes@google.com>,
+ Jacob Pan <jacob.pan@linux.microsoft.com>,
+ Jason Gunthorpe <jgg@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Jonathan Corbet <corbet@lwn.net>, Josh Hilke <jrhilke@google.com>,
+ Kevin Tian <kevin.tian@intel.com>, kexec@lists.infradead.org,
+ kvm@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
+ Leon Romanovsky <leonro@nvidia.com>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ Lukas Wunner <lukas@wunner.de>,
+ =?UTF-8?B?TWlj?= =?UTF-8?B?aGHFgg==?= Winiarski
+ <michal.winiarski@intel.com>, Mike Rapoport <rppt@kernel.org>,
+ Parav Pandit <parav@nvidia.com>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>,
+ Pranjal Shrivastava <praan@google.com>,
+ Pratyush Yadav <pratyush@kernel.org>,
+ Raghavendra Rao Ananta <rananta@google.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Saeed Mahameed <saeedm@nvidia.com>,
+ Samiullah Khawaja <skhawaja@google.com>,
+ Shuah Khan <skhan@linuxfoundation.org>,
+ Thomas =?UTF-8?B?SGVsbHN0csO2bQ==?= <thomas.hellstrom@linux.intel.com>,
+ Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>,
+ William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>,
+ Zhu Yanjun <yanjun.zhu@linux.dev>, alex@shazbot.org
+Subject: Re: [PATCH v2 10/22] vfio/pci: Skip reset of preserved device after
+ Live Update
+Message-ID: <20260227084658.3767d801@shazbot.org>
+In-Reply-To: <aaDqhjdLyf1qSTSh@google.com>
+References: <20260129212510.967611-1-dmatlack@google.com>
+	<20260129212510.967611-11-dmatlack@google.com>
+	<20260226170030.5a938c74@shazbot.org>
+	<aaDqhjdLyf1qSTSh@google.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|SN7PR12MB8172:EE_
-X-MS-Office365-Filtering-Correlation-Id: 530a7277-bc6f-45da-00a4-08de7613d08a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	hQI6wjMuaAXEMrbaK2wVx0LMIG1qBRKRabX/EIrW7Q33BgbFG84CW45QRXRUUB9suXWFzFJvgApf+1VT/ok9E+sDz8Re0PV4pNoeWfEzTTRAn3jqbGFBsKnyEtUBarlETWMchgDIy8IcGLbY+huv52nq2Byr+eJAiTktm+9UTLLCuYkbtfW75+UWARNkmqmywrMBTx4RIwKGikx6/ceFlzGn3FCoOcDbEI0/C4qZ/zdjgoZQlWijpKZw3N4p9ndYdR+lzccNXtRdQ6aHi2TB8bDT7BO5Wki9gL/X6/27bwu6z8hrDorTbWwlvXbU+vhsdbJeTV9c8KXDfzAaQF9UtwTJ3cC0BR0eZvs1+9JC1laJ4ID1iWZ7JNHJVs5e2U2MyC0K+6d3cYpe0LiR1DLCfBSzuAhnywvgfgrlbC69x5/ONfDvCQ0GGO6y5SfTxkUIKYo+EOPai7NLBMu2tXwL2vIz/UCE4ZNxf8PduIjSnAyJmG+L1WZL9vRZG0CyQeqQMwc6eviLE9Z0cyTHu7du28rkiG5Rywp2zIUMDOxSMfZBNhdZLfauhZvd3HStKkikoQHzlVIKXWsKXoO87bJM3UhC0BObvxt74h6QXlYq7Q+sdJRCqQtwSyIkvgdy6XKpiFReilQGowsM/95+M3PaHZtHfT31ej71y34Rx8FmNxLNlTWpA1HCimxCj+wRh2cB
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NDgzMGdPTjVqcUM4R29uaVQza1FaN0ZsaVJKQzNjMFJSeFJOckVFeWk5ZVJ5?=
- =?utf-8?B?dmtEZTRtSjZqRk4wMnF4RlhvUUtwQnVuU0F3am1RN2lrejRqL3kzL1hGWnBI?=
- =?utf-8?B?aGJmY09Ba2RtRTJES3lVcDhBRUpMTitYZVg2TWFtdzNWV0dYeFplZ01IVDJM?=
- =?utf-8?B?TnVORkVha1M0RFNTeXZvNmlYMVptWmxaQU9kU3JLMnZvbFh2YnVTOFI4UGgv?=
- =?utf-8?B?TkdJYVZTWUNCeXVVejFtMWwzdWxFa2Niakpsa2RvSWx3OWk1dG1SaTZ1SU9H?=
- =?utf-8?B?VFhkY09uNVNYTDQrd2FHelAxWmxXK3JYUVNJS0haU3piQ0crTVBXeVFnNUZx?=
- =?utf-8?B?QnFkN201SUJNTE8vWk9HR3hCeVJXelkySGwyeU9Hc1JUZVFWclc0M1k1YUJh?=
- =?utf-8?B?S05zKzAwdmlCNmtzWXIreDZQWXEydURjNTdkNGJXTmpoQUdNZ3hvV2NNS20z?=
- =?utf-8?B?cEkzOFNnWDNtWEJCbUpRV282MWxadFppTjJwTUd2d2sxc0diQkNSdkExVDIx?=
- =?utf-8?B?WXRmWTlEYUdiSS83VnkwekF2Vklpb3dSeDdvNnhzNkw0Y3JORTZHY24zZm1O?=
- =?utf-8?B?d1BMcWFJMW5HdUE0QjNTRmhoUGdWVTlwRUcwRHFZMHlzRStlSzhYTnp2U3k1?=
- =?utf-8?B?Z2xkR1dWZkY0Z1Y4R3M3c25jODVOREtUSzZDZC9QV2h1NWNibTVvdEJxS3p4?=
- =?utf-8?B?d2VlamJTNlkrbkU5TnNjNWIrZ2llK3JPakszTnR5TUZVRHd4UVlOMDJvazVo?=
- =?utf-8?B?WjAvb0hQT1djaFhacnFDNitTWU1CTlZlVXlVVXJEeExBQ3BZRmgyTXVKZVZ3?=
- =?utf-8?B?K2UvS1JxQkhIbFFkUHlRSWpVdzZRR1I0TzRhOWlZTDg4Qm9jMHluWTBPSy9G?=
- =?utf-8?B?dGJ6Q1huVEh6bXh6L0JwSFRJb280V2E0c21tV01pVTlnWVF0SFkvUkxKZm8z?=
- =?utf-8?B?NE9uVDVQVUJpTldsdHJYRmc5RG5uNGY5Zk5CV2t6VkJBUlVVOXgxbmpuR0pT?=
- =?utf-8?B?dmcyYVlEdERyZlk0NUVyNll3aStrWGcwTFpKU21yaWxPaGZMaHZnYjFmNVpD?=
- =?utf-8?B?SnV5QXZZUDhhL0phYnoyT3lkdVhMZWw4OEgxZ2U2YlN3ZVcxeVJZRHYrNzEz?=
- =?utf-8?B?eTJndlZLUnFkM0pZQUhFOHRFWFJ2eXRtKzlZek8rTCtXa0RWZ1pBRlVJV3Fn?=
- =?utf-8?B?SUNqTjJWU2JjWmw0djNFVjBMbHVIcVpiL0k5OVNQSy80Ym1kWkVhVTY0K2Jj?=
- =?utf-8?B?ajYrSFlEWTJIVHFVYTlIWmxNUGpPUkZTVnNSQTExRmg0bXdVSnQ5enhmZWJP?=
- =?utf-8?B?WUQxK2ZyUisyVkdrRTFtWjhkdU5IMk4rSkdxV2JFYXE1ZStHMFVzYW40cGZn?=
- =?utf-8?B?VEp4cTIwai9RMzZIWmNDK3BpUFd2T3lBNTkyTlVTMUtWUVZBcE10T1NiZWJq?=
- =?utf-8?B?eWlVZUhDdEhWSG1Ybi9teHlEZ0c4RmxCckowdXQ5N2hickl6MDNJbVRCOHVh?=
- =?utf-8?B?L1JrZFhwajRBSmtjMTBRbmg5VnBha3htQmZxaEY0dko5ajhmS3d6MUVpODd2?=
- =?utf-8?B?OFo5Vi95MENUT3JXOW05UUVXT1N1Mi9Id2xtS3BGVFJLSVNKSnpZOHVJbXpC?=
- =?utf-8?B?WENXYTNYOW55K2hqMHRZRkVDTUVIU3ljUk9YZEJCWmFxMFNDQzdFSzlhOHRm?=
- =?utf-8?B?UzhkbXF2OXZ0Rkh4SVZ2b2pqM0NMZmdVYkh6emFXd0cycWJkZXpCdWJlYWZh?=
- =?utf-8?B?TEJyQ2RMU3ZTSHNpMTc5QmFTOUhDTlJsR0NlbUVPV1QrekRnc3VTV0kxUERk?=
- =?utf-8?B?bXpLMG5EWXVQbjcrcmxJaE82Ym1NSld2a055RWJvM0hQaFMyeTRIRWtLN3lp?=
- =?utf-8?B?Y21qRUJuYzZRL1VIck9uVVhtNGUwNlcya0FvK2hXeGVNeFN2Vy83VktVLzdF?=
- =?utf-8?B?MlZQN21LYS80aTlLbElZbzhzZjI5dDdWRlVhU2xsWWFTZHBoOFhaakYwczZJ?=
- =?utf-8?B?cEpnM0JjRFdsYjJIbGZwRXFsR2UxOExyTS9kMFdjQVBleTZsWisvcnc5Y1kw?=
- =?utf-8?B?NExZOG9xS0dTQUV3OHlLMFYxczhSV2dOYWdYMzJXNUd5S0JYMVEvMldsdk5h?=
- =?utf-8?B?TmlhdVBmL1kvZmF0bFdPR2VvTTBUVWRwMDcxMnRjTWV3a0pQOThpb3BiUkVx?=
- =?utf-8?B?TXFVYU5PWjRkZTZrdmh3aE1Ndmp0azlUaVpiZXA1UlNEZWwxaSszSFB4bWU0?=
- =?utf-8?B?Z24zZlRwVE1DSHBwSW9ZV2U5WEFHYXh6TVVNNWE2Vi93VWFFblVJK2hRaENG?=
- =?utf-8?Q?6uAZh7MfumrJE/VQHl?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 530a7277-bc6f-45da-00a4-08de7613d08a
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2026 15:21:01.2509
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NkGk85FD5fPT7pg3ayoQGrcsztbtuLfvxbDihFAAtqkGpcS9KbP5w8EbZyqIL3TG
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8172
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm3,messagingengine.com:s=fm3];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72167-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[45];
+	FREEMAIL_CC(0.00)[nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,kernel.org,linux.microsoft.com,ziepe.ca,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev,shazbot.org];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-72168-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[christian.koenig@amd.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[meta.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EA93A1B9C5C
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: 5E17F1BA51C
 X-Rspamd-Action: no action
 
-Hi Matt,
+On Fri, 27 Feb 2026 00:51:18 +0000
+David Matlack <dmatlack@google.com> wrote:
 
-On 2/27/26 14:02, Matt Evans wrote:
-> Hi Christian,
+> On 2026-02-26 05:00 PM, Alex Williamson wrote:
+> > On Thu, 29 Jan 2026 21:24:57 +0000
+> > David Matlack <dmatlack@google.com> wrote:  
+> > >  
+> > > -	vdev->reset_works = !ret;
+> > >  	pci_save_state(pdev);
+> > >  	vdev->pci_saved_state = pci_store_saved_state(pdev);  
+> > 
+> > Isn't this a problem too?  In the first kernel we store the initial,
+> > post reset state of the device, now we're storing some arbitrary state.
+> > This is the state we're restore when the device is closed.  
 > 
-> On 27/02/2026 10:05, Christian König wrote:
->> On 2/26/26 21:22, Matt Evans wrote:
->>> Add a new dma-buf ioctl() op, DMA_BUF_IOCTL_REVOKE, connected to a new
->>> (optional) dma_buf_ops callback, revoke().  An exporter receiving this
->>> will _permanently_ revoke the DMABUF, meaning it can no longer be
->>> mapped/attached/mmap()ed.  It also guarantees that existing
->>> importers have been detached (e.g. via move_notify) and all mappings
->>> made inaccessible.
->>>
->>> This is useful for lifecycle management in scenarios where a process
->>> has created a DMABUF representing a resource, then delegated it to
->>> a client process; access to the resource is revoked when the client is
->>> deemed "done", and the resource can be safely re-used elsewhere.
->>
->> Well that means revoking from the importer side. That absolutely doesn't make sense to me.
->>
->> Why would you do that?
+> The previous kernel resets the device and restores it back to its
+> post reset state in vfio_pci_liveupdate_freeze() before handing off
+> control to the next kernel. So my intention here is that VFIO will
+> receive the device in that state, allowing it to call
+> pci_store_saved_state() here to capture the post reset state of the
+> device again.
 > 
-> Well, it's for cleanup, but directed to a specific buffer.
-> 
-> Elaborating on the original example, a userspace driver creates a DMABUF
-> for parts of a BAR and then sends its fd to some other client process
-> via SCM_RIGHTS.  The client might then do all of:
-> 
-> - Process mappings of the buffer
-> - iommufd IO-mappings of it
-> - other unrelated drivers import it
-> - share the fd with more processes!
-> 
-> i.e. poking a programming interface and orchestrating P2P DMA to it.
-> Eventually the client completes and messages the driver to say goodbye,
-> except the client is buggy: it hangs before it munmaps or request other
-> drivers to shut down/detach their imports.
-> 
-> Now the original driver can't reuse any BAR ranges it shared out, as
-> there might still be active mappings or even ongoing P2P DMA to them.
-> 
-> The goal is to guarantee a point in time where resources corresponding
-> to a previously-shared DMABUF fd _cannot_ be accessed anymore:  CPUs,
-> or other drivers/importers, or any other kind of P2P DMA.  So yes, a
-> revoke must detach importers, using the synchronous revocation flow
-> Leon added in [0] ("dma-buf: Use revoke mechanism to invalidate shared
-> buffers").
-> 
-> (Apologies, I should really have just built this on top of a tree
-> containing that series to make this need clearer.)
-> 
-> But, it ultimately seems to have the same downstream effects as if one
-> were to, say, shut down VFIO device fds and therefore trigger
-> vfio_pci_dma_buf_cleanup().  It's just the reason to trigger revocation
-> is different:  a selective userspace-triggered revocation of a given
-> buffer, instead of an exporter cleanup-triggered revocation of all
-> buffers.  In both cases the goals are identical too, of a synchronised
-> point after which no more DMA/CPU access can happen.
-> 
-> (If I've misunderstood your question please clarify, but I hope that
-> answers it!)
+> Eventually we want to drop the reset in vfio_pci_liveupdate_freeze() and
+> preserve vdev->pci_saved_state across the Live Update. But I was hoping
+> to add that in a follow up series to avoid this one getting too long.
 
-Yeah that makes it clear, Jasons answer also helped quite a bit to understand what you want to do here.
+I appreciate reviewing this in smaller chunks, but how does userspace
+know whether the kernel contains a stub implementation of liveupdate or
+behaves according to the end goal?
 
-First of all your requirements sound reasonable, but absolutely clear NAK to the way those patches approach of implementing them. You completely mixed up the different DMA-buf roles and which is used for what.
+Also, didn't we violate our own contract in this patch by adding the
+reset_works field to the serialization data without updating the
+compatibility string?  Thanks,
 
-See the IOCTLs on the DMA-buf file descriptor are for the importer side to communicate with the exporter side. E.g. thinks like "I'm done writing with the CPU, please make that visible to yourself and other importers".....
-
-But what you want to do here is just the other way around, the exporter side wants to signal to all importers that it can't use the buffer any more, correct?
-
-If I understood that correctly then my suggestion is that you have a new IOCTL on the VFIO fd you originally used to export the DMA-buf fd. This IOCTL takes the DMA-buf fd and after double checking that it indeed is the exporter of that fd revokes all importer access to it.
-
-I'm certainly open on suggestions on how to improve the DMA-buf documentation to make that more clearer in the future.
-
-Regards,
-Christian.
-
-> 
-> Cheers,
-> 
-> 
-> Matt
-> 
-> [0] https://lore.kernel.org/linux-iommu/20260205-nocturnal-poetic-chamois-f566ad@houat/T/#m310cd07011e3a1461b6fda45e3f9b886ba76571a
-> 
->>
->> Regards,
->> Christian.
->>
->>>
->>> Signed-off-by: Matt Evans <mattev@meta.com>
->>> ---
->>>  drivers/dma-buf/dma-buf.c    |  5 +++++
->>>  include/linux/dma-buf.h      | 22 ++++++++++++++++++++++
->>>  include/uapi/linux/dma-buf.h |  1 +
->>>  3 files changed, 28 insertions(+)
->>>
->>> diff --git a/drivers/dma-buf/dma-buf.c b/drivers/dma-buf/dma-buf.c
->>> index edaa9e4ee4ae..b9b315317f2d 100644
->>> --- a/drivers/dma-buf/dma-buf.c
->>> +++ b/drivers/dma-buf/dma-buf.c
->>> @@ -561,6 +561,11 @@ static long dma_buf_ioctl(struct file *file,
->>>         case DMA_BUF_IOCTL_IMPORT_SYNC_FILE:
->>>                 return dma_buf_import_sync_file(dmabuf, (const void __user *)arg);
->>>  #endif
->>> +       case DMA_BUF_IOCTL_REVOKE:
->>> +               if (dmabuf->ops->revoke)
->>> +                       return dmabuf->ops->revoke(dmabuf);
->>> +               else
->>> +                       return -EINVAL;
->>>
->>>         default:
->>>                 return -ENOTTY;
->>> diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
->>> index 0bc492090237..a68c9ad7aebd 100644
->>> --- a/include/linux/dma-buf.h
->>> +++ b/include/linux/dma-buf.h
->>> @@ -277,6 +277,28 @@ struct dma_buf_ops {
->>>
->>>         int (*vmap)(struct dma_buf *dmabuf, struct iosys_map *map);
->>>         void (*vunmap)(struct dma_buf *dmabuf, struct iosys_map *map);
->>> +
->>> +       /**
->>> +        * @revoke:
->>> +        *
->>> +        * This callback is invoked from a userspace
->>> +        * DMA_BUF_IOCTL_REVOKE operation, and requests that access to
->>> +        * the buffer is immediately and permanently revoked.  On
->>> +        * successful return, the buffer is not accessible through any
->>> +        * mmap() or dma-buf import.  The request fails if the buffer
->>> +        * is pinned; otherwise, the exporter marks the buffer as
->>> +        * inaccessible and uses the move_notify callback to inform
->>> +        * importers of the change.  The buffer is permanently
->>> +        * disabled, and the exporter must refuse all map, mmap,
->>> +        * attach, etc. requests.
->>> +        *
->>> +        * Returns:
->>> +        *
->>> +        * 0 on success, or a negative error code on failure:
->>> +        * -ENODEV if the associated device no longer exists/is closed.
->>> +        * -EBADFD if the buffer has already been revoked.
->>> +        */
->>> +       int (*revoke)(struct dma_buf *dmabuf);
->>>  };
->>>
->>>  /**
->>> diff --git a/include/uapi/linux/dma-buf.h b/include/uapi/linux/dma-buf.h
->>> index 5a6fda66d9ad..84bf2dd2d0f3 100644
->>> --- a/include/uapi/linux/dma-buf.h
->>> +++ b/include/uapi/linux/dma-buf.h
->>> @@ -178,5 +178,6 @@ struct dma_buf_import_sync_file {
->>>  #define DMA_BUF_SET_NAME_B     _IOW(DMA_BUF_BASE, 1, __u64)
->>>  #define DMA_BUF_IOCTL_EXPORT_SYNC_FILE _IOWR(DMA_BUF_BASE, 2, struct dma_buf_export_sync_file)
->>>  #define DMA_BUF_IOCTL_IMPORT_SYNC_FILE _IOW(DMA_BUF_BASE, 3, struct dma_buf_import_sync_file)
->>> +#define DMA_BUF_IOCTL_REVOKE   _IO(DMA_BUF_BASE, 4)
->>>
->>>  #endif
->>> --
->>> 2.47.3
->>>
->>
-> 
-
+Alex
 
