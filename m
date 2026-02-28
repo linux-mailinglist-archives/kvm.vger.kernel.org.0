@@ -1,85 +1,84 @@
-Return-Path: <kvm+bounces-72256-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72257-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ICE5FwY7omk71AQAu9opvQ
-	(envelope-from <kvm+bounces-72256-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 01:47:02 +0100
+	id eJVLFQ87omk71AQAu9opvQ
+	(envelope-from <kvm+bounces-72257-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 01:47:11 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 071AE1BF7B9
-	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 01:47:01 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1ABB1BF7C8
+	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 01:47:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0FC003059AB8
-	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 00:46:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1DAF23008CA2
+	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 00:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A908D2472A5;
-	Sat, 28 Feb 2026 00:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C034719D8A8;
+	Sat, 28 Feb 2026 00:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MEJbrnTS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GZAOemLA"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF70B24B45
-	for <kvm@vger.kernel.org>; Sat, 28 Feb 2026 00:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE9D1AE877
+	for <kvm@vger.kernel.org>; Sat, 28 Feb 2026 00:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772239606; cv=none; b=hCr9wM6HEkE+MCxvAxHsRu4VGjZ2I7Om1Y1AjnvOFV7fG1AkXadWzPpx9jKFtVGqUw3WVvrybjLnk6gOYKZjxnLCXlNoISjJD3LEJitKqrVvvXaWH62IeU/qnqgjHWvwgWyX5y+kMpsSoqox16Z/txqw+wqjvyhfjyLaflEprJY=
+	t=1772239622; cv=none; b=mR1/I+EpczmWZTWc8End/PjQ4ttGK8DQJ01WjDs9nPB6tMALZJApzCr+3+dBTgWukUYq46OlmJi8YNW0CTLsek+R9JmRIiGRpGwRj33ggTtz6NXiJNQ66TYH6CF2l6Bg6E22vG1+t8BkY2pi8mDI3Zx8rNMoqhc7BbeTzPqoz8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772239606; c=relaxed/simple;
-	bh=QRvC1jZ8oS8U7LcAW8SYx0fY3Tvg5kmOfu9Odf4nRNo=;
+	s=arc-20240116; t=1772239622; c=relaxed/simple;
+	bh=fdo6TPmuGcNdCa9dePZZk6EZTcMkP9umdD92dv0c71k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EusR2qOLx9icrI+KmL+AvaW5UMCdZj0kAUXiIorK3NgodNDRNLoMnqYS37ha0X86g1YzgwpzFYutMaIjhxHNsllC1Rv6FTyi5d3NW6sA7l+CcXuDlX3Rh/ZVfzB9ezdysAWAjsrKOSLdrs1Q/UAXr9ae6oa1gz397YIdSSnMrMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MEJbrnTS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B065C116C6
-	for <kvm@vger.kernel.org>; Sat, 28 Feb 2026 00:46:46 +0000 (UTC)
+	 To:Cc:Content-Type; b=rVa6zSPydeHTu4r8v1LYvgrtrghcWh1LAvwj2aO7nIGcQqinJgyjFMkkkDoQCXE+9pg5J9lbDv9cSwKPRYrPk4ro5hChds74zQrKhuszvKWVlMRPimukqXm0jhx8k+JK4LT5NmKjIQknCvh1t+3EzTdXfBy5XOwmz96heMQU6Fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GZAOemLA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7185C2BC86
+	for <kvm@vger.kernel.org>; Sat, 28 Feb 2026 00:47:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772239606;
-	bh=QRvC1jZ8oS8U7LcAW8SYx0fY3Tvg5kmOfu9Odf4nRNo=;
+	s=k20201202; t=1772239621;
+	bh=fdo6TPmuGcNdCa9dePZZk6EZTcMkP9umdD92dv0c71k=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=MEJbrnTSsxVBQMK0wIr9GMjBARrf4CQEPqOqUksuSiyEqFM+7JvwQwSzDWUnb7uZ+
-	 5eUMU1tqFqf58snIk2r6vYRE3ZqyFW4d3jzRU9O5W+ncfNH5CTekusDIp/xDzO4UcL
-	 Cy0mAOdJ0SuCdCnSrfoV0YYrDZstbCGAH91Wf5J1nIfddfVbKNPH1V+Nray4fcH91V
-	 D5qbh5QnEwSiClylcOIE49tRGH9N44sT5SvrLc21MCq09xpTy7GsTKQX1Y8P5uwLM4
-	 HF/26v7NdM5F2DQ5ccUb6MFeL7/xy5MIhq/atnOvpK/yfvdY6vicpbMWZE+Yghl8T8
-	 GjaTeAuD5s+fA==
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-65c0d2f5fe1so5392896a12.3
-        for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 16:46:46 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUq+pG/hW+2mP0mlgrKTHg4UKjAN3Hs6s94Y3zIQxGgX+Vczp0TnlgBs3ktnqVuNeMnS90=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJhl4BOtlicHQXWP/8tiaGc2tM8NW5YRN1JNW7R/xg/rndGt0I
-	8pEmSOwye8rjuEbOua/BdQU4cR81zxSfBcth+hsyW117nbguQn4whyTVzh84hVauvCWB6dvOWwA
-	guZVY2j/qHUfkl/grH51wmAW6WFpHAtY=
-X-Received: by 2002:a17:906:6a27:b0:b88:68b6:e578 with SMTP id
- a640c23a62f3a-b93763bfb31mr359879166b.25.1772239605447; Fri, 27 Feb 2026
- 16:46:45 -0800 (PST)
+	b=GZAOemLArlZoxB6eaYpOQg5uWLLwxOGXFiHXcYHm41lgmuC9lCi5Aq5RjTpTuHmVY
+	 F0CvNGduEY7maJzyXnmfeLcDJUd/vJ+kERKZulaWu9lp8dBkaiUZEmbiEmzme/R6EW
+	 tKvgubpPyixTOEiCynPq9v2q+pjKFzpcty38whbYTy7YwdHMGkFFmk2InPUOSFnCty
+	 x6lGsqBpEBkrPU//pUmuUk8uo3xmYnQFcTge76XdXRQznu+d/i+FtubOohWC5q9Guk
+	 07uoY2dZqvu58tnQvZsgIGAIpg9E8g0IabVBfej6k0Lb2Tx8FkdQMdLvY8ATt5zHa3
+	 3oPuDFnvfYI4Q==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b935ff845c8so311822966b.2
+        for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 16:47:01 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXSm4OeMGkvrrYzAt1jXBqk+d1Gc5vWuLFf+Fy+n5KFA22ijNCaXfPE/b4W4IY5Qj6iDOs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywug3pogvgrFwzESV0semSzuFa1NSrPZMR9zYYRzyjXD0+HEdZ0
+	UItI9pJ0Mu9TVXOzgao1vPv5Wjq6+vYgxJbU+tLNUKq5ZdogF8jA/77jv0Nko66lC3PD57/l3Fw
+	d+8QWqab9Xh2QNGZzNxhdlHyiczTvDMg=
+X-Received: by 2002:a17:907:803:b0:b8a:f7fb:4f4d with SMTP id
+ a640c23a62f3a-b9376385917mr270101666b.16.1772239620487; Fri, 27 Feb 2026
+ 16:47:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260209195142.2554532-1-yosry.ahmed@linux.dev>
- <20260209195142.2554532-2-yosry.ahmed@linux.dev> <txfn2izdpaavep6yrcujlxkqrqf2gwk2ccb6dplwcfnsstdnie@lgx74e27nus7>
- <aaCO62eQiZX5pvSk@google.com> <CAO9r8zOcBbgtNzy6FizPe8Xm8W=jg3CR8pmdByfszfEM3rqzsA@mail.gmail.com>
- <aaI51_1_bR4zRTXY@google.com>
-In-Reply-To: <aaI51_1_bR4zRTXY@google.com>
+References: <20260224223405.3270433-1-yosry@kernel.org> <20260224223405.3270433-17-yosry@kernel.org>
+ <aaIxtBYRNCHdEvsV@google.com>
+In-Reply-To: <aaIxtBYRNCHdEvsV@google.com>
 From: Yosry Ahmed <yosry@kernel.org>
-Date: Fri, 27 Feb 2026 16:46:33 -0800
-X-Gmail-Original-Message-ID: <CAO9r8zPvQ1+_HGNuRZJuOTQ_YJHgMB=52-68rHFXKF8mWy6CNw@mail.gmail.com>
-X-Gm-Features: AaiRm53nCUap8U36P5oZ1TByvqsfEJ3Xmhur7Scckz7btZlaFClDOeUUzH_VoPs
-Message-ID: <CAO9r8zPvQ1+_HGNuRZJuOTQ_YJHgMB=52-68rHFXKF8mWy6CNw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] KVM: SVM: Triple fault L1 on unintercepted
- EFER.SVME clear by L2
+Date: Fri, 27 Feb 2026 16:46:49 -0800
+X-Gmail-Original-Message-ID: <CAO9r8zMRkFfxm_zs88uc_ijARrU4XxHQQZAQFmC_t0H9qdbM-A@mail.gmail.com>
+X-Gm-Features: AaiRm533CyEX4TQbd1-6amDST_Vrw0ZT1a5h-AyrGEPbqLiGyLqIW3fupTgKFLo
+Message-ID: <CAO9r8zMRkFfxm_zs88uc_ijARrU4XxHQQZAQFmC_t0H9qdbM-A@mail.gmail.com>
+Subject: Re: [PATCH v6 16/31] KVM: nSVM: Unify handling of VMRUN failures with
+ proper cleanup
 To: Sean Christopherson <seanjc@google.com>
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -88,78 +87,179 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72256-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72257-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	RCPT_COUNT_FIVE(0.00)[5]
-X-Rspamd-Queue-Id: 071AE1BF7B9
+X-Rspamd-Queue-Id: C1ABB1BF7C8
 X-Rspamd-Action: no action
 
-> > What if we key off vcpu->wants_to_run?
+On Fri, Feb 27, 2026 at 4:07=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
-> That crossed my mind too.
+> On Tue, Feb 24, 2026, Yosry Ahmed wrote:
+> > There are currently two possible causes of VMRUN failures emulated by
+> > KVM:
+> >
+> > 1) Consistency checks failures. In this case, KVM updates the exit code
+> >    in the mapped VMCB12 and exits early in nested_svm_vmrun(). This
+> >    causes a few problems:
+> >
+> >   A) KVM does not clear the GIF if the early consistency checks fail
+> >      (because nested_svm_vmexit() is not called). Nothing requires
+> >      GIF=3D0 before a VMRUN, from the APM:
+> >
+> >       It is assumed that VMM software cleared GIF some time before
+> >       executing the VMRUN instruction, to ensure an atomic state
+> >       switch.
+> >
+> >      So an early #VMEXIT from early consistency checks could leave the
+> >      GIF set.
+> >
+> >   B) svm_leave_smm() is missing consistency checks on the newly loaded
+> >      guest state, because the checks aren't performed by
+> >      enter_svm_guest_mode().
 >
-> > It's less protection against false positives from things like
-> > kvm_vcpu_reset() if it didn't leave nested before clearing EFER, but
-> > more protection against the #VMEXIT case you mentioned. Also should be
-> > much lower on the fugliness scale imo.
+> This is flat out wrong.  RSM isn't missing any consistency checks that ar=
+e
+> provided by nested_vmcb_check_save().
 >
-> Yeah, I had pretty much the exact same thought process and assessment.  I suggested
-> the WRMSR approach because I'm not sure how I feel about using wants_to_run for
-> functional behavior.  But after realizing that hooking WRMSR won't handle RSM,
-> I'm solidly against my WRMSR idea.
+>         if (CC(!(save->efer & EFER_SVME)))                               =
+     <=3D=3D=3D irrelevant given KVM's implementation
+>                 return false;
 >
-> Honestly, I'm leaning slightly towards dropping this patch entirely since it's
-> not a bug fix.  But I'm definitely not completely against it either.  So what if
-> we throw it in, but plan on reverting if there are any more problems (that aren't
-> obviously due to goofs elsewhere in KVM).
+>         if (CC((save->cr0 & X86_CR0_CD) =3D=3D 0 && (save->cr0 & X86_CR0_=
+NW)) ||  <=3D=3D kvm_set_cr0() in rsm_enter_protected_mode()
+>             CC(save->cr0 & ~0xffffffffULL))
+>                 return false;
+>
+>         if (CC(!kvm_dr6_valid(save->dr6)) || CC(!kvm_dr7_valid(save->dr7)=
+))   <=3D=3D kvm_set_dr() in rsm_load_state_{32,64}
+>                 return false;
+>
+>         /*
+>          * These checks are also performed by KVM_SET_SREGS,
+>          * except that EFER.LMA is not checked by SVM against
+>          * CR0.PG && EFER.LME.
+>          */
+>         if ((save->efer & EFER_LME) && (save->cr0 & X86_CR0_PG)) {
+>                 if (CC(!(save->cr4 & X86_CR4_PAE)) ||                    =
+     <=3D=3D kvm_set_cr4() in rsm_enter_protected_mode()
+>                     CC(!(save->cr0 & X86_CR0_PE)) ||                     =
+     <=3D=3D kvm_set_cr0() in rsm_enter_protected_mode()
+>                     CC(!kvm_vcpu_is_legal_cr3(vcpu, save->cr3)))         =
+     <=3D=3D kvm_set_cr3() in rsm_enter_protected_mode()
+>                         return false;
+>         }
+>
+>         /* Note, SVM doesn't have any additional restrictions on CR4. */
+>         if (CC(!__kvm_is_valid_cr4(vcpu, save->cr4)))                    =
+     <=3D=3D kvm_set_cr4() in rsm_enter_protected_mode()
+>                 return false;
+>
+>         if (CC(!kvm_valid_efer(vcpu, save->efer)))                       =
+     <=3D=3D __kvm_emulate_msr_write() in rsm_load_state_64()
+>                 return false;
+>
+> Even if RSM were missing checks on the L2 state being loaded, I'm not wil=
+ling to
+> take on _any_ complexity in nested VMRUN to make RSM suck a little less. =
+ KVM's
+> L2 =3D> SMM =3D> RSM =3D> L2 is fundamentally broken.  Anyone that argues=
+ otherwise is
+> ignoring architecturally defined behavior in the SDM and APM.
+>
+> If someone wants to actually put in the effort to properly emulating SMI =
+=3D> RSM
+> from L2, then I'd be happy to take on some complexity, but even then it's=
+ not at
+> all clear that it would be necessary.
+>
+> > 2) Failure to load L2's CR3 or merge the MSR bitmaps. In this case, a
+> >    fully-fledged #VMEXIT injection is performed as VMCB02 is already
+> >    prepared.
+> >
+> > Arguably all VMRUN failures should be handled before the VMCB02 is
+> > prepared, but with proper cleanup (e.g. clear the GIF).
+>
+> Eh, so long as KVM cleans up after itself, I don't see anything wrong wit=
+h
+> preparing some of vmcb02.
+>
+> So after staring at this for some time, us having gone through multiple a=
+ttempts
+> to get things right, and this being tagged for stable@, unless I'm missin=
+g some
+> massive simplification this provides down the road, I am strongly against=
+ refactoring
+> this code, and 100% against reworking things to "fix" SMM.
 
-I am okay with that.
+For context, this patch (and others you quoted below) were a direct
+result of this discussion in v2:
+https://lore.kernel.org/kvm/aThIQzni6fC1qdgj@google.com/. I didn't
+look too closely into the SMM bug tbh I just copy/pasted that verbatim
+into the changelog.
+
+As for refactoring the code, I didn't really do it for SMM, but I
+think the code is generally cleaner with the single VMRUN failure
+path. That being said..
+
+> And so for the stable@ patches, I'm also opposed to all of these:
+>
+>   KVM: nSVM: Refactor minimal #VMEXIT handling out of nested_svm_vmexit()
+>   KVM: nSVM: Call nested_svm_init_mmu_context() before switching to VMCB0=
+2
+>   KVM: nSVM: Call nested_svm_merge_msrpm() from enter_svm_guest_mode()
+>   KVM: nSVM: Make nested_svm_merge_msrpm() return an errno
+>   KVM: nSVM: Call enter_guest_mode() before switching to VMCB02
+>   KVM: nSVM: Drop nested_vmcb_check_{save/control}() wrappers
+>
+> unless they're *needed* by some later commit (I didn't look super closely=
+).
+>
+> For stable@, just fix the GIF case and move on.
+
+.. I am not sure if you mean dropping them completely, or dropping
+them from stable@.
+
+I am fine with dropping the stable@ tag from everything from this
+point onward, or re-ordering the patches to keep it for the missing
+consistency checks.
+
+If you mean drop them completely, it's a bit of a shame because I
+think the code ends up looking much better, but I also understand
+given all the back-and-forth, and the new problem I reported recently
+that will need further refactoring to address (see my other reply to
+the same patch).
+
+Let me know how you want to proceed: drop the patches entirely and
+just fix GIF, or fix GIF first for stable, and keep the refactoring
+for non-stable.
+
 
 >
-> Is this what you were thinking?
-
-Yeah, exactly.
-
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index d734cd5eef5e..d9790e37d4e8 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -1036,6 +1036,7 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
+>                 vmcb12->control.exit_code    =3D SVM_EXIT_ERR;
+>                 vmcb12->control.exit_info_1  =3D 0;
+>                 vmcb12->control.exit_info_2  =3D 0;
+> +               svm_set_gif(svm, false);
+>                 goto out;
+>         }
 >
-> ---
->  arch/x86/kvm/svm/svm.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 1b31b033d79b..3e48e9c1c955 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -216,6 +216,19 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
->
->         if ((old_efer & EFER_SVME) != (efer & EFER_SVME)) {
->                 if (!(efer & EFER_SVME)) {
-> +                       /*
-> +                        * Architecturally, clearing EFER.SVME while a guest is
-> +                        * running yields undefined behavior, i.e. KVM can do
-> +                        * literally anything.  Force the vCPU back into L1 as
-> +                        * that is the safest option for KVM, but synthesize a
-> +                        * triple fault (for L1!) so that KVM at least doesn't
-> +                        * run random L2 code in the context of L1.  Do so if
-> +                        * and only if the vCPU is actively running, e.g. to
-> +                        * avoid positives if userspace is stuffing state.
-> +                        */
-> +                       if (is_guest_mode(vcpu) && vcpu->wants_to_run)
-> +                               kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
-> +
->                         svm_leave_nested(vcpu);
->                         /* #GP intercept is still needed for vmware backdoor */
->                         if (!enable_vmware_backdoor)
->
-> base-commit: 95deaec3557dced322e2540bfa426e60e5373d46
-> --
+> Sorry for not catching this earlier, I didn't actually read the changelog=
+ until
+> this version.  /facepalm
 
