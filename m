@@ -1,191 +1,245 @@
-Return-Path: <kvm+bounces-72283-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72284-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CLROE+9Jo2nW/AQAu9opvQ
-	(envelope-from <kvm+bounces-72283-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 21:02:55 +0100
+	id GAM7MXZMo2nW/AQAu9opvQ
+	(envelope-from <kvm+bounces-72284-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 21:13:42 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A56D71C7D13
-	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 21:02:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A0781C80C6
+	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 21:13:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9E724303CC23
-	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 19:53:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 105DF3506E86
+	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 20:03:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2484D3B3C19;
-	Sat, 28 Feb 2026 18:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE882E424F;
+	Sat, 28 Feb 2026 19:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="K00HouUK"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="hFMEmxJN";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="wTwSIaYD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5B33B3BE2
-	for <kvm@vger.kernel.org>; Sat, 28 Feb 2026 18:29:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8C22C21F8
+	for <kvm@vger.kernel.org>; Sat, 28 Feb 2026 19:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772303348; cv=none; b=dycjDh37XF7Zq0UP5ITEE/OtaJIs1hb4zWM45xRGxponpMwDGmw7bHJYxiDN+TnneVOPW5Y9z+kxmQ7bySmxOUEAuVf1/QBRPbPWRjAEeJ9eZBKKN8kj5zBsKZ5yaSD1HH2hb9Yr6Mb7BA2/6pyiRgYC2HTyFaml9tI9FMLOkmo=
+	t=1772308287; cv=none; b=UYvnai8pSJScitkJCu2hfh75Yw5tONgMbw3FOo2dAcwWj9f0rRK9rTG5Zvr6lJC+g9HLZzvjkqQ726KrJigI4Ru77Bd7rCX6bnBw1uxVes+REmu5e5MRYioCnKjGO/maAjkfVXTK+x0hJ1uUMv3qQ1/R1au5n5kG0T0T3V0CmLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772303348; c=relaxed/simple;
-	bh=rkzmltbCB7oYdQAHuLM1PEc4LQu8jhDMt38DwB5M/W8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rgu+z5OMp8WSQC387CfYbrwyJ3uLXoYkWY6watTJiLF++8oVxn9oaReDD2U2i5H4XloZG7IkwK6/bVo9lPS5MpORVIoHASYixGa1sgPZRHN4VqiRxo1xo42IgOPiol946eV2SVP5fOtVlxk85U3aTXPzfRDrYW9uDXIvD1g4zkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=K00HouUK; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-896f9397ecdso37663876d6.3
-        for <kvm@vger.kernel.org>; Sat, 28 Feb 2026 10:29:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1772303346; x=1772908146; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=htHav7RfCL20FBhzRA0W1wS3HhKQenwSmiA0/DmxMnY=;
-        b=K00HouUKZsJ6yofhTGJ0y/OJayrg2Rsbz/GeTxPCJWzmcZsFElp0hZ7EKb+Rn/Qvv4
-         wR+PylfQBXK+AxGiU3Z59C80ZvmbSqGS6YsTSwanJhY78/jhBPUdb/mUAGl0cMpD+cxD
-         WegdScwcg4S/V0UJDNFYNF1oVir02y0RqUHhurykjNSgjrQNTYyGgGcPJahJibb7BoIh
-         hKqYM6jmiKxNBaCKkiE+uwgFGb9wll501tkQmwTIlaBNtCIgkQgAz79/nXfOV0T6Na2W
-         eO2WBVU+ql4+Iqbib8RKBVi4jsEWODNOaZCMxdyuV4ed9G/yOduHEtrOXqjCMDPDa7R7
-         NuQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772303346; x=1772908146;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=htHav7RfCL20FBhzRA0W1wS3HhKQenwSmiA0/DmxMnY=;
-        b=ELMIYt01nwmz3RYtBdyNFUiD6him5Uc6Z8jMyFU0Fx6YuAl3Lq6BbGI4Qd0T05iXkR
-         85O6UNucHppnsXSFEjRTrxupUcF12kea2mjtgWP2NuQ8DskwFD0VCrTE/EQmjFFZPoPC
-         WR/d6Hi3Te252R1GNLIa7V+9YA4aMog0cWJJ8qXCmA8lnrXzreNLnF4gZvLkvBn/l8Z3
-         hl2xFNo9G6xghBfV2d08jrulu+6bsnMxz+ULwrcmKWEnhPdt9m5RpfvXDHoRRCVFWOfQ
-         99qzjZ6DUd2Dv5BefbVBgBxqmX4sT6C4ogsRpFL/KL1x/sy3n+9Ypl7OyCWjR9eSAk2g
-         EF0g==
-X-Forwarded-Encrypted: i=1; AJvYcCX8tKU4gD77ynThtptdzgnaAacOmez/65npBdE46OCxlXJhUBeR5qv7u1PoK17AsHYNl/8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzinyQChrYZV6KuGEeFNEg6zVysgpncT7gkup+emjP8605V9Kp6
-	TWs30tULYvtUGyr2LO6DG1BiIYxB30iu9Jtl/mA+ow36k/Hzx8fF+GyglNIgyi8i0q0=
-X-Gm-Gg: ATEYQzzUMokuA2sBGWx1wThIzXlLfQkO/XM5Fr2lLPnluCjSb5seO9e07O7Rs53zo9j
-	9dQT7HJfCb3e+bccXt0v2IhSue23upv/XUKjiMzisDFrYq3afrBNm0hlzIiH3/+kMKuE2U96rup
-	lgilVp4hoAHylYuFJYzq/W8EvzyaR5TXtV3vp3H7ajdjOrcobc/VmI5DCHHVz7R5A7dNFskjlr1
-	rV9Ah34Cokamf0fHMUeypVf2ViPf/xHpd5Tjueo9MF0qLB2tUHerglp9jx15H8Wf/OcXmmy1Oi/
-	w1dh1eGfgykE8qEMEdbxzR2eIWONcOgPQWETobpEDrKdh2BMyqxFRXD/8IkrHMnwtPStb2AwnCo
-	IRSl8JpqwTfi+KmXUwAdcjanMhWTBQhc5/rv+jH3s/1cXzcydDyC351ULgHmKE9fR6onBEUaGfe
-	hR9bslJdFC9X4DlthEsaPDk+PQdtQL2tnVSgjlziryjaAUpD2H17RO4UQA1UFWFc9DGJZ4IbgyS
-	Y+6WW8c
-X-Received: by 2002:a05:6214:1943:b0:896:fe42:e8a0 with SMTP id 6a1803df08f44-899d1e8b1camr101368936d6.63.1772303346029;
-        Sat, 28 Feb 2026 10:29:06 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899c7376847sm71654726d6.28.2026.02.28.10.29.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Feb 2026 10:29:05 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vwP3o-0000000250x-2vIE;
-	Sat, 28 Feb 2026 14:29:04 -0400
-Date: Sat, 28 Feb 2026 14:29:04 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Ackerley Tng <ackerleytng@google.com>,
-	Alexey Kardashevskiy <aik@amd.com>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Steve Sistare <steven.sistare@oracle.com>,
-	Nicolin Chen <nicolinc@nvidia.com>, iommu@lists.linux.dev,
-	linux-coco@lists.linux.dev, Dan Williams <dan.j.williams@intel.com>,
-	Santosh Shukla <santosh.shukla@amd.com>,
-	"Pratik R . Sampat" <prsampat@amd.com>,
-	Fuad Tabba <tabba@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	michael.roth@amd.com, vannapurve@google.com
-Subject: Re: [RFC PATCH kernel] iommufd: Allow mapping from KVM's guest_memfd
-Message-ID: <20260228182904.GR44359@ziepe.ca>
-References: <aZ7-tTpobKiCFT5L@google.com>
- <CAEvNRgEiod74cRoVQVC5LUbWDZf6Wwz1ssjQN0fveN=RBAjsTw@mail.gmail.com>
- <20260226190757.GA44359@ziepe.ca>
- <aaDL8tYrVCWlQg79@google.com>
- <20260227002105.GC44359@ziepe.ca>
- <aaDlRdnhIqRXEbPZ@google.com>
- <20260227010902.GE44359@ziepe.ca>
- <aaFzgGTpZI0eZWdD@yilunxu-OptiPlex-7050>
- <20260227131815.GG44359@ziepe.ca>
- <aaJroUzTZXZfbRAl@yilunxu-OptiPlex-7050>
+	s=arc-20240116; t=1772308287; c=relaxed/simple;
+	bh=Yo9H9uE3LfidqW1Bifx0VGO7JWn331iwNM5MhleuCY0=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=tw9p/46xg6HPEl129S24/CMKsBsUCkLWu4ErRkmeecClejCoawDH5QbKml4ecf58BfsM2cFW9CZeFMI4qw2SaFQp9GutdZ8blMSpy5W/AQPEbaSwfYJ2BpVM6PP6WBVjkriG4vpUk7r8DUTzplGv42RUqXqHIW12k+zO/uxXIX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=hFMEmxJN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=wTwSIaYD; arc=none smtp.client-ip=103.168.172.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 484AF140002C;
+	Sat, 28 Feb 2026 14:51:23 -0500 (EST)
+Received: from phl-imap-18 ([10.202.2.89])
+  by phl-compute-02.internal (MEProxy); Sat, 28 Feb 2026 14:51:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1772308283;
+	 x=1772394683; bh=Xy2WUE6BOrT9WCbqR3HmTt56Y/DQe/Nep1hJay8YzHU=; b=
+	hFMEmxJNUie47YthPIXjRHIuF9NwlSx+4WAE4c+qUPItWuLW8X6Dc1b1aG65nmu+
+	DvV2Q3jvhZ9NL5gVRK9V8c4e4KOapVN07KS955JH6NCVGabdr7BwKsoCFwv3vh/5
+	OxmJSQ+/R4Mim6d+ovk8knRzCP3z3rg6FS7nEQmwCK3Jh95SMgecY88iZ1KvhCEI
+	UUgfGKQcBrtJhNNTvTwWMFvcvOwic5ns+dj+sBDHUoW3QxMbrT381qLScFGlDEEQ
+	Qo7mn0CUhTRMo6NfrkpgPwlR+kiJKg9fyFeYJ6wp9K/0dTMPiwIeRoSl0J17YCJa
+	RjIJ/OCrTRVHxOp6rpZrWg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1772308283; x=
+	1772394683; bh=Xy2WUE6BOrT9WCbqR3HmTt56Y/DQe/Nep1hJay8YzHU=; b=w
+	TwSIaYDm4+nl9sQRgZ6WA0ibKg4nsjk8WcuEZtAXAeBP5EY9uwrBbIFtUBw36XWn
+	8QNxzXO01WDKIJ3bhYC/itVqR4bMpDSQA6zdINsvjEjA7Re/DERnTR/pUuNRj6CJ
+	5Lrv44hmC+1yOHUYPUZUnKMpMzeLH5/zvnSUP0/tgTnAvu4s3RaQtGTCP/4z1arL
+	BGL4L62eLsjc+TaTPV0WNigH/GKCwVWrTiKRX7y8qcsArQpDP8LaHr8Vn1WZlqKC
+	LmteUediS1YSd9Nu1mtxpdTT7Xm6lrD2R2sKzzEyAceNFzsNFs+DV3p3sNWccGsg
+	BTN8DnZiADt4kEbRqr7qA==
+X-ME-Sender: <xms:OkejaRd0bZaSvbT1AyW-aV2pTI_CwfT1bAXRYGDTcx9DPoYeuo4UGA>
+    <xme:OkejaaDrqTXe7huZZddCJ0BC2DK72As_QYp3pR4ns_F5cJccvmFVHdAF4qaeIPEWJ
+    216GStWjnCANafKNWGulhDyqVl-3deKUlud6NomSVgc8Mx_y0wlhA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvhedvjeejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehlvgig
+    ucghihhllhhirghmshhonhdfuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtf
+    frrghtthgvrhhnpefgfeeflefggfffveffteetiedvtedtgfdvieevfeejfeefffevteej
+    tedufffgveenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
+    hmpegrlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepuddvpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehlihhulhhonhhgfhgrnhhgsehhuhgrfigvih
+    drtghomhdprhgtphhtthhopehgihhovhgrnhhnihdrtggrsghiugguuhesihhnthgvlhdr
+    tghomhdprhgtphhtthhopehkvghvihhnrdhtihgrnhesihhnthgvlhdrtghomhdprhgtph
+    htthhopegrvhhihhgrihhhsehnvhhiughirgdrtghomhdprhgtphhtthhopehjghhgsehn
+    vhhiughirgdrtghomhdprhgtphhtthhopehkfigrnhhkhhgvuggvsehnvhhiughirgdrtg
+    homhdprhgtphhtthhopehlvghonhhrohesnhhvihguihgrrdgtohhmpdhrtghpthhtohep
+    mhgrohhrghesnhhvihguihgrrdgtohhmpdhrtghpthhtohephihishhhrghihhesnhhvih
+    guihgrrdgtohhm
+X-ME-Proxy: <xmx:OkejaXAUYD6QiwIl_X5e108KnHyFWW3VpF_S-n5AOWHRjpicZIUJmQ>
+    <xmx:OkejafGQMwv95iHXJ9THO6uq-H66PMvRIpDpwMFXEfZLPVggn_8ylQ>
+    <xmx:OkejaR3T4_t_Z2N4vlJkycfdtDEgiM8IZ_gOGUWJ_VJx-lxZqR45rg>
+    <xmx:OkejaQPDZ99te3ZTcMZ7_5vbet-Bl1jj0QgwwYOcAr1wxD1djg6LiA>
+    <xmx:O0ejaZYorQbyIjAkNbb57sxS0XO15V2rAje2Bj8Vk6A8V170bZpVyjFn>
+Feedback-ID: i03f14258:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 7E69915C008E; Sat, 28 Feb 2026 14:51:22 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aaJroUzTZXZfbRAl@yilunxu-OptiPlex-7050>
+X-ThreadId: AuobAVvnblXw
+Date: Sat, 28 Feb 2026 12:51:02 -0700
+From: "Alex Williamson" <alex@shazbot.org>
+To: "Yishai Hadas" <yishaih@nvidia.com>
+Cc: "Alex Williamson" <alex.williamson@redhat.com>,
+ "Jason Gunthorpe" <jgg@nvidia.com>, kvm@vger.kernel.org,
+ "Kevin Tian" <kevin.tian@intel.com>, joao.m.martins@oracle.com,
+ leonro@nvidia.com, maorg@nvidia.com, avihaih@nvidia.com,
+ liulongfang@huawei.com, giovanni.cabiddu@intel.com,
+ kwankhede <kwankhede@nvidia.com>
+Message-Id: <f58493e4-941b-4e62-b0a2-9fe9ba5bae4c@app.fastmail.com>
+In-Reply-To: <20260227134235.0affe244@shazbot.org>
+References: <20260224082019.25772-1-yishaih@nvidia.com>
+ <20260224082019.25772-3-yishaih@nvidia.com>
+ <20260227134235.0affe244@shazbot.org>
+Subject: Re: [PATCH vfio 2/6] vfio: Add support for
+ VFIO_DEVICE_FEATURE_MIG_PRECOPY_INFOv2
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.15 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
+	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm3,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72283-lists,kvm=lfdr.de];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	DMARC_NA(0.00)[ziepe.ca];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72284-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,kvm@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ziepe.ca:mid,ziepe.ca:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A56D71C7D13
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email,app.fastmail.com:mid]
+X-Rspamd-Queue-Id: 4A0781C80C6
 X-Rspamd-Action: no action
 
-On Sat, Feb 28, 2026 at 12:14:25PM +0800, Xu Yilun wrote:
-> On Fri, Feb 27, 2026 at 09:18:15AM -0400, Jason Gunthorpe wrote:
-> > On Fri, Feb 27, 2026 at 06:35:44PM +0800, Xu Yilun wrote:
-> > 
-> > > Will cause host machine check and host restart, same as host CPU
-> > > accessing encrypted memory. Intel TDX has no lower level privilege
-> > > protection table so the wrong accessing will actually impact the
-> > > memory encryption engine.
-> > 
-> > Blah, of course it does.
-> > 
-> > So Intel needs a two step synchronization to wipe the IOPTEs before
-> > any shared private conversions and restore the right ones after.
-> 
-> Mainly about shared IOPTE (for both T=0 table & T=1 table): "unmap
-> before conversion to private" & "map after conversion to shared"
-> 
-> I see there are already some consideration in QEMU to support in-place
-> conversion + shared passthrough [*], using uptr, but seems that's
-> exactly what you are objecting to
+On Fri, Feb 27, 2026, at 1:42 PM, Alex Williamson wrote:
+> On Tue, 24 Feb 2026 10:20:15 +0200
+> Yishai Hadas <yishaih@nvidia.com> wrote:
+>
+>> Currently, existing VFIO_MIG_GET_PRECOPY_INFO implementations don't
+>> assign info.flags before copy_to_user().
+>> 
+>> Because they copy the struct in from userspace first, this effectively
+>> echoes userspace-provided flags back as output, preventing the field
+>> from being used to report new reliable data from the drivers.
+>> 
+>> Add support for a new device feature named
+>> VFIO_DEVICE_FEATURE_MIG_PRECOPY_INFOv2.
+>> 
+>> On SET, enables the v2 pre_copy_info behaviour, where the
+>> vfio_precopy_info.flags is a valid output field.
+>> 
+>> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+>> ---
+>>  drivers/vfio/pci/vfio_pci_core.c |  1 +
+>>  drivers/vfio/vfio_main.c         | 20 ++++++++++++++++++++
+>>  include/linux/vfio.h             |  1 +
+>>  3 files changed, 22 insertions(+)
+>> 
+>> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+>> index d43745fe4c84..e22280f53ebf 100644
+>> --- a/drivers/vfio/pci/vfio_pci_core.c
+>> +++ b/drivers/vfio/pci/vfio_pci_core.c
+>> @@ -736,6 +736,7 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev)
+>>  #endif
+>>  	vfio_pci_core_disable(vdev);
+>>  
+>> +	core_vdev->precopy_info_flags_fix = 0;
+>>  	vfio_pci_dma_buf_cleanup(vdev);
+>>  
+>>  	mutex_lock(&vdev->igate);
+>> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+>> index 742477546b15..2243a6eb5547 100644
+>> --- a/drivers/vfio/vfio_main.c
+>> +++ b/drivers/vfio/vfio_main.c
+>> @@ -964,6 +964,23 @@ vfio_ioctl_device_feature_migration_data_size(struct vfio_device *device,
+>>  	return 0;
+>>  }
+>>  
+>> +static int
+>> +vfio_ioctl_device_feature_migration_precopy_info_v2(struct vfio_device *device,
+>> +						    u32 flags, size_t argsz)
+>> +{
+>> +	int ret;
+>> +
+>> +	if (!(device->migration_flags & VFIO_MIGRATION_PRE_COPY))
+>> +		return -EINVAL;
+>> +
+>> +	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_SET, 0);
+>
+> This should be VFIO_DEVICE_FEATURE_SET | VFIO_DEVICE_FEATURE_PROBE.
+> Probe support is essentially free, but we've not been good about
+> including it.  Thanks,
 
-There is some ugly stuff in qemu trying to make this work with VFIO..
+Sorry, ignore this, only GET and SET are checked for supported ops, PROBE is implicitly supported.  Thanks,
 
-> Further more, I think "unmap shared IOPTE before conversion to private"
-> may be the only concern to ensure kernel safety, other steps could be
-> fully left to userspace. Hope the downgrading from "remap" to
-> "invalidate" simplifies the notification.
+Alex
 
-Maybe, but there is still the large issue of how to deal with
-fragmenting the mapping and breaking/re-consolidating huge pages,
-which is not trivial..
 
-To really make this work well we may need iommufd to actively mirror
-the guestmemfd into IOPTEs and dynamically track changes.
-
-I will think about it..
-
-Jason
+>> +	if (ret != 1)
+>> +		return ret;
+>> +
+>> +	device->precopy_info_flags_fix = 1;
+>> +	return 0;
+>> +}
+>> +
+>>  static int vfio_ioctl_device_feature_migration(struct vfio_device *device,
+>>  					       u32 flags, void __user *arg,
+>>  					       size_t argsz)
+>> @@ -1251,6 +1268,9 @@ static int vfio_ioctl_device_feature(struct vfio_device *device,
+>>  		return vfio_ioctl_device_feature_migration_data_size(
+>>  			device, feature.flags, arg->data,
+>>  			feature.argsz - minsz);
+>> +	case VFIO_DEVICE_FEATURE_MIG_PRECOPY_INFOv2:
+>> +		return vfio_ioctl_device_feature_migration_precopy_info_v2(
+>> +			device, feature.flags, feature.argsz - minsz);
+>>  	default:
+>>  		if (unlikely(!device->ops->device_feature))
+>>  			return -ENOTTY;
+>> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+>> index e90859956514..3ff21374aeee 100644
+>> --- a/include/linux/vfio.h
+>> +++ b/include/linux/vfio.h
+>> @@ -52,6 +52,7 @@ struct vfio_device {
+>>  	struct vfio_device_set *dev_set;
+>>  	struct list_head dev_set_list;
+>>  	unsigned int migration_flags;
+>> +	u8 precopy_info_flags_fix;
+>>  	struct kvm *kvm;
+>>  
+>>  	/* Members below here are private, not for driver use */
 
