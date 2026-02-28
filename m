@@ -1,189 +1,238 @@
-Return-Path: <kvm+bounces-72277-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72278-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GAI/Hz30omlD8QQAu9opvQ
-	(envelope-from <kvm+bounces-72277-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 14:57:17 +0100
+	id ALAkA+cBo2kJ8wQAu9opvQ
+	(envelope-from <kvm+bounces-72278-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 15:55:35 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44CB61C3623
-	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 14:57:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EEE31C3BB6
+	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 15:55:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EA752301C55F
-	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 13:57:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 32DB03081042
+	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 14:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F3C7372B4E;
-	Sat, 28 Feb 2026 13:57:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581A744BC8D;
+	Sat, 28 Feb 2026 14:55:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M9fmpxR7";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ssnDYfWe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lvL+ytNR"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976183093C7
-	for <kvm@vger.kernel.org>; Sat, 28 Feb 2026 13:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772287023; cv=pass; b=rRMUNJ/tzT30MbsNkk0Pd0bjhHiWJB9cG5ARzYmLBr66NJtnLT4yGZqjQOcqRVFrCpA5JonKywK7wB5j220c0Ou5soD3gyeUW+Lh4koMZ2ltiEz3cyP28YxRAlV3A1upZVVnEfJL/DNOC6kICJpFqTzW3SGsyXKUdpYQTTy1WaA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772287023; c=relaxed/simple;
-	bh=folcasxC8R85n2b8wnCDU1NJVS3iOEobjI0icOIulEk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mIx2WB7+kLuZ2dQiSLh/z/NBuXpZjIZfWf1eNar0+hyf/ydr5DjVwgqv19j9xoQetOFiu/m11NTut3VhO1cESGrETesAbFrrn0asvGFI94i/j/1Grlnw40Bi/VgYErM9sybISEv04DTZMo8RHs7v20mi40WOXXbtELJrPHHcJyQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M9fmpxR7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ssnDYfWe; arc=pass smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772287019;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lPeE6tJ7LvztkqM9H/hBuFs1UkdrH4QjKz/WrRBZT6k=;
-	b=M9fmpxR7HhIRw8B3jvZ8D9lyvJKfZx5nx4h8ue9abcI9yaQhQs1zWQsgCtR7ma5dNl9HXp
-	GUDye5hFO9QI1YgQVc3elxXMRrTQj2fi9FQkPsQ6gMmekHfga2FHdS+fe8mW+xwkSrhAde
-	tV0peDc0rtrhrGjB9m1UN+wBXRwY5/4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-684-1VJ6sKqXMcWRoKvWbq-ISA-1; Sat, 28 Feb 2026 08:56:58 -0500
-X-MC-Unique: 1VJ6sKqXMcWRoKvWbq-ISA-1
-X-Mimecast-MFC-AGG-ID: 1VJ6sKqXMcWRoKvWbq-ISA_1772287017
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4836bf1a920so34028805e9.3
-        for <kvm@vger.kernel.org>; Sat, 28 Feb 2026 05:56:57 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772287015; cv=none;
-        d=google.com; s=arc-20240605;
-        b=h4UBSWKN08WGZtZNk4Yj1gox1DiMXycSLVpWPOmVW+k3z7iqZV49GoonAn+fw1Wb53
-         u7VUxGejf+qOqklsd9sTn7Dz2Z42R0fXxzIi3F3xIatAGdpotn+NvzMrYDuZ9dS0kG+x
-         OJRily4hUa19g+zajWJw7IrdwaLGgCisI4GYQ5YiIJbF1d1SsfaOb6CQbCldIvmd6uwq
-         j+2bwx/e0HEIjgqPj+8a/iyvIYbGZZzEi3N6KqD1BWfqpLHfxcva9EDH8zAiFE0xUX1Y
-         bKdqBmmvnQCJ7tKC5Bpu0NXfmsmDl7i7ph0mwFKVTjkilbu6HnZ5TxR/pv1pobJ7jv3i
-         JMpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=lPeE6tJ7LvztkqM9H/hBuFs1UkdrH4QjKz/WrRBZT6k=;
-        fh=qaYm4b6GKYlZ0T3gtLZ7fjEfCEC8jMv5XzYe6fOhw1Y=;
-        b=UUu+ljoBzjWaBWeMV1YPFouK9FtB+64MHo1XaGPNl2Ymij0u9X3dGliWj1Ce21lAQ0
-         PRjZyQW3Lh+O65ztS4YlC/w7uNGdQwiv6Y/tRo7kN8ovYcL8/BtsVRvVmnjr43l6NRrF
-         mAN1tazs0Ts14onKIOh0CARZTSwy3XDYDkG5cfh7qjULRWxYi9DiY+5bqJj7jjx7MUuD
-         sddMBE1pDzDJ7KzalMfH/jKkwul1rVwWc44X8j3KVugbJ42qn9W/6wtmJSy4RoGlYqmz
-         tJDigFAC4yhibbftdccTo/MLYhbMh94sAXoAisULfynFeIJiyv/517wSr2QPs6gbhBfR
-         fjgA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772287015; x=1772891815; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lPeE6tJ7LvztkqM9H/hBuFs1UkdrH4QjKz/WrRBZT6k=;
-        b=ssnDYfWeQ51hHa3Zg2j+Y4CVrWm6J9dPl282gLT37FxJfFJip3+lDPNYWCOwSrLtay
-         vL9ZJdS8rv+bT3xAYnWSqMvm5ASk2NnDk8vW69mE5LgoTSc3dykUX3dD37jnDwga7su2
-         PQKGb1M3e1boWTw0pSBNmp541saFeZ3taXtwJ2OfZ72e7Nk3NU/gtilewG/EfYZNMRW+
-         HcrdAP9MOU/upM0iYryB/Vs9Lx+yM1JvmpUinvj8/5QYS9Z+tAP/f4+hZZHFTDfDIr5z
-         8PSO8IaUZK5QN1CvOnyIeGD2nT1DFQ4qM6odiPe4xnsGXav1ASkOQ/Jo1Zn79WynSLWt
-         vGzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772287015; x=1772891815;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=lPeE6tJ7LvztkqM9H/hBuFs1UkdrH4QjKz/WrRBZT6k=;
-        b=WjXwLC6j1wP6yyZJI7kI03wpvMMr4kTS43TkCm/X7BZEkTINUJit8qtP8isYcAbSIx
-         /vMKQ6L4Div49g7qyyXVKoJceXTxnq6X82k2z70OxLDD80rF2SS4cGo3RuqdiYyZ0hPV
-         8mrV7ddgP412bXScJI9D6V8NWN6I2HeOF1O45o7Z+yVLaXWRZ7r0zT3w6NDk34XmFGoa
-         OoSjeP76hNpQSUpkbu8++MqKf5rnEEAbn+1T4lgPY+eoGRNSr/RRwi7AJe4jmJgqtIFy
-         TfvGxDjkc0BjBwZk696O9pdie6RDJVJb86+whjc2tY2pNC1EN6wE0esw7XDTcpkPiLB9
-         TNYA==
-X-Gm-Message-State: AOJu0Yy/xU1Ha6+jE+YYrf7ckMATnVLunF42oOR1yL6LOQNqFLsGb9+i
-	ifjh4zjB8YSkHAhQlTjHoGTYdFPSHnC9SYqNFmZF3yrxBIkACdcTNAKRF8NqrLX1HaWwNc5lUxq
-	bzXfPjbzJyQSSKC+jzeK/HuHPUVVCoJf5Jp1eH/BbpnmebKYNRXmGreEYGVj0jC9WIme4L2XNXW
-	jZXw5NLrT4TDcZOXeomuV6mMFbLIckkpLIBBnRU8A=
-X-Gm-Gg: ATEYQzyMrhR0rKMph06RaBzl0HRRDT6lGw+ddHTLv7kgBujX6hkCa5ua6CptFgZXQa/
-	KbCEbfkVGhg4LZEONWR65xtRRgYP8JqT9zvgIMZFQz7VUOkpxjdYR+CCS0bVmDq3cScPGxqXGtQ
-	wSk9hFg+H8M1IvkkeXGBILlIUrNm8wUlrMUiNP4cUawPLNH4f/r6nOszWHBtLJcLj5nXh9691G5
-	3Zx0G1cgEla6ibgKY36Y1wz6vQGmzv4fc3Q6GQyWwzn8ySTFdvUw7Q3+JVxwsgzM98FBp4anrEz
-	o+rkgHA=
-X-Received: by 2002:a05:600c:8711:b0:47e:e20e:bbb2 with SMTP id 5b1f17b1804b1-483c9b970a5mr96104655e9.7.1772287015623;
-        Sat, 28 Feb 2026 05:56:55 -0800 (PST)
-X-Received: by 2002:a05:600c:8711:b0:47e:e20e:bbb2 with SMTP id
- 5b1f17b1804b1-483c9b970a5mr96104395e9.7.1772287015182; Sat, 28 Feb 2026
- 05:56:55 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895BB44B67B;
+	Sat, 28 Feb 2026 14:55:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772290521; cv=none; b=EBVf1hQ9lxCSV/zB4gX6jbQvFg+jlVtiSW6xGdcrXiCOic0XlKjdJA6jQK9F4W1VW+kVKvbNt71qDMcsaJAuPzglGeQxjgn0/0PgA8x6aCgAXtKZ8juh5rV5bS192frT+BpBF194y7VbY0gLdtM0YnAuUVQpM/WWS8JHQC0wS4k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772290521; c=relaxed/simple;
+	bh=uDGbn5qTPyn7SYcOtQEiMBHNdhrIS+xWkV/U9uw99VQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EtR9xiO3MIDvjOUXUTei9cpmpXI6BHUNxsD2E1qE6wIIrWQgswkcgtj7xbpNN9SFTYiwbGqrQhg82kYANjKaF9nwX1O6ReZ2bWwYZep+AuX9tT3wgwkiO+LkRF2oBoSNiPVXwvM8tr3XMT9ZXMtk407Reoz/KoyniyhAYMIcXcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lvL+ytNR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C573C116D0;
+	Sat, 28 Feb 2026 14:55:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772290521;
+	bh=uDGbn5qTPyn7SYcOtQEiMBHNdhrIS+xWkV/U9uw99VQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lvL+ytNRenVVjkZCGdLRzJfFajM2+nss730FrnO5QQHOVTmrRBXsPejW+Bgkpw18K
+	 39KxNpbsdzd+0oqWIjH+zBf7cyrp+/PpYvpVUADfVhsKDDqxuocj0G5yvwRH33/7kr
+	 7jJO17LPjA7tZxrhOC0it+orKWBXkTWKyGQumc38L19bYEfd5ETU0OEQtGRJZhCUy1
+	 g9cCDQAH0Fzy9mtjNeMNHZOg6PiK6ZAWVGmS+GMd9p69LiG0Mr0TQuwEcHQ5BoM4Zk
+	 Bgb6/+CvtemEthv+F0ziPbmR5bbgXB4wZvmZheal1MjvWHhpZoaDBvKZaKfRUETRlv
+	 hzRPgSiU9o4Dw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vwLix-0000000EhXB-0BmL;
+	Sat, 28 Feb 2026 14:55:19 +0000
+Date: Sat, 28 Feb 2026 14:55:18 +0000
+Message-ID: <874in0ex49.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: syzbot <syzbot+f6a46b038fc243ac0175@syzkaller.appspotmail.com>, syzkaller@googlegroups.com
+Cc: catalin.marinas@arm.com,
+	joey.gouly@arm.com,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	oupton@kernel.org,
+	suzuki.poulose@arm.com,
+	syzkaller-bugs@googlegroups.com,
+	will@kernel.org,
+	yuzenghui@huawei.com
+Subject: Re: [syzbot] [kvmarm?] [kvm?] BUG: unable to handle kernel paging request in kvm_vgic_destroy
+In-Reply-To: <69a2d58c.050a0220.3a55be.003b.GAE@google.com>
+References: <69a2d58c.050a0220.3a55be.003b.GAE@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260207041011.913471-1-seanjc@google.com> <20260207041011.913471-3-seanjc@google.com>
- <CABgObfZeV6D-2cEht1300xNgxYtz=mi6oX4-D8x7exittEe22Q@mail.gmail.com>
- <CABgObfbKh1Tbzv63GfopW3KQhYtfAGgXXBgGn6EiR2kSBgH_jA@mail.gmail.com>
- <aYp86UFynnoBLy3m@google.com> <aaInA0WGEM3fVCNs@google.com>
-In-Reply-To: <aaInA0WGEM3fVCNs@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 28 Feb 2026 14:56:42 +0100
-X-Gm-Features: AaiRm52HcKDpbS6MO9vZNRRsa_AijihXRFwIw89yTT0EnVi90z05uyRBgaOXTs4
-Message-ID: <CABgObfaV27kPyGH1dDa-f1XaiqP_uM1cCFmSfnrakFD68u0hPg@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM: Generic changes for 6.20
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: syzbot+f6a46b038fc243ac0175@syzkaller.appspotmail.com, syzkaller@googlegroups.com, catalin.marinas@arm.com, joey.gouly@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oupton@kernel.org, suzuki.poulose@arm.com, syzkaller-bugs@googlegroups.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=148fc9aa8e041d0a];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	TAGGED_FROM(0.00)[bounces-72277-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pbonzini@redhat.com,kvm@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72278-lists,kvm=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[storage.googleapis.com:url,appspotmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
+	TAGGED_RCPT(0.00)[kvm,f6a46b038fc243ac0175];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 44CB61C3623
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 9EEE31C3BB6
 X-Rspamd-Action: no action
 
-On Sat, Feb 28, 2026 at 12:21=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
-> Finally got around to prepping a v2, and I realized that vcpu->mutex isn'=
-t held
-> when kvm_alloc_apic_access_page() is called, and thus isn't (currently) t=
-aken
-> outside kvm->slots_arch_lock.
+On Sat, 28 Feb 2026 11:46:20 +0000,
+syzbot <syzbot+f6a46b038fc243ac0175@syzkaller.appspotmail.com> wrote:
+> 
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    6316366129d2 Merge branch kvm-arm64/misc-6.20 into kvmarm-..
+> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=15e59c4a580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=148fc9aa8e041d0a
+> dashboard link: https://syzkaller.appspot.com/bug?extid=f6a46b038fc243ac0175
+> compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+> userspace arch: arm64
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13182006580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=173900ba580000
+> 
+> Downloadable assets:
+> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/fa3fbcfdac58/non_bootable_disk-63163661.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/1018400deda3/vmlinux-63163661.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/fb8a8bb5d8a4/Image-63163661.gz.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+f6a46b038fc243ac0175@syzkaller.appspotmail.com
+> 
+>  __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+>  invoke_syscall+0x90/0x230 arch/arm64/kernel/syscall.c:49
+>  el0_svc_common+0x120/0x2f4 arch/arm64/kernel/syscall.c:132
+>  do_el0_svc+0x58/0x74 arch/arm64/kernel/syscall.c:151
+>  el0_svc+0x5c/0x238 arch/arm64/kernel/entry-common.c:724
+>  el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:743
+>  el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+> Unable to handle kernel paging request at virtual address ffef800000000000
+> KASAN: maybe wild-memory-access in range [0xff00000000000000-0xff0000000000000f]
+> Mem abort info:
+>   ESR = 0x0000000096000004
+>   EC = 0x25: DABT (current EL), IL = 32 bits
+>   SET = 0, FnV = 0
+>   EA = 0, S1PTW = 0
+>   FSC = 0x04: level 0 translation fault
+> Data abort info:
+>   ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
+>   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+>   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+> [ffef800000000000] address between user and kernel address ranges
+> Internal error: Oops: 0000000096000004 [#1]  SMP
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 3651 Comm: syz.2.17 Not tainted syzkaller #0 PREEMPT 
+> Hardware name: linux,dummy-virt (DT)
+> pstate: 01402009 (nzcv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+> pc : kvm_vgic_dist_destroy arch/arm64/kvm/vgic/vgic-init.c:445 [inline]
+> pc : kvm_vgic_destroy+0x2d4/0x624 arch/arm64/kvm/vgic/vgic-init.c:518
+> lr : kvm_vgic_dist_destroy arch/arm64/kvm/vgic/vgic-init.c:444 [inline]
+> lr : kvm_vgic_destroy+0x290/0x624 arch/arm64/kvm/vgic/vgic-init.c:518
+> sp : ffff80008e647b90
+> x29: ffff80008e647ba0 x28: 0000000000000005 x27: cdf00000200a52d8
+> x26: cdf00000200a4db0 x25: 00000000000000cd x24: cdf00000200a4d8c
+> x23: 00000000000000cd x22: 00000000000000cd x21: cdf00000200a4ad0
+> x20: efff800000000000 x19: cdf00000200a4000 x18: 00000000030f4b63
+> x17: 0000000000000031 x16: 0000000000000000 x15: ffff800088209a68
+> x14: ffffffffffffffff x13: 0000000000000028 x12: 5df000001795c1f0
+> x11: ffff800088209a68 x10: 0000000000ff0100 x9 : 0ff0000000000000
+> x8 : 0000000000000000 x7 : ffff80008672f958 x6 : 0000000000000000
+> x5 : 0000000000000000 x4 : 0000000000000000 x3 : 0000000000000002
+> x2 : 0000000000000008 x1 : 0000000000000000 x0 : 0000000000000007
+> Call trace:
+>  kvm_vgic_dist_destroy arch/arm64/kvm/vgic/vgic-init.c:445 [inline] (P)
+>  kvm_vgic_destroy+0x2d4/0x624 arch/arm64/kvm/vgic/vgic-init.c:518 (P)
+>  kvm_arch_destroy_vm+0x88/0x138 arch/arm64/kvm/arm.c:299
+>  kvm_destroy_vm virt/kvm/kvm_main.c:1317 [inline]
+>  kvm_put_kvm+0x778/0xbe0 virt/kvm/kvm_main.c:1354
+>  kvm_vm_release+0x58/0x78 virt/kvm/kvm_main.c:1377
+>  __fput+0x4ac/0x978 fs/file_table.c:468
+>  ____fput+0x20/0x58 fs/file_table.c:496
+>  task_work_run+0x1b8/0x250 kernel/task_work.c:233
+>  resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+>  __exit_to_user_mode_loop kernel/entry/common.c:44 [inline]
+>  exit_to_user_mode_loop+0x110/0x188 kernel/entry/common.c:75
+>  __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
+>  exit_to_user_mode_prepare_legacy include/linux/irq-entry-common.h:242 [inline]
+>  arm64_exit_to_user_mode arch/arm64/kernel/entry-common.c:81 [inline]
+>  el0_svc+0x17c/0x238 arch/arm64/kernel/entry-common.c:725
+>  el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:743
+>  el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+> Code: 54000420 b2481c28 d344fd09 d378fc28 (38696a89) 
+> ---[ end trace 0000000000000000 ]---
+> ----------------
+> Code disassembly (best guess):
+>    0:	54000420 	b.eq	0x84  // b.none
+>    4:	b2481c28 	orr	x8, x1, #0xff00000000000000
+>    8:	d344fd09 	lsr	x9, x8, #4
+>    c:	d378fc28 	lsr	x8, x1, #56
+> * 10:	38696a89 	ldrb	w9, [x20, x9] <-- trapping instruction
 
-It is, via kvm_mmu_new_pgd (kvm_mmu_reload -> kvm_mmu_load ->
-mmu_alloc_shadow_roots -> mmu_first_shadow_root_alloc).  In fact
-commit b10a038e added slots_arch_lock exactly to have something that
-could be taken within the SRCU critical section, and thus within
-vcpu->mutex :)
+Oh gawd, fault injection. Because we didn't have enough bona fide,
+directly triggerable bugs, we're tricking the kernel into generating
+more. Oh well.
 
-(slots_arch_lock is also taken inside slots_lock, and therefore it
-must be taken inside vcpu->mutex transitively; but more to the point
-it exists specifically to be taken during KVM_RUN).
+Thankfully, that's an easy one: vgic_allocate_private_irqs_locked()
+fails, we exit kvm_vgic_create() early, leaving dist->rd_regions
+uninitialised. kvm_vgic_dist_destroy() comes along and walks into the
+weeds.
 
-> But update the changelog to not claim that the behavior is "arguablyh wro=
-ng".
+Note to the syzcaller folks: being a lazy bastard, I run the test case
+(both kernel and C reproducer) as a nested guest using kvmtool.
+kvmtool has a very simple init that doesn't mount debugfs by default.
+It'd be great if the reproducer could check that the debugfs files are
+accessible and stop if it can't configure them. I initially couldn't
+reproduce the issue because of this.
 
-That too, yes.
+Anyway, that being said:
 
-Paolo
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/vgic-fixes-7.0
 
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
 
