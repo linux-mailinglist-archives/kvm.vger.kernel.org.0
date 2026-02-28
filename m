@@ -1,223 +1,178 @@
-Return-Path: <kvm+bounces-72268-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72269-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KIX1DIZiommN2gQAu9opvQ
-	(envelope-from <kvm+bounces-72268-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 04:35:34 +0100
+	id YAD1MVRwommf3AQAu9opvQ
+	(envelope-from <kvm+bounces-72269-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 05:34:28 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A26E21C0241
-	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 04:35:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C8FE1C0497
+	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 05:34:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A413230EE47E
-	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 03:34:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 66B1430614D5
+	for <lists+kvm@lfdr.de>; Sat, 28 Feb 2026 04:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3717D2E2665;
-	Sat, 28 Feb 2026 03:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E357F33EAED;
+	Sat, 28 Feb 2026 04:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aVcInqJu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="abU0k8+l"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587DA2DF707
-	for <kvm@vger.kernel.org>; Sat, 28 Feb 2026 03:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1F578F59;
+	Sat, 28 Feb 2026 04:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772249620; cv=none; b=a6LgEiVl8Zke6ZzPSNZLENTXmkZU0DftkC3gVcREl5BqSONhscIj9dlwF8FkirOK0tOoAFqF/Y8g9DL/fNaJzEGgnk+ufNZHDIpnGx7DCQKQFhSl6cUi3hSq4DXEaOs65nuVB0P6O6KFvKL71OsNJCejm4ygVyQAsyjbRqnJ6tc=
+	t=1772253251; cv=none; b=mdYCbk6T1VJ7zfWEXayHLqRMGQV1hYLvdV7sRNFWVPrdpkievtK4A3mqJBRW13fNb6SVwBdM1WNb7bOfmodnMvtKhpTmmNL8BeaeVmcdOhhdm66zXssCacuw1hsCCAZoQ1n5Ckhi05b69xsMKPQTUnBFDu7nRWHt402j+N3vrZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772249620; c=relaxed/simple;
-	bh=/lCxiHbvKeja+uJyJNRaWhTwWnRWmN3ecTB1MEqsjPs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=f5QdRyCGYVPiTCnaAChy/5L4dulDIR3f317Sswzs5iyjLzba488Hqdsp4Pe9O7MXGRvKIVgTOpb4LjM/8CXyl4YUCet0IDp+QF3R1nf2d8TlrOLH+/xdkWaTMUC1oDbPxjnNAaDuSZwqYLhfBjxth01q2lnOOUHscq+7cPN+Ckc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aVcInqJu; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chengkev.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2aae146bab0so39713605ad.0
-        for <kvm@vger.kernel.org>; Fri, 27 Feb 2026 19:33:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772249619; x=1772854419; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zzK+ahrN0WrI65Z8BtzgCkPZKdVkUFBx57SYFZxh0S8=;
-        b=aVcInqJullGrn8lOqBWKmJSXiZiCYX8JJuMsK2j3Xs7MdYwl59Tl/RP2sWt402/9Sp
-         eXpFqAQxWi7lADL0JFOTU3+tblhmrp72YwsjsQAftjtvD18s2er3jNH4+PuQfuaIScXA
-         spQOstvGflDaiwFdrlPhRzQdMv65kosbtbjzN+ro7esGKC4WaZ0P3H5ww25FOmhqJ9KN
-         zOouHD3n0RXubNxBsA7/llhenCbn5sMNRbqJYkSlbqoVTPazFuj0FkttFB7At2Yqy58g
-         ppB12taDb8e5EtmHoNQTXMeVeK6i3w/9W6kzEM62TLz6j9yXxP9trajNlilPy4QLBWnV
-         OK0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772249619; x=1772854419;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zzK+ahrN0WrI65Z8BtzgCkPZKdVkUFBx57SYFZxh0S8=;
-        b=CGLfszDBEjb7vPqbtft3MoLHtDVCKGHdezTi79IpPK2cRhF4l7WKPTUcrInejtSaIk
-         JXCJFHL1/I4KNsyJY5En8rNb+bQlvf0qlwrqsPgty3yiUS+Bz7w82AAKPXlPzGoxsURT
-         KLkbrMrrkTOTsHj6urD5kc2gIx1QaplLwCHVbMA+yXhdatD1qItE8+8ZO0XNpb9wDVdm
-         gEGrjYWtUjAvp+7Ez2O0HigLaN908iq0tLbY1n/3m9VHVHe5FR6f+L5NkrcgONshZobv
-         H6ghGN2TQxqorG+wLfBfZi/Kf38TBxkTx5NRYXzHZhciRtuevMuYR8+nXyevbdJHWA/y
-         k/rQ==
-X-Gm-Message-State: AOJu0YzWjyR0pcehJfKhqWpxp4mbG4nRQ66NG1NT7yv32EXzB3IyzDgN
-	ArBavjL3s5oBAc5y3mL8oWHk/LRcdW7fWd1+9wu/LRNr3tk9GZ2B+6Byc5PnrXCLuaNwHIRrTsF
-	rYFZwoOvsA1hSaQ==
-X-Received: from plkg16.prod.google.com ([2002:a17:903:19d0:b0:298:1151:5f6d])
- (user=chengkev job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:18b:b0:2ad:da26:c2c4 with SMTP id d9443c01a7336-2ae2e3ce810mr48921795ad.9.1772249618503;
- Fri, 27 Feb 2026 19:33:38 -0800 (PST)
-Date: Sat, 28 Feb 2026 03:33:28 +0000
-In-Reply-To: <20260228033328.2285047-1-chengkev@google.com>
+	s=arc-20240116; t=1772253251; c=relaxed/simple;
+	bh=6ZTdM+dG94A4q6lLWOntfkiT+NYMWFdAVdePg/GzGgM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J2szMnlB64kRApybXa7GsbodxV3dv+KaT6rSiYCHckJ8XPnZbNhq6WvPj1O65tcv6xgjSOnrYx7tEZOS06JHYrEn6lAbXhX+fS0p/YyjrfJ9Y+8WBBfxFHWFHPELclyHB1rWWkiQPdFtmSKeLLL3zVmd+Ha1taorBiekrTlUpQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=abU0k8+l; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772253249; x=1803789249;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6ZTdM+dG94A4q6lLWOntfkiT+NYMWFdAVdePg/GzGgM=;
+  b=abU0k8+lOtrDe7CP/kg13OCt8U9mZ6qHrDH3PiMdMx2NreNl6V+LJzLc
+   nvclNYwMDv5h7iKnc29OB1Xbq28rzwGO5FqfQFoYUgX44vWFeey+sEZ5x
+   +XxI8i2zrJdSeTB6uUdIilTL2jXPMh0z3W3/gptT0wyAxL65GHY3Sy3yd
+   BaMyXcxHm2Yt7dgAjCye/A52giHVoSs7rX/cp61oKM1LTxi6wbnz+sZQE
+   Ea6YDtARMoi1G6bLQ8FKOwBrDrWQgiU2owBICtbcsj2ES7WEC8tqkiv14
+   9OPMBui11F7DKFWO1IcKO3exDh9dPP7RsI8N1tWGXiVVvQOEQynYGr/NU
+   A==;
+X-CSE-ConnectionGUID: 2BCQ7cuzQCK2Z92db8qraw==
+X-CSE-MsgGUID: 3ZX96dOyQyKhuPUQgDsXBQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11714"; a="73383060"
+X-IronPort-AV: E=Sophos;i="6.21,315,1763452800"; 
+   d="scan'208";a="73383060"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2026 20:34:09 -0800
+X-CSE-ConnectionGUID: PMTaQJFSSROROo54YRIIow==
+X-CSE-MsgGUID: lR9E7gR8QGqIjUNJzS9R/g==
+X-ExtLoop1: 1
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa003.fm.intel.com with ESMTP; 27 Feb 2026 20:34:04 -0800
+Date: Sat, 28 Feb 2026 12:14:25 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Alexey Kardashevskiy <aik@amd.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Kevin Tian <kevin.tian@intel.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>, iommu@lists.linux.dev,
+	linux-coco@lists.linux.dev, Dan Williams <dan.j.williams@intel.com>,
+	Santosh Shukla <santosh.shukla@amd.com>,
+	"Pratik R . Sampat" <prsampat@amd.com>,
+	Fuad Tabba <tabba@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	michael.roth@amd.com, vannapurve@google.com
+Subject: Re: [RFC PATCH kernel] iommufd: Allow mapping from KVM's guest_memfd
+Message-ID: <aaJroUzTZXZfbRAl@yilunxu-OptiPlex-7050>
+References: <20260225075211.3353194-1-aik@amd.com>
+ <aZ7-tTpobKiCFT5L@google.com>
+ <CAEvNRgEiod74cRoVQVC5LUbWDZf6Wwz1ssjQN0fveN=RBAjsTw@mail.gmail.com>
+ <20260226190757.GA44359@ziepe.ca>
+ <aaDL8tYrVCWlQg79@google.com>
+ <20260227002105.GC44359@ziepe.ca>
+ <aaDlRdnhIqRXEbPZ@google.com>
+ <20260227010902.GE44359@ziepe.ca>
+ <aaFzgGTpZI0eZWdD@yilunxu-OptiPlex-7050>
+ <20260227131815.GG44359@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260228033328.2285047-1-chengkev@google.com>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260228033328.2285047-5-chengkev@google.com>
-Subject: [PATCH V4 4/4] KVM: SVM: Raise #UD if VMMCALL instruction is not intercepted
-From: Kevin Cheng <chengkev@google.com>
-To: seanjc@google.com, pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, yosry@kernel.org, 
-	Kevin Cheng <chengkev@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260227131815.GG44359@ziepe.ca>
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72268-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72269-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chengkev@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_NEQ_ENVFROM(0.00)[yilun.xu@linux.intel.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A26E21C0241
+X-Rspamd-Queue-Id: 8C8FE1C0497
 X-Rspamd-Action: no action
 
-The AMD APM states that if VMMCALL instruction is not intercepted, the
-instruction raises a #UD exception.
+On Fri, Feb 27, 2026 at 09:18:15AM -0400, Jason Gunthorpe wrote:
+> On Fri, Feb 27, 2026 at 06:35:44PM +0800, Xu Yilun wrote:
+> 
+> > Will cause host machine check and host restart, same as host CPU
+> > accessing encrypted memory. Intel TDX has no lower level privilege
+> > protection table so the wrong accessing will actually impact the
+> > memory encryption engine.
+> 
+> Blah, of course it does.
+> 
+> So Intel needs a two step synchronization to wipe the IOPTEs before
+> any shared private conversions and restore the right ones after.
 
-Create a vmmcall exit handler that generates a #UD if a VMMCALL exit
-from L2 is being handled by L0, which means that L1 did not intercept
-the VMMCALL instruction. The exception to this is if the exiting
-instruction was for Hyper-V L2 TLB flush hypercalls as they are handled
-by L0.
+Mainly about shared IOPTE (for both T=0 table & T=1 table): "unmap
+before conversion to private" & "map after conversion to shared"
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Kevin Cheng <chengkev@google.com>
----
- arch/x86/kvm/svm/hyperv.h | 11 +++++++++++
- arch/x86/kvm/svm/nested.c |  4 +---
- arch/x86/kvm/svm/svm.c    | 19 ++++++++++++++++++-
- 3 files changed, 30 insertions(+), 4 deletions(-)
+I see there are already some consideration in QEMU to support in-place
+conversion + shared passthrough [*], using uptr, but seems that's
+exactly what you are objecting to.
 
-diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
-index d3f8bfc05832e..9af03970d40c2 100644
---- a/arch/x86/kvm/svm/hyperv.h
-+++ b/arch/x86/kvm/svm/hyperv.h
-@@ -41,6 +41,13 @@ static inline bool nested_svm_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu)
- 	return hv_vcpu->vp_assist_page.nested_control.features.directhypercall;
- }
+[*]: https://lore.kernel.org/all/18f64464-2ead-42d4-aeaa-f781020dca05@intel.com/
 
-+static inline bool nested_svm_is_l2_tlb_flush_hcall(struct kvm_vcpu *vcpu)
-+{
-+	return guest_hv_cpuid_has_l2_tlb_flush(vcpu) &&
-+	       nested_svm_l2_tlb_flush_enabled(vcpu) &&
-+	       kvm_hv_is_tlb_flush_hcall(vcpu);
-+}
-+
- void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
- #else /* CONFIG_KVM_HYPERV */
- static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu) {}
-@@ -48,6 +55,10 @@ static inline bool nested_svm_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu)
- {
- 	return false;
- }
-+static inline bool nested_svm_is_l2_tlb_flush_hcall(struct kvm_vcpu *vcpu)
-+{
-+	return false;
-+}
- static inline void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu) {}
- #endif /* CONFIG_KVM_HYPERV */
+For Intel, T=1 private IOPTE reuses S-EPT, this is the real CC business
+and the correctness is managed by KVM & firmware, no notification
+needed.
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index de90b104a0dd5..45d1496031a74 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -1674,9 +1674,7 @@ int nested_svm_exit_special(struct vcpu_svm *svm)
- 	}
- 	case SVM_EXIT_VMMCALL:
- 		/* Hyper-V L2 TLB flush hypercall is handled by L0 */
--		if (guest_hv_cpuid_has_l2_tlb_flush(vcpu) &&
--		    nested_svm_l2_tlb_flush_enabled(vcpu) &&
--		    kvm_hv_is_tlb_flush_hcall(vcpu))
-+		if (nested_svm_is_l2_tlb_flush_hcall(vcpu))
- 			return NESTED_EXIT_HOST;
- 		break;
- 	default:
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index f8f9b7a124c36..d662d5ce986ac 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -52,6 +52,7 @@
- #include "svm.h"
- #include "svm_ops.h"
+Further more, I think "unmap shared IOPTE before conversion to private"
+may be the only concern to ensure kernel safety, other steps could be
+fully left to userspace. Hope the downgrading from "remap" to
+"invalidate" simplifies the notification.
 
-+#include "hyperv.h"
- #include "kvm_onhyperv.h"
- #include "svm_onhyperv.h"
-
-@@ -3258,6 +3259,22 @@ static int bus_lock_exit(struct kvm_vcpu *vcpu)
- 	return 0;
- }
-
-+static int vmmcall_interception(struct kvm_vcpu *vcpu)
-+{
-+	/*
-+	 * Per the AMD APM, VMMCALL raises #UD if the VMMCALL intercept
-+	 * is not set. For an L2 guest, inject #UD as L1 did not intercept
-+	 * VMMCALL, except for Hyper-V L2 TLB flush hypercalls as they
-+	 * are handled by L0.
-+	 */
-+	if (is_guest_mode(vcpu) && !nested_svm_is_l2_tlb_flush_hcall(vcpu)) {
-+		kvm_queue_exception(vcpu, UD_VECTOR);
-+		return 1;
-+	}
-+
-+	return kvm_emulate_hypercall(vcpu);
-+}
-+
- static int (*const svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
- 	[SVM_EXIT_READ_CR0]			= cr_interception,
- 	[SVM_EXIT_READ_CR3]			= cr_interception,
-@@ -3308,7 +3325,7 @@ static int (*const svm_exit_handlers[])(struct kvm_vcpu *vcpu) = {
- 	[SVM_EXIT_TASK_SWITCH]			= task_switch_interception,
- 	[SVM_EXIT_SHUTDOWN]			= shutdown_interception,
- 	[SVM_EXIT_VMRUN]			= vmrun_interception,
--	[SVM_EXIT_VMMCALL]			= kvm_emulate_hypercall,
-+	[SVM_EXIT_VMMCALL]			= vmmcall_interception,
- 	[SVM_EXIT_VMLOAD]			= vmload_interception,
- 	[SVM_EXIT_VMSAVE]			= vmsave_interception,
- 	[SVM_EXIT_STGI]				= stgi_interception,
---
-2.53.0.473.g4a7958ca14-goog
-
+> 
+> AMD needs a nasty HW synchronization with RMP changes, but otherwise
+> wants to map the entire physical space.
+> 
+> ARM doesn't care much, I think it could safely do either approach?
+> 
+> These are very different behaviors so I would expect that userspace
+> needs to signal which of the two it wants.
+> 
+> It feels like we need a fairly complex dedicated synchronization logic
+> in iommufd coupled to the shared/private machinery in guestmemfd
+> 
+> Not really sure how to implement the Intel version right now, it is
+> sort of like a nasty version of SVA..
+> 
+> Jason
 
