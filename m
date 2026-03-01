@@ -1,57 +1,58 @@
-Return-Path: <kvm+bounces-72291-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72292-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uIvoN4KVo2lPHgUAu9opvQ
-	(envelope-from <kvm+bounces-72291-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sun, 01 Mar 2026 02:25:22 +0100
+	id GHKNAa6Vo2lPHgUAu9opvQ
+	(envelope-from <kvm+bounces-72292-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sun, 01 Mar 2026 02:26:06 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8ACE1CA834
-	for <lists+kvm@lfdr.de>; Sun, 01 Mar 2026 02:25:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D013B1CA95B
+	for <lists+kvm@lfdr.de>; Sun, 01 Mar 2026 02:26:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 64C763014F4E
-	for <lists+kvm@lfdr.de>; Sun,  1 Mar 2026 01:21:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5E15F3015ED6
+	for <lists+kvm@lfdr.de>; Sun,  1 Mar 2026 01:21:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34C4D2848AD;
-	Sun,  1 Mar 2026 01:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B0A01482E8;
+	Sun,  1 Mar 2026 01:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PFcy/J/L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vAD4h8YW"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698532BD0B;
-	Sun,  1 Mar 2026 01:20:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4156E2BD0B;
+	Sun,  1 Mar 2026 01:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772328059; cv=none; b=FXjTLG7MIwg10DCgoHpGSQKYeKLs7A/d0xTKITBnBA02j/s01hSWV9Kn7AqYfRx6PA/Blp9mrximgAE8tbbReqtNrzzpgZzGzy4A0foPWVRStbkNVEdNdZMpZaN5LE+pZtmxuhtHHrHUeaM4x47UrQW8w62B7o3FOlg3rhYus9E=
+	t=1772328078; cv=none; b=s/Btb0ZVPu5tIZpegKLOBSE8+Hdby+ZMCI4gDOAfX9buXU8hVCelX3ClD8TZvVQiG/CImcirrBfjooeA6HD0Xs3l4AcXTiHjCwW3JxA5YngtANKkqSIKu/UfEb1aP5+8t7eiTWfBzjWQx5KgXkOB+p0yM1ppeIUvWSDXKVMLfh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772328059; c=relaxed/simple;
-	bh=zCvOeCqR4GE1v1zY+J8ukX5yI1snoTKj7zOaqopj7WM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n8S0nZlUn8L4yhWMX1Ll+qkwerjwCd0QS8LvxYiB1vBhjyQfdP5WrpwmI5gLh9JSsDlq4Z5MYVGn0x9fW0pqX4/n8EE05Xaoo5zsxtDhoH6ptGesfXwkqYoEyIAvrafM+KH2+Q3bmfXwiTrEWHm4I4aDl6Ly2W5pu2oAxFFSPkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PFcy/J/L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD729C19421;
-	Sun,  1 Mar 2026 01:20:58 +0000 (UTC)
+	s=arc-20240116; t=1772328078; c=relaxed/simple;
+	bh=pGzf6WhVMJ3tYTYuYC5AQtZVsJ240z0+qn4B7toQ81Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VIIyhMzMWmNdIVX6j6bxMe1kahfM2LmPAvIjmDBpgEqHsbedU34b1/+oPvcPbnvr5WSxEwNot+bQZuUdOGbdfXPJGiKc//dqn7ztez0Yj4NFvW0N45pjBiE4cgtUc2EfetfFdGWqufTOl6NwA/LIecMcprnRKCOE5LbJe+XC024=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vAD4h8YW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77DF6C19421;
+	Sun,  1 Mar 2026 01:21:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772328059;
-	bh=zCvOeCqR4GE1v1zY+J8ukX5yI1snoTKj7zOaqopj7WM=;
+	s=k20201202; t=1772328078;
+	bh=pGzf6WhVMJ3tYTYuYC5AQtZVsJ240z0+qn4B7toQ81Y=;
 	h=From:To:Cc:Subject:Date:From;
-	b=PFcy/J/LKdGSPnmyQywBBb1tvgRuKxnvdNiFhqE6dwxw8lLnrT+9JECzr26iJXz4a
-	 EMtBtfPBNIrgT5FsD8BbVC7q4I3v9mqIPynjxQBWXpnuSIOSsq6zdiFd9wB0e2/4IE
-	 rian/fVmAN5weJvEhlXDWuM66ctfgs+KGCvbYOLKhIPvB+PlZIppsxZtPcIn/24riW
-	 B5cIFnESpralStGdwiSJVc9O+B0yFTYA/W7y99uP/0VAj8YnGENvOts33KxMAFm+G9
-	 8ERE4Ae/wppUnyAMq2gANeygcK8zEq10vZCuomGa+2e7yR08Jw75D1LTazc0TF933t
-	 89kDLSZ4zwuvg==
+	b=vAD4h8YW9orGgtq1aM51xTsAMJ+B/xMp4HrbYrfXOnU57eLkYlcBCcwcws5gdap7O
+	 D7XKD2ICnsqOz2VutoR911q+i1VfTgszBOZhWxOT2NH2FZP7Re8rRLznPWrCvkwj6x
+	 N/bkpQS5EL38gGkYYo4eve4TlRMB259RZgfs65qfQhfYEylkNGhu4H/MvbTWUv4iQw
+	 fxgtwxRXNUIPVyHLkOYI/ClGRCM16DhoHSkdXmThgEAM9UdBpd4z5no3V4+y+t4yKx
+	 3oUViG979Dp5XA0JRkj/KxnTANsjE9JAe54Ed/2dh+OZ1mGVgC2EMS5R9Nq5wgJLHm
+	 xK9BBBEebmZbA==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	seanjc@google.com
-Cc: Alessandro Ratti <alessandro@0x65c.net>,
-	syzbot+1522459a74d26b0ac33a@syzkaller.appspotmail.com,
+	yosry@kernel.org
+Cc: Maxim Levitsky <mlevitsk@redhat.com>,
+	Yosry Ahmed <yosry.ahmed@linux.dev>,
+	Sean Christopherson <seanjc@google.com>,
 	kvm@vger.kernel.org
-Subject: FAILED: Patch "KVM: x86: Ignore -EBUSY when checking nested events from vcpu_block()" failed to apply to 6.12-stable tree
-Date: Sat, 28 Feb 2026 20:20:57 -0500
-Message-ID: <20260301012057.1676727-1-sashal@kernel.org>
+Subject: FAILED: Patch "KVM: nSVM: Always use vmcb01 in VMLOAD/VMSAVE emulation" failed to apply to 6.12-stable tree
+Date: Sat, 28 Feb 2026 20:21:16 -0500
+Message-ID: <20260301012116.1677145-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -63,35 +64,34 @@ X-Patchwork-Hint: ignore
 X-stable: review
 Content-Transfer-Encoding: 8bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72291-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72292-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.995];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[kvm,1522459a74d26b0ac33a];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,appspotmail.com:email,msgid.link:url]
-X-Rspamd-Queue-Id: E8ACE1CA834
+	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,msgid.link:url,linux.dev:email]
+X-Rspamd-Queue-Id: D013B1CA95B
 X-Rspamd-Action: no action
 
 The patch below does not apply to the 6.12-stable tree.
@@ -104,57 +104,50 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From ead63640d4e72e6f6d464f4e31f7fecb79af8869 Mon Sep 17 00:00:00 2001
-From: Sean Christopherson <seanjc@google.com>
-Date: Thu, 8 Jan 2026 19:06:57 -0800
-Subject: [PATCH] KVM: x86: Ignore -EBUSY when checking nested events from
- vcpu_block()
+From 127ccae2c185f62e6ecb4bf24f9cb307e9b9c619 Mon Sep 17 00:00:00 2001
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+Date: Sat, 10 Jan 2026 00:48:18 +0000
+Subject: [PATCH] KVM: nSVM: Always use vmcb01 in VMLOAD/VMSAVE emulation
 
-Ignore -EBUSY when checking nested events after exiting a blocking state
-while L2 is active, as exiting to userspace will generate a spurious
-userspace exit, usually with KVM_EXIT_UNKNOWN, and likely lead to the VM's
-demise.  Continuing with the wakeup isn't perfect either, as *something*
-has gone sideways if a vCPU is awakened in L2 with an injected event (or
-worse, a nested run pending), but continuing on gives the VM a decent
-chance of surviving without any major side effects.
+Commit cc3ed80ae69f ("KVM: nSVM: always use vmcb01 to for vmsave/vmload
+of guest state") made KVM always use vmcb01 for the fields controlled by
+VMSAVE/VMLOAD, but it missed updating the VMLOAD/VMSAVE emulation code
+to always use vmcb01.
 
-As explained in the Fixes commits, it _should_ be impossible for a vCPU to
-be put into a blocking state with an already-injected event (exception,
-IRQ, or NMI).  Unfortunately, userspace can stuff MP_STATE and/or injected
-events, and thus put the vCPU into what should be an impossible state.
+As a result, if VMSAVE/VMLOAD is executed by an L2 guest and is not
+intercepted by L1, KVM will mistakenly use vmcb02. Always use vmcb01
+instead of the current VMCB.
 
-Don't bother trying to preserve the WARN, e.g. with an anti-syzkaller
-Kconfig, as WARNs can (hopefully) be added in paths where _KVM_ would be
-violating x86 architecture, e.g. by WARNing if KVM attempts to inject an
-exception or interrupt while the vCPU isn't running.
-
-Cc: Alessandro Ratti <alessandro@0x65c.net>
+Fixes: cc3ed80ae69f ("KVM: nSVM: always use vmcb01 to for vmsave/vmload of guest state")
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
 Cc: stable@vger.kernel.org
-Fixes: 26844fee6ade ("KVM: x86: never write to memory from kvm_vcpu_check_block()")
-Fixes: 45405155d876 ("KVM: x86: WARN if a vCPU gets a valid wakeup that KVM can't yet inject")
-Link: https://syzkaller.appspot.com/text?tag=ReproC&x=10d4261a580000
-Reported-by: syzbot+1522459a74d26b0ac33a@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/671bc7a7.050a0220.455e8.022a.GAE@google.com
-Link: https://patch.msgid.link/20260109030657.994759-1-seanjc@google.com
+Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+Link: https://patch.msgid.link/20260110004821.3411245-2-yosry.ahmed@linux.dev
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/x86/kvm/svm/svm.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e4418409b468d..fe9d324da72ab 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11597,8 +11597,7 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
- 	if (is_guest_mode(vcpu)) {
- 		int r = kvm_check_nested_events(vcpu);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index e454ae095cf7c..f1a5b61bdb5bc 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2122,12 +2122,13 @@ static int vmload_vmsave_interception(struct kvm_vcpu *vcpu, bool vmload)
  
--		WARN_ON_ONCE(r == -EBUSY);
--		if (r < 0)
-+		if (r < 0 && r != -EBUSY)
- 			return 0;
+ 	ret = kvm_skip_emulated_instruction(vcpu);
+ 
++	/* KVM always performs VMLOAD/VMSAVE on VMCB01 (see __svm_vcpu_run()) */
+ 	if (vmload) {
+-		svm_copy_vmloadsave_state(svm->vmcb, vmcb12);
++		svm_copy_vmloadsave_state(svm->vmcb01.ptr, vmcb12);
+ 		svm->sysenter_eip_hi = 0;
+ 		svm->sysenter_esp_hi = 0;
+ 	} else {
+-		svm_copy_vmloadsave_state(vmcb12, svm->vmcb);
++		svm_copy_vmloadsave_state(vmcb12, svm->vmcb01.ptr);
  	}
  
+ 	kvm_vcpu_unmap(vcpu, &map);
 -- 
 2.51.0
 
