@@ -1,58 +1,56 @@
-Return-Path: <kvm+bounces-72306-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72307-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GFesB8+ao2l4IAUAu9opvQ
-	(envelope-from <kvm+bounces-72306-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sun, 01 Mar 2026 02:47:59 +0100
+	id 2OmfIJudo2l2IQUAu9opvQ
+	(envelope-from <kvm+bounces-72307-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sun, 01 Mar 2026 02:59:55 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E48DE1CBC79
-	for <lists+kvm@lfdr.de>; Sun, 01 Mar 2026 02:47:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F5A1CC8AA
+	for <lists+kvm@lfdr.de>; Sun, 01 Mar 2026 02:59:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 50B0B305FB6E
-	for <lists+kvm@lfdr.de>; Sun,  1 Mar 2026 01:42:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E196232E904F
+	for <lists+kvm@lfdr.de>; Sun,  1 Mar 2026 01:43:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6676026ED35;
-	Sun,  1 Mar 2026 01:41:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3832D8DA6;
+	Sun,  1 Mar 2026 01:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n9WrRiHk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n6yZ1fFa"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC8B277C9D;
-	Sun,  1 Mar 2026 01:41:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51231145A1F;
+	Sun,  1 Mar 2026 01:43:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772329318; cv=none; b=sOREAoKvNQ2QpjHYqqmQ5EAbBNYOBs2SWP0JMk7N/xVQcLhHRL6KO8878dHJfrG8WeOkIfsw8aTBrsUIttO6LtdPJR4ysv1DWKBiP8I7f4E2JFx5kD2F/OHoPlNAiWhiAIqK8WSbfxAhH+RX54KP7CTz5I/howYiOf/Q1Ka/UvE=
+	t=1772329414; cv=none; b=qHEABekTWLL/JDxJS1SpipCsdMY4SoAMGBcHuyS6KYQA42cOO610qVsG6MMhACGzn+pNWh81ySaFgCgcEOQHn723xxAV/bQkMbXM++Mqq+49fG/F7noX/1R8ebqX8cMwxQQehUYymSHWZ5qrq0ZB0YLs3frLABvfStw0Wz3E7w0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772329318; c=relaxed/simple;
-	bh=sNIm/syIpXLQY8irgCpfUS8E+jfY6JWMK27YtMlbmb4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hwfMjppcCcUmRjbonjv6jo7m/qK7S/mVM5LXDXu9JbXXcSaLjgPnzldeOdKbixPjHKk/5JiAlvPUh4Unztp4YJbrM/SkzT135G5ouefzztzSzvUktgm9HjkrHBhDx/jZqvZL2ZENtHAriIY4pNr3lQtb+thT2/j6pbTv0Wp8eCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n9WrRiHk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6A11C19421;
-	Sun,  1 Mar 2026 01:41:57 +0000 (UTC)
+	s=arc-20240116; t=1772329414; c=relaxed/simple;
+	bh=Q5wpVgnREjETGE1Db+bjR8On0pA/fN5oYvQjbsr/+NA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d02GyeNOHI+Yo2KbpkKDYb/coQ9Bid1P3JNVXX+vT/Of1Deon6K143lE4X7nwIbEzbIQHAm45lPurWfhnji6h1kaJtcEGDrMYrbqTxJB+hlkYn7+z8nkA6zuaia6OmZGtnCwXT7TnIz34Zcx6J61hDot7e6V9eRZeLNrwuzJ1uE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n6yZ1fFa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3576C19421;
+	Sun,  1 Mar 2026 01:43:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772329318;
-	bh=sNIm/syIpXLQY8irgCpfUS8E+jfY6JWMK27YtMlbmb4=;
+	s=k20201202; t=1772329414;
+	bh=Q5wpVgnREjETGE1Db+bjR8On0pA/fN5oYvQjbsr/+NA=;
 	h=From:To:Cc:Subject:Date:From;
-	b=n9WrRiHkAefXdzbwwkagnVr1gE2ZkDYkJPRyW7QmZsYFXaRMRaCMQ/sL9yvAB86K4
-	 mwLvGphCImg0gVKTvdzE1e0+jQE5o2tFJ1CKE6MLNT37lttg3Wc/2DeDGO9QCwb9x5
-	 YyKoxHjf+/9dFiybMgATTHU/9pd8Wy3JGZre0R3bpiotvVsEEv32LyqCWwYxh0s0pi
-	 Z/9xFoLyV9pLDdlRaav+NPQZKziRTdlKry8HisUhpa4raoF5h06hm+343EYUBM9KUB
-	 snvBOj4Ki4KBs6pLqJwQaVn6Gy4KMsXTSbbHA3CjUBiTC+scY20shBtcUzGq6BL5Rs
-	 2lYR1gNU3AxHw==
+	b=n6yZ1fFaS62lIHZegtZ96L+pCh9l3wXJHrETnEErfdI04X1XwLWchOSHOUjgO7Nfa
+	 Btw6NRrOFS5LiNwKnOqPgWe+5IjoYTayCV4Mb1BYHwi6Ndk4hSXjuFBhAzKmSDykOi
+	 ksgnsSqp+G97pKwhI5wFF4F3Ndc7ZEuaAtdsfybiNT3YS6k4BZqIzm30s0/KBGhPMg
+	 c+JR83X+DLtvsSoqhuAb0jaaLNbvpndSHR5psP5tg4dW5CpgmXc0k3CwnR0NQVtwd1
+	 1vFB6dz/qlsr14vJtESx+7aGenwoHK5fVWlOTi+90NolsibOgTSr49Cea0S0xRs19H
+	 pgDeCxZeaoCRw==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
-	yosry@kernel.org
-Cc: Maxim Levitsky <mlevitsk@redhat.com>,
-	Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Sean Christopherson <seanjc@google.com>,
+	kovalev@altlinux.org
+Cc: Sean Christopherson <seanjc@google.com>,
 	kvm@vger.kernel.org
-Subject: FAILED: Patch "KVM: nSVM: Always use vmcb01 in VMLOAD/VMSAVE emulation" failed to apply to 6.1-stable tree
-Date: Sat, 28 Feb 2026 20:41:56 -0500
-Message-ID: <20260301014156.1703695-1-sashal@kernel.org>
+Subject: FAILED: Patch "KVM: x86: Add SRCU protection for reading PDPTRs in __get_sregs2()" failed to apply to 6.1-stable tree
+Date: Sat, 28 Feb 2026 20:43:32 -0500
+Message-ID: <20260301014332.1705643-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -69,19 +67,19 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72306-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72307-lists,kvm=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_THREE(0.00)[4];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sashal@kernel.org,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -89,9 +87,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,msgid.link:url,linux.dev:email]
-X-Rspamd-Queue-Id: E48DE1CBC79
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxtesting.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msgid.link:url,altlinux.org:email]
+X-Rspamd-Queue-Id: F3F5A1CC8AA
 X-Rspamd-Action: no action
 
 The patch below does not apply to the 6.1-stable tree.
@@ -104,50 +102,88 @@ Sasha
 
 ------------------ original commit in Linus's tree ------------------
 
-From 127ccae2c185f62e6ecb4bf24f9cb307e9b9c619 Mon Sep 17 00:00:00 2001
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-Date: Sat, 10 Jan 2026 00:48:18 +0000
-Subject: [PATCH] KVM: nSVM: Always use vmcb01 in VMLOAD/VMSAVE emulation
+From 95d848dc7e639988dbb385a8cba9b484607cf98c Mon Sep 17 00:00:00 2001
+From: Vasiliy Kovalev <kovalev@altlinux.org>
+Date: Sat, 24 Jan 2026 01:28:01 +0300
+Subject: [PATCH] KVM: x86: Add SRCU protection for reading PDPTRs in
+ __get_sregs2()
 
-Commit cc3ed80ae69f ("KVM: nSVM: always use vmcb01 to for vmsave/vmload
-of guest state") made KVM always use vmcb01 for the fields controlled by
-VMSAVE/VMLOAD, but it missed updating the VMLOAD/VMSAVE emulation code
-to always use vmcb01.
+Add SRCU read-side protection when reading PDPTR registers in
+__get_sregs2().
 
-As a result, if VMSAVE/VMLOAD is executed by an L2 guest and is not
-intercepted by L1, KVM will mistakenly use vmcb02. Always use vmcb01
-instead of the current VMCB.
+Reading PDPTRs may trigger access to guest memory:
+kvm_pdptr_read() -> svm_cache_reg() -> load_pdptrs() ->
+kvm_vcpu_read_guest_page() -> kvm_vcpu_gfn_to_memslot()
 
-Fixes: cc3ed80ae69f ("KVM: nSVM: always use vmcb01 to for vmsave/vmload of guest state")
-Cc: Maxim Levitsky <mlevitsk@redhat.com>
+kvm_vcpu_gfn_to_memslot() dereferences memslots via __kvm_memslots(),
+which uses srcu_dereference_check() and requires either kvm->srcu or
+kvm->slots_lock to be held. Currently only vcpu->mutex is held,
+triggering lockdep warning:
+
+=============================
+WARNING: suspicious RCU usage in kvm_vcpu_gfn_to_memslot
+6.12.59+ #3 Not tainted
+
+include/linux/kvm_host.h:1062 suspicious rcu_dereference_check() usage!
+
+other info that might help us debug this:
+
+rcu_scheduler_active = 2, debug_locks = 1
+1 lock held by syz.5.1717/15100:
+ #0: ff1100002f4b00b0 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x1d5/0x1590
+
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0xf0/0x120 lib/dump_stack.c:120
+ lockdep_rcu_suspicious+0x1e3/0x270 kernel/locking/lockdep.c:6824
+ __kvm_memslots include/linux/kvm_host.h:1062 [inline]
+ __kvm_memslots include/linux/kvm_host.h:1059 [inline]
+ kvm_vcpu_memslots include/linux/kvm_host.h:1076 [inline]
+ kvm_vcpu_gfn_to_memslot+0x518/0x5e0 virt/kvm/kvm_main.c:2617
+ kvm_vcpu_read_guest_page+0x27/0x50 virt/kvm/kvm_main.c:3302
+ load_pdptrs+0xff/0x4b0 arch/x86/kvm/x86.c:1065
+ svm_cache_reg+0x1c9/0x230 arch/x86/kvm/svm/svm.c:1688
+ kvm_pdptr_read arch/x86/kvm/kvm_cache_regs.h:141 [inline]
+ __get_sregs2 arch/x86/kvm/x86.c:11784 [inline]
+ kvm_arch_vcpu_ioctl+0x3e20/0x4aa0 arch/x86/kvm/x86.c:6279
+ kvm_vcpu_ioctl+0x856/0x1590 virt/kvm/kvm_main.c:4663
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl fs/ioctl.c:893 [inline]
+ __x64_sys_ioctl+0x18b/0x210 fs/ioctl.c:893
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xbd/0x1d0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Cc: stable@vger.kernel.org
-Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-Link: https://patch.msgid.link/20260110004821.3411245-2-yosry.ahmed@linux.dev
+Fixes: 6dba94035203 ("KVM: x86: Introduce KVM_GET_SREGS2 / KVM_SET_SREGS2")
+Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
+Link: https://patch.msgid.link/20260123222801.646123-1-kovalev@altlinux.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/x86/kvm/x86.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index e454ae095cf7c..f1a5b61bdb5bc 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2122,12 +2122,13 @@ static int vmload_vmsave_interception(struct kvm_vcpu *vcpu, bool vmload)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 386cdb775fd48..1ea94f4a3dcbc 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12145,9 +12145,11 @@ static void __get_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2)
+ 		return;
  
- 	ret = kvm_skip_emulated_instruction(vcpu);
- 
-+	/* KVM always performs VMLOAD/VMSAVE on VMCB01 (see __svm_vcpu_run()) */
- 	if (vmload) {
--		svm_copy_vmloadsave_state(svm->vmcb, vmcb12);
-+		svm_copy_vmloadsave_state(svm->vmcb01.ptr, vmcb12);
- 		svm->sysenter_eip_hi = 0;
- 		svm->sysenter_esp_hi = 0;
- 	} else {
--		svm_copy_vmloadsave_state(vmcb12, svm->vmcb);
-+		svm_copy_vmloadsave_state(vmcb12, svm->vmcb01.ptr);
+ 	if (is_pae_paging(vcpu)) {
++		kvm_vcpu_srcu_read_lock(vcpu);
+ 		for (i = 0 ; i < 4 ; i++)
+ 			sregs2->pdptrs[i] = kvm_pdptr_read(vcpu, i);
+ 		sregs2->flags |= KVM_SREGS2_FLAGS_PDPTRS_VALID;
++		kvm_vcpu_srcu_read_unlock(vcpu);
  	}
+ }
  
- 	kvm_vcpu_unmap(vcpu, &map);
 -- 
 2.51.0
 
