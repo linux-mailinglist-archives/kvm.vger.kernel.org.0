@@ -1,245 +1,290 @@
-Return-Path: <kvm+bounces-72373-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72374-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GGxRINiTpWnXEAYAu9opvQ
-	(envelope-from <kvm+bounces-72373-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 14:42:48 +0100
+	id aGVcCHGZpWnxEgYAu9opvQ
+	(envelope-from <kvm+bounces-72374-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 15:06:41 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15F331D9FEE
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 14:42:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8833B1DA5ED
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 15:06:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 12B17309A2C7
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 13:35:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A760330C0CB0
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 13:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301EC3FB045;
-	Mon,  2 Mar 2026 13:35:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E363FD125;
+	Mon,  2 Mar 2026 13:58:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="I1M0dET2"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DsF2MTxI";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="CY+RNJkr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB0B368287
-	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 13:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772458531; cv=none; b=a3z82JTZ2rNnz2zWQktaPPufVoJCJYxbX/xC6kyQMI0FRgw/X5X35j+NjQoObBRaVQUFLqDJYsY4XkXXIIh2lQbGQmCf8nlm3I6PLbGKzuq0TFgTzOShm4KWH6J+Lgvi1izKe2fJnf8ABQs2od7mxGCNCe3ZqZ/4IyN6TX8Rd8o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772458531; c=relaxed/simple;
-	bh=FbvCdNY37UamTN31SSyauOm8sq3E53gqKRjT2KA5HYc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gQRkVqR29Df6FPd76/Pb4n3hCWYJj5h6/yLJAy9j/hBdmPt0D053wSJAcWz0dAMSIJN6geD4inG2vwsthx5StyipDB3YJbASbMGpClJcAh9lESldNNkGC/1M5tsNTwbLaCb06k6og/f58T/GWjheevmaDsdApxdlKiTzU/YDsKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=I1M0dET2; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-899ab9d13d0so34878336d6.0
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 05:35:29 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3EA3E5563;
+	Mon,  2 Mar 2026 13:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772459896; cv=fail; b=cA7HjHrMIo3TSbhGhlb/70kgIswJLuCnXLnHXlteqP0NElW35sJQcHEiZskGrOeQCelpWJyRdBaqz8qjiGImhO0tzaJPVpEBTYMFSsEtuMrzIVSTUofN4anoqIgAfmqTuEOnW9S8qdRW3UK/MZM2fAQN6Xh89hauK0HjljMcjm0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772459896; c=relaxed/simple;
+	bh=OBdfpj3pUtF5+UcB/k3qCzFCYxyzMnOzG4LZ0v5UjTI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=suwqVyUvqNwBRA7GWHIS7SfccY9aRXzKIXYcxuQ3qCDCtHA4B7EgEe30x7g2KS68WCERj872mSEPdPj1gq+DfbN9QLmNYlrTcQYoTD3jQqWdXEy7LQpNHIVAY/FX6Pdd5qv6YE0bPLtfEbaY8+C/xypM6hy/WTn84KWrTOkFBYA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=DsF2MTxI; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=CY+RNJkr; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 622DLiF03498359;
+	Mon, 2 Mar 2026 13:57:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=s1qfasEMWmDS4VaeKi
+	mxkxaDdhGdG52aNCgLcbVuORs=; b=DsF2MTxIVqIA5Xu5Y2/+bbvSkYziwU+7rI
+	cyP3rsnA6Hi/cFkOs5WHQyR831i0yHLUljJ7Empnpqucz+1dKUt/E76r4Zu4a27W
+	ysIHnqBF1c5kZV6jVyXqDHUYMTNEbRhcyguL+VRQcGgbuE7ci22+5KgWIPtJ0LIf
+	4pGObV2o3Hz1jWD2CI/qMJ88AWuUMC3/iZVBOfzNDUpFZdTaFSCz1A7c5VMO7Rc+
+	MmPeP1Loapj9uhzCy4pEgo3kCQ0aYjcLqeYS1PuERXkljdACRSaNyj0n6b4zORrO
+	FDMpHjek1fwIaim95IJRVar7IOkV/mRvCQi8QJtf1Oo28KKf8bwA==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cnbc902jt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 02 Mar 2026 13:57:22 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 622C0Jib037769;
+	Mon, 2 Mar 2026 13:57:21 GMT
+Received: from ch5pr02cu005.outbound.protection.outlook.com (mail-northcentralusazon11012064.outbound.protection.outlook.com [40.107.200.64])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4ckptd8802-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 02 Mar 2026 13:57:21 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PptwxL6iE36TWrwiRMNwlfyez9pBSS/AU9HSiW8pVnlQg58Z9V5dwWOBb9A+/OC7Ny3KXZfzfuHiOlHwEJyC2tauAaWyNRWDVa9S3JTZYYPQisiRz/BCfRQKC+eE8zes72SzbW8OsjKUJ2xD84d6/33BqUearhMcvI2JVjGKPLqaAB2gDcCgMDqCHonzIUZgoPTqewrVms5VmR72rmeKND/nzYcBhJj5Uz6omKpCOvzeP459uyM5zMzLxTTJf2RLQpaz2QRTGnywMoxakHmW4VT5epywYY+SMd+X9TDIOLYNlVxdTytVbmT+XTGLu03MRQqs1wtjxntIvkX28MjEyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=s1qfasEMWmDS4VaeKimxkxaDdhGdG52aNCgLcbVuORs=;
+ b=scXbBOxwxcg3pqFoHeV0GXU/SztwuhzDTekyqCv6qL6hhER3ADVYV+xFWThqeUl5ho1tpCwzboUwzwkymzVvZbu/nL20F0PColW3Joqg1lo/C9KnFh4dt8zgrzrJYMDdi2R+AylOAT6O6Dvq1JPZe/o0x7+NiGaHZoUcwaNnlTjI+Z5Kfl2PJlF6RJeYInJGb6ht+5dBabUxmNLINSr5I2ryVmF3FWxpiR/RqZdjfdMG3ljDhzWDLQoXAzpXUHfdDTHrKFXOdTL6HSU6Y9+6qy6KPKqGhBCH19eo+dAsJ+PgML6R35MSsz0P5PhmUsNekFk5jkB+IGIjSlya+Q0ASQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1772458529; x=1773063329; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o+HFg2ochnrDtRr4Pe6iIPk9bCWPHCXlKNRCptQLo7I=;
-        b=I1M0dET2Ho1B+9mNKm59IIWPjOOp4DFEB6sr8tvyhIGtableCz4iUafcseALk0B3Mg
-         58uC+8aJDwvTfa5jdgPiuGUPA5do6INXBHg7IS41vIFJHJ+Qa4CkEccCPcCd8usLq3zY
-         w/TYwl/chBBA+PGiOkvRsJ6OpDZ9wqBFD/ErtLLkbn4HAYMNRXcsNufcZQtS0dfKmcr3
-         uIIyGiWDpd2zJStNUIALQAvzj39dkaU72ozsfsL6vS1UMd7JOM+uptBiUwMOK3bZXjqp
-         orbE3ZKzdDCd8M4bJYJZ/rmXlKncVepAJ7MyoGVqS2shEwyJHI8okw6m/Pgp3pUyKaSJ
-         9IBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772458529; x=1773063329;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o+HFg2ochnrDtRr4Pe6iIPk9bCWPHCXlKNRCptQLo7I=;
-        b=ulkDDv83n+HiayJ6t42Kz19LmzJ8rR/PBVWHRpmr6gLwGQ+m0hZhAn6dAglnNJ2RZ2
-         EjHL50CKoawoybJ3ElG+Bl8Hp/ru3YcTol162WAu6juEpj2JNYkLiWZWmOArRs0qHEgJ
-         vfg6G+x2NvBL7aPy9iLckAIvtcfCtII7jfXgkol5IOTxwWTpwQUykgxhvVhBPNc4KAVY
-         bSVAEinmdEK+l/NyUbwRVZrCdN+PY203wOolpyZXSFIwTTY/1TkleodMbupFoSEIvNQN
-         Mq1sMe/WelXlcqeNyUIrYtUrNFdt8kRUOhnIZjP7TkEfDlwIIFoYqu3dFOCKezXy/jFn
-         ZhAw==
-X-Forwarded-Encrypted: i=1; AJvYcCXYP9sxuO5P3L5oQ2Ra6Er50myrS3OBMDNRFuuC3aGwoDRJ2/xhsEj/bAB5t/AqHehn27U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKmqj3yApBvHNlfie4zgtY5GY+STLuzYUeROALAKWTneCLX2JC
-	CEH/xTpHeJQOPzhsXEaRL2QnGvegtNcF54ewmDco/OSO4gDyyQlqXmrqUvZYFjBR9z8=
-X-Gm-Gg: ATEYQzwEovXJPDmC80xkBR2nXiZ4rf298uMfnCRxN8cbtyQiWbHQ8bl4P/+7v7XFcBp
-	/K7Lfi0ij0ronZaJL105j1IZWo6JPPMqPTdWom+c1x/JBExxGscVbT/v6PYU114RSbEi8TUc0T6
-	vrvwfXv9quprjGvfqB+7CXAkuolfMdvO2Yzxc6Wav+a/Ewa/8TI/txS0e/Wd5jejHPu88ytW0Br
-	z3iPqPhy8tLWrK6vStsG2y2y4s2yj5WDLTP+VyB4yjyA+m65vjGjRHiftX6i48vUKT1TpDc3YIe
-	Jsi4F8yNdAvzWl6LZdGQSH3bSt2VX1S60gp5E6w/n3NN+nI8+NQ700pjwpCrRinYgwfhdpze3Mv
-	om1AVVpclTR04Ffx2wvOiWgTbUNTE9tofaS6s2oJbSKb8lV2tC1jZhpnrRb8OFR6MRuIsSjDITi
-	kxEK8Y9GgPHQkRjJbw0qmNJ34ABQ5qlc0Py2iHFgpJ71cjE+M3VAuYsXoOONZ/Q4VQNM9IOeuz4
-	0uT2D2P
-X-Received: by 2002:a05:6214:21e1:b0:895:4b4f:133a with SMTP id 6a1803df08f44-899d1d8459dmr178895326d6.5.1772458528769;
-        Mon, 02 Mar 2026 05:35:28 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-899f4fb208dsm35628906d6.28.2026.03.02.05.35.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 05:35:28 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vx3Ql-00000003fNz-1MAa;
-	Mon, 02 Mar 2026 09:35:27 -0400
-Date: Mon, 2 Mar 2026 09:35:27 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: Robin Murphy <robin.murphy@arm.com>, x86@kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-pci@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Mike Rapoport <rppt@kernel.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Melody Wang <huibo.wang@amd.com>,
-	Seongman Lee <augustus92@kaist.ac.kr>,
-	Joerg Roedel <joerg.roedel@amd.com>,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Andi Kleen <ak@linux.intel.com>,
-	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
-	Tony Luck <tony.luck@intel.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Denis Efremov <efremov@linux.com>,
-	Geliang Tang <geliang@kernel.org>,
-	Piotr Gregor <piotrgregor@rsyncme.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Alex Williamson <alex@shazbot.org>, Arnd Bergmann <arnd@arndb.de>,
-	Jesse Barnes <jbarnes@virtuousgeek.org>,
-	Jacob Pan <jacob.jun.pan@linux.intel.com>,
-	Yinghai Lu <yinghai@kernel.org>,
-	Kevin Brodsky <kevin.brodsky@arm.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Kim Phillips <kim.phillips@amd.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Claire Chang <tientzu@chromium.org>, linux-coco@lists.linux.dev,
-	iommu@lists.linux.dev, Jiri Pirko <jiri@resnulli.us>
-Subject: Re: [PATCH kernel 6/9] x86/dma-direct: Stop changing encrypted page
- state for TDISP devices
-Message-ID: <20260302133527.GV44359@ziepe.ca>
-References: <20260225053806.3311234-1-aik@amd.com>
- <20260225053806.3311234-7-aik@amd.com>
- <d8102507-e537-4e7c-8137-082a43fd270d@arm.com>
- <20260228000630.GN44359@ziepe.ca>
- <2a5b2d8c-7359-42bd-9e8e-2c3efacee747@amd.com>
- <20260302003535.GU44359@ziepe.ca>
- <500e3174-9aa1-464a-b933-f0bcc2ddde68@amd.com>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=s1qfasEMWmDS4VaeKimxkxaDdhGdG52aNCgLcbVuORs=;
+ b=CY+RNJkrNkZ5UGJbqJLpZSNRUPjQqTIl/1pvYwJpQAtmuKQecD9ZkLUxLJXzvxRmOoZr01+E2aB/8DEpCjgclrO81dMvc182g4f4t06ykqZuen4SCwm6vh2I0ZgCfEinXBx6vvf9n5eaiyCzPtgmust5BUrvhNDGUrSc576qL18=
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com (2603:10b6:8:1cc::16)
+ by DM4PR10MB6838.namprd10.prod.outlook.com (2603:10b6:8:106::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.21; Mon, 2 Mar
+ 2026 13:57:17 +0000
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::f3ea:674e:7f2e:b711]) by DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::f3ea:674e:7f2e:b711%4]) with mapi id 15.20.9632.010; Mon, 2 Mar 2026
+ 13:57:17 +0000
+Date: Mon, 2 Mar 2026 13:57:13 +0000
+From: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: akpm@linux-foundation.org, willy@infradead.org, david@kernel.org,
+        ziy@nvidia.com, matthew.brost@intel.com, joshua.hahnjy@gmail.com,
+        rakie.kim@sk.com, byungchul@sk.com, gourry@gourry.net,
+        ying.huang@linux.alibaba.com, apopple@nvidia.com,
+        baolin.wang@linux.alibaba.com, Liam.Howlett@oracle.com,
+        npache@redhat.com, ryan.roberts@arm.com, dev.jain@arm.com,
+        baohua@kernel.org, lance.yang@linux.dev, vbabka@suse.cz,
+        jannh@google.com, rppt@kernel.org, mhocko@suse.com, pfalcato@suse.de,
+        kees@kernel.org, maddy@linux.ibm.com, npiggin@gmail.com,
+        mpe@ellerman.id.au, chleroy@kernel.org, borntraeger@linux.ibm.com,
+        frankja@linux.ibm.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, svens@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, linux-mm@kvack.org,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v3 1/3] mm/vma: cleanup error handling path in
+ vma_expand()
+Message-ID: <877a55ac-b12d-4997-8c0f-fc0405220a63@lucifer.local>
+References: <20260226070609.3072570-1-surenb@google.com>
+ <20260226070609.3072570-2-surenb@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260226070609.3072570-2-surenb@google.com>
+X-ClientProxiedBy: AS4P189CA0049.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:659::27) To DM4PR10MB8218.namprd10.prod.outlook.com
+ (2603:10b6:8:1cc::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <500e3174-9aa1-464a-b933-f0bcc2ddde68@amd.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR10MB8218:EE_|DM4PR10MB6838:EE_
+X-MS-Office365-Filtering-Correlation-Id: a67df607-b719-4fab-3ae0-08de78639d5b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	8A6Y/xYV+RA6Ypswg0Gai0lSpAWqjBHt4vxzw9dpPVFqloFafj6JV/bzD9CFbUMMI1Za0eJvra4FfiCsJk7exuNlftnQgQ4d3QDCFm7KjgxmnKX7Xz7WlFbpMC1Vm9i8S/TgllGdqKe5XMx1Q5CVZguaPwSnHgLTZhDmuM555QDtT5NVPXrbRKA0tYaNVhiwmXtufeOeuNnZ6XVT7ZHx2Qx242YkH9W2K+pZ4tTciLZSHlBVQy4qzbyjaXOtXuSrfXfZ+rZA9QLlDRZSg4DQtuegxBHQgEGHog9uLoQ8zZvLgMM2xKzLaHw9pobx47sloPue/CcGiV6ZBSVZg7CYu3sMCKNyKd6b3w76gzSppRXNhstyFCurtxgWb2CCLBoEQRtcaeBXCbpYSpRnS/IFJQB20PwCFVMEXs0AMjFI44Ez7JTro3reWB8RH9+AOOZjpQO/1QiJRy21o2L6rfbsDjqfmGPKnkLPpqnfXJ3wvUmuFcVoAbnrbbkkIlTKM0Mka+dNHy55yBuIdUtO6FkIfqJva7Ugbw3Z+UgI0lC2U+aSrKTJNg83z0PSGev0W1Ngt6UvR3KZ5c2f4TjA5dsXPlnoexFaCOpYypAFYEGec+1Y4Qlz+4Ohrq8Tv/8CCTHKgb+6VFNuepsN1YR9X66AMcM1b86T3odmog5hfudGVB/doAsjWBBjVhzQu+ogyx3p+IgeNwMDpDqAzBXkD5C/ME3HfP6T/CEg2rLBxTifh3c=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB8218.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?NuqvE95C+y0binJuSuabrgJ/KlmDERlv3duHTuRm2O9S+YLYaJKVjrceVId5?=
+ =?us-ascii?Q?uKH++VjxhUVbHPOUcQGUKKtu80Y2RegCyfw/6T3TMUDI10q/XfBQ1d/iEYvq?=
+ =?us-ascii?Q?MqzoldLloqmf8PXT6dvM+oODdbX2hEi8uTooiNp7hJRfPYWdvd8+yPfDqtsN?=
+ =?us-ascii?Q?KeInnuV5tHWerpJfax3xJBIpHH6LhMezTx+Q92zHyJGSlBJ5zsSVeHXhmHYd?=
+ =?us-ascii?Q?vmD+UuCpIyEcBp6SnR2rogfzssQyCUwPoRmqN3T5LE3kK0KFaQLHUclWtRho?=
+ =?us-ascii?Q?OiEVW+LD3PCJqHvFKipUKYJl7htvNp5iTMjhn6hUUhTE9/QnzzJdYb6KgjuK?=
+ =?us-ascii?Q?iOV0v15ymY33+iXboQYpNFr+sNjdoVAcaHXyoMKwRSZWxrs/9GexaU3RsN6O?=
+ =?us-ascii?Q?2GjqgjvwIrbiz4r4XoZWA5DEZXXuwQR/9k4jwxRgZWyHWRDzWsKhKMQrzaju?=
+ =?us-ascii?Q?HMrQlaV5lO6+yAGCgPDaH8uYvKQaiPYUTUUNFECjMaytLEBwXKyqWscKugZb?=
+ =?us-ascii?Q?9lJfTv+0uV+Ae6TvB3nWZyBjA5cWAqUsJVsxR0AKPg+oROzGo4o63tTbFK15?=
+ =?us-ascii?Q?TE2XICVhohOZu5MFsUmep93OZ3AOLyJWSZCTi05Vpo+19GlVqjQyuRGdsB8A?=
+ =?us-ascii?Q?PaE3y7cX5uIo4f5dlfIvSrXfyCVzrgv59MV+B+aKNKkv+4swB1fyOVebjruY?=
+ =?us-ascii?Q?ya9O64jXm0tv3fUrkILmQsd6ZPUEwWNAgWzmT25wXcVfA19+uCNuKWW895qP?=
+ =?us-ascii?Q?diPIANkOhZk459OQDgPHKNrCm4RAYEgwc/Yunr9tHV0U1iUiTiH9T6a1OzEX?=
+ =?us-ascii?Q?zSCLWvn9vzIQ+tuNlgQh4CzFVOnF11GlJd2SGvSKHM08Im+qa/JaQOXZ2hfo?=
+ =?us-ascii?Q?kkkl+g4mz+OfCOJGQ4OKQJZ99/ZqrcdNpeXFHZVJbixhPCLqYQ73qoV6/l3D?=
+ =?us-ascii?Q?AS2q9EZi+9oEqzhQgUvov/YEFpnojS0PWY+K8IErM1PW1J71f4ZGovmY5jEa?=
+ =?us-ascii?Q?CTQojZlGxJ1quzSL/mDS7XWP/wCU3hqKyXgSsiywW/TKxuIBvVlv5Yh2C9le?=
+ =?us-ascii?Q?kCFgg0s/2ni9t6cNg7YO/bECrnHZsCy7ajh4ZNfxD1/RRUkIZjB5iMKjOCjA?=
+ =?us-ascii?Q?toIRzGCYZxNX8WdEmdvP7VIHTv+lMdzLcNwLtoO3E/PA5aQOtQBmfctsp1av?=
+ =?us-ascii?Q?MQ/Ztwqeo6FqHcWTXh2OfgpuZrHo5ucPbseHYM/EyGVOLfUwRRksGs/2pu+Q?=
+ =?us-ascii?Q?QZWAZYRb+s6HvgKg3RqCLDQqL7WgMzeyjbgd9ChdC+FoIKHRNScwbhnnl0D9?=
+ =?us-ascii?Q?eNC0kTWQ16Je4LGYh9QinsTzxyeujMfwdtnP57TMqPo6mTewOh4FfML4KRvA?=
+ =?us-ascii?Q?BO7+AqC2vKmtD0GP692PGrT9JtndZ7W1TcYv3cUR+7f4D+QcUbZqSYQmfTio?=
+ =?us-ascii?Q?WZuY49+MBCuCY1FUgkUMyMtuUbPqdb9GfkPIJ/bzBfzSywereFW+aXPdn60i?=
+ =?us-ascii?Q?uoJqoFJSVMYG5yOse2RSyU0iWmI9w+Z8s1SmkUsU5m+9fKIz5Wk7ngtILr4Z?=
+ =?us-ascii?Q?/h5IZjZsCkPL6GClvHH6uyjrNc3wJM4zHd42GQR1f4bRa4UbOmRJrjB5d7rJ?=
+ =?us-ascii?Q?wkh3l+xxpy8NRQz020xB7ZVigjFSNDVowgt5zf0Av2+LJnJLiP+0re+a9e2L?=
+ =?us-ascii?Q?F/swKmWyxBryIjPQzPgngxVgF6FKlZSwsWLQqa+xCb+Q1KiNeFdvl/HDfEgD?=
+ =?us-ascii?Q?r+Z6LKYgDIug0lsM1IWJ3Et1DjVOVOs=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	bk1zATV3R3FeIgrJe7mEomPMseFxqwSUYwWErki7n1kwM3BQ8aQEDxoQ8WqReOGRdzU51y7pUIf/DjeCOeUIjLYjQXlCMDjGWBnLbK0HIoYU01s5h2CyFAqaeABVLKx2CzBl98gEZ432sTsAdYZjd7+vtli13j9PsFI5WsSaougRWH6eYr9imHmBQYrfwtPvoAzY4hKcka59MakXe8vzISaU1r+dH8BtLU1ZBxACdLorLdINHRi/NO4C0ZQnWf+45OpJXO1W4l6FMDWdfFnSP0zrNS4vagFVjusxX8d40yb3f7vmGZDfxuEaikwuVV0/W+t990LRgR5UBW38izCcuatefo5IdgqmTxkH0qbPdehPPaaTPN/dDNnIs1Ju7BAj7HJTVscMIPCMG8ofMW4vrqfnQGZCPAqTO4eUYJkgoLoXdjvw+qowOdzBWGi1bz+cULmh7v3kLESzce5GGt4Em/ONctJfuW+lylVBDY4VPZ5HWzzcJ3++Ta/9ZreIhN6tYrXQbA5kAL0nrZs1V34WkbMJoidPfcMenjBdRaqNGnfiUMmqfV0EI0lADx5EhtwAod8dMPqqc/fiGOT4+2VfqHAtZZnmrHvGLh4KNmk3qAU=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a67df607-b719-4fab-3ae0-08de78639d5b
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR10MB8218.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2026 13:57:17.1629
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9X/QwnK+6+JZIG0ZFQpetk4MJkfjGhIWvm5jPqHqey/OEnY2+5Y3vWFB/kzZuSU9KmztowggRr+eSpQ0baJElKgVjmuHxMKrhxwRw+luD+M=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR10MB6838
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-02_03,2026-03-02_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 malwarescore=0 phishscore=0
+ spamscore=0 mlxscore=0 mlxlogscore=999 suspectscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2602130000
+ definitions=main-2603020117
+X-Authority-Analysis: v=2.4 cv=cYjfb3DM c=1 sm=1 tr=0 ts=69a59742 b=1 cx=c_pps
+ a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=Yq5XynenixoA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=jiCTI4zE5U7BLdzWsZGv:22 a=BqU2WV_vvsyTyxaotp0D:22 a=1XWaLZrsAAAA:8
+ a=yPCof4ZbAAAA:8 a=OF6kxwJpqsOYwMMz9xMA:9 a=CjuIK1q_8ugA:10 cc=ntf
+ awl=host:13810
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzAyMDExOCBTYWx0ZWRfX7KGmopciTqX1
+ Rog6iA4gZxul4xvWr+McBbyh1nJm1xHDN+Y2zMrVvnSFOxY6cV83CeFAQC2WBWphp1Kaqq104P3
+ t4jtvvB+n+K8+Af4vAzQ3YzhaEI3fmAEK1oXvVIK9858m8FLUjFMaPPkjYdZDleVnGeKZG6KZBX
+ UfAlP5rQPjHFej+/hz7TRX2lL78u3+Ci7tmvU4s4vI/CrCD50WCHiKYtCbRUdBoFDkXVQ/Aju6X
+ W9nvHypay8EFcdHXzQBdyRsTE0f6RgrJv6aLUe8nZhlXbhoPXt3dXliik/rDXBgY88NOu1UJJLS
+ qhYFmUvNUAjyADOu+y+E2CZEEjQg/JMEh3kT3OktPhr54yQuuMfhUzg/4Lt8KDZtA+zsPQLifi7
+ vIXRdXhROL1Ky5f/8z8Noo/UJ+wvoxYjI36MwrZbKJAo7aYbTWVQ1fbh5sHN7dG/nMKqLQ23c7H
+ DVf9vcmZxItiSi6DOhCMd+X1Ig26lSNFlj4osykY=
+X-Proofpoint-ORIG-GUID: eimM0tO95bqLedeoX3idFtBTupzaw62l
+X-Proofpoint-GUID: eimM0tO95bqLedeoX3idFtBTupzaw62l
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[ziepe.ca:s=google];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25,oracle.onmicrosoft.com:s=selector2-oracle-onmicrosoft-com];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ziepe.ca:+];
-	TAGGED_FROM(0.00)[bounces-72373-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[ziepe.ca];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[42];
+	TAGGED_FROM(0.00)[bounces-72374-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_CC(0.00)[linux-foundation.org,infradead.org,kernel.org,nvidia.com,intel.com,gmail.com,sk.com,gourry.net,linux.alibaba.com,oracle.com,redhat.com,arm.com,linux.dev,suse.cz,google.com,suse.com,suse.de,linux.ibm.com,ellerman.id.au,kvack.org,lists.ozlabs.org,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lucifer.local:mid,oracle.onmicrosoft.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,oracle.com:email,oracle.com:dkim];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jgg@ziepe.ca,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo.stoakes@oracle.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[oracle.com:+,oracle.onmicrosoft.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_GT_50(0.00)[59];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ziepe.ca:mid,ziepe.ca:dkim]
-X-Rspamd-Queue-Id: 15F331D9FEE
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 8833B1DA5ED
 X-Rspamd-Action: no action
 
-On Mon, Mar 02, 2026 at 04:26:58PM +1100, Alexey Kardashevskiy wrote:
+On Wed, Feb 25, 2026 at 11:06:07PM -0800, Suren Baghdasaryan wrote:
+> vma_expand() error handling is a bit confusing with "if (ret) return ret;"
+> mixed with "if (!ret && ...) ret = ...;". Simplify the code to check
+> for errors and return immediately after an operation that might fail.
+> This also makes later changes to this function more readable.
+>
+> No functional change intended.
+>
+> Suggested-by: Jann Horn <jannh@google.com>
+> Signed-off-by: Suren Baghdasaryan <surenb@google.com>
 
-> > > Without secure vIOMMU, no Cbit in the S2 table (==host) for any
-> > > VM. SDTE (==IOMMU) decides on shared/private for the device,
-> > > i.e. (device_cc_accepted()?private:shared).
-> > 
-> > Is this "Cbit" part of the CPU S2 page table address space or is it
-> > actually some PTE bit that says it is "encrypted" ?
-> > 
-> > It is confusing when you say it would start working with a vIOMMU.
-> 
-> When I mention vIOMMU, I mean the S1 table which is guest owned and
-> which has Cbit in PTEs.
+LGTM, so:
 
-Yes, I understand this.
+Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
 
-It seems from your email that the CPU S2 has the Cbit as part of the
-address and the S1 feeds it through to the S2, so it is genuinely has
-two addres spaces?
+> ---
+>  mm/vma.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+>
+> diff --git a/mm/vma.c b/mm/vma.c
+> index be64f781a3aa..bb4d0326fecb 100644
+> --- a/mm/vma.c
+> +++ b/mm/vma.c
+> @@ -1186,12 +1186,16 @@ int vma_expand(struct vma_merge_struct *vmg)
+>  	 * Note that, by convention, callers ignore OOM for this case, so
+>  	 * we don't need to account for vmg->give_up_on_mm here.
+>  	 */
+> -	if (remove_next)
+> +	if (remove_next) {
+>  		ret = dup_anon_vma(target, next, &anon_dup);
+> -	if (!ret && vmg->copied_from)
+> +		if (ret)
+> +			return ret;
+> +	}
 
-While the IOMMU S1 does not and instead needs a PTE bit which is
-emphatically not an address bit because it does not feed through the
-S2?
+> +	if (vmg->copied_from) {
+>  		ret = dup_anon_vma(target, vmg->copied_from, &anon_dup);
+> -	if (ret)
+> -		return ret;
+> +		if (ret)
+> +			return ret;
+> +	}
 
-> > If 1<<51 is a valid IOPTE, and it is an actually address, then it
-> > should be mapped into the IOMMU S2, shouldn't it? If it is in the
-> > IOMMU S2 then shouldn't it work as a dma_addr_t?
-> 
-> It should (and checked with the HW folks), I just have not tried it  as, like, whyyy.
+Thanks that is an improvement!
 
-Well, I think things work more sensibly if you don't have to mangle
-the address..
+I was going to suggest declaring 'ret' in each block but that kinda adds noise
+so this is fine.
 
-> > But in this case I would expect the vIOMMU to also use the same GPA
-> > space starting from 0 and also remove the C bit, as the S2 shouldn't
-> > have mappings starting at 1<<51.
-> 
-> How would then IOMMU know if DMA targets private or shared memory?
-> The Cbit does not participate in the S2 translation as an address
-> bit but IOMMU still knows what it is.
+Maybe rename 'ret' to 'err' but not a big deal, this function could do with a
+little more cleanup too I think!
 
-Same way it knows if there is no S1? Why does the S1 change anything?
-
-> > > There is vTOM in SDTE which is "every phys_addr_t above vTOM is no
-> > > Cbit, below - with Cbit" (and there is the same thing for the CPU
-> > > side in SEV) but this not it, right?
-> > 
-> > That seems like the IOMMU HW is specially handling the address bits in
-> > some way?
-> 
-> Yeah there is this capability. Except everything below vTOM is
-> private and every above is shared so SME mask for it would be
-> reverse than the CPU SME mask :) Not using this thing though (not
-> sure why we have it). Thanks,
-
-Weird!!
-
-Jason
+>
+>  	if (remove_next) {
+>  		vma_start_write(next);
+> --
+> 2.53.0.414.gf7e9f6c205-goog
+>
 
