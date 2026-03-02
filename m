@@ -1,159 +1,423 @@
-Return-Path: <kvm+bounces-72381-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72383-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GMoTBZelpWngCwAAu9opvQ
-	(envelope-from <kvm+bounces-72381-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 15:58:31 +0100
+	id MG6NATqmpWnNDQAAu9opvQ
+	(envelope-from <kvm+bounces-72383-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:01:14 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C15FC1DB466
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 15:58:30 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA3D51DB506
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:01:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C22A83051497
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 14:53:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C3A0E3074785
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 14:56:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3773E40149D;
-	Mon,  2 Mar 2026 14:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 560DE3FB051;
+	Mon,  2 Mar 2026 14:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Eppqsdpe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WOqaPuFx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC7D3FB050
-	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 14:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887A8332EC1;
+	Mon,  2 Mar 2026 14:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772463215; cv=none; b=NXIeB1LAraYLQHBs59FDY//DC+LBtEsSDGp9JC7yXPoCitGNbYj8F4/pPuukoLEan04M7OivK6SO6DrlfJeHFDl1ZK9vGomRSJLAUlzH6fHAELhKwLd2Zb+KnyJ45hy6qVQ973c834P07RtFUGxjQ5GhdgxDIweppjrw8U69LfE=
+	t=1772463387; cv=none; b=hTOTntLpLa2ZfpJdeFii0pAFdk+k9+DUEf5/P21yQJro870TzEGZtDgZcovMaO2VvbZ/YVOagEliVFLQ5L7rHe2lXWsOM4vzlClSDiE3fR31UQ+Ng9kTjQVvj3th/ZeP4XkWtmtf+fxqKi27FIvM4fu0zmXx6MbJFMgaBNMGUX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772463215; c=relaxed/simple;
-	bh=6ExRMPFgIfFtm73b8MmQlt2f6XqOd4ntkJPefGvIjkk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hhrU5fIYOOf3cMOUPeT/k6QzL3oU3LLYmjhR4KqJLxIHrp1gDcDhY0ISmpN6b2WECr1L2sKSFFSBeHXXWV9B4TcEaVFagPP5o/SaEj5t87yBFvyEx7mxpHWSkxXldNrb1b1nSjQx+LgeLKvrUOH2Qz5P5Gw2x5HwsZvxOrzjTEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Eppqsdpe; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3598733bec0so8976021a91.2
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 06:53:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772463214; x=1773068014; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Hp04vGRTMSOv92SowVVT4dSiJozA1zhnX0e0dsa/0Oo=;
-        b=EppqsdpemHwPiT97Vjztdbott2L/6s3eyjTL6aM9WGegGV7XzS96XZF8PeMOvJnPGA
-         CL9BjjuP/qtbvjfLmRtDI6PJApSBUmSG5HryIf7X8oCTGUR6JUaOcGuI8uZ9vvROs1jO
-         6nprj/ZhVCJKQhbRp0b6jzYDsXPwOiD09GPhzTwIcduVmOK0TC1XQN9vC+bPNs0N6YEm
-         TnZQ4o5P3Vf+338W23muIm6vL5XyXAh68GSkziq/epXjXocJ7+pjwGoZCbbpoWImvcKw
-         z4Cwtk15Pf7nQ/oUSuzLDaiIq51CxLaPJyyrG4CXGAOcHTfQiFI2EzA6tKlxm1oMK3xo
-         y2mA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772463214; x=1773068014;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Hp04vGRTMSOv92SowVVT4dSiJozA1zhnX0e0dsa/0Oo=;
-        b=L2FjxXoj9+wh2Jzh5Ommo0H6PyFwJYoip/bz0ZUDXJ+rSDw7EyIhGhWQ0pd4oPw6Oe
-         cYZxIEjKxxop2KkvAS3M26/h4yt5wli0wIhbG7pXcApgG6S5mDLbmJY8ZPYZqzGDV3ij
-         xKBNSkcxTGYDSRm0a8vXI8OPwaf9uCIb93735fBUf2jlZffF9f9smUJd3vKdfXVr8IBC
-         rMiJDMMkoKc2IsaoHA1xF7Y55NLTZterTiZziX90wLMBaSbMguXcEDEwyMtmMXFWn26P
-         C7bUpqBPv6a36iLTvOP+7peN0VG8g/KkPydoNIOtMh1chJCt76tMulU3ohXMDxJeoZ+r
-         XuIg==
-X-Gm-Message-State: AOJu0Yx55GOMfjZ0knQvTX2BvuRr9qaC1gG3nzWg4Q5ibgoLLSAyxasG
-	w1NS4RCNwkT7RCXv+xVng3Iy05aWAbrYJoVTsJnWWxZqEMnxYRn0ocAJShLmRJjoa5jnhRC5EPs
-	j6Jk92A==
-X-Received: from pjev23.prod.google.com ([2002:a17:90a:e17:b0:359:7984:d6f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4d8d:b0:354:a546:5edd
- with SMTP id 98e67ed59e1d1-35965c49839mr11157040a91.11.1772463213614; Mon, 02
- Mar 2026 06:53:33 -0800 (PST)
-Date: Mon, 2 Mar 2026 06:53:30 -0800
-In-Reply-To: <CABgObfaV27kPyGH1dDa-f1XaiqP_uM1cCFmSfnrakFD68u0hPg@mail.gmail.com>
+	s=arc-20240116; t=1772463387; c=relaxed/simple;
+	bh=oU0GLS1+U0aFHGSu270A22eis8d+o92JaCiSGmMvS24=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Vv6Q8IyuWKKWcfPj/eIRGHjn4i6E3RyZWdxDPM5sFGiFD/3NIl6zi2l1LsUHq1zq27TzeyIqWtvNbZdgWbFtXf0/cUeHnK1+HB3zHszIC0MLlnZTOttiSUrnZwd3sjADLNhhDPSmYgcPbkeE4G3GskzRf4T6U6vliAquqP1taYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WOqaPuFx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F10F4C19423;
+	Mon,  2 Mar 2026 14:56:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772463387;
+	bh=oU0GLS1+U0aFHGSu270A22eis8d+o92JaCiSGmMvS24=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WOqaPuFxs1WNSBVnJVs+xQ78aogVXY35SDYjXMhv134i3GflGPX8NXP0w0efq8mZp
+	 zi9knDrh4WhE8yqZTmPNiBnF8s2Fgecef/h2o3GZde7B2QwOMR25Xt+Vf3oMX7di9F
+	 ZImPHmuzLv04/JA8K3Qb4FUA2151t88+D2P4rr6j7qAJqCEIPxsBnm7TF1rPwZzODe
+	 XTTQ9A8PPtQN7cSGghlNLFSJWSUYhePiG2eYW0nH0t2iyr5I/tVv/XGKG0iemy4g3/
+	 u/ETusTUkU3kScjMhu8E1/7SE+QlY5P1/jGmgW6Z2qXUiwTMC5i3lIBNs7ALQhlxt7
+	 u5+cr7FDVMs4g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vx4h6-0000000FHdF-3Ieo;
+	Mon, 02 Mar 2026 14:56:24 +0000
+Date: Mon, 02 Mar 2026 14:56:24 +0000
+Message-ID: <86qzq28elj.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>
+Subject: Re: [PATCH v12 20/46] arm64: RMI: Allow populating initial contents
+In-Reply-To: <20251217101125.91098-21-steven.price@arm.com>
+References: <20251217101125.91098-1-steven.price@arm.com>
+	<20251217101125.91098-21-steven.price@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260207041011.913471-1-seanjc@google.com> <20260207041011.913471-3-seanjc@google.com>
- <CABgObfZeV6D-2cEht1300xNgxYtz=mi6oX4-D8x7exittEe22Q@mail.gmail.com>
- <CABgObfbKh1Tbzv63GfopW3KQhYtfAGgXXBgGn6EiR2kSBgH_jA@mail.gmail.com>
- <aYp86UFynnoBLy3m@google.com> <aaInA0WGEM3fVCNs@google.com> <CABgObfaV27kPyGH1dDa-f1XaiqP_uM1cCFmSfnrakFD68u0hPg@mail.gmail.com>
-Message-ID: <aaWkaoEemeI3rYal@google.com>
-Subject: Re: [GIT PULL] KVM: Generic changes for 6.20
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: C15FC1DB466
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Rspamd-Queue-Id: AA3D51DB506
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72381-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72383-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[arm.com:query timed out];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RSPAMD_EMAILBL_FAIL(0.00)[steven.price.arm.com:query timed out];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Sat, Feb 28, 2026, Paolo Bonzini wrote:
-> On Sat, Feb 28, 2026 at 12:21=E2=80=AFAM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> > Finally got around to prepping a v2, and I realized that vcpu->mutex is=
-n't held
-> > when kvm_alloc_apic_access_page() is called, and thus isn't (currently)=
- taken
-> > outside kvm->slots_arch_lock.
->=20
-> It is, via kvm_mmu_new_pgd (kvm_mmu_reload -> kvm_mmu_load ->
-> mmu_alloc_shadow_roots -> mmu_first_shadow_root_alloc).  In fact
-> commit b10a038e added slots_arch_lock exactly to have something that
-> could be taken within the SRCU critical section, and thus within
-> vcpu->mutex :)
+On Wed, 17 Dec 2025 10:10:57 +0000,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> The VMM needs to populate the realm with some data before starting (e.g.
+> a kernel and initrd). This is measured by the RMM and used as part of
+> the attestation later on.
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v11:
+>  * The multiplex CAP is gone and there's a new ioctl which makes use of
+>    the generic kvm_gmem_populate() functionality.
+> Changes since v7:
+>  * Improve the error codes.
+>  * Other minor changes from review.
+> Changes since v6:
+>  * Handle host potentially having a larger page size than the RMM
+>    granule.
+>  * Drop historic "par" (protected address range) from
+>    populate_par_region() - it doesn't exist within the current
+>    architecture.
+>  * Add a cond_resched() call in kvm_populate_realm().
+> Changes since v5:
+>  * Refactor to use PFNs rather than tracking struct page in
+>    realm_create_protected_data_page().
+>  * Pull changes from a later patch (in the v5 series) for accessing
+>    pages from a guest memfd.
+>  * Do the populate in chunks to avoid holding locks for too long and
+>    triggering RCU stall warnings.
+> ---
+>  arch/arm64/include/asm/kvm_rmi.h |   4 +
+>  arch/arm64/kvm/Kconfig           |   1 +
+>  arch/arm64/kvm/arm.c             |   9 ++
+>  arch/arm64/kvm/rmi.c             | 175 +++++++++++++++++++++++++++++++
+>  4 files changed, 189 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+> index 8a862fc1a99d..b5e36344975c 100644
+> --- a/arch/arm64/include/asm/kvm_rmi.h
+> +++ b/arch/arm64/include/asm/kvm_rmi.h
+> @@ -99,6 +99,10 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu);
+>  int kvm_rec_pre_enter(struct kvm_vcpu *vcpu);
+>  int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
+>  
+> +struct kvm_arm_rmi_populate;
+> +
+> +int kvm_arm_rmi_populate(struct kvm *kvm,
+> +			 struct kvm_arm_rmi_populate *arg);
+>  void kvm_realm_unmap_range(struct kvm *kvm,
+>  			   unsigned long ipa,
+>  			   unsigned long size,
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 1cac6dfc0972..b495dfd3a8b4 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -39,6 +39,7 @@ menuconfig KVM
+>  	select GUEST_PERF_EVENTS if PERF_EVENTS
+>  	select KVM_GUEST_MEMFD
+>  	select KVM_GENERIC_MEMORY_ATTRIBUTES
+> +	select HAVE_KVM_ARCH_GMEM_POPULATE
+>  	help
+>  	  Support hosting virtualized guest machines.
+>  
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 7927181887cf..0a06ed9d1a64 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2037,6 +2037,15 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>  			return -EFAULT;
+>  		return kvm_vm_ioctl_get_reg_writable_masks(kvm, &range);
+>  	}
+> +	case KVM_ARM_RMI_POPULATE: {
+> +		struct kvm_arm_rmi_populate req;
+> +
+> +		if (!kvm_is_realm(kvm))
+> +			return -EPERM;
 
-Oh, right, duh.  I was fixated on kvm_alloc_apic_access_page() and didn't t=
-hink
-about the "other" side of the lock (i.e. the whole reason the lock exists..=
-.).
+EPERM is odd. It isn't that the VMM doesn't have the right to do it,
+it is that it shouldn't have called that, because the ioctl doesn't
+exist for a normal VM. -ENOSYS?
 
-Oof, and it's also taken via
+> +		if (copy_from_user(&req, argp, sizeof(req)))
+> +			return -EFAULT;
+> +		return kvm_arm_rmi_populate(kvm, &req);
+> +	}
+>  	default:
+>  		return -EINVAL;
+>  	}
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> index fe15b400091c..39577e956a59 100644
+> --- a/arch/arm64/kvm/rmi.c
+> +++ b/arch/arm64/kvm/rmi.c
+> @@ -558,6 +558,150 @@ void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
+>  		realm_unmap_private_range(kvm, start, end, may_block);
+>  }
+>  
+> +static int realm_create_protected_data_granule(struct realm *realm,
+> +					       unsigned long ipa,
+> +					       phys_addr_t dst_phys,
+> +					       phys_addr_t src_phys,
+> +					       unsigned long flags)
+> +{
+> +	phys_addr_t rd = virt_to_phys(realm->rd);
+> +	int ret;
+> +
+> +	if (rmi_granule_delegate(dst_phys))
+> +		return -ENXIO;
+> +
+> +	ret = rmi_data_create(rd, dst_phys, ipa, src_phys, flags);
+> +	if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
+> +		/* Create missing RTTs and retry */
+> +		int level = RMI_RETURN_INDEX(ret);
+> +
+> +		WARN_ON(level == RMM_RTT_MAX_LEVEL);
 
-  kvm_inhibit_apic_access_page()
-  |
-  -> __x86_set_memory_region()
-     |
-     -> kvm_set_internal_memslot()
-        |
-        -> kvm_set_memory_region()
-           |
-           -> kvm_set_memslot()
+If this is unexpected, why do we still try to handle it? We should
+abort hard on anything that doesn't seem 100% correct, and mark the
+realm dead.
 
-So I was right about kvm_alloc_apic_access_page(), and wrong about everythi=
-ng
-else.  Go me.
+> +
+> +		ret = realm_create_rtt_levels(realm, ipa, level,
+> +					      RMM_RTT_MAX_LEVEL, NULL);
+> +		if (ret)
+> +			return -EIO;
+> +
+> +		ret = rmi_data_create(rd, dst_phys, ipa, src_phys, flags);
+> +	}
+> +	if (ret)
+> +		return -EIO;
+> +
+> +	return 0;
+> +}
+> +
+> +static int realm_create_protected_data_page(struct realm *realm,
+> +					    unsigned long ipa,
+> +					    kvm_pfn_t dst_pfn,
+> +					    kvm_pfn_t src_pfn,
+> +					    unsigned long flags)
+> +{
+> +	unsigned long rd = virt_to_phys(realm->rd);
+> +	phys_addr_t dst_phys, src_phys;
+> +	bool undelegate_failed = false;
+> +	int ret, offset;
+> +
+> +	dst_phys = __pfn_to_phys(dst_pfn);
+> +	src_phys = __pfn_to_phys(src_pfn);
+> +
+> +	for (offset = 0; offset < PAGE_SIZE; offset += RMM_PAGE_SIZE) {
+> +		ret = realm_create_protected_data_granule(realm,
+> +							  ipa,
+> +							  dst_phys,
+> +							  src_phys,
+> +							  flags);
+> +		if (ret)
+> +			goto err;
+> +
+> +		ipa += RMM_PAGE_SIZE;
+> +		dst_phys += RMM_PAGE_SIZE;
+> +		src_phys += RMM_PAGE_SIZE;
+> +	}
+> +
+> +	return 0;
+> +
+> +err:
+> +	if (ret == -EIO) {
+> +		/* current offset needs undelegating */
+> +		if (WARN_ON(rmi_granule_undelegate(dst_phys)))
+> +			undelegate_failed = true;
+> +	}
+> +	while (offset > 0) {
+> +		ipa -= RMM_PAGE_SIZE;
+> +		offset -= RMM_PAGE_SIZE;
+> +		dst_phys -= RMM_PAGE_SIZE;
+> +
+> +		rmi_data_destroy(rd, ipa, NULL, NULL);
+> +
+> +		if (WARN_ON(rmi_granule_undelegate(dst_phys)))
+> +			undelegate_failed = true;
+> +	}
+> +
+> +	if (undelegate_failed) {
+> +		/*
+> +		 * A granule could not be undelegated,
+> +		 * so the page has to be leaked
+> +		 */
+> +		get_page(pfn_to_page(dst_pfn));
+> +	}
+> +
+> +	return -ENXIO;
+> +}
+> +
+> +static int populate_region_cb(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+> +			      void __user *src, int order, void *opaque)
+> +{
+> +	struct realm *realm = &kvm->arch.realm;
+> +	unsigned long data_flags = *(unsigned long *)opaque;
+> +	phys_addr_t ipa = gfn_to_gpa(gfn);
+> +	int npages = (1 << order);
+> +	int i;
+> +
+> +	for (i = 0; i < npages; i++) {
+> +		struct page *src_page;
+> +		int ret;
+> +
+> +		ret = get_user_pages((unsigned long)src, 1, 0, &src_page);
+> +		if (ret < 0)
+> +			return ret;
+> +		if (ret != 1)
+> +			return -ENOMEM;
+> +
+> +		ret = realm_create_protected_data_page(realm, ipa, pfn,
+> +						       page_to_pfn(src_page),
+> +						       data_flags);
+> +
+> +		put_page(src_page);
+> +
+> +		if (ret)
+> +			return ret;
+> +
+> +		ipa += PAGE_SIZE;
+> +		pfn++;
+> +		src += PAGE_SIZE;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static long populate_region(struct kvm *kvm,
+> +			    gfn_t base_gfn,
+> +			    unsigned long pages,
+> +			    u64 uaddr,
+> +			    unsigned long data_flags)
+> +{
+> +	long ret = 0;
+> +
+> +	mutex_lock(&kvm->slots_lock);
+> +	mmap_read_lock(current->mm);
+> +	ret = kvm_gmem_populate(kvm, base_gfn, u64_to_user_ptr(uaddr), pages,
+> +				populate_region_cb, &data_flags);
+> +	mmap_read_unlock(current->mm);
+> +	mutex_unlock(&kvm->slots_lock);
+> +
+> +	return ret;
+> +}
+> +
+>  enum ripas_action {
+>  	RIPAS_INIT,
+>  	RIPAS_SET,
+> @@ -655,6 +799,37 @@ static int realm_ensure_created(struct kvm *kvm)
+>  	return -ENXIO;
+>  }
+>  
+> +int kvm_arm_rmi_populate(struct kvm *kvm,
+> +			 struct kvm_arm_rmi_populate *args)
+> +{
+> +	unsigned long data_flags = 0;
+> +	unsigned long ipa_start = args->base;
+> +	unsigned long ipa_end = ipa_start + args->size;
+> +	int ret;
+> +
+> +	if (args->reserved ||
+> +	    (args->flags & ~KVM_ARM_RMI_POPULATE_FLAGS_MEASURE) ||
+> +	    !IS_ALIGNED(ipa_start, PAGE_SIZE) ||
+> +	    !IS_ALIGNED(ipa_end, PAGE_SIZE))
+> +		return -EINVAL;
+> +
+> +	ret = realm_ensure_created(kvm);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (args->flags & KVM_ARM_RMI_POPULATE_FLAGS_MEASURE)
 
-> (slots_arch_lock is also taken inside slots_lock, and therefore it
-> must be taken inside vcpu->mutex transitively; but more to the point
-> it exists specifically to be taken during KVM_RUN).
+This flag isn't documented.
+
+> +		data_flags |= RMI_MEASURE_CONTENT;
+> +
+> +	ret = populate_region(kvm, gpa_to_gfn(ipa_start),
+> +			      args->size >> PAGE_SHIFT,
+> +			      args->source_uaddr, args->flags);
+> +
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	return ret * PAGE_SIZE;
+
+Bits of the code works on PAGE_SIZE, other bits on RMM_PAGE_SIZE. It
+is pretty confusing. Are you in the middle of reworking this?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
