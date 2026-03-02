@@ -1,156 +1,251 @@
-Return-Path: <kvm+bounces-72392-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72394-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GBSgOHSxpWk8EgAAu9opvQ
-	(envelope-from <kvm+bounces-72392-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:49:08 +0100
+	id +PQxDmaypWlMEgAAu9opvQ
+	(envelope-from <kvm+bounces-72394-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:53:10 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B4B71DC283
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:49:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FF671DC32A
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:53:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D07D2307F9AB
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 15:43:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BDED430F7E34
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 15:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9627411628;
-	Mon,  2 Mar 2026 15:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4304241B352;
+	Mon,  2 Mar 2026 15:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVapTgy8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qn2tNu2a"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC92C1A2C0B;
-	Mon,  2 Mar 2026 15:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F6441163E
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 15:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772466212; cv=none; b=TxfDE1vLBEP02EE7rzLlr1jPgpEhHuIirTm4gO4tC9HKvJkk1bU3SX2TCuVi2U/oWaxjUu1bUS+u9Y8Tp0baybxYhvMurflFaw0FAu+QWPpICYsXsZDggcqm7am6+PKFfSdOHDmxYQvojijGJRLWclLaUk0d5RYtcvU6hNYbv8g=
+	t=1772466526; cv=none; b=Bj1mie1ZBXkHEADYCmCCgxt1L5cbR89KqyLWHyS0JJzT4WDvhJCIjI5xQ+C7lU4K3BcBPUhmpr1z61rlxZzodlt/Kiiv81RhCwma+b/zUbqfZ5jHxBDAWM26RNFyNmngay3/wve51kjHzeiIfGU4tgRTilCHXJM6P/ECUKv5bOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772466212; c=relaxed/simple;
-	bh=BRe7At9WvNHmpVJLo9/EsBeq7CyAy2K9i5SpxPRKlvY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KwNmf049OgCxXY0LO9mJmzaAhMRzBdD+aWrV8W0I45uLwLtyp8YM4hNwv8Pgt+qF0FK7o88lVI0niVOgUDMN8iYAxCTv3pjmRfNewCmm02gzNNLoBrLm/hLhveavMUvzLjdnhELpSawbjJJmN7OlZi5HcD5psDvcbr0hOOVF+KA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NVapTgy8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AE72C19423;
-	Mon,  2 Mar 2026 15:43:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772466212;
-	bh=BRe7At9WvNHmpVJLo9/EsBeq7CyAy2K9i5SpxPRKlvY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=NVapTgy8nkUYrNufw4ANp/xtU+x9h35sbUNi5NnHqJgJP6vwgSpNtWJ3sP56Yqr/r
-	 J1KgOvVMs48rcBFJAET9mh3LCH5wxC6VvIRrlwocW1HMVHlSpNEuKhK8lj0hDCcFlr
-	 OulHwm1ZUwIxP+pBme7ppYRrHPCHkCti/5XjFJu/HeUjP82B6F5CckqVeBk01U3rLu
-	 wblW9pB0qJjFrkz91XWLP7E+OeZoeN6dB7szVgyhj9+XVG3k1AbhWjaHdtctWfqbyH
-	 zSDUusMev6ZNHTB96RejvSJRLaRu/eT/nFPsMazNZa4g2nhWMNQjT/0/Je4QbG5wUn
-	 IEPxYyoFGCw0A==
-From: Yosry Ahmed <yosry@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Kevin Cheng <chengkev@google.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yosry Ahmed <yosry@kernel.org>
-Subject: [PATCH] KVM: x86: Drop redundant call to kvm_deliver_exception_payload()
-Date: Mon,  2 Mar 2026 15:42:49 +0000
-Message-ID: <20260302154249.784529-1-yosry@kernel.org>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+	s=arc-20240116; t=1772466526; c=relaxed/simple;
+	bh=+EtwxgqdOWRZ2FQfy7w/Q9MnqfJZ8XSUbgIqg74laiY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fSkJhUDwfZ6HUfTRo++1WCzG4qQdqiDpx8QyiW62jtAUStWl3MyKK4dpAO48W8rP7X0ZkFQ9voUHZsIow2jINM10+tUEiv9XVTwUX6N2KlaxrFOhQkUIHdrnVGBSXFQiyDP8xjlwM96H3hohMRqn0ecDCCXWkip6Bo91DvqgwoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qn2tNu2a; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <42a719d3-5fbd-4b96-a150-6c0b4a1521a3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1772466512;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FTECatV7Hem2M5Whzj/+5qLaShaqM0faNoQsDp0E1eI=;
+	b=qn2tNu2asGcPBaNPiLBEHqPA1ISUAYvFdlA3yDgMEjvnV9wFHAHANAKzMMQI7p+eoGhJbw
+	GB+5m+Qs2PPeTQk6Pxy5HsBkMVi/kh8tLAqThalAcm3txH4p/T0ROgVUJGN2DzQ2qMT7uD
+	UjSW9pewzRKpXJGWz1nxJ1hYJh2XlGg=
+Date: Mon, 2 Mar 2026 23:48:11 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 6B4B71DC283
+Subject: Re: [PATCH v5 2/2] x86/tlb: skip redundant sync IPIs for native TLB
+ flush
+Content-Language: en-US
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: akpm@linux-foundation.org, david@kernel.org, dave.hansen@intel.com,
+ dave.hansen@linux.intel.com, ypodemsk@redhat.com, hughd@google.com,
+ will@kernel.org, aneesh.kumar@kernel.org, npiggin@gmail.com,
+ tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+ hpa@zytor.com, arnd@arndb.de, lorenzo.stoakes@oracle.com, ziy@nvidia.com,
+ baolin.wang@linux.alibaba.com, Liam.Howlett@oracle.com, npache@redhat.com,
+ ryan.roberts@arm.com, dev.jain@arm.com, baohua@kernel.org,
+ shy828301@gmail.com, riel@surriel.com, jannh@google.com, jgross@suse.com,
+ seanjc@google.com, pbonzini@redhat.com, boris.ostrovsky@oracle.com,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, ioworker0@gmail.com
+References: <20260302063048.9479-1-lance.yang@linux.dev>
+ <20260302063048.9479-3-lance.yang@linux.dev>
+ <20260302145652.GH1395266@noisy.programming.kicks-ass.net>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Lance Yang <lance.yang@linux.dev>
+In-Reply-To: <20260302145652.GH1395266@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Rspamd-Queue-Id: 8FF671DC32A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72392-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72394-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[linux-foundation.org,kernel.org,intel.com,linux.intel.com,redhat.com,google.com,gmail.com,linutronix.de,alien8.de,zytor.com,arndb.de,oracle.com,nvidia.com,linux.alibaba.com,arm.com,surriel.com,suse.com,lists.linux.dev,vger.kernel.org,kvack.org];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.994];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lance.yang@linux.dev,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.dev:dkim,linux.dev:mid]
 X-Rspamd-Action: no action
 
-In kvm_check_and_inject_events(), kvm_deliver_exception_payload() is
-called for pending #DB exceptions. However, shortly after, the
-per-vendor inject_exception callbacks are made. Both
-vmx_inject_exception() and svm_inject_exception() unconditionally call
-kvm_deliver_exception_payload(), so the call in
-kvm_check_and_inject_events() is redundant.
 
-Note that the extra call for pending #DB exceptions is harmless, as
-kvm_deliver_exception_payload() clears exception.has_payload after the
-first call.
 
-The call in kvm_check_and_inject_events() was added in commit
-f10c729ff965 ("kvm: vmx: Defer setting of DR6 until #DB delivery"). At
-that point, the call was likely needed because svm_queue_exception()
-checked whether an exception for L2 is intercepted by L1 before calling
-kvm_deliver_exception_payload(), as SVM did not have a
-check_nested_events callback. Since DR6 is updated before the #DB
-intercept in SVM (unlike VMX), it was necessary to deliver the DR6
-payload before calling svm_queue_exception().
+On 2026/3/2 22:56, Peter Zijlstra wrote:
+> On Mon, Mar 02, 2026 at 02:30:36PM +0800, Lance Yang wrote:
+> 
+> 
+>> @@ -221,3 +222,18 @@ NOKPROBE_SYMBOL(native_load_idt);
+>>   
+>>   EXPORT_SYMBOL(pv_ops);
+>>   EXPORT_SYMBOL_GPL(pv_info);
+>> +
+>> +void __init native_pv_tlb_init(void)
+>> +{
+>> +	/*
+>> +	 * If PV backend already set the property, respect it.
+>> +	 * Otherwise, check if native TLB flush sends real IPIs to all target
+>> +	 * CPUs (i.e., not using INVLPGB broadcast invalidation).
+>> +	 */
+>> +	if (pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast)
+>> +		return;
+>> +
+>> +	if (pv_ops.mmu.flush_tlb_multi == native_flush_tlb_multi &&
+>> +	    !cpu_feature_enabled(X86_FEATURE_INVLPGB))
+>> +		pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast = true;
+>> +}
+> 
+> How about making this a static_branch instead?
 
-After that, commit 7c86663b68ba ("KVM: nSVM: inject exceptions via
-svm_check_nested_events") added a check_nested_events callback for SVM,
-which checked for L1 intercepts for L2's exceptions, and delivered the
-the payload appropriately before the intercept. At that point,
-svm_queue_exception() started calling kvm_deliver_exception_payload()
-unconditionally, and the call to kvm_deliver_exception_payload() from
-its caller became redundant.
+Cool. Thanks for the suggestion!
 
-No functional change intended.
+> 
+>> diff --git a/arch/x86/include/asm/tlb.h b/arch/x86/include/asm/tlb.h
+>> index 866ea78ba156..87ef7147eac8 100644
+>> --- a/arch/x86/include/asm/tlb.h
+>> +++ b/arch/x86/include/asm/tlb.h
+>> @@ -5,10 +5,23 @@
+>>   #define tlb_flush tlb_flush
+>>   static inline void tlb_flush(struct mmu_gather *tlb);
+>>   
+>> +#define tlb_table_flush_implies_ipi_broadcast tlb_table_flush_implies_ipi_broadcast
+>> +static inline bool tlb_table_flush_implies_ipi_broadcast(void);
+>> +
+>>   #include <asm-generic/tlb.h>
+>>   #include <linux/kernel.h>
+>>   #include <vdso/bits.h>
+>>   #include <vdso/page.h>
+>> +#include <asm/paravirt.h>
+>> +
+>> +static inline bool tlb_table_flush_implies_ipi_broadcast(void)
+>> +{
+>> +#ifdef CONFIG_PARAVIRT
+>> +	return pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast;
+>> +#else
+>> +	return !cpu_feature_enabled(X86_FEATURE_INVLPGB);
+>> +#endif
+>> +}
+> 
+> Then this turns into:
+> 
+> static inline bool tlb_table_flush_implies_ipi_broadcast(void)
+> {
+> 	return static_branch_likely(&tlb_ipi_broadcast_key);
+> }
 
-Signed-off-by: Yosry Ahmed <yosry@kernel.org>
+Right. That would be cleaner and faster, eliminating the branch overhead.
+
+Trying using static_branch on top of this series, something like:
+
+---8<---
+diff --git a/arch/x86/include/asm/tlb.h b/arch/x86/include/asm/tlb.h
+index 87ef7147eac8..409bbf335f26 100644
+--- a/arch/x86/include/asm/tlb.h
++++ b/arch/x86/include/asm/tlb.h
+@@ -10,17 +10,16 @@ static inline bool 
+tlb_table_flush_implies_ipi_broadcast(void);
+
+  #include <asm-generic/tlb.h>
+  #include <linux/kernel.h>
++#include <linux/jump_label.h>
+  #include <vdso/bits.h>
+  #include <vdso/page.h>
+  #include <asm/paravirt.h>
+
++DECLARE_STATIC_KEY_FALSE(tlb_ipi_broadcast_key);
++
+  static inline bool tlb_table_flush_implies_ipi_broadcast(void)
+  {
+-#ifdef CONFIG_PARAVIRT
+-	return pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast;
+-#else
+-	return !cpu_feature_enabled(X86_FEATURE_INVLPGB);
+-#endif
++	return static_branch_likely(&tlb_ipi_broadcast_key);
+  }
+
+  static inline void tlb_flush(struct mmu_gather *tlb)
+diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
+index b681b8319295..bcf28980c319 100644
+--- a/arch/x86/kernel/paravirt.c
++++ b/arch/x86/kernel/paravirt.c
+@@ -15,6 +15,7 @@
+  #include <linux/kprobes.h>
+  #include <linux/pgtable.h>
+  #include <linux/static_call.h>
++#include <linux/jump_label.h>
+
+  #include <asm/bug.h>
+  #include <asm/paravirt.h>
+@@ -223,6 +224,8 @@ NOKPROBE_SYMBOL(native_load_idt);
+  EXPORT_SYMBOL(pv_ops);
+  EXPORT_SYMBOL_GPL(pv_info);
+
++DEFINE_STATIC_KEY_FALSE(tlb_ipi_broadcast_key);
++
+  void __init native_pv_tlb_init(void)
+  {
+  	/*
+@@ -230,10 +233,14 @@ void __init native_pv_tlb_init(void)
+  	 * Otherwise, check if native TLB flush sends real IPIs to all target
+  	 * CPUs (i.e., not using INVLPGB broadcast invalidation).
+  	 */
+-	if (pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast)
++	if (pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast) {
++		static_branch_enable(&tlb_ipi_broadcast_key);
+  		return;
++	}
+
+  	if (pv_ops.mmu.flush_tlb_multi == native_flush_tlb_multi &&
+-	    !cpu_feature_enabled(X86_FEATURE_INVLPGB))
++	    !cpu_feature_enabled(X86_FEATURE_INVLPGB)) {
+  		pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast = true;
++		static_branch_enable(&tlb_ipi_broadcast_key);
++	}
+  }
 ---
- arch/x86/kvm/x86.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index db3f393192d94..a9080418f3cfd 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10737,12 +10737,10 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
- 			__kvm_set_rflags(vcpu, kvm_get_rflags(vcpu) |
- 					     X86_EFLAGS_RF);
- 
--		if (vcpu->arch.exception.vector == DB_VECTOR) {
--			kvm_deliver_exception_payload(vcpu, &vcpu->arch.exception);
--			if (vcpu->arch.dr7 & DR7_GD) {
--				vcpu->arch.dr7 &= ~DR7_GD;
--				kvm_update_dr7(vcpu);
--			}
-+		if (vcpu->arch.exception.vector == DB_VECTOR &&
-+		    vcpu->arch.dr7 & DR7_GD) {
-+			vcpu->arch.dr7 &= ~DR7_GD;
-+			kvm_update_dr7(vcpu);
- 		}
- 
- 		kvm_inject_exception(vcpu);
 
-base-commit: 183bb0ce8c77b0fd1fb25874112bc8751a461e49
--- 
-2.53.0.473.g4a7958ca14-goog
+Thanks,
+Lance
 
 
