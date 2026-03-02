@@ -1,139 +1,171 @@
-Return-Path: <kvm+bounces-72413-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72414-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MERvHI7/pWl5IwAAu9opvQ
-	(envelope-from <kvm+bounces-72413-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 22:22:22 +0100
+	id uIDWIj8GpmlVJAAAu9opvQ
+	(envelope-from <kvm+bounces-72414-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 22:50:55 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1B8B1E2950
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 22:22:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25A5A1E4269
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 22:50:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3ADDE332BD91
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 21:11:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7C7503185A69
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 21:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A6104DD6DB;
-	Mon,  2 Mar 2026 20:41:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A4F7391840;
+	Mon,  2 Mar 2026 20:52:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RLTXvBuI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="COztYI7P"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906B04DC53F
-	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 20:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6158E390CAD;
+	Mon,  2 Mar 2026 20:52:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772484107; cv=none; b=nhzvUNnL/jP58hfuPrJDC7eQiWnVOu3EBDT0jPogZU31fIAxXYi5dG/WnpGklqV10dtbMh4XAyFxnEM56xhxhU9zKiaQ5jvZofSDx0zLt0II7EMYfNbu5h5t5DnaRJYgcO3kKr53LOPLfkJ0VEDOi0/nDyioFYTcNU4iFHiNoR8=
+	t=1772484733; cv=none; b=UAb282wwWbyqyHcJsceUFmzJj9uwvcLEiHgR4LtQJLH0AtL/3/U7K/r6+luTaw3+J4TSYA6eMMv1CSaQCFxxDxEQYyJ+QMTWwuxEVBJk4Ity6pCpyxWSBxVGq1coeLV8XbPdl+mgLBCpFylbqzgRuKeWTLjEhriBhHLuBwd00Ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772484107; c=relaxed/simple;
-	bh=R/MIcxqUVQTwE5wwGHyGtW9Y/bGlblc1zMp+2swWJbA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nNLAUj/eToPMQtJr2yGhJ5GCilhqMRc5kjtxD4B6nU3kpZtmiBn7U0Xhzl0Tq5qYrm55AiLFJWL4rHS4EwUIuInhBZVjiNLrXYfJTkVvoiFzTGmgMpap2DMC4tBu0IMjRmKhFt96cXNVaaNVG5hOixYJ1l2pnAxYMpvzTaHVavM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RLTXvBuI; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3598d3e3bc7so1268086a91.3
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 12:41:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772484106; x=1773088906; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LgZDmqmpagJozBHMzfcbK0Tu/J0kjNTVJeXoQ0mkXOo=;
-        b=RLTXvBuIv+tpS/Y4nq4dGMGUemVDivwhhxcYUlswcPt7lFpV1LDYYeCDiH8SDr+eSE
-         A7yPRj5NMUJYu0L1Dw8nOnlecvKDeh2XVosoiBXFX4i4LmPteiyV+nwigY8Pos5Qg+xa
-         /wLjHqB2SIbcTZV9IbkOEy8brhzKgqJpMqD3BrzydBIb5fMREdE1tVSaT40xtYfIs3JS
-         9kI+3YXL/JwYOM6nqL+OWQVUVtHmjlfJObefcFp0VwxtfvYU9OIndFgAyZIf380a9Wmh
-         652egbnj1UvdeMZnt0dwhmCK9kemdK+EwkUufdmU6vAfw6AdrdeTu6keJjMXg6itRGEh
-         AjEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772484106; x=1773088906;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LgZDmqmpagJozBHMzfcbK0Tu/J0kjNTVJeXoQ0mkXOo=;
-        b=YxilhJbF+rn+QjXBOZbRZ5+54WOWg7f0SBxRBYwkzGIVoZMn9TnGHs0rwvHE8ZAU+T
-         on6yyMaZKAlMKWG2zAyA/6uS0Mj8VxuedBUsUfB0AHMwzBWCSSS53R1LZEOEDw95jPWI
-         hsAcAlxpJrVtwAKGCpAClORUDNRkYTBCLtPKJuYDYBFN1bRbq/b9he04v9Kx3IkLMgbi
-         v/7LZLyGnmFXWXVGzg5AA2dweZthLyXVn22qMK0+hTIu5nOBAb9KPQgVWqjuToBM/TM1
-         gLDufJDFy2FpZi3j0Bfb8vGMznvc2pVC8Wfg8YBnC9OspnraeAvUOnFVIXxGmvteOSdI
-         iZ+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWyBw+Db3mcRDpBtD9n+V9uXRVQdL/ayrRT00Sd1bdHWhVUS92bpvcR+bBWmKzZduL44i4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxaDpx9zetj2vs6D6q+EEYU7e7j3/R7NIoBDrBs0qtUPPNB/5l
-	oTgRPo9H6vgADwxLxBEQX24aoUdLon0QT7ZmwG1t011v1GaUdsO3EmvvuYzFwB5mn/5WeAWaRKQ
-	YRZ4eBw==
-X-Received: from pjwo3.prod.google.com ([2002:a17:90a:d243:b0:359:8c13:8588])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:524a:b0:356:7b41:d348
- with SMTP id 98e67ed59e1d1-35965cd00e3mr10408302a91.20.1772484105712; Mon, 02
- Mar 2026 12:41:45 -0800 (PST)
-Date: Mon, 2 Mar 2026 12:41:44 -0800
-In-Reply-To: <CAO9r8zMJ8rvzS00eXJ7RPkRPicg2BwB4eq+xVtKXFWn5ZUamUw@mail.gmail.com>
+	s=arc-20240116; t=1772484733; c=relaxed/simple;
+	bh=5nkwyikcQXaXCi1A+f+dmyTarjj6BA0S0U62XmKtJ4E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FN8iO18pIoENpAjlbpxdOMew5CxnIJtKXec1Liuaok7Ra+GDPn1M2xF0UA47z1Hhr7RC3iiK6dHFS8foLlrS6fjl7uX86IUbnOyioYG64llHmkGtkEVjwT9XkbV/9sgXGCrxlVyajBrzmLQP/z6CLGenu67KVCOPs8Qf7mkOI+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=COztYI7P; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772484732; x=1804020732;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=5nkwyikcQXaXCi1A+f+dmyTarjj6BA0S0U62XmKtJ4E=;
+  b=COztYI7POV4QYp040egfBAQLbUfY5xlj2c0Xae4NoYDB3Ckk7y3f2zCb
+   USJmX669TifxdRg9sFdIgDFeuSfw91VoYBLic/j8Dozp+kgzsEon7wxS6
+   BO0KANdo/YejKMStfXYF43iUp5dXzEAQgL3L4+Ne1MgGxkkygAsVB+w31
+   2FKU/XHAVJ0mv3gyfbHrqfa0TDXlLuIkUgMrOmaba5IL+U4HuIoGLgLRH
+   /ijS1phXO6v3zVl8WW6fwC6ZjTU2U9m2Ed8pSWw8I3YeLubCpYUvrtXTp
+   7ahbg1vEzcaRcwT/EqTMI/n5ogK5JLw416Kh3C+u7LBWLxFt0OGHJSlNS
+   w==;
+X-CSE-ConnectionGUID: meSyS91PTzqg25b/nVnIVQ==
+X-CSE-MsgGUID: mbbNM7quRWWWA7V8+TuLtw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11717"; a="77118637"
+X-IronPort-AV: E=Sophos;i="6.21,320,1763452800"; 
+   d="scan'208";a="77118637"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 12:52:11 -0800
+X-CSE-ConnectionGUID: yS909TLyRH6Khi9IYa8F1Q==
+X-CSE-MsgGUID: oR4mSGNHRmGeJzvcaF6jRQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,320,1763452800"; 
+   d="scan'208";a="221932550"
+Received: from khuang2-desk.gar.corp.intel.com ([10.124.220.2])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 12:52:08 -0800
+From: Kai Huang <kai.huang@intel.com>
+To: seanjc@google.com,
+	pbonzini@redhat.com
+Cc: shuah@kernel.org,
+	shivankg@amd.com,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kai Huang <kai.huang@intel.com>,
+	Yi Lai <yi1.lai@intel.com>
+Subject: [PATCH v2] KVM: selftests: Increase 'maxnode' for guest_memfd tests
+Date: Tue,  3 Mar 2026 09:51:58 +1300
+Message-ID: <20260302205158.178058-1-kai.huang@intel.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260225005950.3739782-1-yosry@kernel.org> <20260225005950.3739782-3-yosry@kernel.org>
- <CAO9r8zMJ8rvzS00eXJ7RPkRPicg2BwB4eq+xVtKXFWn5ZUamUw@mail.gmail.com>
-Message-ID: <aaX2CKeO831_Nx3r@google.com>
-Subject: Re: [PATCH v3 2/8] KVM: nSVM: Sync interrupt shadow to cached vmcb12
- after VMRUN of L2
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Rspamd-Queue-Id: D1B8B1E2950
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 25A5A1E4269
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72413-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72414-lists,kvm=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kai.huang@intel.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[intel.com:+];
+	TAGGED_RCPT(0.00)[kvm];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Fri, Feb 27, 2026, Yosry Ahmed wrote:
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index de90b104a0dd5..9909ff237e5ca 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -521,6 +521,7 @@ void nested_sync_control_from_vmcb02(struct vcpu_svm *svm)
-> >         u32 mask;
-> >         svm->nested.ctl.event_inj      = svm->vmcb->control.event_inj;
-> >         svm->nested.ctl.event_inj_err  = svm->vmcb->control.event_inj_err;
-> > +       svm->nested.ctl.int_state       = svm->vmcb->control.int_state;
-> 
-> FWIW, this is an incomplete fix. KVM might update the interrupt shadow
-> after this point through __svm_skip_emulated_instruction(), and that
-> won't be captured in svm->nested.ctl.int_state.
-> 
-> I think it's not worth fixing that case too, and any further effort
-> should go toward teaching KVM_GET_NESTED_STATE to pull state from the
-> correct place as discussed earlier.
+Increase 'maxnode' when using 'get_mempolicy' syscall in guest_memfd
+mmap and NUMA policy tests to fix a failure on one Intel GNR platform.
 
-+1.  FWIW, AMD doesn't have a MOV/POP SS shadow, so practically speaking the only
-impact is that an STI shadow could get extended for one extra instruction.  Unless
-the guest is doing e.g. "sti; hlt; cli", that's a non-issue.
+On a CXL-capable platform, the memory affinity of CXL memory regions may
+not be covered by the SRAT.  Since each CXL memory region is enumerated
+via a CFMWS table, at early boot the kernel parses all CFMWS tables to
+detect all CXL memory regions and assigns a 'faked' NUMA node for each
+of them, starting from the highest NUMA node ID enumerated via the SRAT.
+
+This increases the 'nr_node_ids'.  E.g., on the aforementioned Intel GNR
+platform which has 4 NUMA nodes and 18 CFMWS tables, it increases to 22.
+
+This results in the 'get_mempolicy' syscall failure on that platform,
+because currently 'maxnode' is hard-coded to 8 but the 'get_mempolicy'
+syscall requires the 'maxnode' to be not smaller than the 'nr_node_ids'.
+
+Increase the 'maxnode' to the number of bits of 'nodemask', which is
+'unsigned long', to fix this.
+
+This may not cover all systems.  Perhaps a better way is to always set
+the 'nodemask' and 'maxnode' based on the actual maximum NUMA node ID on
+the system, but for now just do the simple way.
+
+Reported-by: Yi Lai <yi1.lai@intel.com>
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=221014
+Closes: https://lore.kernel.org/all/bug-221014-28872@https.bugzilla.kernel.org%2F
+Signed-off-by: Kai Huang <kai.huang@intel.com>
+---
+
+v1 -> v2:
+ - Add 'Reported-by' and 'Closes" tags.  - Sean
+ - Use BITS_PER_TYPE().  - Sean
+ - Slightly simplify changelog to simply say "increase 'maxnode' to bits
+   of 'nodemask'" to reflect the code better.
+
+---
+ tools/testing/selftests/kvm/guest_memfd_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+index 618c937f3c90..cc329b57ce2e 100644
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+@@ -80,7 +80,7 @@ static void test_mbind(int fd, size_t total_size)
+ {
+ 	const unsigned long nodemask_0 = 1; /* nid: 0 */
+ 	unsigned long nodemask = 0;
+-	unsigned long maxnode = 8;
++	unsigned long maxnode = BITS_PER_TYPE(nodemask);
+ 	int policy;
+ 	char *mem;
+ 	int ret;
+
+base-commit: a91cc48246605af9aeef1edd32232976d74d9502
+-- 
+2.53.0
+
 
