@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-72428-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72429-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iHb4CGIZpmmeKQAAu9opvQ
-	(envelope-from <kvm+bounces-72428-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:12:34 +0100
+	id kAm2AH0ZpmmeKQAAu9opvQ
+	(envelope-from <kvm+bounces-72429-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:13:01 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1C071E6651
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:12:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5785A1E6667
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:13:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 372B9320451F
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 22:33:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4B9743218921
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 22:34:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10539358376;
-	Mon,  2 Mar 2026 22:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E36633F5BC;
+	Mon,  2 Mar 2026 22:32:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XXFQ8gMM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fygeblAk"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D2531F9BA;
-	Mon,  2 Mar 2026 22:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117A733F596;
+	Mon,  2 Mar 2026 22:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772490754; cv=none; b=dqkfWJD2gHfS2hWDHxsUOxu6r2RM4aFeFMAfOoQJJsexSSQ8xwxXWvE8z2/qaW8DLH+xRsJzcbl2mE+HslL5rb4wQ5oayNeTdxmaH2lFWZ8USeA1XXDDseKuTgGy/Xu0naQYHNro/pcSmtJdw0n3o6kZGuA3kbQGR9H0bOuqZ5w=
+	t=1772490778; cv=none; b=ISdclyOrrh+1Rd8CYSrWuMEQ/h9CdoEsaK0OQmICSMspm3yDkRdAvHjBVswmiduaD2Ax2/n1nfv7MPHsP8DFfnxxyP3cWm4Msr4StLk9A1WIzM5cYDsHd7yDm4Ihr6xPSaKeuRNbAW8UWfqA5m/7nCsiCtIxSOGEQENeNaGd2Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772490754; c=relaxed/simple;
-	bh=W1PK6P5b2D18LYKUtf20jG38cjGheOCiI34y91UDR9c=;
+	s=arc-20240116; t=1772490778; c=relaxed/simple;
+	bh=XIszOHXUW2Ma9+nnZ3/YturdyR3Ht3mu9bLE28QYKvA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TG3r4ubDS6hl0DBGo1pJ8H1oGQjRTtiWZDz1J5VW/1ojX/To+kkEVFlgDBQBq6a4j1i76zLQC+J7ocyhft30W7/ir5uU3N6wvSiA5Pc7RJVJppC5X0nUZcYIx5KvUfe/WCkS5LfzKxMOMXljN+MP84qwWJhynVN03MczVnWvCgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XXFQ8gMM; arc=none smtp.client-ip=198.175.65.16
+	 In-Reply-To:Content-Type; b=ZtYB9fNGrHWppkypJMaopUPe/h580wUM3i6DCQdFiZuhXjx5Zidix3dIxxmN6SdzpsGfZc56Xndx2zahqmAAKGjaKG+cszb4MWNstzNbA2h9eAC2dyxJvyHLKOAdnMCBAWMZA4gZMU4zRttv2sPgd7nrLng+bZjKEYErXhhUpY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fygeblAk; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772490753; x=1804026753;
+  t=1772490777; x=1804026777;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=W1PK6P5b2D18LYKUtf20jG38cjGheOCiI34y91UDR9c=;
-  b=XXFQ8gMMO6ayMWZEPJqlihDH9uUxnM+sZDllBEI9YHYXAYRclimkvVJI
-   Pi+L8LX380msx2jTmeXufX+gcOGEtwD1xoQ9S2SAalAQRVjKAWqAP8mYY
-   4WtwTqIMq/Qf1LXFUMOiI65tKp1i3StpCLgqoFLDmvbjPvZ5lDO6c4TVD
-   eZK/I0wGmue0F+/oiq7NtxaXtAnUeloX4QDbK+4JUXmgBxGB5OU37a2e7
-   vX9/lHfOfMZcjT0KJZA+q2eSwm9TN3XkE1mGrJYZdQTlYjjEeJUxeUE2D
-   HvPeI0lsValtQypl9i926hJd4g7i4KcpCI3SrbhMr35TZPAHiGFZWD7Aw
+  bh=XIszOHXUW2Ma9+nnZ3/YturdyR3Ht3mu9bLE28QYKvA=;
+  b=fygeblAkXsOSpAh91WVSA4tXqjP7fBBcizceUWaIcU6ZG+qcs8qB+4MI
+   gwjFC1qc4gxXfdfZNo170AEWgssxE4AGG2mwmwzDBMq951/jD4IhQxN3T
+   4qKxsuG/QqlzhxOgXrHqrPo13axP91sdMQXiTaFIQsjFuMKjXo2atd5K9
+   gb6qi2jbMlyOQN9cU/jqzo1N/UnerdvEx+8d/s5n/3bBOf7gd7DIfgY6e
+   uIaYkVbMAOW+To5mDfRKVxCI7MzF27wtdVSTIzMa1ntliAusZAHOdhkfs
+   rrPTlbhin2xZcXW4C0aUtP61oE8mrXU+2oTvUtginZZJNCSac6PclI/0K
    A==;
-X-CSE-ConnectionGUID: lY7peGN3STWui5lR8YS1vA==
-X-CSE-MsgGUID: 2qYVATALT4SB0T2ch2FRnQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11717"; a="73700608"
+X-CSE-ConnectionGUID: Onr7m5YtQTenEusrQDlZrQ==
+X-CSE-MsgGUID: QVlkufBIS8CZLfqLfjOcLw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11717"; a="73700643"
 X-IronPort-AV: E=Sophos;i="6.21,320,1763452800"; 
-   d="scan'208";a="73700608"
+   d="scan'208";a="73700643"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 14:32:32 -0800
-X-CSE-ConnectionGUID: CfVi0PTlQUu2MsL8kan2hg==
-X-CSE-MsgGUID: MWrj7z7JSlSa23P/hsVqiA==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 14:32:56 -0800
+X-CSE-ConnectionGUID: Yr7ySr+oTT6DGi//Z0drsg==
+X-CSE-MsgGUID: iZBo+rYVTqyQIz9QvRHxgw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,320,1763452800"; 
-   d="scan'208";a="255665232"
+   d="scan'208";a="255665281"
 Received: from cmdeoliv-mobl4.amr.corp.intel.com (HELO [10.125.108.103]) ([10.125.108.103])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 14:32:32 -0800
-Message-ID: <b5a44f79-8f99-4e61-aaa2-e8aec6f0cf69@intel.com>
-Date: Mon, 2 Mar 2026 14:32:36 -0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 14:32:56 -0800
+Message-ID: <42071ce1-39ab-409d-bb9b-ceb7c2e385e0@intel.com>
+Date: Mon, 2 Mar 2026 14:33:00 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -132,19 +132,19 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
 In-Reply-To: <85aec55af41957678d214e9629eb6249b064fa87.1772486459.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: B1C071E6651
+X-Rspamd-Queue-Id: 5785A1E6667
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[34];
-	TAGGED_FROM(0.00)[bounces-72428-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72429-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+];
@@ -153,7 +153,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
@@ -161,100 +161,9 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 3/2/26 13:35, Ashish Kalra wrote:
-> The new RMPOPT instruction sets bits in a per-CPU RMPOPT table, which
-> indicates whether specific 1GB physical memory regions contain SEV-SNP
-> guest memory.
+Oh, and:
 
-Honestly, this is an implementation detail that we don't need to know
-about in the kernel. It's also not even factually correct. The
-instruction _might_ not set any bits, either because there is SEV-SNP
-memory or because it's being run in query mode.
+[PATCH v2 2/7] x86/sev: add support for enabling RMPOPT
 
-	The new RMPOPT instruction helps manage per-CPU RMP optimization
-	structures inside the CPU. It takes a 1GB-aligned physical
-	address and either returns the status of the optimizations or
-	tries to enable the optimizations.
-
-> Per-CPU RMPOPT tables support at most 2 TB of addressable memory for
-> RMP optimizations.
-> 
-> Initialize the per-CPU RMPOPT table base to the starting physical
-> address. This enables RMP optimization for up to 2 TB of system RAM on
-> all CPUs.
-
-The reset looks good.
-
-> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-> index da5275d8eda6..8e7da03abd5b 100644
-> --- a/arch/x86/include/asm/msr-index.h
-> +++ b/arch/x86/include/asm/msr-index.h
-> @@ -753,6 +753,9 @@
->  #define MSR_AMD64_SEG_RMP_ENABLED_BIT	0
->  #define MSR_AMD64_SEG_RMP_ENABLED	BIT_ULL(MSR_AMD64_SEG_RMP_ENABLED_BIT)
->  #define MSR_AMD64_RMP_SEGMENT_SHIFT(x)	(((x) & GENMASK_ULL(13, 8)) >> 8)
-> +#define MSR_AMD64_RMPOPT_BASE		0xc0010139
-> +#define MSR_AMD64_RMPOPT_ENABLE_BIT	0
-> +#define MSR_AMD64_RMPOPT_ENABLE		BIT_ULL(MSR_AMD64_RMPOPT_ENABLE_BIT)
->  
->  #define MSR_SVSM_CAA			0xc001f000
->  
-> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-> index a4f3a364fb65..405199c2f563 100644
-> --- a/arch/x86/virt/svm/sev.c
-> +++ b/arch/x86/virt/svm/sev.c
-> @@ -500,6 +500,41 @@ static bool __init setup_rmptable(void)
->  	}
->  }
->  
-> +static void __configure_rmpopt(void *val)
-> +{
-> +	u64 rmpopt_base = ((u64)val & PUD_MASK) | MSR_AMD64_RMPOPT_ENABLE;
-> +
-> +	wrmsrq(MSR_AMD64_RMPOPT_BASE, rmpopt_base);
-> +}
-> +
-> +static __init void configure_and_enable_rmpopt(void)
-> +{
-> +	phys_addr_t pa_start = ALIGN_DOWN(PFN_PHYS(min_low_pfn), PUD_SIZE);
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT)) {
-> +		pr_debug("RMPOPT not supported on this platform\n");
-> +		return;
-> +	}
-> +
-> +	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP)) {
-> +		pr_debug("RMPOPT optimizations not enabled as SNP support is not enabled\n");
-> +		return;
-> +	}
-
-To be honest, I think those two are just plain noise ^^.
-
-> +	if (!(rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED)) {
-> +		pr_info("RMPOPT optimizations not enabled, segmented RMP required\n");
-> +		return;
-> +	}
-> +
-> +	/*
-> +	 * Per-CPU RMPOPT tables support at most 2 TB of addressable memory for RMP optimizations.
-> +	 *
-> +	 * Set per-core RMPOPT base to min_low_pfn to enable RMP optimization for
-> +	 * up to 2TB of system RAM on all CPUs.
-> +	 */
-
-Please at least be consistent with your comments. This is both over 80
-columns *and* not even consistent in the two sentences.
-
-> +	on_each_cpu_mask(cpu_online_mask, __configure_rmpopt, (void *)pa_start, true);
-> +}
-
-What's wrong with:
-
-	u64 rmpopt_base = pa_start | MSR_AMD64_RMPOPT_ENABLE;
-	...
-	for_each_online_cpu(cpu)
-		wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE, rmpopt_base);
-
-Then there's at least no ugly casting.
-
+		        ^ Capitalize this, please
 
