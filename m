@@ -1,178 +1,172 @@
-Return-Path: <kvm+bounces-72397-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72398-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id w6ppIRS4pWmDFQAAu9opvQ
-	(envelope-from <kvm+bounces-72397-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 17:17:24 +0100
+	id eJ/YGfq1pWkiFQAAu9opvQ
+	(envelope-from <kvm+bounces-72398-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 17:08:26 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC8721DC908
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 17:17:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D748D1DC673
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 17:08:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 34AE63183FF6
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 15:58:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 02449308C593
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 16:04:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 014AF41C30C;
-	Mon,  2 Mar 2026 15:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D1F40149C;
+	Mon,  2 Mar 2026 16:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P1H1H/zY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E+v5ilfp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5A541C0A3
-	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 15:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9A23603D4
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 16:02:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772467061; cv=none; b=rzEwd10IHfYEL/Wef/n2nAdu7GUQoCEj4HjiTRswEKS1NkAStG3Q0HRuxuKjAmjIaYoaiWHH+/sJBOc9b2fhkqdBKFVSiSbVDFvqNd/NJ3Ggm3B0wmjRswtHSOv6mEzPdDGFMUNmvveo998WEdywNF8IAPBlkqSaye+TP7BOOWI=
+	t=1772467380; cv=none; b=P5nvbKOAQL2Ys5fz7WVFaZAm/AlEsjEHtSusUnKAcZzcqRBZ466JMBpvycnPhZYd5wh3ziyheDXmnmqgah3afGZUXqJU/abWJKjwgzao0vi5/LsHoiYwm3ySa99vJHRQh+xUJ57ka6ZTlolEHXoZV0At+poXHyjAFiu/YPWEjHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772467061; c=relaxed/simple;
-	bh=iYsd3Elf0ik4GJpr4eGq44qKeDc6FOSqBZtqVOSshJc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hGNOOtCGg9k+xxdJ8LKAtAl9DbEAHQdcWYmPefbN+mLHsD99+e+Fk5Zch4yl+rqH5UyF0i2JgEUGEKdX2JKoi1xvHP8nyj4tMm8xmJtsuUn5zwKkhsr12Ob6B5/agZjy+zI/VMWncPf8t1cCIZcoCco3bbp/neEsVSHf6GrRtc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P1H1H/zY; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-354490889b6so17279790a91.3
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 07:57:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772467059; x=1773071859; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ta44dSkyUYoWSHu8DjFcJDUvqHtZprEgi2FuVoYoKhw=;
-        b=P1H1H/zYZoibKL1lGEcVpuz8c6BDWHwJEYFNS4Jua76NRE5innUXZ8hsEA2CcexsiY
-         tClaS3cIVl82DPhOnWJElue/vEuShWsawQNJPPHKMyjjYpcPGXof4w151ZCpr+RBY4K6
-         4CqQQdDWMYZq8GgrWm7qZcgye3SZ2A1fkDZsPTwu/tmKvgtFkWri3Hw1xoXjO29eBwpt
-         Hbtq7XkQHrX0ESOe5DKUZjmqwp8UqJr5JkkB2+BAl7TjfsroiaF3myWgDDN/5eOpJDvV
-         DwMjvTPESSOOTuimsTvxNGBl/f7p2gKop400EIyK0PQAX/tJhLIUxm+zu9fCVfCn5wpy
-         ogCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772467059; x=1773071859;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ta44dSkyUYoWSHu8DjFcJDUvqHtZprEgi2FuVoYoKhw=;
-        b=XmmqHcTttXf6dG4vQxdZE8f8mN8oVe7o5lJRaQRpUkRwCm3lxeOburJmxy3D4HPEGY
-         lfAMt/+cJDKf1LTIH6Udapsu8XHlYTkjDnqsOSEWU6829D3VmU3NTr3GR9S1xeGRTFMq
-         4C8qf7MGFvgIkbcP9q1t8nrc/vOi93FfmnBeBykQoP2Muy20PJsUTVxtAVGVo/bKiWyS
-         zv3pSO8UYxSaRVaxFrQ+qDmVVOLIVd1Ab85GlRdL9/TKlx8q99ygYNLTArxAzq+gtSFo
-         Nn8qverbsTq56JE3/gqQlfCGOldhIHEBxF44SWFPTn3pSS9zn41PY9yXkNvaUjohA3Wc
-         9+LQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXW6eORgpmskoEqUe6pf08p/shGGJWG01ZoXuP4DmG/JQ1MNMFth00Poz8oZWpkpXy3ji4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5073AQbDvFadhtp/IdSl10CNkuZP35reXp1bSG9haB3IdnAAd
-	+1p0nUi5vw5160Lx8PeKyXHqM0PWGfdnbpSbz1LzRUX47sAfzAA1IJiS80kJlNcBdxH/O6MTCDI
-	4YP4sKw==
-X-Received: from pjpy12.prod.google.com ([2002:a17:90a:a40c:b0:359:8e40:28c5])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4c0b:b0:359:8cad:bcdc
- with SMTP id 98e67ed59e1d1-3598cadbd66mr3700334a91.10.1772467059132; Mon, 02
- Mar 2026 07:57:39 -0800 (PST)
-Date: Mon, 2 Mar 2026 07:57:32 -0800
-In-Reply-To: <20260302090739.464786-1-kai.huang@intel.com>
+	s=arc-20240116; t=1772467380; c=relaxed/simple;
+	bh=x+S0GQMfmr/lSbc+D4zHvln2sig1ozKiD35K43MESKw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TxqUBPxADSefnJ0Gm0VbKVWuIbv6WS0gUFLUbTkyybPht5en+7ahLR14YigEFiproKsosCzj7Nm/bbbMBOUJEHoLID6CSE77xwtJt+DdP+Ur7OkSwmuINpL2es2BVaUgbBNNaYI0u4CAUBZTmx50dhZ7i1RsbKi2XBg27uKyvGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E+v5ilfp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA67CC19423
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 16:02:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772467379;
+	bh=x+S0GQMfmr/lSbc+D4zHvln2sig1ozKiD35K43MESKw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=E+v5ilfptjxxLejchysjpG/9n8t4rpNuVknsBpnOOyIU7LbqfkozqIuAGOneIM2Ai
+	 ngj2bmAyCakVJbg6J11COZZAZbbVDwgEl+mLjs9f64CK6ys+BFIyV6FzvW/8rAU8gV
+	 qN1GTD3P/aiVo8rFxIzk+vu4yv7h1MkJhmfPSzaCtHPdHuFqRmlufbWGr4SOdLUpKE
+	 Dc4q7q+1GjNpO6m297Cqd1ikFoSa0QiR/wQcy/+paT9ApexvgdmIEy5RGCOegKOOaY
+	 Fnv0993cZAMKnZvcF1O2T9N9VTCb0REzJX3ZBvtg1Sp+D3HTCRxBnZT3c4bVp6oC6v
+	 DWMKICGEiK7TA==
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b93695f7cdcso527057866b.3
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 08:02:59 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUprK6nl35OLbcVSi7T9auncx1TfyaKKLzAtIfbJCH3u+mMFlE86/X1nQyKB0wW4gprHy4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwR3nZ4AMaiqPKem0tSAE7po3NTEvAoPPc313/olbf/napVVk+c
+	0j3znfxc21A3jz7kBmLqJYma/xFnC85GS0g2GwCk04TISRyVvaajrjl2TFRnOUi2uRFjXcgmKpR
+	G6a6WF6r+ZDcLuI81GQry9IK+L8zNlDo=
+X-Received: by 2002:a17:907:d20:b0:b88:48ba:cdd with SMTP id
+ a640c23a62f3a-b937652bdd8mr801240966b.43.1772467378484; Mon, 02 Mar 2026
+ 08:02:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260302090739.464786-1-kai.huang@intel.com>
-Message-ID: <aaWzbCEWbStphJPh@google.com>
-Subject: Re: [PATCH] KVM: selftests: Increase 'maxnode' for guest_memfd tests
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: pbonzini@redhat.com, shuah@kernel.org, shivankg@amd.com, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
-X-Rspamd-Queue-Id: DC8721DC908
+MIME-Version: 1.0
+References: <20260224223405.3270433-1-yosry@kernel.org> <20260224223405.3270433-17-yosry@kernel.org>
+ <aaIxtBYRNCHdEvsV@google.com> <CAO9r8zMRkFfxm_zs88uc_ijARrU4XxHQQZAQFmC_t0H9qdbM-A@mail.gmail.com>
+ <aaI_XogE98GvJjAU@google.com>
+In-Reply-To: <aaI_XogE98GvJjAU@google.com>
+From: Yosry Ahmed <yosry@kernel.org>
+Date: Mon, 2 Mar 2026 08:02:47 -0800
+X-Gmail-Original-Message-ID: <CAO9r8zP-chd6VcS5zGgU=g_AWAu9ytqnxzemQ9BKdV61rRHimQ@mail.gmail.com>
+X-Gm-Features: AaiRm53-1AXUYFs4ixMjDlmhaA3cQcnhMekzIIFzh8IR8IGzErRKc2L-bOAzrSM
+Message-ID: <CAO9r8zP-chd6VcS5zGgU=g_AWAu9ytqnxzemQ9BKdV61rRHimQ@mail.gmail.com>
+Subject: Re: [PATCH v6 16/31] KVM: nSVM: Unify handling of VMRUN failures with
+ proper cleanup
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: D748D1DC673
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72397-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72398-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:email]
+	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-On Mon, Mar 02, 2026, Kai Huang wrote:
-> Increase 'maxnode' when using 'get_mempolicy' syscall in guest_memfd
-> mmap and NUMA policy tests to fix a failure on one Intel GNR platform.
-> 
-> On a CXL-capable platform, the memory affinity of CXL memory regions may
-> not be covered by the SRAT.  Since each CXL memory region is enumerated
-> via a CFMWS table, at early boot the kernel parses all CFMWS tables to
-> detect all CXL memory regions and assigns a 'faked' NUMA node for each
-> of them, starting from the highest NUMA node ID enumerated via the SRAT.
-> 
-> This increases the 'nr_node_ids'.  E.g., on the aforementioned Intel GNR
-> platform which has 4 NUMA nodes and 18 CFMWS tables, it increases to 22.
-> 
-> This results in the 'get_mempolicy' syscall failure on that platform,
-> because currently 'maxnode' is hard-coded to 8 but the 'get_mempolicy'
-> syscall requires the 'maxnode' to be not smaller than the 'nr_node_ids'.
-> 
-> Increase the 'maxnode' to the number of bits of 'unsigned long' (i.e.,
-> 64 on 64-bit systems) to fix this.  Note the 'nodemask' is 'unsigned
-> long', so it makes sense to set 'maxnode' to bits of 'unsigned long'
-> anyway.
-> 
-> This may not cover all systems.  Perhaps a better way is to always set
-> the 'nodemask' and 'maxnode' based on the actual maximum NUMA node ID on
-> the system, but for now just do the simple way.
-> 
+> > As for refactoring the code, I didn't really do it for SMM, but I
+> > think the code is generally cleaner with the single VMRUN failure
+> > path.
+>
+> Except for the minor detail of being wrong :-)
 
-Can you add:
+I guess we're nitpicking now :P
 
-Reported-by: Yi Lai <yi1.lai@intel.com>
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=221014
-Closes: https://lore.kernel.org/all/bug-221014-28872@https.bugzilla.kernel.org%2F
+> My preference is to completely drop these:
+>
+>   KVM: nSVM: Unify handling of VMRUN failures with proper cleanup
+>   KVM: nSVM: Refactor minimal #VMEXIT handling out of nested_svm_vmexit()
+>   KVM: nSVM: Call nested_svm_init_mmu_context() before switching to VMCB02
+>   KVM: nSVM: Call nested_svm_merge_msrpm() from enter_svm_guest_mode()
+>   KVM: nSVM: Call enter_guest_mode() before switching to VMCB02
+>
+> > I am fine with dropping the stable@ tag from everything from this
+> > point onward, or re-ordering the patches to keep it for the missing
+> > consistency checks.
+>
+> And then moving these to the end of the series (or at least, beyond the stable@
+> patches):
+>
+>   KVM: nSVM: Make nested_svm_merge_msrpm() return an errno
 
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
->  tools/testing/selftests/kvm/guest_memfd_test.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-> index 618c937f3c90..b434612bc3ec 100644
-> --- a/tools/testing/selftests/kvm/guest_memfd_test.c
-> +++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-> @@ -80,7 +80,7 @@ static void test_mbind(int fd, size_t total_size)
->  {
->  	const unsigned long nodemask_0 = 1; /* nid: 0 */
->  	unsigned long nodemask = 0;
-> -	unsigned long maxnode = 8;
-> +	unsigned long maxnode = sizeof(nodemask) * 8;
+I don't think there's much value in keeping this now, it was mainly needed for:
 
-Pretty sure this can be:
+>   KVM: nSVM: Call nested_svm_merge_msrpm() from enter_svm_guest_mode()
 
-	unsigned long maxnode = BITS_PER_TYPE(nodemask)
+But I can keep it if you like it on its own.
 
->  	int policy;
->  	char *mem;
->  	int ret;
-> 
-> base-commit: a91cc48246605af9aeef1edd32232976d74d9502
-> -- 
-> 2.53.0
-> 
+>   KVM: nSVM: Drop nested_vmcb_check_{save/control}() wrappers
+
+This one will still be needed ahead of the consistency checks, specifically:
+
+> KVM: nSVM: Add missing consistency check for hCR0.PG and NP_ENABLE
+
+As we pass in L1's CR0, and with the wrappers in place it isn't
+obviously correct that the current CR0 is L1's.
+
+> > If you mean drop them completely, it's a bit of a shame because I
+> > think the code ends up looking much better, but I also understand
+> > given all the back-and-forth, and the new problem I reported recently
+> > that will need further refactoring to address (see my other reply to
+> > the same patch).
+>
+> After paging more of this stuff back in (it's been a while since I looked at the
+> equivalent nVMX flow in depth), I'm quite opposed to aiming for a unified #VMEXIT
+> path for VMRUN.  Although it might seem otherwise at times, nVMX and nSVM didn't
+> end up with nested_vmx_load_cr3() buried toward the end of their flows purely to
+> make the code harder to read, there are real dependencies that need to be taken
+> into account.
+
+Yeah, and I tried to take them into account but that obviously didn't
+work out well :)
+
+> And there's also value in having similar flows for nVMX and nSVM, e.g. where most
+> consistency checks occur before KVM starts loading L2 state.  VMX just happens to
+> architecturally _require_ that, whereas with SVM it was a naturally consequence
+> of writing the code.
+>
+> Without the unification, a minimal #VMEXIT helper doesn't make any sense, and
+> I don't see any strong justification for shuffling around the order.
+
+Yeah that's fair.
 
