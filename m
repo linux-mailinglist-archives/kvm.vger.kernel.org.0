@@ -1,156 +1,158 @@
-Return-Path: <kvm+bounces-72442-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72443-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8OihKpMepmmeKQAAu9opvQ
-	(envelope-from <kvm+bounces-72442-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:34:43 +0100
+	id iJzyAS0fpmkDKwAAu9opvQ
+	(envelope-from <kvm+bounces-72443-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:37:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08F8C1E6B50
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:34:42 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D30C11E6B85
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:37:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6811730F26E9
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 23:29:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2A61E30080B6
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 23:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75EC133C53D;
-	Mon,  2 Mar 2026 23:29:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E96733D4FE;
+	Mon,  2 Mar 2026 23:36:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="TSxh7FtX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SXD10vZC"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870DE175A8B;
-	Mon,  2 Mar 2026 23:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51212D592C
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 23:36:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772494178; cv=none; b=T5sItySvKP35+nTfA0ia3EYtXzWEfvdFzfefTDNCfKvz8smG6JAerDCr+hFxVnRsVhTn8jFu7FsefBHWVwVh6xKPn+oiDHQI5yPzsQUqvckRQBmYLgeDvGs1pgelbdNzx3nwvwslFVGR1AIgyRb+3GlF5leOjsbE32sNh2NLlgE=
+	t=1772494615; cv=none; b=t5dxBbrIorD5KuoSggVbE8od/FlsV6h+GEIAWNEcXkHPqReDrRg/w/vCQKHAYPdtM/wH49mS4+Xlqq8l8lGKt/JZsAcRwK3PFBWbRjTIgOYl46vLtAiQX+fV2Y4+gxtm1DGnOFHmZMCAyD3UIvu5SlnZBWyQW3VnIa0eaInl9j8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772494178; c=relaxed/simple;
-	bh=cGbDhS0SYNM7ywiKo18nxPHughICS0VYorf2j+DgiJI=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=g3hHH+zDDTxkJyHJkey9uTFiwg8Buuc2kdMjBcIzqTb4uwdJKGbZ3baEEkmiTw1MBJy98twra857rLTxrDTGZJmUooBbBjMAGkhymbOHN2w9lR4Xci8UI54puscRomys/MBLyb/QbBMR/mxC0z/bTIeKRQiLV/S2oCG2ym9rR+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=TSxh7FtX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67948C2BC86;
-	Mon,  2 Mar 2026 23:29:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1772494178;
-	bh=cGbDhS0SYNM7ywiKo18nxPHughICS0VYorf2j+DgiJI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TSxh7FtXeAjmq+kHAoxRq7blbJce7OjcAyo5efUABhyEIDg5ECsbidW5Mcj6tsYRQ
-	 DzsG6rRpbWkeoTG5vogARAaO0jUDloWcC8I+5NMkdmsuNVjw9kdp+VtHQVYC7rwOhD
-	 vT8qcareSz2ZYaJdXKgw++Ul/6kRr6+5kG6+y49U=
-Date: Mon, 2 Mar 2026 15:29:34 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: "David Hildenbrand (Arm)" <david@kernel.org>
-Cc: linux-kernel@vger.kernel.org, "linux-mm @ kvack . org"
- <linux-mm@kvack.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>, Vlastimil Babka
- <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan
- <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn
- <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>, David Rientjes
- <rientjes@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>, Alice Ryhl
- <aliceryhl@google.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, Michael
- Ellerman <mpe@ellerman.id.au>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio
- Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Arve =?ISO-8859-1?Q?Hj=F8nnev?=
- =?ISO-8859-1?Q?=E5g?= <arve@android.com>, Todd Kjos <tkjos@android.com>,
- Christian Brauner <brauner@kernel.org>, Carlos Llamas
- <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, H Hartley Sweeten
- <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi
- <rodrigo.vivi@intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>, David
- Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jason
- Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Dimitri
- Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim
- <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, Vincenzo Frascino
- <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, Neal
- Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Miguel Ojeda <ojeda@kernel.org>,
- linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
- intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v1 00/16] mm: cleanups around unmapping / zapping
-Message-Id: <20260302152934.eba1cfede1c9b8cebdf45b09@linux-foundation.org>
-In-Reply-To: <20260227200848.114019-1-david@kernel.org>
-References: <20260227200848.114019-1-david@kernel.org>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1772494615; c=relaxed/simple;
+	bh=RIh46aKXqH8m9feKRZzfWkJHaJQBpvp9DXVobA4WVbc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Xsro8e1BiwEfVb25aoBibGz1na0UK2pgYxgiUwjcSW2KeOZ0Rn5wwwvRih2F4GXWFuAumBCWZwqv1zlgpjJOZqvKJJXDsF+YqoIDPntqkXuUDPw3FArgCG8bRu0ZEGq3/HUvi/yaQrychg5R13kUZfl/LZm0RELvHCQOyfMkqjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SXD10vZC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CD16C19423
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 23:36:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772494615;
+	bh=RIh46aKXqH8m9feKRZzfWkJHaJQBpvp9DXVobA4WVbc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=SXD10vZCs4GpFJAOBf7JAjdvk9SAIbWmSCFb4aWx959RJiU/Html9y+bctmcFqDNm
+	 UUYSLSkVHHUmi1UWW0hbvBW1Sr+59mN54J/e2UHkqicjqAOsfij5qkRRDmpFo/JOs8
+	 aoaIS32Af4BdvtD83T1Y9gDPNjnQE9rM1WhqyQ35xBDYS6zw9lC7qyhhO3MEUkDGep
+	 4Q6ZsTaQQ531O1hmKHTs0s9hZHWbKVXjngaikD2jqE5livl4ARqjxfoZPFlC+MjWFa
+	 U3lGwX8EiN7N65fV3ZzKme/XspvGIS9A9gnPgwIUDroRNCOapdwSsSILiY4qq18FFM
+	 CGLyrlQCwRYXA==
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-65a43a512b0so5723591a12.3
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 15:36:55 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU1EEug9rz87gyVkr0bRpOA0ksCT2Emwbfzga1/XbkeM8fSO26RzmX3/nEJYUZGE/zMyP0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzamosqQhYsEJO2I9OwA6xuCRlkbPEWLeQoGYGWxjq85A/iEkRR
+	QobkQjT5EfQVqkkbvcOwjMgq0JYKF0JBLMrIY5UKReRvqJpRb0R+Cfm/c/SG1nYOAx08sS7U+I3
+	M08S8BKt+WTZDhGkT4mccZdwF4tIM34I=
+X-Received: by 2002:a17:907:3c94:b0:b8e:d162:2404 with SMTP id
+ a640c23a62f3a-b937639ba42mr903123566b.15.1772494614310; Mon, 02 Mar 2026
+ 15:36:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 08F8C1E6B50
+MIME-Version: 1.0
+References: <20260227011306.3111731-1-yosry@kernel.org> <20260227011306.3111731-4-yosry@kernel.org>
+ <aaG_o58_0aHT8Xjg@google.com> <aaHHg2-lcpvkejB8@google.com>
+ <CAO9r8zMdyvAJUvnxH0Scb6z3L51Djb1qpMAzX3M9g7hOkB=ZOQ@mail.gmail.com>
+ <aaHf9Lxx8ap_3DRI@google.com> <CAO9r8zOFWHZ5LHRRKL4KU8TctjNs+vQYDr9OoBmao=eG9Q8C2w@mail.gmail.com>
+ <aaYbx59lQf5beYSv@google.com>
+In-Reply-To: <aaYbx59lQf5beYSv@google.com>
+From: Yosry Ahmed <yosry@kernel.org>
+Date: Mon, 2 Mar 2026 15:36:42 -0800
+X-Gmail-Original-Message-ID: <CAO9r8zOKUv+FiTN8tKu0dP3x_FiH2xMJBSw5XaJ7=hRmZo+oJw@mail.gmail.com>
+X-Gm-Features: AaiRm53x17xg_pWp-r18u63otxmgvoNpw2AFncGIC1DeAiBMKkos0EjuPTxkzTA
+Message-ID: <CAO9r8zOKUv+FiTN8tKu0dP3x_FiH2xMJBSw5XaJ7=hRmZo+oJw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] KVM: x86: Check for injected exceptions before
+ queuing a debug exception
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: D30C11E6B85
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=korg];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72442-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[linux-foundation.org:+];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[linux-foundation.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-72443-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[73];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[akpm@linux-foundation.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux-foundation.org:dkim,linux-foundation.org:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-On Fri, 27 Feb 2026 21:08:31 +0100 "David Hildenbrand (Arm)" <david@kernel.org> wrote:
+On Mon, Mar 2, 2026 at 3:22=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Fri, Feb 27, 2026, Yosry Ahmed wrote:
+> > > > That being said, I hate nested_run_in_progress. It's too close to
+> > > > nested_run_pending and I am pretty sure they will be mixed up.
+> > >
+> > > Agreed, though the fact that name is _too_ close means that, aside fr=
+om the
+> > > potential for disaster (minor detail), it's accurate.
+> > >
+> > > One thought is to hide nested_run_in_progress beyond a KConfig, so th=
+at attempts
+> > > to use it for anything but the sanity check(s) would fail the build. =
+ I don't
+> > > really want to create yet another KVM_PROVE_xxx though, but unlike KV=
+M_PROVE_MMU,
+> > > I think we want to this enabled in production.
+> > >
+> > > I'll chew on this a bit...
+> >
+> > Maybe (if we go this direction) name it very explicitly
+> > warn_on_nested_exception if it's only intended to be used for the
+> > sanity checks?
+>
+> It's not just about exceptions though.  That's the case that has caused a=
+ rash
+> of recent problems, but the rule isn't specific to exceptions, it's very =
+broadly
+> Thou Shalt Not Cancel VMRUN.
+>
+> I think that's where there's some disconnect.  We can't make the nested_r=
+un_pending
+> warnings go away by adding more sanity checks, and I am dead set against =
+removing
+> those warnings.
+>
+> Aha!  Idea.  What if we turn nested_run_pending into a u8, and use a magi=
+c value
+> of '2' to indicate that userspace gained control of the CPU since nested_=
+run_pending
+> was set, and then only WARN on nested_run_pending=3D=3D1?  That way we do=
+n't have to
+> come up with a new name, and there's zero chance of nested_run_pending an=
+d something
+> like nested_run_in_progress getting out of sync.
 
-> A bunch of cleanups around unmapping and zapping. Mostly simplifications,
-> code movements, documentation and renaming of zapping functions.
-
-Thanks, I added this (and the below) to mm.git
-
-I suppressed the dded-to-mm emails to protect the innocent.
-
---- a/rust/kernel/mm/virt.rs~mm-memory-remove-zap_details-parameter-from-zap_page_range_single-fix
-+++ a/rust/kernel/mm/virt.rs
-@@ -123,9 +123,7 @@ impl VmaRef {
-         // SAFETY: By the type invariants, the caller has read access to this VMA, which is
-         // sufficient for this method call. This method has no requirements on the vma flags. The
-         // address range is checked to be within the vma.
--        unsafe {
--            bindings::zap_page_range_single(self.as_ptr(), address, size)
--        };
-+        unsafe { bindings::zap_page_range_single(self.as_ptr(), address, size) };
-     }
- 
-     /// If the [`VM_MIXEDMAP`] flag is set, returns a [`VmaMixedMap`] to this VMA, otherwise
-_
-
+Yeah this should work, the only thing I would change is using macros
+instead of 1 and 2 for readability.
 
