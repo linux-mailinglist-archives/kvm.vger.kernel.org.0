@@ -1,346 +1,228 @@
-Return-Path: <kvm+bounces-72423-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72424-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yP1QL48UpmnlJgAAu9opvQ
-	(envelope-from <kvm+bounces-72423-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 23:51:59 +0100
+	id KLV7HwQJpmmRJAAAu9opvQ
+	(envelope-from <kvm+bounces-72424-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 23:02:44 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45D991E5F1C
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 23:51:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA8B1E4951
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 23:02:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F2B39380469D
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 21:47:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8ED14301DEEB
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 21:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8215138B022;
-	Mon,  2 Mar 2026 21:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8BDC1A6819;
+	Mon,  2 Mar 2026 21:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Zccse3Az"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="QekejI2m";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="NSFmSvdz"
 X-Original-To: kvm@vger.kernel.org
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011062.outbound.protection.outlook.com [40.93.194.62])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67EBB37E682;
-	Mon,  2 Mar 2026 21:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772487466; cv=fail; b=oZbtoR8OCN8dWrvEP6ynOhvIDhDKbAtON4XgPK3ZBxpIztj6n+2WdK6Q8dvX7m+HbGr/nem3OXFDGCI6RZqeJH+aoz1v6cXPPi9sYpwCKhyq2Fz05smP9xjrH3xqEfhBmCM9ocX4znHG+kTihNmbAbjwXCC3sjcV16pTyLhOlLE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772487466; c=relaxed/simple;
-	bh=TKvEodTkiW5FZ8zovTcaqqRclHhYEhq9qj9slYVIaa8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pIPpmhfKwlFyQDgTZS25zKAvJDp3rNBfdRy+Hmfr3gPKfZ+ul21VnsV2WUyyP3D6PmVQZudWZOH5pDVp6WrSEAVyE0ucnUkupaaQXjEO3dflB6e4sVXcEolQZNsASx0wev1qoBvqPW7t8A4Y6EkPFvXTtQ4VCDOy1roP/dA2mqQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Zccse3Az; arc=fail smtp.client-ip=40.93.194.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NRHcb7OOZWSOc7l4Je3/sTZuyUJm0fI0xkOaRAnKykFn5yb9mi5Oi9jpbSzRb5H7fcfTPCgXFf4ApAjBEhUfGjbK+AjLTAwQnECskyKJ62T9oZi9EgCOUBRRkvmzygyx68UsaJpQjL7WYuQc6I2Z5kHyiqy3CuasKdpLL5iO4VjMrlBt+utqaiSwPj8FaDmMogax7s6bI0yM6tonsLsLdO5ZMfCim8QZBOAQC5Kwg9vlGhI9oTBMVwavS0HQmdl5MYVGmMnyvJCrDkHdD6y5e/FAiK9X9gB0ImJiyIxHnKfjV6k9obe6Et4QzgQTSJGa8tX3ORYDFvJd8Vi8gI0Rxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5KabDjPLVSfBS647KfV3I/TxeBbALzYgaCL+9laF59w=;
- b=qrXWGOjnpCfizsJLQi88M006dZ3Kuq+mXNBgDVoWk6+obAvgavYWWWBN+3ccSkfXOmUdGGMYWI5NYAZqpmhPnfga6nlXk+rqnq4n5jp5Ak+dV/IkvqZBqaBLD7JPqSosHAdxW7MTZR7h+AXjlrxBvGrrnls9rLL1UbQA49yV/ce/DfDj9Q4gq74JB7vZE1r52Y/pxoMTLhKRRmCvn1NjttcNBOHvU1sYkkRg70fGFXneZdVrR5BBlp3dv2o17AF9O9ihlkfw/4hm2P1B7teittjn6kpuHYsR0HCSSuTod3Tb7tI50SgQxrRsxnSBn4ti51T6P3VDUYBvYwCVWZr++g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5KabDjPLVSfBS647KfV3I/TxeBbALzYgaCL+9laF59w=;
- b=Zccse3AzVQBtNrje9umwLaYX+4BkAkcfUrbC4QqzkQCaNcxErsmXbWTEk/YzTAl60q3zg98re1JkBZGoQPGc68W/mzY2jTjL+Im2K8S1UiqNPE9+Q1dJsKeujVKHCJ/iPFYrQpoplutsjaEgflCLK8eaee2iIPHfLTh1jqfZycQ=
-Received: from CH5PR02CA0018.namprd02.prod.outlook.com (2603:10b6:610:1ed::20)
- by DS0PR12MB7852.namprd12.prod.outlook.com (2603:10b6:8:147::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.14; Mon, 2 Mar
- 2026 21:37:37 +0000
-Received: from DS2PEPF000061C3.namprd02.prod.outlook.com
- (2603:10b6:610:1ed:cafe::d2) by CH5PR02CA0018.outlook.office365.com
- (2603:10b6:610:1ed::20) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.21 via Frontend Transport; Mon,
- 2 Mar 2026 21:37:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- DS2PEPF000061C3.mail.protection.outlook.com (10.167.23.70) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9654.16 via Frontend Transport; Mon, 2 Mar 2026 21:37:36 +0000
-Received: from nigeria-2635-os.aus-spse (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 2 Mar
- 2026 15:37:34 -0600
-From: Ashish Kalra <Ashish.Kalra@amd.com>
-To: <tglx@kernel.org>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
-	<seanjc@google.com>, <peterz@infradead.org>, <thomas.lendacky@amd.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <ardb@kernel.org>
-CC: <pbonzini@redhat.com>, <aik@amd.com>, <Michael.Roth@amd.com>,
-	<KPrateek.Nayak@amd.com>, <Tycho.Andersen@amd.com>,
-	<Nathan.Fontenot@amd.com>, <jackyli@google.com>, <pgonda@google.com>,
-	<rientjes@google.com>, <jacobhxu@google.com>, <xin@zytor.com>,
-	<pawan.kumar.gupta@linux.intel.com>, <babu.moger@amd.com>,
-	<dyoung@redhat.com>, <nikunj@amd.com>, <john.allen@amd.com>,
-	<darwi@linutronix.de>, <linux-kernel@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<linux-coco@lists.linux.dev>
-Subject: [PATCH v2 7/7] x86/sev: Add debugfs support for RMPOPT
-Date: Mon, 2 Mar 2026 21:37:25 +0000
-Message-ID: <7dcbcbe5dab82fa59056fdb0bfa330cd0da8e62a.1772486459.git.ashish.kalra@amd.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1772486459.git.ashish.kalra@amd.com>
-References: <cover.1772486459.git.ashish.kalra@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29BB16132A
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 21:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772488661; cv=none; b=Wn5O3btWUAwyBMFboGlv3MoAHhcKQCgHHfXnuGspPF+K003mv30HF6bCyP8DSQAiAKxsKdAoHxAGeTxV6QhVaZFGPlKjxDENT386NxiQHwqp18LVHlkYcqW0VdP/NLiha1MqCITFPvhnz4zlepM0aE0Vjy68iZpSyPMaiysM/Z4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772488661; c=relaxed/simple;
+	bh=rkLPlMUYiUKbkvwZg90We9QKLp263vaP+3vQEnbTceA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u6/sWSOG8q35EMlcOuA4nGgqyH0vKBkNzqWFB3H0IPb46LNvVoKYVUv/2zqwccamuN1VChTYCJ+A3GDbb678jaxw5JHx2+TRNrYxGoG/FztYpHPawkfiU5gj1zeF97gJXNeoy/Jn7JX7mooJbn2Xuu44LjA2MJ4hLsrwLm/xtoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=QekejI2m; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=NSFmSvdz; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 622KnxrV959075
+	for <kvm@vger.kernel.org>; Mon, 2 Mar 2026 21:57:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=kKGEnQyVqddtbVsVaKzEMP9/
+	0r9eYevQQlpSxYQoULw=; b=QekejI2mpiNgKb1T0/vwrfrCoNAOsem1o8Sw/ucO
+	FHzM/wRfm4PxxcRiftZRmvgH5WcI7YV7n9cfJOH5RtmUKFgnzgo+lE0izVwDhVgT
+	QtJmS0rUZLV9vNYNyjdaZj6nhHI9+BRckTWrNWV1pWx1io7ydCOgP+IA7E3vnuMQ
+	JU8PGldNHy9DY+3C1TyWRmJY+XK7YhYgcIvKBR964pyrJ9V+KTNFTmJznWZLyvGy
+	mbwpAETh2U8fhYV81pQU6KIjAu98mxVBOPWvz02FgrDALKS7ZzlHBkNtND91bXAg
+	8XN7sDhqjzCTy0GT1hJ0TBFV7x/V+DMlyIfvbeIl3J/l/g==
+Received: from mail-dl1-f70.google.com (mail-dl1-f70.google.com [74.125.82.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cnhx585nf-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 21:57:39 +0000 (GMT)
+Received: by mail-dl1-f70.google.com with SMTP id a92af1059eb24-1275c2ae713so8279727c88.0
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 13:57:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1772488659; x=1773093459; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kKGEnQyVqddtbVsVaKzEMP9/0r9eYevQQlpSxYQoULw=;
+        b=NSFmSvdzRr+YQgrsM/r1waEQoz4c1J+ndTnpl2VtyiukRkc74ZHdA1NMXxcbR5n1sN
+         fnVnTWtMHHgC5KLV3X+bFOkzGbodAmkF9aUEuv6cKYLFO5al5eN7444ifFdmWHyFWPL/
+         yTZmZNTMm5t4feba3848R92qOuxYwJyvvftftgJsqv4piWM9hJq6QFTvKjBI0O3kWH2t
+         qHQdwLzloMPjvVqtwX/OcWxAKS7SFv0wCzFjCqxQVYP3+x4wY+Qvo8b4Zt2LGqgcJHEU
+         TmHS4CraDA47k4Gzgis8ADDtR2A3WAo3dJX4sMzDiEtEMRK9co2xEoZ8JNughnJb6w8e
+         DN3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772488659; x=1773093459;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kKGEnQyVqddtbVsVaKzEMP9/0r9eYevQQlpSxYQoULw=;
+        b=Vw6G9qYp2HzJE9SukwfMeqLBh2xHRTkE1zEUGVOPGrDsyYoOHvCX/AOwiR5kOC3KGF
+         ARgcYi9yj/+SHvJHWlaRBqLtcGf8aXP4HYEjLCYBLwkGNndamLWhugEkDyqB301tFb3e
+         3aklyv6rMt2rg/m30IcK82T70UrIRDCv6uSK6JleataZ3AxHRXjE5wp4RtbSddgiaE8n
+         6TJkJIUMCIfh4H5byhklUGyJ1yHk3oLEn7FTdTUR2gU8XYz6VzRSvcQNpfqfEEBHxxkg
+         S0CpgTQyVlU4ILpUxS5HhCy249OhqvrdIAr8Ogt6cak+sdANX83JN52dZOgKZKdZBVVN
+         +WtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXLDT83jpPLaPlUcDLc31apXMuJL2CEG2c8s8tYUHfK1/CKp0iXZnKSnS2fcpcARj4Ga8c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxbm/JOvp3Hxs8cBNe3MSb6WZT7qO/J2+UJV0wFTfDCmlQvU3X2
+	mdGjwswuSr35W4CASKlKQDY0P/2drM+uiZUke3c+yilmZs4/In63euUjlOLLTf2Lv+ZouWuSWVJ
+	obHHtSePWXmknYoIUn6fat9LKdnHkf5khxQV+A0Dz05RXA/SjbotseMs=
+X-Gm-Gg: ATEYQzx1E5WFXfO3JUdljJhwp8tVHpc2HcZQ6Ok9cuvONAn41p9Cc771FbDpYAK+awm
+	uawMvJgqN4waXP9RIXfD2svRymgGT/7k+i8rZYRjQgxPGtuRk0kMJ9ijdJK3S96Z+mYRhmQeM96
+	+m/V6msyq+YsAdqyTX9sNiTw+V8wQBesPz5g7SuzfkzjCVh1Z8C4pOqScOVBEk79plR+xWyEcEH
+	AQvurgRrr/1vCtocLEDg5sBeDg5l7/mQzvrBGXQuoPmUPvKFGPDpCNvxXGVUPfL1/Jx2TSzlXWE
+	6mQCY/LGogBXdnlwvISMwYmcbmWHqU56c1C9ETHJc5eBwisPal3pw1qsTT38e4G+WJyMTEtXbu+
+	PWbv8hpHEXZeIC4kgGAuYwwBQTjJXR8Q=
+X-Received: by 2002:a05:7022:4584:b0:119:e56b:9590 with SMTP id a92af1059eb24-1278fcf8749mr7439095c88.21.1772488658569;
+        Mon, 02 Mar 2026 13:57:38 -0800 (PST)
+X-Received: by 2002:a05:7022:4584:b0:119:e56b:9590 with SMTP id a92af1059eb24-1278fcf8749mr7439077c88.21.1772488658006;
+        Mon, 02 Mar 2026 13:57:38 -0800 (PST)
+Received: from localhost ([140.82.166.162])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2bdf662eb6dsm7208496eec.2.2026.03.02.13.57.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Mar 2026 13:57:37 -0800 (PST)
+Date: Mon, 2 Mar 2026 15:57:36 -0600
+From: Andrew Jones <andrew.jones@oss.qualcomm.com>
+To: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+Cc: linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
+        kvm@vger.kernel.org, Alexandre Ghiti <alex@ghiti.fr>,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Anup Patel <anup@brainfault.org>, Atish Patra <atish.patra@linux.dev>,
+        Albert Ou <aou@eecs.berkeley.edu>, Jiakai Xu <jiakaiPeanut@gmail.com>
+Subject: Re: [PATCH v9 2/3] KVM: selftests: Refactor UAPI tests into
+ dedicated function
+Message-ID: <kxssxvwvt2dyzznftbuudkxt7gonnceou4jrjswyhkhg5vrkgh@26sivnbte6mq>
+References: <20260228005355.823048-1-xujiakai2025@iscas.ac.cn>
+ <20260228005355.823048-3-xujiakai2025@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF000061C3:EE_|DS0PR12MB7852:EE_
-X-MS-Office365-Filtering-Correlation-Id: e22d2292-e6a6-4361-2336-08de78a3ec0b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|7416014|82310400026|921020;
-X-Microsoft-Antispam-Message-Info:
-	HJ5GmPviqbFmeMs92ggSGzjt0DNjsENS28pqnqrMS5rkQWnVcRKgt87Oa5cuwtzFmIiKR+KVEN8bfs3JfWQzqGx9j0ksvwxROzurUWr7zwXZUvyONDqB5D6a5YThX1+w+OMUxJLKXfmIKS88tEp03AF8yeJ+BykirsW5njuN9O11pwp+d3X7wxE0oUUlniZo6CWphoCmKP3hTZh4DrjYtBR83dYu1xQGzZ8242JhGlwkR0dFrHV8TP/LGmP42OmVfxIjLTrPA5mmCZ3I7uO3ewLOBYXFj92SrpIt5TaTol+UIvcYGI2KiTg8VqzG1gjOR26vQjfAZq/TqCH8C2kTkpC5irY4dqEB6M69RuSDcJ2y/rYxgjNKI6cQ0W+53BPBW01FQLyTYIgmvsP44cl42Q6nPOlBdtkPRhcNebmO8ETU+UlA82Mw5ieU8vmCymTO5rTEkYWnBYF4hc3+IFEgpHjEatv+v2q5LR0Yc8yjocywEhdICeZVsNJXbpseMsW1jWtp3ltQuEAezX+3THlhCJ3LASA2HKzuHDIPnvhD5Orgf1JYIafkDkt/G2mOWFiklX/5F1PSTry3Cwm1QOg5cybyabOgkxEu03EI6MWOzVigNt6n+uSEJT02nx8hWpyw8hHXcKUmQSzaV15WAJlp/3X/nKaXUUVa/DR8qi6di0x8TLM0yu9S957Fgll/0GFSU5kBfxH0MYC51GlcaTCBEnNRIb3Z8FpFi2/gXJtkWnG2Tc1tM+mEK/OE8wh6Mgt4dEk3/gBTrG1fsw+NuN+CTdaBod0rdYjvEx9JxWRCUwODVopkesBsmh95LllqHUpyleX4yUAS06/RrOPJwCXHwIDwTinL2+k1NsYW4lII7BA=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(7416014)(82310400026)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	wRtEnaRKdKBEJ5/xH4N/vcmJoqK73iHDXFtk3NpBK8eZ+tSMaEVl4cAn2undZVuAsMk9rHYguEk7EZb2c3b82vYcRq84yi6ESAqzibhG9YTnjCBUvwF+xRVk6BRCX34lAK/8awBkWYgMrRF4tGXe3iLmaVFWPZ+qkgxw7LdUoqY+eSUQvQd7cKcTHPDSROV7DH/mS1zckR4KZ1CuB7Z+OGlkOWcMCgUFe2pt8OmzPV4ILSS2aMLdj2PqLll6iVO/WF6mhuwxfGdczV5FssRVCbQXZre8NN7cdVbjPNshjSgFooEeo1cblnnYT8x7CL21erP7IapA8xBZ9a0Ey6yeqYAwx+ok9wcp5N/mFHSNFuuJbev0x8iim7r2wrnTTl+ZiLIuNImx0sabGlQG+XGpScBT6ebGIuz+H/s9svZ69gJiI63frwxdNESN9sFE9CaI
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2026 21:37:36.7596
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e22d2292-e6a6-4361-2336-08de78a3ec0b
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF000061C3.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7852
-X-Rspamd-Queue-Id: 45D991E5F1C
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260228005355.823048-3-xujiakai2025@iscas.ac.cn>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzAyMDE2NCBTYWx0ZWRfX0ltHyfhpGo9J
+ 3A3izZMxqZp1+twupRi/fyj1BB8ownsFu6uss4la8MWmiG3qyQb3Fg2q3HZ6k5FVkl/O+UcTfEU
+ B2yJZ0AiMLdgoTzDaSFdylTBGHVAUpEEoeC7yGruvAoQxQ7DeH0NM/Hgcv57sQwEiMkE45bxq1t
+ JpuKZIug1uugpO4C3AN9W3WPt9nDCdmITD5v9GSScxOkVMlrcctDWVssuLUJIl4p8VDaZX6amv3
+ ZdMvVD+ZgaqTH1hobVLoh5AzELxiZh/j9ae9PxJrrJGO8QNQxcjHM4MOTL2QmNtqErpq/a1nkyC
+ zLJVZ0dRIpn6MWhBlooddTUxmWvHguEP8cu6JvjEJOaXeexJPJ6WRSHWmt/MWspQGDSr6wZMLcA
+ II1D2xRMVvxvpWp3WJtFS5YNWSpQGTyAoB4tdf9SXUm7dpUtDuBa+Rd9FuHbB6ZLWhAHc5lUJk+
+ JUc1jv6P0Wl0nzVaETg==
+X-Authority-Analysis: v=2.4 cv=T9CBjvKQ c=1 sm=1 tr=0 ts=69a607d3 cx=c_pps
+ a=SvEPeNj+VMjHSW//kvnxuw==:117 a=cvcws7F5//HeuvjG1O1erQ==:17
+ a=kj9zAlcOel0A:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22
+ a=EUspDBNiAAAA:8 a=pGLkceISAAAA:8 a=oAJ8CtkVvmEuxm3YF40A:9 a=CjuIK1q_8ugA:10
+ a=Kq8ClHjjuc5pcCNDwlU0:22
+X-Proofpoint-GUID: y5Gj-Hhh3mwHOF5K-sqhoMKSP-OXpMzO
+X-Proofpoint-ORIG-GUID: y5Gj-Hhh3mwHOF5K-sqhoMKSP-OXpMzO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-02_05,2026-03-02_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 adultscore=0 spamscore=0 lowpriorityscore=0 bulkscore=0
+ priorityscore=1501 clxscore=1015 suspectscore=0 malwarescore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2602130000
+ definitions=main-2603020164
+X-Rspamd-Queue-Id: 1DA8B1E4951
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [1.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72423-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72424-lists,kvm=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lists.infradead.org,vger.kernel.org,ghiti.fr,redhat.com,kernel.org,dabbelt.com,ventanamicro.com,brainfault.org,linux.dev,eecs.berkeley.edu,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Ashish.Kalra@amd.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,oss.qualcomm.com:dkim,qualcomm.com:dkim,qualcomm.com:email];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:dkim,amd.com:email,amd.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew.jones@oss.qualcomm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+On Sat, Feb 28, 2026 at 12:53:54AM +0000, Jiakai Xu wrote:
+> Move steal time UAPI tests from steal_time_init() into a separate
+> check_steal_time_uapi() function for better code organization and
+> maintainability.
+> 
+> Previously, x86 and ARM64 architectures performed UAPI validation
+> tests within steal_time_init(), mixing initialization logic with
+> uapi tests.
+> 
+> Changes by architecture:
+> x86_64:
+>   - Extract MSR reserved bits test from steal_time_init()
+>   - Move to check_steal_time_uapi() which tests that setting
+>     MSR_KVM_STEAL_TIME with KVM_STEAL_RESERVED_MASK fails
+> ARM64:
+>   - Extract three UAPI tests from steal_time_init():
+>      Device attribute support check
+>      Misaligned IPA rejection (EINVAL)
+>      Duplicate IPA setting rejection (EEXIST)
+>   - Move all tests to check_steal_time_uapi()
+> RISC-V:
+>   - Add empty check_steal_time_uapi() stub for future use
+>   - No changes to steal_time_init() (had no tests to extract)
+> 
+> The new check_steal_time_uapi() function:
+>   - Is called once before the per-VCPU test loop
+> 
+> No functional change intended.
+> 
+> Suggested-by: Andrew Jones <andrew.jones@oss.qualcomm.com>
+> Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+> Signed-off-by: Jiakai Xu <jiakaiPeanut@gmail.com>
+> ---
+> V8 -> V9: Created a temporary VM with one vCPU in
+>            check_steal_time_uapi() instead of adding extra vCPUs to the
+>            main VM.
+>           Made check_steal_time_uapi() parameterless for all architectures.
+> V7 -> V8: Used ST_GPA_BASE directly instead of
+>            st_gva[]/sync_global_to_guest() in x86_64 and ARM64
+>            check_steal_time_uapi().
+>           Created a temporary vcpu in ARM64 check_steal_time_uapi() to
+>            avoid EEXIST when steal_time_init() later sets IPA for vcpu[0].
+>           Removed unnecessary comment in RISC-V check_steal_time_uapi().
+> ---
+>  tools/testing/selftests/kvm/steal_time.c | 67 ++++++++++++++++++------
+>  1 file changed, 51 insertions(+), 16 deletions(-)
 
-Add a debugfs interface to report per-CPU RMPOPT status across all
-system RAM.
-
-To dump the per-CPU RMPOPT status for all system RAM:
-
-/sys/kernel/debug/rmpopt# cat rmpopt-table
-
-Memory @  0GB: CPU(s): none
-Memory @  1GB: CPU(s): none
-Memory @  2GB: CPU(s): 0-1023
-Memory @  3GB: CPU(s): 0-1023
-Memory @  4GB: CPU(s): none
-Memory @  5GB: CPU(s): 0-1023
-Memory @  6GB: CPU(s): 0-1023
-Memory @  7GB: CPU(s): 0-1023
-...
-Memory @1025GB: CPU(s): 0-1023
-Memory @1026GB: CPU(s): 0-1023
-Memory @1027GB: CPU(s): 0-1023
-Memory @1028GB: CPU(s): 0-1023
-Memory @1029GB: CPU(s): 0-1023
-Memory @1030GB: CPU(s): 0-1023
-Memory @1031GB: CPU(s): 0-1023
-Memory @1032GB: CPU(s): 0-1023
-Memory @1033GB: CPU(s): 0-1023
-Memory @1034GB: CPU(s): 0-1023
-Memory @1035GB: CPU(s): 0-1023
-Memory @1036GB: CPU(s): 0-1023
-Memory @1037GB: CPU(s): 0-1023
-Memory @1038GB: CPU(s): none
-
-Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
----
- arch/x86/virt/svm/sev.c | 101 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 100 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index 4dd5a525ad32..49bd7ba76169 100644
---- a/arch/x86/virt/svm/sev.c
-+++ b/arch/x86/virt/svm/sev.c
-@@ -20,6 +20,8 @@
- #include <linux/amd-iommu.h>
- #include <linux/nospec.h>
- #include <linux/kthread.h>
-+#include <linux/debugfs.h>
-+#include <linux/seq_file.h>
- 
- #include <asm/sev.h>
- #include <asm/processor.h>
-@@ -135,6 +137,13 @@ static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
- 
- static unsigned long snp_nr_leaked_pages;
- 
-+static cpumask_t rmpopt_cpumask;
-+static struct dentry *rmpopt_debugfs;
-+
-+struct seq_paddr {
-+	phys_addr_t next_seq_paddr;
-+};
-+
- #undef pr_fmt
- #define pr_fmt(fmt)	"SEV-SNP: " fmt
- 
-@@ -515,9 +524,14 @@ static bool __init setup_rmptable(void)
-  */
- static void rmpopt(void *val)
- {
-+	bool optimized;
-+
- 	asm volatile(".byte 0xf2, 0x0f, 0x01, 0xfc"
--		     : : "a" ((u64)val & PUD_MASK), "c" ((u64)val & 0x1)
-+		     : "=@ccc" (optimized)
-+		     : "a" ((u64)val & PUD_MASK), "c" ((u64)val & 0x1)
- 		     : "memory", "cc");
-+
-+	assign_cpu(smp_processor_id(), &rmpopt_cpumask, optimized);
- }
- 
- static int rmpopt_kthread(void *__unused)
-@@ -563,6 +577,89 @@ static void rmpopt_all_physmem(void)
- 		wake_up_process(rmpopt_task);
- }
- 
-+/*
-+ * start() can be called multiple times if allocated buffer has overflowed
-+ * and bigger buffer is allocated.
-+ */
-+static void *rmpopt_table_seq_start(struct seq_file *seq, loff_t *pos)
-+{
-+	phys_addr_t end_paddr = ALIGN(PFN_PHYS(max_pfn), PUD_SIZE);
-+	struct seq_paddr *p = seq->private;
-+
-+	if (*pos == 0) {
-+		p->next_seq_paddr = ALIGN_DOWN(PFN_PHYS(min_low_pfn), PUD_SIZE);
-+		return &p->next_seq_paddr;
-+	}
-+
-+	if (p->next_seq_paddr == end_paddr)
-+		return NULL;
-+
-+	return &p->next_seq_paddr;
-+}
-+
-+static void *rmpopt_table_seq_next(struct seq_file *seq, void *v, loff_t *pos)
-+{
-+	phys_addr_t end_paddr = ALIGN(PFN_PHYS(max_pfn), PUD_SIZE);
-+	phys_addr_t *curr_paddr = v;
-+
-+	(*pos)++;
-+	if (*curr_paddr == end_paddr)
-+		return NULL;
-+	*curr_paddr += PUD_SIZE;
-+
-+	return curr_paddr;
-+}
-+
-+static void rmpopt_table_seq_stop(struct seq_file *seq, void *v)
-+{
-+}
-+
-+static int rmpopt_table_seq_show(struct seq_file *seq, void *v)
-+{
-+	phys_addr_t *curr_paddr = v;
-+
-+	seq_printf(seq, "Memory @%3lluGB: ", *curr_paddr >> PUD_SHIFT);
-+
-+	cpumask_clear(&rmpopt_cpumask);
-+	on_each_cpu_mask(cpu_online_mask, rmpopt,
-+			 (void *)(*curr_paddr | RMPOPT_FUNC_REPORT_STATUS),
-+			 true);
-+
-+	if (cpumask_empty(&rmpopt_cpumask))
-+		seq_puts(seq, "CPU(s): none\n");
-+	else
-+		seq_printf(seq, "CPU(s): %*pbl\n", cpumask_pr_args(&rmpopt_cpumask));
-+
-+	return 0;
-+}
-+
-+static const struct seq_operations rmpopt_table_seq_ops = {
-+	.start = rmpopt_table_seq_start,
-+	.next = rmpopt_table_seq_next,
-+	.stop = rmpopt_table_seq_stop,
-+	.show = rmpopt_table_seq_show
-+};
-+
-+static int rmpopt_table_open(struct inode *inode, struct file *file)
-+{
-+	return seq_open_private(file, &rmpopt_table_seq_ops, sizeof(struct seq_paddr));
-+}
-+
-+static const struct file_operations rmpopt_table_fops = {
-+	.open = rmpopt_table_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = seq_release_private,
-+};
-+
-+static void rmpopt_debugfs_setup(void)
-+{
-+	rmpopt_debugfs = debugfs_create_dir("rmpopt", arch_debugfs_dir);
-+
-+	debugfs_create_file("rmpopt-table", 0444, rmpopt_debugfs,
-+			    NULL, &rmpopt_table_fops);
-+}
-+
- static void __configure_rmpopt(void *val)
- {
- 	u64 rmpopt_base = ((u64)val & PUD_MASK) | MSR_AMD64_RMPOPT_ENABLE;
-@@ -611,6 +708,8 @@ static __init void configure_and_enable_rmpopt(void)
- 	 * optimizations on all physical memory.
- 	 */
- 	rmpopt_all_physmem();
-+
-+	rmpopt_debugfs_setup();
- }
- 
- /*
--- 
-2.43.0
-
+Reviewed-by: Andrew Jones <andrew.jones@oss.qualcomm.com>
 
