@@ -1,161 +1,185 @@
-Return-Path: <kvm+bounces-72351-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72352-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uIIeEGxUpWnR9AUAu9opvQ
-	(envelope-from <kvm+bounces-72351-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 10:12:12 +0100
+	id eIrlDTVhpWlX/AUAu9opvQ
+	(envelope-from <kvm+bounces-72352-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 11:06:45 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D56901D558F
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 10:12:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A052B1D609B
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 11:06:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8C0D030642C8
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 09:07:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 559D23059AB7
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 10:01:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C47D7385500;
-	Mon,  2 Mar 2026 09:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C27399009;
+	Mon,  2 Mar 2026 10:01:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RJXZT90X"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pKcMeK5z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 956B138CFFD;
-	Mon,  2 Mar 2026 09:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3ECA39524C
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 10:01:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772442474; cv=none; b=f83ddYe32DKZ3tQD6b9o5Hk5IkQ5hU22WvI3gmr2M71gOdSc53vk7KvcSuC1v+Kd+vl5nhtJIkAr7c5mZ/4MCFnC6pvR3G/cyzdqMj/DMbmXFwi0rfhcYnXYebwfbDjfIF4wLoKNIu0wx/oWAPpUUi+QK5P7MAo2Fi5WeCm7bm8=
+	t=1772445675; cv=none; b=q/04hN25uhXd99pKyjkQl3xha1+2iXufNhbkYe/bCCOMd4dBxWcTK6Qhfdatg+5kExC55LQZmpdkGa8PbT/I8onvvhIlaIAld2Uufxa5BaANiOBbjAdtjTVKqbNX5WPAIwh485Wxtgx3+wLxNWkLxsX5+ZYTQf+z1MMm1eB6GYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772442474; c=relaxed/simple;
-	bh=RrNvne41GkESDMIdLFaFc2z9SiWAsQLvTma2o3qaeA8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KR295580PZdapvI7liHvTLAEvhuybjDQtTGL8H28VU7XhI/gJs57y4sviEe2Itb6pkG+W0Gvb8hw7+5AcHyaCWl5FkZcmNTZ2Ntr/WhxlgGAcYHcxzR6kutEQMIzrtNTXMngBnQPUHRLlQch65/pDiX+YFfivbZnAu8Ip4clWAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RJXZT90X; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772442473; x=1803978473;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=RrNvne41GkESDMIdLFaFc2z9SiWAsQLvTma2o3qaeA8=;
-  b=RJXZT90XTc/HjSXa+nvoIf+PmN1y3RcpRj98KU8/4s6SRFmHz3ujB5pZ
-   bEX8VXHxBATnke+zwIzry9VNYBOvgcMrttmp0p0cBFmtyiCieTw98mElG
-   Bnv4rCZqJGGF4mfclwXTKf46onKLW1zsi50RpMa/71pHVM0JJ/XeD9i/x
-   srviMzqCmEjNgfWCqzB7Lfx0r7nKjXZmwJj9K73FiVCnnFSvTykggXTz5
-   Qr5FbGWbvhIhXgrmmauOl5cd0kLSihW69UpOOHFHFrDUfPa0a4DF5Dvcg
-   NphUqUkjnPVasBiOYOsSBQDm/PXGecoHyk8vRiSI7oEx68QL4Sy/GVuI+
-   Q==;
-X-CSE-ConnectionGUID: wT2MvpicSTSetF8ScqqC3Q==
-X-CSE-MsgGUID: kQ3WADQ6SxGlrM35VIQSPA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11716"; a="72645786"
-X-IronPort-AV: E=Sophos;i="6.21,319,1763452800"; 
-   d="scan'208";a="72645786"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 01:07:52 -0800
-X-CSE-ConnectionGUID: 4TMUvlNUTmedC+msUFah9A==
-X-CSE-MsgGUID: 0zTg/96CQPqeuAf+UHFtPQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,319,1763452800"; 
-   d="scan'208";a="240610170"
-Received: from khuang2-desk.gar.corp.intel.com ([10.124.220.16])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 01:07:49 -0800
-From: Kai Huang <kai.huang@intel.com>
-To: seanjc@google.com,
-	pbonzini@redhat.com
-Cc: shuah@kernel.org,
-	shivankg@amd.com,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kai Huang <kai.huang@intel.com>
-Subject: [PATCH] KVM: selftests: Increase 'maxnode' for guest_memfd tests
-Date: Mon,  2 Mar 2026 22:07:39 +1300
-Message-ID: <20260302090739.464786-1-kai.huang@intel.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1772445675; c=relaxed/simple;
+	bh=XcDBiF+tm+FToq8gICWmU+m/nRh9Ny7buWewqeSSE5s=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sUNRtkBRF7quAylRkJDJsCWMenZDNMjP3voZh/dljqtafnC7dTSbqMxexQlu6DlhMj1UAOmU3VYZjFRt1pN2DSmBP6cYSWguMuZ9mf9Yu4xlgV666Kh5Hc26moT7GpjGhN/Gwg8SCvSm+Ker/r7SkKb1lbbdHvZSbSru362p5GM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pKcMeK5z; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4836b7c302fso43405935e9.1
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 02:01:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772445672; x=1773050472; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tjS8FX592qmj/rFkafjn+lojx6cnlsSGWxK3ppaLTGU=;
+        b=pKcMeK5zFCeuyEDqN9uC2KaA70X8zgbgjnqAslsyyaFYEXtkS9V6COy+BZIyCzxSmQ
+         pOEovWK8dwfeI8hGnwiaqcOR0b2SAyvlou6AEigYeorhF6m2bin/+hJiFLV9gNI5yJ9X
+         5VbDb+pbUiHmxG/B6jxauf6w66cmYQoGlfDcBBhNz9g73G6Xfxxfk2cqgDlaiRQTKaSH
+         2TMAEi4ATjIBTiC2y3HnwO5ZQIREWjEyEayiTutzK8+3fCDcwXrIjy29bqj+MgfJewS+
+         TQdyTuXurfVHvukuPqLt4qL+/V7ElyQD1yki55tyknaGoKa4sg5MjKF7WPiUKOM217sF
+         9gCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772445672; x=1773050472;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tjS8FX592qmj/rFkafjn+lojx6cnlsSGWxK3ppaLTGU=;
+        b=S0niO+cRNQbMH74IAarm4YOBEp2FoUYVkxpDGfK7UBYfjqrrZ6kfQE+4D4lgpIifaI
+         2ASv3q5m8GqKliEoFBPyXKWYWfVjSV4r+szTrHKbU+0Zt2sBsh2kvYJIU7zzEZJlQQGD
+         V1cdk6bLC+GKklDLzYZ+uZmqfb8LX6+yK1Kyys6pn46G1ygWfb0RZM2n41xv40rw9sjQ
+         LZ3zP7Dt5/zTp7bqA01Y+XM2Ro8XPRA9J75QiI4z5NGgHi6BHK+RUZYrVEupLEs5vRcP
+         oLauLvLUWLZRLXmduV/ZZZCX9ojTZOGCQHv04vv7YWgoDmpZGYSC3wMSzVKW9StdnA2M
+         Cm3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUTIOySZhn0ZgvJy+QssGvNlZY8f0CS1+0BnYYvASLW7X8D5P9XEXUyCUXjerpM1ZipzQY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYxJxjHZidAuIWkfhhWiTU1+MvYzjuCQTNTjm6bztO/bzxjZDg
+	0jtrQ7S6vuLSY+kML84+vVxpcRM55jxvF1pwGJZqfJREkUcAUXjU1n/wpCr6ctz6dRWVpPfdLbr
+	1ESet2+4ifEPl5KANwQ==
+X-Received: from wmbg9.prod.google.com ([2002:a05:600c:a409:b0:483:7827:ade4])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:3110:b0:480:2521:4d92 with SMTP id 5b1f17b1804b1-483c9c23ffbmr196674855e9.24.1772445671732;
+ Mon, 02 Mar 2026 02:01:11 -0800 (PST)
+Date: Mon, 2 Mar 2026 10:01:10 +0000
+In-Reply-To: <8a27e9ac-2025-4724-a46d-0a7c90894ba7@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20260227200848.114019-1-david@kernel.org> <20260227200848.114019-3-david@kernel.org>
+ <aaLh2BxSgC9Jl5iS@google.com> <8a27e9ac-2025-4724-a46d-0a7c90894ba7@kernel.org>
+Message-ID: <aaVf5gv4XjV6Ddt-@google.com>
+Subject: Re: [PATCH v1 02/16] mm/memory: remove "zap_details" parameter from zap_page_range_single()
+From: Alice Ryhl <aliceryhl@google.com>
+To: "David Hildenbrand (Arm)" <david@kernel.org>
+Cc: linux-kernel@vger.kernel.org, 
+	"linux-mm @ kvack . org" <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, 
+	Pedro Falcato <pfalcato@suse.de>, David Rientjes <rientjes@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
+	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, 
+	H Hartley Sweeten <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
+	Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+	Dimitri Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, 
+	Vincenzo Frascino <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
+	linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org, 
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="utf-8"
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72351-lists,kvm=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
+	TAGGED_FROM(0.00)[bounces-72352-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kai.huang@intel.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[73];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:mid,intel.com:dkim,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D56901D558F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A052B1D609B
 X-Rspamd-Action: no action
 
-Increase 'maxnode' when using 'get_mempolicy' syscall in guest_memfd
-mmap and NUMA policy tests to fix a failure on one Intel GNR platform.
+On Mon, Mar 02, 2026 at 09:18:45AM +0100, David Hildenbrand (Arm) wrote:
+> On 2/28/26 13:38, Alice Ryhl wrote:
+> > On Fri, Feb 27, 2026 at 09:08:33PM +0100, David Hildenbrand (Arm) wrote:
+> >> Nobody except memory.c should really set that parameter to non-NULL. So
+> >> let's just drop it and make unmap_mapping_range_vma() use
+> >> zap_page_range_single_batched() instead.
+> >>
+> >> Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
+> > 
+> >> diff --git a/rust/kernel/mm/virt.rs b/rust/kernel/mm/virt.rs
+> >> index da21d65ccd20..b8e59e4420f3 100644
+> >> --- a/rust/kernel/mm/virt.rs
+> >> +++ b/rust/kernel/mm/virt.rs
+> >> @@ -124,7 +124,7 @@ pub fn zap_page_range_single(&self, address: usize, size: usize) {
+> >>          // sufficient for this method call. This method has no requirements on the vma flags. The
+> >>          // address range is checked to be within the vma.
+> >>          unsafe {
+> >> -            bindings::zap_page_range_single(self.as_ptr(), address, size, core::ptr::null_mut())
+> >> +            bindings::zap_page_range_single(self.as_ptr(), address, size)
+> >>          };
+> > 
+> > Please run rustfmt on Rust changes. Here, rustfmt leads to this being
+> > formatted on a single line:
+> 
+> Having to run tooling I don't even have installed when removing a single
+> function parameter; did not expect that :)
 
-On a CXL-capable platform, the memory affinity of CXL memory regions may
-not be covered by the SRAT.  Since each CXL memory region is enumerated
-via a CFMWS table, at early boot the kernel parses all CFMWS tables to
-detect all CXL memory regions and assigns a 'faked' NUMA node for each
-of them, starting from the highest NUMA node ID enumerated via the SRAT.
+Well, rustfmt comes with the compiler, and it would be ideal to build
+test changes before sending them :)
 
-This increases the 'nr_node_ids'.  E.g., on the aforementioned Intel GNR
-platform which has 4 NUMA nodes and 18 CFMWS tables, it increases to 22.
+But no worries, I took care of testing it. Thanks for taking the time to
+update the Rust code as well.
 
-This results in the 'get_mempolicy' syscall failure on that platform,
-because currently 'maxnode' is hard-coded to 8 but the 'get_mempolicy'
-syscall requires the 'maxnode' to be not smaller than the 'nr_node_ids'.
+Documentation/rust/quick-start.rst has details for most distros.
 
-Increase the 'maxnode' to the number of bits of 'unsigned long' (i.e.,
-64 on 64-bit systems) to fix this.  Note the 'nodemask' is 'unsigned
-long', so it makes sense to set 'maxnode' to bits of 'unsigned long'
-anyway.
-
-This may not cover all systems.  Perhaps a better way is to always set
-the 'nodemask' and 'maxnode' based on the actual maximum NUMA node ID on
-the system, but for now just do the simple way.
-
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
- tools/testing/selftests/kvm/guest_memfd_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index 618c937f3c90..b434612bc3ec 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -80,7 +80,7 @@ static void test_mbind(int fd, size_t total_size)
- {
- 	const unsigned long nodemask_0 = 1; /* nid: 0 */
- 	unsigned long nodemask = 0;
--	unsigned long maxnode = 8;
-+	unsigned long maxnode = sizeof(nodemask) * 8;
- 	int policy;
- 	char *mem;
- 	int ret;
-
-base-commit: a91cc48246605af9aeef1edd32232976d74d9502
--- 
-2.53.0
-
+Alice
 
