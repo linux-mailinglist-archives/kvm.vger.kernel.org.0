@@ -1,238 +1,559 @@
-Return-Path: <kvm+bounces-72388-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72390-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KNInBjiqpWmpDgAAu9opvQ
-	(envelope-from <kvm+bounces-72388-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:18:16 +0100
+	id OOhbJA6tpWn4EAAAu9opvQ
+	(envelope-from <kvm+bounces-72390-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:30:22 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EF691DBA8D
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:18:15 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 090201DBDE9
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:30:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8487530EEDFD
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 15:12:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B791A308AA98
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 15:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31F0411604;
-	Mon,  2 Mar 2026 15:12:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEDD942048;
+	Mon,  2 Mar 2026 15:26:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WNrY60Ac";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="FiKaHq+2"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eLSQ5iWK";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="uJf/FZiN"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6A040F8D8
-	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 15:12:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772464342; cv=none; b=b8BKKnntCWH4H/T6/fhLjLjt+L11iUDDYeSf2QhW8PAgXr0ipBQ6X0GmxrlDC14kWFdq+YW1aaKJJykqAgcq9GmaoPrgWxutmmH8jH2HGaUDZY9RBGAezd3PQx8Mf8McXHteMGl2PIgSejvvSZbL4qIbTxFfWz8GzCDMsg7jL80=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772464342; c=relaxed/simple;
-	bh=op0liavrrZXpHIYFE8b5murCMpJBWBYITF7jRogwVXU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gf+e3PYXaYvBxLDMFM+uMLON/5+5QUZzBbDoHSB8wXTvdoNBmPoYntVr94X2jzaH0AMeX85RISIvQqX3sqESUNhd4qFhu2g7sBYTYkl7bcuk27RVCaL73M1MpLAFSwLNrAQ5pu+EtBKt91gsmhZdnXJda2MIpkLvsTsv8gpBmSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WNrY60Ac; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FiKaHq+2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772464339;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RF0n2SJ1RvllNep2fFvHq0JPMVeIU4OKpnJDj8ItlsE=;
-	b=WNrY60AciXkRUrU7h7ICByvMGUZj1SnNtt+hm75P8we+1+FJxkJ1wIOUoE9QZ/1D0nKLG3
-	vzhXClEwxWSPQ3ufLyXyqY1TbJcpfigwvcUFWe9lBcv71DesprVc0EvDAklpJXCSl8koL3
-	KS/8gcEt4+G7JCvQsWinErhHURtZKMc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-526-_BYLGL49Ns6Pi39d7GmT7g-1; Mon, 02 Mar 2026 10:12:16 -0500
-X-MC-Unique: _BYLGL49Ns6Pi39d7GmT7g-1
-X-Mimecast-MFC-AGG-ID: _BYLGL49Ns6Pi39d7GmT7g_1772464335
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4832c4621c2so50439805e9.3
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 07:12:16 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A61430B86;
+	Mon,  2 Mar 2026 15:26:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772465194; cv=fail; b=f4gYWc7OIpw6ZDfTkSTrITNrrR8b4W7atAtuP7NRbWUcuzqSfC5xIOCYpxdxkSD2uqdyhKLGagZonLRAgNHYiUZ4LCHatuHLSsKbP3oR0IqlgFf6jl9uQgh5QaJ+7soMQp974cliStdNKOahJ0gg2oNOU5LNMmav+q4nCXf6d+M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772465194; c=relaxed/simple;
+	bh=LfPz8MfdHbsvuzzJ/QBlpLKfa7H/+9ZAiFuxcILzUDs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=nrZSMOEhBE744pkJmbQWoOMx50DHuBhE0T209SpRtzkwfzkzbkMvSf+vfLC9Jlzj/CGfOVAEETQO9ieKLGIb6c6cIvX5nhgLr11T4AakvJ7NoIfapFC7MlZaPEDvJuMf0WkTS0dFJwhvsjTsG/xgSdJUhewY6EFQjz69702dNQw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=eLSQ5iWK; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=uJf/FZiN; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 622EWobp1250166;
+	Mon, 2 Mar 2026 15:25:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=LeQer900DaREbQuJR8
+	TRJLVt+VDBieTDy4p7RWpMOXQ=; b=eLSQ5iWKC4BzMSJa2NQOBwXhneewGjno33
+	JUoQ32BjChpfcZkd3lb4r6zSMEDsl/vFAgjCXD3tfIydfC9YpsDn3KY0vQ0X9GKM
+	F3pDfqHMVlWy7xdXq5hsvNEe8lJn2U9j3IdFSAHrk4iOCWmhSNJFVpzaHLhJA2Fs
+	dI6DoaO4ql4rZ3HT9sISVDsYW1y9I60ckl8nsw0PbiAiWailnFi0k5G3jr2z2aIi
+	BCavfPJ+gOgbY3j357AieMM1G1hcUXOaur2QMcLhmOXSi9GyUa7nvTApDifiNabU
+	NvdX8N2S1H6wByPRLUF05gxXrnOttVuQ94tXB0tqtnWjyfhhRdbQ==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4cncdc0304-4
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 02 Mar 2026 15:25:11 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 622E1Con035398;
+	Mon, 2 Mar 2026 15:19:33 GMT
+Received: from dm5pr21cu001.outbound.protection.outlook.com (mail-centralusazon11011068.outbound.protection.outlook.com [52.101.62.68])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4ckptd30qv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 02 Mar 2026 15:19:33 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CSddOaeGtxOFW57ELesOq73KFWdSY7fl+lFSDBQy/+FArlB2AZZWIWac7YaG7SSAT5Rrwp3ugF5w9s/3FB/gMQPS9Z+5uqYCqKT+6FfgelIjnrb1IxOMjs5xaW4JeDaZDvxeLtB27GGCNsBIgnsZLxcFqWFAufirvl7Ey5OLjYr7smZZm0q0d2aFbaCQrDgBxP9uS6zlIL1LvblYJI3ks1mHL+DlUZlcS/+yQp97qlFVt+K/fAEHEP7rkHP0IgZ5kmR//8HzcbR/T5TUDOLVMX+3754rLO0L1CHkmFdLIJVZOGN78+jM/XKAuojga89iDzK6gpLUZGLYY6BS+k9GOA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LeQer900DaREbQuJR8TRJLVt+VDBieTDy4p7RWpMOXQ=;
+ b=Y/dhZopZBD1/iB+R7dAwwcEZ9nO9OGJeBs48a1oizePy4ez94OyEP/cG/R+D8DqZD703b7pUtaZE9+gOwuQXrdRKwQBD3kBNnCdcNlEbhSTg0FzO993PIIEi1GTxbLLBe0ywRPbTRmp9NYRUmTm/DYQ4auTTW5w0kOTGdGkH6PLBE+o3i7uHaLfKXBJx0UeR98WlSgLCp2Q/XW0hGUuUc7GDO+qz7mOjYjZMc2Zv9L51H+f6Ptjhf2cX/rEmUpO4JLHi4k+L0ODkw2P9gIjzt+/cNpY6gLyRmObF/h0bP9ZojiDRyKKn7LM3PtFVokCV+jf4Rcyw6KDs5jKbnjv9YA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772464335; x=1773069135; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RF0n2SJ1RvllNep2fFvHq0JPMVeIU4OKpnJDj8ItlsE=;
-        b=FiKaHq+2tyH8zoTrCU34EKgaF6VI4eGrN7Cpbgpl+PK5i9Xi1gzBpVkXVTuX0/q+a0
-         GrU8h9k5AzbcY92nNVQACuup3wznw+f/TOJ1Dc5QUwJMgS/3gUHhyvOFMOw+SKm/jmAa
-         7vwIfA2H4OV8wzoSeCRzOKTBwyFtVgHf+qkV3silkj5mu1YfM4P+q/evcNISgDe5MiMV
-         lmm3qELJZMuLhM74D257VLkImoXcgGS/tVtoQm++PHkshiu8gSx8VvdOBrU3UvvtxzpZ
-         nIzYn0LoiPHZR9xsY1hAI0CCwwM8DHzHmYdaWSQzVcBdWNrlRJVWcxQtELEQHGcZahdd
-         /9GA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772464335; x=1773069135;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RF0n2SJ1RvllNep2fFvHq0JPMVeIU4OKpnJDj8ItlsE=;
-        b=euPVpqQlHWS2TdyX+5IFEqWqT4hDoiylw3fLSIOI51RjtCmXaP1W/g25eIdbxqjQco
-         xDZ16Fqcu7HgFnfeax04saxfPB4t61k9VTCD2igQ0u86Qc/ORI9NhDy6wUjIrSBCJ/+c
-         JwCyrCuR01gmgLdlhlHKCJY9E3zAOoeqg7lK3eITchKG+NsTmXJ6GglUAxV8gu1VeLax
-         2JKQzvEGcJ8xnfdrHlIR0eKi4MNxiaGHJa0jwG0seHIiP0087JW4HRFaIw4EnflicFDK
-         93M29XDZ5b2Mm33yJk8MYl0DS+YfeM/uOnF5tbEoCvgSTZ0EpG8ykMBYCMfonEa3jKec
-         lo7g==
-X-Forwarded-Encrypted: i=1; AJvYcCWr7WiFitrq6ZvuWJ1Q+Uz5U+r1e2p6Hrd9cuOunywrFvnIxDj+GquzFC9pdle0QHv2usM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoynpFxX423OTrifVU2kEEzR+IUW5kMjFLdWi6n8zix/AbFFoD
-	y2TgI9SOGtXbUD83vHsJsfYuvA6+1w1maoqqQmnwfJma5K43P2ecCOySwNKKOrRKPwnVytYzZBN
-	piOZQUPMd+7GfayL/TwWHD6v+XJYdskme9gSOYDfvWHDroFUFTwkkPw==
-X-Gm-Gg: ATEYQzyDMnnTkCGYblt0ANzvqDlw5pn7mtfedCNicC198Ra+8iyFoQesYcunq/asrRa
-	dKm7MReZlfhuLUAeOblxdJCJr3U3AhyS25rlvuiQFMsB6KyTOQ1yO7AVTlBinziMeCu4pqXOyL6
-	3CxguvBDpZPCJcAkEEozHoKFgErNZFxPbi8DVtOwmWT/El1si3SM/X+4Mhl+nhqRgpZePO+WW6L
-	+s75WhWzhgP+0ukmmwDdsLtKVWH6SkF0mr/Vr113iMvYo7dXNvlMkrSzgWtZYAYNnWKuzby6i21
-	4LW4Wtb0AWqjGTRinvLEBsVR1U7upPUdIdNdD5/5hqECY210DHyvFApzyN971nPHpPU06frDsJI
-	fZbC+pX9/5NkFDbTiJbpa159FYY7jmXfNeZXlbGFWb8cZgg==
-X-Received: by 2002:a05:600c:8106:b0:46f:c55a:5a8d with SMTP id 5b1f17b1804b1-483c9bb6559mr206067715e9.4.1772464335135;
-        Mon, 02 Mar 2026 07:12:15 -0800 (PST)
-X-Received: by 2002:a05:600c:8106:b0:46f:c55a:5a8d with SMTP id 5b1f17b1804b1-483c9bb6559mr206067215e9.4.1772464334575;
-        Mon, 02 Mar 2026 07:12:14 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd765604sm360962425e9.15.2026.03.02.07.12.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 07:12:13 -0800 (PST)
-Date: Mon, 2 Mar 2026 10:12:11 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: linux-kernel@vger.kernel.org, ShuangYu <shuangyu@yunyoo.cc>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH RFC] vhost: fix vhost_get_avail_idx for a non empty ring
-Message-ID: <20260302101125-mutt-send-email-mst@kernel.org>
-References: <559b04ae6ce52973c535dc47e461638b7f4c3d63.1772441455.git.mst@redhat.com>
- <aaWTjPXDqhMZlwLr@sgarzare-redhat>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LeQer900DaREbQuJR8TRJLVt+VDBieTDy4p7RWpMOXQ=;
+ b=uJf/FZiNvaVysjwyTWIL0MjykUnsK28LwY+27thr1hbaK33MIYhU7qVA3BaeWF7f/2XCciWYo8A9SM6y8km+8KsblNBe10RAjNJJjX2VZnwXD4r8A/HZDrzPJoGRDdSnzil04svDsm9aSqUsbGlnCf35C4xk6GmaWXrMnaXTaq4=
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com (2603:10b6:8:1cc::16)
+ by DS7PR10MB4943.namprd10.prod.outlook.com (2603:10b6:5:3ac::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.21; Mon, 2 Mar
+ 2026 15:19:29 +0000
+Received: from DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::f3ea:674e:7f2e:b711]) by DM4PR10MB8218.namprd10.prod.outlook.com
+ ([fe80::f3ea:674e:7f2e:b711%4]) with mapi id 15.20.9632.010; Mon, 2 Mar 2026
+ 15:19:29 +0000
+Date: Mon, 2 Mar 2026 15:19:24 +0000
+From: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: akpm@linux-foundation.org, willy@infradead.org, david@kernel.org,
+        ziy@nvidia.com, matthew.brost@intel.com, joshua.hahnjy@gmail.com,
+        rakie.kim@sk.com, byungchul@sk.com, gourry@gourry.net,
+        ying.huang@linux.alibaba.com, apopple@nvidia.com,
+        baolin.wang@linux.alibaba.com, Liam.Howlett@oracle.com,
+        npache@redhat.com, ryan.roberts@arm.com, dev.jain@arm.com,
+        baohua@kernel.org, lance.yang@linux.dev, vbabka@suse.cz,
+        jannh@google.com, rppt@kernel.org, mhocko@suse.com, pfalcato@suse.de,
+        kees@kernel.org, maddy@linux.ibm.com, npiggin@gmail.com,
+        mpe@ellerman.id.au, chleroy@kernel.org, borntraeger@linux.ibm.com,
+        frankja@linux.ibm.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, svens@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, linux-mm@kvack.org,
+        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v3 3/3] mm: use vma_start_write_killable() in
+ process_vma_walk_lock()
+Message-ID: <72ff2fc0-07fe-4964-9a1e-eccf8c7ed6a7@lucifer.local>
+References: <20260226070609.3072570-1-surenb@google.com>
+ <20260226070609.3072570-4-surenb@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260226070609.3072570-4-surenb@google.com>
+X-ClientProxiedBy: AM6P191CA0062.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:209:7f::39) To DM4PR10MB8218.namprd10.prod.outlook.com
+ (2603:10b6:8:1cc::16)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aaWTjPXDqhMZlwLr@sgarzare-redhat>
-X-Rspamd-Queue-Id: 6EF691DBA8D
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR10MB8218:EE_|DS7PR10MB4943:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0b3e26ec-1a4f-4541-abf9-08de786f18ff
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	Ou+V1pno7jOHAUJk20QkBNoaAOtSfIYtBEHmNdT6ubJe6yE/w8GoW4NvnTCvTErm/JbreM95TxuS0VGu4aJMb8I8aDyyHPTy6A+Bua0BNDktO2YczSYX7Xmknr661EvYZiBFuSoYzx7VzvPuSKCYdzPtr5UBFvDjOYqI6fFuhaNum+kk51yHQ4KqTGW/KnPR5zS8GS6p7KVDO6jbfDi9iAqjxzb0aVl7JfP5ILLxXEy9tKugIMvBStODTDyCHa7TAQ/oFsZEptMQA+uewGKm0YdMMG0L/VWwmfWGdce/Zo/pmZ7VXbF86oyBagNejRANpFubuIbB4htst+AdoXRucSfy9EDOEyp7ZOcGFI6ifz3UUaDAXj6b0sPpMy6M19EDCwoD5TCtJcBIIuU+/hEFD49OkUg4Vvjhmw3MZ3KYbU+Pf9y856H5KNJBNKQFV10QKni+UwQZIHPXK76JOZsmPddkJJyfq64auAyn+vxjZAJpnvk1O9UNEKcinIrkX7+aFw+e3CnyuG7qXAvPbBMXwVpqv2B2n6bebxE88sgfcX1cpJfRnT1PFnFRSLaC2kHyoM1BYQbFlS/x0IwgyPqtnTp2qjet30gQ3z3BUr5VBGRoubRH+YQ+L5UhcrbEmPvst+bIwfERHN0jE8fLeC6uH0zCa8FDIY6FYyJi+9PsscxVi0UXPzKn1N67HKpiTzguTzQDceJS9PHgbLgu26kU/GW3D4lCXKtQnSN8VirW5sM=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR10MB8218.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?TJKjmz+O3ocfk703QhwrmXnLipX1dpet22vVgXKcI73AKKnPDAvj4LwX/nJu?=
+ =?us-ascii?Q?dDkQONDUMbN/vSAkVOkTSX8/ER+o38tTcb5KyPzOlhqRrL8HabdptlmH+/G5?=
+ =?us-ascii?Q?0P0TPnRTROp6Wwtl4gg21Ep++36MbWVsET97gnqbJSWFTb78jOvN7By737mO?=
+ =?us-ascii?Q?Orw+eyGo6V6viuUCuVt5gosw08NpPKLoCD3z1nxkZSxc4HQQ1XH4leHgFU6g?=
+ =?us-ascii?Q?5HK07eJtCgiU9gZL+8s+MiQGyaC4DgQlY2HxhhLTJ4j0JKmRDWvLenSb192J?=
+ =?us-ascii?Q?DKFvd4vAjMcuLd98dMptl27M78iy94Pa0OLkwhl9VyOmTMw+EA3+y9pP4WPt?=
+ =?us-ascii?Q?A9MtVeOmmdg3AsUqIWqfJgYCv944pxWSILnFDaMYgCXXqfFhllwWtCBtR9nD?=
+ =?us-ascii?Q?+hsB70SKb8E2keqPpx7FuelSLPxqIdcUBmjkLUSfEP97DAmTajMdFI1qY368?=
+ =?us-ascii?Q?AuWJOopPC0FQSFXxnozX0qbDPw5gYYMKL1PxmEZD+3VqWtnYvolQ7f1NGcHj?=
+ =?us-ascii?Q?jwH921OP+M6/QcOPQyqhSJeLmTEU5/RU+hncaYW+Zg6TzkeEAeLlWIAZSNQv?=
+ =?us-ascii?Q?cLdTAN5hsu9CLdzA0iRZMW1IgnfIZzqPV6EWF3OIPiLOvHl3jtQRUj4errk/?=
+ =?us-ascii?Q?7YPPHB2DohjdGuygRUSTPqpP2wYlMDkVRiRf1Vv8b4l5xUFg43PxRU4m0fMZ?=
+ =?us-ascii?Q?byzBin90b4yc+zcw1QJpIPtyWfRklUdQ8xQjylMzewQFWyfl+0v6QDtfa0SS?=
+ =?us-ascii?Q?Kw9vliGnnF5/gUVSjeMa5QaGtycmL/2m4/0OzXPff9OnoRhdlRDQY5pNpAn4?=
+ =?us-ascii?Q?ctYofMZFXTZjg2Ck1RtqI4VRltit8AV25I/0pzDQhZuWwxcSfgCYjQ5O6jbV?=
+ =?us-ascii?Q?T+eXakP2OqCPD9nbMVOOmQk74yazjSxnYqgaxgW/ZSC8gQEJVtK731X577wY?=
+ =?us-ascii?Q?TQZxXgqkJddqXwna+xPcIlVqJAXMAwmX2ehTv7JUfkjOb9o9NniIImdfdNht?=
+ =?us-ascii?Q?Ja9EyFsCFpJj43QLugmfqn7dbefNVfnywPjDeGVLgv8//X/yI4stkAxGtBpV?=
+ =?us-ascii?Q?RDIl2qZompoub/OhhQGfOM/HmGIZI+kAD+ZLVFQ5Brw+it3W5g4zE6YbGn8I?=
+ =?us-ascii?Q?cmUk2de1t7TTkB20YQumRxKALy7DhZlYepTTUsAhhHAdVHYyOeyb7cVivVXJ?=
+ =?us-ascii?Q?GIcBN3GEMAUQrKpDe+xEa6H+UzCWzDyoWMxDlqvXhbU5663NK3ZGgUUkbAGY?=
+ =?us-ascii?Q?RuvSkPcWpRKxBMj+k9VTKf8qRHQmwCeYQEPFNAdKjx4krmHvU3qgMPzmc0X3?=
+ =?us-ascii?Q?D/piTDol3o0GTZB0Gv9iIwnXDy49Q7PeYPpLev3HEulp27S/7Qk/1RaeWqF5?=
+ =?us-ascii?Q?DIhGOnmlAzOlSDEQuerQowc/tJUOFI4SUiddNVnOTvbKqW5KHmDDqmFQc6w4?=
+ =?us-ascii?Q?pmC9No/VT6gl4Ql0gJf2gN0VAqLhHBClqWfwDpmS3HyPIJLPYvkrj44ZzNKQ?=
+ =?us-ascii?Q?R7TvBY7yPEEb+C+XG7eJQD/PULzLIOsth1wmKp33R5UePYYbscmjhjG2+ADC?=
+ =?us-ascii?Q?w1abolGZyrDZ25MknkshILmeRjEFAN1ojJDil6cWiFu1M0VeTeX0ozOhyABC?=
+ =?us-ascii?Q?JC7LhcBZBXZ/Rf6t8k/b3dRKnxZP3dH1+eOLStErmbLbA3piJPTT4/DT9BvH?=
+ =?us-ascii?Q?yLmrD2fIrlJQqmhSUNwwKk4CrUuzGJeWCNd0cXDg75AbMXjqvKqOm1EyoVsj?=
+ =?us-ascii?Q?QUnsvuS9GC8RL2h8ffbSCf+/o7GsS0E=3D?=
+X-Exchange-RoutingPolicyChecked:
+	p1cXQo5wDLlU/LeQ0Jjv1E52pLLeJk+aVxgKm/7dhMofX+qtK+nvl87tzIskVwgtpzR2UJLeQbogkr0x23jSxlS2WxBUwnyewdYJtg7E9wvP8xoVyPkEQ3gme2mvuWM+XgsdjYZ8I/lSBJWmPgeunULCL+GQ2iXYr/YaCPgRwIFr4XqDIYxTleiHGTzl7eFfMqZbfyS/sstGHY//yhzXMXxLqCqZxNaFg17Cj3i4aXHxpLkDj6BlDm8ajQNL/whoxlYs1jRpWpo5agg3k7bSeiX6kF5n2KhChrlCBg0c5tJrvmgHCGdiJv3w7eS4NTyfSMJXU4BEKzeg3H2xGnHPtQ==
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	COm2yThpGv/P39S4PsmkjIg3BDmnUdv9gTc0m3jPOy1HiIt7hRFjzj6XtSzzJ7b0gZul4nFcUn8jxdnWoddUcpkjB5WXRgrKZUPQzgww2ynLlNFwULUBhbG2ZG8LvWLPdNe22OruEVRSRimqICp824aRLwXzLQYm7ljLJ/uiapYhigT/IGpcK669SuW4gB/dl4UnCscdQYHAy+eiVeV6B/dKR9eUfjyFk3uXmQNbCF81LtWg8PiGH6LOgcUWAAvxOR/kqX1AOUooAQc/x73l+IYSukNCmZ7VaTimKybUoj5GEasrqzQKw5KV5cRCLPIslySziHvVwXKGI/ajETf7bfzOb5afUn9q0duIf0EYVTKbom4GJkuZBh+LVFhdn59Sdy1hCb5eKQqHrFH9HGz6VWGlUfgF1JFhDGc//qhubRBo3eI/HdcgBRP04LqDUGvisSYCku6wQJCgJyVUBmusELAnGy1WLxQgQw+QWYrX4ax2QSGzsNHvj0MqiR4KCha1moI19gUp0vTFYzmY3XDSk4z5QmrxlYHa29S1GJCsrMMGsMmtHpT0fqM9A/DcKHNSjAEdlhigmHZwskHxhmw85b66XCqA9SD1uzFWI9BMeO0=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b3e26ec-1a4f-4541-abf9-08de786f18ff
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR10MB8218.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2026 15:19:29.1849
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LMYUG37+ph60ahzddoHoLfRnvj0nw0QnfLaWrVnwlq1tSyP4Ru+bJwNigcq3z0ZfUKCGytm7YGalgde+QxhTkEOR+CE98bhtnBV7TmoijIg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB4943
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-02_03,2026-03-02_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
+ malwarescore=0 mlxscore=0 phishscore=0 mlxlogscore=999 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2602130000 definitions=main-2603020128
+X-Authority-Analysis: v=2.4 cv=R6kO2NRX c=1 sm=1 tr=0 ts=69a5abd7 b=1 cx=c_pps
+ a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=Yq5XynenixoA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=jiCTI4zE5U7BLdzWsZGv:22 a=7Gl3-_t3PgB9XO-mQDs3:22 a=1XWaLZrsAAAA:8
+ a=Z0nbYNfEsf-Ief7VEgcA:9 a=CjuIK1q_8ugA:10 cc=ntf awl=host:12261
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzAyMDEyOSBTYWx0ZWRfX7VtQwywX6ooG
+ 0D8bP/ZDRgsCclQ5GjffQHPxrLvOG5+XbdvszRaob+PwdUvt1Q168qWv/IqPk688WQxZ+Hn1qZy
+ lKAZv2f9pBL1ova7C6Z5y27STvHtyfAPWRqMmfZkr7j/YJ9H8dVIMD96W/Df/NasqcVJJmnt0Kn
+ OCuWyy8SPKgx2VgPCfZCuj/A2z1erHGSpI5WYgkkYzdqXd3Z8rt04457oMd0hWN/nH8vjFgTAgk
+ 2SF7yxHyjDX9GHAOmkkx0zpFKo6DrRQRgJ2FNwmGXqUeY1FkUWBlhyLumQeeQhmdAhVqkMnXvuu
+ J4Ej2fLIL0GnzWpscnE7uYuOaDYPf44nM0ygW7OnVJv4RJVhaUlpO3E7XTcZLpxQBQa7MPYtQ4V
+ hsq8EiFeuKvipUL21qXE60x7Qd6ZmMo5wexpWGK7pNTKfrS4SeIV3ifP8mkcKQIc6uusumkVDPa
+ QpF+uabU6DuvH50DJICbNLLxeqd49NEOD//+5WDg=
+X-Proofpoint-GUID: JKBFqk39Tp4k2wQxlpi03gJq46iLIQ_q
+X-Proofpoint-ORIG-GUID: JKBFqk39Tp4k2wQxlpi03gJq46iLIQ_q
+X-Rspamd-Queue-Id: 090201DBDE9
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[oracle.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[oracle.com:s=corp-2025-04-25,oracle.onmicrosoft.com:s=selector2-oracle-onmicrosoft-com];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_TWELVE(0.00)[42];
+	TAGGED_FROM(0.00)[bounces-72390-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[linux-foundation.org,infradead.org,kernel.org,nvidia.com,intel.com,gmail.com,sk.com,gourry.net,linux.alibaba.com,oracle.com,redhat.com,arm.com,linux.dev,suse.cz,google.com,suse.com,suse.de,linux.ibm.com,ellerman.id.au,kvack.org,lists.ozlabs.org,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72388-lists,kvm=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lucifer.local:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo.stoakes@oracle.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[oracle.com:+,oracle.onmicrosoft.com:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
-On Mon, Mar 02, 2026 at 03:30:53PM +0100, Stefano Garzarella wrote:
-> On Mon, Mar 02, 2026 at 03:51:49AM -0500, Michael S. Tsirkin wrote:
-> > vhost_get_avail_idx is supposed to report whether it has updated
-> > vq->avail_idx. Instead, it returns whether all entries have been
-> > consumed, which is usually the same. But not always - in
-> > drivers/vhost/net.c and when mergeable buffers have been enabled, the
-> > driver checks whether the combined entries are big enough to store an
-> > incoming packet. If not, the driver re-enables notifications with
-> > available entries still in the ring. The incorrect return value from
-> > vhost_get_avail_idx propagates through vhost_enable_notify and causes
-> > the host to livelock if the guest is not making progress, as vhost will
-> > immediately disable notifications and retry using the available entries.
-> 
-> Here I'd add something like this just to make it clear the full picture,
-> because I spent quite some time to understand how it was related to the
-> Fixes tag (which I agree is the right one to use).
-> 
->   This goes back to commit d3bb267bbdcb ("vhost: cache avail index in
->   vhost_enable_notify()") which changed vhost_enable_notify() to compare
->   the freshly read avail index against vq->last_avail_idx instead of the
->   previously cached vq->avail_idx. Commit 7ad472397667 ("vhost: move
->   smp_rmb() into vhost_get_avail_idx()") then carried over the same
->   comparison when refactoring vhost_enable_notify() to call the unified
->   vhost_get_avail_idx().
+On Wed, Feb 25, 2026 at 11:06:09PM -0800, Suren Baghdasaryan wrote:
+> Replace vma_start_write() with vma_start_write_killable() when
+> process_vma_walk_lock() is used with PGWALK_WRLOCK option.
+> Adjust its direct and indirect users to check for a possible error
+> and handle it. Ensure users handle EINTR correctly and do not ignore
+> it.
+>
+> Signed-off-by: Suren Baghdasaryan <surenb@google.com>
 
-Indeed.
+Have raised concerns below but also this feels like you're trying to do a bit
+too much in one patch here, probably worth splitting out based on the different
+parts you changed.
 
-> > 
-> > The obvious fix is to make vhost_get_avail_idx do what the comment
-> > says it does and report whether new entries have been added.
-> > 
-> > Reported-by: ShuangYu <shuangyu@yunyoo.cc>
-> > Fixes: d3bb267bbdcb ("vhost: cache avail index in vhost_enable_notify()")
-> > Cc: Stefano Garzarella <sgarzare@redhat.com>
-> > Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> > 
-> > Lightly tested, posting early to simplify testing for the reporter.
-> 
-> Tested with vhost-vsock and I didn't see any issue.
-> 
-> Thanks!
-> 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> > 
-> > drivers/vhost/vhost.c | 11 +++++++----
-> > 1 file changed, 7 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > index 2f2c45d20883..db329a6f6145 100644
-> > --- a/drivers/vhost/vhost.c
-> > +++ b/drivers/vhost/vhost.c
-> > @@ -1522,6 +1522,7 @@ static void vhost_dev_unlock_vqs(struct vhost_dev *d)
-> > static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
-> > {
-> > 	__virtio16 idx;
-> > +	u16 avail_idx;
-> > 	int r;
-> > 
-> > 	r = vhost_get_avail(vq, idx, &vq->avail->idx);
-> > @@ -1532,17 +1533,19 @@ static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
-> > 	}
-> > 
-> > 	/* Check it isn't doing very strange thing with available indexes */
-> > -	vq->avail_idx = vhost16_to_cpu(vq, idx);
-> > -	if (unlikely((u16)(vq->avail_idx - vq->last_avail_idx) > vq->num)) {
-> > +	avail_idx = vhost16_to_cpu(vq, idx);
-> > +	if (unlikely((u16)(avail_idx - vq->last_avail_idx) > vq->num)) {
-> > 		vq_err(vq, "Invalid available index change from %u to %u",
-> > -		       vq->last_avail_idx, vq->avail_idx);
-> > +		       vq->last_avail_idx, avail_idx);
-> > 		return -EINVAL;
-> > 	}
-> > 
-> > 	/* We're done if there is nothing new */
-> > -	if (vq->avail_idx == vq->last_avail_idx)
-> > +	if (avail_idx == vq->avail_idx)
-> > 		return 0;
-> > 
-> > +	vq->avail_idx = avail_idx;
-> > +
-> > 	/*
-> > 	 * We updated vq->avail_idx so we need a memory barrier between
-> > 	 * the index read above and the caller reading avail ring entries.
-> > -- 
-> > MST
-> > 
+> ---
+>  arch/s390/kvm/kvm-s390.c |  2 +-
+>  fs/proc/task_mmu.c       |  5 ++++-
+>  mm/mempolicy.c           | 14 +++++++++++---
+>  mm/pagewalk.c            | 20 ++++++++++++++------
+>  mm/vma.c                 | 22 ++++++++++++++--------
+>  mm/vma.h                 |  6 ++++++
+>  6 files changed, 50 insertions(+), 19 deletions(-)
+>
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 7a175d86cef0..337e4f7db63a 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2948,7 +2948,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>  		}
+>  		/* must be called without kvm->lock */
+>  		r = kvm_s390_handle_pv(kvm, &args);
+> -		if (copy_to_user(argp, &args, sizeof(args))) {
+> +		if (r != -EINTR && copy_to_user(argp, &args, sizeof(args))) {
 
+This is horribly ugly, and if we were already filtering any other instance of
+-EINTR (if they're even possible from copy_to_user()) why is -EINTR being
+treated in a special way?
+
+I honestly _hate_ this if (errcode != -EINTR) { ... } pattern in general, I'd
+really rather we didn't.
+
+It's going to bitrot and people are going to assume it's for some _very good
+reason_ and nobody will understand why it's getting special treatment...
+
+Surely a fatal signal would have previously resulted in -EFAULT before which is
+a similar situation so most consistent would be to keep filtering no?
+
+>  			r = -EFAULT;
+>  			break;
+>  		}
+> diff --git a/fs/proc/task_mmu.c b/fs/proc/task_mmu.c
+> index e091931d7ca1..1238a2988eb6 100644
+> --- a/fs/proc/task_mmu.c
+> +++ b/fs/proc/task_mmu.c
+> @@ -1797,6 +1797,7 @@ static ssize_t clear_refs_write(struct file *file, const char __user *buf,
+>  		struct clear_refs_private cp = {
+>  			.type = type,
+>  		};
+> +		int err;
+>
+>  		if (mmap_write_lock_killable(mm)) {
+>  			count = -EINTR;
+> @@ -1824,7 +1825,9 @@ static ssize_t clear_refs_write(struct file *file, const char __user *buf,
+>  						0, mm, 0, -1UL);
+>  			mmu_notifier_invalidate_range_start(&range);
+>  		}
+> -		walk_page_range(mm, 0, -1, &clear_refs_walk_ops, &cp);
+> +		err = walk_page_range(mm, 0, -1, &clear_refs_walk_ops, &cp);
+> +		if (err < 0)
+
+Again with this < 0 :) let's be consistent, if (err).
+
+> +			count = err;
+>  		if (type == CLEAR_REFS_SOFT_DIRTY) {
+>  			mmu_notifier_invalidate_range_end(&range);
+>  			flush_tlb_mm(mm);
+> diff --git a/mm/mempolicy.c b/mm/mempolicy.c
+> index 90939f5bde02..3c8b3dfc9c56 100644
+> --- a/mm/mempolicy.c
+> +++ b/mm/mempolicy.c
+> @@ -988,6 +988,8 @@ queue_pages_range(struct mm_struct *mm, unsigned long start, unsigned long end,
+>  			&queue_pages_lock_vma_walk_ops : &queue_pages_walk_ops;
+
+There's a comment above:
+
+ * queue_pages_range() may return:
+ * 0 - all pages already on the right node, or successfully queued for moving
+ *     (or neither strict checking nor moving requested: only range checking).
+ * >0 - this number of misplaced folios could not be queued for moving
+ *      (a hugetlbfs page or a transparent huge page being counted as 1).
+ * -EIO - a misplaced page found, when MPOL_MF_STRICT specified without MOVEs.
+ * -EFAULT - a hole in the memory range, when MPOL_MF_DISCONTIG_OK unspecified.
+ */
+
+You should add the -EINTR to it.
+
+>
+>  	err = walk_page_range(mm, start, end, ops, &qp);
+> +	if (err == -EINTR)
+> +		return err;
+
+Again, you're special casing without really any justification here. Let's please
+not special case -EINTR unless you have a _really good_ reason to.
+
+And also - if we fail to walk the page range because we couldn't get a VMA write
+lock, that's ok. The walk failed. There's nothing to unlock, because we didn't
+even get the write lock in the first place, so there's no broken state, it's as
+if we failed at some other point right?
+
+So I don't see why we're special casing this _at all_.
+
+>
+>  	if (!qp.first)
+>  		/* whole range in hole */
+> @@ -1309,9 +1311,14 @@ static long migrate_to_node(struct mm_struct *mm, int source, int dest,
+>  				      flags | MPOL_MF_DISCONTIG_OK, &pagelist);
+>  	mmap_read_unlock(mm);
+
+
+>
+> +	if (nr_failed == -EINTR)
+> +		err = nr_failed;
+
+Ugh please don't, that's REALLY horrible.
+
+Actually the only way you'd get a write lock happening in the walk_page_range()
+is if flags & MPOL_MF_WRLOCK, menaing queue_pages_lock_vma_walk_ops are used
+which specifies .walk_lock = PGWALK_WRLOCK.
+
+And this flag is only set in do_mbind(), not in migrate_to_node().
+
+So this check is actually totally unnecessary. You'll never get -EINTR here.
+
+Maybe this code needs some refactoring though in general... yikes.
+
+> +
+>  	if (!list_empty(&pagelist)) {
+> -		err = migrate_pages(&pagelist, alloc_migration_target, NULL,
+> -			(unsigned long)&mtc, MIGRATE_SYNC, MR_SYSCALL, NULL);
+> +		if (!err)
+> +			err = migrate_pages(&pagelist, alloc_migration_target,
+> +					    NULL, (unsigned long)&mtc,
+> +					    MIGRATE_SYNC, MR_SYSCALL, NULL);
+
+Given the above, this is unnecessary too.
+
+>  		if (err)
+>  			putback_movable_pages(&pagelist);
+>  	}
+> @@ -1611,7 +1618,8 @@ static long do_mbind(unsigned long start, unsigned long len,
+>  				MR_MEMPOLICY_MBIND, NULL);
+>  	}
+>
+> -	if (nr_failed && (flags & MPOL_MF_STRICT))
+> +	/* Do not mask EINTR */
+
+Useless comment... You're not explaining why, and it's obvious what you're doing.
+
+> +	if ((err != -EINTR) && (nr_failed && (flags & MPOL_MF_STRICT)))
+
+Weird use of parens...
+
+And again why are we treating -EINTR in a special way?
+
+>  		err = -EIO;
+>  	if (!list_empty(&pagelist))
+>  		putback_movable_pages(&pagelist);
+> diff --git a/mm/pagewalk.c b/mm/pagewalk.c
+> index a94c401ab2cf..dc9f7a7709c6 100644
+> --- a/mm/pagewalk.c
+> +++ b/mm/pagewalk.c
+> @@ -425,14 +425,13 @@ static inline void process_mm_walk_lock(struct mm_struct *mm,
+>  		mmap_assert_write_locked(mm);
+>  }
+>
+> -static inline void process_vma_walk_lock(struct vm_area_struct *vma,
+> +static inline int process_vma_walk_lock(struct vm_area_struct *vma,
+>  					 enum page_walk_lock walk_lock)
+>  {
+>  #ifdef CONFIG_PER_VMA_LOCK
+>  	switch (walk_lock) {
+>  	case PGWALK_WRLOCK:
+> -		vma_start_write(vma);
+> -		break;
+> +		return vma_start_write_killable(vma);
+>  	case PGWALK_WRLOCK_VERIFY:
+>  		vma_assert_write_locked(vma);
+>  		break;
+> @@ -444,6 +443,7 @@ static inline void process_vma_walk_lock(struct vm_area_struct *vma,
+>  		break;
+>  	}
+>  #endif
+> +	return 0;
+>  }
+>
+>  /*
+> @@ -487,7 +487,9 @@ int walk_page_range_mm_unsafe(struct mm_struct *mm, unsigned long start,
+>  			if (ops->pte_hole)
+>  				err = ops->pte_hole(start, next, -1, &walk);
+>  		} else { /* inside vma */
+> -			process_vma_walk_lock(vma, ops->walk_lock);
+> +			err = process_vma_walk_lock(vma, ops->walk_lock);
+> +			if (err)
+> +				break;
+>  			walk.vma = vma;
+>  			next = min(end, vma->vm_end);
+>  			vma = find_vma(mm, vma->vm_end);
+> @@ -704,6 +706,7 @@ int walk_page_range_vma_unsafe(struct vm_area_struct *vma, unsigned long start,
+>  		.vma		= vma,
+>  		.private	= private,
+>  	};
+> +	int err;
+>
+>  	if (start >= end || !walk.mm)
+>  		return -EINVAL;
+> @@ -711,7 +714,9 @@ int walk_page_range_vma_unsafe(struct vm_area_struct *vma, unsigned long start,
+>  		return -EINVAL;
+>
+>  	process_mm_walk_lock(walk.mm, ops->walk_lock);
+> -	process_vma_walk_lock(vma, ops->walk_lock);
+> +	err = process_vma_walk_lock(vma, ops->walk_lock);
+> +	if (err)
+> +		return err;
+>  	return __walk_page_range(start, end, &walk);
+>  }
+>
+> @@ -734,6 +739,7 @@ int walk_page_vma(struct vm_area_struct *vma, const struct mm_walk_ops *ops,
+>  		.vma		= vma,
+>  		.private	= private,
+>  	};
+> +	int err;
+>
+>  	if (!walk.mm)
+>  		return -EINVAL;
+> @@ -741,7 +747,9 @@ int walk_page_vma(struct vm_area_struct *vma, const struct mm_walk_ops *ops,
+>  		return -EINVAL;
+>
+>  	process_mm_walk_lock(walk.mm, ops->walk_lock);
+> -	process_vma_walk_lock(vma, ops->walk_lock);
+> +	err = process_vma_walk_lock(vma, ops->walk_lock);
+> +	if (err)
+> +		return err;
+>  	return __walk_page_range(vma->vm_start, vma->vm_end, &walk);
+>  }
+>
+> diff --git a/mm/vma.c b/mm/vma.c
+> index 9f2664f1d078..46bbad6e64a4 100644
+> --- a/mm/vma.c
+> +++ b/mm/vma.c
+> @@ -998,14 +998,18 @@ static __must_check struct vm_area_struct *vma_merge_existing_range(
+>  	if (anon_dup)
+>  		unlink_anon_vmas(anon_dup);
+>
+> -	/*
+> -	 * This means we have failed to clone anon_vma's correctly, but no
+> -	 * actual changes to VMAs have occurred, so no harm no foul - if the
+> -	 * user doesn't want this reported and instead just wants to give up on
+> -	 * the merge, allow it.
+> -	 */
+> -	if (!vmg->give_up_on_oom)
+> -		vmg->state = VMA_MERGE_ERROR_NOMEM;
+> +	if (err == -EINTR) {
+> +		vmg->state = VMA_MERGE_ERROR_INTR;
+
+Yeah this is incorrect. You seem adament in passing through -EINTR _no
+matter what_ :)
+
+There are callers that don't care at all if the merge failed, whether through
+oom or VMA write lock not being acquired.
+
+There's really no benefit in exiting early here I don't think, the subsequent
+split will call vma_start_write_killable() anyway.
+
+So I think this adds a lot of complexity and mess for nothing.
+
+So can we drop all this change to the merge logic please?
+
+> +	} else {
+> +		/*
+> +		 * This means we have failed to clone anon_vma's correctly,
+> +		 * but no actual changes to VMAs have occurred, so no harm no
+> +		 * foul - if the user doesn't want this reported and instead
+> +		 * just wants to give up on the merge, allow it.
+> +		 */
+> +		if (!vmg->give_up_on_oom)
+> +			vmg->state = VMA_MERGE_ERROR_NOMEM;
+> +	}
+>  	return NULL;
+>  }
+>
+> @@ -1681,6 +1685,8 @@ static struct vm_area_struct *vma_modify(struct vma_merge_struct *vmg)
+>  	merged = vma_merge_existing_range(vmg);
+>  	if (merged)
+>  		return merged;
+> +	if (vmg_intr(vmg))
+> +		return ERR_PTR(-EINTR);
+>  	if (vmg_nomem(vmg))
+>  		return ERR_PTR(-ENOMEM);
+>
+> diff --git a/mm/vma.h b/mm/vma.h
+> index eba388c61ef4..fe4560f81f4f 100644
+> --- a/mm/vma.h
+> +++ b/mm/vma.h
+> @@ -56,6 +56,7 @@ struct vma_munmap_struct {
+>  enum vma_merge_state {
+>  	VMA_MERGE_START,
+>  	VMA_MERGE_ERROR_NOMEM,
+> +	VMA_MERGE_ERROR_INTR,
+>  	VMA_MERGE_NOMERGE,
+>  	VMA_MERGE_SUCCESS,
+>  };
+> @@ -226,6 +227,11 @@ static inline bool vmg_nomem(struct vma_merge_struct *vmg)
+>  	return vmg->state == VMA_MERGE_ERROR_NOMEM;
+>  }
+>
+> +static inline bool vmg_intr(struct vma_merge_struct *vmg)
+> +{
+> +	return vmg->state == VMA_MERGE_ERROR_INTR;
+> +}
+> +
+>  /* Assumes addr >= vma->vm_start. */
+>  static inline pgoff_t vma_pgoff_offset(struct vm_area_struct *vma,
+>  				       unsigned long addr)
+> --
+> 2.53.0.414.gf7e9f6c205-goog
+>
 
