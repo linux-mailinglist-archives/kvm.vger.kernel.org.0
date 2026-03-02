@@ -1,212 +1,246 @@
-Return-Path: <kvm+bounces-72356-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72357-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8GgEJaxqpWkaAQYAu9opvQ
-	(envelope-from <kvm+bounces-72356-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 11:47:08 +0100
+	id eMteOpF0pWkNBgYAu9opvQ
+	(envelope-from <kvm+bounces-72357-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 12:29:21 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 009A61D6C8E
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 11:47:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 485161D7807
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 12:29:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19269305DECD
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 10:41:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 693533033E54
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 11:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A833E338593;
-	Mon,  2 Mar 2026 10:41:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F07D363096;
+	Mon,  2 Mar 2026 11:29:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="hfCFGuyd"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="WPkbthSN"
 X-Original-To: kvm@vger.kernel.org
-Received: from pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.245.243.92])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDDB22E8B6B;
-	Mon,  2 Mar 2026 10:41:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.245.243.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385BD302753
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 11:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772448109; cv=none; b=HKFmgGKu5hNRCh07iOSKTahL1FHD0l07WQN4C2xkxLW1+MfTAgVNK6d6Ax77I8P8zoCURw9hyF0No+8bfyKKHdF7/hJwT5puY19Jpc1Fn1+/VwWlV3lPd6w/prxZVWsYA8A/8FtO0AXYC5oNJ3bTSR6j70f3sgJzM+XyMTaRO2I=
+	t=1772450942; cv=none; b=DJ7BXgyt9QmOBUXK8MiAibkzWzgVEQvylslsYD8gzD2LRrlsESVEcavLIv0HLiRh092owIZKjukbaJ/MMN2eYT7TdamOgl0CvBmEcFTVGxzmVdT6Gk/6D1hChm3LrnsnWyyTt8IhU74IngbJ88U1gzuFxlM4Aj1xlruX7eIBozY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772448109; c=relaxed/simple;
-	bh=tssolyZ/YJCfV3/umAHfzNxVcIF+e27Ql8ibnVvdcIQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j7iU7Z8ebOfDWwTrlF8Ocd7kGxeq7yf75I178FFnosZ3I+Kppyw9ihCyo95V7SUnaZkaciAEHnqliZGAQkbLV2gbeIvgQO7wFU9g/5756YrfU369UaNZ8se2TyWoab9a1KrhLdUH5AIqiHRI+Rwn7NfJbyOt07YPTFhPbD1S7bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=hfCFGuyd; arc=none smtp.client-ip=44.245.243.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1772450942; c=relaxed/simple;
+	bh=K5ULHdjkJWFTrPH0dXx05JrTB8YMHL8lkvPnUG9C6K8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U9Y3R/Zt6FVCyItWB+kPyOl7J1gc3QvFOeB2JJH2+eJvsTvunsVRIAn+Nsm7idE7flgex1xiBHmFknHp7dpiS1suChjeenEq3ZSOZMyvtZcQhdoEhmAd0SYjGEzVZRlxjK2oeBESv68tDyQRf3F0YJYXSA+1w67BYfbk3ZnrX64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=WPkbthSN; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4836d541968so4116375e9.2
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 03:29:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1772448107; x=1803984107;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=TCNz9HmwgZYgQfhhE1VoK/ya6x9J13TYyDFYQ1fU77U=;
-  b=hfCFGuydtwSydaRnlGcTEAEc9PjJ6ZF+AJzRhmfh5Q065/LntOcRXdXk
-   ArJ7u+P1QjFmY5SydQarm5S+lkcZprbZQIH4u1e5Ov9jri5dT3lN1IBJ+
-   exj5AyeBtumj3ktJeiTv2IASPkwK3qz6PGQJgAoeDVQQH2Bu3bQnvhpvT
-   mHKtWhDnjyQSBAiQ2ARmnho3dGsWzbNs91dlaD6tNJ7WQvonF6z0SU1CI
-   Ittz5XSpOzrvXcCWe6U/m19pjLKp/eqtmrgEt0MLDTT9UcRee6ypiS4O7
-   LSQyqzxVhiMIzTaVVchdBrSUjHVuXqCnCARreDKewQgfABXstU4LHjC9x
-   w==;
-X-CSE-ConnectionGUID: ZM/7z7dpRBet+6eK5lCQmw==
-X-CSE-MsgGUID: EFzeNHdLR3eeejuf50Cq2Q==
-X-IronPort-AV: E=Sophos;i="6.21,319,1763424000"; 
-   d="scan'208";a="13621734"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 10:41:45 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.48:14150]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.51.143:2525] with esmtp (Farcaster)
- id ea3ba174-8803-4d35-8e59-505ad1c706ad; Mon, 2 Mar 2026 10:41:45 +0000 (UTC)
-X-Farcaster-Flow-ID: ea3ba174-8803-4d35-8e59-505ad1c706ad
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 2 Mar 2026 10:41:42 +0000
-Received: from ip-10-253-83-51.amazon.com (172.19.99.218) by
- EX19D020UWC004.ant.amazon.com (10.13.138.149) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 2 Mar 2026 10:41:40 +0000
-From: Alexander Graf <graf@amazon.com>
-To: <virtualization@lists.linux.dev>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <eperezma@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, <mst@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	<nh-open-source@amazon.com>
-Subject: [PATCH] vsock: Enable H2G override
-Date: Mon, 2 Mar 2026 10:41:38 +0000
-Message-ID: <20260302104138.77555-1-graf@amazon.com>
-X-Mailer: git-send-email 2.47.1
+        d=suse.com; s=google; t=1772450939; x=1773055739; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1aYNafgGLMp2zV21P8+oK10uFDyPLpaq2eVinuia9OY=;
+        b=WPkbthSNzjYrkGU2OaP3MGRaE9A5AuVqltBR4seCVfRAZXAhlC2TmDaxdGFWEk7/FL
+         +Ozwiv1gLw5N71yFaR9/B/GpXOPMZk3ECkeWegS0Ge9zjts8Brb4zpbLMhBLOJP+E20V
+         Hs4PcY2KtdCjAuGG7dKrzJGniGx+rzz35WjCQUkni89jmc2Q20+6Dl8WLZrwiBm5rPCp
+         SfYa99XbWEjSffA4H7rVRo5lYkAAXl6e/v1BIDONDbAJHKl8/1Py2xtyICM4Er+bgT17
+         rbpFg9Wp+FpJ0JgiVdfqJX/KzMX6DXLZHg37CTAI3ZkB/Qa7KYzAu+5JhO3A5r53N0MK
+         z4mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772450939; x=1773055739;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1aYNafgGLMp2zV21P8+oK10uFDyPLpaq2eVinuia9OY=;
+        b=GTZG63FOV2Sonz/M8vG9imMDErfOBHoNTlUEsHv6uOxKRoA5/Rw1iHdAhkZo06ZPJc
+         FCq8K7k9rrIiKP3INzW9IQZwjP+qevEzog/FqeMrSzg9aXpDLnIkQFeq7cNbZEm9P90p
+         nMxrMr+3gulTvXdjmssYWHRxSynWbzl1aEK8LnoKekOHTYF5MMRZlMGwBurhukICJKGQ
+         7XctZ+g76idVYakKjy9cZk9FhbV9v8Ck+SiApPfxVab1GSQFeEHYPajvSCkI87V2kyg4
+         uX0nbs3TvkF2T860JRH4HQTJPQHeL3qqStQNygPwT7m56AxHbnQbTDf2kG8lg9oUVEpJ
+         b6cA==
+X-Gm-Message-State: AOJu0YxkgmubITmziyGYDUEf3bh2ggDqv47ivLwOgiDf+Cy5XIpNcE0g
+	/QlnF+/ofd2joVjZciIKgJVTDeo3AnMHEobrxEYCbGXpGdUTb8J1BEVY2Nax86AUyvo=
+X-Gm-Gg: ATEYQzw38yYa2PYWuCDUu840qHqzvBNrLIHhImbFBSRZouNXZZMZX8sE6OHS/daN20y
+	gal4EpiS7DC8tOM9VG9as56fIrzYFRv4I/QdxvUTW07OnCjILXgylVh9bxQ57OYySd5Uw8HGAp/
+	R8lHZnRqHhfd4UtydlWg39f2BM+fHrgMuqlKRFRp+qCYiiEnib2y7BEet1HlL0armTLeN561Zhu
+	Z9B4cAUwvOp5C4QHmGKpfXOi8N5pH3NuZ6AebQthrd2wP/gJ3tC/H1Xb6BrPnIVnJbrL3lhjRb4
+	iCATgD3gXCyKGZ8pG7RUo8bAgLgI33v3vHPM3XZzOTGLcaZQEFQ0JdPgOEY1e8TQaqybFaspgXE
+	x0VdorXG868tAHx8Clvn2Opv/lzzab5OA+qF5zmjqdWTgGw1n7qqQxQEAHK22eka5mJuUofSEoh
+	zECsrSqDHAMP7sBa0BEHcJ6z4NuNZBxo6Da/3AWglsz9JrSyrECDrj9qSEoQ==
+X-Received: by 2002:a05:600c:1989:b0:46e:43f0:6181 with SMTP id 5b1f17b1804b1-483c9bfbdd5mr117360665e9.7.1772450939437;
+        Mon, 02 Mar 2026 03:28:59 -0800 (PST)
+Received: from ?IPV6:2001:1a48:8:903:1ed6:4f73:ce38:f9d4? ([2001:1a48:8:903:1ed6:4f73:ce38:f9d4])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfb789efsm210891065e9.2.2026.03.02.03.28.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Mar 2026 03:28:59 -0800 (PST)
+Message-ID: <5097ff66-b727-4eac-b845-3bd08d1a0ead@suse.com>
+Date: Mon, 2 Mar 2026 12:28:57 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: EX19D037UWB002.ant.amazon.com (10.13.138.121) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="us-ascii"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v2 2/6] KVM: guest_memfd: Directly allocate folios
+ with filemap_alloc_folio()
+Content-Language: en-US
+To: Ackerley Tng <ackerleytng@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
+ David Hildenbrand <david@kernel.org>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>, Vlastimil Babka
+ <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ seanjc@google.com, rientjes@google.com, rick.p.edgecombe@intel.com,
+ yan.y.zhao@intel.com, fvdl@google.com, jthoughton@google.com,
+ vannapurve@google.com, shivankg@amd.com, michael.roth@amd.com,
+ pratyush@kernel.org, pasha.tatashin@soleen.com, kalyazin@amazon.com,
+ tabba@google.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-doc@vger.kernel.org
+References: <20260225-gmem-st-blocks-v2-0-87d7098119a9@google.com>
+ <20260225-gmem-st-blocks-v2-2-87d7098119a9@google.com>
+From: Vlastimil Babka <vbabka@suse.com>
+In-Reply-To: <20260225-gmem-st-blocks-v2-2-87d7098119a9@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-8.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[amazon.com:+];
-	TAGGED_FROM(0.00)[bounces-72356-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[35];
+	TAGGED_FROM(0.00)[bounces-72357-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[graf@amazon.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[vbabka@suse.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 009A61D6C8E
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:mid,suse.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.cz:email]
+X-Rspamd-Queue-Id: 485161D7807
 X-Rspamd-Action: no action
 
-Vsock maintains a single CID number space which can be used to
-communicate to the host (G2H) or to a child-VM (H2G). The current logic
-trivially assumes that G2H is only relevant for CID <= 2 because these
-target the hypervisor.  However, in environments like Nitro Enclaves, an
-instance that hosts vhost_vsock powered VMs may still want to communicate
-to Enclaves that are reachable at higher CIDs through virtio-vsock-pci.
+On 2/25/26 08:20, Ackerley Tng wrote:
+> __filemap_get_folio_mpol() is parametrized by a bunch of GFP flags, which
 
-That means that for CID > 2, we really want an overlay. By default, all
-CIDs are owned by the hypervisor. But if vhost registers a CID, it takes
-precedence.  Implement that logic. Vhost already knows which CIDs it
-supports anyway.
+                                                           FGP?
 
-With this logic, I can run a Nitro Enclave as well as a nested VM with
-vhost-vsock support in parallel, with the parent instance able to
-communicate to both simultaneously.
+> adds complexity for the reader. Since guest_memfd doesn't meaningfully use
+> any of the other FGP flags, undo that complexity by directly calling
+> filemap_alloc_folio().
+> 
+> Directly calling filemap_alloc_folio() also allows the order of 0 to be
+> explicitly specified, which is the only order guest_memfd supports. This is
+> easier to understand, and removes the chance of anything else being able to
+> unintentionally influence allocated folio size.
 
-Signed-off-by: Alexander Graf <graf@amazon.com>
----
- drivers/vhost/vsock.c    | 11 +++++++++++
- include/net/af_vsock.h   |  3 +++
- net/vmw_vsock/af_vsock.c |  3 +++
- 3 files changed, 17 insertions(+)
+Isn't it determined by FGF_GET_ORDER() so when you pass FGP_LOCK | FGP_CREAT
+and no order, it's straigtforward the order will be 0?
 
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index 054f7a718f50..223da817e305 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -91,6 +91,16 @@ static struct vhost_vsock *vhost_vsock_get(u32 guest_cid, struct net *net)
- 	return NULL;
- }
- 
-+static bool vhost_transport_has_cid(u32 cid)
-+{
-+	bool found;
-+
-+	rcu_read_lock();
-+	found = vhost_vsock_get(cid) != NULL;
-+	rcu_read_unlock();
-+	return found;
-+}
-+
- static void
- vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
- 			    struct vhost_virtqueue *vq)
-@@ -424,6 +434,7 @@ static struct virtio_transport vhost_transport = {
- 		.module                   = THIS_MODULE,
- 
- 		.get_local_cid            = vhost_transport_get_local_cid,
-+		.has_cid                  = vhost_transport_has_cid,
- 
- 		.init                     = virtio_transport_do_socket_init,
- 		.destruct                 = virtio_transport_destruct,
-diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-index 533d8e75f7bb..4cdcb72f9765 100644
---- a/include/net/af_vsock.h
-+++ b/include/net/af_vsock.h
-@@ -179,6 +179,9 @@ struct vsock_transport {
- 	/* Addressing. */
- 	u32 (*get_local_cid)(void);
- 
-+	/* Check if this transport serves a specific remote CID. */
-+	bool (*has_cid)(u32 cid);
-+
- 	/* Read a single skb */
- 	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
- 
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 2f7d94d682cb..8b34b264b246 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -584,6 +584,9 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
- 		else if (remote_cid <= VMADDR_CID_HOST || !transport_h2g ||
- 			 (remote_flags & VMADDR_FLAG_TO_HOST))
- 			new_transport = transport_g2h;
-+		else if (transport_h2g->has_cid &&
-+			 !transport_h2g->has_cid(remote_cid))
-+			new_transport = transport_g2h;
- 		else
- 			new_transport = transport_h2g;
- 		break;
--- 
-2.47.1
+But if this helps with patch 4, ok.
 
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 
+Acked-by: Vlastimil Babka <vbabka@suse.cz>
 
-
-Amazon Web Services Development Center Germany GmbH
-Tamara-Danz-Str. 13
-10243 Berlin
-Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
-Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-Sitz: Berlin
-Ust-ID: DE 365 538 597
+> ---
+>  virt/kvm/guest_memfd.c | 51 +++++++++++++++++++++++++++++++++++---------------
+>  1 file changed, 36 insertions(+), 15 deletions(-)
+> 
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 2df27b6443115..2488d7b8f2b0d 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -107,6 +107,39 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>  	return __kvm_gmem_prepare_folio(kvm, slot, index, folio);
+>  }
+>  
+> +static struct folio *__kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
+> +{
+> +	/* TODO: Support huge pages. */
+> +	struct mempolicy *policy;
+> +	struct folio *folio;
+> +	gfp_t gfp;
+> +	int ret;
+> +
+> +	/*
+> +	 * Fast-path: See if folio is already present in mapping to avoid
+> +	 * policy_lookup.
+> +	 */
+> +	folio = filemap_lock_folio(inode->i_mapping, index);
+> +	if (!IS_ERR(folio))
+> +		return folio;
+> +
+> +	gfp = mapping_gfp_mask(inode->i_mapping);
+> +
+> +	policy = mpol_shared_policy_lookup(&GMEM_I(inode)->policy, index);
+> +	folio = filemap_alloc_folio(gfp, 0, policy);
+> +	mpol_cond_put(policy);
+> +	if (!folio)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	ret = filemap_add_folio(inode->i_mapping, folio, index, gfp);
+> +	if (ret) {
+> +		folio_put(folio);
+> +		return ERR_PTR(ret);
+> +	}
+> +
+> +	return folio;
+> +}
+> +
+>  /*
+>   * Returns a locked folio on success.  The caller is responsible for
+>   * setting the up-to-date flag before the memory is mapped into the guest.
+> @@ -118,23 +151,11 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+>   */
+>  static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
+>  {
+> -	/* TODO: Support huge pages. */
+> -	struct mempolicy *policy;
+>  	struct folio *folio;
+>  
+> -	/*
+> -	 * Fast-path: See if folio is already present in mapping to avoid
+> -	 * policy_lookup.
+> -	 */
+> -	folio = filemap_lock_folio(inode->i_mapping, index);
+> -	if (!IS_ERR(folio))
+> -		return folio;
+> -
+> -	policy = mpol_shared_policy_lookup(&GMEM_I(inode)->policy, index);
+> -	folio = __filemap_get_folio_mpol(inode->i_mapping, index,
+> -					 FGP_LOCK | FGP_CREAT,
+> -					 mapping_gfp_mask(inode->i_mapping), policy);
+> -	mpol_cond_put(policy);
+> +	do {
+> +		folio = __kvm_gmem_get_folio(inode, index);
+> +	} while (PTR_ERR(folio) == -EEXIST);
+>  
+>  	/*
+>  	 * External interfaces like kvm_gmem_get_pfn() support dealing
+> 
 
 
