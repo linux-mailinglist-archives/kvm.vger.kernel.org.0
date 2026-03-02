@@ -1,411 +1,198 @@
-Return-Path: <kvm+bounces-72404-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72405-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UC3XCu3BpWmBFgAAu9opvQ
-	(envelope-from <kvm+bounces-72404-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 17:59:25 +0100
+	id mBFzKcXDpWnEFgAAu9opvQ
+	(envelope-from <kvm+bounces-72405-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 18:07:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB4041DD628
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 17:59:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 200F71DD853
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 18:07:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B8018306582B
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 16:48:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3C1483046AB8
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 17:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C35428850;
-	Mon,  2 Mar 2026 16:47:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E504F426D07;
+	Mon,  2 Mar 2026 17:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T1FIhc6F"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7799E41C0A4;
-	Mon,  2 Mar 2026 16:47:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D1C426685
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 17:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772470024; cv=none; b=H4iPhF64Y6eCv+X3geYzCuaJUYH8iIuetm/AJmc7/etWBWlX5rclJjuV3N501f2CXYSGuW4TyGY3kmZKur718afYp3gqDu524shVRt0R+TKugqlA1Se0nGV2tAz4YAGi2n0EkCc7TuHQ0mXqarw/zj8iWXPd1hY6/gteN5VdgTo=
+	t=1772470964; cv=none; b=hXbwbvHqVelhykyr3jFuJ9+F2ytH8UqZOFE7GC9wM9ilQCa/ZNx1Bn2ZhQ6xTl95pybsz0hHaDWxjwMJuDHjvIFfcHlFf6840rNsM8iHDwfzXalUh9GHPishmEaCYPvfkOA+IjeE7OSXdIM2tza466s0/IC5/2efx5xFzbUE3XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772470024; c=relaxed/simple;
-	bh=lTGRPWD5nMRyqg81LvsdYccWHtDwYOeLqtmq3kGQQ9E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Rzr6BDfq0Wxybr3GNZFSR5lRolDw/tH3LZ1pbS7WELHpdO9RQ2dJPXuWr/YT2QkQmsarBMKZXEtXtizb0umaDjqS1AgTErH7XtM/a1VK9mi1SM0QhRmYhUORU3t9poZ06o7e73Qr74qcOteu8PMqzGs3auFOkLqMbQWsHgd8DSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 67C6714BF;
-	Mon,  2 Mar 2026 08:46:54 -0800 (PST)
-Received: from [10.57.55.216] (unknown [10.57.55.216])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA0543F694;
-	Mon,  2 Mar 2026 08:46:54 -0800 (PST)
-Message-ID: <782ffcc2-1a72-46f0-a0c7-f1277fb84ced@arm.com>
-Date: Mon, 2 Mar 2026 16:46:52 +0000
+	s=arc-20240116; t=1772470964; c=relaxed/simple;
+	bh=f7f6RNaV0yL3M61YiC7jd5CCIvUd17Z5NSWa/2LOMhg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Knk9nEYKlQzzoDQrYFfrf5rsVVOv8EgKXt/qhBi+pDwgG/4FOgHTPgRv+v0oiHBbtu8hYI05NjoP1uDtr+LGKRaMPus5OXB4pRjOsC4wL2MQdjhsBK4Yiu5CRn40wAJ4DmVYbilrK+ERflvaZM2BCeki0COldjlDlZswgGM5vYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T1FIhc6F; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c70f137aa4aso2753258a12.2
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 09:02:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772470962; x=1773075762; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D7nIJKnAoTlZY5dkO0+xgnDvgGoKc3sJhm52pQfwJ7k=;
+        b=T1FIhc6F8MXdZikqypWZJAlmBBUGA/YLvfF0axgVD/DQkwzweQjvmFwRcNxsDyzuR/
+         TMYIcgj/lqGYSvnMNHQte7uKGNFqVWckWexF4OtE6XnNO+zNc1p7IZQIjnZe/3DS+TYY
+         R78xAMio1GS+iqsFVMLUPGWwTjGJVCINnPH4IS9YwwBs+hpThO7zR+ktYbvOA7DOJwrz
+         iEDQDhFQisbrAo102Y7sHmbFE3m/VxtQL1zeQHxBAjipl8ksugOAsoHVUjKhbsImEAXz
+         rOkn2WXef+5OCWTFxqBFTO08cVunbPcPkgMSWEbLvDJUHcsDsjSTVlrCayDEhNCyngOO
+         Fgjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772470962; x=1773075762;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D7nIJKnAoTlZY5dkO0+xgnDvgGoKc3sJhm52pQfwJ7k=;
+        b=EU2XkPTVnS+8s5D3M21nJxeu+UVay6vRoC+pXNxWjy9yZn2c6TBU+0n2e0wup6gYw5
+         n0wpN3a7uTZMJSEWGX9PfATna5RIuMtffFcDp1kaJzx79NRIf/0oqNN4JMt/1i6d8If5
+         IL1AyAGcQ8neKtgh687AUGawWq9eS3BVGQyushScn/srF/6fcpqBqrwSa3VN05b1iel8
+         kSJGAAbAm/tIA56G6Ee4f7gTZxbzuQmriwr5MYaoXaNbxwoXW7IFBGu2fCZhU8eUIMM7
+         SnxZ8B5NYR7/heccyVietBKvW7SS2U0Z5td4VnDdbm6qSthJ+YTJgpOTz4h90o3X6zjS
+         OTZA==
+X-Gm-Message-State: AOJu0YwTXytKy4s4fb87fTcM80hc29vfqTaxCarmDGjhIoe4QV4UYbYm
+	WqE3MW3NBgxoVzdNHUpqihI3DjJ/e/Pd5IvDPLlKG2M0o9IiG6Z1RgdhMw4HTeQBC8DHd066I4N
+	iXpIfeA==
+X-Received: from pjyl18.prod.google.com ([2002:a17:90a:ec12:b0:359:8830:eace])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:c106:b0:356:35a5:4a64
+ with SMTP id 98e67ed59e1d1-35965c17f3cmr11375810a91.4.1772470962136; Mon, 02
+ Mar 2026 09:02:42 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Mon,  2 Mar 2026 09:02:39 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 20/46] arm64: RMI: Allow populating initial contents
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>
-References: <20251217101125.91098-1-steven.price@arm.com>
- <20251217101125.91098-21-steven.price@arm.com> <86qzq28elj.wl-maz@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <86qzq28elj.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: CB4041DD628
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260302170239.596810-1-seanjc@google.com>
+Subject: [PATCH v2] Documentation: KVM: Formalizing taking vcpu->mutex
+ *outside* of kvm->slots_lock
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 200F71DD853
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.36 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steven.price@arm.com,kvm@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.910];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-72405-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72404-lists,kvm=lfdr.de];
-	R_DKIM_NA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[]
+	RCVD_COUNT_THREE(0.00)[4];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.dev:email];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	HAS_REPLYTO(0.00)[seanjc@google.com];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[6];
+	REPLYTO_EQ_FROM(0.00)[]
 X-Rspamd-Action: no action
 
-On 02/03/2026 14:56, Marc Zyngier wrote:
-> On Wed, 17 Dec 2025 10:10:57 +0000,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> The VMM needs to populate the realm with some data before starting (e.g.
->> a kernel and initrd). This is measured by the RMM and used as part of
->> the attestation later on.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v11:
->>  * The multiplex CAP is gone and there's a new ioctl which makes use of
->>    the generic kvm_gmem_populate() functionality.
->> Changes since v7:
->>  * Improve the error codes.
->>  * Other minor changes from review.
->> Changes since v6:
->>  * Handle host potentially having a larger page size than the RMM
->>    granule.
->>  * Drop historic "par" (protected address range) from
->>    populate_par_region() - it doesn't exist within the current
->>    architecture.
->>  * Add a cond_resched() call in kvm_populate_realm().
->> Changes since v5:
->>  * Refactor to use PFNs rather than tracking struct page in
->>    realm_create_protected_data_page().
->>  * Pull changes from a later patch (in the v5 series) for accessing
->>    pages from a guest memfd.
->>  * Do the populate in chunks to avoid holding locks for too long and
->>    triggering RCU stall warnings.
->> ---
->>  arch/arm64/include/asm/kvm_rmi.h |   4 +
->>  arch/arm64/kvm/Kconfig           |   1 +
->>  arch/arm64/kvm/arm.c             |   9 ++
->>  arch/arm64/kvm/rmi.c             | 175 +++++++++++++++++++++++++++++++
->>  4 files changed, 189 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
->> index 8a862fc1a99d..b5e36344975c 100644
->> --- a/arch/arm64/include/asm/kvm_rmi.h
->> +++ b/arch/arm64/include/asm/kvm_rmi.h
->> @@ -99,6 +99,10 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu);
->>  int kvm_rec_pre_enter(struct kvm_vcpu *vcpu);
->>  int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
->>  
->> +struct kvm_arm_rmi_populate;
->> +
->> +int kvm_arm_rmi_populate(struct kvm *kvm,
->> +			 struct kvm_arm_rmi_populate *arg);
->>  void kvm_realm_unmap_range(struct kvm *kvm,
->>  			   unsigned long ipa,
->>  			   unsigned long size,
->> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->> index 1cac6dfc0972..b495dfd3a8b4 100644
->> --- a/arch/arm64/kvm/Kconfig
->> +++ b/arch/arm64/kvm/Kconfig
->> @@ -39,6 +39,7 @@ menuconfig KVM
->>  	select GUEST_PERF_EVENTS if PERF_EVENTS
->>  	select KVM_GUEST_MEMFD
->>  	select KVM_GENERIC_MEMORY_ATTRIBUTES
->> +	select HAVE_KVM_ARCH_GMEM_POPULATE
->>  	help
->>  	  Support hosting virtualized guest machines.
->>  
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 7927181887cf..0a06ed9d1a64 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -2037,6 +2037,15 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->>  			return -EFAULT;
->>  		return kvm_vm_ioctl_get_reg_writable_masks(kvm, &range);
->>  	}
->> +	case KVM_ARM_RMI_POPULATE: {
->> +		struct kvm_arm_rmi_populate req;
->> +
->> +		if (!kvm_is_realm(kvm))
->> +			return -EPERM;
-> 
-> EPERM is odd. It isn't that the VMM doesn't have the right to do it,
-> it is that it shouldn't have called that, because the ioctl doesn't
-> exist for a normal VM. -ENOSYS?
+Explicitly document the ordering of vcpu->mutex being taken *outside* of
+kvm->slots_lock.  While somewhat unintuitive since vCPUs conceptually have
+narrower scope than VMs, the scope of the owning object (vCPU versus VM)
+doesn't automatically carry over to the lock.  In this case, vcpu->mutex
+has far broader scope than kvm->slots_lock.  As Paolo put it, it's a
+"don't worry about multiple ioctls at the same time" mutex that's intended
+to be taken at the outer edges of KVM.
 
-Ack
+More importantly, arm64 and x86 have gained flows that take kvm->slots_lock
+inside of vcpu->mutex.  x86's kvm_inhibit_apic_access_page() is particularly
+nasty, as slots_lock is taken quite deep within KVM_RUN, i.e. simply
+swapping the ordering isn't an option.
 
->> +		if (copy_from_user(&req, argp, sizeof(req)))
->> +			return -EFAULT;
->> +		return kvm_arm_rmi_populate(kvm, &req);
->> +	}
->>  	default:
->>  		return -EINVAL;
->>  	}
->> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->> index fe15b400091c..39577e956a59 100644
->> --- a/arch/arm64/kvm/rmi.c
->> +++ b/arch/arm64/kvm/rmi.c
->> @@ -558,6 +558,150 @@ void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
->>  		realm_unmap_private_range(kvm, start, end, may_block);
->>  }
->>  
->> +static int realm_create_protected_data_granule(struct realm *realm,
->> +					       unsigned long ipa,
->> +					       phys_addr_t dst_phys,
->> +					       phys_addr_t src_phys,
->> +					       unsigned long flags)
->> +{
->> +	phys_addr_t rd = virt_to_phys(realm->rd);
->> +	int ret;
->> +
->> +	if (rmi_granule_delegate(dst_phys))
->> +		return -ENXIO;
->> +
->> +	ret = rmi_data_create(rd, dst_phys, ipa, src_phys, flags);
->> +	if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
->> +		/* Create missing RTTs and retry */
->> +		int level = RMI_RETURN_INDEX(ret);
->> +
->> +		WARN_ON(level == RMM_RTT_MAX_LEVEL);
-> 
-> If this is unexpected, why do we still try to handle it? We should
-> abort hard on anything that doesn't seem 100% correct, and mark the
-> realm dead.
+Commit to the vcpu->mutex => kvm->slots_lock ordering, as vcpu->mutex
+really is intended to be a "top-level" lock, whereas kvm->slots_lock is
+"just" a helper lock.
 
-Well this is a "should never happen - the RMM (or Linux kerne) is buggy" 
-situation - so it's not specifically the realm's fault. The "do nothing" 
-error handling deals with things quite reasonably - the following 
-realm_create_rtt_levels() call is a no-op, so we'll retry the 
-rmi_data_create() call and bubble the error up.
+Opportunistically document that vcpu->mutex is also taken outside of
+slots_arch_lock, e.g. when allocating shadow roots on x86 (which is the
+entire reason slots_arch_lock exists, as shadow roots must be allocated
+while holding kvm->srcu)
 
-I'll change this to KVM_BUG_ON so that the guest is killed just in case 
-it turns out the guest can somehow trigger this maliciously.
+  kvm_mmu_new_pgd()
+  |
+  -> kvm_mmu_reload()
+     |
+     -> kvm_mmu_load()
+        |
+        -> mmu_alloc_shadow_roots()
+           |
+           -> mmu_first_shadow_root_alloc()
 
->> +
->> +		ret = realm_create_rtt_levels(realm, ipa, level,
->> +					      RMM_RTT_MAX_LEVEL, NULL);
->> +		if (ret)
->> +			return -EIO;
->> +
->> +		ret = rmi_data_create(rd, dst_phys, ipa, src_phys, flags);
->> +	}
->> +	if (ret)
->> +		return -EIO;
->> +
->> +	return 0;
->> +}
->> +
->> +static int realm_create_protected_data_page(struct realm *realm,
->> +					    unsigned long ipa,
->> +					    kvm_pfn_t dst_pfn,
->> +					    kvm_pfn_t src_pfn,
->> +					    unsigned long flags)
->> +{
->> +	unsigned long rd = virt_to_phys(realm->rd);
->> +	phys_addr_t dst_phys, src_phys;
->> +	bool undelegate_failed = false;
->> +	int ret, offset;
->> +
->> +	dst_phys = __pfn_to_phys(dst_pfn);
->> +	src_phys = __pfn_to_phys(src_pfn);
->> +
->> +	for (offset = 0; offset < PAGE_SIZE; offset += RMM_PAGE_SIZE) {
->> +		ret = realm_create_protected_data_granule(realm,
->> +							  ipa,
->> +							  dst_phys,
->> +							  src_phys,
->> +							  flags);
->> +		if (ret)
->> +			goto err;
->> +
->> +		ipa += RMM_PAGE_SIZE;
->> +		dst_phys += RMM_PAGE_SIZE;
->> +		src_phys += RMM_PAGE_SIZE;
->> +	}
->> +
->> +	return 0;
->> +
->> +err:
->> +	if (ret == -EIO) {
->> +		/* current offset needs undelegating */
->> +		if (WARN_ON(rmi_granule_undelegate(dst_phys)))
->> +			undelegate_failed = true;
->> +	}
->> +	while (offset > 0) {
->> +		ipa -= RMM_PAGE_SIZE;
->> +		offset -= RMM_PAGE_SIZE;
->> +		dst_phys -= RMM_PAGE_SIZE;
->> +
->> +		rmi_data_destroy(rd, ipa, NULL, NULL);
->> +
->> +		if (WARN_ON(rmi_granule_undelegate(dst_phys)))
->> +			undelegate_failed = true;
->> +	}
->> +
->> +	if (undelegate_failed) {
->> +		/*
->> +		 * A granule could not be undelegated,
->> +		 * so the page has to be leaked
->> +		 */
->> +		get_page(pfn_to_page(dst_pfn));
->> +	}
->> +
->> +	return -ENXIO;
->> +}
->> +
->> +static int populate_region_cb(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
->> +			      void __user *src, int order, void *opaque)
->> +{
->> +	struct realm *realm = &kvm->arch.realm;
->> +	unsigned long data_flags = *(unsigned long *)opaque;
->> +	phys_addr_t ipa = gfn_to_gpa(gfn);
->> +	int npages = (1 << order);
->> +	int i;
->> +
->> +	for (i = 0; i < npages; i++) {
->> +		struct page *src_page;
->> +		int ret;
->> +
->> +		ret = get_user_pages((unsigned long)src, 1, 0, &src_page);
->> +		if (ret < 0)
->> +			return ret;
->> +		if (ret != 1)
->> +			return -ENOMEM;
->> +
->> +		ret = realm_create_protected_data_page(realm, ipa, pfn,
->> +						       page_to_pfn(src_page),
->> +						       data_flags);
->> +
->> +		put_page(src_page);
->> +
->> +		if (ret)
->> +			return ret;
->> +
->> +		ipa += PAGE_SIZE;
->> +		pfn++;
->> +		src += PAGE_SIZE;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static long populate_region(struct kvm *kvm,
->> +			    gfn_t base_gfn,
->> +			    unsigned long pages,
->> +			    u64 uaddr,
->> +			    unsigned long data_flags)
->> +{
->> +	long ret = 0;
->> +
->> +	mutex_lock(&kvm->slots_lock);
->> +	mmap_read_lock(current->mm);
->> +	ret = kvm_gmem_populate(kvm, base_gfn, u64_to_user_ptr(uaddr), pages,
->> +				populate_region_cb, &data_flags);
->> +	mmap_read_unlock(current->mm);
->> +	mutex_unlock(&kvm->slots_lock);
->> +
->> +	return ret;
->> +}
->> +
->>  enum ripas_action {
->>  	RIPAS_INIT,
->>  	RIPAS_SET,
->> @@ -655,6 +799,37 @@ static int realm_ensure_created(struct kvm *kvm)
->>  	return -ENXIO;
->>  }
->>  
->> +int kvm_arm_rmi_populate(struct kvm *kvm,
->> +			 struct kvm_arm_rmi_populate *args)
->> +{
->> +	unsigned long data_flags = 0;
->> +	unsigned long ipa_start = args->base;
->> +	unsigned long ipa_end = ipa_start + args->size;
->> +	int ret;
->> +
->> +	if (args->reserved ||
->> +	    (args->flags & ~KVM_ARM_RMI_POPULATE_FLAGS_MEASURE) ||
->> +	    !IS_ALIGNED(ipa_start, PAGE_SIZE) ||
->> +	    !IS_ALIGNED(ipa_end, PAGE_SIZE))
->> +		return -EINVAL;
->> +
->> +	ret = realm_ensure_created(kvm);
->> +	if (ret)
->> +		return ret;
->> +
->> +	if (args->flags & KVM_ARM_RMI_POPULATE_FLAGS_MEASURE)
-> 
-> This flag isn't documented.
+but also when manipulating memslots in vCPU context, e.g. when inhibiting
+the APIC-access page via the aforementioned kvm_inhibit_apic_access_page()
 
-Indeed - that's an oversight! I'll add the following to the docs:
+  kvm_inhibit_apic_access_page()
+  |
+  -> __x86_set_memory_region()
+     |
+     -> kvm_set_internal_memslot()
+        |
+        -> kvm_set_memory_region()
+           |
+           -> kvm_set_memslot()
 
-`flags` can be set to `KVM_ARM_RMI_POPULATE_FLAGS_MEASURE` to request that the
-populated data is hashed and added to the guest's Realm Initial Measurement
-(RIM).
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
 
->> +		data_flags |= RMI_MEASURE_CONTENT;
->> +
->> +	ret = populate_region(kvm, gpa_to_gfn(ipa_start),
->> +			      args->size >> PAGE_SHIFT,
->> +			      args->source_uaddr, args->flags);
->> +
->> +	if (ret < 0)
->> +		return ret;
->> +
->> +	return ret * PAGE_SIZE;
-> 
-> Bits of the code works on PAGE_SIZE, other bits on RMM_PAGE_SIZE. It
-> is pretty confusing. Are you in the middle of reworking this?
+v2:
+ - Document that vcpu->mutex is taken outside of slots_arch_lock. [Paolo]
+ - Rework changelog to not claim that taking vcpu->mutex outside of
+   slots_lock is "arguably wrong". [Paolo]
+ - Provide sample call chains for slots_arch_lock. [Paolo]
 
-Yes, sorry about that - RMM_PAGE_SIZE will be completely gone when
-this is updated to RMM v2.0.
+v1:
+ - https://lore.kernel.org/all/20251016235538.171962-1-seanjc@google.com
+ - https://lore.kernel.org/all/20260207041011.913471-3-seanjc@google.com
 
-Thanks,
-Steve
+ Documentation/virt/kvm/locking.rst | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
+index ae8bce7fecbe..662231e958a0 100644
+--- a/Documentation/virt/kvm/locking.rst
++++ b/Documentation/virt/kvm/locking.rst
+@@ -17,6 +17,8 @@ The acquisition orders for mutexes are as follows:
+ 
+ - kvm->lock is taken outside kvm->slots_lock and kvm->irq_lock
+ 
++- vcpu->mutex is taken outside kvm->slots_lock and kvm->slots_arch_lock
++
+ - kvm->slots_lock is taken outside kvm->irq_lock, though acquiring
+   them together is quite rare.
+ 
+
+base-commit: b1195183ed42f1522fae3fe44ebee3af437aa000
+-- 
+2.53.0.473.g4a7958ca14-goog
 
 
