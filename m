@@ -1,68 +1,68 @@
-Return-Path: <kvm+bounces-72434-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72435-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QNvlITUcpmmeKQAAu9opvQ
-	(envelope-from <kvm+bounces-72434-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:24:37 +0100
+	id kF62D7kcpmmeKQAAu9opvQ
+	(envelope-from <kvm+bounces-72435-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:26:49 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 061581E6944
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:24:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9010E1E6A1E
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:26:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D24F430DE1B8
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 22:57:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D27C131262BD
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 23:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A33B2DECB2;
-	Mon,  2 Mar 2026 22:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48136282F11;
+	Mon,  2 Mar 2026 23:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WLQx+WMr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HJK7Zzaw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAEBE2D73BD;
-	Mon,  2 Mar 2026 22:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E061A683F;
+	Mon,  2 Mar 2026 23:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772492222; cv=none; b=AX2WYnRky7XX45ymS9egwULf9rvlzy7kK/dfgGgaM80+l6fdZ2CrAk/76PLGZIS8IH2SB48vSzfTH4udJt0fnoo7DqjuDksqkK8RjRk1usaF/Az8nKku/VwO2LwZk3q+ugWJ/IAq8Pu9xjHIq9ZNdTf+kcIz14UBEllyxeB5B+U=
+	t=1772492406; cv=none; b=mor3kZ259FuNMrDQHdjYda/2MW03dqlEbmhB7Ohworc4JhUxtLioccGjFjmnSKl3+Sg7yiRURtLPYBo+m8IvlqHLYKRz2iZA6HAxvjhgYGN4Vr0MP67ospBxYaU2dcZZ30eaKlufWoi/OsGY5QRDh443PPZg344/uYmd/kCQzdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772492222; c=relaxed/simple;
-	bh=IaR/YVxInhGX1QKitvlSQAov+Xp/viWCeh+vpDCYrMc=;
+	s=arc-20240116; t=1772492406; c=relaxed/simple;
+	bh=2J+XJu7ap9evpt/XBbXxZK4EJ5x/4jkKGFsRJeddi1g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cpDt/YO31xvfTZcJC7pEU0w/3OCU09p5NlR6HZjuOd0yXeFRR1ixPrm70n0296IIpnvxp8/U3nOAQdDPIXt3Tq8H1w2f07JZ8IBKbtrWvgwM8jpPoSnuOsx1ZJd6xeH+W/VF5yrakGZuHzkXNR7vvsmHZjemVK6xGrnF+FemgRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WLQx+WMr; arc=none smtp.client-ip=192.198.163.15
+	 In-Reply-To:Content-Type; b=HKKQ/+yLhtKekCwe/nJXMNZ8pSNMXo+9wki+vV8SXPdGxxWzAUvjYQJzD1nkzb5uuBMgXZyLLSli2ivI8SkuDD70/o+187e3c0JWN86mS3BAntS8lq8q8+IKp63J+2hTqWpxWz5uEXawL4+EbkstfycACBPTdnYkNoOcX9UncQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HJK7Zzaw; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772492220; x=1804028220;
+  t=1772492405; x=1804028405;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=IaR/YVxInhGX1QKitvlSQAov+Xp/viWCeh+vpDCYrMc=;
-  b=WLQx+WMrGT7lILmPpDX1OH+g00rDCp7BGG3OdfHAKulwoo8M0zjikT9a
-   Akh9rQ9us+q3m4bm1GUDbs+ENBdHUMTCDFXnnTVS6sblJ3guzfOoiUD7u
-   RBJrIQPNMp60SQ4MTCu5lXgNQt2V+NGz7niYoTQqwG8tNcjl1kiXk3hqe
-   97yN0UfgU/Z288GTbHsWlH8+slrgiHKdVizx9F+jE19wvbMkPwypWL7Dk
-   mDUmO3Lzm7astQdrWYRC6Q7Exw10O0lfzzWD3mkWNLGA1DVmuIvMMrxwg
-   NLY+fn5EqU+USRJnX4dN8vtcaVHaj6ykMKazSxxwyRdFeGchaB4SJIhG2
-   Q==;
-X-CSE-ConnectionGUID: n2VNR1SrT52Hopp4I2RDLw==
-X-CSE-MsgGUID: kD2WfDEdRuCE0lXKDPyeJg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11717"; a="73628794"
+  bh=2J+XJu7ap9evpt/XBbXxZK4EJ5x/4jkKGFsRJeddi1g=;
+  b=HJK7ZzawphKOhtipWrKhG22ItU7zl7FpFIcx387xaaDEbbVKOLaAtBZb
+   +nt3fTW+1/SRUwYiVpRIUlTbVlPAleCJ7lZ7/zrU8rwfLPhEbOsOch1uF
+   o8vOTYXhJBNzRKrEbFxV/p1Ie2asERKXH37lTJ0esc6w+yY8oR+qVpFUa
+   nK/jCx/6MVwLTkGs8dCjN9MEgxIJsRj+Es2821/hDJgr02hj+yfzHQ0A9
+   c8XciJls5N5fVAW187FwpeTYZHpwBLgaKLpBlZe3mGlkzsGjnFkwH3QYx
+   Rs0uKNujljZlxXxV40PGgoF/1GUqg4Qppjg47Ov7MNKIS5ZZe9+8J/8O9
+   A==;
+X-CSE-ConnectionGUID: juubK7LVSi2Pc2aBnyXyGw==
+X-CSE-MsgGUID: FbiR3Q8QRsCCqhRUMTGQ1A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11717"; a="98987235"
 X-IronPort-AV: E=Sophos;i="6.21,320,1763452800"; 
-   d="scan'208";a="73628794"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 14:56:59 -0800
-X-CSE-ConnectionGUID: 78vV/02pSfWtK4swQNFAeg==
-X-CSE-MsgGUID: XE6gTTCCTHudlbxc9l33yQ==
+   d="scan'208";a="98987235"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 15:00:04 -0800
+X-CSE-ConnectionGUID: 4JVBorZgRlexv62icekUVg==
+X-CSE-MsgGUID: eUSFDL7BRZaH7/SLv0QQMQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,320,1763452800"; 
-   d="scan'208";a="217797010"
+   d="scan'208";a="217034536"
 Received: from cmdeoliv-mobl4.amr.corp.intel.com (HELO [10.125.108.103]) ([10.125.108.103])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 14:56:58 -0800
-Message-ID: <a1701ab4-d80f-496c-bdb3-5d94d2d2f673@intel.com>
-Date: Mon, 2 Mar 2026 14:57:03 -0800
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 15:00:03 -0800
+Message-ID: <86bcca73-0c1b-405f-a72d-debb3c696333@intel.com>
+Date: Mon, 2 Mar 2026 15:00:08 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,11 +70,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/7] x86/sev: add support for RMPOPT instruction
-To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com,
- bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
- herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org
+Subject: Re: [PATCH v2 2/7] x86/sev: add support for enabling RMPOPT
+To: "Kalra, Ashish" <ashish.kalra@amd.com>, tglx@kernel.org,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
+ thomas.lendacky@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
+ ardb@kernel.org
 Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
  KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
  jackyli@google.com, pgonda@google.com, rientjes@google.com,
@@ -83,7 +84,9 @@ Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
  darwi@linutronix.de, linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
 References: <cover.1772486459.git.ashish.kalra@amd.com>
- <8dc0198f1261f5ae4b16388fc1ffad5ddb3895f9.1772486459.git.ashish.kalra@amd.com>
+ <85aec55af41957678d214e9629eb6249b064fa87.1772486459.git.ashish.kalra@amd.com>
+ <b5a44f79-8f99-4e61-aaa2-e8aec6f0cf69@intel.com>
+ <6a50d050-f602-43fd-a44a-cecedd9823eb@amd.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -129,22 +132,22 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <8dc0198f1261f5ae4b16388fc1ffad5ddb3895f9.1772486459.git.ashish.kalra@amd.com>
+In-Reply-To: <6a50d050-f602-43fd-a44a-cecedd9823eb@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 061581E6944
+X-Rspamd-Queue-Id: 9010E1E6A1E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[34];
-	TAGGED_FROM(0.00)[bounces-72434-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72435-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+];
@@ -153,180 +156,29 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:mid,amd.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-That subject could use a wee bit of work.
+On 3/2/26 14:55, Kalra, Ashish wrote:
+>> What's wrong with:
+>>
+>> 	u64 rmpopt_base = pa_start | MSR_AMD64_RMPOPT_ENABLE;
+>> 	...
+>> 	for_each_online_cpu(cpu)
+>> 		wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE, rmpopt_base);
+>>
+>> Then there's at least no ugly casting.
+>>
+> RMOPT_BASE MSRs don't need to be set serially, therefore, by
+> using the cpu_online_mask and on_each_cpu_mask(), we can setup the MSRs
+> concurrently and in parallel. Using for_each_online_cpu() will be slower than
+> doing on_each_cpu_mask() as it doesn't send IPIs in parallel, right.
 
-I'd probably talk about this adding a new kernel thread that does the
-optimizations asynchronously.
-
-
-On 3/2/26 13:36, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> As SEV-SNP is enabled by default on boot when an RMP table is
-> allocated by BIOS, the hypervisor and non-SNP guests are subject to
-> RMP write checks to provide integrity of SNP guest memory.
-> 
-> RMPOPT is a new instruction that minimizes the performance overhead of
-> RMP checks on the hypervisor and on non-SNP guests by allowing RMP
-> checks to be skipped for 1GB regions of memory that are known not to
-> contain any SEV-SNP guest memory.
-> 
-> Enable RMPOPT optimizations globally for all system RAM at RMP
-> initialization time. RMP checks can initially be skipped for 1GB memory
-> ranges that do not contain SEV-SNP guest memory (excluding preassigned
-> pages such as the RMP table and firmware pages). As SNP guests are
-> launched, RMPUPDATE will disable the corresponding RMPOPT optimizations.
-
-This is heavy on the "what" and light on the "why" and "how".
-
-> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-> index 405199c2f563..c99270dfe3b3 100644
-> --- a/arch/x86/virt/svm/sev.c
-> +++ b/arch/x86/virt/svm/sev.c
-> @@ -19,6 +19,7 @@
->  #include <linux/iommu.h>
->  #include <linux/amd-iommu.h>
->  #include <linux/nospec.h>
-> +#include <linux/kthread.h>
->  
->  #include <asm/sev.h>
->  #include <asm/processor.h>
-> @@ -122,6 +123,13 @@ static u64 rmp_cfg;
->  
->  static u64 probed_rmp_base, probed_rmp_size;
->  
-> +enum rmpopt_function {
-> +	RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS,
-> +	RMPOPT_FUNC_REPORT_STATUS
-> +};
-
-Shouldn't these go by the instruction definition?
-
-You could even call it rmpopt_rcx or something.
-
-> +static struct task_struct *rmpopt_task;
-> +
->  static LIST_HEAD(snp_leaked_pages_list);
->  static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
->  
-> @@ -500,6 +508,61 @@ static bool __init setup_rmptable(void)
->  	}
->  }
->  
-> +/*
-> + * 'val' is a system physical address aligned to 1GB OR'ed with
-> + * a function selection. Currently supported functions are 0
-> + * (verify and report status) and 1 (report status).
-> + */
-> +static void rmpopt(void *val)
-> +{
-> +	asm volatile(".byte 0xf2, 0x0f, 0x01, 0xfc"
-> +		     : : "a" ((u64)val & PUD_MASK), "c" ((u64)val & 0x1)
-> +		     : "memory", "cc");
-> +}
-
-Doesn't this belong in:
-
-arch/x86/include/asm/special_insns.h
-
-Also, it's not reporting *any* status here, right? So why even talk
-about it if the kernel isn't doing any status checks? It just makes it
-more confusing.
-
-> +static int rmpopt_kthread(void *__unused)
-> +{
-> +	phys_addr_t pa_start, pa_end;
-> +
-> +	pa_start = ALIGN_DOWN(PFN_PHYS(min_low_pfn), PUD_SIZE);
-> +	pa_end = ALIGN(PFN_PHYS(max_pfn), PUD_SIZE);
-
-Needs vertical alignment:
-
-	pa_start = ALIGN_DOWN(PFN_PHYS(min_low_pfn), PUD_SIZE);
-	pa_end   = ALIGN(     PFN_PHYS(max_pfn),     PUD_SIZE);
-
-Nit: the architecture says "1GB" regions, not PUD_SIZE. If we ever got
-fancy and changed the page tables, this code would break. Why make it
-harder on ourselves than it has to be?
-
-> +	/* Limit memory scanning to the first 2 TB of RAM */
-> +	pa_end = (pa_end - pa_start) <= SZ_2T ? pa_end : pa_start + SZ_2T;
-
-That's a rather unfortunate use of ternary form. Isn't this a billion
-times more clear?
-
-	if (pa_end - pa_start > SZ_2T)
-		pa_end = pa_start + SZ_2T;
-
-> +	while (!kthread_should_stop()) {
-> +		phys_addr_t pa;
-> +
-> +		pr_info("RMP optimizations enabled on physical address range @1GB alignment [0x%016llx - 0x%016llx]\n",
-> +			pa_start, pa_end);
-
-This isn't really enabling optimizations. It's trying to enable them,
-right? It might fall on its face and fail every time, right?
-
-> +		/*
-> +		 * RMPOPT optimizations skip RMP checks at 1GB granularity if this range of
-> +		 * memory does not contain any SNP guest memory.
-> +		 */
-> +		for (pa = pa_start; pa < pa_end; pa += PUD_SIZE) {
-> +			/* Bit zero passes the function to the RMPOPT instruction. */
-> +			on_each_cpu_mask(cpu_online_mask, rmpopt,
-> +					 (void *)(pa | RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS),
-> +					 true);
-> +
-> +			 /* Give a chance for other threads to run */
-> +			cond_resched();
-> +		}
-
-Could you also put together some proper helpers, please? The
-lowest-level helper should look a lot like the instruction reference:
-
-void __rmpopt(u64 rax, u64 rcx)
-{
-	asm volatile(".byte 0xf2, 0x0f, 0x01, 0xfc"
-		     : : "a" (rax), "c" (rcx)
-		     : "memory", "cc");
-}
-
-Then you can have a higher-level instruction that shows how you convert
-the logical things "physical address" and "rmpopt_function" into the
-register arguments:
-
-void rmpopt(unsigned long pa)
-{
-	u64 rax = ALIGN_DOWN(pa & SZ_1GB);
-	u64 rcx = RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS;
-
-	__rmpopt(rax, rcx);
-}
-
-There's no need right now to pack and unpack rax/rcx from a pointer. Why
-even bother when rcx is a fixed value?
-
-> +		set_current_state(TASK_INTERRUPTIBLE);
-> +		schedule();
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void rmpopt_all_physmem(void)
-> +{
-> +	if (rmpopt_task)
-> +		wake_up_process(rmpopt_task);
-> +}
-
-Wait a sec, doesn't this just run all the time? It'll be doing an RMPOPT
-on some forever.
+If that's the case and you *need* performance, then please go add a
+wrmsrq_on_cpumask() function to do things in parallel.
 
