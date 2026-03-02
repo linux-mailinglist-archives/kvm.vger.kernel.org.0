@@ -1,274 +1,286 @@
-Return-Path: <kvm+bounces-72342-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72343-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cPqDEV9CpWkg7AUAu9opvQ
-	(envelope-from <kvm+bounces-72342-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 08:55:11 +0100
+	id mNiYBSVDpWkg7AUAu9opvQ
+	(envelope-from <kvm+bounces-72343-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 08:58:29 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D121C1D4331
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 08:55:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75A521D4393
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 08:58:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0D8083013DE8
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 07:55:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 814BF3023DFF
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 07:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66BF2387371;
-	Mon,  2 Mar 2026 07:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D5338736C;
+	Mon,  2 Mar 2026 07:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ImjHKrId"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="KkeFGYO3"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 947863859FD;
-	Mon,  2 Mar 2026 07:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772438107; cv=none; b=YISyDgbjQ2CqtkH7y53mfyDwogzS2tkHCtOseaZ+Y2y6Ibc1DsryCaUVW2VV+ZskI9BxwDH4KOXgykPGDhtulqCrnD9Lq2T32dLs3yWUzwoegx0Y8ez15HgJPmhH/j/3+DLh37Jqc+YYkDIbewuQm0Ul+vv6URd0mdfcXdwukWA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772438107; c=relaxed/simple;
-	bh=TpSHHOMB+i4iaPaUlJVmKGcvqLj7+j67v8W16M22Nc4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=t1rngud9hBaL4lgt/vCV+727eb6KPrLlDtjqB46cQ0mN1+c6eLfky7TQWA0A6HIu8l+jhiW+S/pCODgCGoXiXTqAx4sucKd6SnQYX4B1UC8PKnC5WJSW/Lt8IQu+kiJu4tCQGsR1bmRhfRbGz3+6J8jO/U4qHd8ATK7Pj4haXUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ImjHKrId; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8181C19423;
-	Mon,  2 Mar 2026 07:54:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772438107;
-	bh=TpSHHOMB+i4iaPaUlJVmKGcvqLj7+j67v8W16M22Nc4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=ImjHKrIdoo15tSikWAsezZ9zmWHDO6VGBVoSqiP2coKiypFMXFUQjAF0i2d1xi4xN
-	 tRzNS4Sg4dyzE1mz6b9uakWZPbSJcKcl77IgnWyH5mvWK9ZC+UKn73Aq3zx9NSGUVY
-	 HrVcG87kXYw0i6utiq7NHNfuLgg2sP6vGGnpGzvzK/UqkE3oxrZcMzQ6+zeOrMDIn+
-	 V7VOirFzBKNg39OpP4HUx6sPZl5IpXLNBCpbPqOjYGh0NarJUr0jwW7yV8qjcatDOY
-	 lvFN5ONLkqbjf7w612WT58JnVSiSzOf+21r2l8ww3pC8D7brwNZq5A5+oUQZm9TYfm
-	 nNmRGvVyzcvxA==
-X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Alexey Kardashevskiy <aik@amd.com>, x86@kernel.org
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Mike Rapoport <rppt@kernel.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Melody Wang <huibo.wang@amd.com>,
-	Seongman Lee <augustus92@kaist.ac.kr>,
-	Joerg Roedel <joerg.roedel@amd.com>,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Andi Kleen <ak@linux.intel.com>,
-	Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
-	Tony Luck <tony.luck@intel.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Denis Efremov <efremov@linux.com>,
-	Geliang Tang <geliang@kernel.org>,
-	Piotr Gregor <piotrgregor@rsyncme.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Jesse Barnes <jbarnes@virtuousgeek.org>,
-	Jacob Pan <jacob.jun.pan@linux.intel.com>,
-	Yinghai Lu <yinghai@kernel.org>,
-	Kevin Brodsky <kevin.brodsky@arm.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Kim Phillips <kim.phillips@amd.com>,
-	Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Claire Chang <tientzu@chromium.org>,
-	linux-coco@lists.linux.dev, iommu@lists.linux.dev,
-	Alexey Kardashevskiy <aik@amd.com>
-Subject: Re: [PATCH kernel 4/9] dma/swiotlb: Stop forcing SWIOTLB for TDISP
- devices
-In-Reply-To: <20260225053806.3311234-5-aik@amd.com>
-References: <20260225053806.3311234-1-aik@amd.com>
- <20260225053806.3311234-5-aik@amd.com>
-Date: Mon, 02 Mar 2026 13:24:47 +0530
-Message-ID: <yq5acy1mu0mw.fsf@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF0D335562
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 07:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772438234; cv=pass; b=W/uve/De5n927H7okY0qag+QN9iGeMVqAylc6GXPk3E9o8Hjx5nd11B5iK+POsd0qg5kbStvG5iHv3iyKtPubyU4IClnzOfut9KyytQ8CDWfDMHqD8HOycSzSO//EcVcJlURWiYH/xchbaPwVRsVskZgfLZBq90HoRcD9RmxnBU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772438234; c=relaxed/simple;
+	bh=dctTorRnS+gZP+tjbeRsADcbZXE0DiCC91FuR/lgzS4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VksVTDp9EgX0KFdB7HHT8PLFPm/4AnBRXmgUXg6og8blGRNGlwWhoUt+KOIZFObThNXWb52U8SRN2uG5U410BtroVNs/m3aPRBN4pPmN2QqtsuxNWv84CUriOJOq6V23LyWONv3IcYTzWosztre1KsXwERnvyL0D2PGgTykXo0I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=KkeFGYO3; arc=pass smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-662f9aeb782so3385225eaf.3
+        for <kvm@vger.kernel.org>; Sun, 01 Mar 2026 23:57:12 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772438232; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Txjauu/JCrT7clGlekD1OeqcoHRcvQtFhI0PUDU74YYL3UViPdsrxOkZTituAnlYRr
+         eZ8s+rddZ2XDau2bF1rLlAoj/fbsKloosy6cceEw+evMqHnWCjmNFgjLt37S6YlxKTjO
+         k1r6ey6mRrHohb5Qy0MWKqcmY+j87MoPvOJ+AnioVffLWC6lQwYQuKhI7ledt0ITASQr
+         NMik1Rp5lTvvWRdH/J1v3taF6NdiSRQRIrz672Av1h1yM55tUt33+poSjEbCfHx7PdY9
+         FFjLG5aXojMrdImMLRuiBvRJycRX/3hqSW6klN1Ud9tDamPCOJ5Zjb6eIYVnt7kcrmOz
+         ribg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=sYw7BzIszduQmcIAASuAjoew5S5p7hWuqNEaXkq1rV0=;
+        fh=SGo2MmD/OkfGFBB4Pt+YbCcZl06lvflPekczjVqCv8E=;
+        b=OFhTQB1e3424VhRK6oxTiZHFBitwHdMhxnYMF7UE8r8GM0QEoED5kyLifdJgr+b7Y2
+         XucEFObTUXBX4sgGTSrFJOxdl0h9nML/2XYQ0L9J73VxHpH0o5CwHQ3/h8T6VQWOcWkt
+         brEUhUhRlmWdnM4tqil6xOjAKEdS+VmnqCtEE3lXeDoGxnqLt5b7dc4x/sFTD/1Tk5Ev
+         ds6JIYgcJlqdbT9LLxaoj+Uk1I4emKYxhOUzjdsi8ckT2x6Z+cKhcNvQl5gu+g2d+a/L
+         RxL5LHyog0OXNRkTWdVidPBetyjTeMM1InujCPGGKno4W3AOOnRypiuW9sGElcqBsnSf
+         6Gzw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1772438232; x=1773043032; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sYw7BzIszduQmcIAASuAjoew5S5p7hWuqNEaXkq1rV0=;
+        b=KkeFGYO3RZljS4t5zW8EwdxpE7GaLTd1SOzcMJuHthGi4tfNzDYy4B9fcQhYp1kL7W
+         lH6EFaeHI08dX0O3XA057LIRbePECKvfS9a0P7p7fUtz1Vyloo5a8CubM2JhFPbE+nC9
+         2ARXpr/smc7liIYRwaM5fLU7jSAr9KH7YRtHiJCq5nmB0sMwK+VkxuSZWJty3FgYe6mL
+         7l0PHseEyIRAm6k/7RAqxBbwChpzWzcB0LC2JxfnsedG9hjt24/Vrrp9MHJOeYLac0yX
+         ZcEpg0DWBqMPwksEjfNLW804nODppzK4xwfpXDN9/KQ7Nf065h6epErkrSty7+44iegB
+         lZOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772438232; x=1773043032;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=sYw7BzIszduQmcIAASuAjoew5S5p7hWuqNEaXkq1rV0=;
+        b=fC2TwgJ4eLIWk3PyRDXRADN6V4XrBAfAAXsJRgGymIFHzjy6moGVa0kDgJ0XTw7rl9
+         qbA+liDQrgpFapNA3/tMD37D1Z/hQF67bvDB1lLwfwuV6ECB4YTcdqStZ2RhBI3dZwfO
+         slRhSwWiuyHYLU8bpunKD5mvNSYB2mxNgtEWA1NOU/V0DIF3W+cb5f0pXvT2w6g19pHk
+         Tj9hr9xBlmRMjO/xX1qFD2eljBOPctuhPs0efb7+2QrGpZ/aGWHISPfNK/NPSQXK/ahE
+         nFsHBoH8fEEvhDxlKZp/vIyqjS3E242+HhU0UZS37nEnhmlrM3M2DBO7Gg83wLs5BKSu
+         oq5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXGROMXXWJaH6BuKyU4MJxiYPvmXeLZIPtQYPisIIvUnG+EawslZwwkBZQC0Qa3KgTcLh0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzY+Qr9nfUA+JTAkCkmI+CHdo/P3o9HrTTdDQvbB+tGpOFI2bB3
+	PkIivdsv3aivcAnyyrwtRaQw9yEn++emkC0H9iihWvMAwoYwBYOR4wPnAo+tR5b/KZBTstj6f43
+	WWW0jUIsmf3q8BoV0ZBboqDMzLdCAJg9fJhUQF/THHQ==
+X-Gm-Gg: ATEYQzzxz8tR/sucOP0cV1qmsL/gOHjC7T2ZiuIZRxJdiT+8ap9pb1snGbTTwnAJKmY
+	zO+YeFu1Bis5n918zfEAcO2cXQ/73jnxr+xsspOUNzDBEcK8GUdT/o5rwKpk1obFp7EQgm76FSA
+	57m86EhTHzd0F/MWf6fSjjdknEmZboSYlxfEFCkk6AgRLzK/54Ko7fZSU/hrOhPDNPbMgPxpg1T
+	fQeq9BpJEV4kPLCQ3AEDrPXnwQneUq2C7ZRQdtp1YVrdAT4ie4XTZO7kmq6GIg8sJGl1geizfi3
+	RcKIG3DyUqqRTWn1uQXzy5VNc6P2BrM7l4vUvGaImHmD6dkwrwf/tIhwqPia2j+l/gRl2zljDuv
+	9NSw5myn48t71sYhqsia00gEbshw=
+X-Received: by 2002:a05:6820:2083:b0:663:f65:1c92 with SMTP id
+ 006d021491bc7-679faef9814mr7063277eaf.49.1772438231609; Sun, 01 Mar 2026
+ 23:57:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20260224104438.57727-1-xujiakai2025@iscas.ac.cn>
+In-Reply-To: <20260224104438.57727-1-xujiakai2025@iscas.ac.cn>
+From: Anup Patel <anup@brainfault.org>
+Date: Mon, 2 Mar 2026 13:27:00 +0530
+X-Gm-Features: AaiRm50pyr6g5dnPfdIYyaLubJSF_te9LsJuAngs7UB_FiwXT0ux5z9Q5yJiHLM
+Message-ID: <CAAhSdy38=Ho1H21AboHyN3AgqskRxqrPfrzP-uJmv80QjBPRrg@mail.gmail.com>
+Subject: Re: [PATCH] RISC-V: KVM: Fix use-after-free in kvm_riscv_aia_aplic_has_attr()
+To: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	Atish Patra <atish.patra@linux.dev>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alex@ghiti.fr>, Jiakai Xu <jiakaiPeanut@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[brainfault-org.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-72342-lists,kvm=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72343-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[brainfault.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,linux.dev,sifive.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[brainfault-org.20230601.gappssmtp.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[58];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aneesh.kumar@kernel.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[anup@brainfault.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.994];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amd.com:email]
-X-Rspamd-Queue-Id: D121C1D4331
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iscas.ac.cn:email,brainfault-org.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 75A521D4393
 X-Rspamd-Action: no action
 
-Alexey Kardashevskiy <aik@amd.com> writes:
+On Tue, Feb 24, 2026 at 4:14=E2=80=AFPM Jiakai Xu <xujiakai2025@iscas.ac.cn=
+> wrote:
+>
+> Fuzzer reports a KASAN use-after-free bug triggered by a race
+> between KVM_HAS_DEVICE_ATTR and KVM_SET_DEVICE_ATTR ioctls on the AIA
+> device. The root cause is that aia_has_attr() invokes
+> kvm_riscv_aia_aplic_has_attr() without holding dev->kvm->lock, while
+> a concurrent aia_set_attr() may call aia_init() under that lock. When
+> aia_init() fails after kvm_riscv_aia_aplic_init() has succeeded, it
+> calls kvm_riscv_aia_aplic_cleanup() in its fail_cleanup_imsics path,
+> which frees both aplic_state and aplic_state->irqs. The concurrent
+> has_attr path can then dereference the freed aplic->irqs in
+> aplic_read_pending():
+>         irqd =3D &aplic->irqs[irq];   /* UAF here */
+>
+> KASAN report:
+>  BUG: KASAN: slab-use-after-free in aplic_read_pending
+>              arch/riscv/kvm/aia_aplic.c:119 [inline]
+>  BUG: KASAN: slab-use-after-free in aplic_read_pending_word
+>              arch/riscv/kvm/aia_aplic.c:351 [inline]
+>  BUG: KASAN: slab-use-after-free in aplic_mmio_read_offset
+>              arch/riscv/kvm/aia_aplic.c:406
+>  Read of size 8 at addr ff600000ba965d58 by task 9498
+>  Call Trace:
+>   aplic_read_pending arch/riscv/kvm/aia_aplic.c:119 [inline]
+>   aplic_read_pending_word arch/riscv/kvm/aia_aplic.c:351 [inline]
+>   aplic_mmio_read_offset arch/riscv/kvm/aia_aplic.c:406
+>   kvm_riscv_aia_aplic_has_attr arch/riscv/kvm/aia_aplic.c:566
+>   aia_has_attr arch/riscv/kvm/aia_device.c:469
+>  allocated by task 9473:
+>   kvm_riscv_aia_aplic_init arch/riscv/kvm/aia_aplic.c:583
+>   aia_init arch/riscv/kvm/aia_device.c:248 [inline]
+>   aia_set_attr arch/riscv/kvm/aia_device.c:334
+>  freed by task 9473:
+>   kvm_riscv_aia_aplic_cleanup arch/riscv/kvm/aia_aplic.c:644
+>   aia_init arch/riscv/kvm/aia_device.c:292 [inline]
+>   aia_set_attr arch/riscv/kvm/aia_device.c:334
+>
+> The patch replaces the actual MMIO read in kvm_riscv_aia_aplic_has_attr()
+> with a new aplic_mmio_has_offset() that only validates whether the given
+> offset falls within a known APLIC region, without touching any
+> dynamically allocated state. This is consistent with the KVM API
+> documentation for KVM_HAS_DEVICE_ATTR:
+>   "Tests whether a device supports a particular attribute. A successful
+>    return indicates the attribute is implemented. It does not necessarily
+>    indicate that the attribute can be read or written in the device's
+>    current state."
 
-> SWIOTLB is enforced when encrypted guest memory is detected
-> in pci_swiotlb_detect() which is required for legacy devices.
+This is not a hard requirement.
+
+> The upper bounds of each region are taken directly from the
+> RISC-V AIA specification, so the check is independent of the runtime
+> values of nr_irqs and nr_words.
 >
-> Skip SWIOTLB for TDISP devices.
+> This patch both fixes the use-after-free and makes the has_attr
+> implementation semantically correct.
 >
-> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+> Fixes: 289a007b98b06d ("RISC-V: KVM: Expose APLIC registers as attributes=
+ of AIA irqchip")
+> Signed-off-by: Jiakai Xu <jiakaiPeanut@gmail.com>
+> Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
 > ---
->  include/linux/swiotlb.h | 9 +++++++++
->  1 file changed, 9 insertions(+)
+>  arch/riscv/kvm/aia_aplic.c | 28 ++++++++++++++++++++++++++--
+>  1 file changed, 26 insertions(+), 2 deletions(-)
 >
-> diff --git a/include/linux/swiotlb.h b/include/linux/swiotlb.h
-> index 3dae0f592063..119c25d639a7 100644
-> --- a/include/linux/swiotlb.h
-> +++ b/include/linux/swiotlb.h
-> @@ -173,6 +173,15 @@ static inline bool is_swiotlb_force_bounce(struct de=
-vice *dev)
->  {
->  	struct io_tlb_mem *mem =3D dev->dma_io_tlb_mem;
->=20=20
-> +	/*
-> +	 * CC_ATTR_GUEST_MEM_ENCRYPT enforces SWIOTLB_FORCE in
-> +	 * swiotlb_init_remap() to allow legacy devices access arbitrary
-> +	 * VM encrypted memory.
-> +	 * Skip it for TDISP devices capable of DMA-ing the encrypted memory.
-> +	 */
-> +	if (device_cc_accepted(dev))
-> +		return false;
+> diff --git a/arch/riscv/kvm/aia_aplic.c b/arch/riscv/kvm/aia_aplic.c
+> index f59d1c0c8c43a..5e7a1055b2de6 100644
+> --- a/arch/riscv/kvm/aia_aplic.c
+> +++ b/arch/riscv/kvm/aia_aplic.c
+> @@ -527,6 +527,31 @@ static struct kvm_io_device_ops aplic_iodoev_ops =3D=
+ {
+>         .write =3D aplic_mmio_write,
+>  };
+>
+> +static int aplic_mmio_has_offset(struct kvm *kvm, gpa_t off)
+> +{
+> +       if ((off & 0x3) !=3D 0)
+> +               return -EOPNOTSUPP;
 > +
->  	return mem && mem->force_bounce;
->  }
->=20=20
+> +       if ((off =3D=3D APLIC_DOMAINCFG) ||
+> +               (off >=3D APLIC_SOURCECFG_BASE && off < (APLIC_SOURCECFG_=
+BASE + 1023 * 4)) ||
+> +               (off >=3D APLIC_SETIP_BASE && off < (APLIC_SETIP_BASE + 3=
+2 * 4)) ||
+> +               (off =3D=3D APLIC_SETIPNUM) ||
+> +               (off >=3D APLIC_CLRIP_BASE && off < (APLIC_CLRIP_BASE + 3=
+2 * 4)) ||
+> +               (off =3D=3D APLIC_CLRIPNUM) ||
+> +               (off >=3D APLIC_SETIE_BASE && off < (APLIC_SETIE_BASE + 3=
+2 * 4)) ||
+> +               (off =3D=3D APLIC_SETIENUM) ||
+> +               (off >=3D APLIC_CLRIE_BASE && off < (APLIC_CLRIE_BASE + 3=
+2 * 4)) ||
+> +               (off =3D=3D APLIC_CLRIENUM) ||
+> +               (off =3D=3D APLIC_SETIPNUM_LE) ||
+> +               (off =3D=3D APLIC_SETIPNUM_BE) ||
+> +               (off =3D=3D APLIC_GENMSI) ||
+> +               (off >=3D APLIC_TARGET_BASE && off < (APLIC_TARGET_BASE +=
+ 1203 * 4))
+> +       )
+> +               return 0;
+> +       else
+> +               return -ENODEV;
+> +}
+> +
 
+This is changing the functional behavior of KVM_HAS_DEVICE_ATTR
+for APLIC because now KVM_HAS_DEVICE_ATTR will return 0 even
+for non-existent APLIC registers.
 
-I=E2=80=99m wondering whether we need more than that. Perhaps we could start
-with a simpler assumption: a TDISP-capable device will never require
-SWIOTLB bouncing. That would significantly simplify the DMA allocation
-path for T=3D1.
+Instead, the correct fix is to just take dev->kvm->lock in aia_has_attr()
+just like aia_get_attr() and aia_put_attr().
 
-Without this assumption, we might need to implement a private
-io_tlb_mem.
+>  int kvm_riscv_aia_aplic_set_attr(struct kvm *kvm, unsigned long type, u3=
+2 v)
+>  {
+>         int rc;
+> @@ -558,12 +583,11 @@ int kvm_riscv_aia_aplic_get_attr(struct kvm *kvm, u=
+nsigned long type, u32 *v)
+>  int kvm_riscv_aia_aplic_has_attr(struct kvm *kvm, unsigned long type)
+>  {
+>         int rc;
+> -       u32 val;
+>
+>         if (!kvm->arch.aia.aplic_state)
+>                 return -ENODEV;
+>
+> -       rc =3D aplic_mmio_read_offset(kvm, type, &val);
+> +       rc =3D aplic_mmio_has_offset(kvm, type);
+>         if (rc)
+>                 return rc;
+>
+> --
+> 2.34.1
+>
 
-We should also avoid supporting TDISP mode on devices that require
-things like restricted-memory SWIOTLB pool.
-
-Something like:
-
-modified   arch/arm64/mm/mem_encrypt.c
-@@ -18,6 +18,7 @@
- #include <linux/err.h>
- #include <linux/mm.h>
- #include <linux/mem_encrypt.h>
-+#include <linux/device.h>
-=20
- static const struct arm64_mem_crypt_ops *crypt_ops;
-=20
-@@ -53,3 +54,12 @@ int set_memory_decrypted(unsigned long addr, int numpage=
-s)
- 	return crypt_ops->decrypt(addr, numpages);
- }
- EXPORT_SYMBOL_GPL(set_memory_decrypted);
-+
-+bool force_dma_unencrypted(struct device *dev)
-+{
-+	if (device_cc_accepted(dev))
-+		return false;
-+
-+	return is_realm_world();
-+}
-+EXPORT_SYMBOL_GPL(force_dma_unencrypted);
-modified   include/linux/swiotlb.h
-@@ -173,6 +173,11 @@ static inline bool is_swiotlb_force_bounce(struct devi=
-ce *dev)
- {
- 	struct io_tlb_mem *mem =3D dev->dma_io_tlb_mem;
-=20
-+	if (device_cc_accepted(dev)) {
-+		dev_warn_once(dev, "(TIO) Disable SWIOTLB");
-+		return false;
-+	}
-+
- 	return mem && mem->force_bounce;
- }
-=20
-@@ -287,6 +292,9 @@ bool swiotlb_free(struct device *dev, struct page *page=
-, size_t size);
-=20
- static inline bool is_swiotlb_for_alloc(struct device *dev)
- {
-+	if (device_cc_accepted(dev))
-+		return false;
-+
- 	return dev->dma_io_tlb_mem->for_alloc;
- }
- #else
-modified   kernel/dma/direct.c
-@@ -159,6 +159,14 @@ static struct page *__dma_direct_alloc_pages(struct de=
-vice *dev, size_t size,
-  */
- static bool dma_direct_use_pool(struct device *dev, gfp_t gfp)
- {
-+	/*
-+	 * Atomic pools are marked decrypted and are used if we require require
-+	 * updation of pfn mem encryption attributes or for DMA non-coherent
-+	 * device allocation. Both is not true for trusted device.
-+	 */
-+	if (device_cc_accepted(dev))
-+		return false;
-+
- 	return !gfpflags_allow_blocking(gfp) && !is_swiotlb_for_alloc(dev);
- }
-=20
-modified   kernel/dma/swiotlb.c
-@@ -1643,6 +1643,9 @@ bool is_swiotlb_active(struct device *dev)
- {
- 	struct io_tlb_mem *mem =3D dev->dma_io_tlb_mem;
-=20
-+	if (device_cc_accepted(dev))
-+		return false;
-+
- 	return mem && mem->nslabs;
- }
-=20
-
+Regards,
+Anup
 
