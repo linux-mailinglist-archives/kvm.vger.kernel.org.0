@@ -1,190 +1,346 @@
-Return-Path: <kvm+bounces-72400-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72401-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uAiwAo26pWmoFQAAu9opvQ
-	(envelope-from <kvm+bounces-72400-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 17:27:57 +0100
+	id OJwyJjG6pWmoFQAAu9opvQ
+	(envelope-from <kvm+bounces-72401-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 17:26:25 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF1571DCC89
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 17:27:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 855FA1DCC2E
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 17:26:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2509A307E401
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 16:22:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2A9DC3024916
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 16:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7296F30B53E;
-	Mon,  2 Mar 2026 16:21:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2251032AAA0;
+	Mon,  2 Mar 2026 16:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mLeAJ/QH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eIotqif5";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="KyweOOID"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F1C30148B
-	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 16:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE48536EAAB
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 16:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772468513; cv=none; b=XFoJ02TNT8EgXTsJ4PYiJ6obFXJTk0a0JWkA+DJBE45T/S0U3AJPO0UzKTRvmB6yI9pQchgxcrudtvY0+BtSMbLImtnhjt+6ae2iPuTEZpl8h06FN4o56J/mfLo/6JbPh1UOQxraCZLbg+sSjG11QONRq2K4zVu+zjtb7UTS4TQ=
+	t=1772468775; cv=none; b=Kmk9QBX0t6oz3WwrBel/mCDwRdUpFMyNZxTpX+YSpdfo2aQsAbJn9d/UpUJ0ED4W6eroDrB4DuE0wFahH8JnCsQaaZep3uSIaIJjOAa/se0ZMIJAP277svJ/TGpPKYji2ZyoBBt9vm4W+pdr+jhS8op5c3GMGG7ln8hv1FVMbvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772468513; c=relaxed/simple;
-	bh=ixtmi1sOKDzMdGYBHXwuHWHA2dkIBibp399Wn7IQN2M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GPP/6wtl4OlVt1eW5w6Ozi0HS421mZbEDaLkHT6vaadfZCJCnNTYape7FRdfrebvqg2F8vM0dsGlpavXD7ufcACmpJ3Tel4VuOEGWNgkbLr2/TgJloFbC0j10F+iKHI8+Cagf5h+ZFHK33kblpXKFGFDeilihXnLEFXPCVUL3fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mLeAJ/QH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5953FC4AF09
-	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 16:21:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772468513;
-	bh=ixtmi1sOKDzMdGYBHXwuHWHA2dkIBibp399Wn7IQN2M=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=mLeAJ/QHXM6jHrV4tSbxcnyx53Gom/g7zhC6mSB+B2hh+BOl+tRlUpznV+HNENWlX
-	 6VulmuUg2e30qpIsuPpQS9sCt2hVYNYUhU/xSxBvJMjsluRSjxhPk+8lg8tkZ6ivyz
-	 0C/nJHtt505VDrAF4B0BuVI1J9rhVRykwU+DNLghhXFZZ/lW9nRDiS05oJIWDBRqtz
-	 AzttkI/v2UNKWMsgWJDNWkKo0Q/xsIF9r93kfkRlyPmDVZpzDqC9/fRWmERttxDP50
-	 jBBtstaMEgkL+47o82LOUmJiOoMvNkS80XexN3jZu+1dRF0bFDHVrC4xF+wXoWgCtL
-	 6pBTuEvLf7WeA==
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b8fb6ad3243so693754766b.1
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 08:21:53 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXgjNUtdXaogYu0Rwp4SqPA6R/pr3R1Y3v25JIUcCzMGQYKoXkvl8giPnAMRo9wCKdevvI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyin62zVmS0WL5oqXsD3F/Y1gXxBFopF7NuAAn0WOKNGr/0SDRb
-	Ki7P+qCX+GwJ4yWpWTWY8lHzG9JCbXx3ZitT3USm6zdX6A/7jSDfSg/8w/Trd9dwECtZfhmZqdR
-	JotWQgM2DE9fq/h/wcVlvQQCAS2qFdII=
-X-Received: by 2002:a17:906:f815:b0:b86:ef1f:6d19 with SMTP id
- a640c23a62f3a-b937658299emr663725466b.59.1772468512099; Mon, 02 Mar 2026
- 08:21:52 -0800 (PST)
+	s=arc-20240116; t=1772468775; c=relaxed/simple;
+	bh=VUukFPCECqC7eKh/jyhbn/43A15nBMbp1SbN479gtOA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AfnkX+AYUqMht28ZRMU5VrzQUm2jNw0LO1z96xjMd3GK6qp2fX90dldd57OqjXmQ5PJmGMNnzOejzdmvd6qEVUfuKMjJfg2R9McIOatc+JC1sNwaJZzakTyrK0t+pKrYrNXZkkCoLHwCMC3W+tQNY3ANFpAgk8NKNB1zyc2Esec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eIotqif5; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=KyweOOID; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772468772;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vg8IbmZ7D530z7Jvag10aXKFjAkHqDPNjDI453xyigM=;
+	b=eIotqif5Nqzf7KpCMKh63y75XArVrVNn+SRw16u6ENxoWpavWiARfrkyLHpEg7/GqxLn0L
+	ext9wyt2hNyRX0vnGmWaF7wcbBoUTdvOyV7n+EL5uNAUB6HKYMtoxQsQJeVRwo9k6BEvyY
+	n5gbQpJBy9NRr/bsSPPZXBSavcBxw8U=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-259-Vb3xer9-NCqEHpcj_n9aGg-1; Mon, 02 Mar 2026 11:26:10 -0500
+X-MC-Unique: Vb3xer9-NCqEHpcj_n9aGg-1
+X-Mimecast-MFC-AGG-ID: Vb3xer9-NCqEHpcj_n9aGg_1772468770
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4837a71903aso28435045e9.1
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 08:26:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1772468769; x=1773073569; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vg8IbmZ7D530z7Jvag10aXKFjAkHqDPNjDI453xyigM=;
+        b=KyweOOIDJQMtP4zF80QPVaprQbCMrUB74X3nHVufXphEo9UJ6PTX3an3+2wB+bFJIY
+         IsKh23+0Zigj0VZdRhbllIyhI3sOwPWI9+DQPj8Kuxsyy4v6nTQc8jXA+qT4h5tJ+oWJ
+         vTWGFpkxypFOSrRR9TNYvjPWHJuBL1UfbkU1QZYa4S/mW50qNfQIxPB0+byzvgB7BLHt
+         EsrlGJLsO3jlJXjnFrNiP2aZ1LW8s3+eMTQhz7//nTsd+sqQcm96XEOay6JI6lYUDd+V
+         yNlPPmZ1wRtZHVuH07bZE8kzL2GS5Mytz9LuuDSeC2he1qGrlNHUq0vzAdzD6s2Tbiws
+         D4fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772468769; x=1773073569;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vg8IbmZ7D530z7Jvag10aXKFjAkHqDPNjDI453xyigM=;
+        b=SDRlPswAf2LiwdHiZXHbHw19qbM7g5slFsCPMzU7Y9pFahwH/rNw9AFM8BcjEQEpIv
+         DG41xxKRiylfFrpfBQkL11NrdUpW776N+8KmyJmtlnDC/tzTOF85MOvV/eaLS7inClVk
+         euaHavsVwQDMxe/I5k+l4z2OY84yJLBXM5Os9JsQxG0rwYLAyxt9t7eWBZJgBHxBKDUX
+         Z9gM1R16qN9l8UVKtg7kuCGFznHsm/HwQuA/gQ9FrpVfnIsLMbf40O/LVySGJHm4uwGV
+         cT529qeQMs1PSt0XUwuqjWo2c1ImIDcgjm4d/iCIAB8tTPbwnf/oCvxIzDFO4sY+IUdG
+         7XuA==
+X-Forwarded-Encrypted: i=1; AJvYcCUtN60sJoPRoSnyC+ZDhrOYrMOq92HmZqcGQyc9xVjlwBJWZiJO790ZDhiPsJshtEsCtGk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeNWIlyLkW85RrYuzwYpC/GCzgruEdIw1Zhpxv133g0Rqm31Ka
+	ZkSruZGlE3unHcYI8+Lt31es2hWQF39/Z3PQ1/Yq362wW4hUM42gP4zMIJqBMwTx2E6HYRklsoU
+	hY8nGJu0BRcJwwifncl5rPdCBGk29v+20j7fA4rb9dFh+o417MUz1Kg==
+X-Gm-Gg: ATEYQzy5N+MIcmyNDvqQrSLx4jEOlXNTWxH3e074st1n2QRLSedKpmIQRmpKSleL2zU
+	yJhl1MM9gFsfGhqR/JCHgGaaIB57V3kpqKFK3Tgv4EuCDPlHvfwJA5vETQZl2+4v4q1pxI/o6jZ
+	n7rZQ8LAxHlTL/yw7i3FrGTuOoczVHSGPTPEsvykz7iPEsSMYHeX04TZ7hIgZG6Sr/fEB+Mm99m
+	qDrPyu90swsW2d/q11vjbmjuz4+c7jtmOCN8dCYB13aU3LNAoONdV2KdggD30/msl9lT9kSktcX
+	qmBJyPBgEH7L2BgTc+2u06qTxO9uerguu11Vrgc6Ou8VtZAR+1zIyUzx60L/qqMwXTD2sNfhtOt
+	yS/kBoVdd+eQR0gA+xkf9/klhParzX3FDWltKohSMLED/db7YulMcDXiDFyI2jxupkMSvvOs=
+X-Received: by 2002:a05:600c:6095:b0:47e:e952:86c9 with SMTP id 5b1f17b1804b1-483c9b7ac8bmr235315805e9.0.1772468769447;
+        Mon, 02 Mar 2026 08:26:09 -0800 (PST)
+X-Received: by 2002:a05:600c:6095:b0:47e:e952:86c9 with SMTP id 5b1f17b1804b1-483c9b7ac8bmr235315315e9.0.1772468768929;
+        Mon, 02 Mar 2026 08:26:08 -0800 (PST)
+Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfb87030sm134278895e9.10.2026.03.02.08.26.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Mar 2026 08:26:08 -0800 (PST)
+Date: Mon, 2 Mar 2026 17:25:49 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Alexander Graf <graf@amazon.com>
+Cc: Bryan Tan <bryan-bt.tan@broadcom.com>, 
+	Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, kvm@vger.kernel.org, eperezma@redhat.com, 
+	Jason Wang <jasowang@redhat.com>, mst@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, 
+	nh-open-source@amazon.com
+Subject: Re: [PATCH] vsock: Enable H2G override
+Message-ID: <aaW2FgoaXIJEymyR@sgarzare-redhat>
+References: <20260302104138.77555-1-graf@amazon.com>
+ <aaVrsXMmULivV4Se@sgarzare-redhat>
+ <aaV80wWlpjEtYCQJ@sgarzare-redhat>
+ <17d63837-6028-475a-90df-6966329a0fc2@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260228033328.2285047-1-chengkev@google.com>
-In-Reply-To: <20260228033328.2285047-1-chengkev@google.com>
-From: Yosry Ahmed <yosry@kernel.org>
-Date: Mon, 2 Mar 2026 08:21:40 -0800
-X-Gmail-Original-Message-ID: <CAO9r8zODn_ZGHsftsj0B6dJe9jy8sVZwdOgFi=ebZoHfGrWxXw@mail.gmail.com>
-X-Gm-Features: AaiRm53VNkGaRUQbMSdG_qyksdWla4_VTg7R6yN9aIYfiWKy5ld_4_e5YnOEgcQ
-Message-ID: <CAO9r8zODn_ZGHsftsj0B6dJe9jy8sVZwdOgFi=ebZoHfGrWxXw@mail.gmail.com>
-Subject: Re: [PATCH V4 0/4] Align SVM with APM defined behaviors
-To: Kevin Cheng <chengkev@google.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: BF1571DCC89
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <17d63837-6028-475a-90df-6966329a0fc2@amazon.com>
+X-Rspamd-Queue-Id: 855FA1DCC2E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72400-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72401-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5]
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Fri, Feb 27, 2026 at 7:33=E2=80=AFPM Kevin Cheng <chengkev@google.com> w=
-rote:
+On Mon, Mar 02, 2026 at 04:48:33PM +0100, Alexander Graf wrote:
 >
-> The APM lists the following behaviors
->   - The VMRUN, VMLOAD, VMSAVE, CLGI, VMMCALL, and INVLPGA instructions
->     can be used when the EFER.SVME is set to 1; otherwise, these
->     instructions generate a #UD exception.
->   - If VMMCALL instruction is not intercepted, the instruction raises a
->     #UD exception.
+>On 02.03.26 13:06, Stefano Garzarella wrote:
+>>CCing Bryan, Vishnu, and Broadcom list.
+>>
+>>On Mon, Mar 02, 2026 at 12:47:05PM +0100, Stefano Garzarella wrote:
+>>>
+>>>Please target net-next tree for this new feature.
+>>>
+>>>On Mon, Mar 02, 2026 at 10:41:38AM +0000, Alexander Graf wrote:
+>>>>Vsock maintains a single CID number space which can be used to
+>>>>communicate to the host (G2H) or to a child-VM (H2G). The current logic
+>>>>trivially assumes that G2H is only relevant for CID <= 2 because these
+>>>>target the hypervisor.  However, in environments like Nitro 
+>>>>Enclaves, an
+>>>>instance that hosts vhost_vsock powered VMs may still want to 
+>>>>communicate
+>>>>to Enclaves that are reachable at higher CIDs through virtio-vsock-pci.
+>>>>
+>>>>That means that for CID > 2, we really want an overlay. By default, all
+>>>>CIDs are owned by the hypervisor. But if vhost registers a CID, 
+>>>>it takes
+>>>>precedence.  Implement that logic. Vhost already knows which CIDs it
+>>>>supports anyway.
+>>>>
+>>>>With this logic, I can run a Nitro Enclave as well as a nested VM with
+>>>>vhost-vsock support in parallel, with the parent instance able to
+>>>>communicate to both simultaneously.
+>>>
+>>>I honestly don't understand why VMADDR_FLAG_TO_HOST (added 
+>>>specifically for Nitro IIRC) isn't enough for this scenario and we 
+>>>have to add this change.  Can you elaborate a bit more about the 
+>>>relationship between this change and VMADDR_FLAG_TO_HOST we added?
 >
-> The patches in this series fix current SVM bugs that do not adhere to
-> the APM listed behaviors.
 >
-> v3 -> v4:
->   - Dropped "KVM: SVM: Inject #UD for STGI if EFER.SVME=3D0 and SVM Lock
->     and DEV are not available" as per Sean
->   - Added back STGI and CLGI intercept clearing in init_vmcb to maintain
->     previous behavior on intel guests. Previously intel guests always
->     had STGI and CLGI intercepts cleared if vgif was enabled. In V3,
->     because the clearing of the intercepts was moved from init_vmcb() to
->     the !guest_cpuid_is_intel_compatible() case in
->     svm_recalc_instruction_intercepts(), the CLGI intercept would be
->     indefinitely set on intel guests. I added back the clearing to
->     init_vmcb() to retain intel guest behavior before this patch.
+>The main problem I have with VMADDR_FLAG_TO_HOST for connect() is that 
+>it punts the complexity to the user. Instead of a single CID address 
+>space, you now effectively create 2 spaces: One for TO_HOST (needs a 
+>flag) and one for TO_GUEST (no flag). But every user space tool needs 
+>to learn about this flag. That may work for super special-case 
+>applications. But propagating that all the way into socat, iperf, etc 
+>etc? It's just creating friction.
 
-I am a bit confused by this. v4 kept initializing the intercepts as
-cleared for all guests, but we still set the CLGI/STGI intercepts for
-Intel-compatible guests in svm_recalc_instruction_intercepts() patch
-3. So what difference did this make?
+Okay, I would like to have this (or part of it) in the commit message to 
+better explain why we want this change.
 
-Also taking a step back, I am not really sure what's the right thing
-to do for Intel-compatible guests here. It also seems like even if we
-set the intercept, svm_set_gif() will clear the STGI intercept, even
-on Intel-compatible guests.
+>
+>IMHO the most natural experience is to have a single CID space, 
+>potentially manually segmented by launching VMs of one kind within a 
+>certain range.
 
-Maybe we should leave that can of worms alone, go back to removing
-initializing the CLGI/STGI intercepts in init_vmcb(), and in
-svm_recalc_instruction_intercepts() set/clear these intercepts based
-on EFER.SVME alone, irrespective of Intel-compatibility?
+I see, but at this point, should the kernel set VMADDR_FLAG_TO_HOST in 
+the remote address if that path is taken "automagically" ?
 
+So in that way the user space can have a way to understand if it's 
+talking with a nested guest or a sibling guest.
 
 
->   - In "Raise #UD if VMMCALL instruction is not intercepted" patch:
->       - Exempt Hyper-V L2 TLB flush hypercalls from the #UD injection,
->         as L0 intentionally intercepts these VMMCALLs on behalf of L1
->         via the direct hypercall enlightenment.
->       - Added nested_svm_is_l2_tlb_flush_hcall() which just returns true
->         if the hypercall was a Hyper-V L2 TLB flush hypercall.
+That said, I'm concerned about the scenario where an application does 
+not even consider communicating with a sibling VM.
+
+Until now, it knew that by not setting that flag, it could only talk to 
+nested VMs, so if there was no VM with that CID, the connection simply 
+failed. Whereas from this patch onwards, if the device in the host 
+supports sibling VMs and there is a VM with that CID, the application 
+finds itself talking to a sibling VM instead of a nested one, without 
+having any idea.
+
+Should we make this feature opt-in in some way, such as sockopt or 
+sysctl? (I understand that there is the previous problem, but honestly, 
+it seems like a significant change to the behavior of AF_VSOCK).
+
 >
-> v3: https://lore.kernel.org/kvm/20260122045755.205203-1-chengkev@google.c=
-om/
+>At the end of the day, the host vs guest problem is super similar to a 
+>routing table.
+
+Yeah, but the point of AF_VSOCK is precisely to avoid complexities such 
+as routing tables as much as possible; otherwise, AF_INET is already 
+there and ready to be used. In theory, we only want communication 
+between host and guest.
+
 >
-> v2 -> v3:
->   - Elaborated on 'Move STGI and CLGI intercept handling' commit message
->     as per Sean
->   - Fixed bug due to interaction with svm_enable_nmi_window() and 'Move
->     STGI and CLGI intercept handling' as pointed out by Yosry. Code
->     changes suggested by Sean/Yosry.
->   - Removed open-coded nested_svm_check_permissions() in STGI
->     interception function as per Yosry
 >
-> v2: https://lore.kernel.org/all/20260112174535.3132800-1-chengkev@google.=
-com/
+>>>
+>>>>
+>>>>Signed-off-by: Alexander Graf <graf@amazon.com>
+>>>>---
+>>>>drivers/vhost/vsock.c    | 11 +++++++++++
+>>>>include/net/af_vsock.h   |  3 +++
+>>>>net/vmw_vsock/af_vsock.c |  3 +++
+>>>>3 files changed, 17 insertions(+)
+>>>>
+>>>>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>>>>index 054f7a718f50..223da817e305 100644
+>>>>--- a/drivers/vhost/vsock.c
+>>>>+++ b/drivers/vhost/vsock.c
+>>>>@@ -91,6 +91,16 @@ static struct vhost_vsock 
+>>>>*vhost_vsock_get(u32 guest_cid, struct net *net)
+>>>>    return NULL;
+>>>>}
+>>>>
+>>>>+static bool vhost_transport_has_cid(u32 cid)
+>>>>+{
+>>>>+    bool found;
+>>>>+
+>>>>+    rcu_read_lock();
+>>>>+    found = vhost_vsock_get(cid) != NULL;
+>>>
+>>>We recently added namespaces support that changed 
+>>>vhost_vsock_get() params. This is also in net tree now and in 
+>>>Linus' tree, so not sure where this patch is based, but this needs 
+>>>to be rebased since it is not building:
+>>>
+>>>../drivers/vhost/vsock.c: In function ‘vhost_transport_has_cid’:
+>>>../drivers/vhost/vsock.c:99:17: error: too few arguments to 
+>>>function ‘vhost_vsock_get’; expected 2, have 1
+>>>  99 |         found = vhost_vsock_get(cid) != NULL;
+>>>     |                 ^~~~~~~~~~~~~~~
+>>>../drivers/vhost/vsock.c:74:28: note: declared here
+>>>  74 | static struct vhost_vsock *vhost_vsock_get(u32 guest_cid, 
+>>>struct net *net)
+>>>     |
 >
-> v1 -> v2:
->   - Split up the series into smaller more logical changes as suggested
->     by Sean
->   - Added patch for injecting #UD for STGI under APM defined conditions
->     as suggested by Sean
->   - Combined EFER.SVME=3D0 conditional with intel CPU logic in
->     svm_recalc_instruction_intercepts
 >
-> Kevin Cheng (4):
->   KVM: SVM: Move STGI and CLGI intercept handling
->   KVM: SVM: Inject #UD for INVLPGA if EFER.SVME=3D0
->   KVM: SVM: Recalc instructions intercepts when EFER.SVME is toggled
->   KVM: SVM: Raise #UD if VMMCALL instruction is not intercepted
+>D'oh. Sorry, I built this on 6.19 and only realized after the send 
+>that namespace support got in. Will fix up for v2.
+
+Thanks.
+
 >
->  arch/x86/kvm/svm/hyperv.h | 11 ++++++++
->  arch/x86/kvm/svm/nested.c |  4 +--
->  arch/x86/kvm/svm/svm.c    | 59 +++++++++++++++++++++++++++++++++++----
->  3 files changed, 65 insertions(+), 9 deletions(-)
 >
-> --
-> 2.53.0.473.g4a7958ca14-goog
+>>>
+>>>>+    rcu_read_unlock();
+>>>>+    return found;
+>>>>+}
+>>>>+
+>>>>static void
+>>>>vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+>>>>                struct vhost_virtqueue *vq)
+>>>>@@ -424,6 +434,7 @@ static struct virtio_transport vhost_transport = {
+>>>>        .module                   = THIS_MODULE,
+>>>>
+>>>>        .get_local_cid            = vhost_transport_get_local_cid,
+>>>>+        .has_cid                  = vhost_transport_has_cid,
+>>>>
+>>>>        .init                     = virtio_transport_do_socket_init,
+>>>>        .destruct                 = virtio_transport_destruct,
+>>>>diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>>>>index 533d8e75f7bb..4cdcb72f9765 100644
+>>>>--- a/include/net/af_vsock.h
+>>>>+++ b/include/net/af_vsock.h
+>>>>@@ -179,6 +179,9 @@ struct vsock_transport {
+>>>>    /* Addressing. */
+>>>>    u32 (*get_local_cid)(void);
+>>>>
+>>>>+    /* Check if this transport serves a specific remote CID. */
+>>>>+    bool (*has_cid)(u32 cid);
+>>>
+>>>What about "has_remote_cid" ?
+>>>
+>>>>+
+>>>>    /* Read a single skb */
+>>>>    int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
+>>>>
+>>>>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>>>>index 2f7d94d682cb..8b34b264b246 100644
+>>>>--- a/net/vmw_vsock/af_vsock.c
+>>>>+++ b/net/vmw_vsock/af_vsock.c
+>>>>@@ -584,6 +584,9 @@ int vsock_assign_transport(struct vsock_sock 
+>>>>*vsk, struct vsock_sock *psk)
+>>>>        else if (remote_cid <= VMADDR_CID_HOST || !transport_h2g ||
+>>>>             (remote_flags & VMADDR_FLAG_TO_HOST))
+>>>>            new_transport = transport_g2h;
+>>>>+        else if (transport_h2g->has_cid &&
+>>>>+             !transport_h2g->has_cid(remote_cid))
+>>>>+            new_transport = transport_g2h;
+>>>
+>>>We should update the comment on top of this fuction, and maybe 
+>>>also try to support the other H2G transport (i.e. VMCI).
+>>>
+>>>@Bryan @Vishnu can the new has_cid()/has_remote_cid() be supported 
+>>>by VMCI too?
+>>
+>>Oops, I forgot to CC them, now they should be in copy.
 >
+>
+>Ack. I can also take a quick look if it's trivial to add.
+
+Great, thanks for that!
+
+Stefano
+
 
