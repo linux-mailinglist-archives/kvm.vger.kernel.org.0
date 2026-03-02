@@ -1,246 +1,253 @@
-Return-Path: <kvm+bounces-72357-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72358-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eMteOpF0pWkNBgYAu9opvQ
-	(envelope-from <kvm+bounces-72357-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 12:29:21 +0100
+	id 8Km8CAV6pWm6CAYAu9opvQ
+	(envelope-from <kvm+bounces-72358-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 12:52:37 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 485161D7807
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 12:29:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 781D11D7E20
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 12:52:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 693533033E54
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 11:29:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 524FB309CCAF
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 11:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F07D363096;
-	Mon,  2 Mar 2026 11:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FE72363C55;
+	Mon,  2 Mar 2026 11:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="WPkbthSN"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Kze1Y62c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385BD302753
-	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 11:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6BC175A8B;
+	Mon,  2 Mar 2026 11:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772450942; cv=none; b=DJ7BXgyt9QmOBUXK8MiAibkzWzgVEQvylslsYD8gzD2LRrlsESVEcavLIv0HLiRh092owIZKjukbaJ/MMN2eYT7TdamOgl0CvBmEcFTVGxzmVdT6Gk/6D1hChm3LrnsnWyyTt8IhU74IngbJ88U1gzuFxlM4Aj1xlruX7eIBozY=
+	t=1772452009; cv=none; b=qJLhYufMWo9z8nDt8KdhOBhKGzFAqrU0RnXVriJl1z2vqzys+904n/5tYEx48PF12evW7KkbQAmh2k48cnNhG/oBBbWycVqUNP8UUvlekmvmM14A5O9fE+wG83Q1LhPB6z9vB57Tu/XNPxDPIIBLVntF0Mu/3IUr+FtIw+MnBAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772450942; c=relaxed/simple;
-	bh=K5ULHdjkJWFTrPH0dXx05JrTB8YMHL8lkvPnUG9C6K8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U9Y3R/Zt6FVCyItWB+kPyOl7J1gc3QvFOeB2JJH2+eJvsTvunsVRIAn+Nsm7idE7flgex1xiBHmFknHp7dpiS1suChjeenEq3ZSOZMyvtZcQhdoEhmAd0SYjGEzVZRlxjK2oeBESv68tDyQRf3F0YJYXSA+1w67BYfbk3ZnrX64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=WPkbthSN; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4836d541968so4116375e9.2
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 03:29:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1772450939; x=1773055739; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1aYNafgGLMp2zV21P8+oK10uFDyPLpaq2eVinuia9OY=;
-        b=WPkbthSNzjYrkGU2OaP3MGRaE9A5AuVqltBR4seCVfRAZXAhlC2TmDaxdGFWEk7/FL
-         +Ozwiv1gLw5N71yFaR9/B/GpXOPMZk3ECkeWegS0Ge9zjts8Brb4zpbLMhBLOJP+E20V
-         Hs4PcY2KtdCjAuGG7dKrzJGniGx+rzz35WjCQUkni89jmc2Q20+6Dl8WLZrwiBm5rPCp
-         SfYa99XbWEjSffA4H7rVRo5lYkAAXl6e/v1BIDONDbAJHKl8/1Py2xtyICM4Er+bgT17
-         rbpFg9Wp+FpJ0JgiVdfqJX/KzMX6DXLZHg37CTAI3ZkB/Qa7KYzAu+5JhO3A5r53N0MK
-         z4mA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772450939; x=1773055739;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1aYNafgGLMp2zV21P8+oK10uFDyPLpaq2eVinuia9OY=;
-        b=GTZG63FOV2Sonz/M8vG9imMDErfOBHoNTlUEsHv6uOxKRoA5/Rw1iHdAhkZo06ZPJc
-         FCq8K7k9rrIiKP3INzW9IQZwjP+qevEzog/FqeMrSzg9aXpDLnIkQFeq7cNbZEm9P90p
-         nMxrMr+3gulTvXdjmssYWHRxSynWbzl1aEK8LnoKekOHTYF5MMRZlMGwBurhukICJKGQ
-         7XctZ+g76idVYakKjy9cZk9FhbV9v8Ck+SiApPfxVab1GSQFeEHYPajvSCkI87V2kyg4
-         uX0nbs3TvkF2T860JRH4HQTJPQHeL3qqStQNygPwT7m56AxHbnQbTDf2kG8lg9oUVEpJ
-         b6cA==
-X-Gm-Message-State: AOJu0YxkgmubITmziyGYDUEf3bh2ggDqv47ivLwOgiDf+Cy5XIpNcE0g
-	/QlnF+/ofd2joVjZciIKgJVTDeo3AnMHEobrxEYCbGXpGdUTb8J1BEVY2Nax86AUyvo=
-X-Gm-Gg: ATEYQzw38yYa2PYWuCDUu840qHqzvBNrLIHhImbFBSRZouNXZZMZX8sE6OHS/daN20y
-	gal4EpiS7DC8tOM9VG9as56fIrzYFRv4I/QdxvUTW07OnCjILXgylVh9bxQ57OYySd5Uw8HGAp/
-	R8lHZnRqHhfd4UtydlWg39f2BM+fHrgMuqlKRFRp+qCYiiEnib2y7BEet1HlL0armTLeN561Zhu
-	Z9B4cAUwvOp5C4QHmGKpfXOi8N5pH3NuZ6AebQthrd2wP/gJ3tC/H1Xb6BrPnIVnJbrL3lhjRb4
-	iCATgD3gXCyKGZ8pG7RUo8bAgLgI33v3vHPM3XZzOTGLcaZQEFQ0JdPgOEY1e8TQaqybFaspgXE
-	x0VdorXG868tAHx8Clvn2Opv/lzzab5OA+qF5zmjqdWTgGw1n7qqQxQEAHK22eka5mJuUofSEoh
-	zECsrSqDHAMP7sBa0BEHcJ6z4NuNZBxo6Da/3AWglsz9JrSyrECDrj9qSEoQ==
-X-Received: by 2002:a05:600c:1989:b0:46e:43f0:6181 with SMTP id 5b1f17b1804b1-483c9bfbdd5mr117360665e9.7.1772450939437;
-        Mon, 02 Mar 2026 03:28:59 -0800 (PST)
-Received: from ?IPV6:2001:1a48:8:903:1ed6:4f73:ce38:f9d4? ([2001:1a48:8:903:1ed6:4f73:ce38:f9d4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfb789efsm210891065e9.2.2026.03.02.03.28.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Mar 2026 03:28:59 -0800 (PST)
-Message-ID: <5097ff66-b727-4eac-b845-3bd08d1a0ead@suse.com>
-Date: Mon, 2 Mar 2026 12:28:57 +0100
+	s=arc-20240116; t=1772452009; c=relaxed/simple;
+	bh=dZrOA+1QPUYVCXFMovFbCtFNY6xI315tteq+nBYF/HA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZRVdPIZXOSfx1Nfg7uu8imsf7O92u3OnnPxfbnvVyzJ9f1xiGA89mW+3l9ncAkTdo177ueRM7pW2C0W/I16Kmsgzx74exXGwnptXdtWrpD7dq5A0SsqwFdTmo4HGjhB6F8e+zx/9NeZcpc+E4ciQTW2yMNbOyiWlII7AQUwyK5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Kze1Y62c; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Mee3Fn9fKuTL6HlV7u9HV8PPrdbpMBB1HvOzNZ43Rbw=; b=Kze1Y62c26784z5nuWg/Xdi77E
+	2wYdWPVjwviEZv1JGS5TZQMNiQMgT5dxB9pD1QKcuYuMC8VF8MoWWrPG3xkruJuJ8LHEpBEfO93iI
+	ZDjUThoSflE1iTLxBTeGrL/7XfF9EuI92HfHcz+MNgy68npSDXzet2x4psJhBX0gAi4bt+OnuqFy5
+	pT7ustlANyWPtRO0EQvJkjxvC7XXxQXl0U6amuvUwK0SffpGEys5BrcaZZOQRycJW3H6EnkDpluUa
+	F8E1iAya8jCnpu+NUdQ2taliMbDV1EOleoqtoipj1NroGMJe4yTsID5FzRLjCk+6Z64g+74659Flw
+	d6X2D3yA==;
+Received: from 2001-1c00-8d85-5700-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:5700:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vx1jT-00000009Lim-01SH;
+	Mon, 02 Mar 2026 11:46:39 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id B57B1300B40; Mon, 02 Mar 2026 12:46:36 +0100 (CET)
+Date: Mon, 2 Mar 2026 12:46:36 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Jiri Slaby <jirislaby@kernel.org>
+Cc: Matthieu Baerts <matttbe@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
+	rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
+	Linux Kernel <linux-kernel@vger.kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"luto@kernel.org" <luto@kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <MKoutny@suse.com>,
+	Waiman Long <longman@redhat.com>
+Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
+ stalls, timeout
+Message-ID: <20260302114636.GL606826@noisy.programming.kicks-ass.net>
+References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
+ <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
+ <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 2/6] KVM: guest_memfd: Directly allocate folios
- with filemap_alloc_folio()
-Content-Language: en-US
-To: Ackerley Tng <ackerleytng@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
- David Hildenbrand <david@kernel.org>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>, Vlastimil Babka
- <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
- Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- seanjc@google.com, rientjes@google.com, rick.p.edgecombe@intel.com,
- yan.y.zhao@intel.com, fvdl@google.com, jthoughton@google.com,
- vannapurve@google.com, shivankg@amd.com, michael.roth@amd.com,
- pratyush@kernel.org, pasha.tatashin@soleen.com, kalyazin@amazon.com,
- tabba@google.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-doc@vger.kernel.org
-References: <20260225-gmem-st-blocks-v2-0-87d7098119a9@google.com>
- <20260225-gmem-st-blocks-v2-2-87d7098119a9@google.com>
-From: Vlastimil Babka <vbabka@suse.com>
-In-Reply-To: <20260225-gmem-st-blocks-v2-2-87d7098119a9@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DKIM_TRACE(0.00)[infradead.org:+];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[35];
-	TAGGED_FROM(0.00)[bounces-72357-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72358-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vbabka@suse.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[peterz@infradead.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:mid,suse.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.cz:email]
-X-Rspamd-Queue-Id: 485161D7807
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,msgid.link:url,infradead.org:email,infradead.org:dkim,noisy.programming.kicks-ass.net:mid]
+X-Rspamd-Queue-Id: 781D11D7E20
 X-Rspamd-Action: no action
 
-On 2/25/26 08:20, Ackerley Tng wrote:
-> __filemap_get_folio_mpol() is parametrized by a bunch of GFP flags, which
+On Mon, Mar 02, 2026 at 06:28:38AM +0100, Jiri Slaby wrote:
 
-                                                           FGP?
-
-> adds complexity for the reader. Since guest_memfd doesn't meaningfully use
-> any of the other FGP flags, undo that complexity by directly calling
-> filemap_alloc_folio().
+> The state of the lock:
 > 
-> Directly calling filemap_alloc_folio() also allows the order of 0 to be
-> explicitly specified, which is the only order guest_memfd supports. This is
-> easier to understand, and removes the chance of anything else being able to
-> unintentionally influence allocated folio size.
-
-Isn't it determined by FGF_GET_ORDER() so when you pass FGP_LOCK | FGP_CREAT
-and no order, it's straigtforward the order will be 0?
-
-But if this helps with patch 4, ok.
-
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-
-Acked-by: Vlastimil Babka <vbabka@suse.cz>
-
-> ---
->  virt/kvm/guest_memfd.c | 51 +++++++++++++++++++++++++++++++++++---------------
->  1 file changed, 36 insertions(+), 15 deletions(-)
-> 
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 2df27b6443115..2488d7b8f2b0d 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -107,6 +107,39 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
->  	return __kvm_gmem_prepare_folio(kvm, slot, index, folio);
->  }
->  
-> +static struct folio *__kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
-> +{
-> +	/* TODO: Support huge pages. */
-> +	struct mempolicy *policy;
-> +	struct folio *folio;
-> +	gfp_t gfp;
-> +	int ret;
-> +
-> +	/*
-> +	 * Fast-path: See if folio is already present in mapping to avoid
-> +	 * policy_lookup.
-> +	 */
-> +	folio = filemap_lock_folio(inode->i_mapping, index);
-> +	if (!IS_ERR(folio))
-> +		return folio;
-> +
-> +	gfp = mapping_gfp_mask(inode->i_mapping);
-> +
-> +	policy = mpol_shared_policy_lookup(&GMEM_I(inode)->policy, index);
-> +	folio = filemap_alloc_folio(gfp, 0, policy);
-> +	mpol_cond_put(policy);
-> +	if (!folio)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	ret = filemap_add_folio(inode->i_mapping, folio, index, gfp);
-> +	if (ret) {
-> +		folio_put(folio);
-> +		return ERR_PTR(ret);
-> +	}
-> +
-> +	return folio;
-> +}
-> +
->  /*
->   * Returns a locked folio on success.  The caller is responsible for
->   * setting the up-to-date flag before the memory is mapped into the guest.
-> @@ -118,23 +151,11 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
->   */
->  static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
->  {
-> -	/* TODO: Support huge pages. */
-> -	struct mempolicy *policy;
->  	struct folio *folio;
->  
-> -	/*
-> -	 * Fast-path: See if folio is already present in mapping to avoid
-> -	 * policy_lookup.
-> -	 */
-> -	folio = filemap_lock_folio(inode->i_mapping, index);
-> -	if (!IS_ERR(folio))
-> -		return folio;
-> -
-> -	policy = mpol_shared_policy_lookup(&GMEM_I(inode)->policy, index);
-> -	folio = __filemap_get_folio_mpol(inode->i_mapping, index,
-> -					 FGP_LOCK | FGP_CREAT,
-> -					 mapping_gfp_mask(inode->i_mapping), policy);
-> -	mpol_cond_put(policy);
-> +	do {
-> +		folio = __kvm_gmem_get_folio(inode, index);
-> +	} while (PTR_ERR(folio) == -EEXIST);
->  
->  	/*
->  	 * External interfaces like kvm_gmem_get_pfn() support dealing
+> crash> struct rq.__lock -x ffff8d1a6fd35dc0
+>   __lock = {
+>     raw_lock = {
+>       {
+>         val = {
+>           counter = 0x40003
+>         },
+>         {
+>           locked = 0x3,
+>           pending = 0x0
+>         },
+>         {
+>           locked_pending = 0x3,
+>           tail = 0x4
+>         }
+>       }
+>     }
+>   },
 > 
 
+
+That had me remember the below patch that never quite made it. I've
+rebased it to something more recent so it applies.
+
+If you stick that in, we might get a clue as to who is owning that lock.
+Provided it all wants to reproduce well enough.
+
+---
+Subject: locking/qspinlock: Save previous node & owner CPU into mcs_spinlock
+From: Waiman Long <longman@redhat.com>
+Date: Fri, 3 May 2024 22:41:06 -0400
+
+From: Waiman Long <longman@redhat.com>
+
+When examining a contended spinlock in a crash dump, we can only find
+out the tail CPU in the MCS wait queue. There is no simple way to find
+out what other CPUs are waiting for the spinlock and which CPU is the
+lock owner.
+
+Make it easier to figure out these information by saving previous node
+data into the mcs_spinlock structure. This will allow us to reconstruct
+the MCS wait queue from tail to head. In order not to expand the size
+of mcs_spinlock, the original count field is split into two 16-bit
+chunks. The first chunk is for count and the second one is the new
+prev_node value.
+
+  bits 0-1 : qnode index
+  bits 2-15: CPU number + 1
+
+This prev_node value may be truncated if there are 16k or more CPUs in
+the system.
+
+The locked value in the queue head is also repurposed to hold an encoded
+qspinlock owner CPU number when acquiring the lock in the qspinlock
+slowpath of an contended lock.
+
+This lock owner information will not be available when the lock is
+acquired directly in the fast path or in the pending code path. There
+is no easy way around that.
+
+These changes should make analysis of a contended spinlock in a crash
+dump easier.
+
+Signed-off-by: Waiman Long <longman@redhat.com>
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Link: https://patch.msgid.link/20240504024106.654319-1-longman@redhat.com
+---
+ include/asm-generic/mcs_spinlock.h |    5 +++--
+ kernel/locking/mcs_spinlock.h      |    8 +++++++-
+ kernel/locking/qspinlock.c         |    8 ++++++++
+ 3 files changed, 18 insertions(+), 3 deletions(-)
+
+--- a/include/asm-generic/mcs_spinlock.h
++++ b/include/asm-generic/mcs_spinlock.h
+@@ -3,8 +3,9 @@
+ 
+ struct mcs_spinlock {
+ 	struct mcs_spinlock *next;
+-	int locked; /* 1 if lock acquired */
+-	int count;  /* nesting count, see qspinlock.c */
++	int locked;	 /* non-zero if lock acquired */
++	short count;	 /* nesting count, see qspinlock.c */
++	short prev_node; /* encoded previous node value */
+ };
+ 
+ /*
+--- a/kernel/locking/mcs_spinlock.h
++++ b/kernel/locking/mcs_spinlock.h
+@@ -13,6 +13,12 @@
+ #ifndef __LINUX_MCS_SPINLOCK_H
+ #define __LINUX_MCS_SPINLOCK_H
+ 
++/*
++ * Save an encoded version of the current MCS lock owner CPU to the
++ * mcs_spinlock structure of the next lock owner.
++ */
++#define MCS_LOCKED	(smp_processor_id() + 1)
++
+ #include <asm/mcs_spinlock.h>
+ 
+ #ifndef arch_mcs_spin_lock_contended
+@@ -34,7 +40,7 @@
+  * unlocking.
+  */
+ #define arch_mcs_spin_unlock_contended(l)				\
+-	smp_store_release((l), 1)
++	smp_store_release((l), MCS_LOCKED)
+ #endif
+ 
+ /*
+--- a/kernel/locking/qspinlock.c
++++ b/kernel/locking/qspinlock.c
+@@ -250,6 +250,7 @@ void __lockfunc queued_spin_lock_slowpat
+ 
+ 	node->locked = 0;
+ 	node->next = NULL;
++	node->prev_node = 0;
+ 	pv_init_node(node);
+ 
+ 	/*
+@@ -278,6 +279,13 @@ void __lockfunc queued_spin_lock_slowpat
+ 	next = NULL;
+ 
+ 	/*
++	 * The prev_node value is saved for crash dump analysis purpose only,
++	 * it is not used within the qspinlock code. The encoded node value
++	 * may be truncated if there are 16k or more CPUs in the system.
++	 */
++	node->prev_node = old >> _Q_TAIL_IDX_OFFSET;
++
++	/*
+ 	 * if there was a previous node; link it and wait until reaching the
+ 	 * head of the waitqueue.
+ 	 */
 
