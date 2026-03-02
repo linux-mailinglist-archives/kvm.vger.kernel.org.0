@@ -1,244 +1,234 @@
-Return-Path: <kvm+bounces-72353-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72354-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJpuOsxipWmx+wUAu9opvQ
-	(envelope-from <kvm+bounces-72353-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 11:13:32 +0100
+	id oHeNMllmpWmx+wUAu9opvQ
+	(envelope-from <kvm+bounces-72354-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 11:28:41 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FBED1D62AA
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 11:13:32 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7AB31D67CD
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 11:28:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 94D0E3060CF3
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 10:08:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6D55E302022C
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 10:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9151F395DB7;
-	Mon,  2 Mar 2026 10:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 245F33A9DA3;
+	Mon,  2 Mar 2026 10:28:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ijRKskdO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Krl6+69H"
 X-Original-To: kvm@vger.kernel.org
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010053.outbound.protection.outlook.com [40.93.198.53])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78490A932;
-	Mon,  2 Mar 2026 10:07:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772446076; cv=fail; b=l51cDNhX/TLbf77vb7bKIZIhuD8Nnyp9yjJ7YoV6hMCAIUTWEz1ySyHyPHmzJyAPQ4DqNTUmvRrkGk+y1gbNnwrxMApl8wVwh6otXoqNMw93FG5jTU/rG33tI8u5D5vuR6VA0XI5MVAecJVqjX5hzAEdRZAanIO2WT5vbNT8gME=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772446076; c=relaxed/simple;
-	bh=H2Jrp+dH0uXq2blw+4Gitl/PmDPBUH4l4Rb7Q2WDapM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=eqfmD+bfVOTNG8rDiw/FnB/Fn9g88+lDx7p1hH7AXhSI88XOnBG2dB+7gQU+3Fqlc4dSUb7MmyHYx7c/B+FmrZdV4WrGi95X0TtLP0qvl4bkxwCsnovY7s1Vb4MOjI4jb9LWCMhjhRC/UVIN9lsDa+yzL7c7yeUMfVCoqjIpb+Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ijRKskdO; arc=fail smtp.client-ip=40.93.198.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=U77wpS5bfmMN22ursMz4meGedEykHRg1OZ7zFvXR6Tq2PkIZVxpOc7ivm4yc+PG6RB9eea3+r7TQOliNgFm1+q7IBheOAGqqHrc3/Af2HlOUtfKU1sUwbiVb89hJpRWMXMVW20dAakevKFlnRa/woniyZ/etewkXGd2oytWAChOXLQLNTx3CwFCEQJ+n9TJ3pyQ8RySH9WlNPJbLYEYRUzLlJ/blUeYbfBn5DGWbcY+kOyOLojPIMCED19ZJE3GW0fLJViRMhMetvoZ02fpL9BlnBN7qM8CyH0CTJ50qLtCQo+706hLOZmP1KEjDPFKRxk84DIy72GDGgu5hH0YNhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=D/2NCaDgDDIB3WoYgBV7wMKYg0cWRLRw544yATMvLUg=;
- b=vPRsrPU+z9uS5UUkgfRkJsTF8ZX08iJAQezGRGq42MX04Z+n7G3LNYodpSoQlmeX6a/0YwO7ilG2ShiXfkSGhbHczLtKUXXFl7qzZzP1F4OHB6ApxWiVZimUhCBGXYvxSViXCDrYb86jn92RvseVJKy6IbAwNlzalhQLkX/pzFFOOqzixFij31g5PEuyfUOB4EGTE5RNIbLgEhYPZ9tYS6vIDEJEt/0MNkL2nagT1W9c06qhl0KPFRWo6LYVpAFJKi3dNfDwpj3AtFBpMyQ3ZV+VD+/PwVVDpoxJT0P0bA1j6wAxXmn0Gl+/yRHf5NytsGrWMo405XrTzSs5wt8b7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D/2NCaDgDDIB3WoYgBV7wMKYg0cWRLRw544yATMvLUg=;
- b=ijRKskdOq8y6nPf9qIQz+Fnkv8PCgeaurLjwB9PWPTtaO6e57ikENJOK4jrXGjea91g0jK5+hLEL/garDVbyX74q2egW0AFL3GI+XhCrR2VaiC7pcqyZQZlO/QklvnTy8x8IvaAGYGLg2xvF2whlrq3U3y6PCMPgEDVeiOMJErQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by BL4PR12MB9478.namprd12.prod.outlook.com (2603:10b6:208:58e::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.18; Mon, 2 Mar
- 2026 10:07:52 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.20.9654.014; Mon, 2 Mar 2026
- 10:07:52 +0000
-Message-ID: <b729ebe1-aea2-4f45-bb3f-3b4b59078c8d@amd.com>
-Date: Mon, 2 Mar 2026 11:07:41 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 3/7] vfio/pci: Support mmap() of a DMABUF
-To: Jason Gunthorpe <jgg@nvidia.com>, Alex Mastro <amastro@fb.com>
-Cc: Matt Evans <mattev@meta.com>, Alex Williamson <alex@shazbot.org>,
- Leon Romanovsky <leon@kernel.org>, Mahmoud Adam <mngyadam@amazon.de>,
- David Matlack <dmatlack@google.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- Kevin Tian <kevin.tian@intel.com>, Ankit Agrawal <ankita@nvidia.com>,
- Pranjal Shrivastava <praan@google.com>, Alistair Popple
- <apopple@nvidia.com>, Vivek Kasireddy <vivek.kasireddy@intel.com>,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
- kvm@vger.kernel.org
-References: <20260226202211.929005-1-mattev@meta.com>
- <20260226202211.929005-4-mattev@meta.com>
- <90bd4185-1e87-4393-b9e1-1318a656a7d9@amd.com>
- <20260227125109.GH5933@nvidia.com>
- <c5a8f318-20af-4d80-a279-2393192108c3@meta.com>
- <20260227194807.GL5933@nvidia.com>
- <aaISD4mw1XzQl1S8@devgpu015.cco6.facebook.com>
- <20260227220427.GM5933@nvidia.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <20260227220427.GM5933@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0321.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:eb::13) To PH7PR12MB5685.namprd12.prod.outlook.com
- (2603:10b6:510:13c::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362F1394483;
+	Mon,  2 Mar 2026 10:27:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772447279; cv=none; b=pRzcWTwd1XgqqDtlLPcoMCGaLzcrbIHjWSJlWe46ZnDFpSKPvVSdvhzXmSB/oPwBGcHz7Fho5tfJyxNk45tNp2fwkZMHzN/gSLD4rhJfl/4esdSx/reTUbSlkgqspbU2bK6pGAZMQbQuidDPBcmmNmNlykggVTKljdFHnmA9w3A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772447279; c=relaxed/simple;
+	bh=8Jbu9H2WLMZ/Y0rr095qrTvIs+zg55Kd2JEbFtyGHmY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WPYMa1aRFKbwZB/nyrYrdV2NMVUOBsVCA/+N2E9jwwFUvARGTDPdwRX37rafvnUIwiEuMxb+EoFzLrIlK6X/TLPpGCY2e9OezElwy9vcnGzHJc2GJfoenhKcoqdSqWHPrg0wqYYJKYW8xl13EoKBtEW9rdtjMsHl2LoJ7HnXNag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Krl6+69H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03A46C2BC87;
+	Mon,  2 Mar 2026 10:27:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772447279;
+	bh=8Jbu9H2WLMZ/Y0rr095qrTvIs+zg55Kd2JEbFtyGHmY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Krl6+69HdQKfsIadgvHYi287ier/j1szZ993OZDT7DLhjavvKec7Gmr03hTpHVgXj
+	 X0/0EjLIMbPIDZrCrJh9in109yydXaY5xnii3BGEGQDsH91yBSGTL2rsyr6PES0xNG
+	 KzCTBZZYNcrS+JljktAcnv3r/4+UE5gSO+jilmVPIvLhvKH/uOqaeeaW5ID/ViHWtE
+	 1C/VnCBU/fOpg6j3zXJeKFB9GExjAgAF8c5qVzy1gVHvIfNNS90zmmwWo7JQbWGXi2
+	 hMrX3cYHDYRwL5mIhmHn77RYJyzkHV9dkffdxYZV/gl7j7Y90QzUkwjrqRa3JIEhbO
+	 Sst0s9UkPTtwg==
+Message-ID: <f2f3a8a1-3dbf-4ef9-a89a-a6ec20791d1c@kernel.org>
+Date: Mon, 2 Mar 2026 11:27:40 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|BL4PR12MB9478:EE_
-X-MS-Office365-Filtering-Correlation-Id: 91a235ec-eae0-4325-5967-08de784390b8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	gv+j/TvPCDdvnk9Chohp8oXFeSWr8oYjlxeFBYEk7A13Ia3rDzTF4Z4dNJvbm6wNEW+ZmRegeZwWY6PfEiMLcvVpHRKyk5BF4ktWy9OS7F1LgLj/DZ/bGoX3+jE3DoAZU3c79FLN9QvyyJH1fUCAMKKgAAEgj27WC/yN+Hcs0An8TtJqaHbmtqvJk+Fa4lsAVXX9UBAh0roZ3Rfqd+meLMLg5qHvQo0q4RjdjALo1Kj9+6qho2XOYyl7n6Pcf1Ysoi9K9hit4ObxVkr4lFFpF3Nxgf89G6TG1JJA+sSfHpd97cZq92MpA0Ony1wQCwXpWhlOfmmgEIOV//aeo0A+cA5EhpBqTaR04Jr/2gbnzpv7VsFGs3cXhstj6AsGsgwMV5djorImozv7aW5euHA9PY5aq1qoEmco1fhtX/YBes509rh+x3fMBR614AdQyF7ppBR300kF3j2kQJBTGhJQUtWv/YVFfdJ7qnBl/HDVjdz2nwm0TRKposQ5/goflzUIJZEbPXe6bvheoZ43eA28i9siCOLtxrPmghi6xU+igE1MtXcA/zLG5DwjwGno6khq6j53Y53sHF6PecCzdOX5wYWcOsSwTjHPPTIalipZtyoJB/nFuBAFnCu8Brr4RL+Sx/rkX668fkugFk988qG0yRo7rFkanzGJDF1+2nRlD+6/OuMHOQGD45aUPoQKHcCg91mjwoKxST6KvP5OkCx3foQyCak6UDSgRrajHyoVjzw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UVlVaDN0V25zRExWd252WGlIZ0pRVklJcXNqa3BnQkZhZXJWS2FvSlVXU3lS?=
- =?utf-8?B?Y2VrK0xndU5CU1BNc0QzUDVxY2ZnMlNNVVl0SDRxTDRqMWJ6SlNCUWFuVUd4?=
- =?utf-8?B?dEk1ZXRBTURjcFduTVpIdkpJV2wvY01vUi80Z3NnSFpQcW5NWldOb2syNGZl?=
- =?utf-8?B?V2tmRFNZUzZyWE8wbUd3NXZkNUVlNnZqRUdmR1Jib3J4TUdKaUpMejNPSEx6?=
- =?utf-8?B?SFF0cW9QaUpMdUJQaDZIS3gzOWNiLzQySUx1Y0drYnlJOWlVUS9veWJNQnBR?=
- =?utf-8?B?Z3JQUm85NmFmM3FjaE5OenZhSlVNTXNsZDFCWDRiZTZXbGxUM0ZMNzk4cHRp?=
- =?utf-8?B?THczdUNBaEZxbVh6enZMUW5OUTJRbFVCR0tvMWhYZE9xcmIyeTByditkdFVq?=
- =?utf-8?B?UnlBMTZsc1dQdlRoNmhzTTlEK3BiZXNSNXhwVFJ1L3RxaTVGck5uL0hydHc3?=
- =?utf-8?B?L3RFK0I2UzI3YnlUODZGbGpSdktabFdaaGJhRW4xbUFPSFFVOEdzdWRJQWl0?=
- =?utf-8?B?NnUzdjZBWnNZdjROM2dhcGNBdlF4Rk1QUllPSTdrdm5FK011cXdoS3FDVWJj?=
- =?utf-8?B?ZkhCdEIyd2QzNzI0UFJpTGxhSzZnT1NLUWROZ2k5TzJ3TmhaOGlRY3ZTQUlM?=
- =?utf-8?B?YjRSclgyMUtQSjN1Z0FtcGg2cFFhWW5uYS9scUNKYVhsODV3THRzcHdJd0Q3?=
- =?utf-8?B?cHlaWDhOWG0wcnhST3JIRHFBMk8rVnpmUUt3OTlKZEZnQ1h0OW5XZ2N5c2hX?=
- =?utf-8?B?cnp5MndINVhNWEZVbW10UlBrUzhhczYwUythYmxrc2MwV2llRjNoSUNqaUtn?=
- =?utf-8?B?aTB6ZFZ5YWd4NFhkcnFlZndLT0liU0s2eklzMkc3RGdTMS9YU2Z2MEpSYXhx?=
- =?utf-8?B?ekNDOW9BcE9oaWl5dkE0YnIzd3BpUTVGYlZSdlkwMlc5bVcxRHJaZW1CbW53?=
- =?utf-8?B?aThVNjEwcUN1K1VDcGsxNFpHMGZYaWQvNDBQL21hTE1rZ3hZUXBqdldjTWt5?=
- =?utf-8?B?VFhGSEorU0RrMzZNbjhweHozWGhVbnBkY25DZnlTUE1zbjVZSFFjMk1QdWlu?=
- =?utf-8?B?Z2VWcnBUYjl0NHR6M0dVanV4a2VKYU9Qb2hOQ3F0QVBZeHRtMjNTSGJ2UmRo?=
- =?utf-8?B?RjZOOVYxeFZ5eWFlWFJaK2p2NUx0N2JQMHBDdFp2YmRPcWNJNzYxaWc2NjVO?=
- =?utf-8?B?dG9kdXg0Y0l2RjB4TjNFWExnM2xqUE1QYXNBK2RnWjg0aFVlUFhXcEtnSVVY?=
- =?utf-8?B?bHRJZ1dKQ3hQbjIwV2FMVFZCZFkxdURodU5GMVFQbUhTOTRHMkdadkhFblo3?=
- =?utf-8?B?SXBRekpucTllYjJaQVl4a0YzdnFONjBKR3A2SUs5MFUvcDlEUEhhSWdqUmVH?=
- =?utf-8?B?aHp3ckxEa3BxclRHSitRYWNxbC9mdTFmVWJXY1dEb0hOMU5xSEFYVUZQWWp1?=
- =?utf-8?B?dkYrdXNwcFF5WXJqbm1lbzcvS1dPZkRJYWRFSzhhN0lGbllZVmNoRmxRSGlz?=
- =?utf-8?B?M3Rmb0xxa2psZ2xlQmJJMU1BSzgydGFTbUt5K0plMEllNzBacmdmc3lVcDYv?=
- =?utf-8?B?Y2hDYzZMV0wyczBxQzIreUpsa0dKYkdvTTQvRG9NdDFFRk82b3lGM1ZCV2ox?=
- =?utf-8?B?YlZEUHM4SExtZmxlcDhLaDVVWlQyNm5JdlE4ZlZ3OUtpNlVXTHRJcHRrRWxq?=
- =?utf-8?B?MzErMGFTNHlBQzQ3eHVXQll0ZklrNkdOaFhkTDRqcnl5VVF3Vm5wa1lacCtX?=
- =?utf-8?B?STEyWXdQZ3RqbE9xbkxLLy8vSVE4S1haZExaKzIyUmxMTnV2VDd3WmVjazJZ?=
- =?utf-8?B?L0NCdjYzdXNaNXRFTXg2MFN1R0F2MVMybjNFUXVvTC83cGxicTE1MGx4Uk9w?=
- =?utf-8?B?Ry93T1djVTRRUkM1LzdnZ3h3cnZRNHNETVlzM2NnaXBvZ3pZZGVWNi8veDl2?=
- =?utf-8?B?bzBKL2ljOHZKaFBnMG1peWd0YitIR2ljNEdNU0NlcC9pNHBOWFRJbmxCSklD?=
- =?utf-8?B?US9QUEFRckdENjdJelRFdlAxYk85SUNKUnVZWStST1RPL0wrdzR6VForZGk4?=
- =?utf-8?B?MG1wL3o1MnhHVy9IcjlaOWtUMGVDcE9Sa1hmQTFrZW9oK0dyWjRSblpvSUs0?=
- =?utf-8?B?WnBRMlN2YVBHRjZZd1VjU2UyVzBnbUJhdy9ZdFZmRTR6QUJMeit1a3FJbkJi?=
- =?utf-8?B?WUV1RXFpcTVlbzJmaFJOOXp5cFZpUE1icHRYSmhiNjRHNzZtc20wY2JBZ1Ix?=
- =?utf-8?B?S1hvQy8yUlFZRkFXdWV1MDJVd2Izd25ydHo3dGI3WmZWOFcyRDlHb1VQcTdz?=
- =?utf-8?Q?VVJswcN5vUFAGlJZHa?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91a235ec-eae0-4325-5967-08de784390b8
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2026 10:07:52.0313
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DMVcuhRSfJY1Wc3qa+zw/vkoaTQG1ULErrk06G3qUh5T93V6M6nGfxaqwWLOE4u0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL4PR12MB9478
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 02/16] mm/memory: remove "zap_details" parameter from
+ zap_page_range_single()
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: linux-kernel@vger.kernel.org, "linux-mm @ kvack . org"
+ <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+ Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
+ Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>,
+ David Rientjes <rientjes@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ =?UTF-8?Q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
+ Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>,
+ Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>,
+ H Hartley Sweeten <hsweeten@visionengravers.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Leon Romanovsky <leon@kernel.org>,
+ Dimitri Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
+References: <20260227200848.114019-1-david@kernel.org>
+ <20260227200848.114019-3-david@kernel.org> <aaLh2BxSgC9Jl5iS@google.com>
+ <8a27e9ac-2025-4724-a46d-0a7c90894ba7@kernel.org>
+ <aaVf5gv4XjV6Ddt-@google.com>
+From: "David Hildenbrand (Arm)" <david@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=david@kernel.org; keydata=
+ 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
+ qIws/H2t
+In-Reply-To: <aaVf5gv4XjV6Ddt-@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72353-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[christian.koenig@amd.com,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-72354-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[73];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amd.com:mid,amd.com:dkim]
-X-Rspamd-Queue-Id: 5FBED1D62AA
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B7AB31D67CD
 X-Rspamd-Action: no action
 
-On 2/27/26 23:04, Jason Gunthorpe wrote:
-> On Fri, Feb 27, 2026 at 01:52:15PM -0800, Alex Mastro wrote:
->> On Fri, Feb 27, 2026 at 03:48:07PM -0400, Jason Gunthorpe wrote:
->>>>> I actually would like to go the other way and have VFIO always have a
->>>>> DMABUF under the VMA's it mmaps because that will make it easy to
->>>>> finish the type1 emulation which requires finding dmabufs for the
->>>>> VMAs.
+On 3/2/26 11:01, Alice Ryhl wrote:
+> On Mon, Mar 02, 2026 at 09:18:45AM +0100, David Hildenbrand (Arm) wrote:
+>> On 2/28/26 13:38, Alice Ryhl wrote:
 >>>
->>> This is a still better idea since it avoid duplicating the VMA flow
->>> into two parts..
+>>>
+>>> Please run rustfmt on Rust changes. Here, rustfmt leads to this being
+>>> formatted on a single line:
 >>
->> I suppose this would also compose with your idea to use dma-buf for
->> iommufd_compat support of VFIO_IOMMU_MAP_DMA of vfio device fd-backed mmap()s
->> [1]? Instead of needing to materialize a new dma-buf, you could use the existing
->> backing one?
+>> Having to run tooling I don't even have installed when removing a single
+>> function parameter; did not expect that :)
 > 
-> Yeah, that too
+> Well, rustfmt comes with the compiler, and it would be ideal to build
+> test changes before sending them :)
+
+At least on Ubuntu on my notebook where I do most of the coding+patch
+submissions it's a separate package?
+
+I do all my builds on a different (more powerful) machine where the
+whole rust machinery's in place. Further, build bots that run on my
+private branches did not report any issues.
+
+
+> But no worries, I took care of testing it. Thanks for taking the time to
+> update the Rust code as well.
+
+I just did an allyesconfig and it does not report any warnings.
+
+So apparently, rustfmt problems not result in the compiler complaining?
+
+Or something else is off here that rust/kernel/mm/virt.rs won't get
+compiled on my machine, even with allyesconfig. I can definitely see
+some RUSTC stuff happening in the logs, like
+
+	RUSTC L rust/kernel.o
+
+Thanks for the review and for pointing out rustfmt!
+
 > 
-> I think it is a fairly easy progression:
-> 
-> 1) mmap_prepare() allocates a new dmabuf file * and sticks it in
->    desc->vm_file. Rework so all the vma_ops are using vm_file that is
->    a dmabuf. The allocated dmabuf has a singleton range
+> Documentation/rust/quick-start.rst has details for most distros.
 
-Interesting approach to fix this, but I would suggest something even simpler:
+Will read that the next time I feel brave enough to touch rust code.
 
-Use the same structure as base class for the VFIO and DMA-buf file for your vma->vm_file->private_data object.
+-- 
+Cheers,
 
-The DMA-buf file actually contains the real ranges exposed by it and pointing to the exporting VFIO, while the one for the VFIO is just a dummy covering the whole range and pointing to itself.
-
-This way you should be able to use the same vm_operations_struct for VMAs mapped through both DMA-buf and the VFIO file descriptors.
-
-
-Independent of how you implement this just one additional warning: huge_fault has caused a number of really hard to debug problems on x86.
-
-As far as I know background is that on x86 pte_special() only works on true leave pte but not pmd/pud.
-
-That in turn results in some nasty surprises when your PFNs are potentially backed by struct pages, e.g. for direct I/O. For example on the resulting mmap() get_user_pages_fast() works, but get_user_pages() doesn't.
-
-I hope that those problems aren't applicable here, but if it is Thomas from the Intel XE team can give you more details on that stuff.
-
-Regards,
-Christian.
-
-> 2) Teach the fault handlers to support full range semantics
-> 3) Use dmabuf revoke variables/etc in the mmap fault handlers
-> 4) Move the address space from the vfio to the dmabuf
-> 5) Allow mmaping the dmabuf fd directly which is now only a couple lines
-> 
-> I forget how all the different mmap implementations in vfio interact
-> though - but I think the above is good for vfio-pci
-> 
-> Jason
-
+David
 
