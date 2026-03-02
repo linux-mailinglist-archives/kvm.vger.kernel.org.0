@@ -1,423 +1,173 @@
-Return-Path: <kvm+bounces-72383-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72384-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MG6NATqmpWnNDQAAu9opvQ
-	(envelope-from <kvm+bounces-72383-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:01:14 +0100
+	id +KtWN8impWngCwAAu9opvQ
+	(envelope-from <kvm+bounces-72384-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:03:36 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA3D51DB506
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:01:08 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E78A91DB5DB
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 16:03:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C3A0E3074785
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 14:56:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E8DBC3031DA6
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 14:57:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 560DE3FB051;
-	Mon,  2 Mar 2026 14:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DE440148E;
+	Mon,  2 Mar 2026 14:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WOqaPuFx"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ikqD6uAl"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887A8332EC1;
-	Mon,  2 Mar 2026 14:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB0A3E714D;
+	Mon,  2 Mar 2026 14:57:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772463387; cv=none; b=hTOTntLpLa2ZfpJdeFii0pAFdk+k9+DUEf5/P21yQJro870TzEGZtDgZcovMaO2VvbZ/YVOagEliVFLQ5L7rHe2lXWsOM4vzlClSDiE3fR31UQ+Ng9kTjQVvj3th/ZeP4XkWtmtf+fxqKi27FIvM4fu0zmXx6MbJFMgaBNMGUX0=
+	t=1772463441; cv=none; b=X5pUokxZNDAwaEngPB97zf1P+eDH5UWXUK1Nflgbwkv+KG2c0a0ph7XNVXQaP7ypeBuDMZycS1z+rtZQdxaYqVEPmX22rmwExwvHPRx1EtZ68KLSaqoYtC7B1fPBwIS52E4ySPX+Aha3UYoyDEaeu2T6CNvJ+xWzzT1Ngwez7yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772463387; c=relaxed/simple;
-	bh=oU0GLS1+U0aFHGSu270A22eis8d+o92JaCiSGmMvS24=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Vv6Q8IyuWKKWcfPj/eIRGHjn4i6E3RyZWdxDPM5sFGiFD/3NIl6zi2l1LsUHq1zq27TzeyIqWtvNbZdgWbFtXf0/cUeHnK1+HB3zHszIC0MLlnZTOttiSUrnZwd3sjADLNhhDPSmYgcPbkeE4G3GskzRf4T6U6vliAquqP1taYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WOqaPuFx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F10F4C19423;
-	Mon,  2 Mar 2026 14:56:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772463387;
-	bh=oU0GLS1+U0aFHGSu270A22eis8d+o92JaCiSGmMvS24=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WOqaPuFxs1WNSBVnJVs+xQ78aogVXY35SDYjXMhv134i3GflGPX8NXP0w0efq8mZp
-	 zi9knDrh4WhE8yqZTmPNiBnF8s2Fgecef/h2o3GZde7B2QwOMR25Xt+Vf3oMX7di9F
-	 ZImPHmuzLv04/JA8K3Qb4FUA2151t88+D2P4rr6j7qAJqCEIPxsBnm7TF1rPwZzODe
-	 XTTQ9A8PPtQN7cSGghlNLFSJWSUYhePiG2eYW0nH0t2iyr5I/tVv/XGKG0iemy4g3/
-	 u/ETusTUkU3kScjMhu8E1/7SE+QlY5P1/jGmgW6Z2qXUiwTMC5i3lIBNs7ALQhlxt7
-	 u5+cr7FDVMs4g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vx4h6-0000000FHdF-3Ieo;
-	Mon, 02 Mar 2026 14:56:24 +0000
-Date: Mon, 02 Mar 2026 14:56:24 +0000
-Message-ID: <86qzq28elj.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v12 20/46] arm64: RMI: Allow populating initial contents
-In-Reply-To: <20251217101125.91098-21-steven.price@arm.com>
-References: <20251217101125.91098-1-steven.price@arm.com>
-	<20251217101125.91098-21-steven.price@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1772463441; c=relaxed/simple;
+	bh=AXvtUVp1dqbd31BiNo7WZp/bdARrTW0igKEmAv50fNg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KLlEnClSx3jAVszcqA8+1W2BYvu78ZiezJz6mecAyhNz3LGwqtw/nRmyL6jFDWXNzDBBJGG99nmH0Fcru29bHlU+QMJzY6vF9CTCzdS53HU/05IE06nyM7HxSCP2hsLJSJ6nRQ1eroPBB9Qnhw1yZ03IXfgjEBCLv9wJeqxPMQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ikqD6uAl; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=51FG2UnZd5khg0RiqyUJE+vDT2282n/46yWgskAeolw=; b=ikqD6uAloCgZUSOvOS1RgqjF4j
+	0XIj9O9goT/8xRogpP2thUUsSIS6z6JWEPcQH9XZaVqqzGvygD4VsIpoHCr1qyKzC26ftB59EfJj4
+	ZGmXp93LBinORiESM14NyWGh/7+QsJnxk+EgUkkCTpW8LcSlBacpm/5Tz9r8d3yMTeKHR7p/EvZPa
+	LnsXDLD9suCcGnHP3/FwMEA8mhNGTTsBheT81VAn3/XPP0Sabalo7OY2Zq9wiCkH5hfCZ0iaMIIAN
+	booolOQAPvKEaMjwKIc5sHw7R58mGIjeizpynkcC6PUcaiHg89lm4LO7xxSozE8eKTfj2NL0VoMs2
+	DvbBhhPQ==;
+Received: from 2001-1c00-8d85-5700-266e-96ff-fe07-7dcc.cable.dynamic.v6.ziggo.nl ([2001:1c00:8d85:5700:266e:96ff:fe07:7dcc] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vx4hZ-00000009dtZ-23cs;
+	Mon, 02 Mar 2026 14:56:53 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 06C34300B40; Mon, 02 Mar 2026 15:56:53 +0100 (CET)
+Date: Mon, 2 Mar 2026 15:56:52 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Lance Yang <lance.yang@linux.dev>
+Cc: akpm@linux-foundation.org, david@kernel.org, dave.hansen@intel.com,
+	dave.hansen@linux.intel.com, ypodemsk@redhat.com, hughd@google.com,
+	will@kernel.org, aneesh.kumar@kernel.org, npiggin@gmail.com,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+	hpa@zytor.com, arnd@arndb.de, lorenzo.stoakes@oracle.com,
+	ziy@nvidia.com, baolin.wang@linux.alibaba.com,
+	Liam.Howlett@oracle.com, npache@redhat.com, ryan.roberts@arm.com,
+	dev.jain@arm.com, baohua@kernel.org, shy828301@gmail.com,
+	riel@surriel.com, jannh@google.com, jgross@suse.com,
+	seanjc@google.com, pbonzini@redhat.com, boris.ostrovsky@oracle.com,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, ioworker0@gmail.com
+Subject: Re: [PATCH v5 2/2] x86/tlb: skip redundant sync IPIs for native TLB
+ flush
+Message-ID: <20260302145652.GH1395266@noisy.programming.kicks-ass.net>
+References: <20260302063048.9479-1-lance.yang@linux.dev>
+ <20260302063048.9479-3-lance.yang@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Rspamd-Queue-Id: AA3D51DB506
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260302063048.9479-3-lance.yang@linux.dev>
+X-Rspamd-Queue-Id: E78A91DB5DB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-72384-lists,kvm=lfdr.de];
+	FREEMAIL_CC(0.00)[linux-foundation.org,kernel.org,intel.com,linux.intel.com,redhat.com,google.com,gmail.com,linutronix.de,alien8.de,zytor.com,arndb.de,oracle.com,nvidia.com,linux.alibaba.com,arm.com,surriel.com,suse.com,lists.linux.dev,vger.kernel.org,kvack.org];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72383-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RSPAMD_URIBL_FAIL(0.00)[arm.com:query timed out];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RSPAMD_EMAILBL_FAIL(0.00)[steven.price.arm.com:query timed out];
-	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[peterz@infradead.org,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.996];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,noisy.programming.kicks-ass.net:mid,infradead.org:dkim]
 X-Rspamd-Action: no action
 
-On Wed, 17 Dec 2025 10:10:57 +0000,
-Steven Price <steven.price@arm.com> wrote:
-> 
-> The VMM needs to populate the realm with some data before starting (e.g.
-> a kernel and initrd). This is measured by the RMM and used as part of
-> the attestation later on.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v11:
->  * The multiplex CAP is gone and there's a new ioctl which makes use of
->    the generic kvm_gmem_populate() functionality.
-> Changes since v7:
->  * Improve the error codes.
->  * Other minor changes from review.
-> Changes since v6:
->  * Handle host potentially having a larger page size than the RMM
->    granule.
->  * Drop historic "par" (protected address range) from
->    populate_par_region() - it doesn't exist within the current
->    architecture.
->  * Add a cond_resched() call in kvm_populate_realm().
-> Changes since v5:
->  * Refactor to use PFNs rather than tracking struct page in
->    realm_create_protected_data_page().
->  * Pull changes from a later patch (in the v5 series) for accessing
->    pages from a guest memfd.
->  * Do the populate in chunks to avoid holding locks for too long and
->    triggering RCU stall warnings.
-> ---
->  arch/arm64/include/asm/kvm_rmi.h |   4 +
->  arch/arm64/kvm/Kconfig           |   1 +
->  arch/arm64/kvm/arm.c             |   9 ++
->  arch/arm64/kvm/rmi.c             | 175 +++++++++++++++++++++++++++++++
->  4 files changed, 189 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-> index 8a862fc1a99d..b5e36344975c 100644
-> --- a/arch/arm64/include/asm/kvm_rmi.h
-> +++ b/arch/arm64/include/asm/kvm_rmi.h
-> @@ -99,6 +99,10 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu);
->  int kvm_rec_pre_enter(struct kvm_vcpu *vcpu);
->  int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
+On Mon, Mar 02, 2026 at 02:30:36PM +0800, Lance Yang wrote:
+
+
+> @@ -221,3 +222,18 @@ NOKPROBE_SYMBOL(native_load_idt);
 >  
-> +struct kvm_arm_rmi_populate;
+>  EXPORT_SYMBOL(pv_ops);
+>  EXPORT_SYMBOL_GPL(pv_info);
 > +
-> +int kvm_arm_rmi_populate(struct kvm *kvm,
-> +			 struct kvm_arm_rmi_populate *arg);
->  void kvm_realm_unmap_range(struct kvm *kvm,
->  			   unsigned long ipa,
->  			   unsigned long size,
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 1cac6dfc0972..b495dfd3a8b4 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -39,6 +39,7 @@ menuconfig KVM
->  	select GUEST_PERF_EVENTS if PERF_EVENTS
->  	select KVM_GUEST_MEMFD
->  	select KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	select HAVE_KVM_ARCH_GMEM_POPULATE
->  	help
->  	  Support hosting virtualized guest machines.
+> +void __init native_pv_tlb_init(void)
+> +{
+> +	/*
+> +	 * If PV backend already set the property, respect it.
+> +	 * Otherwise, check if native TLB flush sends real IPIs to all target
+> +	 * CPUs (i.e., not using INVLPGB broadcast invalidation).
+> +	 */
+> +	if (pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast)
+> +		return;
+> +
+> +	if (pv_ops.mmu.flush_tlb_multi == native_flush_tlb_multi &&
+> +	    !cpu_feature_enabled(X86_FEATURE_INVLPGB))
+> +		pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast = true;
+> +}
+
+How about making this a static_branch instead?
+
+> diff --git a/arch/x86/include/asm/tlb.h b/arch/x86/include/asm/tlb.h
+> index 866ea78ba156..87ef7147eac8 100644
+> --- a/arch/x86/include/asm/tlb.h
+> +++ b/arch/x86/include/asm/tlb.h
+> @@ -5,10 +5,23 @@
+>  #define tlb_flush tlb_flush
+>  static inline void tlb_flush(struct mmu_gather *tlb);
 >  
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 7927181887cf..0a06ed9d1a64 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2037,6 +2037,15 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->  			return -EFAULT;
->  		return kvm_vm_ioctl_get_reg_writable_masks(kvm, &range);
->  	}
-> +	case KVM_ARM_RMI_POPULATE: {
-> +		struct kvm_arm_rmi_populate req;
+> +#define tlb_table_flush_implies_ipi_broadcast tlb_table_flush_implies_ipi_broadcast
+> +static inline bool tlb_table_flush_implies_ipi_broadcast(void);
 > +
-> +		if (!kvm_is_realm(kvm))
-> +			return -EPERM;
-
-EPERM is odd. It isn't that the VMM doesn't have the right to do it,
-it is that it shouldn't have called that, because the ioctl doesn't
-exist for a normal VM. -ENOSYS?
-
-> +		if (copy_from_user(&req, argp, sizeof(req)))
-> +			return -EFAULT;
-> +		return kvm_arm_rmi_populate(kvm, &req);
-> +	}
->  	default:
->  		return -EINVAL;
->  	}
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index fe15b400091c..39577e956a59 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -558,6 +558,150 @@ void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
->  		realm_unmap_private_range(kvm, start, end, may_block);
->  }
->  
-> +static int realm_create_protected_data_granule(struct realm *realm,
-> +					       unsigned long ipa,
-> +					       phys_addr_t dst_phys,
-> +					       phys_addr_t src_phys,
-> +					       unsigned long flags)
+>  #include <asm-generic/tlb.h>
+>  #include <linux/kernel.h>
+>  #include <vdso/bits.h>
+>  #include <vdso/page.h>
+> +#include <asm/paravirt.h>
+> +
+> +static inline bool tlb_table_flush_implies_ipi_broadcast(void)
 > +{
-> +	phys_addr_t rd = virt_to_phys(realm->rd);
-> +	int ret;
-> +
-> +	if (rmi_granule_delegate(dst_phys))
-> +		return -ENXIO;
-> +
-> +	ret = rmi_data_create(rd, dst_phys, ipa, src_phys, flags);
-> +	if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
-> +		/* Create missing RTTs and retry */
-> +		int level = RMI_RETURN_INDEX(ret);
-> +
-> +		WARN_ON(level == RMM_RTT_MAX_LEVEL);
-
-If this is unexpected, why do we still try to handle it? We should
-abort hard on anything that doesn't seem 100% correct, and mark the
-realm dead.
-
-> +
-> +		ret = realm_create_rtt_levels(realm, ipa, level,
-> +					      RMM_RTT_MAX_LEVEL, NULL);
-> +		if (ret)
-> +			return -EIO;
-> +
-> +		ret = rmi_data_create(rd, dst_phys, ipa, src_phys, flags);
-> +	}
-> +	if (ret)
-> +		return -EIO;
-> +
-> +	return 0;
+> +#ifdef CONFIG_PARAVIRT
+> +	return pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast;
+> +#else
+> +	return !cpu_feature_enabled(X86_FEATURE_INVLPGB);
+> +#endif
 > +}
-> +
-> +static int realm_create_protected_data_page(struct realm *realm,
-> +					    unsigned long ipa,
-> +					    kvm_pfn_t dst_pfn,
-> +					    kvm_pfn_t src_pfn,
-> +					    unsigned long flags)
-> +{
-> +	unsigned long rd = virt_to_phys(realm->rd);
-> +	phys_addr_t dst_phys, src_phys;
-> +	bool undelegate_failed = false;
-> +	int ret, offset;
-> +
-> +	dst_phys = __pfn_to_phys(dst_pfn);
-> +	src_phys = __pfn_to_phys(src_pfn);
-> +
-> +	for (offset = 0; offset < PAGE_SIZE; offset += RMM_PAGE_SIZE) {
-> +		ret = realm_create_protected_data_granule(realm,
-> +							  ipa,
-> +							  dst_phys,
-> +							  src_phys,
-> +							  flags);
-> +		if (ret)
-> +			goto err;
-> +
-> +		ipa += RMM_PAGE_SIZE;
-> +		dst_phys += RMM_PAGE_SIZE;
-> +		src_phys += RMM_PAGE_SIZE;
-> +	}
-> +
-> +	return 0;
-> +
-> +err:
-> +	if (ret == -EIO) {
-> +		/* current offset needs undelegating */
-> +		if (WARN_ON(rmi_granule_undelegate(dst_phys)))
-> +			undelegate_failed = true;
-> +	}
-> +	while (offset > 0) {
-> +		ipa -= RMM_PAGE_SIZE;
-> +		offset -= RMM_PAGE_SIZE;
-> +		dst_phys -= RMM_PAGE_SIZE;
-> +
-> +		rmi_data_destroy(rd, ipa, NULL, NULL);
-> +
-> +		if (WARN_ON(rmi_granule_undelegate(dst_phys)))
-> +			undelegate_failed = true;
-> +	}
-> +
-> +	if (undelegate_failed) {
-> +		/*
-> +		 * A granule could not be undelegated,
-> +		 * so the page has to be leaked
-> +		 */
-> +		get_page(pfn_to_page(dst_pfn));
-> +	}
-> +
-> +	return -ENXIO;
-> +}
-> +
-> +static int populate_region_cb(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
-> +			      void __user *src, int order, void *opaque)
-> +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	unsigned long data_flags = *(unsigned long *)opaque;
-> +	phys_addr_t ipa = gfn_to_gpa(gfn);
-> +	int npages = (1 << order);
-> +	int i;
-> +
-> +	for (i = 0; i < npages; i++) {
-> +		struct page *src_page;
-> +		int ret;
-> +
-> +		ret = get_user_pages((unsigned long)src, 1, 0, &src_page);
-> +		if (ret < 0)
-> +			return ret;
-> +		if (ret != 1)
-> +			return -ENOMEM;
-> +
-> +		ret = realm_create_protected_data_page(realm, ipa, pfn,
-> +						       page_to_pfn(src_page),
-> +						       data_flags);
-> +
-> +		put_page(src_page);
-> +
-> +		if (ret)
-> +			return ret;
-> +
-> +		ipa += PAGE_SIZE;
-> +		pfn++;
-> +		src += PAGE_SIZE;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static long populate_region(struct kvm *kvm,
-> +			    gfn_t base_gfn,
-> +			    unsigned long pages,
-> +			    u64 uaddr,
-> +			    unsigned long data_flags)
-> +{
-> +	long ret = 0;
-> +
-> +	mutex_lock(&kvm->slots_lock);
-> +	mmap_read_lock(current->mm);
-> +	ret = kvm_gmem_populate(kvm, base_gfn, u64_to_user_ptr(uaddr), pages,
-> +				populate_region_cb, &data_flags);
-> +	mmap_read_unlock(current->mm);
-> +	mutex_unlock(&kvm->slots_lock);
-> +
-> +	return ret;
-> +}
-> +
->  enum ripas_action {
->  	RIPAS_INIT,
->  	RIPAS_SET,
-> @@ -655,6 +799,37 @@ static int realm_ensure_created(struct kvm *kvm)
->  	return -ENXIO;
->  }
->  
-> +int kvm_arm_rmi_populate(struct kvm *kvm,
-> +			 struct kvm_arm_rmi_populate *args)
-> +{
-> +	unsigned long data_flags = 0;
-> +	unsigned long ipa_start = args->base;
-> +	unsigned long ipa_end = ipa_start + args->size;
-> +	int ret;
-> +
-> +	if (args->reserved ||
-> +	    (args->flags & ~KVM_ARM_RMI_POPULATE_FLAGS_MEASURE) ||
-> +	    !IS_ALIGNED(ipa_start, PAGE_SIZE) ||
-> +	    !IS_ALIGNED(ipa_end, PAGE_SIZE))
-> +		return -EINVAL;
-> +
-> +	ret = realm_ensure_created(kvm);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (args->flags & KVM_ARM_RMI_POPULATE_FLAGS_MEASURE)
 
-This flag isn't documented.
+Then this turns into:
 
-> +		data_flags |= RMI_MEASURE_CONTENT;
-> +
-> +	ret = populate_region(kvm, gpa_to_gfn(ipa_start),
-> +			      args->size >> PAGE_SHIFT,
-> +			      args->source_uaddr, args->flags);
-> +
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	return ret * PAGE_SIZE;
+static inline bool tlb_table_flush_implies_ipi_broadcast(void)
+{
+	return static_branch_likely(&tlb_ipi_broadcast_key);
+}
 
-Bits of the code works on PAGE_SIZE, other bits on RMM_PAGE_SIZE. It
-is pretty confusing. Are you in the middle of reworking this?
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
