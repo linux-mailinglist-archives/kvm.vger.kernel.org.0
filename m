@@ -1,256 +1,260 @@
-Return-Path: <kvm+bounces-72427-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72428-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2KgeH0sXpmkCKQAAu9opvQ
-	(envelope-from <kvm+bounces-72427-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:03:39 +0100
+	id iHb4CGIZpmmeKQAAu9opvQ
+	(envelope-from <kvm+bounces-72428-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:12:34 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22E621E63AE
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:03:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1C071E6651
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:12:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E3EF131314CA
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 22:18:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 372B9320451F
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 22:33:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8333731C567;
-	Mon,  2 Mar 2026 22:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10539358376;
+	Mon,  2 Mar 2026 22:32:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="O2l9ikoS";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="LLSG5hvV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XXFQ8gMM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84987390982
-	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 22:18:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D2531F9BA;
+	Mon,  2 Mar 2026 22:32:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772489933; cv=none; b=SA6k9s5kMXkixv4Lo4k9Rtp+NqZbLu1JbIA+TT5gMRZDzM8Gn4BUILuG504EdGXo6Oir6PpJOrri4ep0QXiQCU/ZIjQFnUeb+evzxGHMdui8SxaooMXMtNmHkyYzS1/7eZYEcpyHAKqc2yGIRXfCv/SNaRudeeVusfMieSWCI7w=
+	t=1772490754; cv=none; b=dqkfWJD2gHfS2hWDHxsUOxu6r2RM4aFeFMAfOoQJJsexSSQ8xwxXWvE8z2/qaW8DLH+xRsJzcbl2mE+HslL5rb4wQ5oayNeTdxmaH2lFWZ8USeA1XXDDseKuTgGy/Xu0naQYHNro/pcSmtJdw0n3o6kZGuA3kbQGR9H0bOuqZ5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772489933; c=relaxed/simple;
-	bh=EZsJ49Ewww8UnP2671jWLKEusF2TLYFcEBSnlhxV/P8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jEeQIINOZQ/V/ZKzJw3nPMxFXNHCh1P4CKRn/WSEYHkO/vaVKQuZZ85Z63yBEOu/zGHsu5OTQAg1gThEM70KajCe57KVSnAGAcWfplQRQwv08u+yt/ldlPfqxUnRQnSRMaGV/5DwrhVgi/wss428qlwuSiG4NIx0khIN3ham8sU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=O2l9ikoS; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=LLSG5hvV; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 622G86aF3741985
-	for <kvm@vger.kernel.org>; Mon, 2 Mar 2026 22:18:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	5jzi6xUspl1H57VMYdStLRVZGkZtz1A2ALKD/Cg0yxQ=; b=O2l9ikoSTWGNyUIC
-	/RkMVl/Ty+P1I4fF5G0pQePsr6Cj0YMA/Hr8hfBW5Tu91owY7AYzembkG9zO7kQu
-	ueiBYCTHS4EEjQ83hxmKG8fVLsE8pg+NGW1jzZL6Q5SyfyEyGe+m8J05AdTml5Ji
-	vla6qPm1eZTWKJ7FcbqrRZLzkHVNZWI4i0UvTEdj6vkCfJ9pzLd5bqABqrxkVwBf
-	cpXvqlwHdeS4GoptiRS1jFR34/NWGbp28JY20w2NJFSlLotkQdAXudR8Zf6KMFtV
-	lRS58rwBelV1Mp8zq+zvolVB3vg6KEn7V949N+Hp0GrghZBLYIDinBSlER57fthl
-	HKh6+w==
-Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4cn7trjh8j-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 22:18:51 +0000 (GMT)
-Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-2bdf75bc88fso2001996eec.0
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 14:18:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1772489931; x=1773094731; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5jzi6xUspl1H57VMYdStLRVZGkZtz1A2ALKD/Cg0yxQ=;
-        b=LLSG5hvVnnEcq2+Te+9HTi/3/o3475DcINszFdDp+GMHwp9KBozE2BPKfhbAhyu9do
-         vcSPxaCZ2HGJ4TfyAbzAJIpe9AujcdYzYTO1rPyyYZGITSNTswDZ63+3kQOKCHACfAaF
-         YyBHMvh1qRCx7wBk1FW8PH19C654HozI2FVH0tMJx292iVKRAT+45TE76IBs3vuozh59
-         rfolTubdIbvLP4YEdagz6A+yUUydqKvfXix9asutDcKt23twiniSV7kEfW7y5x5f6ye8
-         KZMGIZUM2Ig/+yOIb+vuq64E7aa08V2S/b8IxDE5nvk+I9bD6anlBCNtTNlxJaOm9XKH
-         xMFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772489931; x=1773094731;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5jzi6xUspl1H57VMYdStLRVZGkZtz1A2ALKD/Cg0yxQ=;
-        b=aH7lshdyoHxAZii5Z76uwTz1Fy9AGywnbaETjvUdAJHHW5OpherBVZyjvKxqscj/1A
-         qCddrtqY9vg1L3NhSfMP3SgTHzh/CCryKL2wrrNUnPNEoJeRceejEkJeAMhEKjU8hjDF
-         NDsv5taggg+nOjdy8HJRLoJTo+0BqYdMBm3AQjCNNtKtaDMN4P3PgaSskKb5KhVLu8mz
-         yfBtOU1NkeDPZFDvhicZeIwZ+qBbe9mf0jAglqaIEI/3e+XyBRHoBnTU4KVFFJlc9ID1
-         pjKnr9G2frC9NhPcOoY9WsGW10STPoHeXoZd+zuodTLi7SJYIIVSBLfglPnV+W7wQMto
-         fFOw==
-X-Forwarded-Encrypted: i=1; AJvYcCXPleD1f1joL1MnHOOmxF7Ppoi2M6d9n7IiOm4+mv1fFSA/QDrXfnsbHsO4lkgH2XdzCQg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRsgs/U0yZb+9t05fYfoNTL0HY+09RrQEDizOqXFBTyb5O1DIM
-	XCF6kDSzO/4u56KL6704ldKfLabqlkBlDWjcgV3rILqh/kAdJA4HcM3I6sG9c/Q08HWw2ISX6CN
-	yFFWnSC2u18Dhvu20G9WYgVC73NNVc4+5bwa1tBXxHi9RJ2HtK552H7hqktZOzLo=
-X-Gm-Gg: ATEYQzzTcxyzvgQJT5F+meu3WA2oi6aqgEIzUxsCG0PNMgvQF3tfoPWQCKV4Nrdp1Ac
-	Z3J54RTXHEXWdxfKWZqRS0wRFUAWwI1bSAckwfBMtqM4m7WQpeBbCqcxxAsfF7ukN/JjmRpni4S
-	EhELQwQdAv/78Hj2Oo/Xg0j2GIlOn21jL9l4XR+88Ny6G74xvjijhYgH00U+eSVweDAmcyxlj74
-	FsCGCWSRdkONJ47ME5nYN+WWl0w3gqqeKIDJztCTsS/tgv0T7S9HF56WQd/IQnNj8VJAiUDzZ7H
-	tSlT9/ExwMdf+8gaIxv6Hx45deo08+giKboFXcEcBbMwkvXbchPLc6hEO1CEIzLgIPgAl/G4Cr2
-	b0sCGZnKxS/dKsyvdssAueGYgWk3nkGM=
-X-Received: by 2002:a05:7300:7309:b0:2ba:8496:498 with SMTP id 5a478bee46e88-2bde1ba0474mr4470658eec.7.1772489930702;
-        Mon, 02 Mar 2026 14:18:50 -0800 (PST)
-X-Received: by 2002:a05:7300:7309:b0:2ba:8496:498 with SMTP id 5a478bee46e88-2bde1ba0474mr4470647eec.7.1772489930109;
-        Mon, 02 Mar 2026 14:18:50 -0800 (PST)
-Received: from localhost ([140.82.166.162])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2bdf662eb6dsm7239828eec.2.2026.03.02.14.18.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 14:18:49 -0800 (PST)
-Date: Mon, 2 Mar 2026 16:18:48 -0600
-From: Andrew Jones <andrew.jones@oss.qualcomm.com>
-To: Jinyu Tang <tjytimi@163.com>
-Cc: Radim =?utf-8?B?S3LEjW3DocWZ?= <radim.krcmar@oss.qualcomm.com>,
-        Anup Patel <anup@brainfault.org>, Atish Patra <atish.patra@linux.dev>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Yong-Xuan Wang <yongxuan.wang@sifive.com>,
-        Nutty Liu <nutty.liu@hotmail.com>, Paul Walmsley <pjw@kernel.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
-        Alexandre Ghiti <alex@ghiti.fr>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7] KVM: riscv: Skip CSR restore if VCPU is reloaded on
- the same core
-Message-ID: <24ev3x4ppteznxfdunzzcl5ra3n64oikjxbnuj2dqhwlvuu52k@aiujsgdy2nsk>
-References: <20260227121008.442241-1-tjytimi@163.com>
+	s=arc-20240116; t=1772490754; c=relaxed/simple;
+	bh=W1PK6P5b2D18LYKUtf20jG38cjGheOCiI34y91UDR9c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TG3r4ubDS6hl0DBGo1pJ8H1oGQjRTtiWZDz1J5VW/1ojX/To+kkEVFlgDBQBq6a4j1i76zLQC+J7ocyhft30W7/ir5uU3N6wvSiA5Pc7RJVJppC5X0nUZcYIx5KvUfe/WCkS5LfzKxMOMXljN+MP84qwWJhynVN03MczVnWvCgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XXFQ8gMM; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772490753; x=1804026753;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=W1PK6P5b2D18LYKUtf20jG38cjGheOCiI34y91UDR9c=;
+  b=XXFQ8gMMO6ayMWZEPJqlihDH9uUxnM+sZDllBEI9YHYXAYRclimkvVJI
+   Pi+L8LX380msx2jTmeXufX+gcOGEtwD1xoQ9S2SAalAQRVjKAWqAP8mYY
+   4WtwTqIMq/Qf1LXFUMOiI65tKp1i3StpCLgqoFLDmvbjPvZ5lDO6c4TVD
+   eZK/I0wGmue0F+/oiq7NtxaXtAnUeloX4QDbK+4JUXmgBxGB5OU37a2e7
+   vX9/lHfOfMZcjT0KJZA+q2eSwm9TN3XkE1mGrJYZdQTlYjjEeJUxeUE2D
+   HvPeI0lsValtQypl9i926hJd4g7i4KcpCI3SrbhMr35TZPAHiGFZWD7Aw
+   A==;
+X-CSE-ConnectionGUID: lY7peGN3STWui5lR8YS1vA==
+X-CSE-MsgGUID: 2qYVATALT4SB0T2ch2FRnQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11717"; a="73700608"
+X-IronPort-AV: E=Sophos;i="6.21,320,1763452800"; 
+   d="scan'208";a="73700608"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 14:32:32 -0800
+X-CSE-ConnectionGUID: CfVi0PTlQUu2MsL8kan2hg==
+X-CSE-MsgGUID: MWrj7z7JSlSa23P/hsVqiA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,320,1763452800"; 
+   d="scan'208";a="255665232"
+Received: from cmdeoliv-mobl4.amr.corp.intel.com (HELO [10.125.108.103]) ([10.125.108.103])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 14:32:32 -0800
+Message-ID: <b5a44f79-8f99-4e61-aaa2-e8aec6f0cf69@intel.com>
+Date: Mon, 2 Mar 2026 14:32:36 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260227121008.442241-1-tjytimi@163.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzAyMDE2NSBTYWx0ZWRfX2K8WOXlVzami
- Gy5xsTYisPQdEsNRrcL40O0+X35GRWZUw8LgwIcGaLOMleV94TVIarzcOmEwi/leRfxlc5xHw4m
- Wx2CVD/OHLLzeABE2ix+gRd3kYSOe2+5C50AcR91PeoCrrTSVqPetmye4szpb8ACgrRA4JIQKoU
- 5d2C5w3bmMSSv7OUgHogtv+EUpOrLsrUo35oAYw3GMs7UCaHYOUo64znhKvktuo1t3S1O3BSNrZ
- vM9f5rMdSVctZfvI5jAv6ozRxXrHsir90TB3P0FTxAXAnENAZ+iEsaTlY1MYS8r1NqOdwaMWpJz
- yZQ1el/HmyCKyBDVz9Si2WIobIApp5SBtd5lWhMvru6XavsKkHZTLLHA336gREDRWtWVSnyydH8
- rxM+qsdCIOyGn0x6J+chrHu7tTUHkcDvtkABQ7kjy3LwQBhaKn3Iz5mAcfVK/OCkU89ekNewjh6
- wMV/obGpfG9ZOZ76f9Q==
-X-Authority-Analysis: v=2.4 cv=TNhIilla c=1 sm=1 tr=0 ts=69a60ccb cx=c_pps
- a=PfFC4Oe2JQzmKTvty2cRDw==:117 a=cvcws7F5//HeuvjG1O1erQ==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22
- a=Byx-y9mGAAAA:8 a=EUspDBNiAAAA:8 a=KQEVWjvnPtaqH-4Khw8A:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10 a=6Ab_bkdmUrQuMsNx7PHu:22
-X-Proofpoint-ORIG-GUID: ISTKolhmcxvbAQC7mrmu0WRY5-ivMjs3
-X-Proofpoint-GUID: ISTKolhmcxvbAQC7mrmu0WRY5-ivMjs3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-02_05,2026-03-02_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 bulkscore=0 lowpriorityscore=0
- malwarescore=0 spamscore=0 phishscore=0 suspectscore=0 impostorscore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2602130000
- definitions=main-2603020165
-X-Rspamd-Queue-Id: 22E621E63AE
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/7] x86/sev: add support for enabling RMPOPT
+To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
+ herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org
+Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+ KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
+ jackyli@google.com, pgonda@google.com, rientjes@google.com,
+ jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+ babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com,
+ darwi@linutronix.de, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
+References: <cover.1772486459.git.ashish.kalra@amd.com>
+ <85aec55af41957678d214e9629eb6249b064fa87.1772486459.git.ashish.kalra@amd.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <85aec55af41957678d214e9629eb6249b064fa87.1772486459.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: B1C071E6651
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72427-lists,kvm=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[163.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,brainfault.org,linux.dev,microchip.com,sifive.com,hotmail.com,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,vger.kernel.org,lists.infradead.org];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	TAGGED_FROM(0.00)[bounces-72428-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,oss.qualcomm.com:dkim,qualcomm.com:dkim,qualcomm.com:email];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew.jones@oss.qualcomm.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	NEURAL_HAM(-0.00)[-0.992];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Fri, Feb 27, 2026 at 08:10:08PM +0800, Jinyu Tang wrote:
-> Currently, kvm_arch_vcpu_load() unconditionally restores guest CSRs,
-> HGATP, and AIA state. However, when a VCPU is loaded back on the same
-> physical CPU, and no other KVM VCPU has run on this CPU since it was
-> last put, the hardware CSRs and AIA registers are still valid.
-> 
-> This patch optimizes the vcpu_load path by skipping the expensive CSR
-> and AIA writes if all the following conditions are met:
-> 1. It is being reloaded on the same CPU (vcpu->arch.last_exit_cpu == cpu).
-> 2. The CSRs are not dirty (!vcpu->arch.csr_dirty).
-> 3. No other VCPU used this CPU (vcpu == __this_cpu_read(kvm_former_vcpu)).
-> 
-> To ensure this fast-path doesn't break corner cases:
-> - Live migration and VCPU reset are naturally safe. KVM initializes
->   last_exit_cpu to -1, which guarantees the fast-path won't trigger.
-> - The 'csr_dirty' flag tracks runtime userspace interventions. If
->   userspace modifies guest configurations (e.g., hedeleg via
->   KVM_SET_GUEST_DEBUG, or CSRs including AIA via KVM_SET_ONE_REG),
->   the flag is set to skip the fast path.
-> 
-> With the 'csr_dirty' safeguard proven effective, it is safe to
-> include kvm_riscv_vcpu_aia_load() inside the skip logic now.
-> 
-> Signed-off-by: Jinyu Tang <tjytimi@163.com>
-> ---
->  v6 -> v7:
->  - Moved kvm_riscv_vcpu_aia_load() into the fast-path skip logic, as
->    suggested by Radim Krčmář.
->  - Verified the fix for the IMSIC instability issue reported in v3.
->    Testing was conducted on QEMU 10.0.2 with explicitly enabled AIA
->    (`-machine virt,aia=aplic-imsic`). The guest boots successfully 
->    using virtio-mmio devices like virtio-blk and virtio-net.
-> 
->  v5 -> v6:
->  As suggested by Andrew Jones, checking 'last_exit_cpu' first (most
->  likely to fail on busy hosts) and placing the expensive
->  __this_cpu_read() last, skipping __this_cpu_write() in kvm_arch_vcpu_put()
->  if kvm_former_vcpu is already set to the current VCPU.
-> 
->  v4 -> v5:
->  - Dropped the 'vcpu->scheduled_out' check as Andrew Jones pointed out,
->    relying on 'last_exit_cpu', 'former_vcpu', and '!csr_dirty'
->    is sufficient and safe. This expands the optimization to cover many
->    userspace exits (e.g., MMIO) as well.
->  - Added a block comment in kvm_arch_vcpu_load() to warn future
->    developers about maintaining the 'csr_dirty' dependency, as Andrew's
->    suggestion to reduce fragility.
->  - Removed unnecessary single-line comments and fixed indentation nits.
-> 
->  v3 -> v4:
->  - Addressed Anup Patel's review regarding hardware state inconsistency.
->  - Introduced 'csr_dirty' flag to track dynamic userspace CSR/CONFIG
->    modifications (KVM_SET_ONE_REG, KVM_SET_GUEST_DEBUG), forcing a full
->    restore when debugging or modifying states at userspace.
->  - Kept kvm_riscv_vcpu_aia_load() out of the skip block to resolve IMSIC
->    VS-file instability.
-> 
->  v2 -> v3:
->  v2 was missing a critical check because I generated the patch from my
->  wrong (experimental) branch. This is fixed in v3. Sorry for my trouble.
-> 
->  v1 -> v2:
->  Apply the logic to aia csr load. Thanks for Andrew Jones's advice.
-> ---
->  arch/riscv/include/asm/kvm_host.h |  3 +++
->  arch/riscv/kvm/vcpu.c             | 24 ++++++++++++++++++++++--
->  arch/riscv/kvm/vcpu_onereg.c      |  2 ++
->  3 files changed, 27 insertions(+), 2 deletions(-)
->
+On 3/2/26 13:35, Ashish Kalra wrote:
+> The new RMPOPT instruction sets bits in a per-CPU RMPOPT table, which
+> indicates whether specific 1GB physical memory regions contain SEV-SNP
+> guest memory.
 
-Reviewed-by: Andrew Jones <andrew.jones@oss.qualcomm.com>
+Honestly, this is an implementation detail that we don't need to know
+about in the kernel. It's also not even factually correct. The
+instruction _might_ not set any bits, either because there is SEV-SNP
+memory or because it's being run in query mode.
+
+	The new RMPOPT instruction helps manage per-CPU RMP optimization
+	structures inside the CPU. It takes a 1GB-aligned physical
+	address and either returns the status of the optimizations or
+	tries to enable the optimizations.
+
+> Per-CPU RMPOPT tables support at most 2 TB of addressable memory for
+> RMP optimizations.
+> 
+> Initialize the per-CPU RMPOPT table base to the starting physical
+> address. This enables RMP optimization for up to 2 TB of system RAM on
+> all CPUs.
+
+The reset looks good.
+
+> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+> index da5275d8eda6..8e7da03abd5b 100644
+> --- a/arch/x86/include/asm/msr-index.h
+> +++ b/arch/x86/include/asm/msr-index.h
+> @@ -753,6 +753,9 @@
+>  #define MSR_AMD64_SEG_RMP_ENABLED_BIT	0
+>  #define MSR_AMD64_SEG_RMP_ENABLED	BIT_ULL(MSR_AMD64_SEG_RMP_ENABLED_BIT)
+>  #define MSR_AMD64_RMP_SEGMENT_SHIFT(x)	(((x) & GENMASK_ULL(13, 8)) >> 8)
+> +#define MSR_AMD64_RMPOPT_BASE		0xc0010139
+> +#define MSR_AMD64_RMPOPT_ENABLE_BIT	0
+> +#define MSR_AMD64_RMPOPT_ENABLE		BIT_ULL(MSR_AMD64_RMPOPT_ENABLE_BIT)
+>  
+>  #define MSR_SVSM_CAA			0xc001f000
+>  
+> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+> index a4f3a364fb65..405199c2f563 100644
+> --- a/arch/x86/virt/svm/sev.c
+> +++ b/arch/x86/virt/svm/sev.c
+> @@ -500,6 +500,41 @@ static bool __init setup_rmptable(void)
+>  	}
+>  }
+>  
+> +static void __configure_rmpopt(void *val)
+> +{
+> +	u64 rmpopt_base = ((u64)val & PUD_MASK) | MSR_AMD64_RMPOPT_ENABLE;
+> +
+> +	wrmsrq(MSR_AMD64_RMPOPT_BASE, rmpopt_base);
+> +}
+> +
+> +static __init void configure_and_enable_rmpopt(void)
+> +{
+> +	phys_addr_t pa_start = ALIGN_DOWN(PFN_PHYS(min_low_pfn), PUD_SIZE);
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT)) {
+> +		pr_debug("RMPOPT not supported on this platform\n");
+> +		return;
+> +	}
+> +
+> +	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP)) {
+> +		pr_debug("RMPOPT optimizations not enabled as SNP support is not enabled\n");
+> +		return;
+> +	}
+
+To be honest, I think those two are just plain noise ^^.
+
+> +	if (!(rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED)) {
+> +		pr_info("RMPOPT optimizations not enabled, segmented RMP required\n");
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * Per-CPU RMPOPT tables support at most 2 TB of addressable memory for RMP optimizations.
+> +	 *
+> +	 * Set per-core RMPOPT base to min_low_pfn to enable RMP optimization for
+> +	 * up to 2TB of system RAM on all CPUs.
+> +	 */
+
+Please at least be consistent with your comments. This is both over 80
+columns *and* not even consistent in the two sentences.
+
+> +	on_each_cpu_mask(cpu_online_mask, __configure_rmpopt, (void *)pa_start, true);
+> +}
+
+What's wrong with:
+
+	u64 rmpopt_base = pa_start | MSR_AMD64_RMPOPT_ENABLE;
+	...
+	for_each_online_cpu(cpu)
+		wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE, rmpopt_base);
+
+Then there's at least no ugly casting.
+
 
