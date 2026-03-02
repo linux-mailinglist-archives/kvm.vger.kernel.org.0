@@ -1,233 +1,164 @@
-Return-Path: <kvm+bounces-72377-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72379-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +DQ+JsOhpWmuCAAAu9opvQ
-	(envelope-from <kvm+bounces-72377-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 15:42:11 +0100
+	id GDFBDOejpWngCwAAu9opvQ
+	(envelope-from <kvm+bounces-72379-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 15:51:19 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 985681DB0D3
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 15:42:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29D281DB2FA
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 15:51:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A991530608BF
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 14:31:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4818C3049C97
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 14:43:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B2063FFACC;
-	Mon,  2 Mar 2026 14:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A09401493;
+	Mon,  2 Mar 2026 14:43:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FOMo/0SW";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qnFcY04Q"
+	dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b="lHWAxzpB"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.thorondor.fr (unknown [82.66.128.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A025C8EB
-	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 14:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47D83E0C7C;
+	Mon,  2 Mar 2026 14:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.66.128.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772461867; cv=none; b=qK7fBOptPLnxPccza8g6mAurngBDr54y/JA+8Pqdvj5BPcUlfa/och7gYKvjozGT+70tOjG4bHcF+Ma66oQigRgiYFGO+6C0UEHAgtfbjXeacbZxJHj2p+K+bKsW4NcONOHhx9Ku90/QZlZ2G5++1gYd+8w71Opi7KJUwJc6Oe8=
+	t=1772462611; cv=none; b=cHAWI28B5UpAzkdvTjpoUPFr0ccaIE9+xF+6MVQV0MLW4sLSI3mVRdyDRnmdEU/ie/UG4XODFbPrFEBe44FE04APquGXXz6FkxRGqkXzeewnfZxCNAMN9E5VIRckaArousfvcxkHnBHb/4ERHT+QnBlMt4/4P6iSgVk4KdNbfx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772461867; c=relaxed/simple;
-	bh=tu6vW5JzAvAhrtnD0Orm8DgWyEhTriU4R1yaRjCyZQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iaNlEu0SMr9ij9gKxYvzI7KJaUFZtFTn4ND2O4eOaZjkj+O+/wE58qcQQh3A2BdsTR7DXAHX3nYKRkOL1lmGz3jXR9/JUNxJalc65Y3FcQj0WiJ1fspoRsDUAGzmULV7wwUaDgD6mqxAoeoHpvkEM7AGHSLlqNI0LD/wZqoJRFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FOMo/0SW; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qnFcY04Q; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772461864;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SKZvtx1jQH7FuclJfSavk4MXL11q6SiX0sIanHFtIBI=;
-	b=FOMo/0SWrxVbghAOHZMptVK13+Y0e7xsTsV8DeeSt2FX3pg4vQeSV/MpHKrIZxvE2OzXBq
-	KFhTsRyP7KrMgZoq0NxNX9A/3iZUgU2O8HnH8iFQBlTSlwW0obmjkThAmzMhQtWJk95zPL
-	4xLVebMK4P1C19/wtcfu61gFUEuRUeU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-497-xVjns6W4Meiw9xQ3reEYlg-1; Mon, 02 Mar 2026 09:31:03 -0500
-X-MC-Unique: xVjns6W4Meiw9xQ3reEYlg-1
-X-Mimecast-MFC-AGG-ID: xVjns6W4Meiw9xQ3reEYlg_1772461862
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4837b7903f3so56036275e9.2
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 06:31:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772461862; x=1773066662; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SKZvtx1jQH7FuclJfSavk4MXL11q6SiX0sIanHFtIBI=;
-        b=qnFcY04QZhtGR/Q79DN22LxyPSlJMCrxEGWYhXtPkaiY1vh7Y9c6rBygQM/CDxsQIX
-         3i60swndx7rl3Qk6IUbhIckBLiwkOVlpweZiLr45Jpx2+7tITucbxrfNgoHlhztRFmHK
-         kmWoXXVk7ClcBqvKY+Jt0bFsIkUStT+j40hamsbo9e7Kmxh1tROXFruxzfC4+BNjvA6x
-         2HYQyduwO/VpocpHyRj1puBnN8IX+0eYxEPjHXixYKxyLbv/cIf8HRW29sYdEPL+3wrX
-         Ek7SnU16GQD6LEhOJf+5qjYsKo8SupWV6SroRzE6tGFgXjYn0mVcHV5c60OJzBEX3nCI
-         VBZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772461862; x=1773066662;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SKZvtx1jQH7FuclJfSavk4MXL11q6SiX0sIanHFtIBI=;
-        b=MUxJH3REbGhdnuwSPHMR3teyrQTw0Uz8JErnti3qYp5tIiok+WkmQcv/vefNbYYH+s
-         iFr0CzbHsbn57yAqdjE/IUG3If7mhcOvhvjxi0lR67bSgvt9FKhHZv0esVGqyy1Zn/mX
-         kT1XaJLYEUDAiwBqKO2GdFyyUxVPeKneikZU655K4bjuY6/xaz/a6XxOtxZkK1omhZ9r
-         k0OdegfIKRxegbJOdp2/CQeEsrmViJrZCUulM3EtaYeYubnm2e3w+8zfMwSqpjLcBKDZ
-         SR7btvCA+oA/1r8lWDxVt3b8jIlx6Kh/YWwigB7v9IqKiIHyGnl+/si1cLmEzhn/RvO/
-         88Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCXfqAn4ZnhoxQ2UY5CM8GgnU62EE9tZf5j6NPi9gJ7mBUrgIZKeh2o2xD/Fti/rv8+1ZnQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywl+bnBB2MFrGIgNrBVDjNitnFZUX1e0SkYgFVDhshUJYtR9yfV
-	zmDHDGGq2S6GhAaHzVwPawD997zK9S8QCV3t7j12eCWkVWeKRfUKKqM6g1Oj2VTaC8Ia3pdBLWr
-	YS0nYbB756+0Nr46n1KvP0vnOWLinl3116HOA/HLDkIUAhj4Ox7J1kw==
-X-Gm-Gg: ATEYQzwltArE2rNwmdtJyXtopq8Uhp48TSDC/AOfcxTAn63T97ftkfCnN+al5NMRG0l
-	C0Y07dIASgNferud3ieXhyzjx2xt1PBfIK8f4SjmjgPwITl0abB6aYdRDGX+z2MHncPxf5xZl9p
-	wK1P0uQ5Ntd5DPySSdbxbcxTlE4KqcWsdduFPN0zfJ37R3WjYiIU6CJqUqr28KiGqBeSNcT7IX7
-	9yZ/Q/jOxT0a1rDr3DjWDWR8uCVEmCjBQgAfmIZUMgpRj9n28rAVFiHyGMcZkuKPsMqXTNSnZdX
-	jM6N85PfdCgCDkaFkvR7ZkbldoPkSCjP8N2Ma83GB9LCP/DspLqJSKte/o5YsCKubiWEp6iY0Y8
-	zIX4DO4aDbeG0I7wk2kvWqxLLx/XP+wpEoFpsWPVxZILCQl4XZJbLRK72M+5lxRYWclKCU+k=
-X-Received: by 2002:a05:600c:64c7:b0:47d:73a4:45a7 with SMTP id 5b1f17b1804b1-483c9c19a6emr218449405e9.24.1772461862153;
-        Mon, 02 Mar 2026 06:31:02 -0800 (PST)
-X-Received: by 2002:a05:600c:64c7:b0:47d:73a4:45a7 with SMTP id 5b1f17b1804b1-483c9c19a6emr218448515e9.24.1772461861478;
-        Mon, 02 Mar 2026 06:31:01 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bfcb318fsm206220415e9.6.2026.03.02.06.30.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Mar 2026 06:31:00 -0800 (PST)
-Date: Mon, 2 Mar 2026 15:30:53 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, ShuangYu <shuangyu@yunyoo.cc>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH RFC] vhost: fix vhost_get_avail_idx for a non empty ring
-Message-ID: <aaWTjPXDqhMZlwLr@sgarzare-redhat>
-References: <559b04ae6ce52973c535dc47e461638b7f4c3d63.1772441455.git.mst@redhat.com>
+	s=arc-20240116; t=1772462611; c=relaxed/simple;
+	bh=pBNHnYeTr5bMbtVN0pOp2JWteLH8/cK0PbgI1wwB2U8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BXbGJ1d2kqgDYm5G5dAalsKHMliluhFoxK38S7s7ihRdBfokvvtcEunaAUuVKNjfC2yMemkBiznN69X63Y7jS4Okp5VtDfQXAJ1TkKxKqH6Axiy2oINTzeYuhuCwkp8tCfOQeIUUP/g6MUL/4wJBqVgdAk5z8HQlcdWCzusByX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr; spf=pass smtp.mailfrom=thorondor.fr; dkim=pass (2048-bit key) header.d=thorondor.fr header.i=@thorondor.fr header.b=lHWAxzpB; arc=none smtp.client-ip=82.66.128.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorondor.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorondor.fr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=thorondor.fr; s=mail;
+	t=1772462190; bh=pBNHnYeTr5bMbtVN0pOp2JWteLH8/cK0PbgI1wwB2U8=;
+	h=From:To:Cc:Subject;
+	b=lHWAxzpBbh3m4K8KboMCxSukIicUQlNqUbPyWPCxGXrre2PoGt0T217k+zjoYl/4+
+	 A1FRa5vvggEgwkV4BCNCeJs8MbHPFiN/rCbOxW4RH8kw2EAcfx+YsN17RZlrLflaJd
+	 zP9mc27m4Cd5KF2zGKdwujD9BiB6Hv4CN4Co+T/Ea1oWWXSrByzPMVESoMRmqIeMQ4
+	 d1rPBDN2fSTgnwFSvBA5cTHlLHZYMRBfzIDAvaxVae8sjGVp9PMl/cV1FECQ13syuX
+	 UteuVe0ch6iWO6o6ZlPD+SohM0URwHoWWZ0HZt06K+0I8Ue9R0jG8yBFn0XrIDuHWa
+	 aGjnxAPpYr1Uw==
+From: Thomas Courrege <thomas.courrege@thorondor.fr>
+To: ashish.kalra@amd.com,
+	corbet@lwn.net,
+	herbert@gondor.apana.org.au,
+	john.allen@amd.com,
+	nikunj@amd.com,
+	pbonzini@redhat.com,
+	seanjc@google.com,
+	thomas.lendacky@amd.com
+Cc: kvm@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	x86@kernel.org,
+	Thomas Courrege <thomas.courrege@thorondor.fr>
+Subject: [PATCH v7 0/1] KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
+Date: Mon,  2 Mar 2026 15:36:23 +0100
+Message-ID: <20260302143626.289792-1-thomas.courrege@thorondor.fr>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <559b04ae6ce52973c535dc47e461638b7f4c3d63.1772441455.git.mst@redhat.com>
-X-Rspamd-Queue-Id: 985681DB0D3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 29D281DB2FA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[thorondor.fr,quarantine];
+	R_DKIM_ALLOW(-0.20)[thorondor.fr:s=mail];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72379-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72377-lists,kvm=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sgarzare@redhat.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[thomas.courrege@thorondor.fr,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[thorondor.fr:+];
 	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[yunyoo.cc:email]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,thorondor.fr:dkim,thorondor.fr:mid]
 X-Rspamd-Action: no action
 
-On Mon, Mar 02, 2026 at 03:51:49AM -0500, Michael S. Tsirkin wrote:
->vhost_get_avail_idx is supposed to report whether it has updated
->vq->avail_idx. Instead, it returns whether all entries have been
->consumed, which is usually the same. But not always - in
->drivers/vhost/net.c and when mergeable buffers have been enabled, the
->driver checks whether the combined entries are big enough to store an
->incoming packet. If not, the driver re-enables notifications with
->available entries still in the ring. The incorrect return value from
->vhost_get_avail_idx propagates through vhost_enable_notify and causes
->the host to livelock if the guest is not making progress, as vhost will
->immediately disable notifications and retry using the available entries.
 
-Here I'd add something like this just to make it clear the full picture, 
-because I spent quite some time to understand how it was related to the 
-Fixes tag (which I agree is the right one to use).
+Overview
+========
+The SEV-SNP Firmware ABI allows the hypervisor to request an
+attestation report via the SEV_CMD_SNP_HV_REPORT_REQ firmware command.
 
-   This goes back to commit d3bb267bbdcb ("vhost: cache avail index in
-   vhost_enable_notify()") which changed vhost_enable_notify() to compare
-   the freshly read avail index against vq->last_avail_idx instead of the
-   previously cached vq->avail_idx. Commit 7ad472397667 ("vhost: move
-   smp_rmb() into vhost_get_avail_idx()") then carried over the same
-   comparison when refactoring vhost_enable_notify() to call the unified
-   vhost_get_avail_idx().
+This allow KVM to expose more of AMD’s SEV‑SNP features.
 
->
->The obvious fix is to make vhost_get_avail_idx do what the comment
->says it does and report whether new entries have been added.
->
->Reported-by: ShuangYu <shuangyu@yunyoo.cc>
->Fixes: d3bb267bbdcb ("vhost: cache avail index in vhost_enable_notify()")
->Cc: Stefano Garzarella <sgarzare@redhat.com>
->Cc: Stefan Hajnoczi <stefanha@redhat.com>
->Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->---
->
->Lightly tested, posting early to simplify testing for the reporter.
+It also allow developers to easily request attestation.
+It could maybe be use by some cloud provider to easily provide an
+attestation report through their API, in case the Guest doesn't respond
+fast enough or even to compare the reports.
 
-Tested with vhost-vsock and I didn't see any issue.
+Testing
+=======
+For testing this via QEMU, please use the following tree:
+        https://github.com/Th0rOnDoR/qemu
 
-Thanks!
+Patch History
+=============
+v6 -> v7:
+Rebase after 7.0 merge window
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+v5 -> v6:
+Fix typos issues in documentation
 
->
-> drivers/vhost/vhost.c | 11 +++++++----
-> 1 file changed, 7 insertions(+), 4 deletions(-)
->
->diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->index 2f2c45d20883..db329a6f6145 100644
->--- a/drivers/vhost/vhost.c
->+++ b/drivers/vhost/vhost.c
->@@ -1522,6 +1522,7 @@ static void vhost_dev_unlock_vqs(struct vhost_dev *d)
-> static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
-> {
-> 	__virtio16 idx;
->+	u16 avail_idx;
-> 	int r;
->
-> 	r = vhost_get_avail(vq, idx, &vq->avail->idx);
->@@ -1532,17 +1533,19 @@ static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq)
-> 	}
->
-> 	/* Check it isn't doing very strange thing with available indexes */
->-	vq->avail_idx = vhost16_to_cpu(vq, idx);
->-	if (unlikely((u16)(vq->avail_idx - vq->last_avail_idx) > vq->num)) {
->+	avail_idx = vhost16_to_cpu(vq, idx);
->+	if (unlikely((u16)(avail_idx - vq->last_avail_idx) > vq->num)) {
-> 		vq_err(vq, "Invalid available index change from %u to %u",
->-		       vq->last_avail_idx, vq->avail_idx);
->+		       vq->last_avail_idx, avail_idx);
-> 		return -EINVAL;
-> 	}
->
-> 	/* We're done if there is nothing new */
->-	if (vq->avail_idx == vq->last_avail_idx)
->+	if (avail_idx == vq->avail_idx)
-> 		return 0;
->
->+	vq->avail_idx = avail_idx;
->+
-> 	/*
-> 	 * We updated vq->avail_idx so we need a memory barrier between
-> 	 * the index read above and the caller reading avail ring entries.
->-- 
->MST
->
+v4 -> v5:
+Set variables in reverse christmas tree order
+Fix and clean the rsp_size logic
+
+v3 -> v4:
+Add newline in documentation to avoid a warning
+Add base commit
+
+v2 -> v3:
+Add padding to structure, code format
+Write back the full MSG_REPORT_RSP structure
+Remove the memzero_explicit for the report
+
+v1 -> v2:
+Renaming, code format
+Zeroes the report before returning
+
+
+Any feedback is appreciated.
+
+Thanks,
+Thomas
+
+Thomas Courrege (1):
+  KVM: SEV: Add KVM_SEV_SNP_HV_REPORT_REQ command
+
+ .../virt/kvm/x86/amd-memory-encryption.rst    | 27 ++++++++
+ arch/x86/include/uapi/asm/kvm.h               |  9 +++
+ arch/x86/kvm/svm/sev.c                        | 63 +++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.c                  |  1 +
+ include/linux/psp-sev.h                       | 31 +++++++++
+ 5 files changed, 131 insertions(+)
+
+
+base-commit: 55365ab85a93edec22395547cdc7cbe73a98231b
+-- 
+2.53.0
 
 
