@@ -1,169 +1,172 @@
-Return-Path: <kvm+bounces-72429-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72430-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kAm2AH0ZpmmeKQAAu9opvQ
-	(envelope-from <kvm+bounces-72429-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:13:01 +0100
+	id 6Mi8MkkTpmnlJgAAu9opvQ
+	(envelope-from <kvm+bounces-72430-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 23:46:33 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5785A1E6667
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 00:13:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46CF91E5E36
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 23:46:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4B9743218921
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 22:34:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 050B53036E90
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 22:46:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E36633F5BC;
-	Mon,  2 Mar 2026 22:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41FC32D592C;
+	Mon,  2 Mar 2026 22:46:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fygeblAk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MuWqXkry"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117A733F596;
-	Mon,  2 Mar 2026 22:32:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7683F1F4176
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 22:46:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772490778; cv=none; b=ISdclyOrrh+1Rd8CYSrWuMEQ/h9CdoEsaK0OQmICSMspm3yDkRdAvHjBVswmiduaD2Ax2/n1nfv7MPHsP8DFfnxxyP3cWm4Msr4StLk9A1WIzM5cYDsHd7yDm4Ihr6xPSaKeuRNbAW8UWfqA5m/7nCsiCtIxSOGEQENeNaGd2Cw=
+	t=1772491580; cv=none; b=b3Mb4FKCQJkla/n7jAmQVKr8qr+U8CVCiBdLCSFlasryRVGSxDDHcr3ruBpJS/jRpBGm5Ocx5ibWzrmbV2NLOh+nhMlyHWIk/SXAFYK7eOvwuUEt1NLFZ45gX5V0i0EPCAGu0ZlWaRraQepMNIqRuzzYCnie+ve+lw3XwxEYRzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772490778; c=relaxed/simple;
-	bh=XIszOHXUW2Ma9+nnZ3/YturdyR3Ht3mu9bLE28QYKvA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZtYB9fNGrHWppkypJMaopUPe/h580wUM3i6DCQdFiZuhXjx5Zidix3dIxxmN6SdzpsGfZc56Xndx2zahqmAAKGjaKG+cszb4MWNstzNbA2h9eAC2dyxJvyHLKOAdnMCBAWMZA4gZMU4zRttv2sPgd7nrLng+bZjKEYErXhhUpY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fygeblAk; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772490777; x=1804026777;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=XIszOHXUW2Ma9+nnZ3/YturdyR3Ht3mu9bLE28QYKvA=;
-  b=fygeblAkXsOSpAh91WVSA4tXqjP7fBBcizceUWaIcU6ZG+qcs8qB+4MI
-   gwjFC1qc4gxXfdfZNo170AEWgssxE4AGG2mwmwzDBMq951/jD4IhQxN3T
-   4qKxsuG/QqlzhxOgXrHqrPo13axP91sdMQXiTaFIQsjFuMKjXo2atd5K9
-   gb6qi2jbMlyOQN9cU/jqzo1N/UnerdvEx+8d/s5n/3bBOf7gd7DIfgY6e
-   uIaYkVbMAOW+To5mDfRKVxCI7MzF27wtdVSTIzMa1ntliAusZAHOdhkfs
-   rrPTlbhin2xZcXW4C0aUtP61oE8mrXU+2oTvUtginZZJNCSac6PclI/0K
-   A==;
-X-CSE-ConnectionGUID: Onr7m5YtQTenEusrQDlZrQ==
-X-CSE-MsgGUID: QVlkufBIS8CZLfqLfjOcLw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11717"; a="73700643"
-X-IronPort-AV: E=Sophos;i="6.21,320,1763452800"; 
-   d="scan'208";a="73700643"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 14:32:56 -0800
-X-CSE-ConnectionGUID: Yr7ySr+oTT6DGi//Z0drsg==
-X-CSE-MsgGUID: iZBo+rYVTqyQIz9QvRHxgw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,320,1763452800"; 
-   d="scan'208";a="255665281"
-Received: from cmdeoliv-mobl4.amr.corp.intel.com (HELO [10.125.108.103]) ([10.125.108.103])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 14:32:56 -0800
-Message-ID: <42071ce1-39ab-409d-bb9b-ceb7c2e385e0@intel.com>
-Date: Mon, 2 Mar 2026 14:33:00 -0800
+	s=arc-20240116; t=1772491580; c=relaxed/simple;
+	bh=vRUnFk/4YjqA8aVK6C5vOSkumDpwteYY9GhbEfoN7Ds=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Gh33nX6pjRuovySydC7f6OVb/r/Zrt4GKbY+2h8lTNh5Bi+mytQdgAHFpizHjARFt4EP0K65Fn184E9I86dxZ2VpvQh8RJ2KtgO7wsL4/duep3SeVyd1WQjdCjW7106AnizwfRqKfEl5qUG1XuUgJHyAEF3ZGFkargO82i5z01Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MuWqXkry; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae53ec06b0so52782535ad.0
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 14:46:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772491579; x=1773096379; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2gsF250ql7Atn/IIODygSV13jGj0UvlZEzVcGG6p2FA=;
+        b=MuWqXkryK8214d0Heur23U7Ib6JWKToo++syOTg7iVx9rADgwFmEEg2LSSDiOy8+kS
+         gPYUgf6DVAMsgB6OXrVBChrTjAIoz3ObBUZeuclGZWGPyBjzjRY91ZyoNMWURuSD8O87
+         Gxcd34tZuLOhd9NdwnX/boXfJyuEJvvC1Ocr1rM6RydN9Ji2CZv2NsB9/bMSQv8H5oHA
+         vyuqpAG4szEagd7nUk7U0WaRXLMd4kkOJhM4+E9aC46Pdi1ldpILlkIrpQjGooKQrXuN
+         36HNZs1Di6ZQN0aU3AuEtGSNekiH7KUY854zew1L17grkG3D0jyBPvk2WPX+W3RMgeer
+         EDxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772491579; x=1773096379;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2gsF250ql7Atn/IIODygSV13jGj0UvlZEzVcGG6p2FA=;
+        b=oXZhbUIhPuS2j5KB6kO433NeuzGiJgQlH1b9S7fIHY3ZUI0eMmDpybjCWISbcwrCq2
+         iv72yiY9zCzuHXuOJCsT45GpxcBJ0OCV395C3ZQn3783itFibxZyO/Chq6r+TxCmV83H
+         1MVTP25Rr1KlzJmxFJiQn+sk6UsQENKgQ/LCFzzEIOO+4zS731gJ4kmRmJJs77pmiP91
+         aj2NB6btf317poDcjueik70uHjJ3RvsOD4fHaAUCMtKyFbuJF6Hj57LgRToDIYDKnAn+
+         57xtPSVS0HzjTq9md0M8/lMkDBFXz+nHP1ldAEi595XaYbq/CF19eyGumBkX9aSr5+Nt
+         VQQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXzOR9e8TfdVYdTwJZMLgVoyRhytzIuimcyh/hMXog9+Iu5yOosIF2RK4ub1M5bqKFUTTk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy07u6/D5OSmiPlKFf5KA9FAWJE+z0slM4GCC0NXGuIZcNUal9d
+	j9ed+E1SjTiPoNlQ71H2s/679r3jWCx/yhbb6nbc1fXSlB0Ow6Tt81+U8+QX7A3w8kChUCLs1yM
+	8YJ0b9g==
+X-Received: from ploc3.prod.google.com ([2002:a17:902:8483:b0:29f:25cf:e576])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:fc87:b0:2ae:5104:571e
+ with SMTP id d9443c01a7336-2ae510458f2mr41552335ad.9.1772491578542; Mon, 02
+ Mar 2026 14:46:18 -0800 (PST)
+Date: Mon, 2 Mar 2026 14:46:17 -0800
+In-Reply-To: <20260210234613.1383279-1-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/7] x86/sev: add support for enabling RMPOPT
-To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com,
- bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
- herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org
-Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
- KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
- jackyli@google.com, pgonda@google.com, rientjes@google.com,
- jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
- babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com,
- darwi@linutronix.de, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
-References: <cover.1772486459.git.ashish.kalra@amd.com>
- <85aec55af41957678d214e9629eb6249b064fa87.1772486459.git.ashish.kalra@amd.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <85aec55af41957678d214e9629eb6249b064fa87.1772486459.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 5785A1E6667
+Mime-Version: 1.0
+References: <20260210234613.1383279-1-jmattson@google.com>
+Message-ID: <aaYTOXlgX-cnkvoy@google.com>
+Subject: Re: [PATCH] KVM: x86: Ignore cpuid faulting in SMM
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jamie Liu <jamieliu@google.com>
+Content-Type: text/plain; charset="us-ascii"
+X-Rspamd-Queue-Id: 46CF91E5E36
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	TAGGED_FROM(0.00)[bounces-72429-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72430-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Oh, and:
+On Tue, Feb 10, 2026, Jim Mattson wrote:
+> The Intel Virtualization Technology FlexMigration Application Note says,
+> "When CPUID faulting is enabled, all executions of the CPUID instruction
+> outside system-management mode (SMM) cause a general-protection exception
+> (#GP(0)) if the current privilege level (CPL) is greater than 0."
+> 
+> Always allow the execution of CPUID in SMM.
+> 
+> Fixes: db2336a80489 ("KVM: x86: virtualize cpuid faulting")
 
-[PATCH v2 2/7] x86/sev: add support for enabling RMPOPT
+I feel like we need a Technically-fixes-but-really-just-a-bad-spec tag for things
+like this.  MISC_ENABLES and MSR_K7_HWCR in particular are a bizarre game of
+"Hold my beer!".
 
-		        ^ Capitalize this, please
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  arch/x86/kvm/cpuid.c   | 3 ++-
+>  arch/x86/kvm/emulate.c | 6 +++---
+>  2 files changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 7fe4e58a6ebf..863ce81023e9 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -2157,7 +2157,8 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
+>  {
+>  	u32 eax, ebx, ecx, edx;
+>  
+> -	if (cpuid_fault_enabled(vcpu) && !kvm_require_cpl(vcpu, 0))
+> +	if (!is_smm(vcpu) && cpuid_fault_enabled(vcpu) &&
+> +	    !kvm_require_cpl(vcpu, 0))
+>  		return 1;
+>  
+>  	eax = kvm_rax_read(vcpu);
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index c8e292e9a24d..4b7289a82bf8 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -3583,10 +3583,10 @@ static int em_cpuid(struct x86_emulate_ctxt *ctxt)
+>  	u64 msr = 0;
+>  
+>  	ctxt->ops->get_msr(ctxt, MSR_MISC_FEATURES_ENABLES, &msr);
+> -	if (msr & MSR_MISC_FEATURES_ENABLES_CPUID_FAULT &&
+> -	    ctxt->ops->cpl(ctxt)) {
+> +	if (!ctxt->ops->is_smm(ctxt) &&
+> +	    (msr & MSR_MISC_FEATURES_ENABLES_CPUID_FAULT &&
+> +	     ctxt->ops->cpl(ctxt)))
+
+I assume you intended the parentheses to wrap the bitwise-AND.  I'll fixup to
+this when applying.
+
+	if (!ctxt->ops->is_smm(ctxt) &&
+	    (msr & MSR_MISC_FEATURES_ENABLES_CPUID_FAULT) &&
+	    ctxt->ops->cpl(ctxt))
 
