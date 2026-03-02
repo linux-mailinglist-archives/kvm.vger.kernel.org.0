@@ -1,195 +1,212 @@
-Return-Path: <kvm+bounces-72355-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72356-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aO+YD+RppWkaAQYAu9opvQ
-	(envelope-from <kvm+bounces-72355-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 11:43:48 +0100
+	id 8GgEJaxqpWkaAQYAu9opvQ
+	(envelope-from <kvm+bounces-72356-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 11:47:08 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D33041D6BF5
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 11:43:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 009A61D6C8E
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 11:47:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 467E23072674
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 10:34:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 19269305DECD
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 10:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25D2133A716;
-	Mon,  2 Mar 2026 10:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A833E338593;
+	Mon,  2 Mar 2026 10:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rq4xdrlu"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="hfCFGuyd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.245.243.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1619C32ED2F
-	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 10:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDDB22E8B6B;
+	Mon,  2 Mar 2026 10:41:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.245.243.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772447631; cv=none; b=oFM1TujBJzJ56sGJxU6ToOT1AyAKeoE7CbMD2hsedHBA7EC+Z68yteSsJQsSdEeieUwCIH0ud9wfvBkH8NdJAtj9r55WhJRjd/4UZsrX+K6gO2hcT4fs4j5SieqoCnECwLAU4rVFF4MjxOG18OtOqF0Pd9vj/eG06pBPKIcmT1A=
+	t=1772448109; cv=none; b=HKFmgGKu5hNRCh07iOSKTahL1FHD0l07WQN4C2xkxLW1+MfTAgVNK6d6Ax77I8P8zoCURw9hyF0No+8bfyKKHdF7/hJwT5puY19Jpc1Fn1+/VwWlV3lPd6w/prxZVWsYA8A/8FtO0AXYC5oNJ3bTSR6j70f3sgJzM+XyMTaRO2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772447631; c=relaxed/simple;
-	bh=QEn+El7Z+bL/DWqeCCzlYqCfrkxihEN+xIGAxOA2r98=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tjKDFGip67IkJYM0LPTLEKGtXbf8d/+r9pf+PP6QiBtiATrHLF3EwmuZkBRrqRtjOabCcxm80F3MgXOXMTi/aELXQ747TfnsaMT//lVVGC+XwZdiaQACz3PB7nzIX/SJS3Vsbj6FxHjpCmflEaz4W4DxAgQmIpxHf9mNrasKwEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rq4xdrlu; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4837bfcfe0dso55050965e9.1
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 02:33:47 -0800 (PST)
+	s=arc-20240116; t=1772448109; c=relaxed/simple;
+	bh=tssolyZ/YJCfV3/umAHfzNxVcIF+e27Ql8ibnVvdcIQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j7iU7Z8ebOfDWwTrlF8Ocd7kGxeq7yf75I178FFnosZ3I+Kppyw9ihCyo95V7SUnaZkaciAEHnqliZGAQkbLV2gbeIvgQO7wFU9g/5756YrfU369UaNZ8se2TyWoab9a1KrhLdUH5AIqiHRI+Rwn7NfJbyOt07YPTFhPbD1S7bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=hfCFGuyd; arc=none smtp.client-ip=44.245.243.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772447626; x=1773052426; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EnMgJMcaQgCDj7i00Uawlj/G1rJtXPwe1sCLwvhoFHI=;
-        b=rq4xdrlutDZNzchgca2LpBR52y6AVtdV4PS2i7Okgss3v9KH1sO1XKDitIIPzPn/hI
-         IIqBvmSXgRGHTGiuZ2XWX5Pua3XkiI1cc6lsjEoJf15THOIKyZkqFuCYgr+6DkhGcWbq
-         zmNhmcRRpDjeE4c/lOsqWaUl7ccq5LIpH087AwRE7M6mp8jAvMMQTC0dLUrRHa5N6j+y
-         qnQVaZXoQ+z5FqKmO3oODPKlACGy9IKYFof51fLeqJh/4dwg7jhlPr9QlqoUYGSz8FbL
-         yQAzPFa8B5RV1degHbdqhI7/iD092kEARW9Nm78z08vqGCxZw109+IAio3IZyqGc1FDw
-         0tZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772447626; x=1773052426;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EnMgJMcaQgCDj7i00Uawlj/G1rJtXPwe1sCLwvhoFHI=;
-        b=Za0UQUIlbnV4OFVLF63vgVxzC7Nb766AeupmMS9PKCRExyXSxFsKwtELZc6b61J+sL
-         qcwjpcDnJzcwLL5Nm0RPH2I4S0QPeK6alhZCNQVLwlAH0LnTghG1N1lmacsKd5ky/PVA
-         moaiQbMZjkoJIEXwSeLrZfkZ35IyxWKI+IBQUBq8tV/K3O5a+upB59N/oB33ZsxjVftv
-         tu8Uhn79yAwzyzWOqC7hiAt6jvhtet4+P4yixX3I7C5UU/Pxi8aPDet7ogbf7kvagoxY
-         yRE8Q8C16KQ94d/RL9zCNeY9E3SPO9vYpHub3QzHzn42o3EnmlQ+Et7uuz2fEPdqTwzu
-         QZtA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6fJW554dDjXHM6APrMXwdBUiGCUbzYUWon6aNPeGrOsV5yjA/kPbIKigOReGep5T0Urw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+gpd7dP+SDlWzsLTp9B8cz23nm2xaf7ZHeNd/1TLorMDoqxlK
-	3VvKxdZ5tuOGveEFc5OLnAfCyNcRj1OcNdBU8FjLv/H0Fz9WovXNKbw9NPnHzkP6US3At6/9GSe
-	y+vk3xyQ+LsYzOtsJrg==
-X-Received: from wmdd1.prod.google.com ([2002:a05:600c:a201:b0:480:3227:a124])
- (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:6383:b0:47d:3ead:7440 with SMTP id 5b1f17b1804b1-483c9bdb683mr186031315e9.32.1772447625915;
- Mon, 02 Mar 2026 02:33:45 -0800 (PST)
-Date: Mon, 2 Mar 2026 10:33:45 +0000
-In-Reply-To: <f2f3a8a1-3dbf-4ef9-a89a-a6ec20791d1c@kernel.org>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1772448107; x=1803984107;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=TCNz9HmwgZYgQfhhE1VoK/ya6x9J13TYyDFYQ1fU77U=;
+  b=hfCFGuydtwSydaRnlGcTEAEc9PjJ6ZF+AJzRhmfh5Q065/LntOcRXdXk
+   ArJ7u+P1QjFmY5SydQarm5S+lkcZprbZQIH4u1e5Ov9jri5dT3lN1IBJ+
+   exj5AyeBtumj3ktJeiTv2IASPkwK3qz6PGQJgAoeDVQQH2Bu3bQnvhpvT
+   mHKtWhDnjyQSBAiQ2ARmnho3dGsWzbNs91dlaD6tNJ7WQvonF6z0SU1CI
+   Ittz5XSpOzrvXcCWe6U/m19pjLKp/eqtmrgEt0MLDTT9UcRee6ypiS4O7
+   LSQyqzxVhiMIzTaVVchdBrSUjHVuXqCnCARreDKewQgfABXstU4LHjC9x
+   w==;
+X-CSE-ConnectionGUID: ZM/7z7dpRBet+6eK5lCQmw==
+X-CSE-MsgGUID: EFzeNHdLR3eeejuf50Cq2Q==
+X-IronPort-AV: E=Sophos;i="6.21,319,1763424000"; 
+   d="scan'208";a="13621734"
+Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
+  by internal-pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 10:41:45 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.48:14150]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.51.143:2525] with esmtp (Farcaster)
+ id ea3ba174-8803-4d35-8e59-505ad1c706ad; Mon, 2 Mar 2026 10:41:45 +0000 (UTC)
+X-Farcaster-Flow-ID: ea3ba174-8803-4d35-8e59-505ad1c706ad
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Mon, 2 Mar 2026 10:41:42 +0000
+Received: from ip-10-253-83-51.amazon.com (172.19.99.218) by
+ EX19D020UWC004.ant.amazon.com (10.13.138.149) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Mon, 2 Mar 2026 10:41:40 +0000
+From: Alexander Graf <graf@amazon.com>
+To: <virtualization@lists.linux.dev>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <eperezma@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, <mst@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+	<nh-open-source@amazon.com>
+Subject: [PATCH] vsock: Enable H2G override
+Date: Mon, 2 Mar 2026 10:41:38 +0000
+Message-ID: <20260302104138.77555-1-graf@amazon.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260227200848.114019-1-david@kernel.org> <20260227200848.114019-3-david@kernel.org>
- <aaLh2BxSgC9Jl5iS@google.com> <8a27e9ac-2025-4724-a46d-0a7c90894ba7@kernel.org>
- <aaVf5gv4XjV6Ddt-@google.com> <f2f3a8a1-3dbf-4ef9-a89a-a6ec20791d1c@kernel.org>
-Message-ID: <aaVnifbdxKhBddQp@google.com>
-Subject: Re: [PATCH v1 02/16] mm/memory: remove "zap_details" parameter from zap_page_range_single()
-From: Alice Ryhl <aliceryhl@google.com>
-To: "David Hildenbrand (Arm)" <david@kernel.org>
-Cc: linux-kernel@vger.kernel.org, 
-	"linux-mm @ kvack . org" <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, 
-	Pedro Falcato <pfalcato@suse.de>, David Rientjes <rientjes@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=" <arve@android.com>, Todd Kjos <tkjos@android.com>, 
-	Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, 
-	H Hartley Sweeten <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Dimitri Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, 
-	Vincenzo Frascino <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org, 
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+X-ClientProxiedBy: EX19D037UWB002.ant.amazon.com (10.13.138.121) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-8.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
-	TAGGED_FROM(0.00)[bounces-72355-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[amazon.com:+];
+	TAGGED_FROM(0.00)[bounces-72356-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[73];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aliceryhl@google.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.998];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D33041D6BF5
+	FROM_NEQ_ENVFROM(0.00)[graf@amazon.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[kvm];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 009A61D6C8E
 X-Rspamd-Action: no action
 
-On Mon, Mar 02, 2026 at 11:27:40AM +0100, David Hildenbrand (Arm) wrote:
-> On 3/2/26 11:01, Alice Ryhl wrote:
-> > On Mon, Mar 02, 2026 at 09:18:45AM +0100, David Hildenbrand (Arm) wrote:
-> >> On 2/28/26 13:38, Alice Ryhl wrote:
-> >>>
-> >>>
-> >>> Please run rustfmt on Rust changes. Here, rustfmt leads to this being
-> >>> formatted on a single line:
-> >>
-> >> Having to run tooling I don't even have installed when removing a single
-> >> function parameter; did not expect that :)
-> > 
-> > Well, rustfmt comes with the compiler, and it would be ideal to build
-> > test changes before sending them :)
-> 
-> At least on Ubuntu on my notebook where I do most of the coding+patch
-> submissions it's a separate package?
-> 
-> I do all my builds on a different (more powerful) machine where the
-> whole rust machinery's in place. Further, build bots that run on my
-> private branches did not report any issues.
+Vsock maintains a single CID number space which can be used to
+communicate to the host (G2H) or to a child-VM (H2G). The current logic
+trivially assumes that G2H is only relevant for CID <= 2 because these
+target the hypervisor.  However, in environments like Nitro Enclaves, an
+instance that hosts vhost_vsock powered VMs may still want to communicate
+to Enclaves that are reachable at higher CIDs through virtio-vsock-pci.
 
-There are some build bots that check for rustfmt, though not all of
-them.
+That means that for CID > 2, we really want an overlay. By default, all
+CIDs are owned by the hypervisor. But if vhost registers a CID, it takes
+precedence.  Implement that logic. Vhost already knows which CIDs it
+supports anyway.
 
-> > But no worries, I took care of testing it. Thanks for taking the time to
-> > update the Rust code as well.
-> 
-> I just did an allyesconfig and it does not report any warnings.
-> 
-> So apparently, rustfmt problems not result in the compiler complaining?
-> 
-> Or something else is off here that rust/kernel/mm/virt.rs won't get
-> compiled on my machine, even with allyesconfig. I can definitely see
-> some RUSTC stuff happening in the logs, like
-> 
-> 	RUSTC L rust/kernel.o
-> 
-> Thanks for the review and for pointing out rustfmt!
+With this logic, I can run a Nitro Enclave as well as a nested VM with
+vhost-vsock support in parallel, with the parent instance able to
+communicate to both simultaneously.
 
-Similar to kerneldoc and other similar targets, formatting isn't checked
-in the normal build, but make can be invoked on the rustfmtcheck target
-to check it.
+Signed-off-by: Alexander Graf <graf@amazon.com>
+---
+ drivers/vhost/vsock.c    | 11 +++++++++++
+ include/net/af_vsock.h   |  3 +++
+ net/vmw_vsock/af_vsock.c |  3 +++
+ 3 files changed, 17 insertions(+)
 
-Alice
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index 054f7a718f50..223da817e305 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -91,6 +91,16 @@ static struct vhost_vsock *vhost_vsock_get(u32 guest_cid, struct net *net)
+ 	return NULL;
+ }
+ 
++static bool vhost_transport_has_cid(u32 cid)
++{
++	bool found;
++
++	rcu_read_lock();
++	found = vhost_vsock_get(cid) != NULL;
++	rcu_read_unlock();
++	return found;
++}
++
+ static void
+ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+ 			    struct vhost_virtqueue *vq)
+@@ -424,6 +434,7 @@ static struct virtio_transport vhost_transport = {
+ 		.module                   = THIS_MODULE,
+ 
+ 		.get_local_cid            = vhost_transport_get_local_cid,
++		.has_cid                  = vhost_transport_has_cid,
+ 
+ 		.init                     = virtio_transport_do_socket_init,
+ 		.destruct                 = virtio_transport_destruct,
+diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+index 533d8e75f7bb..4cdcb72f9765 100644
+--- a/include/net/af_vsock.h
++++ b/include/net/af_vsock.h
+@@ -179,6 +179,9 @@ struct vsock_transport {
+ 	/* Addressing. */
+ 	u32 (*get_local_cid)(void);
+ 
++	/* Check if this transport serves a specific remote CID. */
++	bool (*has_cid)(u32 cid);
++
+ 	/* Read a single skb */
+ 	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
+ 
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index 2f7d94d682cb..8b34b264b246 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -584,6 +584,9 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+ 		else if (remote_cid <= VMADDR_CID_HOST || !transport_h2g ||
+ 			 (remote_flags & VMADDR_FLAG_TO_HOST))
+ 			new_transport = transport_g2h;
++		else if (transport_h2g->has_cid &&
++			 !transport_h2g->has_cid(remote_cid))
++			new_transport = transport_g2h;
+ 		else
+ 			new_transport = transport_h2g;
+ 		break;
+-- 
+2.47.1
+
+
+
+
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
+
 
