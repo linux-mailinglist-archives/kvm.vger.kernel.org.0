@@ -1,172 +1,149 @@
-Return-Path: <kvm+bounces-72430-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72431-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Mi8MkkTpmnlJgAAu9opvQ
-	(envelope-from <kvm+bounces-72430-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 23:46:33 +0100
+	id iE7UHcUTpml2KAAAu9opvQ
+	(envelope-from <kvm+bounces-72431-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 23:48:37 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46CF91E5E36
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 23:46:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 369BB1E5E82
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 23:48:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 050B53036E90
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 22:46:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A085330387C0
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 22:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41FC32D592C;
-	Mon,  2 Mar 2026 22:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541802DECB2;
+	Mon,  2 Mar 2026 22:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MuWqXkry"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H4fbPVni"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7683F1F4176
-	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 22:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B58282F19
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 22:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772491580; cv=none; b=b3Mb4FKCQJkla/n7jAmQVKr8qr+U8CVCiBdLCSFlasryRVGSxDDHcr3ruBpJS/jRpBGm5Ocx5ibWzrmbV2NLOh+nhMlyHWIk/SXAFYK7eOvwuUEt1NLFZ45gX5V0i0EPCAGu0ZlWaRraQepMNIqRuzzYCnie+ve+lw3XwxEYRzA=
+	t=1772491704; cv=none; b=bHbtvHipLLujz8NTShoseWUuqg2aXeBDvXmqUDn5TRGwVU6fKSK9Nqzyq/S7fZsIv7M+Yf7UW/v8pIGSjE2GKYgOyYmlANXQ+4SgA0QI8AUjL/eOQZTjkDEDprARE4hoavh23LPbFR3MnBN/93NU8Sg4s/vl7wmRaTsksmTqKEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772491580; c=relaxed/simple;
-	bh=vRUnFk/4YjqA8aVK6C5vOSkumDpwteYY9GhbEfoN7Ds=;
+	s=arc-20240116; t=1772491704; c=relaxed/simple;
+	bh=0UkKBP3tbA5m+vfGf0CgmiUvMch83YvZUflHAoNHaDs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Gh33nX6pjRuovySydC7f6OVb/r/Zrt4GKbY+2h8lTNh5Bi+mytQdgAHFpizHjARFt4EP0K65Fn184E9I86dxZ2VpvQh8RJ2KtgO7wsL4/duep3SeVyd1WQjdCjW7106AnizwfRqKfEl5qUG1XuUgJHyAEF3ZGFkargO82i5z01Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MuWqXkry; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=nL816KSdJDPguYquFzy7Qut8676WwrsAcQtqrFUOZBum50Zl7O0nECWCShGd0p/X9vdRSJxMNdaL40Yhw8pENoi1gKT5uuvowdq5Se3pc6Ald/eSDPmTl5fMyGQuRqVmA9GyzpDbeQtYl36NGHCffOppKbtlwzPD0gwpg3w9Jqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H4fbPVni; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae53ec06b0so52782535ad.0
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 14:46:19 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3595485abbbso3645509a91.2
+        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 14:48:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772491579; x=1773096379; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772491703; x=1773096503; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2gsF250ql7Atn/IIODygSV13jGj0UvlZEzVcGG6p2FA=;
-        b=MuWqXkryK8214d0Heur23U7Ib6JWKToo++syOTg7iVx9rADgwFmEEg2LSSDiOy8+kS
-         gPYUgf6DVAMsgB6OXrVBChrTjAIoz3ObBUZeuclGZWGPyBjzjRY91ZyoNMWURuSD8O87
-         Gxcd34tZuLOhd9NdwnX/boXfJyuEJvvC1Ocr1rM6RydN9Ji2CZv2NsB9/bMSQv8H5oHA
-         vyuqpAG4szEagd7nUk7U0WaRXLMd4kkOJhM4+E9aC46Pdi1ldpILlkIrpQjGooKQrXuN
-         36HNZs1Di6ZQN0aU3AuEtGSNekiH7KUY854zew1L17grkG3D0jyBPvk2WPX+W3RMgeer
-         EDxA==
+        bh=tXdycAUhqH01yNE4P3PLW9cPG6IWEHVkJ1VuHv/+FFM=;
+        b=H4fbPVniIcjA2Zj/6gYS85yuAR5LGtkhq88NVF73+9KJ1ojRveFFdWKaDfxH1aHCgc
+         Vq/+Lu7KhsyVaabq2v/KjDHlPQLNm0k6NB3BRNCNcoVYSbHwENXenso/e9r8i6VdJHRL
+         44bQcFhw/cCthvShRSOAzPsTJRDAP1tE6KxgS348dRUsdGEPUf7CkNk5sB9TX3QQ9L6p
+         x1QDcf4FvsispuQkps3wQKPvb6UNVFJO5Kcb8Xr5yZjlERJDe/LdD64jYraMYT2hR/k+
+         2xgBbD47AcFtYxGQuWMLp2DRVWSsu2A1DnOd8TIKOGjT2CeIwVF2tH4QUHm/hlXhPB7j
+         9XPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772491579; x=1773096379;
+        d=1e100.net; s=20230601; t=1772491703; x=1773096503;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2gsF250ql7Atn/IIODygSV13jGj0UvlZEzVcGG6p2FA=;
-        b=oXZhbUIhPuS2j5KB6kO433NeuzGiJgQlH1b9S7fIHY3ZUI0eMmDpybjCWISbcwrCq2
-         iv72yiY9zCzuHXuOJCsT45GpxcBJ0OCV395C3ZQn3783itFibxZyO/Chq6r+TxCmV83H
-         1MVTP25Rr1KlzJmxFJiQn+sk6UsQENKgQ/LCFzzEIOO+4zS731gJ4kmRmJJs77pmiP91
-         aj2NB6btf317poDcjueik70uHjJ3RvsOD4fHaAUCMtKyFbuJF6Hj57LgRToDIYDKnAn+
-         57xtPSVS0HzjTq9md0M8/lMkDBFXz+nHP1ldAEi595XaYbq/CF19eyGumBkX9aSr5+Nt
-         VQQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXzOR9e8TfdVYdTwJZMLgVoyRhytzIuimcyh/hMXog9+Iu5yOosIF2RK4ub1M5bqKFUTTk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy07u6/D5OSmiPlKFf5KA9FAWJE+z0slM4GCC0NXGuIZcNUal9d
-	j9ed+E1SjTiPoNlQ71H2s/679r3jWCx/yhbb6nbc1fXSlB0Ow6Tt81+U8+QX7A3w8kChUCLs1yM
-	8YJ0b9g==
-X-Received: from ploc3.prod.google.com ([2002:a17:902:8483:b0:29f:25cf:e576])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:fc87:b0:2ae:5104:571e
- with SMTP id d9443c01a7336-2ae510458f2mr41552335ad.9.1772491578542; Mon, 02
- Mar 2026 14:46:18 -0800 (PST)
-Date: Mon, 2 Mar 2026 14:46:17 -0800
-In-Reply-To: <20260210234613.1383279-1-jmattson@google.com>
+        bh=tXdycAUhqH01yNE4P3PLW9cPG6IWEHVkJ1VuHv/+FFM=;
+        b=JG10WpY+FpNaM6z4iEwAqTEW//4uA8ecXZBIhJyQrjnj52dDfWVSxz0UEozdjgRKaZ
+         utJ5v4sb4ehrbw7sz3NAhaGpPNKMxVxydMqwVkuYsEUnH2FbMlVss1fa4cGXNKNbXdXa
+         Pbwi2Bb0cC8efsYASLvIFPt7HSmCMpBdRwE4JpuMGm2I4ZkI4j87vEbMV0lU1MEx8qQH
+         Dgx49QOd31jZleFjZvGqOWiUHJTh03TJmdjPdunbKhYAGviCZKirdNV0VmY5WBeA5eyx
+         9hTkIWRxq5IFuqKZOjPCYZ/ZWWy+PtV5ZDX5+Xp1HHDF/moMLQOE2GjHHTb64UKj3sRB
+         hTXg==
+X-Forwarded-Encrypted: i=1; AJvYcCXKFVZIZobaOBcLG2jPjkoEMTei1gimq22dXIoYhEfB3KInRvIfQ04K2O7o4Wjm+HAiJHk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyugn8XQblgPaOpMnO4rSYDJSSBuPjLX584ty6PndqzFPCLsaY+
+	PHhMMWMc7QfMR9VBX9QU2jYkvv7NDyXRZJ+ISzDlBXin+HDV3C08ob6WN9AgvtF2a6zDW6ZcobQ
+	jtZVL+g==
+X-Received: from pjao9.prod.google.com ([2002:a17:90a:1689:b0:359:877f:98db])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:588c:b0:34e:630c:616c
+ with SMTP id 98e67ed59e1d1-35965ce42fbmr10435047a91.31.1772491702576; Mon, 02
+ Mar 2026 14:48:22 -0800 (PST)
+Date: Mon, 2 Mar 2026 14:48:21 -0800
+In-Reply-To: <CAO9r8zPvQ1+_HGNuRZJuOTQ_YJHgMB=52-68rHFXKF8mWy6CNw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260210234613.1383279-1-jmattson@google.com>
-Message-ID: <aaYTOXlgX-cnkvoy@google.com>
-Subject: Re: [PATCH] KVM: x86: Ignore cpuid faulting in SMM
+References: <20260209195142.2554532-1-yosry.ahmed@linux.dev>
+ <20260209195142.2554532-2-yosry.ahmed@linux.dev> <txfn2izdpaavep6yrcujlxkqrqf2gwk2ccb6dplwcfnsstdnie@lgx74e27nus7>
+ <aaCO62eQiZX5pvSk@google.com> <CAO9r8zOcBbgtNzy6FizPe8Xm8W=jg3CR8pmdByfszfEM3rqzsA@mail.gmail.com>
+ <aaI51_1_bR4zRTXY@google.com> <CAO9r8zPvQ1+_HGNuRZJuOTQ_YJHgMB=52-68rHFXKF8mWy6CNw@mail.gmail.com>
+Message-ID: <aaYTtTBFmlzfb7tX@google.com>
+Subject: Re: [PATCH v2 1/2] KVM: SVM: Triple fault L1 on unintercepted
+ EFER.SVME clear by L2
 From: Sean Christopherson <seanjc@google.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jamie Liu <jamieliu@google.com>
+To: Yosry Ahmed <yosry@kernel.org>
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
-X-Rspamd-Queue-Id: 46CF91E5E36
+X-Rspamd-Queue-Id: 369BB1E5E82
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72430-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72431-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[5];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Feb 10, 2026, Jim Mattson wrote:
-> The Intel Virtualization Technology FlexMigration Application Note says,
-> "When CPUID faulting is enabled, all executions of the CPUID instruction
-> outside system-management mode (SMM) cause a general-protection exception
-> (#GP(0)) if the current privilege level (CPL) is greater than 0."
+On Fri, Feb 27, 2026, Yosry Ahmed wrote:
+> > > What if we key off vcpu->wants_to_run?
+> >
+> > That crossed my mind too.
+> >
+> > > It's less protection against false positives from things like
+> > > kvm_vcpu_reset() if it didn't leave nested before clearing EFER, but
+> > > more protection against the #VMEXIT case you mentioned. Also should be
+> > > much lower on the fugliness scale imo.
+> >
+> > Yeah, I had pretty much the exact same thought process and assessment.  I suggested
+> > the WRMSR approach because I'm not sure how I feel about using wants_to_run for
+> > functional behavior.  But after realizing that hooking WRMSR won't handle RSM,
+> > I'm solidly against my WRMSR idea.
+> >
+> > Honestly, I'm leaning slightly towards dropping this patch entirely since it's
+> > not a bug fix.  But I'm definitely not completely against it either.  So what if
+> > we throw it in, but plan on reverting if there are any more problems (that aren't
+> > obviously due to goofs elsewhere in KVM).
 > 
-> Always allow the execution of CPUID in SMM.
+> I am okay with that.
 > 
-> Fixes: db2336a80489 ("KVM: x86: virtualize cpuid faulting")
-
-I feel like we need a Technically-fixes-but-really-just-a-bad-spec tag for things
-like this.  MISC_ENABLES and MSR_K7_HWCR in particular are a bizarre game of
-"Hold my beer!".
-
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
->  arch/x86/kvm/cpuid.c   | 3 ++-
->  arch/x86/kvm/emulate.c | 6 +++---
->  2 files changed, 5 insertions(+), 4 deletions(-)
+> >
+> > Is this what you were thinking?
 > 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 7fe4e58a6ebf..863ce81023e9 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -2157,7 +2157,8 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
->  {
->  	u32 eax, ebx, ecx, edx;
->  
-> -	if (cpuid_fault_enabled(vcpu) && !kvm_require_cpl(vcpu, 0))
-> +	if (!is_smm(vcpu) && cpuid_fault_enabled(vcpu) &&
-> +	    !kvm_require_cpl(vcpu, 0))
->  		return 1;
->  
->  	eax = kvm_rax_read(vcpu);
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index c8e292e9a24d..4b7289a82bf8 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -3583,10 +3583,10 @@ static int em_cpuid(struct x86_emulate_ctxt *ctxt)
->  	u64 msr = 0;
->  
->  	ctxt->ops->get_msr(ctxt, MSR_MISC_FEATURES_ENABLES, &msr);
-> -	if (msr & MSR_MISC_FEATURES_ENABLES_CPUID_FAULT &&
-> -	    ctxt->ops->cpl(ctxt)) {
-> +	if (!ctxt->ops->is_smm(ctxt) &&
-> +	    (msr & MSR_MISC_FEATURES_ENABLES_CPUID_FAULT &&
-> +	     ctxt->ops->cpl(ctxt)))
+> Yeah, exactly.
 
-I assume you intended the parentheses to wrap the bitwise-AND.  I'll fixup to
-this when applying.
-
-	if (!ctxt->ops->is_smm(ctxt) &&
-	    (msr & MSR_MISC_FEATURES_ENABLES_CPUID_FAULT) &&
-	    ctxt->ops->cpl(ctxt))
+Nice.  No need for a v3, I'll fixup when applying (it might be a while before
+this gets any "thanks", as I want to land it behind all of the stable@ fixes).
 
