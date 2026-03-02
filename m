@@ -1,293 +1,372 @@
-Return-Path: <kvm+bounces-72339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72340-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KGWTOfYupWkQ5QUAu9opvQ
-	(envelope-from <kvm+bounces-72339-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 07:32:22 +0100
+	id KMJ2HOIxpWli5gUAu9opvQ
+	(envelope-from <kvm+bounces-72340-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 07:44:50 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E61DD1D377D
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 07:32:21 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CAB91D38AF
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 07:44:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 532BB300C7DA
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 06:31:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AA0403012B61
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 06:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03672DB7BE;
-	Mon,  2 Mar 2026 06:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C1FF37BE64;
+	Mon,  2 Mar 2026 06:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YibaaDZz"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="cLbPb6NX"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A00972618;
-	Mon,  2 Mar 2026 06:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772433101; cv=none; b=bQX9eFZUf6kA2759Bi8QVU4WGGwhRq6mibNNsYt3mNOxDY+taU3XRO53ItjpTDDfXmu+UCzjGuSNBP7mPOBy8T1Y1zGiTKyl6QzPpn45SH+lywHKjAYE8DAtX0V9ofZZZJvQHm+VYRJikAHgrWBlFUu8u5mRpaXI6zctJvlTjrw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772433101; c=relaxed/simple;
-	bh=yLsmO5W7JC5aPbOrAz3xMPpUYPJanHjXdS4qc/nKvXo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g1lsVZDdzrfXED1WJ9s3GMfEbVvbLtWI3MSUlXHBF2MbexlhLAV5jnPAzNW5UuITZmP09Ykf4SiadRRKJu2Xv5/v8gDj+9T/3LYKZvdDB1yzrkx5piQLfDXffu3IRI+0L1xKhOrg+mOlPErvan+ZkbVZBhKBfW5J5m8/ilu+ePE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YibaaDZz; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772433097;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I8gx42IHYEQCTDsiOiivkLZbaQbWhY24E85Lk6w39Tk=;
-	b=YibaaDZzBLg3a/3Lzh5+odGfgFy4rKCclMUZCLJe8oVE/bwTQq5eeGRW2n/iATLhzlFuh5
-	X0ieBE+2QbmggG/hWHCuLDq7DvHNaU84T2oUFsxdeTGqgWB5DpcfOGmuitzwpJz9A6mSNO
-	KMYpAP3NT27u9rnisSuI3b0J57v1rSU=
-From: Lance Yang <lance.yang@linux.dev>
-To: akpm@linux-foundation.org
-Cc: peterz@infradead.org,
-	david@kernel.org,
-	dave.hansen@intel.com,
-	dave.hansen@linux.intel.com,
-	ypodemsk@redhat.com,
-	hughd@google.com,
-	will@kernel.org,
-	aneesh.kumar@kernel.org,
-	npiggin@gmail.com,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	x86@kernel.org,
-	hpa@zytor.com,
-	arnd@arndb.de,
-	lorenzo.stoakes@oracle.com,
-	ziy@nvidia.com,
-	baolin.wang@linux.alibaba.com,
-	Liam.Howlett@oracle.com,
-	npache@redhat.com,
-	ryan.roberts@arm.com,
-	dev.jain@arm.com,
-	baohua@kernel.org,
-	shy828301@gmail.com,
-	riel@surriel.com,
-	jannh@google.com,
-	jgross@suse.com,
-	seanjc@google.com,
-	pbonzini@redhat.com,
-	boris.ostrovsky@oracle.com,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	ioworker0@gmail.com,
-	Lance Yang <lance.yang@linux.dev>
-Subject: [PATCH v5 2/2] x86/tlb: skip redundant sync IPIs for native TLB flush
-Date: Mon,  2 Mar 2026 14:30:36 +0800
-Message-ID: <20260302063048.9479-3-lance.yang@linux.dev>
-In-Reply-To: <20260302063048.9479-1-lance.yang@linux.dev>
-References: <20260302063048.9479-1-lance.yang@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8200B21D3CC
+	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 06:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772433887; cv=pass; b=Gav4upeVdw7Fjod/sDwvaB1338xflmC2j28dIzniA4z4l8hJEPv4hmabcqPGXr6nDQIV218mJPnBfQVvFPazYW5l2QIZxcxxeNPIpetTLnc2T2ySPjw01OyyzvKEDfYST9Tl/9ohOy5NGcnfMIZlcAJQsy35erTTJIRpz4L5Kqw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772433887; c=relaxed/simple;
+	bh=eZAD/6SPiyEYf2e1MUESovq0UQJfZEJgZobJj2rE++8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R77ncry1umMtK3D90SMEq+PKtp+ckKOldLJ39y5JDEWVimE79qngtAbDhaAqVDp8Ow9u5004wQue7Q3dlI9i7ZET6ndADvWLTWmB8qHPsUVAx6bGkWflPec+FSA7vVrQF1NO0M6QMgmwIPaNtr3EHbIju7ESl4pC4YE35PD2/mk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=cLbPb6NX; arc=pass smtp.client-ip=209.85.210.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7d18c654458so1954450a34.3
+        for <kvm@vger.kernel.org>; Sun, 01 Mar 2026 22:44:44 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772433883; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JloBNqdObBqMWxqTWFuHypLF7acLCa1RLVZ0sxm2JEqE4/R4EuljkXg/96+v5GEW0X
+         ZHP+tiAKoxPYqkEeMjw93CWGC2cV9WohPXrFp8IVlCYDBGUJZEdrRgTOUTtNlMfl/rsn
+         FvAx5r6+A+4lp8qi+AFlKgShbS/qqPFMSju6nYq3fjfG9CtoztUHvkdEvfsYZHkTbK4x
+         8yipI7X8RSfbOnp/ysBFUeTXDEuOw3IW8QTw4A0JIegx4oaY3orKTu1eGE8UaY2O8Un4
+         vlc5OixuEdsGHorCOz8LNdja/mRZPmqNEiom7BAcRJHYXi228HJgkrDp1R+ouMv99N4w
+         fUyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=3RopwkNMdoSs/liXGJ2jIDDoeSA3z3pzaorR9wzyeyc=;
+        fh=WLNNpbSYOf35gjQQ44EfvhJnM9VvroawDOzakaNcMpM=;
+        b=jGi6AIGKVEGdzSBSNuUWkIXxuRLnbMptQSK5q+M1RXApLN8zXm5P6dZhrdzKwb5CJN
+         bcuegQIg3tgQ8t0SNKRA1tujCe/v0jsBcsfbVVSUan5c07gRUNd1U6UNKxKmTGjqrkCz
+         fThIOIRh4g6nszrENRAnv2cSK7SXeRJTFyVi5lmcQ+TQgOFnO1ASeDVzSx8klWQ8NflO
+         BLh8h+h6Sq2qWlo/d7+3AKwixRCOQ7tKv1JJlJRnpLslmaBwkwpdz1sr4u1a8Tdw8VEm
+         jgfBME8Ve/JdxrCvigNHgdvhh1pGYU9fhqFJqZ7ApVl8txuscv8Kl6Bdm6wDaHL7Cnvt
+         eYoA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1772433883; x=1773038683; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3RopwkNMdoSs/liXGJ2jIDDoeSA3z3pzaorR9wzyeyc=;
+        b=cLbPb6NX3/Es7LLdFJzhuFaK2SdtSJ+fI0wERbzUFLR8zuVQ0Dt43dPmKPKnRX9oX+
+         jKEPCIulbLI7fPnhGn+wtDPZeRMRz46O8k8se3KFGjeRdqf3hLLAHQcNIvtlX7vjy/El
+         n/WO3m9qGg9wS+f0uq4uqlY0Bo5cftHitWZKUC16070Ps5MAeeb+tHpkmOJ6YeTKLC1y
+         zU+bYi4Qgr3uIttjS/AZFypVWzwbkKU62v1mrEndQfZHezeIJ0ec8LzOrbjTRc3xiZAc
+         uLPz46Voe2xSLFx7LT8XFeEG47mBZzCy7A5it3rjeVsrqMMrYBYtGdTvLEHtYTA5oSqR
+         /yTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772433883; x=1773038683;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3RopwkNMdoSs/liXGJ2jIDDoeSA3z3pzaorR9wzyeyc=;
+        b=h9LyOFyhIY2AZEnoNDss9SVL6bka4bfIPbPtqU9UcbA9/s48j7wFUZ5KDXdkQ3LFB2
+         YpLI2hnil+B5G/8/KCvaA3sX+Gg24IZPCuq67w7LSDL+IXY00SXtQKqOWitR8zhMQH4E
+         TOgYyTmf+zBI8c2NFj1QMtexxpNm3/lfR4X5h4AUfNLARkXM6Q11QaM96w7HXshQnzCi
+         P/TCH73zA4Br0JIakGFn2y0CAWnS68a1e957/inFY3sKSQmbzeRkd4hnZVciSG4XwOM5
+         CDev0rB9yszanM9xZfcR7c/+idR+HGZKT56NV0/a5XCjFaT2at8W3DgK5KgGa9e+PM0o
+         4knQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUqmhtYmci6LanmakYdBdDIFgmaKqX4ounTXs/OxuoFGGb+9RngmcUes9ddZIihn/Zeurg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjaS9gKowvZvyXtSbsuxNdmm/dEIGw0v5upT5PKvo/XmtBl1AO
+	R8ORyyrXFY2hoSh40zRNNBXgp+swrTtWbsca7EPqMvoTzdSlsWcJr+84X0QUI0GH7+4RfsGO99m
+	+voyHj0bc7g9ofW4VoCgaoWagxrIvQctsU6BVjtLCUg==
+X-Gm-Gg: ATEYQzwvZnSNH4iUbFTvB7NMJfRIRTLlrNCOcFdP7uQlBaraGrBVHIYVwkhcfVuLdlJ
+	6R9Ca0NM3Bpf6Rm9o41ry0l93qpe4PPxp5l0Ft2xtxIT+1SApVtnXepIvnvAcsWTDGRgkGpgfJz
+	sezqzqgHZF2Rl2aMcSKs+JslnZCAhe7cI3wYFVVESR5H3IISzJ2LboBVdBTJvjHDGXkgJwqQMDv
+	KDustfDxIPvQl8H0bf9VP9YoP3mV3/asDLbnc0qfJ2aGxjieCsXKmAjTFdMLT18sHiVTLtSzzDz
+	kDIGqhKBn2zbTiK9e+nhpEnhbJp5v/cVGIVLXZQQacPbzgtL973a/8fZuzKYbyhZbVfL+9InL/3
+	Z08pVtAv7IqnaQy2zXVwlY6dIUmg=
+X-Received: by 2002:a05:6820:228a:b0:66f:6d5e:76c3 with SMTP id
+ 006d021491bc7-679faf197f4mr6237763eaf.42.1772433883297; Sun, 01 Mar 2026
+ 22:44:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260131025800.1550692-1-xujiakai2025@iscas.ac.cn>
+In-Reply-To: <20260131025800.1550692-1-xujiakai2025@iscas.ac.cn>
+From: Anup Patel <anup@brainfault.org>
+Date: Mon, 2 Mar 2026 12:14:32 +0530
+X-Gm-Features: AaiRm51UWawvMQ4W_XFS-euBUvc7zaH49mHMd54aVoS7NYUqeGJ1N7c5kzY8Sjc
+Message-ID: <CAAhSdy1x=4J2fZA-U_nB2yvFP38rmdcwVqYsR7c_6kHQw56+ew@mail.gmail.com>
+Subject: Re: [PATCH] RISC-V: KVM: Change imsic->vsfile_lock from rwlock_t to raw_spinlock_t
+To: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	Alexandre Ghiti <alex@ghiti.fr>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Atish Patra <atish.patra@linux.dev>, Jiakai Xu <jiakaiPeanut@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[brainfault-org.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[infradead.org,kernel.org,intel.com,linux.intel.com,redhat.com,google.com,gmail.com,linutronix.de,alien8.de,zytor.com,arndb.de,oracle.com,nvidia.com,linux.alibaba.com,arm.com,surriel.com,suse.com,lists.linux.dev,vger.kernel.org,kvack.org,linux.dev];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-72339-lists,kvm=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[38];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72340-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[brainfault.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,ghiti.fr,eecs.berkeley.edu,dabbelt.com,sifive.com,linux.dev,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[brainfault-org.20230601.gappssmtp.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lance.yang@linux.dev,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FROM_NEQ_ENVFROM(0.00)[anup@brainfault.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-0.992];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:mid,linux.dev:dkim,linux.dev:email]
-X-Rspamd-Queue-Id: E61DD1D377D
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 0CAB91D38AF
 X-Rspamd-Action: no action
 
-From: Lance Yang <lance.yang@linux.dev>
+On Sat, Jan 31, 2026 at 8:28=E2=80=AFAM Jiakai Xu <xujiakai2025@iscas.ac.cn=
+> wrote:
+>
+> The per-vCPU IMSIC context uses a vsfile_lock to protect access
+> to the VS-file. Currently, this lock is an rwlock_t, and is used
+> with read_lock_irqsave/write_lock_irqsave in multiple places
+> inside arch/riscv/kvm/aia_imsic.c.
+>
+> During fuzz testing of KVM ioctl sequences, an
+> "[BUG: Invalid wait context]" crash was observed when holding
+> vsfile_lock in certain VCPU scheduling paths, for example during
+> kvm_riscv_vcpu_aia_imsic_put(). Log shows that at this point
+> the task may hold vcpu->mutex and scheduler runqueue locks,
+> and thus is in a context where acquiring a read/write rwlock
+> with irqsave is illegal.
+>
+> The crash manifests as:
+>   [ BUG: Invalid wait context ]
+>   (&imsic->vsfile_lock){....}-{3:3}, at:
+>   kvm_riscv_vcpu_aia_imsic_put arch/riscv/kvm/aia_imsic.c:728
+>   ...
+>   2 locks held by syz.4.4541/8252:
+>    #0: (&vcpu->mutex), at: kvm_vcpu_ioctl virt/kvm/kvm_main.c:4460
+>    #1: (&rq->__lock), at: raw_spin_rq_lock_nested kernel/sched/core.c:639
+>    #1: (&rq->__lock), at: raw_spin_rq_lock kernel/sched/sched.h:1580
+>    #1: (&rq->__lock), at: rq_lock kernel/sched/sched.h:1907
+>    #1: (&rq->__lock), at: __schedule kernel/sched/core.c:6772
+>   ...
+>   Call Trace:
+>    _raw_read_lock_irqsave kernel/locking/spinlock.c:236
+>    kvm_riscv_vcpu_aia_imsic_put arch/riscv/kvm/aia_imsic.c:716
+>    kvm_riscv_vcpu_aia_put arch/riscv/kvm/aia.c:154
+>    kvm_arch_vcpu_put arch/riscv/kvm/vcpu.c:650
+>    kvm_sched_out virt/kvm/kvm_main.c:6421
+>    __fire_sched_out_preempt_notifiers kernel/sched/core.c:4835
+>    fire_sched_out_preempt_notifiers kernel/sched/core.c:4843
+>    prepare_task_switch kernel/sched/core.c:5050
+>    context_switch kernel/sched/core.c:5205
+>    __schedule kernel/sched/core.c:6867
+>    __schedule_loop kernel/sched/core.c:6949
+>    schedule kernel/sched/core.c:6964
+>    kvm_riscv_check_vcpu_requests arch/riscv/kvm/vcpu.c:699
+>    kvm_arch_vcpu_ioctl_run arch/riscv/kvm/vcpu.c:920
+>
+> Therefore, replace vsfile_lock with raw_spinlock_t, and update
+> all acquire/release calls to
+> raw_spin_lock_irqsave()/raw_spin_unlock_irqrestore().
+>
+> Fixes: db8b7e97d6137a ("RISC-V: KVM: Add in-kernel virtualization of AIA =
+IMSIC")
+> Signed-off-by: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+> Signed-off-by: Jiakai Xu <jiakaiPeanut@gmail.com>
 
-Enable the optimization introduced in the previous patch for x86.
+This patch breaks KVM guest booting when the underlying
+KVM host does not have any guest files.
+E.g. "qemu-system-riscv64 -M virt,aia=3Daplic-imsic ..."
 
-Add pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast to track whether
-flush_tlb_multi() sends real IPIs. Initialize it once in
-native_pv_tlb_init() during boot.
+Regards,
+Anup
 
-On CONFIG_PARAVIRT systems, tlb_table_flush_implies_ipi_broadcast() reads
-the pv_ops property. On non-PARAVIRT, it directly checks for INVLPGB.
-
-PV backends (KVM, Xen, Hyper-V) typically have their own implementations
-and don't call native_flush_tlb_multi() directly, so they cannot be trusted
-to provide the IPI guarantees we need. They keep the property false.
-
-Two-step plan as David suggested[1]:
-
-Step 1 (this patch): Skip redundant sync when we're 100% certain the TLB
-flush sent IPIs. INVLPGB is excluded because when supported, we cannot
-guarantee IPIs were sent, keeping it clean and simple.
-
-Step 2 (future work): Send targeted IPIs only to CPUs actually doing
-software/lockless page table walks, benefiting all architectures.
-
-Regarding Step 2, it obviously only applies to setups where Step 1 does
-not apply: like x86 with INVLPGB or arm64.
-
-[1] https://lore.kernel.org/linux-mm/bbfdf226-4660-4949-b17b-0d209ee4ef8c@kernel.org/
-
-Suggested-by: David Hildenbrand (Arm) <david@kernel.org>
-Signed-off-by: Lance Yang <lance.yang@linux.dev>
----
- arch/x86/include/asm/paravirt_types.h |  5 +++++
- arch/x86/include/asm/smp.h            |  7 +++++++
- arch/x86/include/asm/tlb.h            | 20 +++++++++++++++++++-
- arch/x86/kernel/paravirt.c            | 16 ++++++++++++++++
- arch/x86/kernel/smpboot.c             |  1 +
- 5 files changed, 48 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
-index 9bcf6bce88f6..ec01268f2e3e 100644
---- a/arch/x86/include/asm/paravirt_types.h
-+++ b/arch/x86/include/asm/paravirt_types.h
-@@ -112,6 +112,11 @@ struct pv_mmu_ops {
- 	void (*flush_tlb_multi)(const struct cpumask *cpus,
- 				const struct flush_tlb_info *info);
- 
-+	/*
-+	 * True if flush_tlb_multi() sends real IPIs to all target CPUs.
-+	 */
-+	bool flush_tlb_multi_implies_ipi_broadcast;
-+
- 	/* Hook for intercepting the destruction of an mm_struct. */
- 	void (*exit_mmap)(struct mm_struct *mm);
- 	void (*notify_page_enc_status_changed)(unsigned long pfn, int npages, bool enc);
-diff --git a/arch/x86/include/asm/smp.h b/arch/x86/include/asm/smp.h
-index 84951572ab81..4ac175414ac1 100644
---- a/arch/x86/include/asm/smp.h
-+++ b/arch/x86/include/asm/smp.h
-@@ -105,6 +105,13 @@ void native_smp_prepare_boot_cpu(void);
- void smp_prepare_cpus_common(void);
- void native_smp_prepare_cpus(unsigned int max_cpus);
- void native_smp_cpus_done(unsigned int max_cpus);
-+
-+#ifdef CONFIG_PARAVIRT
-+void __init native_pv_tlb_init(void);
-+#else
-+static inline void native_pv_tlb_init(void) { }
-+#endif
-+
- int common_cpu_up(unsigned int cpunum, struct task_struct *tidle);
- int native_kick_ap(unsigned int cpu, struct task_struct *tidle);
- int native_cpu_disable(void);
-diff --git a/arch/x86/include/asm/tlb.h b/arch/x86/include/asm/tlb.h
-index 866ea78ba156..87ef7147eac8 100644
---- a/arch/x86/include/asm/tlb.h
-+++ b/arch/x86/include/asm/tlb.h
-@@ -5,10 +5,23 @@
- #define tlb_flush tlb_flush
- static inline void tlb_flush(struct mmu_gather *tlb);
- 
-+#define tlb_table_flush_implies_ipi_broadcast tlb_table_flush_implies_ipi_broadcast
-+static inline bool tlb_table_flush_implies_ipi_broadcast(void);
-+
- #include <asm-generic/tlb.h>
- #include <linux/kernel.h>
- #include <vdso/bits.h>
- #include <vdso/page.h>
-+#include <asm/paravirt.h>
-+
-+static inline bool tlb_table_flush_implies_ipi_broadcast(void)
-+{
-+#ifdef CONFIG_PARAVIRT
-+	return pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast;
-+#else
-+	return !cpu_feature_enabled(X86_FEATURE_INVLPGB);
-+#endif
-+}
- 
- static inline void tlb_flush(struct mmu_gather *tlb)
- {
-@@ -20,7 +33,12 @@ static inline void tlb_flush(struct mmu_gather *tlb)
- 		end = tlb->end;
- 	}
- 
--	flush_tlb_mm_range(tlb->mm, start, end, stride_shift, tlb->freed_tables);
-+	/*
-+	 * Pass both freed_tables and unshared_tables so that lazy-TLB CPUs
-+	 * also receive IPIs during unsharing page tables.
-+	 */
-+	flush_tlb_mm_range(tlb->mm, start, end, stride_shift,
-+			   tlb->freed_tables || tlb->unshared_tables);
- }
- 
- static inline void invlpg(unsigned long addr)
-diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
-index a6ed52cae003..b681b8319295 100644
---- a/arch/x86/kernel/paravirt.c
-+++ b/arch/x86/kernel/paravirt.c
-@@ -154,6 +154,7 @@ struct paravirt_patch_template pv_ops = {
- 	.mmu.flush_tlb_kernel	= native_flush_tlb_global,
- 	.mmu.flush_tlb_one_user	= native_flush_tlb_one_user,
- 	.mmu.flush_tlb_multi	= native_flush_tlb_multi,
-+	.mmu.flush_tlb_multi_implies_ipi_broadcast = false,
- 
- 	.mmu.exit_mmap		= paravirt_nop,
- 	.mmu.notify_page_enc_status_changed	= paravirt_nop,
-@@ -221,3 +222,18 @@ NOKPROBE_SYMBOL(native_load_idt);
- 
- EXPORT_SYMBOL(pv_ops);
- EXPORT_SYMBOL_GPL(pv_info);
-+
-+void __init native_pv_tlb_init(void)
-+{
-+	/*
-+	 * If PV backend already set the property, respect it.
-+	 * Otherwise, check if native TLB flush sends real IPIs to all target
-+	 * CPUs (i.e., not using INVLPGB broadcast invalidation).
-+	 */
-+	if (pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast)
-+		return;
-+
-+	if (pv_ops.mmu.flush_tlb_multi == native_flush_tlb_multi &&
-+	    !cpu_feature_enabled(X86_FEATURE_INVLPGB))
-+		pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast = true;
-+}
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index 5cd6950ab672..3cdb04162843 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -1167,6 +1167,7 @@ void __init native_smp_prepare_boot_cpu(void)
- 		switch_gdt_and_percpu_base(me);
- 
- 	native_pv_lock_init();
-+	native_pv_tlb_init();
- }
- 
- void __init native_smp_cpus_done(unsigned int max_cpus)
--- 
-2.49.0
-
+> ---
+>  arch/riscv/kvm/aia_imsic.c | 36 ++++++++++++++++++------------------
+>  1 file changed, 18 insertions(+), 18 deletions(-)
+>
+> diff --git a/arch/riscv/kvm/aia_imsic.c b/arch/riscv/kvm/aia_imsic.c
+> index fda0346f0ea1f..8730229442a26 100644
+> --- a/arch/riscv/kvm/aia_imsic.c
+> +++ b/arch/riscv/kvm/aia_imsic.c
+> @@ -47,7 +47,7 @@ struct imsic {
+>          */
+>
+>         /* IMSIC VS-file */
+> -       rwlock_t vsfile_lock;
+> +       raw_spinlock_t vsfile_lock;
+>         int vsfile_cpu;
+>         int vsfile_hgei;
+>         void __iomem *vsfile_va;
+> @@ -597,13 +597,13 @@ static void imsic_vsfile_cleanup(struct imsic *imsi=
+c)
+>          * VCPU is being destroyed.
+>          */
+>
+> -       write_lock_irqsave(&imsic->vsfile_lock, flags);
+> +       raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+>         old_vsfile_hgei =3D imsic->vsfile_hgei;
+>         old_vsfile_cpu =3D imsic->vsfile_cpu;
+>         imsic->vsfile_cpu =3D imsic->vsfile_hgei =3D -1;
+>         imsic->vsfile_va =3D NULL;
+>         imsic->vsfile_pa =3D 0;
+> -       write_unlock_irqrestore(&imsic->vsfile_lock, flags);
+> +       raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+>
+>         memset(imsic->swfile, 0, sizeof(*imsic->swfile));
+>
+> @@ -688,10 +688,10 @@ bool kvm_riscv_vcpu_aia_imsic_has_interrupt(struct =
+kvm_vcpu *vcpu)
+>          * only check for interrupt when IMSIC VS-file is being used.
+>          */
+>
+> -       read_lock_irqsave(&imsic->vsfile_lock, flags);
+> +       raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+>         if (imsic->vsfile_cpu > -1)
+>                 ret =3D !!(csr_read(CSR_HGEIP) & BIT(imsic->vsfile_hgei))=
+;
+> -       read_unlock_irqrestore(&imsic->vsfile_lock, flags);
+> +       raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+>
+>         return ret;
+>  }
+> @@ -713,10 +713,10 @@ void kvm_riscv_vcpu_aia_imsic_put(struct kvm_vcpu *=
+vcpu)
+>         if (!kvm_vcpu_is_blocking(vcpu))
+>                 return;
+>
+> -       read_lock_irqsave(&imsic->vsfile_lock, flags);
+> +       raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+>         if (imsic->vsfile_cpu > -1)
+>                 csr_set(CSR_HGEIE, BIT(imsic->vsfile_hgei));
+> -       read_unlock_irqrestore(&imsic->vsfile_lock, flags);
+> +       raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+>  }
+>
+>  void kvm_riscv_vcpu_aia_imsic_release(struct kvm_vcpu *vcpu)
+> @@ -727,13 +727,13 @@ void kvm_riscv_vcpu_aia_imsic_release(struct kvm_vc=
+pu *vcpu)
+>         struct imsic *imsic =3D vcpu->arch.aia_context.imsic_state;
+>
+>         /* Read and clear IMSIC VS-file details */
+> -       write_lock_irqsave(&imsic->vsfile_lock, flags);
+> +       raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+>         old_vsfile_hgei =3D imsic->vsfile_hgei;
+>         old_vsfile_cpu =3D imsic->vsfile_cpu;
+>         imsic->vsfile_cpu =3D imsic->vsfile_hgei =3D -1;
+>         imsic->vsfile_va =3D NULL;
+>         imsic->vsfile_pa =3D 0;
+> -       write_unlock_irqrestore(&imsic->vsfile_lock, flags);
+> +       raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+>
+>         /* Do nothing, if no IMSIC VS-file to release */
+>         if (old_vsfile_cpu < 0)
+> @@ -786,10 +786,10 @@ int kvm_riscv_vcpu_aia_imsic_update(struct kvm_vcpu=
+ *vcpu)
+>                 return 1;
+>
+>         /* Read old IMSIC VS-file details */
+> -       read_lock_irqsave(&imsic->vsfile_lock, flags);
+> +       raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+>         old_vsfile_hgei =3D imsic->vsfile_hgei;
+>         old_vsfile_cpu =3D imsic->vsfile_cpu;
+> -       read_unlock_irqrestore(&imsic->vsfile_lock, flags);
+> +       raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+>
+>         /* Do nothing if we are continuing on same CPU */
+>         if (old_vsfile_cpu =3D=3D vcpu->cpu)
+> @@ -839,12 +839,12 @@ int kvm_riscv_vcpu_aia_imsic_update(struct kvm_vcpu=
+ *vcpu)
+>         /* TODO: Update the IOMMU mapping ??? */
+>
+>         /* Update new IMSIC VS-file details in IMSIC context */
+> -       write_lock_irqsave(&imsic->vsfile_lock, flags);
+> +       raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+>         imsic->vsfile_hgei =3D new_vsfile_hgei;
+>         imsic->vsfile_cpu =3D vcpu->cpu;
+>         imsic->vsfile_va =3D new_vsfile_va;
+>         imsic->vsfile_pa =3D new_vsfile_pa;
+> -       write_unlock_irqrestore(&imsic->vsfile_lock, flags);
+> +       raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+>
+>         /*
+>          * At this point, all interrupt producers have been moved
+> @@ -943,7 +943,7 @@ int kvm_riscv_aia_imsic_rw_attr(struct kvm *kvm, unsi=
+gned long type,
+>         isel =3D KVM_DEV_RISCV_AIA_IMSIC_GET_ISEL(type);
+>         imsic =3D vcpu->arch.aia_context.imsic_state;
+>
+> -       read_lock_irqsave(&imsic->vsfile_lock, flags);
+> +       raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+>
+>         rc =3D 0;
+>         vsfile_hgei =3D imsic->vsfile_hgei;
+> @@ -958,7 +958,7 @@ int kvm_riscv_aia_imsic_rw_attr(struct kvm *kvm, unsi=
+gned long type,
+>                                             isel, val, 0, 0);
+>         }
+>
+> -       read_unlock_irqrestore(&imsic->vsfile_lock, flags);
+> +       raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+>
+>         if (!rc && vsfile_cpu >=3D 0)
+>                 rc =3D imsic_vsfile_rw(vsfile_hgei, vsfile_cpu, imsic->nr=
+_eix,
+> @@ -1015,7 +1015,7 @@ int kvm_riscv_vcpu_aia_imsic_inject(struct kvm_vcpu=
+ *vcpu,
+>         if (imsic->nr_msis <=3D iid)
+>                 return -EINVAL;
+>
+> -       read_lock_irqsave(&imsic->vsfile_lock, flags);
+> +       raw_spin_lock_irqsave(&imsic->vsfile_lock, flags);
+>
+>         if (imsic->vsfile_cpu >=3D 0) {
+>                 writel(iid, imsic->vsfile_va + IMSIC_MMIO_SETIPNUM_LE);
+> @@ -1025,7 +1025,7 @@ int kvm_riscv_vcpu_aia_imsic_inject(struct kvm_vcpu=
+ *vcpu,
+>                 imsic_swfile_extirq_update(vcpu);
+>         }
+>
+> -       read_unlock_irqrestore(&imsic->vsfile_lock, flags);
+> +       raw_spin_unlock_irqrestore(&imsic->vsfile_lock, flags);
+>
+>         return 0;
+>  }
+> @@ -1081,7 +1081,7 @@ int kvm_riscv_vcpu_aia_imsic_init(struct kvm_vcpu *=
+vcpu)
+>
+>         /* Setup IMSIC context  */
+>         imsic->nr_msis =3D kvm->arch.aia.nr_ids + 1;
+> -       rwlock_init(&imsic->vsfile_lock);
+> +       raw_spin_lock_init(&imsic->vsfile_lock);
+>         imsic->nr_eix =3D BITS_TO_U64(imsic->nr_msis);
+>         imsic->nr_hw_eix =3D BITS_TO_U64(kvm_riscv_aia_max_ids);
+>         imsic->vsfile_hgei =3D imsic->vsfile_cpu =3D -1;
+> --
+> 2.34.1
+>
 
