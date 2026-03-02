@@ -1,179 +1,219 @@
-Return-Path: <kvm+bounces-72408-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72409-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QHdsMb3XpWmuHQAAu9opvQ
-	(envelope-from <kvm+bounces-72408-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 19:32:29 +0100
+	id CCeHA2TfpWkvHgAAu9opvQ
+	(envelope-from <kvm+bounces-72409-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 20:05:08 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43DC71DE68E
-	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 19:32:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C1F61DE9AE
+	for <lists+kvm@lfdr.de>; Mon, 02 Mar 2026 20:05:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 75296302E7FD
-	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 18:32:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BD1E530406A4
+	for <lists+kvm@lfdr.de>; Mon,  2 Mar 2026 19:04:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDD934FF6C;
-	Mon,  2 Mar 2026 18:32:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E196332906;
+	Mon,  2 Mar 2026 19:04:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YxNB+z6a"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="Mpm9WO8s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.155.198.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264BA34250E
-	for <kvm@vger.kernel.org>; Mon,  2 Mar 2026 18:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74D7375ADC;
+	Mon,  2 Mar 2026 19:04:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.155.198.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772476344; cv=none; b=pC4eq3JMXhnpE7DfwpMOh93Zlrfez7ViLfoApI1Kb3AJ6/zLdVD9+WlJUwXyoyTmWNO2ktblyDyEkjQB5y9scFMQNH6lt6MeZqFKRY/INL1nKOEx1SJWoLclQfzKSKvWjwCdbbNpfR4dfrCe5X1ekFvdgDQuWRLTpBCRFL/TBus=
+	t=1772478276; cv=none; b=jNYT4RfspVatQMsMwjSvcug/8vN5sZxfUwWwLEvXr8yzEilpIgy0hil+1POTqeQLIBasvYzm49fbJHeq/LE7sdDN6CKDesrZXOpKI3y2GtMV4wPTKMCrci4vV9aRHwuDkJdZLmCqXyzYdOYr9/Mrm0FHGAXqstKWxP7Va7+T+Iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772476344; c=relaxed/simple;
-	bh=2UhGjQu+VQRXM2/9fNEm8gXzs8rDwPUHo//z+dwv8+4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UZfipMoZevTVxtft6dhsCain82vC/8kCns0vVFRsZK1jW8fjlOmSllyLP+eQ6ehjaOf82rGgDV2oY1ed5wh8DWBWuJMutmBToPrgmS60XG3rJpE0JlTbKYBcdHa0SN5ODZNexoerBUk4HrwQZQGtwI3Q+OFtsN+skwUZwPMPbxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YxNB+z6a; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c70f137aa4aso2801751a12.2
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 10:32:21 -0800 (PST)
+	s=arc-20240116; t=1772478276; c=relaxed/simple;
+	bh=LUQ9tY/9PUB2akCA2g4Nqja3pQ0wkFh1CmjA/J2R78o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=NnoMMnM6JgTOmp0ljvWjib4i2ggk2Y3BBP9UIai7jI8zouqvbSMNeHR5+iWhjSiWa9QqRwkPAsaj+6/qkDnJlPEZPGgDLQzX/ZGO21IxF5asFfrLNgZBZkDlJ8piMhUnnong5+eUcjxe231i0XesuX6k+syNf2ANJsTxyHEOpw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=Mpm9WO8s; arc=none smtp.client-ip=35.155.198.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772476341; x=1773081141; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=99qbGvoBd/oUypUr1ElAkaUmFzKfhUf+q3r8gcDVjGE=;
-        b=YxNB+z6aYDVdzFaoyhQig5/QPvS4ZVF25Ya7feEdZkCHmyWs+hZLKTAvAeWaBkGFTl
-         2qQ5ahWAO4HM0nZaP0EFCxq8yAHEawNMapQ9fnbgr8s1uhyw0eUP+iZJgeJJsq8/bTXm
-         LvNGY51hVUUxw+JXVsJhzNjYZg7y6BZwBQTdWR7PmkVKr6be39vyJjN1R7YQTRi2es5F
-         oylE8RUe39BLzVdzbCSrkXPUAceXMGFp1ETu64FcggMgfBstl6tPJIbm2Q0lfW7gKHU8
-         cndxLHnZiFPI3UGStvxDXr23UMDuwBpyr3fSZL6dKkk4B5cgEAuEYvVH5ANAZ5iV/tKp
-         xPJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772476341; x=1773081141;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=99qbGvoBd/oUypUr1ElAkaUmFzKfhUf+q3r8gcDVjGE=;
-        b=nSCSjU5qj+U9bj9uuZmVgtJXSFVWJPEtkpj6RGbcUSOwHweaV3yLRRUcwqTaYkrPAX
-         Mx0o9aKB/VaFrt85o1g9ZZuQTRNVf07dukAvHiKtJo1A3CTdFGEaotTLw7snzKxRQHze
-         gV8QqfM2jEm1T96PyjbbnKdzdEfoukDAwYMmNA91usSzp0k60QGQHc0iGgd2TqBuf67w
-         NL6S/cxEp4vUgxnCJkZfTJazZ6/5nkvS2SBWdIRtyactBkNuInY1SLsVIeXs/4kHV7jR
-         n0venBJI5Iur6QhoSeWsZFj1ZEh6vm1tDbO0WvFLmRlj7xmnsTcLWcqh7didC7JRPUQj
-         EG1g==
-X-Forwarded-Encrypted: i=1; AJvYcCWlQhbnPwwWjgV5bVR2E4QzjPVvE3IUNieJLSdSbRQx7Y8hGC4eClDa2lddYPYGFFq/SYg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKTXsEzWVoZ/GT3Aj+syQ3HJMEcoeJ7syr8/3BvMyvgHTisvyM
-	nZrRCiqhNF+OHFrdMqOes8G3sTKdDcgVjKWIu7u8mCBVC7fxxy6bHih51eLPrTqfXMSX+XyBg++
-	XeX5slw==
-X-Received: from pgiy6.prod.google.com ([2002:a63:de46:0:b0:c6e:7493:db3e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:a34b:b0:395:3677:2be4
- with SMTP id adf61e73a8af0-395c372dc51mr11458549637.0.1772476341107; Mon, 02
- Mar 2026 10:32:21 -0800 (PST)
-Date: Mon, 2 Mar 2026 10:32:19 -0800
-In-Reply-To: <CAO9r8zODn_ZGHsftsj0B6dJe9jy8sVZwdOgFi=ebZoHfGrWxXw@mail.gmail.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1772478270; x=1804014270;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=LUQ9tY/9PUB2akCA2g4Nqja3pQ0wkFh1CmjA/J2R78o=;
+  b=Mpm9WO8swXMYRuUpcdwbbUAjSOvDTcgPe/55Z+bTW74nv+Nvhp2kLfqY
+   2/DZkmy4YSpOe/6mc0Nvy5vu+HgZCynxucb95w9tgZ8Kxp1p62Khi+H4w
+   DYkfwhW1b/iOiKx2MqKyU2SoGrrx4HbJrQYaG/qRir1Lu9p3CuC65+dkq
+   ELPrZmWURL9ZHvaU2tqexEl6H3ARdRCCfpp4W0pKSZ6wWfE7i4iyQfWkq
+   Em7Fs79Otx31/IZdcaIrQ3xwYZ9m+lHQQqVUcPWRX26KWVF+OBJXHOmXf
+   KySPBlF6ykx4Q18dHcjUAxT9WFQXg1uI+PDB18ObL+o35CerlwgpsC4pf
+   g==;
+X-CSE-ConnectionGUID: Zn+U0SiqSyGcwU0I3DWOgA==
+X-CSE-MsgGUID: NdVVQds4TIiZdCBU2E3yBQ==
+X-IronPort-AV: E=Sophos;i="6.21,320,1763424000"; 
+   d="scan'208";a="14003273"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 19:04:28 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.111:11495]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.39:2525] with esmtp (Farcaster)
+ id 6f655c0e-cf62-4b26-ba13-5634a37d9366; Mon, 2 Mar 2026 19:04:27 +0000 (UTC)
+X-Farcaster-Flow-ID: 6f655c0e-cf62-4b26-ba13-5634a37d9366
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Mon, 2 Mar 2026 19:04:27 +0000
+Received: from [0.0.0.0] (172.19.99.218) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Mon, 2 Mar 2026
+ 19:04:24 +0000
+Message-ID: <27dcad4e-d658-4b6b-93b2-44c64fcbeb11@amazon.com>
+Date: Mon, 2 Mar 2026 20:04:22 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260228033328.2285047-1-chengkev@google.com> <CAO9r8zODn_ZGHsftsj0B6dJe9jy8sVZwdOgFi=ebZoHfGrWxXw@mail.gmail.com>
-Message-ID: <aaXXs4ubgmxf_E1O@google.com>
-Subject: Re: [PATCH V4 0/4] Align SVM with APM defined behaviors
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry@kernel.org>
-Cc: Kevin Cheng <chengkev@google.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 43DC71DE68E
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] vsock: Enable H2G override
+To: Stefano Garzarella <sgarzare@redhat.com>
+CC: Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa
+	<vishnu.dasa@broadcom.com>, Broadcom internal kernel review list
+	<bcm-kernel-feedback-list@broadcom.com>, <virtualization@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <eperezma@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, <mst@redhat.com>, Stefan Hajnoczi
+	<stefanha@redhat.com>, <nh-open-source@amazon.com>
+References: <20260302104138.77555-1-graf@amazon.com>
+ <aaVrsXMmULivV4Se@sgarzare-redhat> <aaV80wWlpjEtYCQJ@sgarzare-redhat>
+ <17d63837-6028-475a-90df-6966329a0fc2@amazon.com>
+ <aaW2FgoaXIJEymyR@sgarzare-redhat>
+Content-Language: en-US
+From: Alexander Graf <graf@amazon.com>
+In-Reply-To: <aaW2FgoaXIJEymyR@sgarzare-redhat>
+X-ClientProxiedBy: EX19D044UWA003.ant.amazon.com (10.13.139.43) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
+X-Rspamd-Queue-Id: 7C1F61DE9AE
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-9.06 / 15.00];
+	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72408-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-72409-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[amazon.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[graf@amazon.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5]
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-On Mon, Mar 02, 2026, Yosry Ahmed wrote:
-> On Fri, Feb 27, 2026 at 7:33=E2=80=AFPM Kevin Cheng <chengkev@google.com>=
- wrote:
-> >
-> > The APM lists the following behaviors
-> >   - The VMRUN, VMLOAD, VMSAVE, CLGI, VMMCALL, and INVLPGA instructions
-> >     can be used when the EFER.SVME is set to 1; otherwise, these
-> >     instructions generate a #UD exception.
-> >   - If VMMCALL instruction is not intercepted, the instruction raises a
-> >     #UD exception.
-> >
-> > The patches in this series fix current SVM bugs that do not adhere to
-> > the APM listed behaviors.
-> >
-> > v3 -> v4:
-> >   - Dropped "KVM: SVM: Inject #UD for STGI if EFER.SVME=3D0 and SVM Loc=
-k
-> >     and DEV are not available" as per Sean
-> >   - Added back STGI and CLGI intercept clearing in init_vmcb to maintai=
-n
-> >     previous behavior on intel guests. Previously intel guests always
-> >     had STGI and CLGI intercepts cleared if vgif was enabled. In V3,
-> >     because the clearing of the intercepts was moved from init_vmcb() t=
-o
-> >     the !guest_cpuid_is_intel_compatible() case in
-> >     svm_recalc_instruction_intercepts(), the CLGI intercept would be
-> >     indefinitely set on intel guests. I added back the clearing to
-> >     init_vmcb() to retain intel guest behavior before this patch.
->=20
-> I am a bit confused by this. v4 kept initializing the intercepts as
-> cleared for all guests, but we still set the CLGI/STGI intercepts for
-> Intel-compatible guests in svm_recalc_instruction_intercepts() patch
-> 3. So what difference did this make?
->=20
-> Also taking a step back, I am not really sure what's the right thing
-> to do for Intel-compatible guests here. It also seems like even if we
-> set the intercept, svm_set_gif() will clear the STGI intercept, even
-> on Intel-compatible guests.
->=20
-> Maybe we should leave that can of worms alone, go back to removing
-> initializing the CLGI/STGI intercepts in init_vmcb(), and in
-> svm_recalc_instruction_intercepts() set/clear these intercepts based
-> on EFER.SVME alone, irrespective of Intel-compatibility?
+Ck9uIDAyLjAzLjI2IDE3OjI1LCBTdGVmYW5vIEdhcnphcmVsbGEgd3JvdGU6Cj4gT24gTW9uLCBN
+YXIgMDIsIDIwMjYgYXQgMDQ6NDg6MzNQTSArMDEwMCwgQWxleGFuZGVyIEdyYWYgd3JvdGU6Cj4+
+Cj4+IE9uIDAyLjAzLjI2IDEzOjA2LCBTdGVmYW5vIEdhcnphcmVsbGEgd3JvdGU6Cj4+PiBDQ2lu
+ZyBCcnlhbiwgVmlzaG51LCBhbmQgQnJvYWRjb20gbGlzdC4KPj4+Cj4+PiBPbiBNb24sIE1hciAw
+MiwgMjAyNiBhdCAxMjo0NzowNVBNICswMTAwLCBTdGVmYW5vIEdhcnphcmVsbGEgd3JvdGU6Cj4+
+Pj4KPj4+PiBQbGVhc2UgdGFyZ2V0IG5ldC1uZXh0IHRyZWUgZm9yIHRoaXMgbmV3IGZlYXR1cmUu
+Cj4+Pj4KPj4+PiBPbiBNb24sIE1hciAwMiwgMjAyNiBhdCAxMDo0MTozOEFNICswMDAwLCBBbGV4
+YW5kZXIgR3JhZiB3cm90ZToKPj4+Pj4gVnNvY2sgbWFpbnRhaW5zIGEgc2luZ2xlIENJRCBudW1i
+ZXIgc3BhY2Ugd2hpY2ggY2FuIGJlIHVzZWQgdG8KPj4+Pj4gY29tbXVuaWNhdGUgdG8gdGhlIGhv
+c3QgKEcySCkgb3IgdG8gYSBjaGlsZC1WTSAoSDJHKS4gVGhlIGN1cnJlbnQgCj4+Pj4+IGxvZ2lj
+Cj4+Pj4+IHRyaXZpYWxseSBhc3N1bWVzIHRoYXQgRzJIIGlzIG9ubHkgcmVsZXZhbnQgZm9yIENJ
+RCA8PSAyIGJlY2F1c2UgCj4+Pj4+IHRoZXNlCj4+Pj4+IHRhcmdldCB0aGUgaHlwZXJ2aXNvci7C
+oCBIb3dldmVyLCBpbiBlbnZpcm9ubWVudHMgbGlrZSBOaXRybyAKPj4+Pj4gRW5jbGF2ZXMsIGFu
+Cj4+Pj4+IGluc3RhbmNlIHRoYXQgaG9zdHMgdmhvc3RfdnNvY2sgcG93ZXJlZCBWTXMgbWF5IHN0
+aWxsIHdhbnQgdG8gCj4+Pj4+IGNvbW11bmljYXRlCj4+Pj4+IHRvIEVuY2xhdmVzIHRoYXQgYXJl
+IHJlYWNoYWJsZSBhdCBoaWdoZXIgQ0lEcyB0aHJvdWdoIAo+Pj4+PiB2aXJ0aW8tdnNvY2stcGNp
+Lgo+Pj4+Pgo+Pj4+PiBUaGF0IG1lYW5zIHRoYXQgZm9yIENJRCA+IDIsIHdlIHJlYWxseSB3YW50
+IGFuIG92ZXJsYXkuIEJ5IAo+Pj4+PiBkZWZhdWx0LCBhbGwKPj4+Pj4gQ0lEcyBhcmUgb3duZWQg
+YnkgdGhlIGh5cGVydmlzb3IuIEJ1dCBpZiB2aG9zdCByZWdpc3RlcnMgYSBDSUQsIGl0IAo+Pj4+
+PiB0YWtlcwo+Pj4+PiBwcmVjZWRlbmNlLsKgIEltcGxlbWVudCB0aGF0IGxvZ2ljLiBWaG9zdCBh
+bHJlYWR5IGtub3dzIHdoaWNoIENJRHMgaXQKPj4+Pj4gc3VwcG9ydHMgYW55d2F5Lgo+Pj4+Pgo+
+Pj4+PiBXaXRoIHRoaXMgbG9naWMsIEkgY2FuIHJ1biBhIE5pdHJvIEVuY2xhdmUgYXMgd2VsbCBh
+cyBhIG5lc3RlZCBWTSAKPj4+Pj4gd2l0aAo+Pj4+PiB2aG9zdC12c29jayBzdXBwb3J0IGluIHBh
+cmFsbGVsLCB3aXRoIHRoZSBwYXJlbnQgaW5zdGFuY2UgYWJsZSB0bwo+Pj4+PiBjb21tdW5pY2F0
+ZSB0byBib3RoIHNpbXVsdGFuZW91c2x5Lgo+Pj4+Cj4+Pj4gSSBob25lc3RseSBkb24ndCB1bmRl
+cnN0YW5kIHdoeSBWTUFERFJfRkxBR19UT19IT1NUIChhZGRlZCAKPj4+PiBzcGVjaWZpY2FsbHkg
+Zm9yIE5pdHJvIElJUkMpIGlzbid0IGVub3VnaCBmb3IgdGhpcyBzY2VuYXJpbyBhbmQgd2UgCj4+
+Pj4gaGF2ZSB0byBhZGQgdGhpcyBjaGFuZ2UuwqAgQ2FuIHlvdSBlbGFib3JhdGUgYSBiaXQgbW9y
+ZSBhYm91dCB0aGUgCj4+Pj4gcmVsYXRpb25zaGlwIGJldHdlZW4gdGhpcyBjaGFuZ2UgYW5kIFZN
+QUREUl9GTEFHX1RPX0hPU1Qgd2UgYWRkZWQ/Cj4+Cj4+Cj4+IFRoZSBtYWluIHByb2JsZW0gSSBo
+YXZlIHdpdGggVk1BRERSX0ZMQUdfVE9fSE9TVCBmb3IgY29ubmVjdCgpIGlzIAo+PiB0aGF0IGl0
+IHB1bnRzIHRoZSBjb21wbGV4aXR5IHRvIHRoZSB1c2VyLiBJbnN0ZWFkIG9mIGEgc2luZ2xlIENJ
+RCAKPj4gYWRkcmVzcyBzcGFjZSwgeW91IG5vdyBlZmZlY3RpdmVseSBjcmVhdGUgMiBzcGFjZXM6
+IE9uZSBmb3IgVE9fSE9TVCAKPj4gKG5lZWRzIGEgZmxhZykgYW5kIG9uZSBmb3IgVE9fR1VFU1Qg
+KG5vIGZsYWcpLiBCdXQgZXZlcnkgdXNlciBzcGFjZSAKPj4gdG9vbCBuZWVkcyB0byBsZWFybiBh
+Ym91dCB0aGlzIGZsYWcuIFRoYXQgbWF5IHdvcmsgZm9yIHN1cGVyIAo+PiBzcGVjaWFsLWNhc2Ug
+YXBwbGljYXRpb25zLiBCdXQgcHJvcGFnYXRpbmcgdGhhdCBhbGwgdGhlIHdheSBpbnRvIAo+PiBz
+b2NhdCwgaXBlcmYsIGV0YyBldGM/IEl0J3MganVzdCBjcmVhdGluZyBmcmljdGlvbi4KPgo+IE9r
+YXksIEkgd291bGQgbGlrZSB0byBoYXZlIHRoaXMgKG9yIHBhcnQgb2YgaXQpIGluIHRoZSBjb21t
+aXQgbWVzc2FnZSAKPiB0byBiZXR0ZXIgZXhwbGFpbiB3aHkgd2Ugd2FudCB0aGlzIGNoYW5nZS4K
+Pgo+Pgo+PiBJTUhPIHRoZSBtb3N0IG5hdHVyYWwgZXhwZXJpZW5jZSBpcyB0byBoYXZlIGEgc2lu
+Z2xlIENJRCBzcGFjZSwgCj4+IHBvdGVudGlhbGx5IG1hbnVhbGx5IHNlZ21lbnRlZCBieSBsYXVu
+Y2hpbmcgVk1zIG9mIG9uZSBraW5kIHdpdGhpbiBhIAo+PiBjZXJ0YWluIHJhbmdlLgo+Cj4gSSBz
+ZWUsIGJ1dCBhdCB0aGlzIHBvaW50LCBzaG91bGQgdGhlIGtlcm5lbCBzZXQgVk1BRERSX0ZMQUdf
+VE9fSE9TVCBpbiAKPiB0aGUgcmVtb3RlIGFkZHJlc3MgaWYgdGhhdCBwYXRoIGlzIHRha2VuICJh
+dXRvbWFnaWNhbGx5IiA/Cj4KPiBTbyBpbiB0aGF0IHdheSB0aGUgdXNlciBzcGFjZSBjYW4gaGF2
+ZSBhIHdheSB0byB1bmRlcnN0YW5kIGlmIGl0J3MgCj4gdGFsa2luZyB3aXRoIGEgbmVzdGVkIGd1
+ZXN0IG9yIGEgc2libGluZyBndWVzdC4KPgo+Cj4gVGhhdCBzYWlkLCBJJ20gY29uY2VybmVkIGFi
+b3V0IHRoZSBzY2VuYXJpbyB3aGVyZSBhbiBhcHBsaWNhdGlvbiBkb2VzIAo+IG5vdCBldmVuIGNv
+bnNpZGVyIGNvbW11bmljYXRpbmcgd2l0aCBhIHNpYmxpbmcgVk0uCgoKSWYgdGhhdCdzIHJlYWxs
+eSBhIHJlYWxpc3RpYyBjb25jZXJuLCB0aGVuIHdlIHNob3VsZCBhZGQgYSAKVk1BRERSX0ZMQUdf
+VE9fR1VFU1QgdGhhdCB0aGUgYXBwbGljYXRpb24gY2FuIHNldC4gRGVmYXVsdCBiZWhhdmlvciBv
+ZiAKYW4gYXBwbGljYXRpb24gdGhhdCBwcm92aWRlcyBubyBmbGFncyBpcyAicm91dGUgdG8gd2hh
+dGV2ZXIgeW91IGNhbiAKZmluZCI6IElmIHZob3N0IGlzIGxvYWRlZCwgaXQgcm91dGVzIHRvIHZo
+b3N0LiBJZiBhIHZzb2NrIGJhY2tlbmQgZHJpdmVyIAppcyBsb2FkZWQsIGl0IHJvdXRlcyB0aGVy
+ZS4gQnV0IHRoZSBhcHBsaWNhdGlvbiBoYXMgbm8gc2F5IGluIHdoZXJlIGl0IApnb2VzOiBJdCdz
+IHB1cmVseSBhIHN5c3RlbSBjb25maWd1cmF0aW9uIHRoaW5nLgoKCj4gVW50aWwgbm93LCBpdCBr
+bmV3IHRoYXQgYnkgbm90IHNldHRpbmcgdGhhdCBmbGFnLCBpdCBjb3VsZCBvbmx5IHRhbGsgCj4g
+dG8gbmVzdGVkIFZNcywgc28gaWYgdGhlcmUgd2FzIG5vIFZNIHdpdGggdGhhdCBDSUQsIHRoZSBj
+b25uZWN0aW9uIAo+IHNpbXBseSBmYWlsZWQuIFdoZXJlYXMgZnJvbSB0aGlzIHBhdGNoIG9ud2Fy
+ZHMsIGlmIHRoZSBkZXZpY2UgaW4gdGhlIAo+IGhvc3Qgc3VwcG9ydHMgc2libGluZyBWTXMgYW5k
+IHRoZXJlIGlzIGEgVk0gd2l0aCB0aGF0IENJRCwgdGhlIAo+IGFwcGxpY2F0aW9uIGZpbmRzIGl0
+c2VsZiB0YWxraW5nIHRvIGEgc2libGluZyBWTSBpbnN0ZWFkIG9mIGEgbmVzdGVkIAo+IG9uZSwg
+d2l0aG91dCBoYXZpbmcgYW55IGlkZWEuCgoKSSdkIHNheSBhbiBhcHBsaWNhdGlvbiB0aGF0IGF0
+dGVtcHRzIHRvIHRhbGsgdG8gYSBDSUQgdGhhdCBpdCBkb2VzIG5vdyAKa25vdyB3aGV0aGVyIGl0
+J3Mgdmhvc3Qgcm91dGVkIG9yIG5vdCBpcyBydW5uaW5nIGludG8gInVuZGVmaW5lZCIgCnRlcnJp
+dG9yeS4gSWYgeW91IHJtbW9kIHRoZSB2aG9zdCBkcml2ZXIsIGl0IHdvdWxkIGFsc28gdGFsayB0
+byB0aGUgCmh5cGVydmlzb3IgcHJvdmlkZWQgdnNvY2suCgoKPiBTaG91bGQgd2UgbWFrZSB0aGlz
+IGZlYXR1cmUgb3B0LWluIGluIHNvbWUgd2F5LCBzdWNoIGFzIHNvY2tvcHQgb3IgCj4gc3lzY3Rs
+PyAoSSB1bmRlcnN0YW5kIHRoYXQgdGhlcmUgaXMgdGhlIHByZXZpb3VzIHByb2JsZW0sIGJ1dCAK
+PiBob25lc3RseSwgaXQgc2VlbXMgbGlrZSBhIHNpZ25pZmljYW50IGNoYW5nZSB0byB0aGUgYmVo
+YXZpb3Igb2YgCj4gQUZfVlNPQ0spLgoKCldlIGNhbiBjcmVhdGUgYSBzeXNjdGwgdG8gZW5hYmxl
+IGJlaGF2aW9yIHdpdGggZGVmYXVsdD1vbi4gQnV0IEknbSAKYWdhaW5zdCBtYWtpbmcgdGhlIGN1
+bWJlcnNvbWUgZG9lcy1ub3Qtd29yay1vdXQtb2YtdGhlLWJveCBleHBlcmllbmNlIAp0aGUgZGVm
+YXVsdC4gV2lsbCBpbmNsdWRlIGl0IGluIHYyLgoKCj4KPj4KPj4gQXQgdGhlIGVuZCBvZiB0aGUg
+ZGF5LCB0aGUgaG9zdCB2cyBndWVzdCBwcm9ibGVtIGlzIHN1cGVyIHNpbWlsYXIgdG8gCj4+IGEg
+cm91dGluZyB0YWJsZS4KPgo+IFllYWgsIGJ1dCB0aGUgcG9pbnQgb2YgQUZfVlNPQ0sgaXMgcHJl
+Y2lzZWx5IHRvIGF2b2lkIGNvbXBsZXhpdGllcyAKPiBzdWNoIGFzIHJvdXRpbmcgdGFibGVzIGFz
+IG11Y2ggYXMgcG9zc2libGU7IG90aGVyd2lzZSwgQUZfSU5FVCBpcyAKPiBhbHJlYWR5IHRoZXJl
+IGFuZCByZWFkeSB0byBiZSB1c2VkLiBJbiB0aGVvcnksIHdlIG9ubHkgd2FudCAKPiBjb21tdW5p
+Y2F0aW9uIGJldHdlZW4gaG9zdCBhbmQgZ3Vlc3QuCgoKWWVzLCBidXQgbmVzdGluZyBpcyBhIHRo
+aW5nIGFuZCBub2JvZHkgdGhvdWdodCBhYm91dCBpdCA6KS4gSW4gCnJldHJvc3BlY3QsIGl0IHdv
+dWxkIGhhdmUgYmVlbiB0byBhbm5vdGF0ZSB0aGUgQ0lEIHdpdGggdGhlIGRpcmVjdGlvbjogCkg1
+IGdvZXMgdG8gQ0lENSBvbiBob3N0IGFuZCBHNSBnb2VzIHRvIENJRDUgb24gZ3Vlc3QuIEJ1dCBJ
+IHNlZSBubyAKY2hhbmNlIHRvIGNoYW5nZSB0aGF0IGJ5IG5vdy4KCgpBbGV4CgoKCgpBbWF6b24g
+V2ViIFNlcnZpY2VzIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKVGFtYXJhLURhbnot
+U3RyLiAxMwoxMDI0MyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RvZiBIZWxsbWlz
+LCBBbmRyZWFzIFN0aWVnZXIKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1
+cmcgdW50ZXIgSFJCIDI1Nzc2NCBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDM2NSA1MzggNTk3
+Cg==
 
-Ya, guest_cpuid_is_intel_compatible() should only be applied to VMLOAD/VMSA=
-VE.
-KVM intercepts VMLOAD/VMSAVE to fixup SYSENTER MSRs, not to inject #UD.  I.=
-e. KVM
-is handling (the absoutely absurd) case that FMS reports an Intel CPU, but =
-the
-guest enables and uses SVM.
-
-	/*
-	 * Intercept VMLOAD if the vCPU model is Intel in order to emulate that
-	 * VMLOAD drops bits 63:32 of SYSENTER (ignoring the fact that exposing
-	 * SVM on Intel is bonkers and extremely unlikely to work).
-	 */
-	if (guest_cpuid_is_intel_compatible(vcpu))
-		guest_cpu_cap_clear(vcpu, X86_FEATURE_V_VMSAVE_VMLOAD);
-
-Sorry for not catching this in previous versions.
 
