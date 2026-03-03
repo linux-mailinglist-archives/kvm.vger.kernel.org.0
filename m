@@ -1,151 +1,143 @@
-Return-Path: <kvm+bounces-72483-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72484-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mHmkF3UvpmkrLwAAu9opvQ
-	(envelope-from <kvm+bounces-72483-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 01:46:45 +0100
+	id CMHuM4c1pmlJMQAAu9opvQ
+	(envelope-from <kvm+bounces-72484-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 02:12:39 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CD611E759F
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 01:46:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 646B71E78C7
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 02:12:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C54003033E4F
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 00:38:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AFD1A30C8D38
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 01:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7EC21BD9CE;
-	Tue,  3 Mar 2026 00:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gIxPOCCH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18237218ACC;
+	Tue,  3 Mar 2026 01:09:25 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB7F19C546
-	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 00:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4849E20CCE4;
+	Tue,  3 Mar 2026 01:09:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772498333; cv=none; b=RtAeVcS4VDDX20AaMRnf6wyqDbT2MZbmUOCDzOO3GlSl8jkginC5aN6b9+0w6cqPUvVzusbDC9lVjIkHalxckj6uFT9Cwy5nmErDMjWsxGfynuQz6lDT9EGK1aBZZUaFW2xZ2YpzNvBSWHh0VFwlNFiylfubBsuL2Mi6R5zlbeA=
+	t=1772500164; cv=none; b=MTG7DB2pfV6N0QRJA3GpSus0hfD6whWNQMCjZ9lT+sLW/q9q7mLX2ApE6+XlZH8i+2fYPfmZzKxu0uscmI8l5p9D/Q4LqgR1BKrJR8h85vlEJwetK92bKr2Q9nv01KLcIgcoWsKuu6ZwwBzaJyKaouMwyoMrk3uBnjevILa8zPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772498333; c=relaxed/simple;
-	bh=OxpVU2IyrLmzkC21htZ+OnzAs6pNP/joTCxdnf5Fcx0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hlpHPBu5putS07wlZwN7Q9fvj6vy7swwCcaDAO+ZFk3aTT8rOSqO+CqFksA/VqrzPKQTVgwu9VMgXnumCVKTzCnFOoLFPU+69NYt5Vt7XlMyhhMH13H6JXINoLvItPuQFdK0r5PMa1o6lEMWOD5XmNqVJTek80PMpZs/7MLidLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gIxPOCCH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6C6DC2BCAF
-	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 00:38:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772498332;
-	bh=OxpVU2IyrLmzkC21htZ+OnzAs6pNP/joTCxdnf5Fcx0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=gIxPOCCH777t244LX0OqEC0eOP6fH6Ph+oTHV8IDUfEo2CXI1TGL+L3dBxyiczUGu
-	 +IBeg4ekIEceIbhrnH++FQgRUuRh8BXrDBieWi2/iuYts64ZclVnfe7PariJ0X4gPO
-	 NuhkrdzUbk8e7tRxhZVsMWJNNGnQpplE0/vYMOyr42xLvSKpoO4snamTSB9dcGTPWx
-	 PzD+3J63bi8i53jfh48E+qMPXwClG8UpUT7L2nnDt53dW+LE179ZYtsOvHLfysEoA/
-	 ATyvCyaO/kdzHjLmQsWSlPe8bE+IIo/5LpKreMTUi+tWH82ws8us/vWRj+I9A/K+GD
-	 Xr6XTBWakYHOA==
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b7cf4a975d2so605467866b.2
-        for <kvm@vger.kernel.org>; Mon, 02 Mar 2026 16:38:52 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVw2jFrwvcT/mFwQWwdyyoxEGhfdb0zswOIa28Bs5t/YL3755ewbrkQbmKYolHsSpCbGkk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkJ7fZK1qTHLf2c6h6uczm2f2oJs4156VeMk+plN82sJvtHqUE
-	lU1VmYfH7KH60rKx6/mC0O8dKAK9vaRiJ9Fjssfk36snguYg93kMiGB8v4LkgyV31LHwHRMo1cs
-	CK7FeQhtDRjhSUcrHCbbh6BrHIMEeujA=
-X-Received: by 2002:a17:907:25c2:b0:b8e:7dcb:7f1b with SMTP id
- a640c23a62f3a-b93763af8f8mr931263566b.21.1772498331545; Mon, 02 Mar 2026
- 16:38:51 -0800 (PST)
+	s=arc-20240116; t=1772500164; c=relaxed/simple;
+	bh=QIzrJqeMZz5zzLBAczS6NuGVz5oGpBmBJ8IpygPKlpw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=avpULAjHkzyNSKliZTIpJiB/2ktVjaD+SPEha/XUnSbSwkj244GHKTW2jDtJtQM+Vi71kgIci9eZQlstugtvqW1J2z1tCg26sBvJx2MXRqA+yINTNazgw+/tmdfp0XwroLbWCdt4lAFcZJ1znLtZGD6zNpGdrPStcLeaPtFpfcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from fric.. (unknown [210.73.43.101])
+	by APP-03 (Coremail) with SMTP id rQCowABXZ86tNKZp7tu6CQ--.27620S2;
+	Tue, 03 Mar 2026 09:09:02 +0800 (CST)
+From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+To: linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-kselftest@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: Alexandre Ghiti <alex@ghiti.fr>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atish.patra@linux.dev>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Jiakai Xu <xujiakai2025@iscas.ac.cn>
+Subject: [PATCH v10 0/3] RISC-V: KVM: Validate SBI STA shmem alignment
+Date: Tue,  3 Mar 2026 01:08:56 +0000
+Message-Id: <20260303010859.1763177-1-xujiakai2025@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260227213849.3653331-1-jmattson@google.com> <CAO9r8zNzhK90=+Pezqbea0aihMEp-dGidcJuXqZQKnmsM2JTDA@mail.gmail.com>
- <CALMp9eRP7-u+6r8-RoVru6PLSPr6fu+EuRgtsNLJE_1EpMJq8Q@mail.gmail.com>
- <CAO9r8zNe9_vhspg4T=zswZ3Hr31XJGPz8=aDbqVvL1Wa9_mrAQ@mail.gmail.com> <aaYqzgO_Il2Pqixm@google.com>
-In-Reply-To: <aaYqzgO_Il2Pqixm@google.com>
-From: Yosry Ahmed <yosry@kernel.org>
-Date: Mon, 2 Mar 2026 16:38:39 -0800
-X-Gmail-Original-Message-ID: <CAO9r8zN3XnwXWpkAM4KdNXEU0sOyTc72XnYckKNqfmRhOW8d-A@mail.gmail.com>
-X-Gm-Features: AaiRm50Qr5aLE8YWy3lI-_0JMDw0nodugMQj6erU1eeKEuHXv0jsUKe0k4mIb7o
-Message-ID: <CAO9r8zN3XnwXWpkAM4KdNXEU0sOyTc72XnYckKNqfmRhOW8d-A@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: nVMX: Add retry loop to advanced RTM
- debugging subtest
-To: Sean Christopherson <seanjc@google.com>
-Cc: Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 7CD611E759F
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowABXZ86tNKZp7tu6CQ--.27620S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Gw4DZFW8ZFyDCr4UJFy5Jwb_yoW8Jr45pa
+	9xCa4FqFy8JayxA3Z3Aw4ktryfWw48CrsFyw17J342yay8KFy8tr47KFWUAasxGF1kXF1Y
+	va4xK3WruF98ZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWlnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67
+	AK6w4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
+	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
+	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
+	6r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
+	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUO-BMDUUU
+	U
+X-CM-SenderInfo: 50xmxthndljiysv6x2xfdvhtffof0/1tbiBwoPCWmmMbkLmAAAsf
+X-Rspamd-Queue-Id: 646B71E78C7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-72483-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	RCVD_COUNT_THREE(0.00)[4];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72484-lists,kvm=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[xujiakai2025@iscas.ac.cn,kvm@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.923];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,iscas.ac.cn:mid]
 X-Rspamd-Action: no action
 
-On Mon, Mar 2, 2026 at 4:26=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Mon, Mar 02, 2026, Yosry Ahmed wrote:
-> > On Mon, Mar 2, 2026 at 4:08=E2=80=AFPM Jim Mattson <jmattson@google.com=
-> wrote:
-> > > > IIUC this will be in the order of 100s of milliseconds. Do we need =
-to
-> > > > wait that long between retries? If the CPU is in a state where it w=
-ill
-> > > > always abort RTM, 30 retries will end up taking seconds or 10s of
-> > > > seconds, right?
-> > >
-> > > I tried reducing the delay by a factor of 10. At 200 retries, I still
-> > > see a 2% skip rate on a Skylake Xeon E5 @ 2GHz. I'd like to get the
-> > > skip rate under 1%. But, maybe others don't care as much?
-> > >
-> > > Yes, 30 billion cycles is going to be on the order of 10 seconds.
-> >
-> > I personally care more about the test time than the fact that it won't
-> > test RTM 2% of the time, but my opinion doesn't really matter :P
->
-> I generally care more about runtime too, but isn't 10 seconds only the wo=
-rst
-> case scenario, and only on these fubar CPUs?  E.g. if there's no perf act=
-ivity
-> in the host, or the CPU isn't one of these oddballs, isn't XBEGIN going t=
-o succeed
-> ~100% of the time?
->
-> If this were a choice between "eat N seconds every time" and "skip the te=
-st",
-> I'd be a-ok with a skip rate of 50% if it meant reducing N.  But, assumin=
-g this
-> requires perf activity and a Skylake-era CPU, odds are good this will onl=
-y be hit
-> in CI environments, at which point adding ~10 seconds to the worst case s=
-cenario
-> isn't a bad tradeoff (so long as it doesn't push the total runtime close =
-to the
-> timeout).
+This series fixes a missing validation in the RISC-V KVM SBI
+steal-time accounting (STA) register handling.
 
-Good point. We can always revisit if we get really unlucky :)
+Patch 1 validates the configured SBI STA shared memory GPA at
+KVM_SET_ONE_REG, enforcing the 64-byte alignment requirement
+defined by the SBI specification or allowing INVALID_GPA to explicitly
+disable steal-time accounting. This prevents invalid userspace state
+from reaching runtime code paths and avoids WARN_ON() triggers during
+KVM_RUN.
+
+Patch 2 refactors existing UAPI tests from steal_time_init() into
+a dedicated check_steal_time_uapi() function for better code organization,
+and adds an empty stub for RISC-V.
+
+Patch 3 fills in the RISC-V stub with tests that verify KVM correctly
+enforces the STA alignment requirements.
+
+Jiakai Xu (3):
+  RISC-V: KVM: Validate SBI STA shmem alignment in 
+    kvm_sbi_ext_sta_set_reg()
+  KVM: selftests: Refactor UAPI tests into dedicated function
+  RISC-V: KVM: selftests: Add RISC-V SBI STA shmem alignment tests
+
+ arch/riscv/kvm/vcpu_sbi_sta.c                 | 16 ++-
+ .../selftests/kvm/include/kvm_util_types.h    |  2 +
+ tools/testing/selftests/kvm/steal_time.c      | 98 ++++++++++++++++---
+ 3 files changed, 95 insertions(+), 21 deletions(-)
+
+-- 
+2.34.1
+
 
