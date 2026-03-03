@@ -1,82 +1,81 @@
-Return-Path: <kvm+bounces-72558-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72559-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WLMsLCMqp2nSfAAAu9opvQ
-	(envelope-from <kvm+bounces-72558-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 19:36:19 +0100
+	id gEcFM2wrp2nSfAAAu9opvQ
+	(envelope-from <kvm+bounces-72559-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 19:41:48 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B1071F5608
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 19:36:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 461BB1F568A
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 19:41:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5FDFF30247EE
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 18:36:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C1F3730234EF
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 18:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E89421A12;
-	Tue,  3 Mar 2026 18:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88EAC494A13;
+	Tue,  3 Mar 2026 18:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BFn1FTwV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DZ1X/22M"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE613C278D
-	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 18:35:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A3D47ECED
+	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 18:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772562961; cv=none; b=m7F0hetlmpOXwkANi7i+Vb80Qn5e0Zje1Ok9VJwy6bYWFEPUmsAMeIIOI/DvJlvxD9Lm69xc3v4iv0OwdxrlqDlJRlixDbQ4s2eriE7XKAbrRcZtO6jyp7NBAmnynx57r4+7r5RYfJpe1CYlyMU3qWgTZw71kxnHX40mgXOOVds=
+	t=1772563293; cv=none; b=k6IJP4KbvDWkFyJ5GSZ7n2m5Ny7TNv5ptZRijWau5exdT4VPQ5JVkp2Moav8RY1RI1cgv9yzJEUAIG5cTAU6GQi3giHpKxfGv0o0H/3yKy60pMwWGulTY06w8swblccHzWrTeWiYxjhUoTUqoRPXMAmdyKWGk9gFZvan2/fP8Hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772562961; c=relaxed/simple;
-	bh=wcbTJ+dxtc43pshEWpYW4YZDVIGTHhabXjI58Bwu58I=;
+	s=arc-20240116; t=1772563293; c=relaxed/simple;
+	bh=AOQWvUqJv4lNcUO8YIDTbhsNhv0Q3kF0idwcy68u+oU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i2Zs5qydyhPUJK981g7aobGHkKozMzEPOEPy3bQa56FK6WSj27z4D+5Sl/xHAwTU2LV5NKvSs7mlczsCMpTc9IEA1qtkAmJSidms1DG0Wr4C4mZwmpJTVPQHdWhfMGGDKGLkBxQxKkmnEv0+kimc24CJmZzT1DLReDORiNdK8cU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BFn1FTwV; arc=none smtp.client-ip=209.85.214.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=NIq5H9+6smUJLdryzoH1AYidhTmcEU38WhubNitlZTWcof/RLg5MMVWQEq6HBugwcO1mYYbaGnbw4HQoinJiaQPIzqdfJ/FTxAXSn/8uFl9OVasn7S7hFF3q10+U2KCwbkSDQqmZlo5znlNY4DgRMhf1uOEK96fXzDEKYuyBxp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DZ1X/22M; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2ae49120e97so91475ad.0
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 10:35:59 -0800 (PST)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2ae3f822163so92995ad.0
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 10:41:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772562959; x=1773167759; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=trHHJ83pdpjgNSAR80l6JTOyQ+mJmW3s5tLBspjTXe4=;
-        b=BFn1FTwVZnxFxqdNhle/XW7GVpahNuTG+cI6vMEMP4nB1Su8Xg5HIhqdLjjGPgnU9g
-         ywgSAZa6U/Vk5aHkaVmXR8qt7wJRLzYH4zDKsJ5Rn60R7BUEknEEW1IoVGwy8BpXuaVl
-         RUG8PngNexu1N84sIrX6IVwFNlwGZAddlnfKfKqKJ00a6Fr068jPiQVN83h1q8On0KnH
-         WAB5QAGOaeMSkEYPTjYnRMiIERZJR461M8AblFWSSnObsebNu6rHC9UuAGvi6f5bdcd1
-         +3PVYN8fulhVWO+akbQ2gHtlE9A/CeG0Y5By+SIbTu/Qzg2GkKjm6LQ0DtZxSUHzYeEi
-         SZqg==
+        d=google.com; s=20230601; t=1772563291; x=1773168091; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=u30Jc93NSo6jjaBUVn4MMoIkiqIVphQIkXw+rRzsOT0=;
+        b=DZ1X/22MJkNAI2sIPsSIy78fjwKbyhplxV1Ou1Ee5llgT7U4xwQT/6wFFGupZv19Hm
+         ZL1p6sUHXRQgIAxq82tpXN9i8m7W/ZFXTWZI9oHo+FXn78Z6PRQ6PpgU9RBjfPJJwtJw
+         Li1akmLuv2AI7riUlR6aSgzlrBZlxHXHIkotENnzxwiyrRMJ9h9hd4Xp8t3pLhLCp+dr
+         muNbUm2ukftA0wi/MTDybRz1cAP6OEZYNhTxjIPmg7VofNIR2gK005IWOXjSfbvDyhUV
+         ac5oZ1xS8T34m+ZLA0Rbq6pEIK67bU3BwvVnS7o4LJCzsoNeL9ZgIrF3jSswPmQjZrDE
+         w1Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772562959; x=1773167759;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=trHHJ83pdpjgNSAR80l6JTOyQ+mJmW3s5tLBspjTXe4=;
-        b=FQGfAMCH7x0xJ9xw38BRn6/MCIJzsSvZ0tUUAM2XsK17N9Z8RatynpXXwFDeDqTqmJ
-         Jo8XSnCqh5i89SxoiGbu+/Iubdt1uTc4zpj9/ZidOYAKgp5Q1AG4/A1/+UQnFaFOLbYS
-         cqheZN56Dplo8vgrZF7tKFOf39J+zW4CCGhfJPNg5zH+nzlTwHr85cOzAfDwsuyzLw1i
-         bq2zxWHeg09aO/sooxGwwbS5BXTGyqUrH9VgLNNwqNfUAwyryMcNbeN4ccPEOWdXynsb
-         8wL4wVnGVfmrnsMgWeokhr3pvACXHZYKt0gI3/Vu827uBEwSQHv5xPzGSfc6c0s45EkK
-         Q0QA==
-X-Forwarded-Encrypted: i=1; AJvYcCUumomMdoPX4Cyv0/3qCOsvdoqn4M2cBvuUUnlIED7Atga51Zn/AeSAqw+0zNU51CxG27o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxf9YzimpyGnubLXTUk8L3AxyogzzHIbGXL0dJjazN4JxO5he/5
-	ejOhmF+IWpdJghgbgJ37aTDTid/UaR8GGDVfOWHf0ICcjZ+3CD/fsgMcURtTAnPoAA==
-X-Gm-Gg: ATEYQzwplV50x6Gn+Si3BQZKRVZacfoKafBZ5FvOLZ1SQWEAgO5gDhLWwhD3M9us74i
-	VhrMcDT70GNf6xvtH8WnYdggXbNqTg/36vAxb77SHU4HZQm2lwIxTht1vQRUfwsOz6PFeU8755X
-	f9Luxl0HGEGBxXmwTCafjr+BfmgywC+GD9rNoTJ0HeX+jLf4k1350acWB1IO0NrrORZ0D1zqJiy
-	uvSh14wA0rzknDx/D5LNjjhCr3Q8KUO7YdXWKuC+JR9O3hn3QTlZbsPaU+lNdGcBMKMOSphrDoU
-	N4cds/lF8WVtQM4JmNzPFQNRbnZeSCgUh5HVu/YIiFEBH9zixF7SXjJdWVtsYbqE5NjI31C662D
-	3U7vGzOduCfoFjmXDTcoH1BZ+VKMuA3ep2wQgJd916Sqbrh1IF3uj+ERL9v+1qvdIWodOyyLpie
-	XzowCUuveVEs5dsKRebbG4Fua9G9u7ZCEtdlyV7fg8LlG1t/M19t90QuuLTSJHow==
-X-Received: by 2002:a17:902:f712:b0:2ae:4f95:df55 with SMTP id d9443c01a7336-2ae4f95e48dmr4767015ad.25.1772562958685;
-        Tue, 03 Mar 2026 10:35:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772563291; x=1773168091;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u30Jc93NSo6jjaBUVn4MMoIkiqIVphQIkXw+rRzsOT0=;
+        b=c9jJ1SJzpzUt6FmyEowoOLYa5udg9vyRIXTfkm71LdlcRoUSNuKMbJmgzZp7tFbrJW
+         Hm6LFZe4o1YiUKi1TMCRIVkPkAK/NcpJMiWD4KIEfgX90vbs1YoFDFnp2M4XqtPWpPEW
+         Rq0Dn9EcchrNw+0JGPBa8bhjGlWcyOu7RRI7nInq3zc+KBtxXS365epyCaG6iICDpRZc
+         kJtGWh/oQEjY3ZxQnqU8cLr3Wrz1XYiipvgYT9Obyv/e8KcK5FccuqIJ6DB2aoWQ1akt
+         rRUzd8J3UVBSn1aRhEs29TGf1AlmDtGIE921E3wxdhbKrf4L9H7OS0UOTmLKS5hNRrLr
+         BD1A==
+X-Forwarded-Encrypted: i=1; AJvYcCX4l7Hsm7UQqPnnqNtDkMdRdFmYO0QgoYtdpeacnyg0O2IHL2dhjOn6jY/6HfbeV4EGfII=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxh1g2O9Jy07IWHVgSsgG4Rz2tVlb3zv6P5NFb3wyloM1CEHdUP
+	DO1GjPHKISbVxQXdpOg92UybBfPeyVyQTqdqy4n3K1JkO6IvT0UtXw9TKeg59SO9tQ==
+X-Gm-Gg: ATEYQzximYDlQY7a5njBrdSy+6s6DSLJCcEPiMOxXdMpim+pt+gNuEq+GNmuw8wtIAp
+	6iKZU95c7RTsJCATqDsjIQhiaywp2VELxXWmf8RGKFDzTnSJvnZv6oDmzFr7vpJDhKNqMD5Mlvl
+	3cbdMIy1dyEgnGFNdhRw5fnJsqN8uLE03gBUYtOwKtQfmGa1WxV+i+FrP8Fuh4V+WelnGtSLxN/
+	b/UxSLLPozw4P3ShTZDiZBcCOBncklCE0J6G0GNgN6CbChGJsNMXwoCdjcwWqElJM590UeeWh6C
+	CysGfrdLCAO1I3gMt4i/88bQq4YBiuz3eG7iGz4t924LHxnSPfGJmZewyHzwXXGM/pQxx0ww4PW
+	a/3LiqR6w3OsKcd3B6xgLS21010QgKuN2FELdsQqaJwuLvfYViLLSMPVWzS5FIG+nZBj1FgcOc4
+	cqajSAwMqLo5OJ8Q4pqfLzSB2YBKAP+vK1vb/Vo0KWKoXLVyCoOlGoLsXzUDRk0A==
+X-Received: by 2002:a17:902:e847:b0:2ae:4808:bd99 with SMTP id d9443c01a7336-2ae4808bec6mr6306545ad.2.1772563290740;
+        Tue, 03 Mar 2026 10:41:30 -0800 (PST)
 Received: from google.com (168.136.83.34.bc.googleusercontent.com. [34.83.136.168])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae5229cd5esm80423705ad.21.2026.03.03.10.35.57
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3599c4e2f85sm3486410a91.17.2026.03.03.10.41.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 10:35:58 -0800 (PST)
-Date: Tue, 3 Mar 2026 18:35:54 +0000
+        Tue, 03 Mar 2026 10:41:30 -0800 (PST)
+Date: Tue, 3 Mar 2026 18:41:26 +0000
 From: Samiullah Khawaja <skhawaja@google.com>
 To: Ankit Soni <Ankit.Soni@amd.com>
 Cc: David Woodhouse <dwmw2@infradead.org>, 
@@ -91,41 +90,40 @@ Cc: David Woodhouse <dwmw2@infradead.org>,
 	David Matlack <dmatlack@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
 	Chris Li <chrisl@kernel.org>, Pranjal Shrivastava <praan@google.com>, 
 	Vipin Sharma <vipinsh@google.com>, YiFei Zhu <zhuyifei@google.com>
-Subject: Re: [PATCH 13/14] vfio/pci: Preserve the iommufd state of the vfio
- cdev
-Message-ID: <mxemy34aaxtwly3ugve5kfy5is3dsgnnrmjzvrmnxq2nvhcmgw@ghnjvhgdodth>
+Subject: Re: [PATCH 04/14] iommu/pages: Add APIs to
+ preserve/unpreserve/restore iommu pages
+Message-ID: <af4h6wh75qdvgu27td43ndlxdyb5drq2pf7tssdsln3q5gce6f@6su7ylrgomhz>
 References: <20260203220948.2176157-1-skhawaja@google.com>
- <20260203220948.2176157-14-skhawaja@google.com>
- <idfs4bm5tib5nfe7i6rrm7hxsvhybbidfxtxl4jx3pamkisdon@zaljkqd66cwq>
+ <20260203220948.2176157-5-skhawaja@google.com>
+ <d3wmnc43r3mir2emoitj432j3bfdw362dqmkvywa2qvu5tskb4@oqjkseil5i54>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <idfs4bm5tib5nfe7i6rrm7hxsvhybbidfxtxl4jx3pamkisdon@zaljkqd66cwq>
-X-Rspamd-Queue-Id: 3B1071F5608
+In-Reply-To: <d3wmnc43r3mir2emoitj432j3bfdw362dqmkvywa2qvu5tskb4@oqjkseil5i54>
+X-Rspamd-Queue-Id: 461BB1F568A
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72558-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72559-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[26];
 	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -135,131 +133,162 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Feb 17, 2026 at 04:18:08AM +0000, Ankit Soni wrote:
->On Tue, Feb 03, 2026 at 10:09:47PM +0000, Samiullah Khawaja wrote:
->> If the vfio cdev is attached to an iommufd, preserve the state of the
->> attached iommufd also. Basically preserve the iommu state of the device
->> and also the attached domain. The token returned by the preservation API
->> will be used to restore/rebind to the iommufd state after liveupdate.
+On Tue, Mar 03, 2026 at 04:42:02PM +0000, Ankit Soni wrote:
+>On Tue, Feb 03, 2026 at 10:09:38PM +0000, Samiullah Khawaja wrote:
+>> IOMMU pages are allocated/freed using APIs using struct ioptdesc. For
+>> the proper preservation and restoration of ioptdesc add helper
+>> functions.
 >>
 >> Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
 >> ---
->>  drivers/vfio/pci/vfio_pci_liveupdate.c | 28 +++++++++++++++++++++++++-
->>  include/linux/kho/abi/vfio_pci.h       | 10 +++++++++
->>  2 files changed, 37 insertions(+), 1 deletion(-)
+>>  drivers/iommu/iommu-pages.c | 74 +++++++++++++++++++++++++++++++++++++
+>>  drivers/iommu/iommu-pages.h | 30 +++++++++++++++
+>>  2 files changed, 104 insertions(+)
 >>
->> diff --git a/drivers/vfio/pci/vfio_pci_liveupdate.c b/drivers/vfio/pci/vfio_pci_liveupdate.c
->> index c52d6bdb455f..af6fbfb7a65c 100644
->> --- a/drivers/vfio/pci/vfio_pci_liveupdate.c
->> +++ b/drivers/vfio/pci/vfio_pci_liveupdate.c
->> @@ -15,6 +15,7 @@
->>  #include <linux/liveupdate.h>
->>  #include <linux/errno.h>
->>  #include <linux/vfio.h>
->> +#include <linux/iommufd.h>
+>> diff --git a/drivers/iommu/iommu-pages.c b/drivers/iommu/iommu-pages.c
+>> index 3bab175d8557..588a8f19b196 100644
+>> --- a/drivers/iommu/iommu-pages.c
+>> +++ b/drivers/iommu/iommu-pages.c
+>> @@ -6,6 +6,7 @@
+>>  #include "iommu-pages.h"
+>>  #include <linux/dma-mapping.h>
+>>  #include <linux/gfp.h>
+>> +#include <linux/kexec_handover.h>
+>>  #include <linux/mm.h>
 >>
->>  #include "vfio_pci_priv.h"
+>>  #define IOPTDESC_MATCH(pg_elm, elm)                    \
+>> @@ -131,6 +132,79 @@ void iommu_put_pages_list(struct iommu_pages_list *list)
+>>  }
+>>  EXPORT_SYMBOL_GPL(iommu_put_pages_list);
 >>
->> @@ -39,6 +40,7 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
->>  	struct vfio_pci_core_device_ser *ser;
->>  	struct vfio_pci_core_device *vdev;
->>  	struct pci_dev *pdev;
->> +	u64 token = 0;
->>
->>  	vdev = container_of(device, struct vfio_pci_core_device, vdev);
->>  	pdev = vdev->pdev;
->> @@ -49,15 +51,32 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
->>  	if (vfio_pci_is_intel_display(pdev))
->>  		return -EINVAL;
->>
->> +#if CONFIG_IOMMU_LIVEUPDATE
->> +	/* If iommufd is attached, preserve the underlying domain */
->> +	if (device->iommufd_attached) {
->> +		int err = iommufd_device_preserve(args->session,
->> +						  device->iommufd_device,
->> +						  &token);
->> +		if (err < 0)
->> +			return err;
+>> +#if IS_ENABLED(CONFIG_IOMMU_LIVEUPDATE)
+>> +void iommu_unpreserve_page(void *virt)
+>> +{
+>> +	kho_unpreserve_folio(ioptdesc_folio(virt_to_ioptdesc(virt)));
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_unpreserve_page);
+>> +
+>> +int iommu_preserve_page(void *virt)
+>> +{
+>> +	return kho_preserve_folio(ioptdesc_folio(virt_to_ioptdesc(virt)));
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_preserve_page);
+>> +
+>> +void iommu_unpreserve_pages(struct iommu_pages_list *list, int count)
+>> +{
+>> +	struct ioptdesc *iopt;
+>> +
+>> +	if (!count)
+>> +		return;
+>> +
+>> +	/* If less than zero then unpreserve all pages. */
+>> +	if (count < 0)
+>> +		count = 0;
+>> +
+>> +	list_for_each_entry(iopt, &list->pages, iopt_freelist_elm) {
+>> +		kho_unpreserve_folio(ioptdesc_folio(iopt));
+>> +		if (count > 0 && --count ==  0)
+>> +			break;
 >> +	}
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_unpreserve_pages);
+>> +
+>> +void iommu_restore_page(u64 phys)
+>> +{
+>> +	struct ioptdesc *iopt;
+>> +	struct folio *folio;
+>> +	unsigned long pgcnt;
+>> +	unsigned int order;
+>> +
+>> +	folio = kho_restore_folio(phys);
+>> +	BUG_ON(!folio);
+>> +
+>> +	iopt = folio_ioptdesc(folio);
+>
+>iopt->incoherent = false; should be here?
+>
+
+Yes this should be set here. I will update this.
+>> +
+>> +	order = folio_order(folio);
+>> +	pgcnt = 1UL << order;
+>> +	mod_node_page_state(folio_pgdat(folio), NR_IOMMU_PAGES, pgcnt);
+>> +	lruvec_stat_mod_folio(folio, NR_SECONDARY_PAGETABLE, pgcnt);
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_restore_page);
+>> +
+>> +int iommu_preserve_pages(struct iommu_pages_list *list)
+>> +{
+>> +	struct ioptdesc *iopt;
+>> +	int count = 0;
+>> +	int ret;
+>> +
+>> +	list_for_each_entry(iopt, &list->pages, iopt_freelist_elm) {
+>> +		ret = kho_preserve_folio(ioptdesc_folio(iopt));
+>> +		if (ret) {
+>> +			iommu_unpreserve_pages(list, count);
+>> +			return ret;
+>> +		}
+>> +
+>> +		++count;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_preserve_pages);
+>> +
 >> +#endif
 >> +
->>  	ser = kho_alloc_preserve(sizeof(*ser));
->> -	if (IS_ERR(ser))
->> +	if (IS_ERR(ser)) {
->> +		if (device->iommufd_attached)
->> +			iommufd_device_unpreserve(args->session,
->> +						  device->iommufd_device, token);
+>>  /**
+>>   * iommu_pages_start_incoherent - Setup the page for cache incoherent operation
+>>   * @virt: The page to setup
+>> diff --git a/drivers/iommu/iommu-pages.h b/drivers/iommu/iommu-pages.h
+>> index ae9da4f571f6..bd336fb56b5f 100644
+>> --- a/drivers/iommu/iommu-pages.h
+>> +++ b/drivers/iommu/iommu-pages.h
+>> @@ -53,6 +53,36 @@ void *iommu_alloc_pages_node_sz(int nid, gfp_t gfp, size_t size);
+>>  void iommu_free_pages(void *virt);
+>>  void iommu_put_pages_list(struct iommu_pages_list *list);
+>>
+>> +#if IS_ENABLED(CONFIG_IOMMU_LIVEUPDATE)
+>> +int iommu_preserve_page(void *virt);
+>> +void iommu_unpreserve_page(void *virt);
+>> +int iommu_preserve_pages(struct iommu_pages_list *list);
+>> +void iommu_unpreserve_pages(struct iommu_pages_list *list, int count);
+>> +void iommu_restore_page(u64 phys);
+>> +#else
+>> +static inline int iommu_preserve_page(void *virt)
+>> +{
+>> +	return -EOPNOTSUPP;
+>> +}
 >> +
->
->To use iommufd_device_preserve()/iommufd_device_unpreserve(),
->looks like the IOMMUFD namespace import is missing here —  MODULE_IMPORT_NS("IOMMUFD");
->
->-Ankit
-
-Agreed, I will add it to this file in v2.
->
->>  		return PTR_ERR(ser);
->> +	}
->>
->>  	pci_liveupdate_outgoing_preserve(pdev);
->>
->>  	ser->bdf = pci_dev_id(pdev);
->>  	ser->domain = pci_domain_nr(pdev->bus);
->>  	ser->reset_works = vdev->reset_works;
->> +	ser->iommufd_ser.token = token;
->>
->>  	args->serialized_data = virt_to_phys(ser);
->>  	return 0;
->> @@ -66,6 +85,13 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
->>  static void vfio_pci_liveupdate_unpreserve(struct liveupdate_file_op_args *args)
->>  {
->>  	struct vfio_device *device = vfio_device_from_file(args->file);
->> +	struct vfio_pci_core_device_ser *ser;
+>> +static inline void iommu_unpreserve_page(void *virt)
+>> +{
+>> +}
 >> +
->> +	ser = phys_to_virt(args->serialized_data);
->> +	if (device->iommufd_attached)
->> +		iommufd_device_unpreserve(args->session,
->> +					  device->iommufd_device,
->> +					  ser->iommufd_ser.token);
->>
->>  	pci_liveupdate_outgoing_unpreserve(to_pci_dev(device->dev));
->>  	kho_unpreserve_free(phys_to_virt(args->serialized_data));
->> diff --git a/include/linux/kho/abi/vfio_pci.h b/include/linux/kho/abi/vfio_pci.h
->> index 6c3d3c6dfc09..d01bd58711c2 100644
->> --- a/include/linux/kho/abi/vfio_pci.h
->> +++ b/include/linux/kho/abi/vfio_pci.h
->> @@ -28,6 +28,15 @@
->>
->>  #define VFIO_PCI_LUO_FH_COMPATIBLE "vfio-pci-v1"
->>
->> +/**
->> + * struct vfio_iommufd_ser - Serialized state of the attached iommufd.
->> + *
->> + * @token: The token of the bound iommufd state.
->> + */
->> +struct vfio_iommufd_ser {
->> +	u32 token;
->> +} __packed;
+>> +static inline int iommu_preserve_pages(struct iommu_pages_list *list)
+>> +{
+>> +	return -EOPNOTSUPP;
+>> +}
+>> +
+>> +static inline void iommu_unpreserve_pages(struct iommu_pages_list *list, int count)
+>> +{
+>> +}
+>> +
+>> +static inline void iommu_restore_page(u64 phys)
+>> +{
+>> +}
+>> +#endif
 >> +
 >>  /**
->>   * struct vfio_pci_core_device_ser - Serialized state of a single VFIO PCI
->>   * device.
->> @@ -40,6 +49,7 @@ struct vfio_pci_core_device_ser {
->>  	u16 bdf;
->>  	u16 domain;
->>  	u8 reset_works;
->> +	struct vfio_iommufd_ser iommufd_ser;
->>  } __packed;
->>
->>  #endif /* _LINUX_LIVEUPDATE_ABI_VFIO_PCI_H */
+>>   * iommu_pages_list_add - add the page to a iommu_pages_list
+>>   * @list: List to add the page to
 >> --
 >> 2.53.0.rc2.204.g2597b5adb4-goog
 >>
-
-Thanks for looking at this.
 
 Sami
 
