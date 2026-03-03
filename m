@@ -1,325 +1,282 @@
-Return-Path: <kvm+bounces-72601-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72602-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ADXgMKpKp2n2gQAAu9opvQ
-	(envelope-from <kvm+bounces-72601-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 21:55:06 +0100
+	id 8E+hDxBOp2nKggAAu9opvQ
+	(envelope-from <kvm+bounces-72602-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 22:09:36 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ED0B1F7029
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 21:55:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A12991F732F
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 22:09:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 71F7431542D8
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 20:53:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5AA57316AA10
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 21:05:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDF01388386;
-	Tue,  3 Mar 2026 20:53:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75593A453E;
+	Tue,  3 Mar 2026 21:05:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GYXRbiox";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jUFl4vdF"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="IHz/bVEM"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.68.102])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BE0379ED4
-	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 20:53:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CCDB372695;
+	Tue,  3 Mar 2026 21:05:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.246.68.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772571190; cv=none; b=OR1ismwNgWYkj7UiUpZyOPE1P6nGciiKuCckZcBUAhPY6UT79At0e2B9+3HTOeIH56cf3+fPvg+7ntGgNO4QGv1DJzQetw1mYDFil0tmwpiX99CWltKCWGBzypJnjUAsDqzQxyv2t//799p4N8TnV8GqDa93WR9I2NdkSm2LQVc=
+	t=1772571954; cv=none; b=LZLcNQEVl1STNjyNqW9Y8Yvk9DkI2BMlemRyr39eOKhThHZ8OGaOdNEyLG0Rfq5T2vIrp4xOaxqIc4m3ORKkaKLFoaVvwNUKOYAhgXKxysVgMTPwLa9RYa6vEZ0bDmL89HigJGGiQE4/WefTLjQavva9DMf/3g809zJUt5OlqbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772571190; c=relaxed/simple;
-	bh=I5gpiqsO+dAgH/nEJUqEofkhf7ZFzhfOnIeWvdgbAYM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IezKi/mrgr/PuhzJcv5zdLuosureFZxKrIFIagpEhunl6DDdLbxsTUYg//Mm9Jgp8iMd5Fkp7l5+hi/Cw3INXRws5W7l1mVihmreN/1VjvskfE6L8FMiazfwQfHmnNNQqTBtPBSGfCe22KIyH5lVNKQ7sycoTEgdkreiUhADoys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GYXRbiox; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jUFl4vdF; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772571187;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VoJ2INzWG7kGdihTQvUQGIPL9oTDsZ5C8rJbFDor7iI=;
-	b=GYXRbiox6gfAFSVV46CVVYZAKr9n/6VU7hqRYfO76d8Ef/mJ/O63jv7KeR5sv/xx6HpDs6
-	oq9oddfBNW0YBLzoHnPDbuCfitzVCtkpKKQZEdqSmpEGOqvC+WN5Sq4EXdAGorSFS3E+2M
-	fZ3rLFf9vfdITsibwqczgtCxghpoOn0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-164-gIU9pr9XNh6cVfOtPyHDQg-1; Tue, 03 Mar 2026 15:53:04 -0500
-X-MC-Unique: gIU9pr9XNh6cVfOtPyHDQg-1
-X-Mimecast-MFC-AGG-ID: gIU9pr9XNh6cVfOtPyHDQg_1772571183
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4837b7903f3so74353675e9.2
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 12:53:04 -0800 (PST)
+	s=arc-20240116; t=1772571954; c=relaxed/simple;
+	bh=xSbybZUSlysUSHT/3Zoqg8wWSZ0OyPjl8uxepV0vRFk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=FJPcld+qFUAiQ+DFy7e4SAbZhRjzM53N/ZZo9+reIo3PWtmQ8dk4GcvdaeJkTZZyiI0Sp15lt4Uiu7nLU/j2d0pD7ZhILACUY5svsU9SybfslpMAF8mHLHVtnuT0GD2xnUQIB6ruwbhGG11a1V8ihbOnQI13mkrcNXWJUi9fNww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=IHz/bVEM; arc=none smtp.client-ip=44.246.68.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772571183; x=1773175983; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=VoJ2INzWG7kGdihTQvUQGIPL9oTDsZ5C8rJbFDor7iI=;
-        b=jUFl4vdFmPneL1yOF7SRlvDZdmbwOGMPVmTFs5ij1O9kUrRqClHSsdno8CcnP2yVT7
-         zxhibugFFpIATrwZ7K1eIDOiPmGaP1+kyKErixiqeGNVhf+Ast1PBhIvQ4RGNek1rsmp
-         k3dfj6BZUVvJqmyUlo9Xx2PvU5v4m9azr5xSD81t+QzNPnULrikA1I+wj6qKaXbUR6v4
-         NJqD/gG8ZIvSZObs05cdd9L5f3IBrOoGbFwcCUzYfuAthYEtK53lNTV7Siwnq3AkWqQp
-         cn7LbWXBzun5VxzI0ATMX4XIVOQ+d1XI6JEYurTGVL0TlVkTDtjtPINVMmF4ztJ9DagX
-         A+Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772571183; x=1773175983;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VoJ2INzWG7kGdihTQvUQGIPL9oTDsZ5C8rJbFDor7iI=;
-        b=ZE6xIG4N8/dn8vHjq11fDXCfZkq6oZCWnTcyQ2VNMG35HxJDOvTtc/Qe7KI82mgfYC
-         gL3JWXzUGOpZE2C4iR/S3PWaBJ+JNORarMnB3EPjITy//4AtlWI540ZpEPF/HGlTvFK1
-         oEbqYsZ7LbxX+I7Y1MLkSTcvjstijOHZiwmjvI7K7ECf9nLPARBgFvBofzlUQCY2OU64
-         6zRQIQJTGap91v8gfEwU1rVWZ6VM3BMKiqlZOcpbWs6PTy07k2CnFg5UshvnZpXOjq2A
-         zs4QxfKoZx/jmIKyEP8KfEMeQO4F8fQzf/5H4YVcO0378jF4Bn89y6vBcQ10DAtS0RYm
-         2BhA==
-X-Forwarded-Encrypted: i=1; AJvYcCXKXmAqsvL3xNtgyEZSUs2rX4hZyStdIIgNl+ZFNnKUlj+6s/LOpwht/HpH89KqEOW2dfg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGMgOKFQ+6A21bhxEUEn1kNwUeFaNSMExPM3vWOM9GtecOBsr9
-	NwST+UnaJndUv6c6qQn+sFvx4A+ATO2UfWubGHLOTBsfp0vSyhuTR7r3ZzG4JdGro77/A/V0kH4
-	NiqeFa6BWtI3jV3wHngkN0lkgkzSlw1jS7Da/lqczoaozrCepB6QWrQ==
-X-Gm-Gg: ATEYQzxFFJJ8a7hCK4dt3+dSS7I+7/8Zf0j31oYqaiIcyLdwgOu8+k2sPPJ5ol8Wh7R
-	W3Wg7blrV6oNZD8n4n7NFFOPRiEcLKj1ngxDzEkdpB3KTuW+cQSoDpb1lj7w50em7UMb1wCzADi
-	iYTlnRefLO0LeyMcKU7q+duq6sKPiDiyK86i8XKO+SexctfIiB+vHPqRcWmhvREYSpReq5AaDVo
-	d1me3FIdIlv1KKQXcMZYBDg2df4ib1wpgPFKbnj7lhBjHQLoFB2NDqwl7ny5BCBZhw3C3H8gJW0
-	ysEFlbWq2dhrieerEmfGhcZKvSR1BDoUO28lNJ3ZbJwLLBEA1Gl6cNFnP3duh77tmEnsdqIEGmY
-	MV5us11IuQREljXLZjRNRe1PX1kaAGPKWcYYFHlWH/D1SKg==
-X-Received: by 2002:a05:600c:4f8b:b0:483:498f:7953 with SMTP id 5b1f17b1804b1-483c9c21525mr326042815e9.28.1772571182892;
-        Tue, 03 Mar 2026 12:53:02 -0800 (PST)
-X-Received: by 2002:a05:600c:4f8b:b0:483:498f:7953 with SMTP id 5b1f17b1804b1-483c9c21525mr326042375e9.28.1772571182293;
-        Tue, 03 Mar 2026 12:53:02 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-485188a20c4sm2138835e9.15.2026.03.03.12.53.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 12:53:01 -0800 (PST)
-Date: Tue, 3 Mar 2026 15:52:58 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Alexander Graf <graf@amazon.com>
-Cc: Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, kvm@vger.kernel.org, eperezma@redhat.com,
-	Jason Wang <jasowang@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, nh-open-source@amazon.com
-Subject: Re: [PATCH] vsock: Enable H2G override
-Message-ID: <20260303155040-mutt-send-email-mst@kernel.org>
-References: <20260302104138.77555-1-graf@amazon.com>
- <aaVrsXMmULivV4Se@sgarzare-redhat>
- <aaV80wWlpjEtYCQJ@sgarzare-redhat>
- <17d63837-6028-475a-90df-6966329a0fc2@amazon.com>
- <aaW2FgoaXIJEymyR@sgarzare-redhat>
- <27dcad4e-d658-4b6b-93b2-44c64fcbeb11@amazon.com>
- <aaaqLbRNmoRHNTkh@sgarzare-redhat>
- <CAOuBmuaQwxKDJoirwtRwEP=690JcRX3Efk6z=udiOHsGr8u6ag@mail.gmail.com>
- <cc4093e8-31c8-4a14-80f9-034852cf54f7@amazon.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1772571953; x=1804107953;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=xSbybZUSlysUSHT/3Zoqg8wWSZ0OyPjl8uxepV0vRFk=;
+  b=IHz/bVEMc2ZUTfNVdR8T1z+l69kxMrtd4vR6gLri4lNu9KLP+ApxY25w
+   BIUfjRcMpd9VLhGOGrvRfHFV5mrd5QNlvoN65RkXCvIMbY72tcOrNv1vY
+   +yy3NPuqMMGMKtXh590+C/AttM4SItOFrwhHh6BzBkEveuiSz+uYZnNvY
+   kx4OyGx4uxmlbdN7m6TZoPmyZ7w5f6muLALyn7h1xlpNtT1xIPe2Aquqz
+   B6qsL5lVkmGIyjeWhuUwHYuaOzRXD2Px3FTIR5dLXytGxINPCjKZD0LGb
+   JUv2sudjduDFMosoRnRWz1zmSHz5abkGO3atIK6b8Dv3FQUMk0VzS3ftI
+   A==;
+X-CSE-ConnectionGUID: f4/R8bIuT3CV3Iy8xZkJqQ==
+X-CSE-MsgGUID: qKzmmgJcQrSyEsgYO9rftA==
+X-IronPort-AV: E=Sophos;i="6.21,322,1763424000"; 
+   d="scan'208";a="14239868"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2026 21:05:50 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.178:7726]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.61.162:2525] with esmtp (Farcaster)
+ id f77dbcf8-6c44-4c35-925d-643b3f86c8e1; Tue, 3 Mar 2026 21:05:50 +0000 (UTC)
+X-Farcaster-Flow-ID: f77dbcf8-6c44-4c35-925d-643b3f86c8e1
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Tue, 3 Mar 2026 21:05:50 +0000
+Received: from [0.0.0.0] (172.19.99.218) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Tue, 3 Mar 2026
+ 21:05:47 +0000
+Message-ID: <737f2d0a-bc82-4510-9804-10146e8d4546@amazon.com>
+Date: Tue, 3 Mar 2026 22:05:44 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cc4093e8-31c8-4a14-80f9-034852cf54f7@amazon.com>
-X-Rspamd-Queue-Id: 2ED0B1F7029
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] vsock: Enable H2G override
+To: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Bryan Tan <bryan-bt.tan@broadcom.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, "Broadcom
+ internal kernel review list" <bcm-kernel-feedback-list@broadcom.com>,
+	<virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <kvm@vger.kernel.org>, <eperezma@redhat.com>, Jason
+ Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+	<nh-open-source@amazon.com>
+References: <20260302104138.77555-1-graf@amazon.com>
+ <aaVrsXMmULivV4Se@sgarzare-redhat> <aaV80wWlpjEtYCQJ@sgarzare-redhat>
+ <17d63837-6028-475a-90df-6966329a0fc2@amazon.com>
+ <aaW2FgoaXIJEymyR@sgarzare-redhat>
+ <27dcad4e-d658-4b6b-93b2-44c64fcbeb11@amazon.com>
+ <aaaqLbRNmoRHNTkh@sgarzare-redhat>
+ <CAOuBmuaQwxKDJoirwtRwEP=690JcRX3Efk6z=udiOHsGr8u6ag@mail.gmail.com>
+ <cc4093e8-31c8-4a14-80f9-034852cf54f7@amazon.com>
+ <20260303155040-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Alexander Graf <graf@amazon.com>
+In-Reply-To: <20260303155040-mutt-send-email-mst@kernel.org>
+X-ClientProxiedBy: EX19D036UWC003.ant.amazon.com (10.13.139.214) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
+X-Rspamd-Queue-Id: A12991F732F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-9.06 / 15.00];
+	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
+	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72601-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-72602-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[amazon.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,kvm@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_NEQ_ENVFROM(0.00)[graf@amazon.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[kvm];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 09:47:26PM +0100, Alexander Graf wrote:
-> 
-> On 03.03.26 15:17, Bryan Tan wrote:
-> > On Tue, Mar 3, 2026 at 9:49 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > > On Mon, Mar 02, 2026 at 08:04:22PM +0100, Alexander Graf wrote:
-> > > > On 02.03.26 17:25, Stefano Garzarella wrote:
-> > > > > On Mon, Mar 02, 2026 at 04:48:33PM +0100, Alexander Graf wrote:
-> > > > > > On 02.03.26 13:06, Stefano Garzarella wrote:
-> > > > > > > CCing Bryan, Vishnu, and Broadcom list.
-> > > > > > > 
-> > > > > > > On Mon, Mar 02, 2026 at 12:47:05PM +0100, Stefano Garzarella wrote:
-> > > > > > > > Please target net-next tree for this new feature.
-> > > > > > > > 
-> > > > > > > > On Mon, Mar 02, 2026 at 10:41:38AM +0000, Alexander Graf wrote:
-> > > > > > > > > Vsock maintains a single CID number space which can be used to
-> > > > > > > > > communicate to the host (G2H) or to a child-VM (H2G). The
-> > > > > > > > > current logic
-> > > > > > > > > trivially assumes that G2H is only relevant for CID <= 2
-> > > > > > > > > because these
-> > > > > > > > > target the hypervisor.  However, in environments like Nitro
-> > > > > > > > > Enclaves, an
-> > > > > > > > > instance that hosts vhost_vsock powered VMs may still want
-> > > > > > > > > to communicate
-> > > > > > > > > to Enclaves that are reachable at higher CIDs through
-> > > > > > > > > virtio-vsock-pci.
-> > > > > > > > > 
-> > > > > > > > > That means that for CID > 2, we really want an overlay. By
-> > > > > > > > > default, all
-> > > > > > > > > CIDs are owned by the hypervisor. But if vhost registers a
-> > > > > > > > > CID, it takes
-> > > > > > > > > precedence.  Implement that logic. Vhost already knows which CIDs it
-> > > > > > > > > supports anyway.
-> > > > > > > > > 
-> > > > > > > > > With this logic, I can run a Nitro Enclave as well as a
-> > > > > > > > > nested VM with
-> > > > > > > > > vhost-vsock support in parallel, with the parent instance able to
-> > > > > > > > > communicate to both simultaneously.
-> > > > > > > > I honestly don't understand why VMADDR_FLAG_TO_HOST (added
-> > > > > > > > specifically for Nitro IIRC) isn't enough for this scenario
-> > > > > > > > and we have to add this change.  Can you elaborate a bit more
-> > > > > > > > about the relationship between this change and
-> > > > > > > > VMADDR_FLAG_TO_HOST we added?
-> > > > > > 
-> > > > > > The main problem I have with VMADDR_FLAG_TO_HOST for connect() is
-> > > > > > that it punts the complexity to the user. Instead of a single CID
-> > > > > > address space, you now effectively create 2 spaces: One for
-> > > > > > TO_HOST (needs a flag) and one for TO_GUEST (no flag). But every
-> > > > > > user space tool needs to learn about this flag. That may work for
-> > > > > > super special-case applications. But propagating that all the way
-> > > > > > into socat, iperf, etc etc? It's just creating friction.
-> > > > > Okay, I would like to have this (or part of it) in the commit
-> > > > > message to better explain why we want this change.
-> > > > > 
-> > > > > > IMHO the most natural experience is to have a single CID space,
-> > > > > > potentially manually segmented by launching VMs of one kind within
-> > > > > > a certain range.
-> > > > > I see, but at this point, should the kernel set VMADDR_FLAG_TO_HOST
-> > > > > in the remote address if that path is taken "automagically" ?
-> > > > > 
-> > > > > So in that way the user space can have a way to understand if it's
-> > > > > talking with a nested guest or a sibling guest.
-> > > > > 
-> > > > > 
-> > > > > That said, I'm concerned about the scenario where an application
-> > > > > does not even consider communicating with a sibling VM.
-> > > > 
-> > > > If that's really a realistic concern, then we should add a
-> > > > VMADDR_FLAG_TO_GUEST that the application can set. Default behavior of
-> > > > an application that provides no flags is "route to whatever you can
-> > > > find": If vhost is loaded, it routes to vhost. If a vsock backend
-> > > mmm, we have always documented this simple behavior:
-> > > - CID = 2 talks to the host
-> > > - CID >= 3 talks to the guest
-> > > 
-> > > Now we are changing this by adding fallback. I don't think we should
-> > > change the default behavior, but rather provide new ways to enable this
-> > > new behavior.
-> > > 
-> > > I find it strange that an application running on Linux 7.0 has a default
-> > > behavior where using CID=42 always talks to a nested VM, but starting
-> > > with Linux 7.1, it also starts talking to a sibling VM.
-> > > 
-> > > > driver is loaded, it routes there. But the application has no say in
-> > > > where it goes: It's purely a system configuration thing.
-> > > This is true for complex things like IP, but for VSOCK we have always
-> > > wanted to keep the default behavior very simple (as written above).
-> > > Everything else must be explicitly enabled IMHO.
-> > > 
-> > > > 
-> > > > > Until now, it knew that by not setting that flag, it could only talk
-> > > > > to nested VMs, so if there was no VM with that CID, the connection
-> > > > > simply failed. Whereas from this patch onwards, if the device in the
-> > > > > host supports sibling VMs and there is a VM with that CID, the
-> > > > > application finds itself talking to a sibling VM instead of a nested
-> > > > > one, without having any idea.
-> > > > 
-> > > > I'd say an application that attempts to talk to a CID that it does now
-> > > > know whether it's vhost routed or not is running into "undefined"
-> > > > territory. If you rmmod the vhost driver, it would also talk to the
-> > > > hypervisor provided vsock.
-> > > Oh, I missed that. And I also fixed that behaviour with commit
-> > > 65b422d9b61b ("vsock: forward all packets to the host when no H2G is
-> > > registered") after I implemented the multi-transport support.
-> > > 
-> > > mmm, this could change my position ;-) (although, to be honest, I don't
-> > > understand why it was like that in the first place, but that's how it is
-> > > now).
-> > > 
-> > > Please document also this in the new commit message, is a good point.
-> > > Although when H2G is loaded, we behave differently. However, it is true
-> > > that sysctl helps us standardize this behavior.
-> > > 
-> > > I don't know whether to see it as a regression or not.
-> > > 
-> > > > 
-> > > > > Should we make this feature opt-in in some way, such as sockopt or
-> > > > > sysctl? (I understand that there is the previous problem, but
-> > > > > honestly, it seems like a significant change to the behavior of
-> > > > > AF_VSOCK).
-> > > > 
-> > > > We can create a sysctl to enable behavior with default=on. But I'm
-> > > > against making the cumbersome does-not-work-out-of-the-box experience
-> > > > the default. Will include it in v2.
-> > > The opposite point of view is that we would not want to have different
-> > > default behavior between 7.0 and 7.1 when H2G is loaded.
-> >  From a VMCI perspective, we only allow communication from guest to
-> > host CIDs 0 and 2. With has_remote_cid implemented for VMCI, we end
-> > up attempting guest to guest communication. As mentioned this does
-> > already happen if there isn't an H2G transport registered, so we
-> > should be handling this anyways. But I'm not too fond of the change
-> > in behaviour for when H2G is present, so in the very least I'd
-> > prefer if has_remote_cid is not implemented for VMCI. Or perhaps
-> > if there was a way for G2H transport to explicitly note that it
-> > supports CIDs that are greater than 2?  With this, it would be
-> > easier to see this patch as preserving the default behaviour for
-> > some transports and fixing a bug for others.
-> 
-> 
-> I understand what you want, but beware that it's actually a change in
-> behavior. Today, whether Linux will send vsock connects to VMCI depends on
-> whether the vhost kernel module is loaded: If it's loaded, you don't see the
-> connect attempt. If it's not loaded, the connect will come through to VMCI.
-> 
-> I agree that it makes sense to limit VMCI to only ever see connects to <= 2
-> consistently. But as I said above, it's actually a change in behavior.
-> 
-> 
-> Alex
-> 
-
-I think it was unintentional, but if you really think people want a
-special module that changes kernel's behaviour on load, we can certainly
-do that. But any hack like this will not be namespace safe.
-
-
-> 
-> 
-> Amazon Web Services Development Center Germany GmbH
-> Tamara-Danz-Str. 13
-> 10243 Berlin
-> Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
-> Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-> Sitz: Berlin
-> Ust-ID: DE 365 538 597
+Ck9uIDAzLjAzLjI2IDIxOjUyLCBNaWNoYWVsIFMuIFRzaXJraW4gd3JvdGU6Cj4gT24gVHVlLCBN
+YXIgMDMsIDIwMjYgYXQgMDk6NDc6MjZQTSArMDEwMCwgQWxleGFuZGVyIEdyYWYgd3JvdGU6Cj4+
+IE9uIDAzLjAzLjI2IDE1OjE3LCBCcnlhbiBUYW4gd3JvdGU6Cj4+PiBPbiBUdWUsIE1hciAzLCAy
+MDI2IGF0IDk6NDnigK9BTSBTdGVmYW5vIEdhcnphcmVsbGEgPHNnYXJ6YXJlQHJlZGhhdC5jb20+
+IHdyb3RlOgo+Pj4+IE9uIE1vbiwgTWFyIDAyLCAyMDI2IGF0IDA4OjA0OjIyUE0gKzAxMDAsIEFs
+ZXhhbmRlciBHcmFmIHdyb3RlOgo+Pj4+PiBPbiAwMi4wMy4yNiAxNzoyNSwgU3RlZmFubyBHYXJ6
+YXJlbGxhIHdyb3RlOgo+Pj4+Pj4gT24gTW9uLCBNYXIgMDIsIDIwMjYgYXQgMDQ6NDg6MzNQTSAr
+MDEwMCwgQWxleGFuZGVyIEdyYWYgd3JvdGU6Cj4+Pj4+Pj4gT24gMDIuMDMuMjYgMTM6MDYsIFN0
+ZWZhbm8gR2FyemFyZWxsYSB3cm90ZToKPj4+Pj4+Pj4gQ0NpbmcgQnJ5YW4sIFZpc2hudSwgYW5k
+IEJyb2FkY29tIGxpc3QuCj4+Pj4+Pj4+Cj4+Pj4+Pj4+IE9uIE1vbiwgTWFyIDAyLCAyMDI2IGF0
+IDEyOjQ3OjA1UE0gKzAxMDAsIFN0ZWZhbm8gR2FyemFyZWxsYSB3cm90ZToKPj4+Pj4+Pj4+IFBs
+ZWFzZSB0YXJnZXQgbmV0LW5leHQgdHJlZSBmb3IgdGhpcyBuZXcgZmVhdHVyZS4KPj4+Pj4+Pj4+
+Cj4+Pj4+Pj4+PiBPbiBNb24sIE1hciAwMiwgMjAyNiBhdCAxMDo0MTozOEFNICswMDAwLCBBbGV4
+YW5kZXIgR3JhZiB3cm90ZToKPj4+Pj4+Pj4+PiBWc29jayBtYWludGFpbnMgYSBzaW5nbGUgQ0lE
+IG51bWJlciBzcGFjZSB3aGljaCBjYW4gYmUgdXNlZCB0bwo+Pj4+Pj4+Pj4+IGNvbW11bmljYXRl
+IHRvIHRoZSBob3N0IChHMkgpIG9yIHRvIGEgY2hpbGQtVk0gKEgyRykuIFRoZQo+Pj4+Pj4+Pj4+
+IGN1cnJlbnQgbG9naWMKPj4+Pj4+Pj4+PiB0cml2aWFsbHkgYXNzdW1lcyB0aGF0IEcySCBpcyBv
+bmx5IHJlbGV2YW50IGZvciBDSUQgPD0gMgo+Pj4+Pj4+Pj4+IGJlY2F1c2UgdGhlc2UKPj4+Pj4+
+Pj4+PiB0YXJnZXQgdGhlIGh5cGVydmlzb3IuICBIb3dldmVyLCBpbiBlbnZpcm9ubWVudHMgbGlr
+ZSBOaXRybwo+Pj4+Pj4+Pj4+IEVuY2xhdmVzLCBhbgo+Pj4+Pj4+Pj4+IGluc3RhbmNlIHRoYXQg
+aG9zdHMgdmhvc3RfdnNvY2sgcG93ZXJlZCBWTXMgbWF5IHN0aWxsIHdhbnQKPj4+Pj4+Pj4+PiB0
+byBjb21tdW5pY2F0ZQo+Pj4+Pj4+Pj4+IHRvIEVuY2xhdmVzIHRoYXQgYXJlIHJlYWNoYWJsZSBh
+dCBoaWdoZXIgQ0lEcyB0aHJvdWdoCj4+Pj4+Pj4+Pj4gdmlydGlvLXZzb2NrLXBjaS4KPj4+Pj4+
+Pj4+Pgo+Pj4+Pj4+Pj4+IFRoYXQgbWVhbnMgdGhhdCBmb3IgQ0lEID4gMiwgd2UgcmVhbGx5IHdh
+bnQgYW4gb3ZlcmxheS4gQnkKPj4+Pj4+Pj4+PiBkZWZhdWx0LCBhbGwKPj4+Pj4+Pj4+PiBDSURz
+IGFyZSBvd25lZCBieSB0aGUgaHlwZXJ2aXNvci4gQnV0IGlmIHZob3N0IHJlZ2lzdGVycyBhCj4+
+Pj4+Pj4+Pj4gQ0lELCBpdCB0YWtlcwo+Pj4+Pj4+Pj4+IHByZWNlZGVuY2UuICBJbXBsZW1lbnQg
+dGhhdCBsb2dpYy4gVmhvc3QgYWxyZWFkeSBrbm93cyB3aGljaCBDSURzIGl0Cj4+Pj4+Pj4+Pj4g
+c3VwcG9ydHMgYW55d2F5Lgo+Pj4+Pj4+Pj4+Cj4+Pj4+Pj4+Pj4gV2l0aCB0aGlzIGxvZ2ljLCBJ
+IGNhbiBydW4gYSBOaXRybyBFbmNsYXZlIGFzIHdlbGwgYXMgYQo+Pj4+Pj4+Pj4+IG5lc3RlZCBW
+TSB3aXRoCj4+Pj4+Pj4+Pj4gdmhvc3QtdnNvY2sgc3VwcG9ydCBpbiBwYXJhbGxlbCwgd2l0aCB0
+aGUgcGFyZW50IGluc3RhbmNlIGFibGUgdG8KPj4+Pj4+Pj4+PiBjb21tdW5pY2F0ZSB0byBib3Ro
+IHNpbXVsdGFuZW91c2x5Lgo+Pj4+Pj4+Pj4gSSBob25lc3RseSBkb24ndCB1bmRlcnN0YW5kIHdo
+eSBWTUFERFJfRkxBR19UT19IT1NUIChhZGRlZAo+Pj4+Pj4+Pj4gc3BlY2lmaWNhbGx5IGZvciBO
+aXRybyBJSVJDKSBpc24ndCBlbm91Z2ggZm9yIHRoaXMgc2NlbmFyaW8KPj4+Pj4+Pj4+IGFuZCB3
+ZSBoYXZlIHRvIGFkZCB0aGlzIGNoYW5nZS4gIENhbiB5b3UgZWxhYm9yYXRlIGEgYml0IG1vcmUK
+Pj4+Pj4+Pj4+IGFib3V0IHRoZSByZWxhdGlvbnNoaXAgYmV0d2VlbiB0aGlzIGNoYW5nZSBhbmQK
+Pj4+Pj4+Pj4+IFZNQUREUl9GTEFHX1RPX0hPU1Qgd2UgYWRkZWQ/Cj4+Pj4+Pj4gVGhlIG1haW4g
+cHJvYmxlbSBJIGhhdmUgd2l0aCBWTUFERFJfRkxBR19UT19IT1NUIGZvciBjb25uZWN0KCkgaXMK
+Pj4+Pj4+PiB0aGF0IGl0IHB1bnRzIHRoZSBjb21wbGV4aXR5IHRvIHRoZSB1c2VyLiBJbnN0ZWFk
+IG9mIGEgc2luZ2xlIENJRAo+Pj4+Pj4+IGFkZHJlc3Mgc3BhY2UsIHlvdSBub3cgZWZmZWN0aXZl
+bHkgY3JlYXRlIDIgc3BhY2VzOiBPbmUgZm9yCj4+Pj4+Pj4gVE9fSE9TVCAobmVlZHMgYSBmbGFn
+KSBhbmQgb25lIGZvciBUT19HVUVTVCAobm8gZmxhZykuIEJ1dCBldmVyeQo+Pj4+Pj4+IHVzZXIg
+c3BhY2UgdG9vbCBuZWVkcyB0byBsZWFybiBhYm91dCB0aGlzIGZsYWcuIFRoYXQgbWF5IHdvcmsg
+Zm9yCj4+Pj4+Pj4gc3VwZXIgc3BlY2lhbC1jYXNlIGFwcGxpY2F0aW9ucy4gQnV0IHByb3BhZ2F0
+aW5nIHRoYXQgYWxsIHRoZSB3YXkKPj4+Pj4+PiBpbnRvIHNvY2F0LCBpcGVyZiwgZXRjIGV0Yz8g
+SXQncyBqdXN0IGNyZWF0aW5nIGZyaWN0aW9uLgo+Pj4+Pj4gT2theSwgSSB3b3VsZCBsaWtlIHRv
+IGhhdmUgdGhpcyAob3IgcGFydCBvZiBpdCkgaW4gdGhlIGNvbW1pdAo+Pj4+Pj4gbWVzc2FnZSB0
+byBiZXR0ZXIgZXhwbGFpbiB3aHkgd2Ugd2FudCB0aGlzIGNoYW5nZS4KPj4+Pj4+Cj4+Pj4+Pj4g
+SU1ITyB0aGUgbW9zdCBuYXR1cmFsIGV4cGVyaWVuY2UgaXMgdG8gaGF2ZSBhIHNpbmdsZSBDSUQg
+c3BhY2UsCj4+Pj4+Pj4gcG90ZW50aWFsbHkgbWFudWFsbHkgc2VnbWVudGVkIGJ5IGxhdW5jaGlu
+ZyBWTXMgb2Ygb25lIGtpbmQgd2l0aGluCj4+Pj4+Pj4gYSBjZXJ0YWluIHJhbmdlLgo+Pj4+Pj4g
+SSBzZWUsIGJ1dCBhdCB0aGlzIHBvaW50LCBzaG91bGQgdGhlIGtlcm5lbCBzZXQgVk1BRERSX0ZM
+QUdfVE9fSE9TVAo+Pj4+Pj4gaW4gdGhlIHJlbW90ZSBhZGRyZXNzIGlmIHRoYXQgcGF0aCBpcyB0
+YWtlbiAiYXV0b21hZ2ljYWxseSIgPwo+Pj4+Pj4KPj4+Pj4+IFNvIGluIHRoYXQgd2F5IHRoZSB1
+c2VyIHNwYWNlIGNhbiBoYXZlIGEgd2F5IHRvIHVuZGVyc3RhbmQgaWYgaXQncwo+Pj4+Pj4gdGFs
+a2luZyB3aXRoIGEgbmVzdGVkIGd1ZXN0IG9yIGEgc2libGluZyBndWVzdC4KPj4+Pj4+Cj4+Pj4+
+Pgo+Pj4+Pj4gVGhhdCBzYWlkLCBJJ20gY29uY2VybmVkIGFib3V0IHRoZSBzY2VuYXJpbyB3aGVy
+ZSBhbiBhcHBsaWNhdGlvbgo+Pj4+Pj4gZG9lcyBub3QgZXZlbiBjb25zaWRlciBjb21tdW5pY2F0
+aW5nIHdpdGggYSBzaWJsaW5nIFZNLgo+Pj4+PiBJZiB0aGF0J3MgcmVhbGx5IGEgcmVhbGlzdGlj
+IGNvbmNlcm4sIHRoZW4gd2Ugc2hvdWxkIGFkZCBhCj4+Pj4+IFZNQUREUl9GTEFHX1RPX0dVRVNU
+IHRoYXQgdGhlIGFwcGxpY2F0aW9uIGNhbiBzZXQuIERlZmF1bHQgYmVoYXZpb3Igb2YKPj4+Pj4g
+YW4gYXBwbGljYXRpb24gdGhhdCBwcm92aWRlcyBubyBmbGFncyBpcyAicm91dGUgdG8gd2hhdGV2
+ZXIgeW91IGNhbgo+Pj4+PiBmaW5kIjogSWYgdmhvc3QgaXMgbG9hZGVkLCBpdCByb3V0ZXMgdG8g
+dmhvc3QuIElmIGEgdnNvY2sgYmFja2VuZAo+Pj4+IG1tbSwgd2UgaGF2ZSBhbHdheXMgZG9jdW1l
+bnRlZCB0aGlzIHNpbXBsZSBiZWhhdmlvcjoKPj4+PiAtIENJRCA9IDIgdGFsa3MgdG8gdGhlIGhv
+c3QKPj4+PiAtIENJRCA+PSAzIHRhbGtzIHRvIHRoZSBndWVzdAo+Pj4+Cj4+Pj4gTm93IHdlIGFy
+ZSBjaGFuZ2luZyB0aGlzIGJ5IGFkZGluZyBmYWxsYmFjay4gSSBkb24ndCB0aGluayB3ZSBzaG91
+bGQKPj4+PiBjaGFuZ2UgdGhlIGRlZmF1bHQgYmVoYXZpb3IsIGJ1dCByYXRoZXIgcHJvdmlkZSBu
+ZXcgd2F5cyB0byBlbmFibGUgdGhpcwo+Pj4+IG5ldyBiZWhhdmlvci4KPj4+Pgo+Pj4+IEkgZmlu
+ZCBpdCBzdHJhbmdlIHRoYXQgYW4gYXBwbGljYXRpb24gcnVubmluZyBvbiBMaW51eCA3LjAgaGFz
+IGEgZGVmYXVsdAo+Pj4+IGJlaGF2aW9yIHdoZXJlIHVzaW5nIENJRD00MiBhbHdheXMgdGFsa3Mg
+dG8gYSBuZXN0ZWQgVk0sIGJ1dCBzdGFydGluZwo+Pj4+IHdpdGggTGludXggNy4xLCBpdCBhbHNv
+IHN0YXJ0cyB0YWxraW5nIHRvIGEgc2libGluZyBWTS4KPj4+Pgo+Pj4+PiBkcml2ZXIgaXMgbG9h
+ZGVkLCBpdCByb3V0ZXMgdGhlcmUuIEJ1dCB0aGUgYXBwbGljYXRpb24gaGFzIG5vIHNheSBpbgo+
+Pj4+PiB3aGVyZSBpdCBnb2VzOiBJdCdzIHB1cmVseSBhIHN5c3RlbSBjb25maWd1cmF0aW9uIHRo
+aW5nLgo+Pj4+IFRoaXMgaXMgdHJ1ZSBmb3IgY29tcGxleCB0aGluZ3MgbGlrZSBJUCwgYnV0IGZv
+ciBWU09DSyB3ZSBoYXZlIGFsd2F5cwo+Pj4+IHdhbnRlZCB0byBrZWVwIHRoZSBkZWZhdWx0IGJl
+aGF2aW9yIHZlcnkgc2ltcGxlIChhcyB3cml0dGVuIGFib3ZlKS4KPj4+PiBFdmVyeXRoaW5nIGVs
+c2UgbXVzdCBiZSBleHBsaWNpdGx5IGVuYWJsZWQgSU1ITy4KPj4+Pgo+Pj4+Pj4gVW50aWwgbm93
+LCBpdCBrbmV3IHRoYXQgYnkgbm90IHNldHRpbmcgdGhhdCBmbGFnLCBpdCBjb3VsZCBvbmx5IHRh
+bGsKPj4+Pj4+IHRvIG5lc3RlZCBWTXMsIHNvIGlmIHRoZXJlIHdhcyBubyBWTSB3aXRoIHRoYXQg
+Q0lELCB0aGUgY29ubmVjdGlvbgo+Pj4+Pj4gc2ltcGx5IGZhaWxlZC4gV2hlcmVhcyBmcm9tIHRo
+aXMgcGF0Y2ggb253YXJkcywgaWYgdGhlIGRldmljZSBpbiB0aGUKPj4+Pj4+IGhvc3Qgc3VwcG9y
+dHMgc2libGluZyBWTXMgYW5kIHRoZXJlIGlzIGEgVk0gd2l0aCB0aGF0IENJRCwgdGhlCj4+Pj4+
+PiBhcHBsaWNhdGlvbiBmaW5kcyBpdHNlbGYgdGFsa2luZyB0byBhIHNpYmxpbmcgVk0gaW5zdGVh
+ZCBvZiBhIG5lc3RlZAo+Pj4+Pj4gb25lLCB3aXRob3V0IGhhdmluZyBhbnkgaWRlYS4KPj4+Pj4g
+SSdkIHNheSBhbiBhcHBsaWNhdGlvbiB0aGF0IGF0dGVtcHRzIHRvIHRhbGsgdG8gYSBDSUQgdGhh
+dCBpdCBkb2VzIG5vdwo+Pj4+PiBrbm93IHdoZXRoZXIgaXQncyB2aG9zdCByb3V0ZWQgb3Igbm90
+IGlzIHJ1bm5pbmcgaW50byAidW5kZWZpbmVkIgo+Pj4+PiB0ZXJyaXRvcnkuIElmIHlvdSBybW1v
+ZCB0aGUgdmhvc3QgZHJpdmVyLCBpdCB3b3VsZCBhbHNvIHRhbGsgdG8gdGhlCj4+Pj4+IGh5cGVy
+dmlzb3IgcHJvdmlkZWQgdnNvY2suCj4+Pj4gT2gsIEkgbWlzc2VkIHRoYXQuIEFuZCBJIGFsc28g
+Zml4ZWQgdGhhdCBiZWhhdmlvdXIgd2l0aCBjb21taXQKPj4+PiA2NWI0MjJkOWI2MWIgKCJ2c29j
+azogZm9yd2FyZCBhbGwgcGFja2V0cyB0byB0aGUgaG9zdCB3aGVuIG5vIEgyRyBpcwo+Pj4+IHJl
+Z2lzdGVyZWQiKSBhZnRlciBJIGltcGxlbWVudGVkIHRoZSBtdWx0aS10cmFuc3BvcnQgc3VwcG9y
+dC4KPj4+Pgo+Pj4+IG1tbSwgdGhpcyBjb3VsZCBjaGFuZ2UgbXkgcG9zaXRpb24gOy0pIChhbHRo
+b3VnaCwgdG8gYmUgaG9uZXN0LCBJIGRvbid0Cj4+Pj4gdW5kZXJzdGFuZCB3aHkgaXQgd2FzIGxp
+a2UgdGhhdCBpbiB0aGUgZmlyc3QgcGxhY2UsIGJ1dCB0aGF0J3MgaG93IGl0IGlzCj4+Pj4gbm93
+KS4KPj4+Pgo+Pj4+IFBsZWFzZSBkb2N1bWVudCBhbHNvIHRoaXMgaW4gdGhlIG5ldyBjb21taXQg
+bWVzc2FnZSwgaXMgYSBnb29kIHBvaW50Lgo+Pj4+IEFsdGhvdWdoIHdoZW4gSDJHIGlzIGxvYWRl
+ZCwgd2UgYmVoYXZlIGRpZmZlcmVudGx5LiBIb3dldmVyLCBpdCBpcyB0cnVlCj4+Pj4gdGhhdCBz
+eXNjdGwgaGVscHMgdXMgc3RhbmRhcmRpemUgdGhpcyBiZWhhdmlvci4KPj4+Pgo+Pj4+IEkgZG9u
+J3Qga25vdyB3aGV0aGVyIHRvIHNlZSBpdCBhcyBhIHJlZ3Jlc3Npb24gb3Igbm90Lgo+Pj4+Cj4+
+Pj4+PiBTaG91bGQgd2UgbWFrZSB0aGlzIGZlYXR1cmUgb3B0LWluIGluIHNvbWUgd2F5LCBzdWNo
+IGFzIHNvY2tvcHQgb3IKPj4+Pj4+IHN5c2N0bD8gKEkgdW5kZXJzdGFuZCB0aGF0IHRoZXJlIGlz
+IHRoZSBwcmV2aW91cyBwcm9ibGVtLCBidXQKPj4+Pj4+IGhvbmVzdGx5LCBpdCBzZWVtcyBsaWtl
+IGEgc2lnbmlmaWNhbnQgY2hhbmdlIHRvIHRoZSBiZWhhdmlvciBvZgo+Pj4+Pj4gQUZfVlNPQ0sp
+Lgo+Pj4+PiBXZSBjYW4gY3JlYXRlIGEgc3lzY3RsIHRvIGVuYWJsZSBiZWhhdmlvciB3aXRoIGRl
+ZmF1bHQ9b24uIEJ1dCBJJ20KPj4+Pj4gYWdhaW5zdCBtYWtpbmcgdGhlIGN1bWJlcnNvbWUgZG9l
+cy1ub3Qtd29yay1vdXQtb2YtdGhlLWJveCBleHBlcmllbmNlCj4+Pj4+IHRoZSBkZWZhdWx0LiBX
+aWxsIGluY2x1ZGUgaXQgaW4gdjIuCj4+Pj4gVGhlIG9wcG9zaXRlIHBvaW50IG9mIHZpZXcgaXMg
+dGhhdCB3ZSB3b3VsZCBub3Qgd2FudCB0byBoYXZlIGRpZmZlcmVudAo+Pj4+IGRlZmF1bHQgYmVo
+YXZpb3IgYmV0d2VlbiA3LjAgYW5kIDcuMSB3aGVuIEgyRyBpcyBsb2FkZWQuCj4+PiAgIEZyb20g
+YSBWTUNJIHBlcnNwZWN0aXZlLCB3ZSBvbmx5IGFsbG93IGNvbW11bmljYXRpb24gZnJvbSBndWVz
+dCB0bwo+Pj4gaG9zdCBDSURzIDAgYW5kIDIuIFdpdGggaGFzX3JlbW90ZV9jaWQgaW1wbGVtZW50
+ZWQgZm9yIFZNQ0ksIHdlIGVuZAo+Pj4gdXAgYXR0ZW1wdGluZyBndWVzdCB0byBndWVzdCBjb21t
+dW5pY2F0aW9uLiBBcyBtZW50aW9uZWQgdGhpcyBkb2VzCj4+PiBhbHJlYWR5IGhhcHBlbiBpZiB0
+aGVyZSBpc24ndCBhbiBIMkcgdHJhbnNwb3J0IHJlZ2lzdGVyZWQsIHNvIHdlCj4+PiBzaG91bGQg
+YmUgaGFuZGxpbmcgdGhpcyBhbnl3YXlzLiBCdXQgSSdtIG5vdCB0b28gZm9uZCBvZiB0aGUgY2hh
+bmdlCj4+PiBpbiBiZWhhdmlvdXIgZm9yIHdoZW4gSDJHIGlzIHByZXNlbnQsIHNvIGluIHRoZSB2
+ZXJ5IGxlYXN0IEknZAo+Pj4gcHJlZmVyIGlmIGhhc19yZW1vdGVfY2lkIGlzIG5vdCBpbXBsZW1l
+bnRlZCBmb3IgVk1DSS4gT3IgcGVyaGFwcwo+Pj4gaWYgdGhlcmUgd2FzIGEgd2F5IGZvciBHMkgg
+dHJhbnNwb3J0IHRvIGV4cGxpY2l0bHkgbm90ZSB0aGF0IGl0Cj4+PiBzdXBwb3J0cyBDSURzIHRo
+YXQgYXJlIGdyZWF0ZXIgdGhhbiAyPyAgV2l0aCB0aGlzLCBpdCB3b3VsZCBiZQo+Pj4gZWFzaWVy
+IHRvIHNlZSB0aGlzIHBhdGNoIGFzIHByZXNlcnZpbmcgdGhlIGRlZmF1bHQgYmVoYXZpb3VyIGZv
+cgo+Pj4gc29tZSB0cmFuc3BvcnRzIGFuZCBmaXhpbmcgYSBidWcgZm9yIG90aGVycy4KPj4KPj4g
+SSB1bmRlcnN0YW5kIHdoYXQgeW91IHdhbnQsIGJ1dCBiZXdhcmUgdGhhdCBpdCdzIGFjdHVhbGx5
+IGEgY2hhbmdlIGluCj4+IGJlaGF2aW9yLiBUb2RheSwgd2hldGhlciBMaW51eCB3aWxsIHNlbmQg
+dnNvY2sgY29ubmVjdHMgdG8gVk1DSSBkZXBlbmRzIG9uCj4+IHdoZXRoZXIgdGhlIHZob3N0IGtl
+cm5lbCBtb2R1bGUgaXMgbG9hZGVkOiBJZiBpdCdzIGxvYWRlZCwgeW91IGRvbid0IHNlZSB0aGUK
+Pj4gY29ubmVjdCBhdHRlbXB0LiBJZiBpdCdzIG5vdCBsb2FkZWQsIHRoZSBjb25uZWN0IHdpbGwg
+Y29tZSB0aHJvdWdoIHRvIFZNQ0kuCj4+Cj4+IEkgYWdyZWUgdGhhdCBpdCBtYWtlcyBzZW5zZSB0
+byBsaW1pdCBWTUNJIHRvIG9ubHkgZXZlciBzZWUgY29ubmVjdHMgdG8gPD0gMgo+PiBjb25zaXN0
+ZW50bHkuIEJ1dCBhcyBJIHNhaWQgYWJvdmUsIGl0J3MgYWN0dWFsbHkgYSBjaGFuZ2UgaW4gYmVo
+YXZpb3IuCj4+Cj4+Cj4+IEFsZXgKPj4KPiBJIHRoaW5rIGl0IHdhcyB1bmludGVudGlvbmFsLCBi
+dXQgaWYgeW91IHJlYWxseSB0aGluayBwZW9wbGUgd2FudCBhCj4gc3BlY2lhbCBtb2R1bGUgdGhh
+dCBjaGFuZ2VzIGtlcm5lbCdzIGJlaGF2aW91ciBvbiBsb2FkLCB3ZSBjYW4gY2VydGFpbmx5Cj4g
+ZG8gdGhhdC4gQnV0IGFueSBoYWNrIGxpa2UgdGhpcyB3aWxsIG5vdCBiZSBuYW1lc3BhY2Ugc2Fm
+ZS4KCgpObywgSSB0aGluayBhbnkgYmVoYXZpb3IgdGhhdCBjaGFuZ2VzIGJhc2VkIG9uIHdoZXRo
+ZXIgYSB2aG9zdCBrZXJuZWwgCm1vZHVsZSBpcyBsb2FkZWQgaXMgYnJva2VuIGJ5IGRlc2lnbiA6
+KS4gSSdsbCBtYWtlIGl0IGNvbnNpc3RlbnQgaW4gdjMuIApKdXN0IHdhbnRlZCB0byBtYWtlIHN1
+cmUgdGhhdCB3ZSdyZSBvbiB0aGUgc2FtZSBwYWdlIHRoYXQgaXQncyBub3QgIlZNQ0kgCmlzIG5v
+dCBhZmZlY3RlZCBieSB0aGlzIi4gSXQgYWxzbyBoYXMgdGhlIHNhbWUgaW5jb25zaXN0ZW5jeSB0
+b2RheS4KCgpBbGV4CgoKCgpBbWF6b24gV2ViIFNlcnZpY2VzIERldmVsb3BtZW50IENlbnRlciBH
+ZXJtYW55IEdtYkgKVGFtYXJhLURhbnotU3RyLiAxMwoxMDI0MyBCZXJsaW4KR2VzY2hhZWZ0c2Z1
+ZWhydW5nOiBDaHJpc3RvZiBIZWxsbWlzLCBBbmRyZWFzIFN0aWVnZXIKRWluZ2V0cmFnZW4gYW0g
+QW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDI1Nzc2NCBCClNpdHo6IEJlcmxp
+bgpVc3QtSUQ6IERFIDM2NSA1MzggNTk3Cg==
 
 
