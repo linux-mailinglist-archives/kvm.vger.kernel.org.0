@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-72526-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72528-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cEFjGJ3qpmnjZgAAu9opvQ
-	(envelope-from <kvm+bounces-72526-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 15:05:17 +0100
+	id IJq9D6rqpmnjZgAAu9opvQ
+	(envelope-from <kvm+bounces-72528-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 15:05:30 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6DC41F105A
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 15:05:16 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4EBA1F1071
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 15:05:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 77F15321B978
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 13:55:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1190730A9041
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 13:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA7A436074A;
-	Tue,  3 Mar 2026 13:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA4235773F;
+	Tue,  3 Mar 2026 13:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qGFNIW3Y"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fwzz3XQE"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0BE35773F;
-	Tue,  3 Mar 2026 13:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9A135836C;
+	Tue,  3 Mar 2026 13:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772546050; cv=none; b=hQeAKP5w90mnV5ltK2l1GZwB2jOWOkvgLW3YT0WQSkduIeMycwrQBQc286BJLSBqkKX/IpsM0zl1+rGp4IVbneMb7QI6dc55Anx9t6idD3ykwsGu+jg+D3LSHPgDIoix5M3qE+W91exrxxQ+Q8SbNtO6w1SvIZBr9wmxIGjbhzw=
+	t=1772546050; cv=none; b=Z6HTRZxywtkGPvMWdMB3Q9kF+u6ufReNO2vbdnS0k+Z2E/ZuHuYnzTmDnF3oeukFKJczedplqEyEOLSlkCyrcAdIXuqy8OZEMXm5uIPZr11l5jnPvt79DadWynAcpKHtppVctGGRWZ9CI7eB1NruVP7DoTN47AJNMHDgBWfjG7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772546050; c=relaxed/simple;
-	bh=W3Z5heyTlUTJJYt0yzYC2uotK3sfAELcH31/p+K/ZIw=;
+	bh=YXasIYVoXiApJJEaO4bL2F5lmFJDAz7dcNZF1wv0rQ4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Du14ddo5dbr29t03q0r8PN8lXAgzNsr/VE3fhoXDrp4X9i3IkgsdgIt7UTFgRgIllhIVqdhAEGqQ/3fK4LMn9SrRoDOSLmL1Rp68m6iYTJqlCbaJy5IZUrL9EBHLma3ri/TSc0BGZwBKp2ciyYQdhZJd4gbN6ekZFMeTQzpjebo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qGFNIW3Y; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=OURYF5o3Q0lJ0sZ1xW0mWuGTkFj3R0okW4SPFiGVDKnchGT6luc5YE5xbh7wvjlvLcE7RnuAVCryRPFQKnu13kUdv8l3nPyr4rS450PweOwfPHct2rINgZj7xXfd+53r/hdurde1Q4Pn7OhoHraUNVzORIZNEiDFPnKnIZxXQsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fwzz3XQE; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6237YdNu2139963;
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6231vMl3859950;
 	Tue, 3 Mar 2026 13:54:08 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=xD7RVCTOIaZ4KkqZs
-	X81F5F4s3SlydJ+5TfZG2HgbT8=; b=qGFNIW3Yw6lk9JFYTZMvBImalY4U+Lgfu
-	NZAt7a8EAIQdC7dYopRh6PJXnISd40IQlpddi8lnYytd3yn1agb5DGHj91mww+rl
-	E0/zwemmhODhkpwltNXGvv42Ysk0rmjGaWCcN8Uebu+6QujlL0n4iov425Uvx/dL
-	DUQs3eh9UsfyV3fG7ONWd5XFY1dbMEbmkmw5cbrqh6cbjcaliSpKPByJjUSnh+E5
-	iDA1wsff7duhqj+eDNvTgFFD4wOLsjogMPp9XSci7ll6RcSvxOABx1KVBbbHRjOF
-	djyq0iUNtoIscrnuWMAxbW13hMI9cqYkbEoV+I3O+un4weImwF/tw==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ckssmjy1m-1
+	:mime-version:references:subject:to; s=pp1; bh=AUl41te4x8oHbWKw1
+	OCUL3jblwtI/MdrKjlyRJc7Wfs=; b=fwzz3XQEX/t60iOo4Xb+ApQArS3BrA2aT
+	uHZVkPzzzaZrvHhPvqoP2wTy48dSUuXetmElWBk7ZEM7flb6CxTdNiIb4IgmgLnv
+	vFMMFgDhO6/biY9dUIwsTOGVP1PxS5JN4b6obbzzExUAL4wASx92H/RtcUkzrJKW
+	J6Ct152WUDSNazcpPfLezUDmgrvmd8uLiY4/yk5PhbmIOGscee1SrTLBb0xJtX+p
+	o3zTPSCu8YXVSo5IATzCEzEI4e9fbCnIe7X6u4E2fpRDBdK2/NFPrTnE63oaUBdl
+	+o5gGjW5TxfUXSkqjXYks/RUyrosCaOUU/0t5GU/rvfy7Jo10nQdA==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ckskbtw4y-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 03 Mar 2026 13:54:07 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 623Dhsgd029080;
+	Tue, 03 Mar 2026 13:54:08 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 623AFERU016802;
 	Tue, 3 Mar 2026 13:54:07 GMT
 Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cmaps2p6a-1
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cmbpn2gxn-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 03 Mar 2026 13:54:06 +0000
+	Tue, 03 Mar 2026 13:54:07 +0000
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 623Ds3M826870130
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 623Ds3JH61342142
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Tue, 3 Mar 2026 13:54:03 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 70ADB20043;
+	by IMSVA (Postfix) with ESMTP id 94A7C20040;
 	Tue,  3 Mar 2026 13:54:03 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 51B1F2004D;
+	by IMSVA (Postfix) with ESMTP id 768FA2004B;
 	Tue,  3 Mar 2026 13:54:03 +0000 (GMT)
 Received: from b46lp25.lnxne.boe (unknown [9.87.84.240])
 	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -74,9 +74,9 @@ From: Janosch Frank <frankja@linux.ibm.com>
 To: kvm@vger.kernel.org
 Cc: linux-s390@vger.kernel.org, mjrosato@linux.ibm.com, freimuth@linux.ibm.com,
         imbrenda@linux.ibm.com, borntraeger@linux.ibm.com
-Subject: [PATCH v2 1/2] KVM: s390: Limit adapter indicator access to mapped page
-Date: Tue,  3 Mar 2026 13:46:34 +0000
-Message-ID: <20260303135250.3665-2-frankja@linux.ibm.com>
+Subject: [PATCH v2 2/2] KVM: s390: selftests: Add IRQ routing address offset tests
+Date: Tue,  3 Mar 2026 13:46:35 +0000
+Message-ID: <20260303135250.3665-3-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260303135250.3665-1-frankja@linux.ibm.com>
 References: <20260303135250.3665-1-frankja@linux.ibm.com>
@@ -88,41 +88,41 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzAzMDEwOCBTYWx0ZWRfX99F2jtK/vM79
- f+Maqh/fe2KvpxJ75/DMXUXNjfRa5TmXtwFzxHg2UBzeOOjoKk/nx97Y3Bl2bcnxJ8yEaD/fgnh
- lrKJvPjaaTM1Ukb7/vFQRKZ6gnCNaBh7O3oP+/IHmmeMP1bClmIF7TBMki3MDpb8DnZ8XvUGyJI
- NbnqyNeo7bH0ua96S805rsvQN7cavYqPy7/2emAr3qenHs39HFHNuVUIYMlYooFgzh3yrWIIZek
- ItoIBRgxEMvbR32n7vWQxJYX+TGpvoUvWgp09KeoxzXS9ACUMjM1pqTp0Fa+1+iRCNt93MkxlgR
- RLWK0xXquo+N/eHL5rVo4pcZSn4QsDXT/HhcjTlGZRwvFBYcxAy9hg1dDPl2I6VGIY+gdRypiWY
- Dz8kQi4u0oWjBxUEZyQenT4zRB2RG/zMNNNFpHZ9FA1DelZHdjF1jX8wS2Vzq70YZ2pGJr7ilqe
- OzBwISH8k34TNhTRDjQ==
-X-Proofpoint-ORIG-GUID: ojGW4Wm1-OOlqZxZjaWYJgf2StcoTR3f
-X-Proofpoint-GUID: ojGW4Wm1-OOlqZxZjaWYJgf2StcoTR3f
-X-Authority-Analysis: v=2.4 cv=AobjHe9P c=1 sm=1 tr=0 ts=69a6e7ff cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+X-Proofpoint-ORIG-GUID: hu8jThj64-NmMvihnyO_7Zsnclwxtaso
+X-Authority-Analysis: v=2.4 cv=b66/I9Gx c=1 sm=1 tr=0 ts=69a6e800 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
  a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8 a=jGWXv5dM_gJt9w-Nn-UA:9
+ a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8 a=nmqUFfGTdH_2drHDQF0A:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzAzMDEwOCBTYWx0ZWRfX6bkAz4f4Mxwf
+ 7/4Emo/uEJBNqN4a5/y1iDFjnaVlqW6JUnFQ0IjVhyJ/qW9OpGtZQW0ZUs4PQdA4Rn2DislZowR
+ M43oSk3b0A7k8NF3+Lz0x8PH9288YYJ4pEZndjTXGmFTb8CkKs0aSpsLblDS1P1WytsRmgioD0o
+ WyvnTjpGxgdptNOFolXCZXTcFaMMHHMZ5fBNtab8f6vTxqDzjNqGYu454PVZHXe4rRLJNtMtwWF
+ jRmpsi/22TkozVpkWWMH8aJMbvMko2LtDk67Hcy5tf/UihNu7jpW3bJW/YR9wE/4FQygN/12qs7
+ 4+FKLJ9rGLkU4oYdvdks5I+CNOAkXsD+Rsd1hdzk5/QbAsxY/6oFtNkQRfUTZ86WFGpdRw6Nwfi
+ yHZRZyqP4Gm7+k99od9tIWr/Ex30CqontT5iuKKCPTLuCpNJDCW9WnEMtHFln1bQRwvd4pMWpxm
+ jT2EIvrFo9hI+muJ5CA==
+X-Proofpoint-GUID: hu8jThj64-NmMvihnyO_7Zsnclwxtaso
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-03-02_05,2026-03-03_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 bulkscore=0 impostorscore=0 malwarescore=0
- spamscore=0 clxscore=1015 suspectscore=0 adultscore=0 priorityscore=1501
+ suspectscore=0 lowpriorityscore=0 phishscore=0 clxscore=1015 adultscore=0
+ bulkscore=0 impostorscore=0 malwarescore=0 spamscore=0 priorityscore=1501
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603030108
-X-Rspamd-Queue-Id: B6DC41F105A
+X-Rspamd-Queue-Id: D4EBA1F1071
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72526-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72528-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -132,62 +132,117 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.ibm.com:mid];
 	DKIM_TRACE(0.00)[ibm.com:+];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Action: no action
 
-While we check the address for errors, we don't seem to check the bit
-offsets and since they are 32 and 64 bits a lot of memory can be
-reached indirectly via those offsets.
+This test tries to setup routes which have address + offset
+combinations which cross a page.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Fixes: 84223598778b ("KVM: s390: irq routing for adapter interrupts.")
-Suggested-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- arch/s390/kvm/interrupt.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ tools/testing/selftests/kvm/Makefile.kvm      |  1 +
+ .../testing/selftests/kvm/s390/irq_routing.c  | 75 +++++++++++++++++++
+ 2 files changed, 76 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/s390/irq_routing.c
 
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index 18932a65ca68..1a702e8ef574 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -2724,6 +2724,9 @@ static unsigned long get_ind_bit(__u64 addr, unsigned long bit_nr, bool swap)
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index fdec90e85467..271cbb63af36 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -205,6 +205,7 @@ TEST_GEN_PROGS_s390 += s390/ucontrol_test
+ TEST_GEN_PROGS_s390 += s390/user_operexec
+ TEST_GEN_PROGS_s390 += s390/keyop
+ TEST_GEN_PROGS_s390 += rseq_test
++TEST_GEN_PROGS_s390 += s390/irq_routing
  
- 	bit = bit_nr + (addr % PAGE_SIZE) * 8;
- 
-+	/* kvm_set_routing_entry() should never allow this to happen */
-+	WARN_ON_ONCE(bit > (PAGE_SIZE * BITS_PER_BYTE - 1));
+ TEST_GEN_PROGS_riscv = $(TEST_GEN_PROGS_COMMON)
+ TEST_GEN_PROGS_riscv += riscv/sbi_pmu_test
+diff --git a/tools/testing/selftests/kvm/s390/irq_routing.c b/tools/testing/selftests/kvm/s390/irq_routing.c
+new file mode 100644
+index 000000000000..7819a0af19a8
+--- /dev/null
++++ b/tools/testing/selftests/kvm/s390/irq_routing.c
+@@ -0,0 +1,75 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * IRQ routing offset tests.
++ *
++ * Copyright IBM Corp. 2026
++ *
++ * Authors:
++ *  Janosch Frank <frankja@linux.ibm.com>
++ */
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/ioctl.h>
 +
- 	return swap ? (bit ^ (BITS_PER_LONG - 1)) : bit;
- }
- 
-@@ -2852,6 +2855,7 @@ int kvm_set_routing_entry(struct kvm *kvm,
- 			  struct kvm_kernel_irq_routing_entry *e,
- 			  const struct kvm_irq_routing_entry *ue)
- {
-+	const struct kvm_irq_routing_s390_adapter *adapter;
- 	u64 uaddr_s, uaddr_i;
- 	int idx;
- 
-@@ -2862,6 +2866,14 @@ int kvm_set_routing_entry(struct kvm *kvm,
- 			return -EINVAL;
- 		e->set = set_adapter_int;
- 
-+		adapter = &ue->u.adapter;
-+		if (adapter->summary_addr + (adapter->summary_offset / 8) >=
-+		    (adapter->summary_addr & PAGE_MASK) + PAGE_SIZE)
-+			return -EINVAL;
-+		if (adapter->ind_addr + (adapter->ind_offset / 8) >=
-+		    (adapter->ind_addr & PAGE_MASK) + PAGE_SIZE)
-+			return -EINVAL;
++#include "test_util.h"
++#include "kvm_util.h"
++#include "kselftest.h"
++#include "ucall_common.h"
 +
- 		idx = srcu_read_lock(&kvm->srcu);
- 		uaddr_s = gpa_to_hva(kvm, ue->u.adapter.summary_addr);
- 		uaddr_i = gpa_to_hva(kvm, ue->u.adapter.ind_addr);
++extern char guest_code[];
++asm("guest_code:\n"
++    "diag %r0,%r0,0\n"
++    "j .\n");
++
++static void test(void)
++{
++	struct kvm_irq_routing *routing;
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	vm_paddr_t mem;
++	int ret;
++
++	struct kvm_irq_routing_entry ue = {
++		.type = KVM_IRQ_ROUTING_S390_ADAPTER,
++		.gsi = 1,
++	};
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++	mem = vm_phy_pages_alloc(vm, 2, 4096 * 42, 0);
++
++	routing = kvm_gsi_routing_create();
++	routing->nr = 1;
++	routing->entries[0] = ue;
++	routing->entries[0].u.adapter.summary_addr = (uintptr_t)mem;
++	routing->entries[0].u.adapter.ind_addr = (uintptr_t)mem;
++
++	routing->entries[0].u.adapter.summary_offset = 4096 * 8;
++	ret = __vm_ioctl(vm, KVM_SET_GSI_ROUTING, routing);
++	ksft_test_result(ret == -1 && errno == EINVAL, "summary offset outside of page\n");
++
++	routing->entries[0].u.adapter.summary_offset -= 4;
++	ret = __vm_ioctl(vm, KVM_SET_GSI_ROUTING, routing);
++	ksft_test_result(ret == 0, "summary offset inside of page\n");
++
++	routing->entries[0].u.adapter.ind_offset = 4096 * 8;
++	ret = __vm_ioctl(vm, KVM_SET_GSI_ROUTING, routing);
++	ksft_test_result(ret == -1 && errno == EINVAL, "ind offset outside of page\n");
++
++	routing->entries[0].u.adapter.ind_offset -= 4;
++	ret = __vm_ioctl(vm, KVM_SET_GSI_ROUTING, routing);
++	ksft_test_result(ret == 0, "ind offset inside of page\n");
++
++	kvm_vm_free(vm);
++}
++
++int main(int argc, char *argv[])
++{
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_IRQ_ROUTING));
++
++	ksft_print_header();
++	ksft_set_plan(4);
++	test();
++
++	ksft_finished();	/* Print results and exit() accordingly */
++}
 -- 
 2.51.0
 
