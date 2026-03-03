@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-72537-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72538-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ODh0AgX6pmk7bgAAu9opvQ
-	(envelope-from <kvm+bounces-72537-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:11:01 +0100
+	id cAAGEcr6pmk7bgAAu9opvQ
+	(envelope-from <kvm+bounces-72538-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:14:18 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AB5F1F21E5
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:10:59 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4746E1F231A
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:14:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2D0CB303D4E7
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 15:04:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 93C7E300C576
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 15:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA7B3CCA06;
-	Tue,  3 Mar 2026 15:04:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9012E3EBF2F;
+	Tue,  3 Mar 2026 15:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JY7AHwKK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eUQTaImb"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED803570DF;
-	Tue,  3 Mar 2026 15:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B169B48033C;
+	Tue,  3 Mar 2026 15:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772550257; cv=none; b=Wqd2xhCZm4wznfQtljL7tn6c0iV2ejS+n5IGK7q6EWoc81bH4rmYgEcsYz1S4fE9/IsjJUShxrpojE1ZCKVJA8Tce/8b4L3ttuKyGhB0+KU+G2W51yYD65Km/ZStjrLW1wFH0qdPMkjwmFEUcNcDMe+Z1yzbxATWviNt8VMhmbw=
+	t=1772550616; cv=none; b=e4Rtb5KLdRtrfwNkQ0mN05MAbQRzDU6bbqvJXkgtPTFoNdhHe67y2Q+Sk3ElfEjFrnwEunT5zassGrDH2wEZhKlGOLuHw08HCYNxJfHcD00g0Aet9XodtoWJCunMx9Af75ezSIvM3AMuGIOJpDnkDqAuZqF/akzggG4x4tQlIZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772550257; c=relaxed/simple;
-	bh=m5QyilMwj8gQLJgwK+1eTtAI5v3WzW1SIDnqSv0lWc4=;
+	s=arc-20240116; t=1772550616; c=relaxed/simple;
+	bh=3VlyXdT6hK30XSxmZHpFyQcWut/XDuGGaq7EOvOoK3Q=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mehVguGo8//p0LPeUFwD/mgV7Ro7OG6na3GtMeueXXveojj/CmeFiG0J4aZwPJ5PjDNe4+jnCAKScKs6VSrQlVYiPjDq9c2afgng/kKNmSzz6EPPMruiOpO8jfSUlplJn0XUhAelYQP5WhbXmtqPChZ1gLYlN0qWKkTpmaarzP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JY7AHwKK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC474C116C6;
-	Tue,  3 Mar 2026 15:04:16 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ac3LmZMaZ+8Z1GJV4xeR/bDsOHKgGGpk+l1Pw3ZZ4D0r8EIlGPvpZZbCY1LChBlsPcbyg3e0m+kuU121Lwt08FDEt/6Kb1ETZq/oEOlbgStUOiA02BuljIBUWepjyJHHDUWF11M5RFeZfc8NGNE07ZUz4Kb2Ufdo0WvaNWWPcis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eUQTaImb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EC89C116C6;
+	Tue,  3 Mar 2026 15:10:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772550256;
-	bh=m5QyilMwj8gQLJgwK+1eTtAI5v3WzW1SIDnqSv0lWc4=;
+	s=k20201202; t=1772550616;
+	bh=3VlyXdT6hK30XSxmZHpFyQcWut/XDuGGaq7EOvOoK3Q=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JY7AHwKKWWoNMnsJBmoTEOcCXh7P6ac/v9qh7g/3jqVZTUVneLYzy+LzMxJ01WVe9
-	 uf93+JLaIdZb1IviCzcEUk6Q86KyYmJ/j8YqIl9EDl1dh1yAb5Pl6O365/7oAH6pjl
-	 h9G/tOK2L2ywgSiVtPK4CsBvqRuE8Rp2LDrACHa3mdRsW7nX72kGSLsbSxPQoKU4m5
-	 RLm4IO7O1ynirIcR6Eo+UWy2hLyqwUXh5wNQht7QatIjlkui/oe4VVBenIC58HUY4j
-	 /IpWwT3DuxPlc+tEcpzFZI8eMcLq6YzxuCgmRn5UBX1rP091gzuqh8Rf8dHUpEv8g3
-	 Q6W/x+BNz7TnQ==
+	b=eUQTaImb5PmSB7++pfagwudV4geeVhlBL9Y2FMNQy7gy2/7G+u129iqIQdX+GqIvU
+	 /5slymtI08DJhWQ/PXl8DEQO7XgJBUIFwj4EUgf2Cvv3rYWhA+oJXAXXRRxRQ5LcI/
+	 wudi9niRsq9HIb3EW9r4icqrlUgjGjUWBXv7dJNjpR0m2TYktCIMaFvfpo7QLHo4NM
+	 2ohcwOR6bAyAdc+cwQHYEXSMEugC4YkdyhQ1OPJm7UkhqM21wGDehNM19d0B30va32
+	 9mqyc1EtoFd9lOXOxPCyBWU4lhBz6M1fbohyP/T+1rJJefvBLhBNO6Xwz2GlHgeppa
+	 +I0vV42fT3HKg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vxRIE-0000000FfuH-3BHU;
-	Tue, 03 Mar 2026 15:04:14 +0000
-Date: Tue, 03 Mar 2026 15:04:14 +0000
-Message-ID: <86cy1l7y4x.wl-maz@kernel.org>
+	id 1vxRO2-0000000FgAa-1gyL;
+	Tue, 03 Mar 2026 15:10:14 +0000
+Date: Tue, 03 Mar 2026 15:10:13 +0000
+Message-ID: <86bjh57xuy.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 Cc: "linux-arm-kernel@lists.infradead.org"
@@ -71,10 +71,10 @@ Cc: "linux-arm-kernel@lists.infradead.org"
 	Timothy Hayes <Timothy.Hayes@arm.com>,
 	"jonathan.cameron@huawei.com"
 	<jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v5 07/36] KVM: arm64: gic: Introduce interrupt type helpers
-In-Reply-To: <20260226155515.1164292-8-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v5 09/36] KVM: arm64: gic-v5: Detect implemented PPIs on boot
+In-Reply-To: <20260226155515.1164292-10-sascha.bischoff@arm.com>
 References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
-	<20260226155515.1164292-8-sascha.bischoff@arm.com>
+	<20260226155515.1164292-10-sascha.bischoff@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -89,13 +89,13 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Rspamd-Queue-Id: 0AB5F1F21E5
+X-Rspamd-Queue-Id: 4746E1F231A
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -104,7 +104,7 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72537-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72538-lists,kvm=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -112,59 +112,132 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,arm.com:email,huawei.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:email,huawei.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Thu, 26 Feb 2026 15:57:14 +0000,
+On Thu, 26 Feb 2026 15:57:45 +0000,
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> GICv5 has moved from using interrupt ranges for different interrupt
-> types to using some of the upper bits of the interrupt ID to denote
-> the interrupt type. This is not compatible with older GICs (which rely
-> on ranges of interrupts to determine the type), and hence a set of
-> helpers is introduced. These helpers take a struct kvm*, and use the
-> vgic model to determine how to interpret the interrupt ID.
+> As part of booting the system and initialising KVM, create and
+> populate a mask of the implemented PPIs. This mask allows future PPI
+> operations (such as save/restore or state, or syncing back into the
+> shadow state) to only consider PPIs that are actually implemented on
+> the host.
 > 
-> Helpers are introduced for PPIs, SPIs, and LPIs. Additionally, a
-> helper is introduced to determine if an interrupt is private - SGIs
-> and PPIs for older GICs, and PPIs only for GICv5.
+> The set of implemented virtual PPIs matches the set of implemented
+> physical PPIs for a GICv5 host. Therefore, this mask represents all
+> PPIs that could ever by used by a GICv5-based guest on a specific
+> host.
 > 
-> The helpers are plumbed into the core vgic code, as well as the Arch
-> Timer and PMU code.
-> 
-> There should be no functional changes as part of this change.
+> Only architected PPIs are currently supported in KVM with
+> GICv5. Moreover, as KVM only supports a subset of all possible PPIS
+> (Timers, PMU, GICv5 SW_PPI) the PPI mask only includes these PPIs, if
+> present. The timers are always assumed to be present; if we have KVM
+> we have EL2, which means that we have the EL1 & EL2 Timer PPIs. If we
+> have a PMU (v3), then the PMUIRQ is present. The GICv5 SW_PPI is
+> always assumed to be present.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 > Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 > ---
->  arch/arm64/kvm/arch_timer.c           |  2 +-
->  arch/arm64/kvm/pmu-emul.c             |  7 +-
->  arch/arm64/kvm/vgic/vgic-kvm-device.c |  2 +-
->  arch/arm64/kvm/vgic/vgic.c            | 14 ++--
->  include/kvm/arm_vgic.h                | 92 +++++++++++++++++++++++++--
->  5 files changed, 100 insertions(+), 17 deletions(-)
->
+>  arch/arm64/kvm/vgic/vgic-v5.c      | 30 ++++++++++++++++++++++++++++++
+>  include/kvm/arm_vgic.h             |  5 +++++
+>  include/linux/irqchip/arm-gic-v5.h | 10 ++++++++++
+>  3 files changed, 45 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 9d9aa5774e634..2c51b9ba4f118 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -8,6 +8,34 @@
+>  
+>  #include "vgic.h"
+>  
+> +static struct vgic_v5_ppi_caps ppi_caps;
+> +
+> +/*
+> + * Not all PPIs are guaranteed to be implemented for GICv5. Deterermine which
+> + * ones are, and generate a mask.
+> + */
+> +static void vgic_v5_get_implemented_ppis(void)
+> +{
+> +	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF))
+> +		return;
+> +
+> +	/*
+> +	 * If we have KVM, we have EL2, which means that we have support for the
+> +	 * EL1 and EL2 P & V timers.
 
-[...]
+nit: please spell out physical and virtual.
 
+> +	 */
+> +	ppi_caps.impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_CNTHP);
+> +	ppi_caps.impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_CNTV);
+> +	ppi_caps.impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_CNTHV);
+> +	ppi_caps.impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_CNTP);
+> +
+> +	/* The SW_PPI should be available */
+> +	ppi_caps.impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_SW_PPI);
+> +
+> +	/* The PMUIRQ is available if we have the PMU */
+> +	if (system_supports_pmuv3())
+> +		ppi_caps.impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_PMUIRQ);
+> +}
+> +
+>  /*
+>   * Probe for a vGICv5 compatible interrupt controller, returning 0 on success.
+>   * Currently only supports GICv3-based VMs on a GICv5 host, and hence only
+> @@ -18,6 +46,8 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
+>  	u64 ich_vtr_el2;
+>  	int ret;
+>  
+> +	vgic_v5_get_implemented_ppis();
+> +
+>  	if (!cpus_have_final_cap(ARM64_HAS_GICV5_LEGACY))
+>  		return -ENODEV;
+>  
 > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index f2eafc65bbf4c..f12b47e589abc 100644
+> index f12b47e589abc..9e4798333b46c 100644
 > --- a/include/kvm/arm_vgic.h
 > +++ b/include/kvm/arm_vgic.h
+> @@ -410,6 +410,11 @@ struct vgic_v3_cpu_if {
+>  	unsigned int used_lrs;
+>  };
+>  
+> +/* What PPI capabilities does a GICv5 host have */
+> +struct vgic_v5_ppi_caps {
+> +	u64	impl_ppi_mask[2];
+> +};
+> +
+>  struct vgic_cpu {
+>  	/* CPU vif control registers for world switch */
+>  	union {
+> diff --git a/include/linux/irqchip/arm-gic-v5.h b/include/linux/irqchip/arm-gic-v5.h
+> index b78488df6c989..1dc05afcab53e 100644
+> --- a/include/linux/irqchip/arm-gic-v5.h
+> +++ b/include/linux/irqchip/arm-gic-v5.h
+> @@ -24,6 +24,16 @@
+>  #define GICV5_HWIRQ_TYPE_LPI		UL(0x2)
+>  #define GICV5_HWIRQ_TYPE_SPI		UL(0x3)
+>  
+> +/*
+> + * Architected PPIs
+> + */
+> +#define GICV5_ARCH_PPI_SW_PPI		0x3
+> +#define GICV5_ARCH_PPI_PMUIRQ		0x17
+> +#define GICV5_ARCH_PPI_CNTHP		0x1a
+> +#define GICV5_ARCH_PPI_CNTV		0x1b
+> +#define GICV5_ARCH_PPI_CNTHV		0x1c
+> +#define GICV5_ARCH_PPI_CNTP		0x1e
 
-[...]
-
-> +#define vgic_is_v5(k) ((k)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
-
-vgic_is_v3() is defined in arch/arm64/kvm/vgic/vgic.h, as a function
-rather than a macro. These things should all live together, and
-preferably have similar implementation styles.
+Could you dump all the architected PPI numbers from R_XDVCM here, even
+if they are not directly relevant to KVM? I'm pretty sure someone will
+find them useful at some point...
 
 Thanks,
 
