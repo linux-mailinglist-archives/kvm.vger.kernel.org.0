@@ -1,92 +1,80 @@
-Return-Path: <kvm+bounces-72536-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72537-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oKP9LITzpmkzawAAu9opvQ
-	(envelope-from <kvm+bounces-72536-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 15:43:16 +0100
+	id ODh0AgX6pmk7bgAAu9opvQ
+	(envelope-from <kvm+bounces-72537-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:11:01 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C93CF1F1B76
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 15:43:15 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AB5F1F21E5
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:10:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DDC3E317D213
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 14:37:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2D0CB303D4E7
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 15:04:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56C23DEAD8;
-	Tue,  3 Mar 2026 14:37:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA7B3CCA06;
+	Tue,  3 Mar 2026 15:04:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RhIGlnEx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JY7AHwKK"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F933C278E;
-	Tue,  3 Mar 2026 14:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED803570DF;
+	Tue,  3 Mar 2026 15:04:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772548623; cv=none; b=YDr1Hvj87EtSZV1mlE/cBsIYKoWZsKbLt8s2nBEkOMKxVhdTn0TkO6sPkfQLL6EM63ZguqXBUzIP3goKm1NKW/W/dBIFGkONbiO9h5vyc0OBM4GzDXC6M7clq0rfVwj2lE8U6uTPg7PqIn7ecT+nL2RLCmsTtHmv0NvNC7pkXa0=
+	t=1772550257; cv=none; b=Wqd2xhCZm4wznfQtljL7tn6c0iV2ejS+n5IGK7q6EWoc81bH4rmYgEcsYz1S4fE9/IsjJUShxrpojE1ZCKVJA8Tce/8b4L3ttuKyGhB0+KU+G2W51yYD65Km/ZStjrLW1wFH0qdPMkjwmFEUcNcDMe+Z1yzbxATWviNt8VMhmbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772548623; c=relaxed/simple;
-	bh=m/46LDof3LqadCUxR8EzTO5Nf7CZ0A3+ar1RNvzBB9o=;
+	s=arc-20240116; t=1772550257; c=relaxed/simple;
+	bh=m5QyilMwj8gQLJgwK+1eTtAI5v3WzW1SIDnqSv0lWc4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VcvGeWaVlRgyrffGl9iQRSfkLiYPbsEjCUn6i77jZWqU8qyxc7Dy9JNgUMbo1UvbzLB0xSxcj7VA9s7uvmVOHqiB6XBBrxK9x+2m0OH+RKX9nIl3LnuHt7U4sbCLPxYc0qISt7DfsFlwOBxqlWEzi7UFN2mlH42MiAFNjbtPBL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RhIGlnEx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62312C116C6;
-	Tue,  3 Mar 2026 14:37:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mehVguGo8//p0LPeUFwD/mgV7Ro7OG6na3GtMeueXXveojj/CmeFiG0J4aZwPJ5PjDNe4+jnCAKScKs6VSrQlVYiPjDq9c2afgng/kKNmSzz6EPPMruiOpO8jfSUlplJn0XUhAelYQP5WhbXmtqPChZ1gLYlN0qWKkTpmaarzP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JY7AHwKK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC474C116C6;
+	Tue,  3 Mar 2026 15:04:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772548623;
-	bh=m/46LDof3LqadCUxR8EzTO5Nf7CZ0A3+ar1RNvzBB9o=;
+	s=k20201202; t=1772550256;
+	bh=m5QyilMwj8gQLJgwK+1eTtAI5v3WzW1SIDnqSv0lWc4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RhIGlnExbvHqjrKvCOMAYKyPDILck1mHKuxKeTG/9P6sPpSNVQ6cVGSbL7lVk0eE2
-	 9UBoGOLIEh5qWL6s/JISGlQp4mz2iB1ITIS/uvl3pIwQGYg5ONc4wXsEBwsSEjDkaf
-	 HiozHmY/lH7MsUI5MKc3IsX58h9FjCaE+SHWEu7RxOJ7OYKS+ZT2t+QKfnIbgpP1mi
-	 Z6PxJHzw0gydgaJntW4yn9TDSF7osodkzkreMS3Hwm87DShNUjUQGxPNJEoNYQmCKg
-	 DutUnLfDX3IAkSu/QqMQWjQxTmao9OnlpFNO4lH+y/+Py6hImTNQ1TZaVemn0rovDS
-	 KiNaUBc0WC6sQ==
+	b=JY7AHwKKWWoNMnsJBmoTEOcCXh7P6ac/v9qh7g/3jqVZTUVneLYzy+LzMxJ01WVe9
+	 uf93+JLaIdZb1IviCzcEUk6Q86KyYmJ/j8YqIl9EDl1dh1yAb5Pl6O365/7oAH6pjl
+	 h9G/tOK2L2ywgSiVtPK4CsBvqRuE8Rp2LDrACHa3mdRsW7nX72kGSLsbSxPQoKU4m5
+	 RLm4IO7O1ynirIcR6Eo+UWy2hLyqwUXh5wNQht7QatIjlkui/oe4VVBenIC58HUY4j
+	 /IpWwT3DuxPlc+tEcpzFZI8eMcLq6YzxuCgmRn5UBX1rP091gzuqh8Rf8dHUpEv8g3
+	 Q6W/x+BNz7TnQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vxQrs-0000000FfAT-4AND;
-	Tue, 03 Mar 2026 14:37:01 +0000
-Date: Tue, 03 Mar 2026 14:37:00 +0000
-Message-ID: <86ecm17zeb.wl-maz@kernel.org>
+	id 1vxRIE-0000000FfuH-3BHU;
+	Tue, 03 Mar 2026 15:04:14 +0000
+Date: Tue, 03 Mar 2026 15:04:14 +0000
+Message-ID: <86cy1l7y4x.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Steven Price <steven.price@arm.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei
- <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v12 06/46] arm64: RMI: Define the user ABI
-In-Reply-To: <d87ee902-3b5e-4cf9-8b97-d83f8da02a5a@arm.com>
-References: <20251217101125.91098-1-steven.price@arm.com>
-	<20251217101125.91098-7-steven.price@arm.com>
-	<86tsuy8g0u.wl-maz@kernel.org>
-	<33053e22-6cc6-4d55-bc7f-01f873a15d28@arm.com>
-	<9d702666-72a8-43e4-8ab3-548d8154a529@arm.com>
-	<86fr6h838s.wl-maz@kernel.org>
-	<d87ee902-3b5e-4cf9-8b97-d83f8da02a5a@arm.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com"
+	<jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v5 07/36] KVM: arm64: gic: Introduce interrupt type helpers
+In-Reply-To: <20260226155515.1164292-8-sascha.bischoff@arm.com>
+References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
+	<20260226155515.1164292-8-sascha.bischoff@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -98,76 +86,85 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Rspamd-Queue-Id: C93CF1F1B76
+X-Rspamd-Queue-Id: 0AB5F1F21E5
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72536-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72537-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,arm.com:email,huawei.com:email]
 X-Rspamd-Action: no action
 
-On Tue, 03 Mar 2026 14:23:08 +0000,
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+On Thu, 26 Feb 2026 15:57:14 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> On 03/03/2026 13:13, Marc Zyngier wrote:
-> > On Mon, 02 Mar 2026 17:13:41 +0000,
-> > Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> >> 
-> >> More importantly, we have to make sure that the "RMI_PSCI_COMPLETE" is
-> >> invoked before both of the following:
-> >>    1. The "source" vCPU is run again
-> >>    2. More importantly the "target" vCPU is run.
-> > 
-> > I don't understand why (1) is required. Once the VMM gets the request,
+> GICv5 has moved from using interrupt ranges for different interrupt
+> types to using some of the upper bits of the interrupt ID to denote
+> the interrupt type. This is not compatible with older GICs (which rely
+> on ranges of interrupts to determine the type), and hence a set of
+> helpers is introduced. These helpers take a struct kvm*, and use the
+> vgic model to determine how to interpret the interrupt ID.
 > 
-> The underlying issue is, the RMM doesn't have the VCPU object for the
-> "target" VCPU, to make the book keeping. Also, please note that for  a
-> Realm, PSCI is emulated by the "RMM". Host is obviously notified of the
-> "PSCI" changes via EXIT_PSCI (note, it is not SMCCC exit)
->  so that it can be in sync with the real state. And does have a say in
->  CPU_ON. So, before we return to running the "source" CPU,
-> Host must provide the target VCPU object and its consent (via
-> psci_status) to the RMM. This allows the RMM to emulate the PSCI
-> request correctly and also at the same time keep its book keeping
-> in tact (i.e., marking the Target VCPU as runnable or not).
+> Helpers are introduced for PPIs, SPIs, and LPIs. Additionally, a
+> helper is introduced to determine if an interrupt is private - SGIs
+> and PPIs for older GICs, and PPIs only for GICv5.
 > 
-> When a "source" VCPU exits to the host with a PSCI_EXIT, the RMM
-> marks the source VCPU has a pending PSCI operation, and
-> RMI_PSCI_COMPLETE request ticks that off, making it runnable again.
+> The helpers are plumbed into the core vgic code, as well as the Arch
+> Timer and PMU code.
+> 
+> There should be no functional changes as part of this change.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> ---
+>  arch/arm64/kvm/arch_timer.c           |  2 +-
+>  arch/arm64/kvm/pmu-emul.c             |  7 +-
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c |  2 +-
+>  arch/arm64/kvm/vgic/vgic.c            | 14 ++--
+>  include/kvm/arm_vgic.h                | 92 +++++++++++++++++++++++++--
+>  5 files changed, 100 insertions(+), 17 deletions(-)
+>
 
-Sure. What I don't get is what this has to happen on the source vcpu
-thread. The RMM has absolutely no clue about that, and there should be
-no impediment to letting the target vcpu do it as it starts.
+[...]
 
-Even better, you should be able to do that on the first thread that
-reenters the guest, completely removing any RMM knowledge from the
-PSCI handling in userspace.
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index f2eafc65bbf4c..f12b47e589abc 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
 
-If you can't do that, then please consider fixing the RMM to allow it.
+[...]
+
+> +#define vgic_is_v5(k) ((k)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
+
+vgic_is_v3() is defined in arch/arm64/kvm/vgic/vgic.h, as a function
+rather than a macro. These things should all live together, and
+preferably have similar implementation styles.
 
 Thanks,
 
