@@ -1,215 +1,265 @@
-Return-Path: <kvm+bounces-72557-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72558-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2PplA0Yhp2mMegAAu9opvQ
-	(envelope-from <kvm+bounces-72557-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 18:58:30 +0100
+	id WLMsLCMqp2nSfAAAu9opvQ
+	(envelope-from <kvm+bounces-72558-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 19:36:19 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 781631F4E07
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 18:58:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1071F5608
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 19:36:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A8F003054CAD
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 17:58:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5FDFF30247EE
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 18:36:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 643FF3DA5AC;
-	Tue,  3 Mar 2026 17:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E89421A12;
+	Tue,  3 Mar 2026 18:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="s8ePtdwy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BFn1FTwV"
 X-Original-To: kvm@vger.kernel.org
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011052.outbound.protection.outlook.com [52.101.57.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD74366577;
-	Tue,  3 Mar 2026 17:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772560704; cv=fail; b=d/wa7SoezaSOqkO7hcnfFAmVxXQVvXBqzr2X/kMzbvTkvERD2O0K/7TmRSQ+mEFO9n5uWCnZQz4kA1Yhoo5N/Ed0E3Y6bl/JbDvgrozOpdMC3WaN6COJM3aFy6w1AqIBNwMmX43YGfS1yxyf1gRyqW4taPiO5DXLs36SIZX4m0w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772560704; c=relaxed/simple;
-	bh=QQi85/5YBrZLkzcY1MaYnLERlpTgRB5TpuDJjQ4tHto=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=tbx8AvoJi5siBGnt4t70r4axPtWT+uoXlnm7ECNxhASmt+3Xv5OYRrAXZVpZQZCcUmqSZeEvDkwBf9n39x2usIpmy3jO1Csp0QC2DadxbO169w0PJm68O3l8/Usc8CmdeqfqupjN7Y1+P5HT02ch7x2CYneorMBXne6RUWG107Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=s8ePtdwy; arc=fail smtp.client-ip=52.101.57.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KupgiNds0z2A53xlXBwPQSxAWsij3W0A5YBuDQrK5f+w2Xw0J55qCf5ezmpWqGjjKbRjNlHa32cwfWVTWMy+JdQEjMBKPgscXaQDKUH02ykLLRDMTNDmNt9l7qp8ACdMLHlF9xAlNx+sSEKIgOrhTJAOz4igNC7A4oYuYSkiIpjMnUviip7+otQf9FF4LcrIMkKfHk9EDFpIBDIQjT8ao/kkhRb3N45wYtDROxNC2XgxuWGsvefSr/xUeE7U11n8FxYe8OUALiCjS1/FKeeSv7WwV8MraCmFBoJ+CfpwubEz4J4Pe3+0rOob9+nxLJcvRO3mwlZKziz8t0yPnWUP/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kKkj4nfxIjaraB4Gwy22VWv8JxWjbGufiVM2AgRKUY8=;
- b=v0RFv5npe7A97W2RLu+XadgAUEtdjNTYlkqNnNpdASAAD2F+W96W+AlRDclRDdWMugUtsApNf9FQsNVFdgnY3kWG1jhq3tPP0RkX789FpaH+NI05upfHz/4yyInqLGYaEOj++fjK+RHDxLCAuRm5H7lx3RnmyDDyyLVggBsGZS5A9rKVHjxKjIGgnbW7QSZiI6IuI00AjcJL4mFGA0K/ifm+2nwQJ46sPdGlrE8hXUqxURq1nZURbXGLqTDp38yFLDnK+JyyAU2y209BIZQGZ/jVmZIRQyvKoDvVMIdFanQUrPxHkKFMNQHjF5mC5dwjAmois9b+y7Kff5YpvdIzHw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kKkj4nfxIjaraB4Gwy22VWv8JxWjbGufiVM2AgRKUY8=;
- b=s8ePtdwyCQl02DjqxOCguovRfM0bvwarKEe0IAaVx01yk2CKRJBZ2LIGMYNPWTkDMYzRIO7msXAmA6TACDHRewfw97FkdFC50Mkvuux2gAdpCnI6MW4Bar4iQmWOYtfFPCP5IFoY4w3wyCg7l8OUw++Cdv9UBJe/KjeHTEm4Cg8=
-Received: from SJ0PR05CA0112.namprd05.prod.outlook.com (2603:10b6:a03:334::27)
- by SA1PR12MB6822.namprd12.prod.outlook.com (2603:10b6:806:25d::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.22; Tue, 3 Mar
- 2026 17:58:17 +0000
-Received: from SJ5PEPF000001ED.namprd05.prod.outlook.com
- (2603:10b6:a03:334:cafe::74) by SJ0PR05CA0112.outlook.office365.com
- (2603:10b6:a03:334::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.16 via Frontend Transport; Tue,
- 3 Mar 2026 17:57:58 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ5PEPF000001ED.mail.protection.outlook.com (10.167.242.201) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9654.16 via Frontend Transport; Tue, 3 Mar 2026 17:58:17 +0000
-Received: from Satlexmb09.amd.com (10.181.42.218) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 3 Mar
- 2026 11:58:15 -0600
-Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb09.amd.com
- (10.181.42.218) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 3 Mar
- 2026 09:58:15 -0800
-Received: from [10.143.199.149] (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Tue, 3 Mar 2026 11:58:10 -0600
-Message-ID: <53026eb8-3510-4bd4-8eaa-ec822ee28087@amd.com>
-Date: Tue, 3 Mar 2026 23:28:09 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE613C278D
+	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 18:35:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772562961; cv=none; b=m7F0hetlmpOXwkANi7i+Vb80Qn5e0Zje1Ok9VJwy6bYWFEPUmsAMeIIOI/DvJlvxD9Lm69xc3v4iv0OwdxrlqDlJRlixDbQ4s2eriE7XKAbrRcZtO6jyp7NBAmnynx57r4+7r5RYfJpe1CYlyMU3qWgTZw71kxnHX40mgXOOVds=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772562961; c=relaxed/simple;
+	bh=wcbTJ+dxtc43pshEWpYW4YZDVIGTHhabXjI58Bwu58I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i2Zs5qydyhPUJK981g7aobGHkKozMzEPOEPy3bQa56FK6WSj27z4D+5Sl/xHAwTU2LV5NKvSs7mlczsCMpTc9IEA1qtkAmJSidms1DG0Wr4C4mZwmpJTVPQHdWhfMGGDKGLkBxQxKkmnEv0+kimc24CJmZzT1DLReDORiNdK8cU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BFn1FTwV; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2ae49120e97so91475ad.0
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 10:35:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772562959; x=1773167759; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=trHHJ83pdpjgNSAR80l6JTOyQ+mJmW3s5tLBspjTXe4=;
+        b=BFn1FTwVZnxFxqdNhle/XW7GVpahNuTG+cI6vMEMP4nB1Su8Xg5HIhqdLjjGPgnU9g
+         ywgSAZa6U/Vk5aHkaVmXR8qt7wJRLzYH4zDKsJ5Rn60R7BUEknEEW1IoVGwy8BpXuaVl
+         RUG8PngNexu1N84sIrX6IVwFNlwGZAddlnfKfKqKJ00a6Fr068jPiQVN83h1q8On0KnH
+         WAB5QAGOaeMSkEYPTjYnRMiIERZJR461M8AblFWSSnObsebNu6rHC9UuAGvi6f5bdcd1
+         +3PVYN8fulhVWO+akbQ2gHtlE9A/CeG0Y5By+SIbTu/Qzg2GkKjm6LQ0DtZxSUHzYeEi
+         SZqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772562959; x=1773167759;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=trHHJ83pdpjgNSAR80l6JTOyQ+mJmW3s5tLBspjTXe4=;
+        b=FQGfAMCH7x0xJ9xw38BRn6/MCIJzsSvZ0tUUAM2XsK17N9Z8RatynpXXwFDeDqTqmJ
+         Jo8XSnCqh5i89SxoiGbu+/Iubdt1uTc4zpj9/ZidOYAKgp5Q1AG4/A1/+UQnFaFOLbYS
+         cqheZN56Dplo8vgrZF7tKFOf39J+zW4CCGhfJPNg5zH+nzlTwHr85cOzAfDwsuyzLw1i
+         bq2zxWHeg09aO/sooxGwwbS5BXTGyqUrH9VgLNNwqNfUAwyryMcNbeN4ccPEOWdXynsb
+         8wL4wVnGVfmrnsMgWeokhr3pvACXHZYKt0gI3/Vu827uBEwSQHv5xPzGSfc6c0s45EkK
+         Q0QA==
+X-Forwarded-Encrypted: i=1; AJvYcCUumomMdoPX4Cyv0/3qCOsvdoqn4M2cBvuUUnlIED7Atga51Zn/AeSAqw+0zNU51CxG27o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxf9YzimpyGnubLXTUk8L3AxyogzzHIbGXL0dJjazN4JxO5he/5
+	ejOhmF+IWpdJghgbgJ37aTDTid/UaR8GGDVfOWHf0ICcjZ+3CD/fsgMcURtTAnPoAA==
+X-Gm-Gg: ATEYQzwplV50x6Gn+Si3BQZKRVZacfoKafBZ5FvOLZ1SQWEAgO5gDhLWwhD3M9us74i
+	VhrMcDT70GNf6xvtH8WnYdggXbNqTg/36vAxb77SHU4HZQm2lwIxTht1vQRUfwsOz6PFeU8755X
+	f9Luxl0HGEGBxXmwTCafjr+BfmgywC+GD9rNoTJ0HeX+jLf4k1350acWB1IO0NrrORZ0D1zqJiy
+	uvSh14wA0rzknDx/D5LNjjhCr3Q8KUO7YdXWKuC+JR9O3hn3QTlZbsPaU+lNdGcBMKMOSphrDoU
+	N4cds/lF8WVtQM4JmNzPFQNRbnZeSCgUh5HVu/YIiFEBH9zixF7SXjJdWVtsYbqE5NjI31C662D
+	3U7vGzOduCfoFjmXDTcoH1BZ+VKMuA3ep2wQgJd916Sqbrh1IF3uj+ERL9v+1qvdIWodOyyLpie
+	XzowCUuveVEs5dsKRebbG4Fua9G9u7ZCEtdlyV7fg8LlG1t/M19t90QuuLTSJHow==
+X-Received: by 2002:a17:902:f712:b0:2ae:4f95:df55 with SMTP id d9443c01a7336-2ae4f95e48dmr4767015ad.25.1772562958685;
+        Tue, 03 Mar 2026 10:35:58 -0800 (PST)
+Received: from google.com (168.136.83.34.bc.googleusercontent.com. [34.83.136.168])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae5229cd5esm80423705ad.21.2026.03.03.10.35.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Mar 2026 10:35:58 -0800 (PST)
+Date: Tue, 3 Mar 2026 18:35:54 +0000
+From: Samiullah Khawaja <skhawaja@google.com>
+To: Ankit Soni <Ankit.Soni@amd.com>
+Cc: David Woodhouse <dwmw2@infradead.org>, 
+	Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Robin Murphy <robin.murphy@arm.com>, 
+	Kevin Tian <kevin.tian@intel.com>, Alex Williamson <alex@shazbot.org>, 
+	Shuah Khan <shuah@kernel.org>, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>, 
+	Adithya Jayachandran <ajayachandra@nvidia.com>, Parav Pandit <parav@nvidia.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, William Tu <witu@nvidia.com>, 
+	Pratyush Yadav <pratyush@kernel.org>, Pasha Tatashin <pasha.tatashin@soleen.com>, 
+	David Matlack <dmatlack@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Chris Li <chrisl@kernel.org>, Pranjal Shrivastava <praan@google.com>, 
+	Vipin Sharma <vipinsh@google.com>, YiFei Zhu <zhuyifei@google.com>
+Subject: Re: [PATCH 13/14] vfio/pci: Preserve the iommufd state of the vfio
+ cdev
+Message-ID: <mxemy34aaxtwly3ugve5kfy5is3dsgnnrmjzvrmnxq2nvhcmgw@ghnjvhgdodth>
+References: <20260203220948.2176157-1-skhawaja@google.com>
+ <20260203220948.2176157-14-skhawaja@google.com>
+ <idfs4bm5tib5nfe7i6rrm7hxsvhybbidfxtxl4jx3pamkisdon@zaljkqd66cwq>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/7] KVM: SVM: Enable FRED support
-From: Shivansh Dhiman <shivansh.dhiman@amd.com>
-To: <seanjc@google.com>, <pbonzini@redhat.com>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
-CC: <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
-	<xin@zytor.com>, <nikunj.dadhania@amd.com>, <santosh.shukla@amd.com>
-References: <20260129063653.3553076-1-shivansh.dhiman@amd.com>
-Content-Language: en-US
-In-Reply-To: <20260129063653.3553076-1-shivansh.dhiman@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001ED:EE_|SA1PR12MB6822:EE_
-X-MS-Office365-Filtering-Correlation-Id: f0b13811-64a9-4263-f762-08de794e72f3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|36860700013|82310400026|1800799024|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	aZ5eJn7kp3ba+w6Aq7epaeR1nINEEQddo9TwRzggni+awrWH5VHPsmat9fqKu3FtDFgUMUuL3QOnVNqsNFE11k/a5PQz18BB4u1p1XRLNz+I5P8ikUOphqKV6CpfA0Is4eFuLPTp8tLNSk+Q1ymobeCRmUDGQNhqbD3h7qovhpLlLXU3pOxjKV4JKH7IRUixkCNhWfFPm7w5erved3KKxnJbBXiTdJHayTAzgxyFdXjZixyzX6ogAMDkVlNwd47AkBE619kK2KD5jNPihkJkVPryUYxfLB8dTLpJHOLWusKo2KfT/atSPnA8XB81F0W4cHJeSyEWxHH5soALtY1DHqdh+5UXUnG8t2Kuk+w2sIXjMBHt1LSLJKjjAnOfKJFIdq5eQDo8buuQxtpKZ1GkyWIx8MeZ4W2F19Nqa3rZVwciKO6O3KxNF9BB1mbAwZHPM8vDkzjUPh0V5f8Zz4JkjLcq8uwfz10ZCtH+ofZ6Uy5jkTrhAlry693EXufKcx8kklpQmN+YbA9u8DaWEHqETIxSUuWBiGra2HMxA3Ge58tSatP7BNuXq7jX0V5TvxpCiW6UrOZ2liUUhGJKJis9korPoWe86sXpzbyEYb1aZ2OWRcoihBlUnM1nC+ksYPZ0W0u7Ndwc2eE9pgKCH15JKrDEATPMQ6gseum9vG8/Oq3S14FYHSISjHQYljxzsVnSgJxYY1+C4WW2EDfzkrOGGKdPXcsAXtcCRkpSX92HuMhC/sRSYxXUJLf6UWQhs1mqzqHtg+jVttVlHQ+ZInhr4egox9U+YkDYpodIEMtacXYGV2FPZOeyCrL6VTYec1VH3ptJbl/KG9vYYzgaX004Rw==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(82310400026)(1800799024)(13003099007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	aC6i3Mt+YOxB46mUZyVjm6W9z0L5t4MBIHoeJulPdzVHES0N3pXzi4Eh++ARBo3T7ZlfsTz739TCHEzRVYs96I3ExPGMs7BMoFDH64YPPAveZx8gqzXqzu9p7dpcX00gKQc5wVV7Ix8sC0jNkuc/M7jCjixKURd4B66WdWknNgYKQzO/51sMBM+zX1G4khaAIgl00Z4Wb+M7Ma8y173/A1EfRTM/rf+W5rSq0TlgxvlqJt8KZwS0z7mW9BxVAWZzB2OraYtoY47+85VvdW5BDz8qj2GVe+hRXUNllyqOnSXH4WXp1BNceUZJIgUDEzVIcxqPMv0YLOVPyoiCqWdWWSk6o2RMkiOetZ55mWRLHB3yUltACxaf0xaiBIuE7gXvot1r+P2Zq3yvyZz1aUR3lWXgvLEGicC9PU8FdHxCJ6R6IRGFSdP0mzpNMULD/J8m
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2026 17:58:17.5498
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f0b13811-64a9-4263-f762-08de794e72f3
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001ED.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6822
-X-Rspamd-Queue-Id: 781631F4E07
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <idfs4bm5tib5nfe7i6rrm7hxsvhybbidfxtxl4jx3pamkisdon@zaljkqd66cwq>
+X-Rspamd-Queue-Id: 3B1071F5608
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_RCPT(0.00)[kvm];
-	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[amd.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shivansh.dhiman@amd.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72557-lists,kvm=lfdr.de];
-	TO_DN_NONE(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[9]
+	TAGGED_FROM(0.00)[bounces-72558-lists,kvm=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[skhawaja@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hi everyone,
+On Tue, Feb 17, 2026 at 04:18:08AM +0000, Ankit Soni wrote:
+>On Tue, Feb 03, 2026 at 10:09:47PM +0000, Samiullah Khawaja wrote:
+>> If the vfio cdev is attached to an iommufd, preserve the state of the
+>> attached iommufd also. Basically preserve the iommu state of the device
+>> and also the attached domain. The token returned by the preservation API
+>> will be used to restore/rebind to the iommufd state after liveupdate.
+>>
+>> Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
+>> ---
+>>  drivers/vfio/pci/vfio_pci_liveupdate.c | 28 +++++++++++++++++++++++++-
+>>  include/linux/kho/abi/vfio_pci.h       | 10 +++++++++
+>>  2 files changed, 37 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/vfio/pci/vfio_pci_liveupdate.c b/drivers/vfio/pci/vfio_pci_liveupdate.c
+>> index c52d6bdb455f..af6fbfb7a65c 100644
+>> --- a/drivers/vfio/pci/vfio_pci_liveupdate.c
+>> +++ b/drivers/vfio/pci/vfio_pci_liveupdate.c
+>> @@ -15,6 +15,7 @@
+>>  #include <linux/liveupdate.h>
+>>  #include <linux/errno.h>
+>>  #include <linux/vfio.h>
+>> +#include <linux/iommufd.h>
+>>
+>>  #include "vfio_pci_priv.h"
+>>
+>> @@ -39,6 +40,7 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
+>>  	struct vfio_pci_core_device_ser *ser;
+>>  	struct vfio_pci_core_device *vdev;
+>>  	struct pci_dev *pdev;
+>> +	u64 token = 0;
+>>
+>>  	vdev = container_of(device, struct vfio_pci_core_device, vdev);
+>>  	pdev = vdev->pdev;
+>> @@ -49,15 +51,32 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
+>>  	if (vfio_pci_is_intel_display(pdev))
+>>  		return -EINVAL;
+>>
+>> +#if CONFIG_IOMMU_LIVEUPDATE
+>> +	/* If iommufd is attached, preserve the underlying domain */
+>> +	if (device->iommufd_attached) {
+>> +		int err = iommufd_device_preserve(args->session,
+>> +						  device->iommufd_device,
+>> +						  &token);
+>> +		if (err < 0)
+>> +			return err;
+>> +	}
+>> +#endif
+>> +
+>>  	ser = kho_alloc_preserve(sizeof(*ser));
+>> -	if (IS_ERR(ser))
+>> +	if (IS_ERR(ser)) {
+>> +		if (device->iommufd_attached)
+>> +			iommufd_device_unpreserve(args->session,
+>> +						  device->iommufd_device, token);
+>> +
+>
+>To use iommufd_device_preserve()/iommufd_device_unpreserve(),
+>looks like the IOMMUFD namespace import is missing here —  MODULE_IMPORT_NS("IOMMUFD");
+>
+>-Ankit
 
-Gentle ping for reviewing patches on SVM support for FRED in this series.
-Would appreciate any feedback or guidance on next steps.
+Agreed, I will add it to this file in v2.
+>
+>>  		return PTR_ERR(ser);
+>> +	}
+>>
+>>  	pci_liveupdate_outgoing_preserve(pdev);
+>>
+>>  	ser->bdf = pci_dev_id(pdev);
+>>  	ser->domain = pci_domain_nr(pdev->bus);
+>>  	ser->reset_works = vdev->reset_works;
+>> +	ser->iommufd_ser.token = token;
+>>
+>>  	args->serialized_data = virt_to_phys(ser);
+>>  	return 0;
+>> @@ -66,6 +85,13 @@ static int vfio_pci_liveupdate_preserve(struct liveupdate_file_op_args *args)
+>>  static void vfio_pci_liveupdate_unpreserve(struct liveupdate_file_op_args *args)
+>>  {
+>>  	struct vfio_device *device = vfio_device_from_file(args->file);
+>> +	struct vfio_pci_core_device_ser *ser;
+>> +
+>> +	ser = phys_to_virt(args->serialized_data);
+>> +	if (device->iommufd_attached)
+>> +		iommufd_device_unpreserve(args->session,
+>> +					  device->iommufd_device,
+>> +					  ser->iommufd_ser.token);
+>>
+>>  	pci_liveupdate_outgoing_unpreserve(to_pci_dev(device->dev));
+>>  	kho_unpreserve_free(phys_to_virt(args->serialized_data));
+>> diff --git a/include/linux/kho/abi/vfio_pci.h b/include/linux/kho/abi/vfio_pci.h
+>> index 6c3d3c6dfc09..d01bd58711c2 100644
+>> --- a/include/linux/kho/abi/vfio_pci.h
+>> +++ b/include/linux/kho/abi/vfio_pci.h
+>> @@ -28,6 +28,15 @@
+>>
+>>  #define VFIO_PCI_LUO_FH_COMPATIBLE "vfio-pci-v1"
+>>
+>> +/**
+>> + * struct vfio_iommufd_ser - Serialized state of the attached iommufd.
+>> + *
+>> + * @token: The token of the bound iommufd state.
+>> + */
+>> +struct vfio_iommufd_ser {
+>> +	u32 token;
+>> +} __packed;
+>> +
+>>  /**
+>>   * struct vfio_pci_core_device_ser - Serialized state of a single VFIO PCI
+>>   * device.
+>> @@ -40,6 +49,7 @@ struct vfio_pci_core_device_ser {
+>>  	u16 bdf;
+>>  	u16 domain;
+>>  	u8 reset_works;
+>> +	struct vfio_iommufd_ser iommufd_ser;
+>>  } __packed;
+>>
+>>  #endif /* _LINUX_LIVEUPDATE_ABI_VFIO_PCI_H */
+>> --
+>> 2.53.0.rc2.204.g2597b5adb4-goog
+>>
 
-Thanks,
-Shivansh
+Thanks for looking at this.
 
-On 29-01-2026 12:06, Shivansh Dhiman wrote:
-> This series adds SVM support for FRED (Flexible Return and Event Delivery)
-> virtualization in KVM.
-> 
-> FRED introduces simplified privilege level transitions to replace IDT-based
-> event delivery and IRET returns, providing lower latency event handling while
-> ensuring complete supervisor context on delivery and full user context on
-> return. FRED defines event delivery for both ring 3->0 and ring 0->0
-> transitions, and introduces ERETU for returning to ring 3 and ERETS for
-> remaining in ring 0.
-> 
-> AMD hardware extends the VMCB to support FRED virtualization with dedicated
-> save area fields for FRED MSRs (RSP0-3, SSP1-3, STKLVLS, CONFIG) and control
-> fields for event injection data (EXITINTDATA, EVENTINJDATA).
-> 
-> The implementation spans seven patches. The important changes are:
-> 
-> 1) Extend VMCB structures with FRED fields mentioned above and disable MSR
->    interception for FRED-enabled guests to avoid unnecessary VM exits.
-> 
-> 2) Support for nested exceptions where we populate event injection data
->    when delivering exceptions like page faults and debug traps. 
-> 
-> This series is based on top of FRED support for VMX patchset [1],
-> patches 1-17. The VMX patchset was rebased on top of v6.18.0 kernel.
-> 
-> [1] https://lore.kernel.org/kvm/20251026201911.505204-1-xin@zytor.com
-> 
-> Regards,
-> Shivansh
-> ---
-> Neeraj Upadhyay (5):
->   KVM: SVM: Initialize FRED VMCB fields
->   KVM: SVM: Disable interception of FRED MSRs for FRED supported guests
->   KVM: SVM: Save restore FRED_RSP0 for FRED supported guests
->   KVM: SVM: Populate FRED event data on event injection
->   KVM: SVM: Support FRED nested exception injection
-> 
-> Shivansh Dhiman (2):
->   KVM: SVM: Dump FRED context in dump_vmcb()
->   KVM: SVM: Enable save/restore of FRED MSRs
-> 
->  arch/x86/include/asm/svm.h |  35 ++++++++++-
->  arch/x86/kvm/svm/svm.c     | 116 +++++++++++++++++++++++++++++++++++--
->  2 files changed, 144 insertions(+), 7 deletions(-)
-> 
-> 
-> base-commit: f76e83ecf6bce6d3793f828d92170b69e636f3c9
-
+Sami
 
