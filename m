@@ -1,325 +1,277 @@
-Return-Path: <kvm+bounces-72510-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72511-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KL4cOZaqpmn9SgAAu9opvQ
-	(envelope-from <kvm+bounces-72510-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 10:32:06 +0100
+	id KOl+JKyrpmn9SgAAu9opvQ
+	(envelope-from <kvm+bounces-72511-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 10:36:44 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 753C51EBE6A
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 10:32:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A6EC1EBF7A
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 10:36:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E0D8030A2805
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 09:27:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B3B30301A687
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 09:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61CA38C427;
-	Tue,  3 Mar 2026 09:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98BFA38F623;
+	Tue,  3 Mar 2026 09:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="sCJXW1tR";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="sCJXW1tR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W/GnIjwj";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rQc+n0mt"
 X-Original-To: kvm@vger.kernel.org
-Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013031.outbound.protection.outlook.com [52.101.83.31])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FEE0388E40;
-	Tue,  3 Mar 2026 09:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.31
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772530071; cv=fail; b=V/z4tJZTP0lFkZ6Gpst3tMEFQKb0f7GpeDtkF37+cSgGqDUNq0xle9JXEFrVHy+eF/Q4oDcHRrfIxD00RIUu2iY18Yrv8Mdk7SV8YiIdgrq1TGJOd3kSKba11kL2ox4mwwjyMXe2jNBRcKiYymKn5QRuhZJFFllGqBUM9UiyF4s=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772530071; c=relaxed/simple;
-	bh=HWfLiAFz9zcZ1kyyt454sGPabLYAfx6SKrQwIAF6SuI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=mxWKdmmV6TBzg7+2GvS1sElQMr8SJKwr3TOA4Urs/4s8j6EmF3+l6ARjIdC0MPV4FZzyC1jF+OZv6j9+THoJk+ttoBQKzecivqS/INCObhfvN0uvUl66VkyqoiP16068ZP6Fdetho+hMrCp/FoQv2iqkZKIpHhPu99PhexbmfnA=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=sCJXW1tR; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=sCJXW1tR; arc=fail smtp.client-ip=52.101.83.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=RKkHh1zn/wWQzvY6S8Tl4+mu8+q4oyVSsHPtRexIjEJvnNi5oxMKESPVFrflWtc4So53BGIQLddoe1u23Pia5hDwYBjFxNcxR2dmR3ac7N97Krten2M68r9FwVaDrXrZJyiNmDVaoWUZNxC824vzhKEDWJ67MFU7jwMMjlxHhtSrtqF1JgXClQFQz7AIYXLZwG3zLfNPqdXoPO9b/PxAe7N9sCQRC7Ns0gKEJWo0/KUS9j8wj5DKd75ejcXs4Bbl2TmQF3vNlrr7OyeDehRYi1Tj/Ktnrtzc6jBzWMONBHF59AGx+ql5iKQsMKbhm9JQtTSaXVJfgQqp5GJSYdm+Sw==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=p2W3F7AANwfXVDP1pQXJZrXkVatr0nzlXFJJ8dLa0uU=;
- b=E2MQ3/WLz3IQGnKlRpicjEwz095ir+DGsm05kgBDmjqAyBgyKM7DLYP+k73Zj1AmBRLBXgsTRIBpQkyIij5q4LXFqBiG2ruFFhAI213hWxcNo+pMF0yemy8JF4JeCOPmiunkbVURcwhPtMiJASQ2PYu8obuGiVda0V6knqLLO/xt+bS6K7T+cTwEaFBLzo2nxiv0L+aIgmNiOSNNEtd9WEbKruCP3k2Hjswg30QiOM9qgIoC0rTSiPutdSyuQRzo0lDQMez6R+8eHUgLyM9sf5CEsDFCbuL9QbqZ3zvyonWg1jiKN1p02+anWamFgdTlu+oFIjl2GUwV74tW0B24vA==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p2W3F7AANwfXVDP1pQXJZrXkVatr0nzlXFJJ8dLa0uU=;
- b=sCJXW1tRL4FfQD0r6BNuIZL+hZo50pkLKXXSNNxRCV23/13/RoW/6GeqpypmWCjv4Ips0hGJQ4TT3wIEKuffhnUaD/msYsjb1Wj9VSHyatOVthqH5p2MHCj4CAtW6yjmYFkE6D2yMEk+KwvzsjWyb2RkRD0lvvjiyBT3hxF7UMg=
-Received: from DUZPR01CA0162.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4bd::10) by PAWPR08MB9805.eurprd08.prod.outlook.com
- (2603:10a6:102:2e6::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.18; Tue, 3 Mar
- 2026 09:27:39 +0000
-Received: from DB1PEPF000509FB.eurprd03.prod.outlook.com
- (2603:10a6:10:4bd:cafe::12) by DUZPR01CA0162.outlook.office365.com
- (2603:10a6:10:4bd::10) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.22 via Frontend Transport; Tue,
- 3 Mar 2026 09:27:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DB1PEPF000509FB.mail.protection.outlook.com (10.167.242.37) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.12
- via Frontend Transport; Tue, 3 Mar 2026 09:27:39 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HKJt69QIBgLhV+GmZCNxwdfC/SM47fpsWBz/9S93albAgfTzT3/tEWCRAsV1fPzJrpewen1wL7i20r5Xu3UyNy1t4O3mT/ELhmdtGr31hxw8pDpxxNfNX5hvi/2huR9YeLnqVX9X4ZsvYU3tqRezHtamYsl5kek2UEgdGyX5Np8my/G1TgkhJ1KFOvS2doMTNeNlBfvaS0tvg5fvjJI45UnyaF3NCjFPFU+TdCodOdrzDU5GMfPu3Yzt+hkChAVTyNMdh/J/kZmB81UrX5Bv+K54fyN8eSP+tAqrFCzeiwmfP0AXmpp3h1vdP15UrtgkmFuryIa08K80EO/JpyfpLg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=p2W3F7AANwfXVDP1pQXJZrXkVatr0nzlXFJJ8dLa0uU=;
- b=rNV78euD9JpoSntL2kRnq4KAAeaTeqxc8RLRaiT4HHZkv4vAHGbEBO0r7CfRfhaAQIziBJnSKumqlaLFM1lyMI4+xrhT5EYfL0raJvZCB+/lNMMR5HCD68TBcx9cfDh/df2DeyjBZep50bzGBqqtepWGv6h6ud66r0/Az93cpULaXeRdqNZqHm7RtkMvnSkFNe2cm/PUommAoYczS51VH3DuhxvGrth7gdZHdVajN2I3/lcsVUnZEop2G6YP3TQIifflaXlntzwtlxJEDKzMxwNwlgI6OFAd/4mabQWc/fXFog8vBaDchdUyH2cgWPXfW6dqSrFpOpl9woxtyFpTKQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p2W3F7AANwfXVDP1pQXJZrXkVatr0nzlXFJJ8dLa0uU=;
- b=sCJXW1tRL4FfQD0r6BNuIZL+hZo50pkLKXXSNNxRCV23/13/RoW/6GeqpypmWCjv4Ips0hGJQ4TT3wIEKuffhnUaD/msYsjb1Wj9VSHyatOVthqH5p2MHCj4CAtW6yjmYFkE6D2yMEk+KwvzsjWyb2RkRD0lvvjiyBT3hxF7UMg=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from DU4PR08MB11769.eurprd08.prod.outlook.com (2603:10a6:10:644::21)
- by PA6PR08MB10782.eurprd08.prod.outlook.com (2603:10a6:102:3d0::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.18; Tue, 3 Mar
- 2026 09:26:33 +0000
-Received: from DU4PR08MB11769.eurprd08.prod.outlook.com
- ([fe80::d424:cd62:81a8:490f]) by DU4PR08MB11769.eurprd08.prod.outlook.com
- ([fe80::d424:cd62:81a8:490f%6]) with mapi id 15.20.9654.020; Tue, 3 Mar 2026
- 09:26:32 +0000
-Message-ID: <ec27e294-0bee-474a-a15b-6be20ee10cd4@arm.com>
-Date: Tue, 3 Mar 2026 09:26:31 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 27/46] KVM: arm64: Handle Realm PSCI requests
-To: Marc Zyngier <maz@kernel.org>, Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>
-References: <20251217101125.91098-1-steven.price@arm.com>
- <20251217101125.91098-28-steven.price@arm.com> <86pl5m89ub.wl-maz@kernel.org>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86pl5m89ub.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PA7P264CA0458.FRAP264.PROD.OUTLOOK.COM
- (2603:10a6:102:398::15) To DU4PR08MB11769.eurprd08.prod.outlook.com
- (2603:10a6:10:644::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FFC38CFEE
+	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 09:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772530590; cv=none; b=L1omhSguHZ3Y47wqqE4Cc1PiabIXwGUtSqDnH/HpYMtLG4Wtz957U3CxfWoNxA6ozNPwq78o2vaCi5JFWXy5PBChWkhnW2CBsnbOQ1/Cca20cMNL/702atKsAAIInicDfigo6KKsGrBpUtcnTq7R1jbizMOW8tU2OBRFdR9TWvM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772530590; c=relaxed/simple;
+	bh=6+oOwL5sXpavV8Fl1wAtLxgVtBUqV+1SjYNS3NMAzvE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tkUAirB0qUCdsIuGLNGCWmjd9ZqcWZehUkO+3/Yam5c5IcdU/g/YR0d2ApOhnGl4+H4mSfL5NyaqTXhFxPaoBKxA+6y38O73pXKyJQK9NbPo48SzEnQ3Q3XKadVsZgYb0RrMp9BJ7/gHS5gEU7o7pkvasxcczNsqfT+zJAkSW1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W/GnIjwj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rQc+n0mt; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772530587;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eztC7kwBaVh7RmAMeNIOU9kxhU9EPtvAY7RolayfUyw=;
+	b=W/GnIjwjrweMvz4Q9J4/mfk0MVDy73/DWsKFjwxygRMCCdV4/nXkKW0SzIEXB82AD23vwe
+	gv7eNtg8qAEVvU5AO78/ag5276Zj7rkGDGnwfrXN/w/B9fNaRIlyfDVqNpWq/aDyIMrkSQ
+	5jkUr0NeqqE7s4CAn6Ap6IJUZf7g4eM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-388--iHBqPCgMYaP5asUb-CiPw-1; Tue, 03 Mar 2026 04:36:26 -0500
+X-MC-Unique: -iHBqPCgMYaP5asUb-CiPw-1
+X-Mimecast-MFC-AGG-ID: -iHBqPCgMYaP5asUb-CiPw_1772530585
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4836b7c302fso53863995e9.1
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 01:36:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1772530585; x=1773135385; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eztC7kwBaVh7RmAMeNIOU9kxhU9EPtvAY7RolayfUyw=;
+        b=rQc+n0mtlppnex1BGShRy3jfqUWUwxUEoWDC/6wXsxclvDWH9bDS+gMzx9npAV1pQn
+         8Yi3S8dridJPVpdAV5PIQ+uo1UABTHzRK+Hx1Ai8at19/UyCf4HYvC/SbYginbTY+3bJ
+         GoUlRQZ9MINP/CFEqZ0ubHdLFEzFzdBENWBVMR2tkBHm3FMBoJALBdFrU3Rd0aygQbkp
+         FDL02JQJ4UtnJQvcm12dZLKk2T1Pbv42gSRGeqQuaLFjkDauP6YpEYWSLoSJ+WI4Yu5F
+         R4Z2Qdb6CRO/yTYOwxGLE9tblL23TbSjDWnFY0RsNJDz4wzffy0ojmE7mn7T3GU0H0yT
+         Gm/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772530585; x=1773135385;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eztC7kwBaVh7RmAMeNIOU9kxhU9EPtvAY7RolayfUyw=;
+        b=VXhYIeVpRJPUazKjNfOyqQ87n/ePvt4BGH4D0v5Aq6HP6hWxPKB1MXXeyMIu7sSpog
+         mwaqPgyU4ixIiOu130Ur9ahIITP5lKat4NxZ2aGje7kJGlqWsIn5FrCackx2D9ibH8bE
+         3GEbpMsdnEkSdfrAu+0nbByygtLNpxL4I5ZVm5joxIhyCkzYjz9vNuWY+IuRe0dCEhEw
+         98Nol2rseRONHo0farNrgqTxwGrH7wimGnZXuvMlFp7WxOrAw7745qMv27jjLqYv2vtC
+         hJWr/bnHQrHM0lfbjrxkNeBj2aW3X11c9fNvoR/uMJbSc9S7lMM3G3/ZU86Inp2/fLAN
+         zWdA==
+X-Forwarded-Encrypted: i=1; AJvYcCWaNgJeHMCVSGp7NqQkr59ue13By4BWU6hm90vEJA+2ZZQWdJlQqqEeMHFPZLarwT1UbcA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyptLaiQDEIxVm7oUxzOBErWAECUtOkthwchXAHQNg/bjONAmAv
+	SNkNwgPozgok55zwlkX5HHRttnHyJP+It+0GNMkPnYx/DzfEy0sPAy6NmYl8voRp9F6CMiq4hUt
+	9x22qXKwI1JQJTPy+p2dXSEIHmM6JmmvK1DBLCsAoFn8EhieoKWxtVQ==
+X-Gm-Gg: ATEYQzwieHHHzG9kuA1LgzSY/dlpwXkDTgEIgpQchscrwhzopI8RNftg+EwJNIfwj67
+	TgnbNGoXhTNydDyDk/mVr2bJUhlWd/nc/Ab1ep3QARyiGw0yagR9w8S6z7EgAd2A0ngj/mkrHiM
+	CugLEBhWjBqZwg+HmUmlZhJzqvvqZA/UceYeNGbrJaYrPcNSQWzQMt/7T+XnQftj5RmBBPQBnls
+	zKzfhyZ/BXd4RXoAJA0c5AXZvNRjHX4QuGLHaMOrWtgqI05R5rkmOsbcIs7wwKlUPdEbQ0MJL+l
+	r/rhx24TYutugl8VmfHVRAm3FIfHBeoSg69m+xL65wvWtiKuGkearXvusfEFsYzGQD2icR23W2S
+	lcdpnCxT1hogo585uxg==
+X-Received: by 2002:a05:600c:548a:b0:47e:e20e:bb9c with SMTP id 5b1f17b1804b1-483c9bdb16emr241639995e9.8.1772530585421;
+        Tue, 03 Mar 2026 01:36:25 -0800 (PST)
+X-Received: by 2002:a05:600c:548a:b0:47e:e20e:bb9c with SMTP id 5b1f17b1804b1-483c9bdb16emr241639475e9.8.1772530584908;
+        Tue, 03 Mar 2026 01:36:24 -0800 (PST)
+Received: from fedora (g3.ign.cz. [91.219.240.17])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48512692c14sm13526465e9.7.2026.03.03.01.36.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Mar 2026 01:36:24 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Kevin Cheng <chengkev@google.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yosry@kernel.org
+Subject: Re: [PATCH V4 4/4] KVM: SVM: Raise #UD if VMMCALL instruction is
+ not intercepted
+In-Reply-To: <aaZF43PdvrZvIaXn@google.com>
+References: <20260228033328.2285047-1-chengkev@google.com>
+ <20260228033328.2285047-5-chengkev@google.com>
+ <aaZF43PdvrZvIaXn@google.com>
+Date: Tue, 03 Mar 2026 10:36:23 +0100
+Message-ID: <87h5qxfe5k.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	DU4PR08MB11769:EE_|PA6PR08MB10782:EE_|DB1PEPF000509FB:EE_|PAWPR08MB9805:EE_
-X-MS-Office365-Filtering-Correlation-Id: 65fc0ce4-d296-4eeb-720e-08de79071d0f
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info-Original:
- ySJ4q5Na58OiWjXasI0Kt+HJEW81x3fs2qB+g3v94XtUPvWCd4bhGLKbU51WpZeSAPGLCvNC4xLL5rxivWhWEAcMyqiWKOpbgge4H5WxkoNdEZgl7FOiE/l+2v3cLDSN1Cc+hywmSyhq3F0vGsrJSz5rRyVKhxfbVgxPh5aGr0HgbGHx7YSynpRzr59PLhGlzuGHwg+4vlG/Xh44WGD7q8fLT9Y7Jo8oCvZg2m1mw9E8y5UlBjp0bGZO2PWA8sT6LVR5RetQIeoDhw8upl4meFNoxjAUdUWoyzRky5pnjYYN8EUDolmLOzm0ThZQ0TEfAQTF/INrw5s3RaJSrhA7b+DM1O6/02TIxejHdcanTLX/yOuJDqz4UjhJi8JECJEYS0lie3pxPARCQKTs44I1iqzBJWi6DRjXTTyKJbHQ69XJ5fgBwCFeiE/4aMTTnzvqJx8L/0kiHTlShoQw/Ef2SJPTQlmsPL2hBNbxcK5puqM+LSyHIW1hXJU5hILaoTdAVVN2j4Bt0VCCjFAc29nBddsuhlubQqdW4uRs7s0PTpnkduRIJuWSKChfNMlMacvOxDd17t9xkfwD7Uzsrs6qE/P2os+Vve38MN56j7LP/53FSQDDJEBmxO80AZofZE9Fy6ryqg4bQk5qL+YCBHP21f1YiqIObdsIDWPQdMA2iZcQvJDCLMSX2VkF9Lj/Yu7uAdZ3RrQ7RXTMc0LF974zbJQrWSVqN5F6AWTKEIIQ3yw=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU4PR08MB11769.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA6PR08MB10782
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB1PEPF000509FB.eurprd03.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	0946886e-2ca1-4197-b886-08de7906f572
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|14060799003|35042699022|376014|1800799024|7416014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	C4EpFPcgBMK4BNup9Nllkdmno1WMOvpsKX3Z5p1vShQmvaViz6Rt6hf4m6uuBKc7+5obrcE7MhlPRhHVsxFXNJ5APZYjDmC7/quhR/XZ4ncq4mZdBb2pYW54L1M6pguEv3UkmLU7dSLd8E/XDFbNdta+weVgRBvVv0oeziOPst6bVXsglFVgBCgQZvEiXe0irTwaeyTAh5RK+BC4r/Z7hQXI7CslZtX8L/7X2GhF6gMb51ib/Z7GZOLQOgpZG5x6jdzs+fGowbbd3zdu984drbPWHW7gkrA07Pn3ZtWZW8mIvgnX8CAtkseTRxgM0RQAjWjRWojT2eBMnwVwo4NvDDYuhl7g/Ms8M3YfPBdbVeAPG9QwNiOVc29d6Pz5xnbzDuxOPukBKydQUfckISEAUB2Xtp57E8ofm721KXTWGoFi32rx7X94/5CNugcf5x5+lzVXlx2a/KVZhLzEyUKQLAF4DchlU6IpamZ5pZuN+rfuVjHqfXZAPoKxuX3C8twvR+qTES+JJFRnamxXYIGIO5daF2hJw1En8ZSk3EsNKeTpNimizEx8+Z6CHam9J8SRadQb7siouI+JSmsqVwKUz3OL4rR6UNfd705QU8XLzSUT89iipWRRkOIIOyNbYJmY4t7Krkt3Dh4QF0Dtlbf+3p6IbY56MnpRBqwWG7Pp19owN6ZnTQawjNqtkQXv1UgzB9fNIDYGcZLQf4QpQjPZPUQd0o+bp0hkQjLP6T0a+qk8X1TU8hK3REmReNnJm8CWtqlaLbaksrB0kdh20/MHtIdpbTFoYieRsz4PME5a4h7cIGigTRQ6TNs92GucULRSILJIK4X4zE40RD+dokH9vw==
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(14060799003)(35042699022)(376014)(1800799024)(7416014)(36860700013);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	/RL5KmztYlq/om9cK2U7lzorDsmg3CqyKnnEeQ225ijHeiNbJU0zu15QQfDxRY+ExGbMsH9BIen7h9gPyrb+S3aVPHXqs9H866ook6HyyoZGx32FqmO52AoWZxDMrhf4Z0RLxbKhYTvdXmh1baXWqDij/hCInU4agoCqL3QiYCWVtOxP4mnYj09TgrFMZsVSsTYvlL2E39a7bb+lQF6ZELq/Auhjqr11Op7nno/B4cGhNVptqD/CH2oDJVaa8lqbWQKYGThwMz3g/nwiXRx063N+eNBYIY5/xQX0z6ZnVSRDRUy21OnhgZXFlmUIVriNI5pppb8iMVzFfRvrgzMniLHWsJcazznt2vJJUG7lD5YdEdxIQLEBBcCx3kfeUXUc9HHO4u+AK8owqWjUpf3TK0ZVUjOjbuAbUFu8CBHzX3NhAEI3KORe72sUxI6RJKcD
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2026 09:27:39.1395
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 65fc0ce4-d296-4eeb-720e-08de79071d0f
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF000509FB.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR08MB9805
-X-Rspamd-Queue-Id: 753C51EBE6A
+Content-Type: text/plain
+X-Rspamd-Queue-Id: 8A6EC1EBF7A
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=3];
-	DMARC_POLICY_ALLOW(-0.50)[arm.com,none];
-	R_DKIM_ALLOW(-0.20)[arm.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	TAGGED_FROM(0.00)[bounces-72510-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	URIBL_MULTI_FAIL(0.00)[sea.lore.kernel.org:server fail,arm.com:server fail];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,arm.com:dkim,arm.com:email,arm.com:mid];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[suzuki.poulose@arm.com,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-72511-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[arm.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[vkuznets@redhat.com,kvm@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 02/03/2026 16:39, Marc Zyngier wrote:
-> On Wed, 17 Dec 2025 10:11:04 +0000,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> The RMM needs to be informed of the target REC when a PSCI call is made
->> with an MPIDR argument. Expose an ioctl to the userspace in case the PSCI
->> is handled by it.
->>
->> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
->> ---
->> Changes since v11:
->>   * RMM->RMI renaming.
->> Changes since v6:
->>   * Use vcpu_is_rec() rather than kvm_is_realm(vcpu->kvm).
->>   * Minor renaming/formatting fixes.
->> ---
->>   arch/arm64/include/asm/kvm_rmi.h |  3 +++
->>   arch/arm64/kvm/arm.c             | 25 +++++++++++++++++++++++++
->>   arch/arm64/kvm/psci.c            | 30 ++++++++++++++++++++++++++++++
->>   arch/arm64/kvm/rmi.c             | 14 ++++++++++++++
->>   4 files changed, 72 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
->> index bfe6428eaf16..77da297ca09d 100644
->> --- a/arch/arm64/include/asm/kvm_rmi.h
->> +++ b/arch/arm64/include/asm/kvm_rmi.h
->> @@ -118,6 +118,9 @@ int realm_map_non_secure(struct realm *realm,
->>   			 kvm_pfn_t pfn,
->>   			 unsigned long size,
->>   			 struct kvm_mmu_memory_cache *memcache);
->> +int realm_psci_complete(struct kvm_vcpu *source,
->> +			struct kvm_vcpu *target,
->> +			unsigned long status);
->>   
->>   static inline bool kvm_realm_is_private_address(struct realm *realm,
->>   						unsigned long addr)
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 06070bc47ee3..fb04d032504e 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -1797,6 +1797,22 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->>   	return __kvm_arm_vcpu_set_events(vcpu, events);
->>   }
->>   
->> +static int kvm_arm_vcpu_rmi_psci_complete(struct kvm_vcpu *vcpu,
->> +					  struct kvm_arm_rmi_psci_complete *arg)
->> +{
->> +	struct kvm_vcpu *target = kvm_mpidr_to_vcpu(vcpu->kvm, arg->target_mpidr);
->> +
->> +	if (!target)
->> +		return -EINVAL;
->> +
->> +	/*
->> +	 * RMM v1.0 only supports PSCI_RET_SUCCESS or PSCI_RET_DENIED
->> +	 * for the status. But, let us leave it to the RMM to filter
->> +	 * for making this future proof.
->> +	 */
->> +	return realm_psci_complete(vcpu, target, arg->psci_status);
->> +}
->> +
->>   long kvm_arch_vcpu_ioctl(struct file *filp,
->>   			 unsigned int ioctl, unsigned long arg)
->>   {
->> @@ -1925,6 +1941,15 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->>   
->>   		return kvm_arm_vcpu_finalize(vcpu, what);
->>   	}
->> +	case KVM_ARM_VCPU_RMI_PSCI_COMPLETE: {
->> +		struct kvm_arm_rmi_psci_complete req;
->> +
->> +		if (!vcpu_is_rec(vcpu))
->> +			return -EPERM;
-> 
-> Same remark as for the other ioctl: EPERM is not quite describing the
-> problem.
-> 
->> +		if (copy_from_user(&req, argp, sizeof(req)))
->> +			return -EFAULT;
->> +		return kvm_arm_vcpu_rmi_psci_complete(vcpu, &req);
->> +	}
->>   	default:
->>   		r = -EINVAL;
->>   	}
->> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
->> index 3b5dbe9a0a0e..a68f3c1878a5 100644
->> --- a/arch/arm64/kvm/psci.c
->> +++ b/arch/arm64/kvm/psci.c
->> @@ -103,6 +103,12 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
->>   
->>   	reset_state->reset = true;
->>   	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
->> +	/*
->> +	 * Make sure we issue PSCI_COMPLETE before the VCPU can be
->> +	 * scheduled.
->> +	 */
->> +	if (vcpu_is_rec(vcpu))
->> +		realm_psci_complete(source_vcpu, vcpu, PSCI_RET_SUCCESS);
->>
-> 
-> I really think in-kernel PSCI should be for NS VMs only. The whole
-> reason for moving to userspace support was to stop adding features to
-> an already complex infrastructure, and CCA is exactly the sort of
-> things we want userspace to deal with.
+Sean Christopherson <seanjc@google.com> writes:
 
-Agreed. How would you like us to enforce this ? Should we always exit
-to the VMM, even if it hasn't requested the handling ? (I guess it is
-fine and in the worst case VMM could exit, it being buggy)
+> +Vitaly
+>
+> On Sat, Feb 28, 2026, Kevin Cheng wrote:
+>> The AMD APM states that if VMMCALL instruction is not intercepted, the
+>> instruction raises a #UD exception.
+>> 
+>> Create a vmmcall exit handler that generates a #UD if a VMMCALL exit
+>> from L2 is being handled by L0, which means that L1 did not intercept
+>> the VMMCALL instruction. The exception to this is if the exiting
+>> instruction was for Hyper-V L2 TLB flush hypercalls as they are handled
+>> by L0.
+>
+> *sigh*
+>
+> Except this changelog doesn't capture *any* of the subtlety.  And were it not for
+> an internal bug discussion, I would have literally no clue WTF is going on.
+>
+> There's not generic missed #UD bug, because this code in recalc_intercepts()
+> effectively disables the VMMCALL intercept in vmcb02 if the intercept isn't set
+> in vmcb12.
+>
+> 	/*
+> 	 * We want to see VMMCALLs from a nested guest only when Hyper-V L2 TLB
+> 	 * flush feature is enabled.
+> 	 */
+> 	if (!nested_svm_l2_tlb_flush_enabled(&svm->vcpu))
+> 		vmcb_clr_intercept(c, INTERCEPT_VMMCALL);
+>
+> I.e. the only bug *knowingly* being fixed, maybe, is an edge case where Hyper-V
+> TLB flushes are enabled for L2 and the hypercall is something other than one of
+> the blessed Hyper-V hypercalls.  But in that case, it's not at all clear to me
+> that synthesizing a #UD into L2 is correct.  I can't find anything in the TLFS
+> (not surprising), so I guess anything goes?
+>
+> Vitaly,
+>
+> The scenario in question is where HV_X64_NESTED_DIRECT_FLUSH is enabled, L1 doesn't
+> intercept VMMCALL, and L2 executes VMMCALL with something other than one of the
+> Hyper-V TLB flush hypercalls.  The proposed change is to synthesize #UD (which
+> is what happens if HV_X64_NESTED_DIRECT_FLUSH isn't enable).  Does that sound
+> sane?  Should KVM instead return an error.
 
-Cheers
-Suzuki
+I think this does sound sane. In the situation, when the hypercall
+issued by L2 is not a TLB flush hypercall, I believe the behavior should
+be exactly the same whether HV_X64_NESTED_DIRECT_FLUSH is enabled or
+not.
 
+Also, I'm tempted to say that L1 not intercepting VMMCALL and at the
+same time using extended features like HV_X64_NESTED_DIRECT_FLUSH can be
+an unsupported combo and we can just refuse to run L2 or crash L1 for
+misbehaving but I'm afraid this can backfire. E.g. when Hyper-V is
+shutting down or in some other 'special' situation.
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
+>
+> As for bugs that are *unknowingly* being fixed, intercepting VMMCALL and manually
+> injecting a #UD effectively fixes a bad interaction with KVM's asinine
+> KVM_X86_QUIRK_FIX_HYPERCALL_INSN.  If KVM doesn't intercept VMMCALL while L2
+> is active (L1 doesn't wants to intercept VMMCALL and the Hyper-V L2 TLB flush
+> hypercall is disabled), then L2 will hang on the VMMCALL as KVM will intercept
+> the #UD, then "emulate" VMMCALL by trying to fixup the opcode and restarting the
+> instruction.
+>
+> That can be "fixed" by disabling the quirk, or by hacking the fixup like so:
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index db3f393192d9..3f6d9950f8f8 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10506,17 +10506,22 @@ static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt)
+>          * If the quirk is disabled, synthesize a #UD and let the guest pick up
+>          * the pieces.
+>          */
+> -       if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_FIX_HYPERCALL_INSN)) {
+> -               ctxt->exception.error_code_valid = false;
+> -               ctxt->exception.vector = UD_VECTOR;
+> -               ctxt->have_exception = true;
+> -               return X86EMUL_PROPAGATE_FAULT;
+> -       }
+> +       if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_FIX_HYPERCALL_INSN))
+> +               goto inject_ud;
+>  
+>         kvm_x86_call(patch_hypercall)(vcpu, instruction);
+>  
+> +       if (is_guest_mode(vcpu) && !memcmp(instruction, ctxt->fetch.data, 3))
+> +               goto inject_ud;
+> +
+>         return emulator_write_emulated(ctxt, rip, instruction, 3,
+>                 &ctxt->exception);
+> +
+> +inject_ud:
+> +       ctxt->exception.error_code_valid = false;
+> +       ctxt->exception.vector = UD_VECTOR;
+> +       ctxt->have_exception = true;
+> +       return X86EMUL_PROPAGATE_FAULT;
+>  }
+>  
+>  static int dm_request_for_irq_injection(struct kvm_vcpu *vcpu)
+> --
+>
+> But that's extremely convoluted for no purpose that I can see.  Not intercepting
+> VMMCALL requires _more_ code and is overall more complex.
+>
+> So unless I'm missing something, I'm going to tack on this to fix the L2 infinite
+> loop, and then figure out what to do about Hyper-V, pending Vitaly's input.
+>
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index 45d1496031a7..a55af647649c 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -156,13 +156,6 @@ void recalc_intercepts(struct vcpu_svm *svm)
+>                         vmcb_clr_intercept(c, INTERCEPT_VINTR);
+>         }
+>  
+> -       /*
+> -        * We want to see VMMCALLs from a nested guest only when Hyper-V L2 TLB
+> -        * flush feature is enabled.
+> -        */
+> -       if (!nested_svm_l2_tlb_flush_enabled(&svm->vcpu))
+> -               vmcb_clr_intercept(c, INTERCEPT_VMMCALL);
+> -
+>         for (i = 0; i < MAX_INTERCEPT; i++)
+>                 c->intercepts[i] |= g->intercepts[i];
+>  
+>
+
+-- 
+Vitaly
 
 
