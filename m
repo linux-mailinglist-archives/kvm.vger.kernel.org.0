@@ -1,366 +1,278 @@
-Return-Path: <kvm+bounces-72560-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72561-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QNxYNVgtp2mbfgAAu9opvQ
-	(envelope-from <kvm+bounces-72560-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 19:50:00 +0100
+	id CHFdAbstp2mbfgAAu9opvQ
+	(envelope-from <kvm+bounces-72561-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 19:51:39 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDF7F1F57A6
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 19:49:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B2031F57D5
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 19:51:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AA8573027588
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 18:49:39 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3D2A6303F1F0
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 18:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A953492528;
-	Tue,  3 Mar 2026 18:49:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 837B248166A;
+	Tue,  3 Mar 2026 18:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XlVCeQ0q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2Y3eOVNr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C6138655B
-	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 18:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27ADC3537F9
+	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 18:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772563774; cv=none; b=A8CDIiH/QQ3ORochRosyurUyQJPJQIu8xGHvR9qIcmuM7FThbGlOyefKBVf+t4RzxS595AaMr5kCTtFfa88/KPYMUSiWJE6//D2yk5P7zJ0YdhUsJzgDKjmQEI5GRFjyrBOPy0xPUisOGLb2Ks2QjclTHN2XJgXs+R6C2AUIZO4=
+	t=1772563885; cv=none; b=XO/yrc4zVBYlMXT2grNuC9y3QlJDZQOCkvoYUTfDr58gcpkpGjwTH0rO6ON/38CV1FgZBK4wEmI9Sd5lW5OZrk9AlBaq71CNQPM5ZPI1XxdAaAlwkXASsxpKJ5x7NdjHlUX3i+H/Tkv+ev2mEHzf2Jz0bKrN2+P4jGuS9X299WI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772563774; c=relaxed/simple;
-	bh=PXqaH0XsPYwKgnbesGlSRGwmPB2SW89gjwUrlS6E3Qw=;
+	s=arc-20240116; t=1772563885; c=relaxed/simple;
+	bh=saFrkHD9A0jl8FG23ePEQhYjIEsy4y0Or5I6Qiz+iBM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VZbAZl30fYY5hzxyLZeWm2p4UCV+G/AOxSYmKXuFteZ6ieGn/IoI7u84DpKxnPYgqFFgGjNJ0lf5Pt7cZGsBJFrz+8SYIR861QXwNKRzXp6ERSH/D82VOmlshFDWdLjq8xHYAWiFJY5aY0emsweVFt2EDDIVbCGuLmsOKfzUCwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XlVCeQ0q; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-82748257f5fso3134896b3a.1
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 10:49:32 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cn88RVfowps5qVzqx8PdAS+Mm9UjB5KkeOnPhTX1QMmttwq5agJGAJ2+8jW6kX0Gm/l8EWo6/Q8uEYLX1gHvxaNBQNwrweReuMt/0/Z/AZeyaZIaSpPb/4n8telW2MSzV5Q/SKL8Be5QMu4atgAX4UISEz82klybE997ivjtpv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2Y3eOVNr; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2ae49120e97so92905ad.0
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 10:51:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772563772; x=1773168572; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772563881; x=1773168681; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lfFy0+sICiIpuWtJU7Loxi/Rf1izKQ3p65y5jr4rNp4=;
-        b=XlVCeQ0qvekpMzZTVBZsEleO5pIUxKBHdqHE5204Z4q56KvArvYNvSAEaJTlNH2T+c
-         WulFhpYzDVCDsAPCAyD7iTsuH0f37aAD/fHdKH0Laj2lNclU5KQi2loe5Skc6S05n2Tb
-         cjwQAdgiV5MqCuQS7Gk3FkQifFD3SCSP0lr+7e4D3inrxnqOUzGeFH7w3sxHlaQoD2vH
-         bBcr3zmAd/5jLnJNIk5gtKCjb/C9cBeeoS/R9KrrDMz8Xz5mSW9kTQzuUvs6PaVq5Tbh
-         QAmDZ7iltIIjZIIgr/OLgVfUmeI7mQlOkoLucCBXqydNHDIJnD54EcY842G1/xhEawtY
-         pupg==
+        bh=HlPLV02PSXP+edDlOLBCujALxcDghVDbBowN1loqhmY=;
+        b=2Y3eOVNrE9i94IMY37bCnR9E5j0FL8OyqcPButlz/YyBNuYK01DiaLOhdrOGXn+yYD
+         Xe7QsaxNT+02T5cJFKkqgw4F3q03SDU1zxnMlwnjDJtUYL8y2LNJl2fWYvK6KEzmlg6h
+         QGliMVerZmzzyaaXN0oy0aPotGORrHkqLZmE3vdsK6wxOUO2JWYQ/AeqkQ0zhxnt/jfV
+         Yzk0Ot6afS0rhej2XK9Xptlm98gVXiotYIZb8or39QpqzWGx0gLsvP15D4Q1IJVv6Rya
+         hQBNAMQRzE9DFwk6CJ7AwmhGtOzlvfALf1uRvgr1Hhd78W4CN/o6qwxWx2uD8uIzNnws
+         f5HQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772563772; x=1773168572;
+        d=1e100.net; s=20230601; t=1772563881; x=1773168681;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lfFy0+sICiIpuWtJU7Loxi/Rf1izKQ3p65y5jr4rNp4=;
-        b=VDf8Twa5kpziMkgCfCFAB8MaK6xLyvz6I5As1FuBRlIpsCJDEAfqmnRdqmgrjXBohF
-         Jmp5xbaAYl6mCtkBR9F8o2D0q0EEiPw4Kvc4SvsIHYcErFE9BVluNGA06CCC9fZJ7CNa
-         p6xFko9j9y8FZXd3ovnc7ndeVHZvGB0XUbXZ+XNUBpOZiv6jdY2dR+unbEcOG3XWCEGh
-         1almXz/csKTHxPvyMg3QXobmeYaBs+8S8nLBMB91kHz7IsBM2jtHfKFMaIukIK4sK8ic
-         YXmhO9VOLj3cWjpNm4mwBVZMfxiDG6lGN5XnIKjf5J2JhslpbsTB1TJxTsIAXoPADiyp
-         USiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCViduD2/tieAPXDoFLrNd6Q29tcvZyA6C/Tt2xAXmjkrRWSlghb8AvyfHa/mjv5OufiGHo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yze95ib5NvuMZWlJwU3cnffBDXUkgkZfQtRqy0P5bJTYPOnLAhZ
-	5Xx+sj02w+qJAXqnCfcdeieQVNQI8zqkkfsH0c986MY90L+AmGPnDiP6
-X-Gm-Gg: ATEYQzyRK2Ej98RvBYeb+iOhgYYnQisydmXGqjzNVpfRLszXGuUVM26dF+iodv+8/OR
-	y15LuW9PEXP4WC8eIcXhHoTACBz7tXBN7rBpaxJs2jOLMqivL6/icIytWRGtJmFBOrPDrdTlZkY
-	fR3v+VdjKhiYysQ0v9Xj7S/1wxnTEjht3Ed8YpTjt7uVVAD4yhD2RByMG4Tmunyeb06JzDZDEVY
-	FolQXjQFjS8Kmoa+AoA+yp2WFkuvyxVMeNb2jB/TPB+09mbylWXEr1dVZN6I85TireEtRzoUP2M
-	L3kRVMEySUU4SsndaoloH/oScgMRoDpTeAP0sacmyoFp1hfsuh25HHGVe4p30OxJo40Ic8QJFIv
-	1BytNk/C2gF9e5XtrwZs30NHN0H8B1p10sPnXFriyXNwM+sRBh7u3GrS2hLmDrwe6YLQPKz+Dhq
-	J5R6pAAAZQFAfalrB3s6Neljg=
-X-Received: by 2002:a17:90b:5286:b0:359:83a3:584d with SMTP id 98e67ed59e1d1-3599ce32dabmr2717858a91.6.1772563772118;
-        Tue, 03 Mar 2026 10:49:32 -0800 (PST)
-Received: from localhost ([27.7.180.69])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3599c49eb5bsm2803924a91.11.2026.03.03.10.49.31
+        bh=HlPLV02PSXP+edDlOLBCujALxcDghVDbBowN1loqhmY=;
+        b=Nl0zCch9Xv+j8Qn0mDL3Nobj/hWt0rPSkrEcmL//DQOpHVPEkn2Sy9cDTadNftpYEk
+         lo/rZiNtL1c6giCwPYQcQ/Luxlh/XNoKtiusft2TgL6d0QZc41OhZyxI8EM7Kl/Kz0s9
+         yogenOkIx6Yk/tJS/a0z9nqYavzpm0lf+Sp+Rdyz3YNW/NorkscmPTgcxbPuZqmk+t+P
+         ZGBuw2uiQ798wXsIZKhR9xFpD+wOgLk/uJRwOT4Qxi0N3LMkt0mXgEniMFO/Tq0a9Qjh
+         nxvk+KpRCqA70AOYJhG9ldM6CszDF4cfWsu4nxUb5SzCuPwpViBqMG3PIQGtM00e+Za3
+         PbPg==
+X-Forwarded-Encrypted: i=1; AJvYcCU+DWwhg7SvmMZHqpotw5cXu2IcESJmpjZ1RmZ5BLfcY7Fr5mtopZ4+xq4GbfIuAgG1BWg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLhIV2FWSsxYiDTBPStAktDBXZhByDNHoQs/BzVNRpGZvsmxt8
+	IU00XfeiF0+O4O+0M8+E6x88knVu9fR4d+FdS1NiTR9kqAedVfbN0InJdiQfzHzBiA==
+X-Gm-Gg: ATEYQzxFEjAqPt5K24EPZ1YZltzWGDitCgRQ7mWOhCG9/x2qX4BXLrZWMMS8LHwiclS
+	V03W1VGjWaZKTug0iXuxryVavj+QbrWTjX9LEXuoHEkCgm94DMkYRB0O0EQRX0vtrOwnCMvc7r4
+	R7m/YQrANykgAIYB09wp+Zq7AQoey3JKTxC3ZQ0FLxIv6phTwc7q2SJht9CkbWDdldeB7IfYoLH
+	FVOicIn1a47NipcxG6UBpAP5MQvzFo6QTZ9Sws0WfjPXECE3E++EU2+GM7q5l9wod1HQ/xAO48c
+	aseg3mKC2q5NhAkE7hktYJFEsHD9YZwXzxLJZXqh+Zp/jGKTKhxvSW9/cZpqIgYO8xxTAl6iZdD
+	HtvvDCX3BTNvrQgLD1ObsfBbU12Vy2EdcZwa2kNUcJQQuSm112A7uHRI+XyA4LjvdJldxQRfdbS
+	2kmK52iGTrVznjY4BohFGn3Mv8LX6SkabkjpIKzlYfpu5ypiR00apnMla40fnDrg==
+X-Received: by 2002:a17:903:fae:b0:2a0:867c:60e2 with SMTP id d9443c01a7336-2ae3b5554c6mr7299895ad.19.1772563880765;
+        Tue, 03 Mar 2026 10:51:20 -0800 (PST)
+Received: from google.com (168.136.83.34.bc.googleusercontent.com. [34.83.136.168])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2adfb5db596sm183363085ad.35.2026.03.03.10.51.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Mar 2026 10:49:31 -0800 (PST)
-Date: Wed, 4 Mar 2026 00:19:28 +0530
-From: shaikh kamaluddin <shaikhkamal2012@gmail.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH] KVM: mmu_notifier: make mn_invalidate_lock non-sleeping
- for non-blocking invalidations
-Message-ID: <aactOOfirdVRYfNS@acer-nitro-anv15-41>
-References: <20260209161527.31978-1-shaikhkamal2012@gmail.com>
- <20260211120944.-eZhmdo7@linutronix.de>
- <aYyhfvC_2s000P7H@google.com>
+        Tue, 03 Mar 2026 10:51:20 -0800 (PST)
+Date: Tue, 3 Mar 2026 18:51:16 +0000
+From: Samiullah Khawaja <skhawaja@google.com>
+To: Ankit Soni <Ankit.Soni@amd.com>
+Cc: David Woodhouse <dwmw2@infradead.org>, 
+	Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, YiFei Zhu <zhuyifei@google.com>, 
+	Robin Murphy <robin.murphy@arm.com>, Kevin Tian <kevin.tian@intel.com>, 
+	Alex Williamson <alex@shazbot.org>, Shuah Khan <shuah@kernel.org>, iommu@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>, 
+	Adithya Jayachandran <ajayachandra@nvidia.com>, Parav Pandit <parav@nvidia.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, William Tu <witu@nvidia.com>, 
+	Pratyush Yadav <pratyush@kernel.org>, Pasha Tatashin <pasha.tatashin@soleen.com>, 
+	David Matlack <dmatlack@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Chris Li <chrisl@kernel.org>, Pranjal Shrivastava <praan@google.com>, 
+	Vipin Sharma <vipinsh@google.com>
+Subject: Re: [PATCH 11/14] iommufd-lu: Persist iommu hardware pagetables for
+ live update
+Message-ID: <n56v7llotm7jlkev4rsrm6l36vpzyufrx273ay5455hfauttzn@kn3oydrbhill>
+References: <20260203220948.2176157-1-skhawaja@google.com>
+ <20260203220948.2176157-12-skhawaja@google.com>
+ <srgagoecgejftgvvqstjiwazi6blsljqyae3v5dlyj7nlv5lii@rjigll2eosuj>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <aYyhfvC_2s000P7H@google.com>
-X-Rspamd-Queue-Id: CDF7F1F57A6
+In-Reply-To: <srgagoecgejftgvvqstjiwazi6blsljqyae3v5dlyj7nlv5lii@rjigll2eosuj>
+X-Rspamd-Queue-Id: 8B2031F57D5
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72560-lists,kvm=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-72561-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[shaikhkamal2012@gmail.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[skhawaja@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_FIVE(0.00)[5];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Wed, Feb 11, 2026 at 07:34:22AM -0800, Sean Christopherson wrote:
-> On Wed, Feb 11, 2026, Sebastian Andrzej Siewior wrote:
-> > On 2026-02-09 21:45:27 [+0530], shaikh.kamal wrote:
-> > > mmu_notifier_invalidate_range_start() may be invoked via
-> > > mmu_notifier_invalidate_range_start_nonblock(), e.g. from oom_reaper(),
-> > > where sleeping is explicitly forbidden.
-> > > 
-> > > KVM's mmu_notifier invalidate_range_start currently takes
-> > > mn_invalidate_lock using spin_lock(). On PREEMPT_RT, spin_lock() maps
-> > > to rt_mutex and may sleep, triggering:
-> > > 
-> > >   BUG: sleeping function called from invalid context
-> > > 
-> > > This violates the MMU notifier contract regardless of PREEMPT_RT;
-> 
-> I highly doubt that.  kvm.mmu_lock is also a spinlock, and KVM has been taking
-> that in invalidate_range_start() since
-> 
->   e930bffe95e1 ("KVM: Synchronize guest physical memory map to host virtual memory map")
-> 
-> which was a full decade before mmu_notifiers even added the blockable concept in
-> 
->   93065ac753e4 ("mm, oom: distinguish blockable mode for mmu notifiers")
-> 
-> and even predate the current concept of a "raw" spinlock introduced by
-> 
->   c2f21ce2e312 ("locking: Implement new raw_spinlock")
-> 
-> > > RT kernels merely make the issue deterministic.
-> 
-> No, RT kernels change the rules, because suddenly a non-sleeping locking becomes
-> sleepable.
-> 
-> > > Fix by converting mn_invalidate_lock to a raw spinlock so that
-> > > invalidate_range_start() remains non-sleeping while preserving the
-> > > existing serialization between invalidate_range_start() and
-> > > invalidate_range_end().
-> 
-> This is insufficient.  To actually "fix" this in KVM mmu_lock would need to be
-> turned into a raw lock on all KVM architectures.  I suspect the only reason there
-> haven't been bug reports is because no one trips an OOM kill on VM while running
-> with CONFIG_DEBUG_ATOMIC_SLEEP=y.
-> 
-> That combination is required because since commit
-> 
->   8931a454aea0 ("KVM: Take mmu_lock when handling MMU notifier iff the hva hits a memslot")
-> 
-> KVM only acquires mmu_lock if the to-be-invalidated range overlaps a memslot,
-> i.e. affects memory that may be mapped into the guest.
-> 
-> E.g. this hack to simulate a non-blockable invalidation
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 7015edce5bd8..7a35a83420ec 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -739,7 +739,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->                 .handler        = kvm_mmu_unmap_gfn_range,
->                 .on_lock        = kvm_mmu_invalidate_begin,
->                 .flush_on_ret   = true,
-> -               .may_block      = mmu_notifier_range_blockable(range),
-> +               .may_block      = false,//mmu_notifier_range_blockable(range),
->         };
->  
->         trace_kvm_unmap_hva_range(range->start, range->end);
-> @@ -768,6 +768,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->          */
->         gfn_to_pfn_cache_invalidate_start(kvm, range->start, range->end);
->  
-> +       non_block_start();
->         /*
->          * If one or more memslots were found and thus zapped, notify arch code
->          * that guest memory has been reclaimed.  This needs to be done *after*
-> @@ -775,6 +776,7 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
->          */
->         if (kvm_handle_hva_range(kvm, &hva_range).found_memslot)
->                 kvm_arch_guest_memory_reclaimed(kvm);
-> +       non_block_end();
->  
->         return 0;
->  }
-> 
-> immediately triggers
-> 
->   BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:241
->   in_atomic(): 0, irqs_disabled(): 0, non_block: 1, pid: 4992, name: qemu
->   preempt_count: 0, expected: 0
->   RCU nest depth: 0, expected: 0
->   CPU: 6 UID: 1000 PID: 4992 Comm: qemu Not tainted 6.19.0-rc6-4d0917ffc392-x86_enter_mmio_stack_uaf_no_null-rt #1 PREEMPT_RT 
->   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
->   Call Trace:
->    <TASK>
->    dump_stack_lvl+0x51/0x60
->    __might_resched+0x10e/0x160
->    rt_write_lock+0x49/0x310
->    kvm_mmu_notifier_invalidate_range_start+0x10b/0x390 [kvm]
->    __mmu_notifier_invalidate_range_start+0x9b/0x230
->    do_wp_page+0xce1/0xf30
->    __handle_mm_fault+0x380/0x3a0
->    handle_mm_fault+0xde/0x290
->    __get_user_pages+0x20d/0xbe0
->    get_user_pages_unlocked+0xf6/0x340
->    hva_to_pfn+0x295/0x420 [kvm]
->    __kvm_faultin_pfn+0x5d/0x90 [kvm]
->    kvm_mmu_faultin_pfn+0x31b/0x6e0 [kvm]
->    kvm_tdp_page_fault+0xb6/0x160 [kvm]
->    kvm_mmu_do_page_fault+0xee/0x1f0 [kvm]
->    kvm_mmu_page_fault+0x8d/0x600 [kvm]
->    vmx_handle_exit+0x18c/0x5a0 [kvm_intel]
->    kvm_arch_vcpu_ioctl_run+0xc70/0x1c90 [kvm]
->    kvm_vcpu_ioctl+0x2d7/0x9a0 [kvm]
->    __x64_sys_ioctl+0x8a/0xd0
->    do_syscall_64+0x5e/0x11b0
->    entry_SYSCALL_64_after_hwframe+0x4b/0x53
->    </TASK>
->   kvm: emulating exchange as write
-> 
-> 
-> It's not at all clear to me that switching mmu_lock to a raw lock would be a net
-> positive for PREEMPT_RT.  OOM-killing a KVM guest in a PREEMPT_RT seems like a
-> comically rare scenario.  Whereas contending mmu_lock in normal operation is
-> relatively common (assuming there are even use cases for running VMs with a
-> PREEMPT_RT host kernel).
-> 
-> In fact, the only reason the splat happens is because mmu_notifiers somewhat
-> artificially forces an atomic context via non_block_start() since commit
-> 
->   ba170f76b69d ("mm, notifier: Catch sleeping/blocking for !blockable")
-> 
-> Given the massive amount of churn in KVM that would be required to fully eliminate
-> the splat, and that it's not at all obvious that it would be a good change overall,
-> at least for now:
-> 
-> NAK
-> 
-> I'm not fundamentally opposed to such a change, but there needs to be a _lot_
-> more analysis and justification beyond "fix CONFIG_DEBUG_ATOMIC_SLEEP=y".
+On Tue, Mar 03, 2026 at 05:56:15AM +0000, Ankit Soni wrote:
+>Hi,
 >
-Hi Sean,
-Thanks for the detailed explanation and for spelling out the border
-issue.
-Understood on both points:
-	1. The changelog wording was too strong; PREEMPT_RT changes
-	spin_lock() semantics, and the splat is fundamentally due to
-	spinlocks becoming sleepable there.
-	2. Converting only mm_invalidate_lock to raw is insufficient
-	since KVM can still take the mmu_lock (and other sleeping locks
-	RT) in invalidate_range_start() when the invalidation hits a
-	memslot.
-Given the above, it shounds like "convert locks to raw" is not the right
-direction without sinificat rework and justification.
-Would an acceptable direction be to handle the !blockable notifier case
-by deferring the heavyweight invalidation work(anything that take
-mmu_lock/may sleep on RT) to a context that may block(e.g. queued work),
-while keeping start()/end() accounting consisting with memslot changes ?
-if so, I can protoptype a patch along those lines and share for
-feedback.
+>On Tue, Feb 03, 2026 at 10:09:45PM +0000, Samiullah Khawaja wrote:
+>> From: YiFei Zhu <zhuyifei@google.com>
+>>
+>> The caller is expected to mark each HWPT to be preserved with an ioctl
+>> call, with a token that will be used in restore. At preserve time, each
+>> HWPT's domain is then called with iommu_domain_preserve to preserve the
+>> iommu domain.
+>>
+>> The HWPTs containing dma mappings backed by unpreserved memory should
+>> not be preserved. During preservation check if the mappings contained in
+>> the HWPT being preserved are only file based and all the files are
+>> preserved.
+>>
+>> The memfd file preservation check is not enough when preserving iommufd.
+>> The memfd might have shrunk between the mapping and memfd preservation.
+>> This means that if it shrunk some pages that are right now pinned due to
+>> iommu mappings are not preserved with the memfd. Only allow iommufd
+>> preservation when all the iopt_pages are file backed and the memory file
+>> was seal sealed during mapping. This guarantees that all the pages that
+>> were backing memfd when it was mapped are preserved.
+>>
+>> Once HWPT is preserved the iopt associated with the HWPT is made
+>> immutable. Since the map and unmap ioctls operates directly on iopt,
+>> which contains an array of domains, while each hwpt contains only one
+>> domain. The logic then becomes that mapping and unmapping is prohibited
+>> if any of the domains in an iopt belongs to a preserved hwpt. However,
+>> tracing to the hwpt through the domain is a lot more tedious than
+>> tracing through the ioas, so if an hwpt is preserved, hwpt->ioas->iopt
+>> is made immutable.
+>>
+>> When undoing this (making the iopts mutable again), there's never
+>> a need to make some iopts mutable and some kept immutable, since
+>> the undo only happen on unpreserve and error path of preserve.
+>> Simply iterate all the ioas and clear the immutability flag on all
+>> their iopts.
+>>
+>> Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+>> Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
+>> ---
+>>  drivers/iommu/iommufd/io_pagetable.c    |  17 ++
+>>  drivers/iommu/iommufd/io_pagetable.h    |   1 +
+>>  drivers/iommu/iommufd/iommufd_private.h |  25 ++
+>>  drivers/iommu/iommufd/liveupdate.c      | 300 ++++++++++++++++++++++++
+>>  drivers/iommu/iommufd/main.c            |  14 +-
+>>  drivers/iommu/iommufd/pages.c           |   8 +
+>>  include/linux/kho/abi/iommufd.h         |  39 +++
+>>  7 files changed, 403 insertions(+), 1 deletion(-)
+>>  create mode 100644 include/linux/kho/abi/iommufd.h
+>>
+>> +
+>> +static int iommufd_save_hwpts(struct iommufd_ctx *ictx,
+>> +			      struct iommufd_lu *iommufd_lu,
+>> +			      struct liveupdate_session *session)
+>> +{
+>> +	struct iommufd_hwpt_paging *hwpt, **hwpts = NULL;
+>> +	struct iommu_domain_ser *domain_ser;
+>> +	struct iommufd_hwpt_lu *hwpt_lu;
+>> +	struct iommufd_object *obj;
+>> +	unsigned int nr_hwpts = 0;
+>> +	unsigned long index;
+>> +	unsigned int i;
+>> +	int rc = 0;
+>> +
+>> +	if (iommufd_lu) {
+>> +		hwpts = kcalloc(iommufd_lu->nr_hwpts, sizeof(*hwpts),
+>> +				GFP_KERNEL);
+>> +		if (!hwpts)
+>> +			return -ENOMEM;
+>> +	}
+>> +
+>> +	xa_lock(&ictx->objects);
+>> +	xa_for_each(&ictx->objects, index, obj) {
+>> +		if (obj->type != IOMMUFD_OBJ_HWPT_PAGING)
+>> +			continue;
+>> +
+>> +		hwpt = container_of(obj, struct iommufd_hwpt_paging, common.obj);
+>> +		if (!hwpt->lu_preserve)
+>> +			continue;
+>> +
+>> +		if (hwpt->ioas) {
+>> +			/*
+>> +			 * Obtain exclusive access to the IOAS and IOPT while we
+>> +			 * set immutability
+>> +			 */
+>> +			mutex_lock(&hwpt->ioas->mutex);
+>> +			down_write(&hwpt->ioas->iopt.domains_rwsem);
+>> +			down_write(&hwpt->ioas->iopt.iova_rwsem);
+>
+>Taking mutex/rwsem under spin-lock is not a good idea.
 
-Alternatively, if you think this needs to be addressed in
-mmu_notifiers(eg. how non_block_start() is applied), I'm happy to
-redirect my efforts there-Please advise.
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index 5fcd401a5897..7a9c33f01a37 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -747,9 +747,9 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
-> > >  	 *
-> > >  	 * Pairs with the decrement in range_end().
-> > >  	 */
-> > > -	spin_lock(&kvm->mn_invalidate_lock);
-> > > +	raw_spin_lock(&kvm->mn_invalidate_lock);
-> > >  	kvm->mn_active_invalidate_count++;
-> > > -	spin_unlock(&kvm->mn_invalidate_lock);
-> > > +	raw_spin_unlock(&kvm->mn_invalidate_lock);
-> > 
-> > 	atomic_inc(mn_active_invalidate_count)
-> > >  
-> > >  	/*
-> > >  	 * Invalidate pfn caches _before_ invalidating the secondary MMUs, i.e.
-> > > @@ -817,11 +817,11 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
-> > >  	kvm_handle_hva_range(kvm, &hva_range);
-> > >  
-> > >  	/* Pairs with the increment in range_start(). */
-> > > -	spin_lock(&kvm->mn_invalidate_lock);
-> > > +	raw_spin_lock(&kvm->mn_invalidate_lock);
-> > >  	if (!WARN_ON_ONCE(!kvm->mn_active_invalidate_count))
-> > >  		--kvm->mn_active_invalidate_count;
-> > >  	wake = !kvm->mn_active_invalidate_count;
-> > 
-> > 	wake = atomic_dec_return_safe(mn_active_invalidate_count);
-> > 	WARN_ON_ONCE(wake < 0);
-> > 	wake = !wake;
-> > 
-> > > -	spin_unlock(&kvm->mn_invalidate_lock);
-> > > +	raw_spin_unlock(&kvm->mn_invalidate_lock);
-> > >  
-> > >  	/*
-> > >  	 * There can only be one waiter, since the wait happens under
-> > > @@ -1129,7 +1129,7 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
-> > > @@ -1635,17 +1635,17 @@ static void kvm_swap_active_memslots(struct kvm *kvm, int as_id)
-> > >  	 * progress, otherwise the locking in invalidate_range_start and
-> > >  	 * invalidate_range_end will be unbalanced.
-> > >  	 */
-> > > -	spin_lock(&kvm->mn_invalidate_lock);
-> > > +	raw_spin_lock(&kvm->mn_invalidate_lock);
-> > >  	prepare_to_rcuwait(&kvm->mn_memslots_update_rcuwait);
-> > >  	while (kvm->mn_active_invalidate_count) {
-> > >  		set_current_state(TASK_UNINTERRUPTIBLE);
-> > > -		spin_unlock(&kvm->mn_invalidate_lock);
-> > > +		raw_spin_unlock(&kvm->mn_invalidate_lock);
-> > >  		schedule();
-> > 
-> > And this I don't understand. The lock protects the rcuwait assignment
-> > which would be needed if multiple waiters are possible. But this goes
-> > away after the unlock and schedule() here. So these things could be
-> > moved outside of the locked section which limits it only to the
-> > mn_active_invalidate_count value.
-> 
-> The implementation is essentially a deliberately unfair rwswem.  The "write" side
-> in kvm_swap_active_memslots() subtly protect this code:
-> 
->   rcu_assign_pointer(kvm->memslots[as_id], slots);
-> 
-> and the "read" side protects the kvm->memslot lookups in kvm_handle_hva_range().
-> 
-> KVM optimizes its mmu_notifier invalidation path to only take action if the
-> to-be-invalidated range overlaps one or more memslots, i.e. affects memory that
-> be can be mapped into the guest.  The wrinkle with those optimizations is that
-> KVM needs to prevent changes to the memslots between invalidation start() and end(),
-> otherwise the accounting can become imbalanced, e.g. mmu_invalidate_in_progress
-> will underflow or be left elevated and essentially hang the VM (among other bad
-> things).
-> 
-> So simply making mn_active_invalidate_count an atomic won't suffice, because KVM
-> needs to block start() to ensure start()+end() see the exact same set of memslots.
+Agreed. I will move this out by taking a reference on the object and
+then setting it separately without xa_lock.
+>
+>> +
+>> +			hwpt->ioas->iopt.lu_map_immutable = true;
+>> +
+>> +			up_write(&hwpt->ioas->iopt.iova_rwsem);
+>> +			up_write(&hwpt->ioas->iopt.domains_rwsem);
+>> +			mutex_unlock(&hwpt->ioas->mutex);
+>> +		}
+>> +
+>> +		if (!hwpt->common.domain) {
+>> +			rc = -EINVAL;
+>> +			xa_unlock(&ictx->objects);
+>> +			goto out;
+>> +		}
+>> +
+>> +		if (!iommufd_lu) {
+>> +			rc = check_iopt_pages_preserved(session, hwpt);
+>> +			if (rc) {
+>> +				xa_unlock(&ictx->objects);
+>> +				goto out;
+>> +			}
+>> +		} else if (iommufd_lu) {
+>
+>Redundant else_if().
+
+Will remove
+>
+>-Ankit
+>
+>> +			hwpts[nr_hwpts] = hwpt;
+>> +			hwpt_lu = &iommufd_lu->hwpts[nr_hwpts];
+>> +
+>> +			hwpt_lu->token = hwpt->lu_token;
+>> +			hwpt_lu->reclaimed = false;
+>> +		}
+>> +
+>> +		nr_hwpts++;
+>> +	}
+>> +	xa_unlock(&ictx->objects);
+>> +
+
+Thanks for looking into this.
+
+Sami
 
