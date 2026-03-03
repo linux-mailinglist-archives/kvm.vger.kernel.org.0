@@ -1,88 +1,93 @@
-Return-Path: <kvm+bounces-72567-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72568-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YLhbDvEwp2kjfwAAu9opvQ
-	(envelope-from <kvm+bounces-72567-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 20:05:21 +0100
+	id uMwKNBMxp2kjfwAAu9opvQ
+	(envelope-from <kvm+bounces-72568-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 20:05:55 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D57D41F5A13
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 20:05:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5419B1F5A31
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 20:05:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E8A52306CC14
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 19:03:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5B57730AC5D0
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 19:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79823ED5A3;
-	Tue,  3 Mar 2026 19:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF194949EC;
+	Tue,  3 Mar 2026 19:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aoiMV6wz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b42AJugh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 320C6377EA1
-	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 19:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D603D6CD8
+	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 19:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772564624; cv=none; b=DN4d9ge4Gv2j6sPtEW7hDd+Ao9bqoZnyKXhKU3lBtg4PGavQ1HiCNHN3guykBT7QvLCdTPeExOLq32DzdjatW9x5f4jkyJ9dOWv5TjhwkuC9EbGk4tQykIw9EoFI1nqiZdgYanl/EVD0VuHO3SOmesAmSNW/OVYR6Jx6VU55z+I=
+	t=1772564625; cv=none; b=a7d8u9yDIQJ4PDGDlMC0vX6xp+63/KWM+97ratdfEkfP5fvhm9Tq0MvRGD1rYXtpEWg5pqHBry3/kr8sdmYyHoa3K7kyENiD6s9FhDxL76SX6Fz5t5NsX6J4ikOKSfqyCdKoanxUFKkt8NnOnOar6zJo75GF4ZKP1zTwT0n4p/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772564624; c=relaxed/simple;
-	bh=ZJW7QnHENow9IC8VkrX5QT5f5RGEfFM4CSOmDGCyhGo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tFDfOResU6C7XYccAUU/MRB7jlkuclJoqT1OdgDl/SG9kOD3xBR94ST1QDkFpra/14Zlj/FaC1aABJnljK8iWoffCYdH6bb/WG3ehYs4AwFMvKAD/ZUhJWXCmGH+DVDUVrTwtdWMQuD/ZbrJiMzTDL3+eGTlSS5NcpNd5Wc9cvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aoiMV6wz; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1772564625; c=relaxed/simple;
+	bh=u7/13Qa3F2z+DYiu+VjB8O1ezedwn/ik7S2XPnbA6UQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=i3JudlcCS97W++T3lMUspo+1XiT9Z68DOw69TjiH/PxNbJClZlJ51Bw96Lvavm7GFc4w/mYBfc8aY21G4XpYsia77q3sqiWMFZzCueIe4pHK9qKI90iMRJiyKWZfFsFLNabSt+tCKPfJsgttlyBWhxDfGXeu6IPNwfe9qUqvf7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b42AJugh; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c6e1d32a128so3586451a12.3
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 11:03:43 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2ae4cdfc468so26415695ad.2
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 11:03:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772564622; x=1773169422; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7HYEqbzPxihlsLjR6JkXJkRv7dD7WWhUy1nb4kzntSw=;
-        b=aoiMV6wzQvtxEHskPP32JZEwkfQ97OamSfxlIS1OIROz63FfgyI+DL8luHrV86YFJm
-         u+iqbzDP23dzW3pI7XcnAviEFZTzeP9otgKz5qFyylgswX1nL7St3NJtrwghD1VMVVaR
-         1rfgby0h2bVbrYyl0Y4hrm1wqTqUX9UNNOcP05NnHgPCprHZlR7783HUOj2UREWixV5D
-         WvypQsrI8XXhszCUGBu3QWdiaQOlH8WO+Lwk4WbdtoPnUlhPmIYieKadh3IEa8tFATQk
-         q8+pNA55Kd4wUptMwm94IgsJSEYbXncdj92qNhAAQs6qJ8ftdtPAI/FxmYSASJ6ObSGV
-         MZ1w==
+        d=google.com; s=20230601; t=1772564624; x=1773169424; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=yz3MkihpO/3OgXiBEUXwzX0zyHyXB+v43DwfQqlp7z0=;
+        b=b42AJughBKEH5TfXni8ocol6gvLPQvtAgGd34hmwo3BD54brWnVck2y80n2o3Eorf5
+         PLKQEF3WL7NajAbLvbHjPRJAvb2azW3Pc5auPEt3YCh01wyrh5pJvTNgV2/nzjDMkhvv
+         MJF1Mf+eYbm0NaBrSIzMhidTkhBz5pjdYVpz8wm+F27a5pYKcu554VpLvqAPXNgFtiqU
+         d2fTrCiLumXOmFhNqjC9Ng7+dP/nhI53T6D9gnwvg6ZexN5yN6N1NuOXe9h+OnO6Hxgb
+         ZNPj5VOutSI2jB9aJblLImdjM6rCq7UlGyDc4LY+eshel0JcEaNKSU/0Z/2nFym+8t/o
+         9ucw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772564622; x=1773169422;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7HYEqbzPxihlsLjR6JkXJkRv7dD7WWhUy1nb4kzntSw=;
-        b=UOqvAakbYE50bX9u6a2WpQuje+N9zOD9XNk5ziwYcIgaPTgW5vb0CB2f0TAqwXS/xh
-         fRiK3DGEhheG44QQL/KJdr70mKOUlO63MJkI/n8eVTUQ6tVd6Zj0FxaO96WhxJ7+G4ry
-         /7s6oftJdB+ym0jL7m/pgDlw0nhFB3gIX/vb1f7RUHtbAr1WPATIne/Bpb7TvxVn/O/S
-         yf0ieaO8lzncjzUUuBLJfBSp83+DYAEcon5OYH5eLlhVy8lDo243ohmab4vWSgYYFQPx
-         e4L8MYehN6kQIaly4UWDkJkNdKj4dAtuslDAE1qX/k7Sx9iZpsdAH6U5nD2YRSyNB1kL
-         v8PA==
-X-Forwarded-Encrypted: i=1; AJvYcCX3iPM6rU0WjEfrb+a0VeJnUHKihXj+nrc5eK0OzA+KAjZcCpIYX43QGt67n2IxgOgZWfU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVdp25FKaWMW+Jwra/wCcWIlOnMPwhv81rWfGKcjJPOHnMXUr/
-	BdBzuu7Ifk2Et22uh82TEk/wfQ70hDksYXTjb40nSywgEPR3pyZwfMiYvbjP/7ZvY5Z+r973PE7
-	W+DnhvQ==
-X-Received: from pgvt6.prod.google.com ([2002:a65:64c6:0:b0:c6e:698a:f5c0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:44c8:b0:38e:54b8:60a1
- with SMTP id adf61e73a8af0-395c39de56amr15737423637.4.1772564622253; Tue, 03
- Mar 2026 11:03:42 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772564624; x=1773169424;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yz3MkihpO/3OgXiBEUXwzX0zyHyXB+v43DwfQqlp7z0=;
+        b=IDPEII8mYsQoOGy3tV+YEziR83egaAyPUKgdMnqoVS7b2YsesrlaQnEMNxEnkAck86
+         6UIccWmoGnh1FaWJDBT5aB92Dup+6VCJOgIpqDy1Ow9swPs9oAaU6gB/UEYXJwLiFEPC
+         4U2ENzbfA93Yvwz4mdSXBmJUVYgk/3Es+BrXT8Ep39UYCTRaQml8/WaEehk3TsD5aF9z
+         4QQ8wF9pky37rw4ouinCsvkO0uX2MODguYFdg5b8l/Af+XEtb6KZ2Lzec7KS1iYOZFIo
+         MKG3MEY3F4tuMEHgNZ+sa8BzCZE21aDytJ+O7QK98rfUlSWSztWFfnDX04EILVJorK5I
+         VxQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUVJcydb7DBibklkxdtlYupQvXIp9bJaz0meJn/Ww8VGuNrEC1YY0kQt/zQh7lgPQLA+Ok=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgJlJzQsT0cvpzi03CZJi8M7l2Wp0OSFiJwtpcDZi9OfRDVzod
+	0TS3kpmdRVL6h4+9xYmO05RMIq81I2JsC2P5TRWAvFr/1CiK2OtOcFIPSGD5jPMxl++6anSNS5t
+	C8cw0UQ==
+X-Received: from plcm18.prod.google.com ([2002:a17:902:f212:b0:2ae:5419:3a0a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1aad:b0:2a9:47d0:12cb
+ with SMTP id d9443c01a7336-2ae2e401dabmr174603315ad.22.1772564624033; Tue, 03
+ Mar 2026 11:03:44 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  3 Mar 2026 11:03:37 -0800
+Date: Tue,  3 Mar 2026 11:03:38 -0800
+In-Reply-To: <20260303190339.974325-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260303190339.974325-1-seanjc@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260303190339.974325-1-seanjc@google.com>
-Subject: [PATCH 0/2] KVM: PPC: e500: Fix build error due to crappy KVM code
+Message-ID: <20260303190339.974325-2-seanjc@google.com>
+Subject: [PATCH 1/2] KVM: PPC: e500: Fix build error due to using
+ kmalloc_obj() with wrong type
 From: Sean Christopherson <seanjc@google.com>
 To: Madhavan Srinivasan <maddy@linux.ibm.com>
 Cc: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, Kees Cook <kees@kernel.org>, 
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: D57D41F5A13
+X-Rspamd-Queue-Id: 5419B1F5A31
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
@@ -95,7 +100,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72567-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72568-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -114,26 +119,47 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	REPLYTO_EQ_FROM(0.00)[]
 X-Rspamd-Action: no action
 
-Fix an e500 build error that was introduced by the recent kmalloc_obj()
-conversion, but in reality is due to crappy KVM code that has existed for
-~13 years.
+Fix a build error in kvmppc_e500_tlb_init() that was introduced by the
+conversion to use kzalloc_objs(), as KVM confusingly uses the size of the
+structure that is one and only field in tlbe_priv:
 
-I'm taking this through kvm-x86 fixes, because it's breaking my testing setup,
-and obviously no one cares about KVM e500 since PPC_WERROR is default 'y' and
-needs to be explicitly disabled via PPC_DISABLE_WERROR.
+  arch/powerpc/kvm/e500_mmu.c:923:33: error: assignment to 'struct tlbe_priv *'
+    from incompatible pointer type 'struct tlbe_ref *' [-Wincompatible-pointer-types]
+  923 |         vcpu_e500->gtlb_priv[0] = kzalloc_objs(struct tlbe_ref,
+      |                                 ^
 
-Sean Christopherson (2):
-  KVM: PPC: e500: Fix build error due to using kmalloc_obj() with wrong
-    type
-  KVM: PPC: e500: Rip out "struct tlbe_ref"
+KVM has been flawed since commit 0164c0f0c404 ("KVM: PPC: e500: clear up
+confusion between host and guest entries"), but the issue went unnoticed
+until kmalloc_obj() came along and enforced types, as "struct tlbe_priv"
+was just a wrapper of "struct tlbe_ref" (why on earth the two ever existed
+separately...).
 
- arch/powerpc/kvm/e500.h          |  6 +--
- arch/powerpc/kvm/e500_mmu.c      |  4 +-
- arch/powerpc/kvm/e500_mmu_host.c | 91 +++++++++++++++-----------------
- 3 files changed, 47 insertions(+), 54 deletions(-)
+Fixes: 69050f8d6d07 ("treewide: Replace kmalloc with kmalloc_obj for non-scalar types")
+Cc: Kees Cook <kees@kernel.org>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/powerpc/kvm/e500_mmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-base-commit: 11439c4635edd669ae435eec308f4ab8a0804808
+diff --git a/arch/powerpc/kvm/e500_mmu.c b/arch/powerpc/kvm/e500_mmu.c
+index 48580c85f23b..75ed1496ead5 100644
+--- a/arch/powerpc/kvm/e500_mmu.c
++++ b/arch/powerpc/kvm/e500_mmu.c
+@@ -920,12 +920,12 @@ int kvmppc_e500_tlb_init(struct kvmppc_vcpu_e500 *vcpu_e500)
+ 	vcpu_e500->gtlb_offset[0] = 0;
+ 	vcpu_e500->gtlb_offset[1] = KVM_E500_TLB0_SIZE;
+ 
+-	vcpu_e500->gtlb_priv[0] = kzalloc_objs(struct tlbe_ref,
++	vcpu_e500->gtlb_priv[0] = kzalloc_objs(struct tlbe_priv,
+ 					       vcpu_e500->gtlb_params[0].entries);
+ 	if (!vcpu_e500->gtlb_priv[0])
+ 		goto free_vcpu;
+ 
+-	vcpu_e500->gtlb_priv[1] = kzalloc_objs(struct tlbe_ref,
++	vcpu_e500->gtlb_priv[1] = kzalloc_objs(struct tlbe_priv,
+ 					       vcpu_e500->gtlb_params[1].entries);
+ 	if (!vcpu_e500->gtlb_priv[1])
+ 		goto free_vcpu;
 -- 
 2.53.0.473.g4a7958ca14-goog
 
