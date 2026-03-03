@@ -1,216 +1,164 @@
-Return-Path: <kvm+bounces-72525-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72527-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0Bx2C/DhpmkPYQAAu9opvQ
-	(envelope-from <kvm+bounces-72525-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 14:28:16 +0100
+	id wDS6MlnspmmQaAAAu9opvQ
+	(envelope-from <kvm+bounces-72527-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 15:12:41 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F1E51F0382
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 14:28:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FB121F1283
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 15:12:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BCF1130D9428
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 13:24:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D1DFB319C3ED
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 13:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02CCB43D501;
-	Tue,  3 Mar 2026 13:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D48B362121;
+	Tue,  3 Mar 2026 13:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RUqskrCw"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="n/MiRvLB"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274F6345CD3;
-	Tue,  3 Mar 2026 13:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC3B35AC2A;
+	Tue,  3 Mar 2026 13:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772544224; cv=none; b=eQHQONCdbku/dIBWMvUxSYgOC2LTupXX8Ij/8Qo55efTAJ9/fyMVpc458aUxB09meYSj+sD0AmqGr/jgpfwYwFKgbQUIBeD5apPL9ruDRin3HxigyBezEFXNsGI2p43KBK3GBy53hBVSod4mfXV7p4sk+Pvz/7gvXpRN7cuExVI=
+	t=1772546050; cv=none; b=EuIBJAaozIUnkirkyhIgC7NXbPovGEb2KS2B0oMjPSxFWo+Rhue7JG3/IX8aUKLbkOhaHnPvUgvUwSxDNSKAGl71troADZ/DkokcLe1pcm3yv3sbKuozj+EImwuvilkApFBDuPcUWSPqN8vqDGxbnTFqk3v3tep64gaF28sNUzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772544224; c=relaxed/simple;
-	bh=QXKFZaIGCPMx+aACFmMjJlQcbli93BFDeSlduovypIE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oYvFByKF4oBMoOxG2Fuk6yJDlbM2xNVjCXLjge33phcmrdHQLtAKBL1VW6lYO0xw85tymfAdh/G7pLvE8ABx/1CFqwDV01zM/GocT2kaHa3YWr6Y7qkufXcl36gXmOoXnXoAD/M3V0fWdfv2995hgcNm+dvnGfAqoQmPeYb7u7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RUqskrCw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D507C116C6;
-	Tue,  3 Mar 2026 13:23:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772544223;
-	bh=QXKFZaIGCPMx+aACFmMjJlQcbli93BFDeSlduovypIE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RUqskrCwytKCoz7NpxBgmM4C3jhH3crzoSTNxyVDDTwdv8G6ut6sKfUyApTW2XPoX
-	 9WHaPeALwgD1XPhAKHOr8dE5Mmp1hV0mv0icFbbVLyfqOMlB3UFv/NkSMzIy7aazPM
-	 LdTVjsG8/D2BW2Zl/G9fcDN8ulWmHcRG52y8mHgO0MyvHUIjhvPYk2YZ18z0zXPDpj
-	 yuJOHNq8K+qFXpcELSHkihdCXpjX+HOVnTo0OJK69xLWZ/AgFFQfFspe14PlLLfoZJ
-	 NKogQHOeytqZA3J7+vluUG0QdVF0rs6keDsM4BukFNuOL5XGuuFpvWPQbjoNvL4Gc4
-	 iY8vhh/W4qIcw==
-Message-ID: <29d38308-e8ae-42aa-8eeb-1c3b347c284b@kernel.org>
-Date: Tue, 3 Mar 2026 14:23:32 +0100
+	s=arc-20240116; t=1772546050; c=relaxed/simple;
+	bh=e9JklGsuGnuRMSdEqvb5+l3qEMMCpWiYy172iVOc028=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u+PJ9uKs6lon7YbxG+Vpvwd+if/FabLY1KYjbOk4mdY6duHTroWAYPp1sv9cRekJPcDmhpaHm8m1mBV4sTsVEdhLG6xE5L3OzQ2tGOTAdOQravmQmw8DdmlrjLAPHjLk2gEllhaPA4/lgxi3KLuvFxM1+WykwcvD3mQwNRfOw2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=n/MiRvLB; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62381udV2123727;
+	Tue, 3 Mar 2026 13:54:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=X5oVahg7GQlz8cfawRgfbe73y9kbbBpDeFYCSDDrw
+	bM=; b=n/MiRvLBn7gcUUKEYjIL17xLM+kwDSqB8mDcm26gCzzM2dONJZ8kWS4be
+	uuUgJBIAxILA6xwlqzbrjMIvr9q6d3Dgv5B5U75Mzi0yqDVt92ho7okhvqOmOWmk
+	3H8/3k974Sh1HEKlssVWDs5PPMkVukLAU0TqDAQDM9n68O23b7loTvbdYMhT2Kdp
+	gitcXQoFtndDT4FK8ITnZm8+dup7V3yjv14OBvoRI8BBMl3M+xoyUTdNo4LqIrG1
+	BTnixNAcHEQaJlcLS66QZWRwCekdl8haCUntAtGlT+K0QaVz+XwVgOvrZ34tFSwI
+	oTx+1omOlrocJ8nIz4rpmCbbCEGmg==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ckskcu6rb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 03 Mar 2026 13:54:08 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 623A3Oet010317;
+	Tue, 3 Mar 2026 13:54:07 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cmc6k2ere-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 03 Mar 2026 13:54:07 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 623Ds3IU26870128
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 3 Mar 2026 13:54:03 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4CBF020040;
+	Tue,  3 Mar 2026 13:54:03 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 22A8020043;
+	Tue,  3 Mar 2026 13:54:03 +0000 (GMT)
+Received: from b46lp25.lnxne.boe (unknown [9.87.84.240])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  3 Mar 2026 13:54:03 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, mjrosato@linux.ibm.com, freimuth@linux.ibm.com,
+        imbrenda@linux.ibm.com, borntraeger@linux.ibm.com
+Subject: [PATCH v2 0/2] KVM: s390: Limit adapter indicator access to page
+Date: Tue,  3 Mar 2026 13:46:33 +0000
+Message-ID: <20260303135250.3665-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
- stalls, timeout
-Content-Language: en-GB, fr-BE
-To: Jiri Slaby <jirislaby@kernel.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
- Netdev <netdev@vger.kernel.org>, rcu@vger.kernel.org,
- MPTCP Linux <mptcp@lists.linux.dev>,
- Linux Kernel <linux-kernel@vger.kernel.org>,
- Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "luto@kernel.org" <luto@kernel.org>,
- Stefano Garzarella <sgarzare@redhat.com>
-References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
- <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8F1E51F0382
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: QSashC0xx1YQ7q4RstNjz2i5SjrEsFV2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzAzMDEwOCBTYWx0ZWRfX+ouGZPaHEYod
+ 6ImLCVka5CyMlFo1Gc06sbLckemRZUvo92IRazsfeYmoY7EYdvuHWAE2/U1WPmmzoznqCgxoF+Z
+ 8dQwc3PDGUvx9RjGHHi85uHpgdju9iSzm4NYARVoxITMU0OpQh/3Hv0zq0Qq1tNYURyw2s6lakH
+ k4q3Bb/0/p57TqlhuI3bkIz4ecmmmWKmBaEh4fXfFbBr1MycnYjwp684GMetZZyqICmSiuKD6KN
+ NiEu7CcLbYsCDuXdGIbL8GqQFzzfjbzNHnWO7r+6POGkg1SUsSH1TCEeGkwG0s9ZQ0T4mkzpIKr
+ SEWALkVc1ePf3vFVxeLJZki0c6uBLHzMzG8YMAwmJQkp9dfX7Ok+nINiQxm9M4VPvmUPr4Y7kpP
+ gPuszDJpqehKJSTleOWHxZmyy/i+hLjBPLba76eNsY9BHaGmpAWUmfG0DUmTpsRIKIigzKo+2/1
+ qDA8kt2c77rdW6mwamw==
+X-Authority-Analysis: v=2.4 cv=H7DWAuYi c=1 sm=1 tr=0 ts=69a6e800 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
+ a=uAbxVGIbfxUO_5tXvNgY:22 a=8hHfqOmpiw9s73ohtJkA:9 a=zZCYzV9kfG8A:10
+X-Proofpoint-ORIG-GUID: QSashC0xx1YQ7q4RstNjz2i5SjrEsFV2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-02_05,2026-03-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 suspectscore=0 phishscore=0 clxscore=1015 priorityscore=1501
+ adultscore=0 bulkscore=0 spamscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603030108
+X-Rspamd-Queue-Id: 6FB121F1283
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72525-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72527-lists,kvm=lfdr.de];
+	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[frankja@linux.ibm.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[ibm.com:+];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,suse.com:url]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Action: no action
 
-Hi Jiri,
+We currently check the address of the indicator fields but not the sum
+of address and offset. This patch remedies that problem and limits the
+address + offset combination to a single page.
 
-On 26/02/2026 11:37, Jiri Slaby wrote:
-> On 06. 02. 26, 12:54, Matthieu Baerts wrote:
->> Our CI for the MPTCP subsystem is now regularly hitting various stalls
->> before even starting the MPTCP test suite. These issues are visible on
->> top of the latest net and net-next trees, which have been sync with
->> Linus' tree yesterday. All these issues have been seen on a "public CI"
->> using GitHub-hosted runners with KVM support, where the tested kernel is
->> launched in a nested (I suppose) VM. I can see the issue with or without
->> debug.config. According to the logs, it might have started around
->> v6.19-rc0, but I was unavailable for a few weeks, and I couldn't react
->> quicker, sorry for that. Unfortunately, I cannot reproduce this locally,
->> and the CI doesn't currently have the ability to execute bisections.
-> 
-> Hmm, after the switch of the qemu guest kernels to 6.19, our (opensuse)
-> build service is stalling in smp_call_function_many_cond() randomly too:
-> https://bugzilla.suse.com/show_bug.cgi?id=1258936
-> 
-> The attachment from there contains sysrq-t logs too:
-> https://bugzilla.suse.com/attachment.cgi?id=888612
+The selftest is very rudimentary but it's a start.
 
-I'm glad I'm not the only one with this issue :)
+v2:
+Reworked KVM limit check.
 
-In your case, do you also have nested VMs with KVM support?
+Changed good-case test to subtract 4 bits instead of 8.
+That should ensure that we catch the error I made in v1.
 
-Are you able to easily reproduce the issue and change the guest kernel
-in your build service?
+Janosch Frank (2):
+  KVM: s390: Limit adapter indicator access to mapped page
+  KVM: s390: selftests: Add IRQ routing address offset tests
 
-On my side, any debugging steps need to be automated. Lately, it looks
-like the issue is more easily triggered on a stable 6.19 kernel, than on
-the last RC.
+ arch/s390/kvm/interrupt.c                     | 12 +++
+ tools/testing/selftests/kvm/Makefile.kvm      |  1 +
+ .../testing/selftests/kvm/s390/irq_routing.c  | 75 +++++++++++++++++++
+ 3 files changed, 88 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/s390/irq_routing.c
 
->> The stalls happen before starting the MPTCP test suite. The init program
->> creates a VSOCK listening socket via socat [1], and different hangs are
->> then visible: RCU stalls followed by a soft lockup [2], only a soft
->> lockup [3], sometimes the soft lockup comes with a delay [4] [5], or
->> there is no RCU stalls or soft lockups detected after one minute, but VM
->> is stalled [6]. In the last case, the VM is stopped after having
->> launched GDB to get more details about what was being executed.
->>
->> It feels like the issue is not directly caused by the VSOCK listening
->> socket, but the stalls always happen after having started the socat
->> command [1] in the background.
-> 
-> It fails randomly while building random packages (go, libreoffice,
-> bayle, ...). I don't think it is VSOCK related in those cases, but who
-> knows what the builds do...
-
-Indeed, unlikely to be VSOCK then.
-
-> I cannot reproduce locally either.
-> 
-> I came across:
->   614da1d3d4cd x86: make page fault handling disable interrupts properly
-> but I have no idea if it could have impact on this at all.
-
-Did it help to revert it?
-
-Cheers,
-Matt
 -- 
-Sponsored by the NGI0 Core fund.
+2.51.0
 
 
