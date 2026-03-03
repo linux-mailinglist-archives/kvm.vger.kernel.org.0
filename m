@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-72585-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72587-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iFK2FAI5p2mofwAAu9opvQ
-	(envelope-from <kvm+bounces-72585-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 20:39:46 +0100
+	id YBWRDRY5p2mofwAAu9opvQ
+	(envelope-from <kvm+bounces-72587-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 20:40:06 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C269E1F6360
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 20:39:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A8B091F637E
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 20:40:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 55275307B672
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 19:38:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EBCA930B4779
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 19:39:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF2E3976AD;
-	Tue,  3 Mar 2026 19:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C03DB3976B6;
+	Tue,  3 Mar 2026 19:38:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V/gBPckI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rpBT5V0Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
+Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2D73976B1
-	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 19:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001B021771B
+	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 19:38:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772566714; cv=none; b=q8NbIG1sThzsVCNhOEZBGZ8XUcUgpphIH/58Adp6pLC/W7mOgOaoWmz7OVoxKOSa1BLRhm6QN9gOgR25YZEsw8s8CLH5RSyToaSKgTleNM9YXs3avBapqmMnMcqCaU/Te8YELuF6QQRKTuuUuRI+yJ4GkFO1k59J4/nlZ3YGi5k=
+	t=1772566716; cv=none; b=hN5Qdoi4p4fD6nMx6iw5spODbA9AmIUYqPVzTyTv9kxZTV4MDjRlYZEzZUP5/EqiPIDS+JE59vwdTJjoNFZlOh7nAK9m7wibm4dtMnWofN7uBMeZH+x5teDX9dznYVCOYpQ6isjDzb/Jf6Cu5HvzjfX/aAq4arjXF9w380CFnyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772566714; c=relaxed/simple;
-	bh=j55EITZPamGOl8xWZUsMHzflfEtE+hCWlGiq3rkNOLU=;
+	s=arc-20240116; t=1772566716; c=relaxed/simple;
+	bh=gEp5dckqG5cP6r+qRr0XG/bWUuqISDwDcz3OMbSqQOA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=L2GN7KfckGiFtrHzBAlllrHY/wQQguh+VK67b7esSpkB+LYYf57M5YQcS3BveP8stlqmuGV2Wprgx11ZmDQxqwRwzBKVnLIDniJzVuJSAYSiqtzgPqLdI3kfdrbLHD/jN2pERKhu3KBXRP/LJCrq48/g8IIbagxtAYaafc+9bRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V/gBPckI; arc=none smtp.client-ip=209.85.161.74
+	 To:Cc:Content-Type; b=h2ZPsr2WFMZXxzQO+n8VMec/dDlG8yuZlkc7I8uHJ8cobFEJaB3Y00NGWGOpBKm6WjsZKeoEkvV3E8YCARQ3SXcEhrZJpgo4FoGpW+1Mk8d0yNQZv3+0tMjtZeiURmjEHBhpBD41OU67gxDR6V5LcL33C9IOeCI+nRJjX7wAIa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rpBT5V0Z; arc=none smtp.client-ip=209.85.210.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
-Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-679c29b437cso50969480eaf.2
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 11:38:31 -0800 (PST)
+Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7d4c3d9dd70so100945333a34.1
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 11:38:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772566711; x=1773171511; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772566712; x=1773171512; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qL4uX3Hf+gcab1Fp0qED7ANoBgaJYjjpW0rRoMZC+68=;
-        b=V/gBPckICWZMj3Z9BUDFdk0gm4kJitU8t6Re/gqJOZbXkAz0w9GKID418eIUCY0UzP
-         wKXaBPrDU2gWGE5HRE4P6e6pDXR1W/CodHfStIVMnafQv3V9tIA/vcIQIrdD+4UcQvcY
-         ZgeMak52Zfz1i9QK64osfn4IQ05k4ffq0igqYAQ+NqE1EEfcxLXmcwsjMdjiEkukN6vk
-         M3fkRKGh8ELqluvxtc9ExSpj/C6UCLc32/kG9ddhHgJa1uHeY7Ar5O50eNEFYjoS29kk
-         qNJx9dAPi2hTdiOc5PCssGMU5WnjM5qTbNcFpTLJwaks+3T9v61e+rK6GO6tsfcPtoEd
-         pxNg==
+        bh=0LK6yP7R5CEoceLoxZTwdESH49A+lkP7zsPWLGIA5lg=;
+        b=rpBT5V0Z1z/OcdY0pbGbqBVmaueYLpV7VKZ7yrGYIbdzsbelIKqU1Nl4cVFq/1znXQ
+         XpA1AaDCUUucVUQh8ZxPlAPehe2mE08pRth54L76H2GRLoDNm3tLKzI2sI7dUC5OfhiF
+         teQXDaEHWIfS5PJb23BW2aHHCf3BRuvHCY4+A71ZbtFnSrqImQIy+GvghsM2D3jp5Yoo
+         fybNMkgRN9vBCKF19OFksabTHi+I6W3FlX5s3OBmz+qEAYsRLigLUX1Y7l7yGKxJQVE8
+         THz6S/b9eg3HWk9X0zK6YYTkrATdMQcJJvMOqvcOkHX+HrBuTqRE8mQYb+TSr8oFrIGW
+         GWOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772566711; x=1773171511;
+        d=1e100.net; s=20230601; t=1772566712; x=1773171512;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qL4uX3Hf+gcab1Fp0qED7ANoBgaJYjjpW0rRoMZC+68=;
-        b=TEKTnM/NkmglqSf/anyEwhfjU/JpQD4ai53aLnyFD+ADcZ5yZlCK9q9skWDSupCOPh
-         ArOUMQIiFHeF8w6IttLKFohzzAtXzYbXR5D9w07tnVromkNQWTPMhKjGD4ScP/uPL8Qt
-         ZECV5B5OUvenhswNR2K/WJ/V7zwI3Te7SGIFxQZz6+c0iWMuSijfLxGZNZmLFg5Nc/BU
-         vJiqbeg/Vs8dBC23gnKHlkGFXdXCA5IuyfXmTF7n75FAXa9lMOAIV1XUEb9KhNEHO5Jb
-         YlkAcWa1+hHH0iQVpcP4KJqTZ5ztNAsFLabYU6f/I7ODRxa8ulbaKN3E7JWmPAqTuUiE
-         ClBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV3Ybb28F5FkDIo8Ju5DXX05H6UGiiZ5IrJTWF44ih/d4Lpz6Vg/YAOERe7D3Rupju8Wos=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5Z5Z7JKlNo046PZeGuQJg9Txwz9t1FwNlupQ6+AJm3GCGmOnt
-	Q9PLCi6NqaGxhhtPAQXl9U4faaYI9lk0nbVejn7I4JGaPSeLUdEn7ENj5sLr1J3fWxGuhpQAtoA
-	/cs91+BEbSw==
-X-Received: from jadw1.prod.google.com ([2002:a05:6638:1381:b0:5c8:f6e4:d33d])
- (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6820:1794:b0:662:c0f7:bed8
- with SMTP id 006d021491bc7-679fadb6c42mr10151810eaf.12.1772566710765; Tue, 03
- Mar 2026 11:38:30 -0800 (PST)
-Date: Tue,  3 Mar 2026 19:38:17 +0000
+        bh=0LK6yP7R5CEoceLoxZTwdESH49A+lkP7zsPWLGIA5lg=;
+        b=ry1+K3X8v6wVtzYIiRtu7SlwyAUkaRtVk7NQBW6BvFkgowCQpRSybtb1mXrO9N6+LU
+         +WpsmwEzt/7eSwGay1d2F2xusSClU7Q+VFYSay1GdGvaek3f4zEyGl60Ks5xno25VaTj
+         Eav7JGg7n5thr9T+ee5BUw8X5BQZv+1HgVtiWZ/5NMmVDfd01nAfv19wTwFEgvkg0dDs
+         XCpdVGz++29NKKT9mmXbhKC4lyKWAwpUOVea913crbkJDOCIbA7XWrALP8CHGiB7lHIr
+         TAAQYCaGqUr4w7aV180cEy/QykDNOfEF6GmhXe2FS7x6Y0LCQdW7guIPWTiT0mmXEvRG
+         d3Pw==
+X-Forwarded-Encrypted: i=1; AJvYcCWIepRaubDX6QSPCV50pfp2E/Dq5uy70kiPEzdWwOyyf9GvaNTfi49DWLwKyWGWi6EU/vs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVY/J0fMc78RoRfajm9S1GzATDmW8ImNWXhFaID14JBvKbRr/s
+	h1IsPWNvgUbisaURuQK6L4SV2MSP4zfo2ceh4dGalqZb3qWiM4/G7BfhXTb2F6JUEMS4GcP8bH1
+	xWsb8pltwxQ==
+X-Received: from jaad15-n1.prod.google.com ([2002:a05:6638:c78f:10b0:5d1:5fa2:71ef])
+ (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6820:2214:b0:67a:2256:e70b
+ with SMTP id 006d021491bc7-67a2256ed3amr763619eaf.41.1772566711689; Tue, 03
+ Mar 2026 11:38:31 -0800 (PST)
+Date: Tue,  3 Mar 2026 19:38:18 +0000
 In-Reply-To: <20260303193822.2526335-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,14 +76,15 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260303193822.2526335-1-rananta@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260303193822.2526335-4-rananta@google.com>
-Subject: [PATCH v6 3/8] vfio: selftests: Introduce a sysfs lib
+Message-ID: <20260303193822.2526335-5-rananta@google.com>
+Subject: [PATCH v6 4/8] vfio: selftests: Extend container/iommufd setup for
+ passing vf_token
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: David Matlack <dmatlack@google.com>, Alex Williamson <alex@shazbot.org>
 Cc: Vipin Sharma <vipinsh@google.com>, Josh Hilke <jrhilke@google.com>, kvm@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, Raghavendra Rao Ananta <rananta@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: C269E1F6360
+X-Rspamd-Queue-Id: A8B091F637E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -95,7 +96,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72585-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72587-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -113,267 +114,142 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Introduce a sysfs library to handle the common reads/writes to the
-PCI sysfs files, for example, getting the total number of VFs supported
-by the device via /sys/bus/pci/devices/$BDF/sriov_totalvfs. The library
-will be used in the upcoming test patch to configure the VFs for a given
-PF device.
+A UUID is normally set as a vf_token to correspond the VFs with the
+PFs, if they are both bound by the vfio-pci driver. This is true for
+iommufd-based approach and container-based approach. The token can be
+set either during device creation (VFIO_GROUP_GET_DEVICE_FD) in
+container-based approach or during iommu bind (VFIO_DEVICE_BIND_IOMMUFD)
+in the iommu-fd case. Hence extend the functions,
+vfio_pci_iommufd_setup() and vfio_pci_container_setup(), to accept
+vf_token as an (optional) argument and handle the necessary setup.
 
-Opportunistically, move vfio_pci_get_group_from_dev() to this library as
-it falls under the same bucket. Rename it to sysfs_iommu_group_get() to
-align with other function names.
+No functional changes are expected.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 Reviewed-by: David Matlack <dmatlack@google.com>
 ---
- .../selftests/vfio/lib/include/libvfio.h      |   1 +
- .../vfio/lib/include/libvfio/sysfs.h          |  12 ++
- tools/testing/selftests/vfio/lib/libvfio.mk   |   1 +
- tools/testing/selftests/vfio/lib/sysfs.c      | 144 ++++++++++++++++++
- .../selftests/vfio/lib/vfio_pci_device.c      |  22 +--
- 5 files changed, 159 insertions(+), 21 deletions(-)
- create mode 100644 tools/testing/selftests/vfio/lib/include/libvfio/sysfs.h
- create mode 100644 tools/testing/selftests/vfio/lib/sysfs.c
+ tools/testing/selftests/vfio/Makefile         |  2 +
+ .../selftests/vfio/lib/vfio_pci_device.c      | 46 +++++++++++++++----
+ 2 files changed, 40 insertions(+), 8 deletions(-)
 
-diff --git a/tools/testing/selftests/vfio/lib/include/libvfio.h b/tools/testing/selftests/vfio/lib/include/libvfio.h
-index 1b6da54cc2cb7..07862b470777b 100644
---- a/tools/testing/selftests/vfio/lib/include/libvfio.h
-+++ b/tools/testing/selftests/vfio/lib/include/libvfio.h
-@@ -5,6 +5,7 @@
- #include <libvfio/assert.h>
- #include <libvfio/iommu.h>
- #include <libvfio/iova_allocator.h>
-+#include <libvfio/sysfs.h>
- #include <libvfio/vfio_pci_device.h>
- #include <libvfio/vfio_pci_driver.h>
+diff --git a/tools/testing/selftests/vfio/Makefile b/tools/testing/selftests/vfio/Makefile
+index 6a9ac6dd32cb6..f27ed18070f14 100644
+--- a/tools/testing/selftests/vfio/Makefile
++++ b/tools/testing/selftests/vfio/Makefile
+@@ -28,6 +28,8 @@ CFLAGS += $(EXTRA_CFLAGS)
  
-diff --git a/tools/testing/selftests/vfio/lib/include/libvfio/sysfs.h b/tools/testing/selftests/vfio/lib/include/libvfio/sysfs.h
-new file mode 100644
-index 0000000000000..c48d5ef00ba6f
---- /dev/null
-+++ b/tools/testing/selftests/vfio/lib/include/libvfio/sysfs.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef SELFTESTS_VFIO_LIB_INCLUDE_LIBVFIO_SYSFS_H
-+#define SELFTESTS_VFIO_LIB_INCLUDE_LIBVFIO_SYSFS_H
-+
-+int sysfs_sriov_totalvfs_get(const char *bdf);
-+int sysfs_sriov_numvfs_get(const char *bdf);
-+void sysfs_sriov_numvfs_set(const char *bdfs, int numvfs);
-+char *sysfs_sriov_vf_bdf_get(const char *pf_bdf, int i);
-+unsigned int sysfs_iommu_group_get(const char *bdf);
-+char *sysfs_driver_get(const char *bdf);
-+
-+#endif /* SELFTESTS_VFIO_LIB_INCLUDE_LIBVFIO_SYSFS_H */
-diff --git a/tools/testing/selftests/vfio/lib/libvfio.mk b/tools/testing/selftests/vfio/lib/libvfio.mk
-index 9f47bceed16f4..b7857319c3f1f 100644
---- a/tools/testing/selftests/vfio/lib/libvfio.mk
-+++ b/tools/testing/selftests/vfio/lib/libvfio.mk
-@@ -6,6 +6,7 @@ LIBVFIO_SRCDIR := $(selfdir)/vfio/lib
- LIBVFIO_C := iommu.c
- LIBVFIO_C += iova_allocator.c
- LIBVFIO_C += libvfio.c
-+LIBVFIO_C += sysfs.c
- LIBVFIO_C += vfio_pci_device.c
- LIBVFIO_C += vfio_pci_driver.c
+ LDFLAGS += -pthread
  
-diff --git a/tools/testing/selftests/vfio/lib/sysfs.c b/tools/testing/selftests/vfio/lib/sysfs.c
-new file mode 100644
-index 0000000000000..1fec6c7a7fce7
---- /dev/null
-+++ b/tools/testing/selftests/vfio/lib/sysfs.c
-@@ -0,0 +1,144 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <linux/limits.h>
++LDLIBS += -luuid
 +
-+#include <libvfio.h>
-+
-+static int sysfs_val_get_int(const char *component, const char *name,
-+			     const char *file)
-+{
-+	char path[PATH_MAX];
-+	char buf[32];
-+	int ret;
-+	int fd;
-+
-+	snprintf_assert(path, PATH_MAX, "/sys/bus/pci/%s/%s/%s", component, name, file);
-+	fd = open(path, O_RDONLY);
-+	if (fd < 0)
-+		return fd;
-+
-+	VFIO_ASSERT_GT(read(fd, buf, ARRAY_SIZE(buf)), 0);
-+	VFIO_ASSERT_EQ(close(fd), 0);
-+
-+	errno = 0;
-+	ret = strtol(buf, NULL, 0);
-+	VFIO_ASSERT_EQ(errno, 0, "sysfs path \"%s\" is not an integer: \"%s\"\n", path, buf);
-+
-+	return ret;
-+}
-+
-+static void sysfs_val_set(const char *component, const char *name,
-+			  const char *file, const char *val)
-+{
-+	char path[PATH_MAX];
-+	int fd;
-+
-+	snprintf_assert(path, PATH_MAX, "/sys/bus/pci/%s/%s/%s", component, name, file);
-+	VFIO_ASSERT_GT(fd = open(path, O_WRONLY), 0);
-+
-+	VFIO_ASSERT_EQ(write(fd, val, strlen(val)), strlen(val));
-+	VFIO_ASSERT_EQ(close(fd), 0);
-+}
-+
-+static int sysfs_device_val_get(const char *bdf, const char *file)
-+{
-+	return sysfs_val_get_int("devices", bdf, file);
-+}
-+
-+static void sysfs_device_val_set(const char *bdf, const char *file, const char *val)
-+{
-+	sysfs_val_set("devices", bdf, file, val);
-+}
-+
-+static void sysfs_device_val_set_int(const char *bdf, const char *file, int val)
-+{
-+	char val_str[32];
-+
-+	snprintf_assert(val_str, sizeof(val_str), "%d", val);
-+	sysfs_device_val_set(bdf, file, val_str);
-+}
-+
-+int sysfs_sriov_totalvfs_get(const char *bdf)
-+{
-+	return sysfs_device_val_get(bdf, "sriov_totalvfs");
-+}
-+
-+int sysfs_sriov_numvfs_get(const char *bdf)
-+{
-+	return sysfs_device_val_get(bdf, "sriov_numvfs");
-+}
-+
-+void sysfs_sriov_numvfs_set(const char *bdf, int numvfs)
-+{
-+	sysfs_device_val_set_int(bdf, "sriov_numvfs", numvfs);
-+}
-+
-+char *sysfs_sriov_vf_bdf_get(const char *pf_bdf, int i)
-+{
-+	char vf_path[PATH_MAX];
-+	char path[PATH_MAX];
-+	char *out_vf_bdf;
-+	int ret;
-+
-+	out_vf_bdf = calloc(16, sizeof(char));
-+	VFIO_ASSERT_NOT_NULL(out_vf_bdf);
-+
-+	snprintf_assert(path, PATH_MAX, "/sys/bus/pci/devices/%s/virtfn%d", pf_bdf, i);
-+
-+	ret = readlink(path, vf_path, PATH_MAX);
-+	VFIO_ASSERT_NE(ret, -1);
-+	vf_path[ret] = '\0';
-+
-+	ret = sscanf(basename(vf_path), "%s", out_vf_bdf);
-+	VFIO_ASSERT_EQ(ret, 1);
-+
-+	return out_vf_bdf;
-+}
-+
-+unsigned int sysfs_iommu_group_get(const char *bdf)
-+{
-+	char dev_iommu_group_path[PATH_MAX];
-+	char path[PATH_MAX];
-+	unsigned int group;
-+	int ret;
-+
-+	snprintf_assert(path, PATH_MAX, "/sys/bus/pci/devices/%s/iommu_group", bdf);
-+
-+	ret = readlink(path, dev_iommu_group_path, sizeof(dev_iommu_group_path));
-+	VFIO_ASSERT_NE(ret, -1, "Failed to get the IOMMU group for device: %s\n", bdf);
-+	dev_iommu_group_path[ret] = '\0';
-+
-+	ret = sscanf(basename(dev_iommu_group_path), "%u", &group);
-+	VFIO_ASSERT_EQ(ret, 1, "Failed to get the IOMMU group for device: %s\n", bdf);
-+
-+	return group;
-+}
-+
-+char *sysfs_driver_get(const char *bdf)
-+{
-+	char driver_path[PATH_MAX];
-+	char path[PATH_MAX];
-+	char *out_driver;
-+	int ret;
-+
-+	out_driver = calloc(64, sizeof(char));
-+	VFIO_ASSERT_NOT_NULL(out_driver);
-+
-+	snprintf_assert(path, PATH_MAX, "/sys/bus/pci/devices/%s/driver", bdf);
-+	ret = readlink(path, driver_path, PATH_MAX);
-+	if (ret == -1) {
-+		free(out_driver);
-+
-+		if (errno == ENOENT)
-+			return NULL;
-+
-+		VFIO_FAIL("Failed to read %s\n", path);
-+	}
-+	driver_path[ret] = '\0';
-+
-+	strcpy(out_driver, basename(driver_path));
-+	return out_driver;
-+}
+ $(TEST_GEN_PROGS): %: %.o $(LIBVFIO_O)
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $< $(LIBVFIO_O) $(LDLIBS) -o $@
+ 
 diff --git a/tools/testing/selftests/vfio/lib/vfio_pci_device.c b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-index 1538d2b30ae59..82f255f0486dc 100644
+index 82f255f0486dc..dc8b37df8d1f1 100644
 --- a/tools/testing/selftests/vfio/lib/vfio_pci_device.c
 +++ b/tools/testing/selftests/vfio/lib/vfio_pci_device.c
-@@ -25,8 +25,6 @@
+@@ -22,6 +22,8 @@
+ #include <linux/types.h>
+ #include <linux/vfio.h>
+ 
++#include <uuid/uuid.h>
++
  #include "kselftest.h"
  #include <libvfio.h>
  
--#define PCI_SYSFS_PATH	"/sys/bus/pci/devices"
--
- static void vfio_pci_irq_set(struct vfio_pci_device *device,
- 			     u32 index, u32 vector, u32 count, int *fds)
- {
-@@ -202,24 +200,6 @@ void vfio_pci_device_reset(struct vfio_pci_device *device)
- 	ioctl_assert(device->fd, VFIO_DEVICE_RESET, NULL);
+@@ -220,7 +222,27 @@ static void vfio_pci_group_setup(struct vfio_pci_device *device, const char *bdf
+ 	ioctl_assert(device->group_fd, VFIO_GROUP_SET_CONTAINER, &device->iommu->container_fd);
  }
  
--static unsigned int vfio_pci_get_group_from_dev(const char *bdf)
--{
--	char dev_iommu_group_path[PATH_MAX] = {0};
--	char sysfs_path[PATH_MAX] = {0};
--	unsigned int group;
--	int ret;
--
--	snprintf_assert(sysfs_path, PATH_MAX, "%s/%s/iommu_group", PCI_SYSFS_PATH, bdf);
--
--	ret = readlink(sysfs_path, dev_iommu_group_path, sizeof(dev_iommu_group_path));
--	VFIO_ASSERT_NE(ret, -1, "Failed to get the IOMMU group for device: %s\n", bdf);
--
--	ret = sscanf(basename(dev_iommu_group_path), "%u", &group);
--	VFIO_ASSERT_EQ(ret, 1, "Failed to get the IOMMU group for device: %s\n", bdf);
--
--	return group;
--}
--
- static void vfio_pci_group_setup(struct vfio_pci_device *device, const char *bdf)
+-static void vfio_pci_container_setup(struct vfio_pci_device *device, const char *bdf)
++static void vfio_pci_group_get_device_fd(struct vfio_pci_device *device,
++					 const char *bdf, const char *vf_token)
++{
++	char arg[64];
++
++	/*
++	 * If a vf_token exists, argument to VFIO_GROUP_GET_DEVICE_FD
++	 * will be in the form of the following example:
++	 * "0000:04:10.0 vf_token=bd8d9d2b-5a5f-4f5a-a211-f591514ba1f3"
++	 */
++	if (vf_token)
++		snprintf_assert(arg, ARRAY_SIZE(arg), "%s vf_token=%s", bdf, vf_token);
++	else
++		snprintf_assert(arg, ARRAY_SIZE(arg), "%s", bdf);
++
++	device->fd = ioctl(device->group_fd, VFIO_GROUP_GET_DEVICE_FD, arg);
++	VFIO_ASSERT_GE(device->fd, 0);
++}
++
++static void vfio_pci_container_setup(struct vfio_pci_device *device,
++				     const char *bdf, const char *vf_token)
  {
- 	struct vfio_group_status group_status = {
-@@ -228,7 +208,7 @@ static void vfio_pci_group_setup(struct vfio_pci_device *device, const char *bdf
- 	char group_path[32];
- 	int group;
+ 	struct iommu *iommu = device->iommu;
+ 	unsigned long iommu_type = iommu->mode->iommu_type;
+@@ -238,8 +260,7 @@ static void vfio_pci_container_setup(struct vfio_pci_device *device, const char
+ 	 */
+ 	(void)ioctl(iommu->container_fd, VFIO_SET_IOMMU, (void *)iommu_type);
  
--	group = vfio_pci_get_group_from_dev(bdf);
-+	group = sysfs_iommu_group_get(bdf);
- 	snprintf_assert(group_path, sizeof(group_path), "/dev/vfio/%d", group);
+-	device->fd = ioctl(device->group_fd, VFIO_GROUP_GET_DEVICE_FD, bdf);
+-	VFIO_ASSERT_GE(device->fd, 0);
++	vfio_pci_group_get_device_fd(device, bdf, vf_token);
+ }
  
- 	device->group_fd = open(group_path, O_RDWR);
+ static void vfio_pci_device_setup(struct vfio_pci_device *device)
+@@ -300,12 +321,20 @@ const char *vfio_pci_get_cdev_path(const char *bdf)
+ 	return cdev_path;
+ }
+ 
+-static void vfio_device_bind_iommufd(int device_fd, int iommufd)
++static void vfio_device_bind_iommufd(int device_fd, int iommufd,
++				     const char *vf_token)
+ {
+ 	struct vfio_device_bind_iommufd args = {
+ 		.argsz = sizeof(args),
+ 		.iommufd = iommufd,
+ 	};
++	uuid_t token_uuid;
++
++	if (vf_token) {
++		VFIO_ASSERT_EQ(uuid_parse(vf_token, token_uuid), 0);
++		args.flags |= VFIO_DEVICE_BIND_FLAG_TOKEN;
++		args.token_uuid_ptr = (u64)token_uuid;
++	}
+ 
+ 	ioctl_assert(device_fd, VFIO_DEVICE_BIND_IOMMUFD, &args);
+ }
+@@ -320,7 +349,8 @@ static void vfio_device_attach_iommufd_pt(int device_fd, u32 pt_id)
+ 	ioctl_assert(device_fd, VFIO_DEVICE_ATTACH_IOMMUFD_PT, &args);
+ }
+ 
+-static void vfio_pci_iommufd_setup(struct vfio_pci_device *device, const char *bdf)
++static void vfio_pci_iommufd_setup(struct vfio_pci_device *device,
++				   const char *bdf, const char *vf_token)
+ {
+ 	const char *cdev_path = vfio_pci_get_cdev_path(bdf);
+ 
+@@ -328,7 +358,7 @@ static void vfio_pci_iommufd_setup(struct vfio_pci_device *device, const char *b
+ 	VFIO_ASSERT_GE(device->fd, 0);
+ 	free((void *)cdev_path);
+ 
+-	vfio_device_bind_iommufd(device->fd, device->iommu->iommufd);
++	vfio_device_bind_iommufd(device->fd, device->iommu->iommufd, vf_token);
+ 	vfio_device_attach_iommufd_pt(device->fd, device->iommu->ioas_id);
+ }
+ 
+@@ -344,9 +374,9 @@ struct vfio_pci_device *vfio_pci_device_init(const char *bdf, struct iommu *iomm
+ 	device->bdf = bdf;
+ 
+ 	if (iommu->mode->container_path)
+-		vfio_pci_container_setup(device, bdf);
++		vfio_pci_container_setup(device, bdf, NULL);
+ 	else
+-		vfio_pci_iommufd_setup(device, bdf);
++		vfio_pci_iommufd_setup(device, bdf, NULL);
+ 
+ 	vfio_pci_device_setup(device);
+ 	vfio_pci_driver_probe(device);
 -- 
 2.53.0.473.g4a7958ca14-goog
 
