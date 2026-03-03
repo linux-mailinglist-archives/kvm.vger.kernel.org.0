@@ -1,189 +1,387 @@
-Return-Path: <kvm+bounces-72539-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72540-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iBUuG1MDp2k7bgAAu9opvQ
-	(envelope-from <kvm+bounces-72539-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:50:43 +0100
+	id 0EBRJUAEp2k7bgAAu9opvQ
+	(envelope-from <kvm+bounces-72540-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:54:40 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2311A1F2F19
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:50:42 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D8091F306E
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:54:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E7CA63086A7D
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 15:47:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 897D93016EC2
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 15:54:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 795D1494A14;
-	Tue,  3 Mar 2026 15:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85BD649250A;
+	Tue,  3 Mar 2026 15:54:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="veD5TKQw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UGdXA+Ii"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4117288D6
-	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 15:47:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772552837; cv=pass; b=j7kjCuYR/K0ExQ607qYgzU/c1wsp8AOke7qU1DS036muzI3DJMmOe/xvfGUoCxguVWLJb7OxOZWGBdHstOKApRkRc4+ycptr/9VJJUd9g2yWDCQO1qMtPMhNaOl0xiHWr1QPQ1Nv5KVhAPhRhJ0IgCTNWKYGB9utn7Bar2hTbrE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772552837; c=relaxed/simple;
-	bh=d5TMbgs1WSF4231wsXXSJxU6n6VNWCH0FsfNgQ8mBQc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IF6HTWzQqhK1qjCpbI9smPZxIpVm55q8vVkdgr5b4usUJfVNEOBOJr5sekxaRtW3BKLL27sbFKsEr+GPmRHQ695DN3ivmK6stE/enCoCTjxR9RPKkn/Al52Vw2a9kVx+ly1C4hF9ZHNqcYzTk8kQm4cXoNTzexorx9zEUdtTBEQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=veD5TKQw; arc=pass smtp.client-ip=209.85.161.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-677bb1c3a9dso2021124eaf.3
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 07:47:15 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772552835; cv=none;
-        d=google.com; s=arc-20240605;
-        b=SpJBloINgRLA4nIub97ityFv84KhHrzxNv3HWwq/XyW/KhP8XtAgQFoDiP6myrjhRr
-         IVm9Dot4JE2Kl781wsL91hEpySd1nr9teCBvyvbbmJfOrpNMwIlTR2Up2W2IuoMkeF24
-         WLLgwxksebKlTgPFUh9C0idQ8q8qS10w5V37Koayju+WmT5nM4ItrwGDfqvSNiWF725g
-         rt749V2HwX8bf1hD0eJJLAbZ1HLJZIOojbeWlV/r66sH+RA3cDIp3GbWyql5seAclYGR
-         xER4pIQSIAo2OlBLdG3cg1Jvmaxy04y1Tlm6M6puix/UjLXPy0VK9yy9bbbqKHm+W+qC
-         g+IQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=rP5o/eMOPhz1A5eUQwkaAxR1nnewuBUqV7uC86UfM1k=;
-        fh=4xCZx9eV17YgRwBdp77uYRK5In+2e0Zockop5e3D/3U=;
-        b=i94rUIhKr30LrOHb7BbnUKMbFqlbXezv5fXURaZACEYgsvP5TcHCx2n2MZJnKnl4X0
-         U9pweScvHGNN18tldSmVLzo4cCCpooUqwMdwsnktyPOhuOo4kvczUmiBN0TWKkyLNHAz
-         j5udMmZo/eHc/+MDUY8eq/EfO6JlSYRnf5LnidGRaLKUZti/rsmQSoCtGN5fhzbIIdW9
-         XtslIHntFTwzoAy7K6lkZpYGxW1twkDFpR5qRg/Cfod+8GyaOx3jdbj7H3QWS9sBsWmW
-         +PaAxgEkHM2J0Im/WDqnBhg7MbcqJbiaiiIkT2TFUc0y2B9YkhHWXSGSNzaPPycA36Zm
-         0eNQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1772552835; x=1773157635; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rP5o/eMOPhz1A5eUQwkaAxR1nnewuBUqV7uC86UfM1k=;
-        b=veD5TKQwGJgmKvhdR4mtmw83WwdV7fD7STfLwemHWNEdKV8tggi1041rlPSwE1snsn
-         H5/nZ+ngbIMOB15ZK4+MNdiTSqyBZetzoaHPrm8q0h0BeqOHsmp7O2Zyux/YzaJY0Huw
-         Yz8NqP7CEea5NvwXz7kVxjNUzQZhnRXaN3+OlrXVwtT5mmGQA+SYDc4FFFPfrK8d/532
-         1fMRX9WSunf2mHpW6ups0TX6ErtTrWUwvNGzNgVvidMi8IxvsU1ieDMe2y6gGf7kXL1K
-         x4N3Au9tVwhx329F9lL8fZvVz256aF1dPLKpyqytKiN+irRcG9tB4ZczfwsUpz7EY5vt
-         F3eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772552835; x=1773157635;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=rP5o/eMOPhz1A5eUQwkaAxR1nnewuBUqV7uC86UfM1k=;
-        b=kosPTb73L3MWi0lZRGkoowVy07WzJRGJTW4vi/x4h49DuPNNPMtecfmzPOjXSol8tA
-         wBg+O2lJWxu4Gbb7S7jorjb7I1ljkccnEoMmB7CIyUm5FpYIgOOJJkAndpP3QKp/i+Oj
-         JyLFm9RqPAktmKn4Z6odYW5ybRslj5hNuYC99AuFMTGiFcE31U4SRcGO/jmm+FhOU6b4
-         SIuzmmumSj3uyLa5d8+ghD7GXJemNvH2cT4iJJBazEzrhZrSQ3ni08O3VROs0h6Wr5KL
-         dm9NEfsod7jCvk/BgoKKaMSxHxQzPET1aIufq4WQQD6v348aUdpNa7fm7Fa2OdaJktIq
-         wEzw==
-X-Forwarded-Encrypted: i=1; AJvYcCXEWtcBj8iDP/T6NcciDAuIV7/LgGS2kyDRHayFb+HITB/2FlIlUxAAb7j7MpWPwxamwnw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8MzjtqDGs1/FyyBrmzPP7VCQRUSyRsfzliRRdG4jXPqY2rHdK
-	r4j5nOcNAeUctnOmgSOvjEVaDGq4tj1uf5aHSRvJeWoXg6I4rCLmvkSRrTxKCUFKe3nK9i17lhR
-	+PFqLkWDXeZBgtuPcsVXnICakGgNUG4mdC2Pc2i1Fvg==
-X-Gm-Gg: ATEYQzzEfI+rLzgLhcdUO1zSRphDuDOOUmA0EcahrckWL7FDCjFFZyNtfc3Gpv4XlK7
-	Xab9xCshS3n9r2u7jM8d2672IGoYMghT0vDxvKLoeladxdMawvSM6w4h8qt7fY3d8UsMXf1SbHa
-	BO7k0+dzhChIv5c6EMd14UeCGJHsUcp03O918cS1qn31DOy8rhQhJQQv3Ffls/b3VIoub2yfces
-	eOkqNiPOtTffgfxcX/wfn4O5h47b0ue1o3Pibr8snq4+zLfHL17MQj2YpJI7Rj10UdpRxdEHYPG
-	ujPvxSmJ8LCykYuc0NVCNny4Eg4wPWadASEsQN53KNWD3n/aNi2oEBGq8kdtQPNgVWnApsasAc2
-	g/BL8Ujh4tnW0a06EAern+fhWsw==
-X-Received: by 2002:a05:6820:e03:b0:67a:2e3:2236 with SMTP id
- 006d021491bc7-67a02e33328mr4850345eaf.23.1772552834606; Tue, 03 Mar 2026
- 07:47:14 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F18382388;
+	Tue,  3 Mar 2026 15:54:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772553276; cv=none; b=QXcx2K9fys3XIL2SG82Pz/QUdmOs7WBaxs7D2DngR/l8tHlfPWjZqZrdR0mKXBTYQbeHJVSPJn27lx/8DwBXsRUiTKV2+lboM0r0XvB/m4SaPP8u5JnHZi8d6OgVtP+/WoDblxEpAWayaBaVcziV6R+2ATuonUYEHuyn2o2GXMM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772553276; c=relaxed/simple;
+	bh=TGmZI4OHu6X3hdFVkQgFuNn6YSaOlqILJxc5Y6vn/8M=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mA75F2r7P1HKCa8wDFwtq9QIvDK9uc5j0V8JHdR8/1w/JxwnUVSboepJML/Dvj9rAkCfgqynnGteuBrXXVlY7koG2NarE/oChNQsZ8QKG3rC6jNd+BFgj02iKDjLjb417zpuohhCU6q0jDPD4wmaCI2pBC1gWPPKmiCI4EeKJgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UGdXA+Ii; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FD3EC116C6;
+	Tue,  3 Mar 2026 15:54:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772553276;
+	bh=TGmZI4OHu6X3hdFVkQgFuNn6YSaOlqILJxc5Y6vn/8M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UGdXA+IiU/6rlC3VdfBfeBXwJZoYYNW/MTSviqSHhYi4ZUVnPBFFtXUiIflqHsXoh
+	 fa0ZRJ4H11e55Y1FeG7Fh6Bv5LOzjIGKP39KroO7K2tsDy9OzsslGicgz8+9hHQ4f+
+	 3/ORLbifRPB7fMILBLkO1oXUs7wF65WHmyXamUUeDkPsIaRNasw9KuRFtHoBtL0mQb
+	 ATPixK1K1QSzCqd2/TQhX6C0tAo0tkdQqwGm1Kw2hEsr1rhdDFvTM/3N0ZVbkOum1b
+	 Qptztcg8WpJpO1avNuBNmToPoPA04qDTB871hODjymfp4IA5NhJDY9kEf8cIr1RY6R
+	 0ZdiUjfyl3rXw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vxS4v-0000000FhF6-3588;
+	Tue, 03 Mar 2026 15:54:33 +0000
+Date: Tue, 03 Mar 2026 15:54:33 +0000
+Message-ID: <86a4wo9adi.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com"
+	<jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v5 10/36] KVM: arm64: gic-v5: Sanitize ID_AA64PFR2_EL1.GCIE
+In-Reply-To: <20260226155515.1164292-11-sascha.bischoff@arm.com>
+References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
+	<20260226155515.1164292-11-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260226191231140_X1Juus7s2kgVlc0ZyW_K@zte.com.cn>
-In-Reply-To: <20260226191231140_X1Juus7s2kgVlc0ZyW_K@zte.com.cn>
-From: Anup Patel <anup@brainfault.org>
-Date: Tue, 3 Mar 2026 21:17:00 +0530
-X-Gm-Features: AaiRm53Tv0HzLC60XnuOQhFibZnnDvaLlp6Dmpq9sGHC5_WRwzY-t4oW2N6N_TA
-Message-ID: <CAAhSdy1Z_rWHW6ra3DTR1h2NeVJoM72SZ85ph-TKWRQqYzrEmA@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: KVM: Skip THP support check during dirty logging
-To: wang.yechao255@zte.com.cn
-Cc: atish.patra@linux.dev, pjw@kernel.org, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, alex@ghiti.fr, liu.xuemei1@zte.com.cn, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 2311A1F2F19
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Rspamd-Queue-Id: 3D8091F306E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[brainfault-org.20230601.gappssmtp.com:s=20230601];
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[brainfault-org.20230601.gappssmtp.com:+];
-	TAGGED_FROM(0.00)[bounces-72539-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[brainfault.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72540-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anup@brainfault.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,brainfault-org.20230601.gappssmtp.com:dkim,zte.com.cn:email,brainfault.org:email]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,arm.com:email]
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026 at 4:42=E2=80=AFPM <wang.yechao255@zte.com.cn> wrote:
->
-> From: Wang Yechao <wang.yechao255@zte.com.cn>
->
-> When dirty logging is enabled, guest stage mappings are forced to
-> PAGE_SIZE granularity. Changing the mapping page size at this point
-> is incorrect.
->
-> Fixes: ed7ae7a34bea ("RISC-V: KVM: Transparent huge page support")
-> Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
+On Thu, 26 Feb 2026 15:58:00 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+> 
+> Add in a sanitization function for ID_AA64PFR2_EL1, preserving the
+> already-present behaviour for the FPMR, MTEFAR, and MTESTOREONLY
+> fields. Add sanitisation for the GCIE field, which is set to IMP if
+> the host supports a GICv5 guest and NI, otherwise.
+> 
+> Extend the sanitisation that takes place in kvm_vgic_create() to zero
+> the ID_AA64PFR2.GCIE field when a non-GICv5 GIC is created. More
+> importantly, move this sanitisation to a separate function,
+> kvm_vgic_finalize_sysregs(), and call it from kvm_finalize_sys_regs().
+> 
+> We are required to finalize the GIC and GCIE fields a second time in
+> kvm_finalize_sys_regs() due to how QEMU blindly reads out then
+> verbatim restores the system register state. This avoids the issue
+> where both the GCIE and GIC features are marked as present (an
+> architecturally invalid combination), and hence guests fall over. See
+> the comment in kvm_finalize_sys_regs() for more details.
+> 
+> Overall, the following happens:
+> 
+> * Before an irqchip is created, FEAT_GCIE is presented if the host
+>   supports GICv5-based guests.
+> * Once an irqchip is created, all other supported irqchips are hidden
+>   from the guest; system register state reflects the guest's irqchip.
+> * Userspace is allowed to set invalid irqchip feature combinations in
+>   the system registers, but...
+> * ...invalid combinations are removed a second time prior to the first
+>   run of the guest, and things hopefully just work.
+> 
+> All of this extra work is required to make sure that "legacy" GICv3
+> guests based on QEMU transparently work on compatible GICv5 hosts
+> without modification.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c       | 70 +++++++++++++++++++++++++++++----
+>  arch/arm64/kvm/vgic/vgic-init.c | 43 +++++++++++++-------
+>  include/kvm/arm_vgic.h          |  1 +
+>  3 files changed, 92 insertions(+), 22 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 11e75f2522f95..1039150716d43 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1758,6 +1758,7 @@ static u8 pmuver_to_perfmon(u8 pmuver)
+>  
+>  static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
+>  static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val);
+> +static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu, u64 val);
+>  static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
+>  
+>  /* Read a sanitised cpufeature ID register by sys_reg_desc */
+> @@ -1783,10 +1784,7 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+>  		val = sanitise_id_aa64pfr1_el1(vcpu, val);
+>  		break;
+>  	case SYS_ID_AA64PFR2_EL1:
+> -		val &= ID_AA64PFR2_EL1_FPMR |
+> -			(kvm_has_mte(vcpu->kvm) ?
+> -			 ID_AA64PFR2_EL1_MTEFAR | ID_AA64PFR2_EL1_MTESTOREONLY :
+> -			 0);
+> +		val = sanitise_id_aa64pfr2_el1(vcpu, val);
+>  		break;
+>  	case SYS_ID_AA64ISAR1_EL1:
+>  		if (!vcpu_has_ptrauth(vcpu))
+> @@ -2024,6 +2022,23 @@ static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val)
+>  	return val;
+>  }
+>  
+> +static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu, u64 val)
+> +{
+> +	val &= ID_AA64PFR2_EL1_FPMR |
+> +	       ID_AA64PFR2_EL1_MTEFAR |
+> +	       ID_AA64PFR2_EL1_MTESTOREONLY;
+> +
+> +	if (!kvm_has_mte(vcpu->kvm)) {
+> +		val &= ~ID_AA64PFR2_EL1_MTEFAR;
+> +		val &= ~ID_AA64PFR2_EL1_MTESTOREONLY;
+> +	}
+> +
+> +	if (vgic_host_has_gicv5())
+> +		val |= SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
+> +
+> +	return val;
+> +}
+> +
+>  static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+>  {
+>  	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
+> @@ -2213,6 +2228,12 @@ static int set_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
+>  	return set_id_reg(vcpu, rd, user_val);
+>  }
+>  
+> +static int set_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
+> +			       const struct sys_reg_desc *rd, u64 user_val)
+> +{
+> +	return set_id_reg(vcpu, rd, user_val);
+> +}
+> +
+>  /*
+>   * Allow userspace to de-feature a stage-2 translation granule but prevent it
+>   * from claiming the impossible.
+> @@ -3194,10 +3215,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  				       ID_AA64PFR1_EL1_RES0 |
+>  				       ID_AA64PFR1_EL1_MPAM_frac |
+>  				       ID_AA64PFR1_EL1_MTE)),
+> -	ID_WRITABLE(ID_AA64PFR2_EL1,
+> -		    ID_AA64PFR2_EL1_FPMR |
+> -		    ID_AA64PFR2_EL1_MTEFAR |
+> -		    ID_AA64PFR2_EL1_MTESTOREONLY),
+> +	ID_FILTERED(ID_AA64PFR2_EL1, id_aa64pfr2_el1,
+> +		    ~(ID_AA64PFR2_EL1_FPMR |
+> +		      ID_AA64PFR2_EL1_MTEFAR |
+> +		      ID_AA64PFR2_EL1_MTESTOREONLY |
+> +		      ID_AA64PFR2_EL1_GCIE)),
+>  	ID_UNALLOCATED(4,3),
+>  	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
+>  	ID_HIDDEN(ID_AA64SMFR0_EL1),
+> @@ -5668,8 +5690,40 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
+>  
+>  		val = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
+>  		kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1, val);
+> +		val = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1) & ~ID_AA64PFR2_EL1_GCIE;
+> +		kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1, val);
+>  		val = kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
+>  		kvm_set_vm_id_reg(kvm, SYS_ID_PFR1_EL1, val);
+> +	} else {
+> +		/*
+> +		 * Certain userspace software - QEMU - samples the system
+> +		 * register state without creating an irqchip, then blindly
+> +		 * restores the state prior to running the final guest. This
+> +		 * means that it restores the virtualization & emulation
+> +		 * capabilities of the host system, rather than something that
+> +		 * reflects the final guest state. Moreover, it checks that the
+> +		 * state was "correctly" restored (i.e., verbatim), bailing if
+> +		 * it isn't, so masking off invalid state isn't an option.
+> +		 *
+> +		 * On GICv5 hardware that supports FEAT_GCIE_LEGACY we can run
+> +		 * both GICv3- and GICv5-based guests. Therefore, we initially
+> +		 * present both ID_AA64PFR0.GIC and ID_AA64PFR2.GCIE as IMP to
+> +		 * reflect that userspace can create EITHER a vGICv3 or a
+> +		 * vGICv5. This is an architecturally invalid combination, of
+> +		 * course. Once an in-kernel GIC is created, the sysreg state is
+> +		 * updated to reflect the actual, valid configuration.
+> +		 *
+> +		 * Setting both the GIC and GCIE features to IMP unsurprisingly
+> +		 * results in guests falling over, and hence we need to fix up
+> +		 * this mess in KVM. Before running for the first time we yet
+> +		 * again ensure that the GIC and GCIE fields accurately reflect
+> +		 * the actual hardware the guest should see.
+> +		 *
+> +		 * This hack allows legacy QEMU-based GICv3 guests to run
+> +		 * unmodified on compatible GICv5 hosts, and avoids the inverse
+> +		 * problem for GICv5-based guests in the future.
+> +		 */
+> +		kvm_vgic_finalize_sysregs(kvm);
 
-LGTM.
+An alternative to this sorry hack would be to have a separate view of
+the idregs for luserspace to get whatever expected. But you then need
+to invalidate that copy at some point so that you can migrate the
+guest safely, and you'd probably end-up doing a similar thing.
 
-Reviewed-by: Anup Patel <anup@brainfault.org>
+I appreciate that you are doing this for the sake of preserving SW
+compatibility, but do you foresee a way out of this mess that does not
+involve asking the QEMU folks to fix their stuff? I don't think we can
+paper over their over-simplistic design forever.
 
-Queued this patch as fix for Linux-7.0-rcX
+>  	}
+>  
+>  	if (vcpu_has_nv(vcpu)) {
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 9b3091ad868cf..d1db384698238 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -71,7 +71,6 @@ static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type);
+>  int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  {
+>  	struct kvm_vcpu *vcpu;
+> -	u64 aa64pfr0, pfr1;
+>  	unsigned long i;
+>  	int ret;
+>  
+> @@ -162,19 +161,11 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  
+>  	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+>  
+> -	aa64pfr0 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
+> -	pfr1 = kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
+> -
+> -	if (type == KVM_DEV_TYPE_ARM_VGIC_V2) {
+> -		kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+> -	} else {
+> -		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
+> -		aa64pfr0 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
+> -		pfr1 |= SYS_FIELD_PREP_ENUM(ID_PFR1_EL1, GIC, GICv3);
+> -	}
+> -
+> -	kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1, aa64pfr0);
+> -	kvm_set_vm_id_reg(kvm, SYS_ID_PFR1_EL1, pfr1);
+> +	/*
+> +	 * We've now created the GIC. Update the system register state
+> +	 * to accurately reflect what we've created.
+> +	 */
+> +	kvm_vgic_finalize_sysregs(kvm);
+
+As pointed out f2f, this will conflict with the patch posted at
+https://patch.msgid.link/20260228164559.936268-1-maz@kernel.org
+
+>  
+>  	if (type == KVM_DEV_TYPE_ARM_VGIC_V3)
+>  		kvm->arch.vgic.nassgicap = system_supports_direct_sgis();
+> @@ -617,6 +608,30 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+>  	return ret;
+>  }
+>  
+> +void kvm_vgic_finalize_sysregs(struct kvm *kvm)
+
+nit: could you rename this to kvm_vgic_finalize_idregs()?
+
+> +{
+> +	u32 type = kvm->arch.vgic.vgic_model;
+> +	u64 aa64pfr0, aa64pfr2, pfr1;
+> +
+> +	aa64pfr0 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
+> +	aa64pfr2 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1) & ~ID_AA64PFR2_EL1_GCIE;
+> +	pfr1 = kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
+> +
+> +	if (type == KVM_DEV_TYPE_ARM_VGIC_V2) {
+> +		kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+> +	} else if (type == KVM_DEV_TYPE_ARM_VGIC_V3) {
+> +		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
+> +		aa64pfr0 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
+> +		pfr1 |= SYS_FIELD_PREP_ENUM(ID_PFR1_EL1, GIC, GICv3);
+> +	} else {
+> +		aa64pfr2 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
+> +	}
+
+I'd rather see this written as:
+
+	switch (kvm->arch.vgic.vgic_model) {
+	case KVM_DEV_TYPE_ARM_VGIC_V2:
+		kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+		break;
+	case KVM_DEV_TYPE_ARM_VGIC_V3:
+		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
+		aa64pfr0 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
+		pfr1 |= SYS_FIELD_PREP_ENUM(ID_PFR1_EL1, GIC, GICv3);
+		break;
+	case KVM_DEV_TYPE_ARM_VGIC_V5:
+		aa64pfr2 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
+		break;
+	default:
+		WARN_ONCE(1, "WTF???\n");
+	}
+
+which I find more readable than the if/else cascade.
 
 Thanks,
-Anup
 
+	M.
 
-> ---
->  arch/riscv/kvm/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> index 0b75eb2a1820..c3539f660142 100644
-> --- a/arch/riscv/kvm/mmu.c
-> +++ b/arch/riscv/kvm/mmu.c
-> @@ -535,7 +535,7 @@ int kvm_riscv_mmu_map(struct kvm_vcpu *vcpu, struct k=
-vm_memory_slot *memslot,
->                 goto out_unlock;
->
->         /* Check if we are backed by a THP and thus use block mapping if =
-possible */
-> -       if (vma_pagesize =3D=3D PAGE_SIZE)
-> +       if (!logging && (vma_pagesize =3D=3D PAGE_SIZE))
->                 vma_pagesize =3D transparent_hugepage_adjust(kvm, memslot=
-, hva, &hfn, &gpa);
->
->         if (writable) {
-> --
-> 2.27.0
+-- 
+Without deviation from the norm, progress is not possible.
 
