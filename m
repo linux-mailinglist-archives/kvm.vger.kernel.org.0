@@ -1,249 +1,427 @@
-Return-Path: <kvm+bounces-72528-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72529-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IJq9D6rqpmnjZgAAu9opvQ
-	(envelope-from <kvm+bounces-72528-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 15:05:30 +0100
+	id sASjAsLupmnjaQAAu9opvQ
+	(envelope-from <kvm+bounces-72529-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 15:22:58 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4EBA1F1071
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 15:05:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E021F1610
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 15:22:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1190730A9041
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 13:55:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3696C3135061
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 14:17:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA4235773F;
-	Tue,  3 Mar 2026 13:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658183E7168;
+	Tue,  3 Mar 2026 14:17:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fwzz3XQE"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cEB3qYdO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f99.google.com (mail-qv1-f99.google.com [209.85.219.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9A135836C;
-	Tue,  3 Mar 2026 13:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772546050; cv=none; b=Z6HTRZxywtkGPvMWdMB3Q9kF+u6ufReNO2vbdnS0k+Z2E/ZuHuYnzTmDnF3oeukFKJczedplqEyEOLSlkCyrcAdIXuqy8OZEMXm5uIPZr11l5jnPvt79DadWynAcpKHtppVctGGRWZ9CI7eB1NruVP7DoTN47AJNMHDgBWfjG7g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772546050; c=relaxed/simple;
-	bh=YXasIYVoXiApJJEaO4bL2F5lmFJDAz7dcNZF1wv0rQ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OURYF5o3Q0lJ0sZ1xW0mWuGTkFj3R0okW4SPFiGVDKnchGT6luc5YE5xbh7wvjlvLcE7RnuAVCryRPFQKnu13kUdv8l3nPyr4rS450PweOwfPHct2rINgZj7xXfd+53r/hdurde1Q4Pn7OhoHraUNVzORIZNEiDFPnKnIZxXQsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fwzz3XQE; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6231vMl3859950;
-	Tue, 3 Mar 2026 13:54:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=AUl41te4x8oHbWKw1
-	OCUL3jblwtI/MdrKjlyRJc7Wfs=; b=fwzz3XQEX/t60iOo4Xb+ApQArS3BrA2aT
-	uHZVkPzzzaZrvHhPvqoP2wTy48dSUuXetmElWBk7ZEM7flb6CxTdNiIb4IgmgLnv
-	vFMMFgDhO6/biY9dUIwsTOGVP1PxS5JN4b6obbzzExUAL4wASx92H/RtcUkzrJKW
-	J6Ct152WUDSNazcpPfLezUDmgrvmd8uLiY4/yk5PhbmIOGscee1SrTLBb0xJtX+p
-	o3zTPSCu8YXVSo5IATzCEzEI4e9fbCnIe7X6u4E2fpRDBdK2/NFPrTnE63oaUBdl
-	+o5gGjW5TxfUXSkqjXYks/RUyrosCaOUU/0t5GU/rvfy7Jo10nQdA==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ckskbtw4y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 03 Mar 2026 13:54:08 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 623AFERU016802;
-	Tue, 3 Mar 2026 13:54:07 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cmbpn2gxn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 03 Mar 2026 13:54:07 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 623Ds3JH61342142
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 3 Mar 2026 13:54:03 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 94A7C20040;
-	Tue,  3 Mar 2026 13:54:03 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 768FA2004B;
-	Tue,  3 Mar 2026 13:54:03 +0000 (GMT)
-Received: from b46lp25.lnxne.boe (unknown [9.87.84.240])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  3 Mar 2026 13:54:03 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, mjrosato@linux.ibm.com, freimuth@linux.ibm.com,
-        imbrenda@linux.ibm.com, borntraeger@linux.ibm.com
-Subject: [PATCH v2 2/2] KVM: s390: selftests: Add IRQ routing address offset tests
-Date: Tue,  3 Mar 2026 13:46:35 +0000
-Message-ID: <20260303135250.3665-3-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260303135250.3665-1-frankja@linux.ibm.com>
-References: <20260303135250.3665-1-frankja@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3302F3A5E62
+	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 14:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.99
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772547445; cv=pass; b=Ee7F9EcLw5nNJqYYcxQvIym37zA99nLFnpc1sc5wWO9O3MhvuqxDIyUuIzM58kHTcZWTUeIm/x0OsNm5prQt4Te58AUNtJdD/SpTK3eLalf9DGiLyevz5PoTfS6orAblcOD8diWJqEjxLiqXs+exTbr9A0qwJxdCE8Sq11y8jtE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772547445; c=relaxed/simple;
+	bh=FOW4eBuqXz179l1EeHpK1J6OT2PkEvWUDszNVZaGDzk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SwHyhh0sJnn1SP2lC/9xvzo/7tmw2jL1Xu+WtlkpRGCB/ZS2te+tn+nJ5+3OHxvjoXMYaqh1jK2PcmtrN0DAAM8DZnU8wULoha6xfRi1Q2ouFsfGkFkRRLmeC13NQTzRlLL3nDoRSsDvHgQEQAgWKeoukywD7GXnfy0zIFwh9SA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cEB3qYdO; arc=pass smtp.client-ip=209.85.219.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qv1-f99.google.com with SMTP id 6a1803df08f44-899e43ae2e1so25542006d6.2
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 06:17:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772547443; x=1773152243;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=q7IID1ya39qPHIfr6YkND7Crbjf1Blfyl6f9cbxC3qI=;
+        b=NOwpdH6p0QeNCrP1pZVKQKINwclAo3t9zTJxWsolZy5/hSX8T9EO2U9eWx22WYDRd8
+         fCCnvFRFpTAuFi+yYycmiPcQtv5UsYF6HM0J5uoXJWUci9HhVxHZsqWnhpraOoosA4dE
+         oeSvkzYsPjzeGqbnWb+rNNeb/V/p9Fr8AGSYwTQQY7LL40/cdFevmkvowlOIV8oThp4Y
+         NnP08aaVvJz/NfFUhqDfGGfUXM5UZOocYGXftjhf4RJOGKjwlhpVWZq+LHaburPwzwhP
+         XIJ2hXt/duiUt7LQ6q3k5ZWqQZrRCOQ1BQDCp7/Q4Bjobe/D0mH0Dphtur2H0wnjL7Iz
+         R65Q==
+X-Forwarded-Encrypted: i=2; AJvYcCV+TudPZly70CD64/jSKKP4qvryFNW9qf/dTUsUF/NZpjt7gApna3mX0JTznkfI9GOp6p8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSiBNAK5MUxHV5HPyvfnru8NNciwRhKQS+NtcZY/cvgxR+wzwe
+	GsgmDQXRcALjX466yHPoM6GSpc/p/g11F/b6s1DorHTVahJ1VPi/8zx6Vi6IMmAA6im+vBPSzfy
+	LpHMEC7ej8Ehl+dYSYlFSLPaWk0nIU3FhQXBm4TWo2rBNPj7NptGE6et7FjsIp4FdQSNh79i3fG
+	jGs+UvmjglH+uQdOKzEnI8UTzXx6SjI9/l/fZpbIyIDBFHiK5SduxdybjtVebcOa2JjYm8k91gm
+	2/B4wS93w==
+X-Gm-Gg: ATEYQzxLPtjzAdAmziR9RbgjemXjCktkZjEmmwq1AHYyTwYkJOeGQKrX1vP8CvpjBHp
+	8W/woBlFkdYrWHQFSr1F/4Qv7j5SdkoMNVy3MynyeIw+8pUZP7/oHF44Rcn42ZBqtg94hLF5IvF
+	Kv1STP2SE2pO1Y9GToMsV/P7THz5rhVp6/JuWoqhO3/7M7+deNw7oFc/1r/gv4SLmve7Or6OOL3
+	9s9HBOrxM47VZyKdpbVqcJNcGPbsowZ3KUD23O2NkVsQom0l3Pyebz0JNz9gdMdt5vxpjeMExCK
+	/iQ632Ct1HJplFJkIDPuxWB8iURbtH5HrOEqXDkTgXSrs5HAzeVjpTlX18vpP74A6y9by1EuKCQ
+	XZCVjUYIkK4ygjJuEbl22TRROIV+rRf3GPbxbLtqmgjw3rz7J5a09Hy6P1pfVTgcGq53AsRmlI8
+	3Y+IgXPF8f1xoo3iF9JvoI9SYgEV4P2uE6GRDXQ7P/5N8gHHRu23aPwDr2nPQ=
+X-Received: by 2002:a05:6214:48d:b0:899:bc85:7b68 with SMTP id 6a1803df08f44-899d1dbd513mr215722906d6.16.1772547442704;
+        Tue, 03 Mar 2026 06:17:22 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-118.dlp.protect.broadcom.com. [144.49.247.118])
+        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-5074517cf5bsm22496071cf.4.2026.03.03.06.17.22
+        for <kvm@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 03 Mar 2026 06:17:22 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-389ebd1e997so57779621fa.1
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 06:17:22 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772547441; cv=none;
+        d=google.com; s=arc-20240605;
+        b=YeL0GlfW5KgXifTF4Ba8o+opMsnlhR6xJ341Lmynjx8YO9oW6hpt65ZPeCkdqoy/XV
+         X/oGK/BEQ/YkIbTFpRWYObhofv3tS9cEziZ5VgR9pP4pcimTEHGb2ymEsww2vWANdltG
+         nX81z8fKNLgI9j0NQcodjzV1fNV4+L7fEzNms9ox2oHs20e0niNrWTtCQenwIhMBfiCY
+         FTdfGzyw0deurEWrl2uKaz1RvEyXyr0xAax2ulDhi6ksSNt2AgR3fFiunLAklzyCxmWI
+         PfNmKlxGJgAO9JbvumZwCClwev8Bc7+kwVN5k/UIbPnN9+0w733dtYZvqqMpFsYAlg/V
+         O+kQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=q7IID1ya39qPHIfr6YkND7Crbjf1Blfyl6f9cbxC3qI=;
+        fh=TZSUQDKOCUGKt812YsfvCrBnt3EdmTdZXE56tQOYLTE=;
+        b=K6WOLPRDRBKxPiY9iAAvG4pqXhw1iy6hvyYvCKNH2xE9qUr+Rn9X/W5rjTLnkqnkur
+         5gneVioUAiSieMkkH6jCpg73EYAzkiL0m8Q5rgQpkilMo9bp77UxPwf6jtZgEGn2oepR
+         Aoma/cPdobsP/DmSIP+kLwWjSqALa9du8Ndh0x70wxkfAuD61uthScFqdjsVQCnZYXp+
+         5rDNTNfhxuVzRD62EtlijwDVEopEW1CLFZlSlfrn+XA0xUdftVExguBaIjSviNw3Ekts
+         MBi6yw3nwL3QLW/2DELU4c0c8zdPkdFNEOz9yUAY3uJZCPOCnKFZyILN29jbK1cM/o8r
+         j2wg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1772547441; x=1773152241; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=q7IID1ya39qPHIfr6YkND7Crbjf1Blfyl6f9cbxC3qI=;
+        b=cEB3qYdOZ+0sFqzArqiYJlpbKcO7+6rDamx+YU+78IpM5nhwsmByNwWtx1sfwsWCTW
+         0P/4YgUd5M0yvjDQb70LlUjoIpGw3Fz2vI/LiqH1GmOwD0JJDbC+lLLR/FtzVjfGdmS7
+         DiBMsHny1hcuRJJCuLebD8US2LrF0WsRwi9YY=
+X-Forwarded-Encrypted: i=1; AJvYcCU9FS/7Rg34xp+8vlcjnshhuoovdxYxbHvaW+KrN3IIJJJvOJgUFteqDnx5BKhozZfbM3s=@vger.kernel.org
+X-Received: by 2002:a2e:9cd6:0:b0:389:fdb2:1068 with SMTP id 38308e7fff4ca-389ff357805mr91185191fa.34.1772547440728;
+        Tue, 03 Mar 2026 06:17:20 -0800 (PST)
+X-Received: by 2002:a2e:9cd6:0:b0:389:fdb2:1068 with SMTP id
+ 38308e7fff4ca-389ff357805mr91184971fa.34.1772547440157; Tue, 03 Mar 2026
+ 06:17:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: hu8jThj64-NmMvihnyO_7Zsnclwxtaso
-X-Authority-Analysis: v=2.4 cv=b66/I9Gx c=1 sm=1 tr=0 ts=69a6e800 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=V8glGbnc2Ofi9Qvn3v5h:22 a=VnNF1IyMAAAA:8 a=nmqUFfGTdH_2drHDQF0A:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzAzMDEwOCBTYWx0ZWRfX6bkAz4f4Mxwf
- 7/4Emo/uEJBNqN4a5/y1iDFjnaVlqW6JUnFQ0IjVhyJ/qW9OpGtZQW0ZUs4PQdA4Rn2DislZowR
- M43oSk3b0A7k8NF3+Lz0x8PH9288YYJ4pEZndjTXGmFTb8CkKs0aSpsLblDS1P1WytsRmgioD0o
- WyvnTjpGxgdptNOFolXCZXTcFaMMHHMZ5fBNtab8f6vTxqDzjNqGYu454PVZHXe4rRLJNtMtwWF
- jRmpsi/22TkozVpkWWMH8aJMbvMko2LtDk67Hcy5tf/UihNu7jpW3bJW/YR9wE/4FQygN/12qs7
- 4+FKLJ9rGLkU4oYdvdks5I+CNOAkXsD+Rsd1hdzk5/QbAsxY/6oFtNkQRfUTZ86WFGpdRw6Nwfi
- yHZRZyqP4Gm7+k99od9tIWr/Ex30CqontT5iuKKCPTLuCpNJDCW9WnEMtHFln1bQRwvd4pMWpxm
- jT2EIvrFo9hI+muJ5CA==
-X-Proofpoint-GUID: hu8jThj64-NmMvihnyO_7Zsnclwxtaso
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-02_05,2026-03-03_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 lowpriorityscore=0 phishscore=0 clxscore=1015 adultscore=0
- bulkscore=0 impostorscore=0 malwarescore=0 spamscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603030108
-X-Rspamd-Queue-Id: D4EBA1F1071
+References: <20260302104138.77555-1-graf@amazon.com> <aaVrsXMmULivV4Se@sgarzare-redhat>
+ <aaV80wWlpjEtYCQJ@sgarzare-redhat> <17d63837-6028-475a-90df-6966329a0fc2@amazon.com>
+ <aaW2FgoaXIJEymyR@sgarzare-redhat> <27dcad4e-d658-4b6b-93b2-44c64fcbeb11@amazon.com>
+ <aaaqLbRNmoRHNTkh@sgarzare-redhat>
+In-Reply-To: <aaaqLbRNmoRHNTkh@sgarzare-redhat>
+From: Bryan Tan <bryan-bt.tan@broadcom.com>
+Date: Tue, 3 Mar 2026 14:17:07 +0000
+X-Gm-Features: AaiRm52JEb6AVb0mzyIgBtpCH-MimPgZjYb76gWACsIcSJONxOy5WDbyUYProjc
+Message-ID: <CAOuBmuaQwxKDJoirwtRwEP=690JcRX3Efk6z=udiOHsGr8u6ag@mail.gmail.com>
+Subject: Re: [PATCH] vsock: Enable H2G override
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Alexander Graf <graf@amazon.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	eperezma@redhat.com, Jason Wang <jasowang@redhat.com>, mst@redhat.com, 
+	Stefan Hajnoczi <stefanha@redhat.com>, nh-open-source@amazon.com
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000094f75b064c1f5c02"
+X-Rspamd-Queue-Id: 34E021F1610
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+X-Spamd-Result: default: False [-4.26 / 15.00];
+	SIGNED_SMIME(-2.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72528-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72529-lists,kvm=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[frankja@linux.ibm.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	HAS_ATTACHMENT(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.ibm.com:mid];
-	DKIM_TRACE(0.00)[ibm.com:+];
+	FROM_NEQ_ENVFROM(0.00)[bryan-bt.tan@broadcom.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-This test tries to setup routes which have address + offset
-combinations which cross a page.
+--00000000000094f75b064c1f5c02
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |  1 +
- .../testing/selftests/kvm/s390/irq_routing.c  | 75 +++++++++++++++++++
- 2 files changed, 76 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/s390/irq_routing.c
+On Tue, Mar 3, 2026 at 9:49=E2=80=AFAM Stefano Garzarella <sgarzare@redhat.=
+com> wrote:
+>
+> On Mon, Mar 02, 2026 at 08:04:22PM +0100, Alexander Graf wrote:
+> >
+> >On 02.03.26 17:25, Stefano Garzarella wrote:
+> >>On Mon, Mar 02, 2026 at 04:48:33PM +0100, Alexander Graf wrote:
+> >>>
+> >>>On 02.03.26 13:06, Stefano Garzarella wrote:
+> >>>>CCing Bryan, Vishnu, and Broadcom list.
+> >>>>
+> >>>>On Mon, Mar 02, 2026 at 12:47:05PM +0100, Stefano Garzarella wrote:
+> >>>>>
+> >>>>>Please target net-next tree for this new feature.
+> >>>>>
+> >>>>>On Mon, Mar 02, 2026 at 10:41:38AM +0000, Alexander Graf wrote:
+> >>>>>>Vsock maintains a single CID number space which can be used to
+> >>>>>>communicate to the host (G2H) or to a child-VM (H2G). The
+> >>>>>>current logic
+> >>>>>>trivially assumes that G2H is only relevant for CID <=3D 2
+> >>>>>>because these
+> >>>>>>target the hypervisor.  However, in environments like Nitro
+> >>>>>>Enclaves, an
+> >>>>>>instance that hosts vhost_vsock powered VMs may still want
+> >>>>>>to communicate
+> >>>>>>to Enclaves that are reachable at higher CIDs through
+> >>>>>>virtio-vsock-pci.
+> >>>>>>
+> >>>>>>That means that for CID > 2, we really want an overlay. By
+> >>>>>>default, all
+> >>>>>>CIDs are owned by the hypervisor. But if vhost registers a
+> >>>>>>CID, it takes
+> >>>>>>precedence.  Implement that logic. Vhost already knows which CIDs i=
+t
+> >>>>>>supports anyway.
+> >>>>>>
+> >>>>>>With this logic, I can run a Nitro Enclave as well as a
+> >>>>>>nested VM with
+> >>>>>>vhost-vsock support in parallel, with the parent instance able to
+> >>>>>>communicate to both simultaneously.
+> >>>>>
+> >>>>>I honestly don't understand why VMADDR_FLAG_TO_HOST (added
+> >>>>>specifically for Nitro IIRC) isn't enough for this scenario
+> >>>>>and we have to add this change.  Can you elaborate a bit more
+> >>>>>about the relationship between this change and
+> >>>>>VMADDR_FLAG_TO_HOST we added?
+> >>>
+> >>>
+> >>>The main problem I have with VMADDR_FLAG_TO_HOST for connect() is
+> >>>that it punts the complexity to the user. Instead of a single CID
+> >>>address space, you now effectively create 2 spaces: One for
+> >>>TO_HOST (needs a flag) and one for TO_GUEST (no flag). But every
+> >>>user space tool needs to learn about this flag. That may work for
+> >>>super special-case applications. But propagating that all the way
+> >>>into socat, iperf, etc etc? It's just creating friction.
+> >>
+> >>Okay, I would like to have this (or part of it) in the commit
+> >>message to better explain why we want this change.
+> >>
+> >>>
+> >>>IMHO the most natural experience is to have a single CID space,
+> >>>potentially manually segmented by launching VMs of one kind within
+> >>>a certain range.
+> >>
+> >>I see, but at this point, should the kernel set VMADDR_FLAG_TO_HOST
+> >>in the remote address if that path is taken "automagically" ?
+> >>
+> >>So in that way the user space can have a way to understand if it's
+> >>talking with a nested guest or a sibling guest.
+> >>
+> >>
+> >>That said, I'm concerned about the scenario where an application
+> >>does not even consider communicating with a sibling VM.
+> >
+> >
+> >If that's really a realistic concern, then we should add a
+> >VMADDR_FLAG_TO_GUEST that the application can set. Default behavior of
+> >an application that provides no flags is "route to whatever you can
+> >find": If vhost is loaded, it routes to vhost. If a vsock backend
+>
+> mmm, we have always documented this simple behavior:
+> - CID =3D 2 talks to the host
+> - CID >=3D 3 talks to the guest
+>
+> Now we are changing this by adding fallback. I don't think we should
+> change the default behavior, but rather provide new ways to enable this
+> new behavior.
+>
+> I find it strange that an application running on Linux 7.0 has a default
+> behavior where using CID=3D42 always talks to a nested VM, but starting
+> with Linux 7.1, it also starts talking to a sibling VM.
+>
+> >driver is loaded, it routes there. But the application has no say in
+> >where it goes: It's purely a system configuration thing.
+>
+> This is true for complex things like IP, but for VSOCK we have always
+> wanted to keep the default behavior very simple (as written above).
+> Everything else must be explicitly enabled IMHO.
+>
+> >
+> >
+> >>Until now, it knew that by not setting that flag, it could only talk
+> >>to nested VMs, so if there was no VM with that CID, the connection
+> >>simply failed. Whereas from this patch onwards, if the device in the
+> >>host supports sibling VMs and there is a VM with that CID, the
+> >>application finds itself talking to a sibling VM instead of a nested
+> >>one, without having any idea.
+> >
+> >
+> >I'd say an application that attempts to talk to a CID that it does now
+> >know whether it's vhost routed or not is running into "undefined"
+> >territory. If you rmmod the vhost driver, it would also talk to the
+> >hypervisor provided vsock.
+>
+> Oh, I missed that. And I also fixed that behaviour with commit
+> 65b422d9b61b ("vsock: forward all packets to the host when no H2G is
+> registered") after I implemented the multi-transport support.
+>
+> mmm, this could change my position ;-) (although, to be honest, I don't
+> understand why it was like that in the first place, but that's how it is
+> now).
+>
+> Please document also this in the new commit message, is a good point.
+> Although when H2G is loaded, we behave differently. However, it is true
+> that sysctl helps us standardize this behavior.
+>
+> I don't know whether to see it as a regression or not.
+>
+> >
+> >
+> >>Should we make this feature opt-in in some way, such as sockopt or
+> >>sysctl? (I understand that there is the previous problem, but
+> >>honestly, it seems like a significant change to the behavior of
+> >>AF_VSOCK).
+> >
+> >
+> >We can create a sysctl to enable behavior with default=3Don. But I'm
+> >against making the cumbersome does-not-work-out-of-the-box experience
+> >the default. Will include it in v2.
+>
+> The opposite point of view is that we would not want to have different
+> default behavior between 7.0 and 7.1 when H2G is loaded.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index fdec90e85467..271cbb63af36 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -205,6 +205,7 @@ TEST_GEN_PROGS_s390 += s390/ucontrol_test
- TEST_GEN_PROGS_s390 += s390/user_operexec
- TEST_GEN_PROGS_s390 += s390/keyop
- TEST_GEN_PROGS_s390 += rseq_test
-+TEST_GEN_PROGS_s390 += s390/irq_routing
- 
- TEST_GEN_PROGS_riscv = $(TEST_GEN_PROGS_COMMON)
- TEST_GEN_PROGS_riscv += riscv/sbi_pmu_test
-diff --git a/tools/testing/selftests/kvm/s390/irq_routing.c b/tools/testing/selftests/kvm/s390/irq_routing.c
-new file mode 100644
-index 000000000000..7819a0af19a8
---- /dev/null
-+++ b/tools/testing/selftests/kvm/s390/irq_routing.c
-@@ -0,0 +1,75 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * IRQ routing offset tests.
-+ *
-+ * Copyright IBM Corp. 2026
-+ *
-+ * Authors:
-+ *  Janosch Frank <frankja@linux.ibm.com>
-+ */
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "kselftest.h"
-+#include "ucall_common.h"
-+
-+extern char guest_code[];
-+asm("guest_code:\n"
-+    "diag %r0,%r0,0\n"
-+    "j .\n");
-+
-+static void test(void)
-+{
-+	struct kvm_irq_routing *routing;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+	vm_paddr_t mem;
-+	int ret;
-+
-+	struct kvm_irq_routing_entry ue = {
-+		.type = KVM_IRQ_ROUTING_S390_ADAPTER,
-+		.gsi = 1,
-+	};
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+	mem = vm_phy_pages_alloc(vm, 2, 4096 * 42, 0);
-+
-+	routing = kvm_gsi_routing_create();
-+	routing->nr = 1;
-+	routing->entries[0] = ue;
-+	routing->entries[0].u.adapter.summary_addr = (uintptr_t)mem;
-+	routing->entries[0].u.adapter.ind_addr = (uintptr_t)mem;
-+
-+	routing->entries[0].u.adapter.summary_offset = 4096 * 8;
-+	ret = __vm_ioctl(vm, KVM_SET_GSI_ROUTING, routing);
-+	ksft_test_result(ret == -1 && errno == EINVAL, "summary offset outside of page\n");
-+
-+	routing->entries[0].u.adapter.summary_offset -= 4;
-+	ret = __vm_ioctl(vm, KVM_SET_GSI_ROUTING, routing);
-+	ksft_test_result(ret == 0, "summary offset inside of page\n");
-+
-+	routing->entries[0].u.adapter.ind_offset = 4096 * 8;
-+	ret = __vm_ioctl(vm, KVM_SET_GSI_ROUTING, routing);
-+	ksft_test_result(ret == -1 && errno == EINVAL, "ind offset outside of page\n");
-+
-+	routing->entries[0].u.adapter.ind_offset -= 4;
-+	ret = __vm_ioctl(vm, KVM_SET_GSI_ROUTING, routing);
-+	ksft_test_result(ret == 0, "ind offset inside of page\n");
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_IRQ_ROUTING));
-+
-+	ksft_print_header();
-+	ksft_set_plan(4);
-+	test();
-+
-+	ksft_finished();	/* Print results and exit() accordingly */
-+}
--- 
-2.51.0
+From a VMCI perspective, we only allow communication from guest to
+host CIDs 0 and 2. With has_remote_cid implemented for VMCI, we end
+up attempting guest to guest communication. As mentioned this does
+already happen if there isn't an H2G transport registered, so we
+should be handling this anyways. But I'm not too fond of the change
+in behaviour for when H2G is present, so in the very least I'd
+prefer if has_remote_cid is not implemented for VMCI. Or perhaps
+if there was a way for G2H transport to explicitly note that it
+supports CIDs that are greater than 2?  With this, it would be
+easier to see this patch as preserving the default behaviour for
+some transports and fixing a bug for others.
 
+--00000000000094f75b064c1f5c02
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+kKXUf8BmgVwrm4J21BIjpK/E9/meSALtIG7FIMpiIKpgHf1MRTzmYywQIWohaXxPRAEIYZK2DSMY
+n+fDChhou4ePAtzo6/x8PTSWPrJbH05U1DQt9FRG7+xcvkNqnjJq+XZK0kiDDFD8BzIKO/cq3ziS
+50EhbzFKXPpa46ztpJqQ+UJTJod2dB7SexAYJlBkjKlGc+niNQIDAQABo4IB2jCCAdYwDgYDVR0P
+AQH/BAQDAgWgMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3NlY3VyZS5n
+bG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEFBQcwAYYt
+aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1UdIAReMFww
+CQYHZ4EMAQUDATALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIBFiZodHRw
+czovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEEGA1UdHwQ6MDgw
+NqA0oDKGMGh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzLmNybDAk
+BgNVHREEHTAbgRlicnlhbi1idC50YW5AYnJvYWRjb20uY29tMBMGA1UdJQQMMAoGCCsGAQUFBwME
+MB8GA1UdIwQYMBaAFAApNp5ceroPry1QLdugI4UYsKCSMB0GA1UdDgQWBBQWxgja/oUqPdrOSir6
+U+YDJVND/DANBgkqhkiG9w0BAQsFAAOCAgEAIL+CGrIYdRkQ80Psq9FtFG65/EZQH8dFSXv3AJTk
+220m3Q98q4NHh+AkBRw/pvzVQMJlRKEBKgM1qYw5FYYoC3IRpeqQ9NqnJHsEAHX2p7Hfkt3l8zd7
+rT9DuQ4Tws1Fjxo4L7OcRz8NDD9f0Y+LHADvcMUHoex2PldpXkGuWd4K1eMjga8xPOrKKYYdvWYw
+cX/rc+AYfo3B0OnjSWXjdsufMPVDDK23uGYfti1djyVhYG7hOCKjW3fg9QdDcVjVa4q7spoCPGnQ
+HGghAH5+ZauOJU1r26oGjwR/73xvsig9pX887/zvEM5WdbTXK82mciLRR4iQB0UlV+8UxxpJzfGd
+j/6onem1o3e1fTH0owcQEn59i7Ygo5cWJm0qnT7zPTS6pgkXJ4xmskj6Dcqi/hRkMlxovq3K05uN
++lgAFg6F7ugpiGTUcxngHsGMRlj8cXIhg8KZO0gBU5KthBSvioQgN2JpAyE5gUV7stnVCu8l+SAr
+Oo+OqcCeAc14zE+TlRnoQVn/xF+q0zAyONDNmQO4uyl0EyLpTIYLK7wFxC6IDrz2FsEzlioH2cBJ
+lUyNMZuhR7c1KUj3dr4qBG1506iDiJ5qqn2rBKJAvk0ph2Irlh+82seX1iL/wX+M+Wwkzoo34GGq
+6CGv4ffBr8W+eQ2/QT4X10tgfAgSZ+Sag3gxggJXMIICUwIBATBiMFIxCzAJBgNVBAYTAkJFMRkw
+FwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlN
+RSBDQSAyMDIzAgx+bIvtS2ArBR9RakkwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIE
+INJgsp+iimvuKp51tVU0hRENooY2OWONPcba116+vUOeMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0B
+BwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDMwMzE0MTcyMVowXAYJKoZIhvcNAQkPMU8wTTALBglghkgB
+ZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcw
+CwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAHrmTB8YkIi6t3/PHsNJLtbXq3OA6CKDqUAK
+WyUe1w+LlJIqMvavgnBzXWKYTixm9KrVZnKTf4n1qcQKwt4E3sRdMpKvRw/NQQ8nZIop4gGk21Je
+o4xM4izjPuKZQYq50ywbDJ8B0Edc8+tQJNgxZrCq9R4G9YG/cweOpCqAi2IdRspqQkJgvAbt8yZu
+JVRcGmuLdvkEZ5MRsHuDh0FDYhdHwGEY6ryh7wWUTzjJIHJZWwsk7WrNtBQvGI/OHEMbec3seMq9
+AbJQfIVtlyZueyOD8d9Hu3eLOAZTcsG5hEhmfBX/zhSTrjw1E6yXr8ybBG4p2hLQSgSYZbJEpEdv
+Y7I=
+--00000000000094f75b064c1f5c02--
 
