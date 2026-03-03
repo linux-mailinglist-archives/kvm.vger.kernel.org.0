@@ -1,210 +1,184 @@
-Return-Path: <kvm+bounces-72613-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72614-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GAFbCVhZp2lsgwAAu9opvQ
-	(envelope-from <kvm+bounces-72613-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 22:57:44 +0100
+	id sA1WGRFcp2knhAAAu9opvQ
+	(envelope-from <kvm+bounces-72614-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 23:09:21 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACDDD1F7D2E
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 22:57:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD60C1F7DE2
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 23:09:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 114C930A87E5
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 21:56:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA0F630BA3A6
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 22:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F61372688;
-	Tue,  3 Mar 2026 21:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C16F53932C1;
+	Tue,  3 Mar 2026 22:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fk3/BNja"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GtX2wovR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3793368AA
-	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 21:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772574993; cv=pass; b=GXxBgcj+R+U+lGZKCbyAOW70ii8Law01eEvXVjb0j5s5hRm69qcfZ/OLay8s0J2XX0Du1TgopT06QWZHMl4HDqD8f7mOlDTr/QkgNXS1tsOJZlWI44RfUxkeJOOpguuFAUlyiqRWeZiFli9K4cztbARNibZIyMGUtKohaIMwOPA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772574993; c=relaxed/simple;
-	bh=rboHVk+33J7HAdeUHlDmisJX+T3/+AQR79cDfX0htt4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uiG4Bp8UZFImcoUQ2+g8qQRe2H97Lf7LgobEWcSPogdp35q993eYgkgwmOMH+zEAPNQLOlKURigFZwiQkMJjYOOB4y6F3PtshSUaMHbcXM6oUd9p2tbmbPDk/9TYlYCfrCFOI64qanetXvSKOt3VfATdPE6A/uKjiFDE0mQhx4w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fk3/BNja; arc=pass smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA21738423A
+	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 22:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772575740; cv=none; b=JEPfnRBdGtPdN33Ahjuw/vQON9T72aPkkII5oWyQrHhhZbprYDfBhiBIlta2DvgAnwj/eiscQXjzgST7s+f+OpHZnTskuB+4vQC3mQNTQEoTedsDO8abNnU+mAPSd9jRLmhn5W9XdZeBZNL+ZIW/bYQ7J34JSzN+/yXIK7tGYvw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772575740; c=relaxed/simple;
+	bh=Of7BTYeza07tyJCqXUipN95k452hh96VN8OAHgpIRDg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=A7XU9vN6y4X8ipnXLT2odmTqjiouM61oHcRbn3iJLa3x6AIxVoT8A6t+56VCJndSRjxtSP+NEaIMxD3dbHRyE+aW5jzmKZdA2UEnkknpim8bL6QE7JLg1q2DmGZxx4GRMMGjMwNQRKL742k6aUuaA6syezTgf8FTGTooRC58hdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GtX2wovR; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-899ee491af3so31772206d6.1
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 13:56:32 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772574991; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Fi3Zu19hvvAIh8sGyjJ5obYBsjttCNpt0efF4gL/n/+aDvUbblxEy7sJPe1WVKV+nw
-         e8cfr22PwO/04+7qgS4C4wEZwqilQv8h0XQbhA/Ca6VAVTLn1CNZbHrX3ZxmfhsfvwGW
-         T2VbgU0pHpAMYg+LPUwzulsTjerm5jOg1Ndn8pRoIE2hIAleSb48yYP02iTaPdKOXjLy
-         VNJp+9MQ+0K3aK/eme2aVuM/5SfXv8SykKQVxnAbIi/We6LeFPhQZGfmnjjyxCun7Wc6
-         YkzXk87XncoLIrdbYRpgpG5qPyybsECGb8grU2zWzDbMb2je4xKC0SAiy/qURgIR1rgB
-         52tQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=yL9ZfF2PiZMMlOEHToQfBb/KFNEINU/ZtZru9/pb3Ao=;
-        fh=bkWIprXAypf3Jpu4X/tsnswe1ABvX80rZ2rEtA4QYus=;
-        b=Pvj8mGbYgzO/xu/bwufr4Jb6a0EZwq1YYm2pHxXpw+9V8cdRtbVHyt64XoYp3bimXl
-         QDpt7hT0M8X8qh4jMoHv+oQ3WeKKG2ADAm1wl8NZ9eqkUqkUjMfCQZycxFRBG6tiWAp4
-         3VK7CEh4IAqJdhFCzYU6x+0Bw+IyOleBwgCSvJLat6Iw33aQTyWqzBf7SpiXF2WKcUg6
-         hww4UYuxil7ZuiedhyR1//jPuyS1A9JRxqTkcbMj5cP30QBywLrd/VJcSK2NAIjHta/r
-         M617Jt8S+0Y5of3lRpQtT4fM5hFRnEyjaNf8GolLbwVunZkyZrNODGuihUJ0/1WwgDnw
-         zfjg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-35980affbf3so2236568a91.0
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 14:08:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772574991; x=1773179791; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yL9ZfF2PiZMMlOEHToQfBb/KFNEINU/ZtZru9/pb3Ao=;
-        b=fk3/BNja0B2y831k7k00ehFnHbcL15qWtsi7+8rznWTud48W6zpp6jXi0ZvaxANpxG
-         x3Z6JrUpIZgxthJ+0vFZHtNd4FijZsvcukqedBfIuUbh7yeOWeMAwkSQfp+Y0xEDIrFe
-         BN12Qx8XqaJtmhSTvQx92Tc8mTYJ+1tCplxEkn3drzSq9DqBxxM9CEA52k1Wt89RLPGR
-         0D9jbzN1QNLlpaXdFuMHcFot+wl8rIcz8A2z39GOusqYCAtqzo3pio9UScEqbfzD7cCo
-         sIJHU8OR/08o3UMIuc4GYdBRDbYJkAdSyXS63eeqlfyfeuBhbckA29h+RN8HUmOMRPCD
-         dF0Q==
+        d=google.com; s=20230601; t=1772575738; x=1773180538; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zj6uWkxQBYzI6TemYHQOyFliUtyyEllmJWAoAGhyJyU=;
+        b=GtX2wovRP/1lxYJ4KIUuiUDDox7ZjCkSBD5PE6yhe6TBbEq2aBasnHqSc9KYIdsG7B
+         pr13GKEHFkQXo7We0eGs9zNn0QSao7oMl5BDFjEg32MN8LvFlb0UA+f8H4FwB49LLYg6
+         RP2RwqBtY9vo7Zzd+52yLvmDdoZyw/cN9sJX0CwyofvxL7NVpOplwhYdoAMeZwCy4SQR
+         C1IDG/M9GXyDvA6ys9NSTimUHPtpiAjvqW4FZoaipteRhLOuotuuLpR0bJ0nTzUmXek4
+         BiuJJ/k2XHz6AFpwimlHoyVhMC/MsEqkV5JleAZfwwB/anRMqyoSmgemwCbIn/36zCC2
+         UdFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772574991; x=1773179791;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=yL9ZfF2PiZMMlOEHToQfBb/KFNEINU/ZtZru9/pb3Ao=;
-        b=dMcj07DUxFmm72lCF9KQJKZn3s3B6lFjK0Tl3F9+83TC2u2RAPSWXgKy32LW3zO6HI
-         4VGYvMslbmTU4MugfxBxgAhn55xrD0m+/3KSpUAP3yMzDY6VTjDlvlvVQJQyOe31xKzd
-         WVpwVqqW5T44RkrpFsVlPweBHSiWU/9tDv+Y46gFuMVVd0zLp9zW2VUmqcr8DHsY1/L2
-         wK2iGQu3iVJWJCB3xBWKThvSaWtdWfNJ7QH0NN5PJm5qUHioZF9VdrtAFKd0YZA75kw+
-         oslSqPOrdOsenWTg48KlUJ+eRDsSxgZoKEpNcMcA6wnxTlZclGTGUc0NwYwl4PqIJyu4
-         wWmw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrtNpL4NIgGM2lMbg6u229UWRKl1vO0dqW71nA7RIsJg8Me6JFrXHeLTKujRz2IBKFScw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqcNKnQmBI2zT5jHN0a9JRwOnSxkU0wqS7hcBX1wvK1YEFe92R
-	GPFj216JVIop5WzqzHRWGGNBej/leYZQ2XX9JSeFPgMmRU623SyYSb4IsKuzqrJUWV7OT4lIxp7
-	TLelOmN5h5MZVm63lq4AfsbIMTBASoZnWJCJNaFxY
-X-Gm-Gg: ATEYQzxPpL1ieRT6/KjHzKgt7WJze5hxajhR8kR2iHdA2ksktJbg9yWStJo6pg/jtoX
-	wLmPVKdBoTaFZJr+33Zur7ESJBqz5h2N10cjdMy8gq46b+wUXWtYHpRyrIHJMAHp4O+fO3Dt1Ix
-	0MhorPVrB8000qkaXDLqND0TEYvY7KO+rfF3jYwyBIOgxDUk0GjGlKFK0KnHis+nPmh4Fw53IVA
-	8TA9jOZw/gNIgWqNjX0HT1aISDNyLm6cG/LeXNJwUYbwIduSh4b5R4SfsaZf0sBEv2f+wtYiwx9
-	zOKB+o7Cd0Ynkt+xXXgmoUM5bMDM2wLvLE1tzaDaLw==
-X-Received: by 2002:a05:6214:d0a:b0:899:fea9:ccff with SMTP id
- 6a1803df08f44-899fea9d39amr120422866d6.55.1772574990865; Tue, 03 Mar 2026
- 13:56:30 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772575738; x=1773180538;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zj6uWkxQBYzI6TemYHQOyFliUtyyEllmJWAoAGhyJyU=;
+        b=SlvN5bbd7dIPBDahGK3mTbpuemuJTtjoQtmAD7KgpQlWZnwMKhXt/lbuBxUoBYLaej
+         Szgc1TmHqu15mSBRzehb8Nr9PgGNJDDJWgcJ4wSERPwtIEZbx7C2SdRb730wNaKHgoRe
+         UG6D1D2VCelCbcyCpzmHi2+IdfecDZuFMztwz3Wps5bD0Seo5JeGq3bfZ75N/x0/MvrQ
+         SZh8TrEJNl+8cb/ARhdPp2Wn+oW0AFEQTpvyou5rH8GPzvxF9w2/FKQGtLxybxHgZbLU
+         JGg8FTeXBuaSyct2bUFw8dw2BjX92pai6+y6tPTxqMH+bzXPnclDRj8S6Z4FoGo9TEhV
+         uFmA==
+X-Forwarded-Encrypted: i=1; AJvYcCUghbyNZlIwaBCj8JcaH4AKGLj3XLZ97Bnq33fIYi06BsZRD5hQtyF/nm+X8JJiLhoRZjQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzy4pHHhwE0yiPr6aqnPJga09xtnoadG0RcDp+qDND/syNxcsaI
+	b/pSNqAVs011ULtZelfnj/drhFsdPOL9yHdgaxUWMvRL6wwTaEbcVxkNKJWsiGgPnuNfxozIaM6
+	LKabelw==
+X-Received: from pjbgm24.prod.google.com ([2002:a17:90b:1018:b0:359:979d:cee5])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1ccc:b0:341:c964:126c
+ with SMTP id 98e67ed59e1d1-35965cef645mr16197271a91.34.1772575738034; Tue, 03
+ Mar 2026 14:08:58 -0800 (PST)
+Date: Tue, 3 Mar 2026 14:08:56 -0800
+In-Reply-To: <CAE6NW_YTqbMZgq1nEiO6XsuQPZsKd9_0DseFDStocrh-sB1TBw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 References: <20260228033328.2285047-1-chengkev@google.com> <CAO9r8zODn_ZGHsftsj0B6dJe9jy8sVZwdOgFi=ebZoHfGrWxXw@mail.gmail.com>
- <aaXXs4ubgmxf_E1O@google.com> <aaYanA9WBSZWjQ8Y@google.com> <aaYssiNf7YrprstZ@google.com>
-In-Reply-To: <aaYssiNf7YrprstZ@google.com>
-From: Kevin Cheng <chengkev@google.com>
-Date: Tue, 3 Mar 2026 16:56:19 -0500
-X-Gm-Features: AaiRm52FCq8g6_s46Y70AXrEXpz_sxOYyYWda8061I3CPpDn_ZAqDxlH0KeTjLE
-Message-ID: <CAE6NW_YTqbMZgq1nEiO6XsuQPZsKd9_0DseFDStocrh-sB1TBw@mail.gmail.com>
+ <aaXXs4ubgmxf_E1O@google.com> <aaYanA9WBSZWjQ8Y@google.com>
+ <aaYssiNf7YrprstZ@google.com> <CAE6NW_YTqbMZgq1nEiO6XsuQPZsKd9_0DseFDStocrh-sB1TBw@mail.gmail.com>
+Message-ID: <aadb-JQdbQJNvm0o@google.com>
 Subject: Re: [PATCH V4 0/4] Align SVM with APM defined behaviors
-To: Sean Christopherson <seanjc@google.com>
+From: Sean Christopherson <seanjc@google.com>
+To: Kevin Cheng <chengkev@google.com>
 Cc: Yosry Ahmed <yosry@kernel.org>, pbonzini@redhat.com, kvm@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: ACDDD1F7D2E
+X-Rspamd-Queue-Id: AD60C1F7DE2
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-72614-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72613-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[chengkev@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Mon, Mar 2, 2026 at 7:35=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Mon, Mar 02, 2026, Sean Christopherson wrote:
+On Tue, Mar 03, 2026, Kevin Cheng wrote:
+> On Mon, Mar 2, 2026 at 7:35=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >
 > > On Mon, Mar 02, 2026, Sean Christopherson wrote:
-> > > On Mon, Mar 02, 2026, Yosry Ahmed wrote:
-> > > > Also taking a step back, I am not really sure what's the right thin=
+> > > On Mon, Mar 02, 2026, Sean Christopherson wrote:
+> > > > On Mon, Mar 02, 2026, Yosry Ahmed wrote:
+> > > > > Also taking a step back, I am not really sure what's the right th=
+ing
+> > > > > to do for Intel-compatible guests here. It also seems like even i=
+f we
+> > > > > set the intercept, svm_set_gif() will clear the STGI intercept, e=
+ven
+> > > > > on Intel-compatible guests.
+> > > > >
+> > > > > Maybe we should leave that can of worms alone, go back to removin=
 g
-> > > > to do for Intel-compatible guests here. It also seems like even if =
-we
-> > > > set the intercept, svm_set_gif() will clear the STGI intercept, eve=
-n
-> > > > on Intel-compatible guests.
+> > > > > initializing the CLGI/STGI intercepts in init_vmcb(), and in
+> > > > > svm_recalc_instruction_intercepts() set/clear these intercepts ba=
+sed
+> > > > > on EFER.SVME alone, irrespective of Intel-compatibility?
 > > > >
-> > > > Maybe we should leave that can of worms alone, go back to removing
-> > > > initializing the CLGI/STGI intercepts in init_vmcb(), and in
-> > > > svm_recalc_instruction_intercepts() set/clear these intercepts base=
-d
-> > > > on EFER.SVME alone, irrespective of Intel-compatibility?
+> > > > Ya, guest_cpuid_is_intel_compatible() should only be applied to VML=
+OAD/VMSAVE.
+> > > > KVM intercepts VMLOAD/VMSAVE to fixup SYSENTER MSRs, not to inject =
+#UD.  I.e. KVM
+> > > > is handling (the absoutely absurd) case that FMS reports an Intel C=
+PU, but the
+> > > > guest enables and uses SVM.
+> > > >
+> > > >     /*
+> > > >      * Intercept VMLOAD if the vCPU model is Intel in order to emul=
+ate that
+> > > >      * VMLOAD drops bits 63:32 of SYSENTER (ignoring the fact that =
+exposing
+> > > >      * SVM on Intel is bonkers and extremely unlikely to work).
+> > > >      */
+> > > >     if (guest_cpuid_is_intel_compatible(vcpu))
+> > > >             guest_cpu_cap_clear(vcpu, X86_FEATURE_V_VMSAVE_VMLOAD);
+> > > >
+> > > > Sorry for not catching this in previous versions.
 > > >
-> > > Ya, guest_cpuid_is_intel_compatible() should only be applied to VMLOA=
-D/VMSAVE.
-> > > KVM intercepts VMLOAD/VMSAVE to fixup SYSENTER MSRs, not to inject #U=
-D.  I.e. KVM
-> > > is handling (the absoutely absurd) case that FMS reports an Intel CPU=
-, but the
-> > > guest enables and uses SVM.
+> > > Because I got all kinds of confused trying to recall what was differe=
+nt between
+> > > v3 and v4, I went ahead and spliced them together.
 > > >
-> > >     /*
-> > >      * Intercept VMLOAD if the vCPU model is Intel in order to emulat=
-e that
-> > >      * VMLOAD drops bits 63:32 of SYSENTER (ignoring the fact that ex=
-posing
-> > >      * SVM on Intel is bonkers and extremely unlikely to work).
-> > >      */
-> > >     if (guest_cpuid_is_intel_compatible(vcpu))
-> > >             guest_cpu_cap_clear(vcpu, X86_FEATURE_V_VMSAVE_VMLOAD);
-> > >
-> > > Sorry for not catching this in previous versions.
+> > > Does the below look right?  If so, I'll formally post just patches 1 =
+and 3 as v5.
+> > > I'll take 2 and 4 directly from here; I want to switch the ordering a=
+nyways so
+> > > that the vgif movement immediately precedes the Recalc "instructions"=
+ patch.
 > >
-> > Because I got all kinds of confused trying to recall what was different=
- between
-> > v3 and v4, I went ahead and spliced them together.
+> > Actually, I partially take that back.  I'm going to send a separate v5 =
+for patch
+> > 4, as there are additional cleanups that can be done related to Hyper-V=
+ stubs.
 > >
-> > Does the below look right?  If so, I'll formally post just patches 1 an=
-d 3 as v5.
-> > I'll take 2 and 4 directly from here; I want to switch the ordering any=
-ways so
-> > that the vgif movement immediately precedes the Recalc "instructions" p=
-atch.
->
-> Actually, I partially take that back.  I'm going to send a separate v5 fo=
-r patch
-> 4, as there are additional cleanups that can be done related to Hyper-V s=
-tubs.
->
+>=20
+> Gotcha, if you're sending just patch 4 as v5, then should I send
+> patches 1 and 3 (with fixes) as a new series?
 
-Gotcha, if you're sending just patch 4 as v5, then should I send
-patches 1 and 3 (with fixes) as a new series?
-
-> P.S. This is a good example of why bundling unrelated patches into series=
- is
-> discouraged.
->
-
-Noted :)
+No need, I'll send a v5 for 1 and 3 as well.
 
