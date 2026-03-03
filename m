@@ -1,65 +1,66 @@
-Return-Path: <kvm+bounces-72493-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72494-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id APiZLJ9SpmkbOAAAu9opvQ
-	(envelope-from <kvm+bounces-72493-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 04:16:47 +0100
+	id aBNKMKRSpmkbOAAAu9opvQ
+	(envelope-from <kvm+bounces-72494-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 04:16:52 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F7A21E8661
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 04:16:47 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 676E71E866A
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 04:16:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 81CF930172FD
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 03:16:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6598E301DD74
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 03:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0672837DE8C;
-	Tue,  3 Mar 2026 03:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF5E37CD41;
+	Tue,  3 Mar 2026 03:16:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fRO6uEQ+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l+f334Fa"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E528D37CD28;
-	Tue,  3 Mar 2026 03:16:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BB437DE97;
+	Tue,  3 Mar 2026 03:16:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772507804; cv=none; b=fAjRLUmizNeh+73XydM9STNnXpTd7zjFjLzk+MGmsUcquAe5uGiLNrdPpcb4A2VrN9GqiXFWBhvzWJfJNnzbxVxCTxOobTnrzdi3RtJ8JlOwMYBpysleC87UHBy943h9V3GtTzlCk/iENsZ0/m44ld0hW4+ljAOW5nIVezlN084=
+	t=1772507807; cv=none; b=iAQbFAy/9lxBRL+QZ0oWWz38uBhW2/+cOj6Aogmqm/Eaqg6gZquSvBbOX0r8PWz4N10nt91W/eTXMqo+zQ9hY4+yf7I0ZmrUS9UrdNujkJezKUvgchW82zFlOZM3GlAWGE6PqDUXW728gCDj/eug/HY8p6ArVD6h9IALUu3IJ6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772507804; c=relaxed/simple;
-	bh=r3QdDH65r1GQj5+EBgeArSdGhwCr5iFvBwbMRkaQrNc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iIloI0DhUVm/rPcYMXJ+VTeCPoZAGwgtvhymFYhYRb1ynoarw96YAgfO47bxZr7GXesGfhf2OOmbLKw3cgL58921OznVhehQu7MeLaZFPJuGWPby0gbxgd8gx+Rj5K5vWgPQVKbVdA9OgZuipC7yznyWNCF9cbm06oSteKWM4dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fRO6uEQ+; arc=none smtp.client-ip=198.175.65.11
+	s=arc-20240116; t=1772507807; c=relaxed/simple;
+	bh=IbCfjAR1kaOoaqHNjlo/eRgvjaAUGZc5tpaeXhcuHZM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Jlgv6MHj9Cz5Lz8z/Sdp4hIbF1QAWCB9A2N2k7LhJOJK4PHWbRnZvm6wniwo/MaebRPse52VJyT4Fl6xd0FHBAHCZJvTcEcu7Z0yQbVzRakLYfOg4EweFqP6bQR6S5ILNZTz1lggn73f+9l9600yFNL+fmv8tkCaiXdcFb/y+HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l+f334Fa; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772507801; x=1804043801;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=r3QdDH65r1GQj5+EBgeArSdGhwCr5iFvBwbMRkaQrNc=;
-  b=fRO6uEQ+z8jy7RhiMplE/9/8Gg0Hr1KXRBY1ywwZw9P6a4y/42bV5vQ2
-   3L7oiKfhE6xS0B2xfpE+7YAvszjGAYBUkhxYQI5lUJMY5jNcd4y9RIX9m
-   J269Igm57lmkG73azTKDbTtzpH5xoIrk/+B1bQeMJPcdCMXqxGyz8V/8t
-   IFz0/hcZU4AssTUx9m169lCiY0Vg00NbsvHDkbfGlMNJqD2Pj8kMyJmgM
-   g8HrdApVumyojhBUFMlkPB4WSCkCQ9tP7l3H1Uw81BHkOJiWbmMh7sKUU
-   7mOnHLa4HmVzsPxXaZFZ5hJWX+LeEPCWQ/e3jq27ssoj8MP60DjHOaA5H
-   A==;
-X-CSE-ConnectionGUID: oWRaddB7Q9yWHOrK6OceYA==
-X-CSE-MsgGUID: S0BImQtZR2iMitwj8iGzIw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11717"; a="83869703"
+  t=1772507805; x=1804043805;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=IbCfjAR1kaOoaqHNjlo/eRgvjaAUGZc5tpaeXhcuHZM=;
+  b=l+f334FalVAcrukkJGLl7KnkPSUG38tuK3o5UdKUGCv6dDL/hosg81bQ
+   /KkqEkNAZ2qFiSeitmNVTb9gslCiuv5vBel34aWX6ShVPWBWntbNiz+QV
+   wZV9svgoaFk3ACiLCIo2EFAwvMvEg2EDWEvWcJV/9JXvREJrB5eT1EkXA
+   pbIaIKjuDSDRIZZz4zHjAjYLMmt33kYUomsz5RjOnCiO/ZMMNn6boYTG0
+   VqvCu7kH7exH88AMb5BaQ0Bqsw3M6IfphBI3kS078ekTS+/E8fZ+kh4px
+   WF7ssK20shvUPZRkJHDwnlRnFBogNLBR1ynZ5s3dKrSp+VCfaEImuQOUn
+   w==;
+X-CSE-ConnectionGUID: bveDPfaNRamd/byNBRAA/A==
+X-CSE-MsgGUID: qUQlB7twRia1RRRY5LNDIQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11717"; a="83869720"
 X-IronPort-AV: E=Sophos;i="6.21,321,1763452800"; 
-   d="scan'208";a="83869703"
+   d="scan'208";a="83869720"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 19:16:41 -0800
-X-CSE-ConnectionGUID: gSw34/KVR4yJg/zNpNggdA==
-X-CSE-MsgGUID: LX51ja+MQ7eeGao1wAXEEw==
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2026 19:16:45 -0800
+X-CSE-ConnectionGUID: aAWS0l08RTeTYBar/mv2bA==
+X-CSE-MsgGUID: DJHPvESqT+uFE1u8TYKvXg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,321,1763452800"; 
-   d="scan'208";a="216988893"
+   d="scan'208";a="216988903"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.22])
-  by orviesa006.jf.intel.com with ESMTP; 02 Mar 2026 19:16:38 -0800
+  by orviesa006.jf.intel.com with ESMTP; 02 Mar 2026 19:16:42 -0800
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Dave Hansen <dave.hansen@linux.intel.com>,
 	Kiryl Shutsemau <kas@kernel.org>,
@@ -78,10 +79,12 @@ Cc: Thomas Gleixner <tglx@linutronix.de>,
 	binbin.wu@linux.intel.com,
 	Tony Lindgren <tony.lindgren@linux.intel.com>,
 	xiaoyao.li@intel.com
-Subject: [PATCH v4 0/4] x86/tdx: Clean up the definitions of TDX TD ATTRIBUTES
-Date: Tue,  3 Mar 2026 11:03:31 +0800
-Message-ID: <20260303030335.766779-1-xiaoyao.li@intel.com>
+Subject: [PATCH v4 1/4] x86/tdx: Fix the typo in TDX_ATTR_MIGRTABLE
+Date: Tue,  3 Mar 2026 11:03:32 +0800
+Message-ID: <20260303030335.766779-2-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260303030335.766779-1-xiaoyao.li@intel.com>
+References: <20260303030335.766779-1-xiaoyao.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,7 +92,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 5F7A21E8661
+X-Rspamd-Queue-Id: 676E71E866A
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -97,7 +100,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -105,9 +108,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72493-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72494-lists,kvm=lfdr.de];
 	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[xiaoyao.li@intel.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -116,56 +119,67 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-The main purpose of this series was to remove redundant macros between
-core TDX and KVM, along with a typo fix. They were implemented as patch 1
-and patch 2.
+The TD scoped TDCS attributes are defined by bit positions. In the guest
+side of the TDX code, the 'tdx_attributes' string array holds pretty
+print names for these attributes, which are generated via macros and
+defines. Today these pretty print names are only used to print the
+attribute names to dmesg.
 
-During the review of v1 and v2, there was encouragement to refine the
-names of the macros related to TD attributes to clarify their scope.
-Thus patch 3 and patch 4 are added.
+Unfortunately there is a typo in the define for the migratable bit.
+Change the defines TDX_ATTR_MIGRTABLE* to TDX_ATTR_MIGRATABLE*. Update
+the sole user, the tdx_attributes array, to use the fixed name.
 
-Note, Binbin suggested to rename tdx_attributes[] to tdx_td_attributes[]
-during v3 review. However, this v4 doesn't do it but leaves it for future
-cleanup to avoid making it more complicated because it also looks like
-it needs to rename "Attributes" to "TD Attributes" in tdx_dump_attributes(),
-which has user visibility change.
+Since these defines control the string printed to dmesg, the change is
+user visible. But the risk of breakage is almost zero since it is not
+exposed in any interface expected to be consumed programmatically.
 
-Changes in v4:
- - Collect Reviewed-by and Acked-by tags;
- - rebase to v7.0-rc1;
-
-v3: https://lore.kernel.org/kvm/20250715091312.563773-1-xiaoyao.li@intel.com/
+Fixes: 564ea84c8c14 ("x86/tdx: Dump attributes and TD_CTLS on boot")
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Reviewed-by: Kai Huang <kai.huang@intel.com>
+Acked-by: Sean Christopherson <seanjc@google.com>
+---
 Changes in v3:
- - use the changelog provided by Rick for patch 1;
- - collect Reviewed-by on patch 4;
- - Add patch 3;
+ - Use the rewritten changelog from Rick.
 
-v2: https://lore.kernel.org/all/20250711132620.262334-1-xiaoyao.li@intel.com/
 Changes in v2:
- - collect Reviewed-by;
- - Explains the impact of the change in patch 1 changelog;
- - Add patch 3.
+ - Add the impact of the change in the commit message. (provided by Rick)
+---
+ arch/x86/coco/tdx/debug.c         | 2 +-
+ arch/x86/include/asm/shared/tdx.h | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-v1: https://lore.kernel.org/all/20250708080314.43081-1-xiaoyao.li@intel.com/
-
-Xiaoyao Li (4):
-  x86/tdx: Fix the typo in TDX_ATTR_MIGRTABLE
-  KVM: TDX: Remove redundant definitions of TDX_TD_ATTR_*
-  x86/tdx: Rename TDX_ATTR_* to TDX_TD_ATTR_*
-  KVM: TDX: Rename KVM_SUPPORTED_TD_ATTRS to KVM_SUPPORTED_TDX_TD_ATTRS
-
- arch/x86/coco/tdx/debug.c         | 26 ++++++++--------
- arch/x86/coco/tdx/tdx.c           |  8 ++---
- arch/x86/include/asm/shared/tdx.h | 50 +++++++++++++++----------------
- arch/x86/kvm/vmx/tdx.c            |  4 +--
- arch/x86/kvm/vmx/tdx_arch.h       |  6 ----
- 5 files changed, 44 insertions(+), 50 deletions(-)
-
-
-base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
+diff --git a/arch/x86/coco/tdx/debug.c b/arch/x86/coco/tdx/debug.c
+index cef847c8bb67..28990c2ab0a1 100644
+--- a/arch/x86/coco/tdx/debug.c
++++ b/arch/x86/coco/tdx/debug.c
+@@ -17,7 +17,7 @@ static __initdata const char *tdx_attributes[] = {
+ 	DEF_TDX_ATTR_NAME(ICSSD),
+ 	DEF_TDX_ATTR_NAME(LASS),
+ 	DEF_TDX_ATTR_NAME(SEPT_VE_DISABLE),
+-	DEF_TDX_ATTR_NAME(MIGRTABLE),
++	DEF_TDX_ATTR_NAME(MIGRATABLE),
+ 	DEF_TDX_ATTR_NAME(PKS),
+ 	DEF_TDX_ATTR_NAME(KL),
+ 	DEF_TDX_ATTR_NAME(TPA),
+diff --git a/arch/x86/include/asm/shared/tdx.h b/arch/x86/include/asm/shared/tdx.h
+index 8bc074c8d7c6..11f3cf30b1ac 100644
+--- a/arch/x86/include/asm/shared/tdx.h
++++ b/arch/x86/include/asm/shared/tdx.h
+@@ -35,8 +35,8 @@
+ #define TDX_ATTR_LASS			BIT_ULL(TDX_ATTR_LASS_BIT)
+ #define TDX_ATTR_SEPT_VE_DISABLE_BIT	28
+ #define TDX_ATTR_SEPT_VE_DISABLE	BIT_ULL(TDX_ATTR_SEPT_VE_DISABLE_BIT)
+-#define TDX_ATTR_MIGRTABLE_BIT		29
+-#define TDX_ATTR_MIGRTABLE		BIT_ULL(TDX_ATTR_MIGRTABLE_BIT)
++#define TDX_ATTR_MIGRATABLE_BIT		29
++#define TDX_ATTR_MIGRATABLE		BIT_ULL(TDX_ATTR_MIGRATABLE_BIT)
+ #define TDX_ATTR_PKS_BIT		30
+ #define TDX_ATTR_PKS			BIT_ULL(TDX_ATTR_PKS_BIT)
+ #define TDX_ATTR_KL_BIT			31
 -- 
 2.43.0
 
