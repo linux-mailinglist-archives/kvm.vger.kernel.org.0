@@ -1,197 +1,325 @@
-Return-Path: <kvm+bounces-72600-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72601-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KOXvNI1Jp2m8gQAAu9opvQ
-	(envelope-from <kvm+bounces-72600-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 21:50:21 +0100
+	id ADXgMKpKp2n2gQAAu9opvQ
+	(envelope-from <kvm+bounces-72601-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 21:55:06 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4336B1F6F34
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 21:50:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ED0B1F7029
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 21:55:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 070B9312F08A
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 20:49:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 71F7431542D8
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 20:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77BFF385527;
-	Tue,  3 Mar 2026 20:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDF01388386;
+	Tue,  3 Mar 2026 20:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MC/6UvpH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GYXRbiox";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jUFl4vdF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBAB387372
-	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 20:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772570962; cv=pass; b=KghqKRVlprCxUcDqN65taMhhflc8MBRLHnPaZvaNEPvmBHRIEohQAe6JohRS0o4To5wJ5oDgKOV+Z/sYH8/kU+4QbhvHBtA/xXXJM02zF9MBQ1xa+vI5Mkt60V82OGvn7euTkwE9VXJrT/T8y3PfiDgg13+e3BjYz2tqph8gS34=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772570962; c=relaxed/simple;
-	bh=z5K9TC0MkEO8By22h3GqX8xxcKLeF0UtxgZ/D1gjfh8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NiIuPw3zUoke6J3Xl7J/AoLZozKk0IyKbnnhBmEPflj0o/2Yv4zbTLguPXYI4oV9qZYcg++17E2Kgr73MjN5ZDlzk/ghQvm4yPIqkeIVfaTTT6exXMKFAQ5fTtNZz9PFsLmVdw3WeB/h+5J3ED9H8G6gSMxn3C2U/nKAFab9uQk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MC/6UvpH; arc=pass smtp.client-ip=74.125.82.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-2bd801b40dbso477020eec.0
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 12:49:21 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772570960; cv=none;
-        d=google.com; s=arc-20240605;
-        b=hM+c/GbYTlCEJVqR7bLG4Jd1Pjep1Bj3icvOqKsPa/uTnudwkgFF3kiXP7lUdrr8qN
-         D3SDYtVXIp7oOSi2aXov378TutK3JTQqotOvOPh3UM49atYK1vN17SHPmQLHS/lis4jw
-         yXnn3f+Mv7emdJVS/xY22VQpx+9oDIyf8PuFlDoBYXQcSTaujSjISifEUeOFlnnu4LD/
-         UYikGJYhuhpX3UFNyN8Jh4aBngZ54IYef1YDUls5WoBSEDdNmiNg5hh4VJI/GWXaw1xR
-         VASrbM1zeSLOrUe+2l+TJGlOSmn7IXKail8qfpYGDLXwzXsa+loVwcSUY4oOqQxpqaRx
-         ilsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=z5K9TC0MkEO8By22h3GqX8xxcKLeF0UtxgZ/D1gjfh8=;
-        fh=58x0xNWAVh8b4b5bFkYfuK842z2cf6gpTpr7wKYLMVo=;
-        b=JpgwDbpoWV6wSWeSwNZISTtG1AKCHxk17JVcdY4vBiUwGepOr1vZKVK6aOFUxUExTq
-         /YG9YJaZ1FhEnRyfg/SdW5GyuWUh6LbsHLhFIkydXd5TmJQyD6rerVGK6cJr0Mz0x/VH
-         G+PO0gJHxukwKKeT5s6kmtarCXeoL5EvjgXR1tOPbrwhoPDFvbyx/I/1FM9GOUV+N+VD
-         7UFzfGmGbQdpStDI5J0aQDBeypp8Jpqro4P2ekbA7xKvJL0xkEIuobizNI+m5j24yC7c
-         kX/cXHwqt2FLS29Kf2A3PsL06q+Ku51eHLSg4FBD5hFmLB8KiTSIv/k9+4jQwkL4Q0PP
-         pXQQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BE0379ED4
+	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 20:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772571190; cv=none; b=OR1ismwNgWYkj7UiUpZyOPE1P6nGciiKuCckZcBUAhPY6UT79At0e2B9+3HTOeIH56cf3+fPvg+7ntGgNO4QGv1DJzQetw1mYDFil0tmwpiX99CWltKCWGBzypJnjUAsDqzQxyv2t//799p4N8TnV8GqDa93WR9I2NdkSm2LQVc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772571190; c=relaxed/simple;
+	bh=I5gpiqsO+dAgH/nEJUqEofkhf7ZFzhfOnIeWvdgbAYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IezKi/mrgr/PuhzJcv5zdLuosureFZxKrIFIagpEhunl6DDdLbxsTUYg//Mm9Jgp8iMd5Fkp7l5+hi/Cw3INXRws5W7l1mVihmreN/1VjvskfE6L8FMiazfwQfHmnNNQqTBtPBSGfCe22KIyH5lVNKQ7sycoTEgdkreiUhADoys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GYXRbiox; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jUFl4vdF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772571187;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VoJ2INzWG7kGdihTQvUQGIPL9oTDsZ5C8rJbFDor7iI=;
+	b=GYXRbiox6gfAFSVV46CVVYZAKr9n/6VU7hqRYfO76d8Ef/mJ/O63jv7KeR5sv/xx6HpDs6
+	oq9oddfBNW0YBLzoHnPDbuCfitzVCtkpKKQZEdqSmpEGOqvC+WN5Sq4EXdAGorSFS3E+2M
+	fZ3rLFf9vfdITsibwqczgtCxghpoOn0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-164-gIU9pr9XNh6cVfOtPyHDQg-1; Tue, 03 Mar 2026 15:53:04 -0500
+X-MC-Unique: gIU9pr9XNh6cVfOtPyHDQg-1
+X-Mimecast-MFC-AGG-ID: gIU9pr9XNh6cVfOtPyHDQg_1772571183
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4837b7903f3so74353675e9.2
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 12:53:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772570960; x=1773175760; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z5K9TC0MkEO8By22h3GqX8xxcKLeF0UtxgZ/D1gjfh8=;
-        b=MC/6UvpHT4SEnjb/NMu4nCD7Y/CgFLGhB10BzWPvEDjKvZA2lZ9okaGCUCGB3IbeLy
-         cGgqGyj71FN7/CioLy93vdYXiKOMJe3vR+j+biXyjvWiP1VvwY0SpZuEnET7WI0E0PLq
-         BBf1WqOSwDjAumUHPBfJGMcqZXc4B6Yuz6rp/ed69z6jmhyN3Yhj3DTtzwNIYZQmx/SF
-         jhT5DwBvS3xmxNKPvfei0LpqgbJOmZuKLyUK2wYyCE/Tg1IJjSJ0URjLr+TYYhp768vW
-         OGrdSbrtyYfSf/xo+vB+w4pxsweRRJyYX/6uv1dcXSw8p0Wob8DVrGmxbm0/OVwZigJr
-         6Z+w==
+        d=redhat.com; s=google; t=1772571183; x=1773175983; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=VoJ2INzWG7kGdihTQvUQGIPL9oTDsZ5C8rJbFDor7iI=;
+        b=jUFl4vdFmPneL1yOF7SRlvDZdmbwOGMPVmTFs5ij1O9kUrRqClHSsdno8CcnP2yVT7
+         zxhibugFFpIATrwZ7K1eIDOiPmGaP1+kyKErixiqeGNVhf+Ast1PBhIvQ4RGNek1rsmp
+         k3dfj6BZUVvJqmyUlo9Xx2PvU5v4m9azr5xSD81t+QzNPnULrikA1I+wj6qKaXbUR6v4
+         NJqD/gG8ZIvSZObs05cdd9L5f3IBrOoGbFwcCUzYfuAthYEtK53lNTV7Siwnq3AkWqQp
+         cn7LbWXBzun5VxzI0ATMX4XIVOQ+d1XI6JEYurTGVL0TlVkTDtjtPINVMmF4ztJ9DagX
+         A+Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772570960; x=1773175760;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=z5K9TC0MkEO8By22h3GqX8xxcKLeF0UtxgZ/D1gjfh8=;
-        b=HtR+m+/7sLEkiihImHUPMOmVJSzQSjTG83dp60ySglcKZahXa3R4mRaDRfab6n8LWE
-         IKRpM5fyrtpfZGrD+pn9drl491KI2rQjh9fmi8XW46WXs5EQcrb/KIVmWJDZfah9/2mU
-         Pu5aYR4rKWt/rOMR8oh3XIyxTS1CSYJ4UYFZLtxnCMoxcEJbW0xY3skfDkQDGY+Ps3uk
-         WX0VUQRDYzeyykC58+zXRpQNqLMjgM2w+HwtzcnFScRl2/HOWUPQSlf6prqpDzNvQKkh
-         fBaDgJZyGLSpKFguoN2ArzIU4tqP5BQ7JoYWmuFww/qlHdB7Z3T7s8OfOmtHDmJg03Fq
-         yMyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUn95F72FU2I1vdZpoSrhA3NX4FZcOlJT6jZ1iEaPBOIe7po4a+Bv66Jus2UIRtCDZwRLY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBel8Hi17TgBPFKTERQ0I8STgns6zzzJMvkUUiPO6YdXpHfn0v
-	hZjjkiL4Hj11oXVuAv2oCOzMbE1MRoye07+1xBmG4A0eDSs2u963qFeX+Yevfhss8ETquZD6vOx
-	49T/kETwjn1lBN/sBIiq1AXyD+wx5dPo=
-X-Gm-Gg: ATEYQzyaNHpqsisl+cVYVnLEbYeeMf1j3zE5shce4eY9duQV4f9JH8+zXmXNYW71Eyd
-	6K+mDYOsbWXdoXaAH7LI4HhCZPEA/Dib/HBd+MLZmZDyrmGuuHFh91L4ixH6LpfqhpEnArtaAPg
-	eClVVzFTAeJRNRrttTMUk4HE1a0FhlxtlNJ7SIe7LEuSxr6P1bycogzdhSawWxvITTgr/JYZI64
-	salNy9fs0hAHnkXJUGndqR2nwtiMo9U9g58hjdSahYNr0IiWzlgQRdc7ODieQm0TGcvpBfbW6Za
-	Z8QDQe6fJKkcT6tauCUEmguKIaVVwO5NGRUPzaOU3RIcCHc1sJIfwhB19gomMpop8bUVqg87UfI
-	MU9Pj/73fZaZfqOm2ihwywS89
-X-Received: by 2002:a05:7300:231e:b0:2b7:103a:7697 with SMTP id
- 5a478bee46e88-2bde1d4bc79mr3350396eec.5.1772570960234; Tue, 03 Mar 2026
- 12:49:20 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772571183; x=1773175983;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VoJ2INzWG7kGdihTQvUQGIPL9oTDsZ5C8rJbFDor7iI=;
+        b=ZE6xIG4N8/dn8vHjq11fDXCfZkq6oZCWnTcyQ2VNMG35HxJDOvTtc/Qe7KI82mgfYC
+         gL3JWXzUGOpZE2C4iR/S3PWaBJ+JNORarMnB3EPjITy//4AtlWI540ZpEPF/HGlTvFK1
+         oEbqYsZ7LbxX+I7Y1MLkSTcvjstijOHZiwmjvI7K7ECf9nLPARBgFvBofzlUQCY2OU64
+         6zRQIQJTGap91v8gfEwU1rVWZ6VM3BMKiqlZOcpbWs6PTy07k2CnFg5UshvnZpXOjq2A
+         zs4QxfKoZx/jmIKyEP8KfEMeQO4F8fQzf/5H4YVcO0378jF4Bn89y6vBcQ10DAtS0RYm
+         2BhA==
+X-Forwarded-Encrypted: i=1; AJvYcCXKXmAqsvL3xNtgyEZSUs2rX4hZyStdIIgNl+ZFNnKUlj+6s/LOpwht/HpH89KqEOW2dfg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGMgOKFQ+6A21bhxEUEn1kNwUeFaNSMExPM3vWOM9GtecOBsr9
+	NwST+UnaJndUv6c6qQn+sFvx4A+ATO2UfWubGHLOTBsfp0vSyhuTR7r3ZzG4JdGro77/A/V0kH4
+	NiqeFa6BWtI3jV3wHngkN0lkgkzSlw1jS7Da/lqczoaozrCepB6QWrQ==
+X-Gm-Gg: ATEYQzxFFJJ8a7hCK4dt3+dSS7I+7/8Zf0j31oYqaiIcyLdwgOu8+k2sPPJ5ol8Wh7R
+	W3Wg7blrV6oNZD8n4n7NFFOPRiEcLKj1ngxDzEkdpB3KTuW+cQSoDpb1lj7w50em7UMb1wCzADi
+	iYTlnRefLO0LeyMcKU7q+duq6sKPiDiyK86i8XKO+SexctfIiB+vHPqRcWmhvREYSpReq5AaDVo
+	d1me3FIdIlv1KKQXcMZYBDg2df4ib1wpgPFKbnj7lhBjHQLoFB2NDqwl7ny5BCBZhw3C3H8gJW0
+	ysEFlbWq2dhrieerEmfGhcZKvSR1BDoUO28lNJ3ZbJwLLBEA1Gl6cNFnP3duh77tmEnsdqIEGmY
+	MV5us11IuQREljXLZjRNRe1PX1kaAGPKWcYYFHlWH/D1SKg==
+X-Received: by 2002:a05:600c:4f8b:b0:483:498f:7953 with SMTP id 5b1f17b1804b1-483c9c21525mr326042815e9.28.1772571182892;
+        Tue, 03 Mar 2026 12:53:02 -0800 (PST)
+X-Received: by 2002:a05:600c:4f8b:b0:483:498f:7953 with SMTP id 5b1f17b1804b1-483c9c21525mr326042375e9.28.1772571182293;
+        Tue, 03 Mar 2026 12:53:02 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-79-166.inter.net.il. [80.230.79.166])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-485188a20c4sm2138835e9.15.2026.03.03.12.53.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Mar 2026 12:53:01 -0800 (PST)
+Date: Tue, 3 Mar 2026 15:52:58 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Alexander Graf <graf@amazon.com>
+Cc: Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, kvm@vger.kernel.org, eperezma@redhat.com,
+	Jason Wang <jasowang@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>, nh-open-source@amazon.com
+Subject: Re: [PATCH] vsock: Enable H2G override
+Message-ID: <20260303155040-mutt-send-email-mst@kernel.org>
+References: <20260302104138.77555-1-graf@amazon.com>
+ <aaVrsXMmULivV4Se@sgarzare-redhat>
+ <aaV80wWlpjEtYCQJ@sgarzare-redhat>
+ <17d63837-6028-475a-90df-6966329a0fc2@amazon.com>
+ <aaW2FgoaXIJEymyR@sgarzare-redhat>
+ <27dcad4e-d658-4b6b-93b2-44c64fcbeb11@amazon.com>
+ <aaaqLbRNmoRHNTkh@sgarzare-redhat>
+ <CAOuBmuaQwxKDJoirwtRwEP=690JcRX3Efk6z=udiOHsGr8u6ag@mail.gmail.com>
+ <cc4093e8-31c8-4a14-80f9-034852cf54f7@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260227200848.114019-1-david@kernel.org> <20260227200848.114019-3-david@kernel.org>
- <aaLh2BxSgC9Jl5iS@google.com> <8a27e9ac-2025-4724-a46d-0a7c90894ba7@kernel.org>
- <aaVf5gv4XjV6Ddt-@google.com> <f2f3a8a1-3dbf-4ef9-a89a-a6ec20791d1c@kernel.org>
- <aaVnifbdxKhBddQp@google.com> <5f8dcb7f-9e4f-4484-b160-3a9ce541d63c@kernel.org>
- <aaWvtn48X8UizaaN@google.com>
-In-Reply-To: <aaWvtn48X8UizaaN@google.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 3 Mar 2026 21:49:06 +0100
-X-Gm-Features: AaiRm50lUTXkxHRxiLsKpWNGF1HIgeoo2SkrDpQfQSxM22wzlSiellk8rvn7q80
-Message-ID: <CANiq72nK8P1rUYw=y3fMzWZR3f_mW2v0_LSLWR1i0dQTtOqu2w@mail.gmail.com>
-Subject: Re: [PATCH v1 02/16] mm/memory: remove "zap_details" parameter from zap_page_range_single()
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: "David Hildenbrand (Arm)" <david@kernel.org>, linux-kernel@vger.kernel.org, 
-	"linux-mm @ kvack . org" <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
-	Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, 
-	Pedro Falcato <pfalcato@suse.de>, David Rientjes <rientjes@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-	Vasily Gorbik <gor@linux.ibm.com>, Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, 
-	Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, 
-	Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, 
-	H Hartley Sweeten <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
-	Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Dimitri Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>, 
-	Vincenzo Frascino <vincenzo.frascino@arm.com>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org, 
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 4336B1F6F34
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cc4093e8-31c8-4a14-80f9-034852cf54f7@amazon.com>
+X-Rspamd-Queue-Id: 2ED0B1F7029
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
-	TAGGED_FROM(0.00)[bounces-72600-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72601-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_GT_50(0.00)[74];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[miguelojedasandonis@gmail.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Mon, Mar 2, 2026 at 4:41=E2=80=AFPM Alice Ryhl <aliceryhl@google.com> wr=
-ote:
->
-> It's not relevant in this patch, but another thing that may be useful is
-> to add CLIPPY=3D1 to the make invocation when building normally. This
-> causes additional warnings to be checked using a tool called clippy.
+On Tue, Mar 03, 2026 at 09:47:26PM +0100, Alexander Graf wrote:
+> 
+> On 03.03.26 15:17, Bryan Tan wrote:
+> > On Tue, Mar 3, 2026 at 9:49 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+> > > On Mon, Mar 02, 2026 at 08:04:22PM +0100, Alexander Graf wrote:
+> > > > On 02.03.26 17:25, Stefano Garzarella wrote:
+> > > > > On Mon, Mar 02, 2026 at 04:48:33PM +0100, Alexander Graf wrote:
+> > > > > > On 02.03.26 13:06, Stefano Garzarella wrote:
+> > > > > > > CCing Bryan, Vishnu, and Broadcom list.
+> > > > > > > 
+> > > > > > > On Mon, Mar 02, 2026 at 12:47:05PM +0100, Stefano Garzarella wrote:
+> > > > > > > > Please target net-next tree for this new feature.
+> > > > > > > > 
+> > > > > > > > On Mon, Mar 02, 2026 at 10:41:38AM +0000, Alexander Graf wrote:
+> > > > > > > > > Vsock maintains a single CID number space which can be used to
+> > > > > > > > > communicate to the host (G2H) or to a child-VM (H2G). The
+> > > > > > > > > current logic
+> > > > > > > > > trivially assumes that G2H is only relevant for CID <= 2
+> > > > > > > > > because these
+> > > > > > > > > target the hypervisor.  However, in environments like Nitro
+> > > > > > > > > Enclaves, an
+> > > > > > > > > instance that hosts vhost_vsock powered VMs may still want
+> > > > > > > > > to communicate
+> > > > > > > > > to Enclaves that are reachable at higher CIDs through
+> > > > > > > > > virtio-vsock-pci.
+> > > > > > > > > 
+> > > > > > > > > That means that for CID > 2, we really want an overlay. By
+> > > > > > > > > default, all
+> > > > > > > > > CIDs are owned by the hypervisor. But if vhost registers a
+> > > > > > > > > CID, it takes
+> > > > > > > > > precedence.  Implement that logic. Vhost already knows which CIDs it
+> > > > > > > > > supports anyway.
+> > > > > > > > > 
+> > > > > > > > > With this logic, I can run a Nitro Enclave as well as a
+> > > > > > > > > nested VM with
+> > > > > > > > > vhost-vsock support in parallel, with the parent instance able to
+> > > > > > > > > communicate to both simultaneously.
+> > > > > > > > I honestly don't understand why VMADDR_FLAG_TO_HOST (added
+> > > > > > > > specifically for Nitro IIRC) isn't enough for this scenario
+> > > > > > > > and we have to add this change.  Can you elaborate a bit more
+> > > > > > > > about the relationship between this change and
+> > > > > > > > VMADDR_FLAG_TO_HOST we added?
+> > > > > > 
+> > > > > > The main problem I have with VMADDR_FLAG_TO_HOST for connect() is
+> > > > > > that it punts the complexity to the user. Instead of a single CID
+> > > > > > address space, you now effectively create 2 spaces: One for
+> > > > > > TO_HOST (needs a flag) and one for TO_GUEST (no flag). But every
+> > > > > > user space tool needs to learn about this flag. That may work for
+> > > > > > super special-case applications. But propagating that all the way
+> > > > > > into socat, iperf, etc etc? It's just creating friction.
+> > > > > Okay, I would like to have this (or part of it) in the commit
+> > > > > message to better explain why we want this change.
+> > > > > 
+> > > > > > IMHO the most natural experience is to have a single CID space,
+> > > > > > potentially manually segmented by launching VMs of one kind within
+> > > > > > a certain range.
+> > > > > I see, but at this point, should the kernel set VMADDR_FLAG_TO_HOST
+> > > > > in the remote address if that path is taken "automagically" ?
+> > > > > 
+> > > > > So in that way the user space can have a way to understand if it's
+> > > > > talking with a nested guest or a sibling guest.
+> > > > > 
+> > > > > 
+> > > > > That said, I'm concerned about the scenario where an application
+> > > > > does not even consider communicating with a sibling VM.
+> > > > 
+> > > > If that's really a realistic concern, then we should add a
+> > > > VMADDR_FLAG_TO_GUEST that the application can set. Default behavior of
+> > > > an application that provides no flags is "route to whatever you can
+> > > > find": If vhost is loaded, it routes to vhost. If a vsock backend
+> > > mmm, we have always documented this simple behavior:
+> > > - CID = 2 talks to the host
+> > > - CID >= 3 talks to the guest
+> > > 
+> > > Now we are changing this by adding fallback. I don't think we should
+> > > change the default behavior, but rather provide new ways to enable this
+> > > new behavior.
+> > > 
+> > > I find it strange that an application running on Linux 7.0 has a default
+> > > behavior where using CID=42 always talks to a nested VM, but starting
+> > > with Linux 7.1, it also starts talking to a sibling VM.
+> > > 
+> > > > driver is loaded, it routes there. But the application has no say in
+> > > > where it goes: It's purely a system configuration thing.
+> > > This is true for complex things like IP, but for VSOCK we have always
+> > > wanted to keep the default behavior very simple (as written above).
+> > > Everything else must be explicitly enabled IMHO.
+> > > 
+> > > > 
+> > > > > Until now, it knew that by not setting that flag, it could only talk
+> > > > > to nested VMs, so if there was no VM with that CID, the connection
+> > > > > simply failed. Whereas from this patch onwards, if the device in the
+> > > > > host supports sibling VMs and there is a VM with that CID, the
+> > > > > application finds itself talking to a sibling VM instead of a nested
+> > > > > one, without having any idea.
+> > > > 
+> > > > I'd say an application that attempts to talk to a CID that it does now
+> > > > know whether it's vhost routed or not is running into "undefined"
+> > > > territory. If you rmmod the vhost driver, it would also talk to the
+> > > > hypervisor provided vsock.
+> > > Oh, I missed that. And I also fixed that behaviour with commit
+> > > 65b422d9b61b ("vsock: forward all packets to the host when no H2G is
+> > > registered") after I implemented the multi-transport support.
+> > > 
+> > > mmm, this could change my position ;-) (although, to be honest, I don't
+> > > understand why it was like that in the first place, but that's how it is
+> > > now).
+> > > 
+> > > Please document also this in the new commit message, is a good point.
+> > > Although when H2G is loaded, we behave differently. However, it is true
+> > > that sysctl helps us standardize this behavior.
+> > > 
+> > > I don't know whether to see it as a regression or not.
+> > > 
+> > > > 
+> > > > > Should we make this feature opt-in in some way, such as sockopt or
+> > > > > sysctl? (I understand that there is the previous problem, but
+> > > > > honestly, it seems like a significant change to the behavior of
+> > > > > AF_VSOCK).
+> > > > 
+> > > > We can create a sysctl to enable behavior with default=on. But I'm
+> > > > against making the cumbersome does-not-work-out-of-the-box experience
+> > > > the default. Will include it in v2.
+> > > The opposite point of view is that we would not want to have different
+> > > default behavior between 7.0 and 7.1 when H2G is loaded.
+> >  From a VMCI perspective, we only allow communication from guest to
+> > host CIDs 0 and 2. With has_remote_cid implemented for VMCI, we end
+> > up attempting guest to guest communication. As mentioned this does
+> > already happen if there isn't an H2G transport registered, so we
+> > should be handling this anyways. But I'm not too fond of the change
+> > in behaviour for when H2G is present, so in the very least I'd
+> > prefer if has_remote_cid is not implemented for VMCI. Or perhaps
+> > if there was a way for G2H transport to explicitly note that it
+> > supports CIDs that are greater than 2?  With this, it would be
+> > easier to see this patch as preserving the default behaviour for
+> > some transports and fixing a bug for others.
+> 
+> 
+> I understand what you want, but beware that it's actually a change in
+> behavior. Today, whether Linux will send vsock connects to VMCI depends on
+> whether the vhost kernel module is loaded: If it's loaded, you don't see the
+> connect attempt. If it's not loaded, the connect will come through to VMCI.
+> 
+> I agree that it makes sense to limit VMCI to only ever see connects to <= 2
+> consistently. But as I said above, it's actually a change in behavior.
+> 
+> 
+> Alex
+> 
 
-Yes, please do use `CLIPPY=3D1` -- the build should be Clippy clean
-modulo exceptional cases that may slip through (and soon linux-next
-will probably start reporting those warnings too).
+I think it was unintentional, but if you really think people want a
+special module that changes kernel's behaviour on load, we can certainly
+do that. But any hack like this will not be namespace safe.
 
-Thanks!
 
-Cheers,
-Miguel
+> 
+> 
+> Amazon Web Services Development Center Germany GmbH
+> Tamara-Danz-Str. 13
+> 10243 Berlin
+> Geschaeftsfuehrung: Christof Hellmis, Andreas Stieger
+> Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+> Sitz: Berlin
+> Ust-ID: DE 365 538 597
+
 
