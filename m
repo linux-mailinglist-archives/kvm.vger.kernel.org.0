@@ -1,167 +1,245 @@
-Return-Path: <kvm+bounces-72548-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72549-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aDT1HY0Tp2ncdQAAu9opvQ
-	(envelope-from <kvm+bounces-72548-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 17:59:57 +0100
+	id GPrZNtcWp2m+dgAAu9opvQ
+	(envelope-from <kvm+bounces-72549-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 18:13:59 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D17EF1F440D
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 17:59:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A0B71F4786
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 18:13:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E490C314802C
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 16:56:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4435730DC9CD
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 17:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0E2492514;
-	Tue,  3 Mar 2026 16:56:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AEA03DA5DA;
+	Tue,  3 Mar 2026 17:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SvdAsliU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uvcf5t4I"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073051F4CA9
-	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 16:56:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E921370D5D;
+	Tue,  3 Mar 2026 17:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772556979; cv=none; b=qd2xv690M+xdSRBZMKVNM1MUQ6H4C5uYqNFEC8Q1NQBpzea9/zkf6BHURNLki4y+XakGhK2EXlBjhzRuObPa6IHLUwxrUwQG7bGspHRns1GoECoymPO94FEtLI0PUSYxuUDaXeUBLMcisFcIT3BvkjX6RADhRBYdFpqo9HmHx+g=
+	t=1772557829; cv=none; b=m7sH3bdM1ozhK86yP2nQzq5mzxn1DB6cDqaA0Mg2juGqu/xyYjqoS0irS11Hhpk2Fq42C1BAz46PVE/E4y46cAk/QVyQ7a5iGFJKoY83y014ns+MB7AxQeUlknfEImVUQ+ZWGRmlt6UZtqWJXaUD7PjrZS2HHWqzHZNJRo+U08g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772556979; c=relaxed/simple;
-	bh=eWysGtIDtMY7WDGsLwuZ7l3aSoC9YDb5TvHL34ug0ic=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Fa3+YlLUGP2CLly7t8iM97fsHx7q3i8rUubIz93iVihYeJgfWLN4GgtaUd4PwIOdMf8QXp4pegWxBK+3rNLLiLkzPQGYLINbXEBRTUV0DvQFbP8NIM++bWOteHI8TlY46lzU8sb5eP3pKbG1Ni5E3A/o5XXFZ1pgD1W0h3ZyU0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SvdAsliU; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a90510a6d1so41133025ad.0
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 08:56:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772556977; x=1773161777; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eEsXhRGfZVnXfS8LLMQGFDrO1HKI5tLULsw5o2HLG48=;
-        b=SvdAsliUnCRwnMJ5nmYf4Fs9Y1c835C/snfHub6YJMC/+LnJYglC6ofPhkvaB/vlqG
-         dlYTotqGZLuHzr5mRnTdPmpCZ+FLYcvW1+A0CpVgS0VydEEfWgqtpzR2Z5KrJoB4EJHu
-         k9ucnte4fHAC2BM2lT20sUXIOzrUvxCwdJkPUECoUqY1Dt/NBjDWHibXFiNXaZV0LYyV
-         6YO+85LQEW6QOj6vkpbV7Yq7B8l8NxIBz3k7mLqsB06odBonSROoSEzUuzlJDEpQnwUD
-         jdMG0W2RSLXw0NHJJCo1JD37DFk1j4vtdEhL0eL+c6b5XQrRp2v1RXGCR6SxRaM39CYq
-         hQzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772556977; x=1773161777;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eEsXhRGfZVnXfS8LLMQGFDrO1HKI5tLULsw5o2HLG48=;
-        b=AQN9D9kHpmBtyyIF116FBO+uHa7dVnWohOpH3z941R9xIpWCRDWUSuZ4V9vFNWiFnP
-         qL+mpQCgLfn9yOjWRDFrNyWQYHEc/Ci9CC6l6+uLep0S5gQQ9EIIBqa1xPMz7C9vENwv
-         TGVIUiYncb6HrP3o4H2rwh9O9SCf9uvGOcGttidoybYy9lYLwa7nu6KL1pnf/NNK595L
-         CyTys7eYcT+d6MUZ9juhNgwgK1jwfkXztQBMSCUy//6apOqNidjcAZnzirNgiQQIhnn/
-         XG9qMRGUZ5m9vjlabmRJqkWzdG0wjjCfTDPKv2sKDtzVWZQmr5XOzUaNNptauMH3fLDf
-         S/+A==
-X-Forwarded-Encrypted: i=1; AJvYcCUiX7Dpx2NOilIs54Hb5ioL8DjQ/Tb+iqi6vg1CpAF2bjQOZiL+oBg1QA0SkjYk+g0zfFE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQHjvM8N0kDsKVO6YBB16fw6dpUXbTIxTqBb8gYXOeFyp6GBp/
-	S4BmhOPtnyZm9y53YxjFJdxvPOMybsDS6nXjWIPgjnIvAGWI4xiGiEy/Qb73c/qrKC2/cakJbHl
-	cgzALPA==
-X-Received: from plsl16.prod.google.com ([2002:a17:903:2450:b0:2ae:4482:4ee0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2446:b0:2a7:5f26:aaf9
- with SMTP id d9443c01a7336-2ae60d54212mr25676705ad.14.1772556977076; Tue, 03
- Mar 2026 08:56:17 -0800 (PST)
-Date: Tue, 3 Mar 2026 08:56:15 -0800
-In-Reply-To: <20260303003421.2185681-16-yosry@kernel.org>
+	s=arc-20240116; t=1772557829; c=relaxed/simple;
+	bh=08QfekEPDjtRvdxfle7tsdiE74TRsVmF4S5TJdJQ/OM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=twCwZKnnK1WSMSqUKyQ9X/+LevA3m2CmdE+Fb+MQNCKi1hHrXim7kls0Z6K0hhbmg365O6irVy6F34AYIxflEFL++inStoHCU7toNZcfpql5x1vVaHzIK22Tico401ESM7r5Qn7sqKsnbrWldvn28ijibkUahSzyPHo7LFNfBxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uvcf5t4I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36805C116C6;
+	Tue,  3 Mar 2026 17:10:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772557829;
+	bh=08QfekEPDjtRvdxfle7tsdiE74TRsVmF4S5TJdJQ/OM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uvcf5t4IKmPp0VcPuqFTEG+Uc4H75lubjehjsFIUsudqZmaM3cqqMzO0AxLE6/xfr
+	 Yvomx7YeHmN0umTZZUvFzktLOpLitniN/AfiBJKlwWsIbmdLjc6BvT63onKSri3ytI
+	 3sem/hoP5go9GpzrF4YPfTI8W9x7L6d2e3fB+3ky9y2poRe5tZu0goA/rXbwiPC2cm
+	 aeFpPBsxzaPfNYrVYwa35c2beGT8QqYQGJ9SrdgM4RODfR9bf46qOqE0QwO+X9Dj0n
+	 W+aUfvwOEOsPo09STsLStvCDiPRb938yci1+559EnYsWlfqEHgX7EZzcEV8WJ1xT2u
+	 TgMM+6QXzAMPg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vxTGM-0000000Fiue-3SjT;
+	Tue, 03 Mar 2026 17:10:26 +0000
+Date: Tue, 03 Mar 2026 17:10:26 +0000
+Message-ID: <867brs96v1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com"
+	<jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v5 14/36] KVM: arm64: gic-v5: Add vgic-v5 save/restore hyp interface
+In-Reply-To: <20260226155515.1164292-15-sascha.bischoff@arm.com>
+References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
+	<20260226155515.1164292-15-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260303003421.2185681-1-yosry@kernel.org> <20260303003421.2185681-16-yosry@kernel.org>
-Message-ID: <aacSr2LanhJczBs-@google.com>
-Subject: Re: [PATCH v7 15/26] KVM: nSVM: Add missing consistency check for
- nCR3 validity
-From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: D17EF1F440D
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Rspamd-Queue-Id: 2A0B71F4786
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72548-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72549-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,g_pat.pa:url]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026, Yosry Ahmed wrote:
-> >From the APM Volume #2, 15.25.4 (24593=E2=80=94Rev. 3.42=E2=80=94March 2=
-024):
->=20
-> 	When VMRUN is executed with nested paging enabled
-> 	(NP_ENABLE =3D 1), the following conditions are considered illegal
-> 	state combinations, in addition to those mentioned in
-> 	=E2=80=9CCanonicalization and Consistency Checks=E2=80=9D:
-> 	=E2=80=A2 Any MBZ bit of nCR3 is set.
-> 	=E2=80=A2 Any G_PAT.PA field has an unsupported type encoding or any
-> 	reserved field in G_PAT has a nonzero value.
->=20
-> Add the consistency check for nCR3 being a legal GPA with no MBZ bits
-> set. The G_PAT.PA check was proposed separately [*].
->=20
-> [*]https://lore.kernel.org/kvm/20260205214326.1029278-3-jmattson@google.c=
-om/
->=20
-> Fixes: 4b16184c1cca ("KVM: SVM: Initialize Nested Nested MMU context on V=
-MRUN")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Yosry Ahmed <yosry@kernel.org>
+On Thu, 26 Feb 2026 15:59:02 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+> 
+> Introduce hyp functions to save/restore the following GICv5 state:
+> 
+> * ICC_ICSR_EL1
+> * ICH_APR_EL2
+> * ICH_PPI_ACTIVERx_EL2
+> * ICH_PPI_DVIRx_EL2
+> * ICH_PPI_ENABLERx_EL2
+> * ICH_PPI_PENDRRx_EL2
+> * ICH_PPI_PRIORITYRx_EL2
+> * ICH_VMCR_EL2
+> 
+> All of these are saved/restored to/from the KVM vgic_v5 CPUIF shadow
+> state, with the exception of the active, pending, and enable
+> state. The pending state is saved and restored from kvm_host_data as
+> any changes here need to be tracked and propagated back to the
+> vgic_irq shadow structures (coming in a future commit). Therefore, an
+> entry and an exit copy is required. The active and enable state is
+> restored from the vgic_v5 CPUIF, but is saved to kvm_host_data. Again,
+> this needs to by synced back into the shadow data structures.
+> 
+> The ICSR must be save/restored as this register is shared between host
+> and guest. Therefore, to avoid leaking host state to the guest, this
+> must be saved and restored. Moreover, as this can by used by the host
+> at any time, it must be save/restored eagerly. Note: the host state is
+> not preserved as the host should only use this register when
+> preemption is disabled.
+> 
+> As part of restoring the ICH_VMCR_EL2 and ICH_APR_EL2, GICv3-compat
+> mode is also disabled by setting the ICH_VCTLR_EL2.V3 bit to 0. The
+> correspoinding GICv3-compat mode enable is part of the VMCR & APR
+> restore for a GICv3 guest as it only takes effect when actually
+> running a guest.
+> 
+> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  arch/x86/kvm/svm/nested.c | 5 +++++
->  1 file changed, 5 insertions(+)
->=20
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 613d5e2e7c3d1..3aaa4f0bb31ab 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -348,6 +348,11 @@ static bool nested_vmcb_check_controls(struct kvm_vc=
-pu *vcpu,
->  	if (CC(control->asid =3D=3D 0))
->  		return false;
-> =20
-> +	if (control->nested_ctl & SVM_NESTED_CTL_NP_ENABLE) {
-> +		if (CC(!kvm_vcpu_is_legal_gpa(vcpu, control->nested_cr3)))
-> +			return false;
+>  arch/arm64/include/asm/kvm_asm.h   |   4 +
+>  arch/arm64/include/asm/kvm_host.h  |  16 ++++
+>  arch/arm64/include/asm/kvm_hyp.h   |   8 ++
+>  arch/arm64/kvm/hyp/nvhe/Makefile   |   2 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  32 ++++++++
+>  arch/arm64/kvm/hyp/vgic-v5-sr.c    | 123 +++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/vhe/Makefile    |   2 +-
+>  include/kvm/arm_vgic.h             |  21 +++++
+>  8 files changed, 206 insertions(+), 2 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/vgic-v5-sr.c
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index a1ad12c72ebf1..fe8d4adfc281d 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -89,6 +89,10 @@ enum __kvm_host_smccc_func {
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
+> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_apr,
+> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_apr,
+> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_ppi_state,
+> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_ppi_state,
+>  };
+>  
+>  #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 332114bd44d2a..60da84071c86e 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -797,6 +797,22 @@ struct kvm_host_data {
+>  	/* Number of debug breakpoints/watchpoints for this CPU (minus 1) */
+>  	unsigned int debug_brps;
+>  	unsigned int debug_wrps;
+> +
+> +	/* PPI state tracking for GICv5-based guests */
+> +	struct {
+> +		/*
+> +		 * For tracking the PPI pending state, we need both
+> +		 * the entry state and exit state to correctly detect
+> +		 * edges as it is possible that an interrupt has been
+> +		 * injected in software in the interim.
+> +		 */
+> +		u64 pendr_entry[2];
+> +		u64 pendr_exit[2];
+> +
+> +		/* The saved state of the regs when leaving the guest */
+> +		u64 activer_exit[2];
+> +		u64 enabler_exit[2];
+> +	} vgic_v5_ppi_state;
+>  };
+>  
+>  struct kvm_host_psci_config {
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 76ce2b94bd97e..3dcec1df87e9e 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -87,6 +87,14 @@ void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if);
+>  void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if);
+>  int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
+>  
+> +/* GICv5 */
+> +void __vgic_v5_save_apr(struct vgic_v5_cpu_if *cpu_if);
+> +void __vgic_v5_restore_vmcr_apr(struct vgic_v5_cpu_if *cpu_if);
+> +void __vgic_v5_save_ppi_state(struct vgic_v5_cpu_if *cpu_if);
+> +void __vgic_v5_restore_ppi_state(struct vgic_v5_cpu_if *cpu_if);
+> +void __vgic_v5_save_state(struct vgic_v5_cpu_if *cpu_if);
+> +void __vgic_v5_restore_state(struct vgic_v5_cpu_if *cpu_if);
 
-Put the full if-statement in CC(), that way the tracepoint will capture the=
- entire
-clause, i.e. will help the reader understand than nested_cr3 was checked
-specifically because NPT was enabled.
+The last two are not plugged as hypercalls? How do they get called?
 
-	if (CC((control->nested_ctl & SVM_NESTED_CTL_NP_ENABLE) &&
-	       !kvm_vcpu_is_legal_gpa(vcpu, control->nested_cr3)))
-		return false;
+Overall, it would be good to describe what gets saved/restored when.
+I'm sure there is a logic behind it all, and maybe it is very close to
+what v3 requires, but that's not completely apparent in this patch (we
+don't see the call sites).
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
