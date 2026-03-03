@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-72540-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72541-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0EBRJUAEp2k7bgAAu9opvQ
-	(envelope-from <kvm+bounces-72540-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:54:40 +0100
+	id YCMEMpgHp2k7bgAAu9opvQ
+	(envelope-from <kvm+bounces-72541-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 17:08:56 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D8091F306E
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:54:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FD571F34FE
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 17:08:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 897D93016EC2
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 15:54:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3139A3086A7D
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 16:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85BD649250A;
-	Tue,  3 Mar 2026 15:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A48F494A0D;
+	Tue,  3 Mar 2026 16:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UGdXA+Ii"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AnTRyR/q"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F18382388;
-	Tue,  3 Mar 2026 15:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0ABB3E3DB1;
+	Tue,  3 Mar 2026 16:02:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772553276; cv=none; b=QXcx2K9fys3XIL2SG82Pz/QUdmOs7WBaxs7D2DngR/l8tHlfPWjZqZrdR0mKXBTYQbeHJVSPJn27lx/8DwBXsRUiTKV2+lboM0r0XvB/m4SaPP8u5JnHZi8d6OgVtP+/WoDblxEpAWayaBaVcziV6R+2ATuonUYEHuyn2o2GXMM=
+	t=1772553759; cv=none; b=SEkfMIP4yF4yDPJ3hnKFSr0PMfj0HMIWcpxECE7g4PwIx6DuMvvEW+0D7nkcOKv9FqPV+1VSSLH/OaihmaQGFxsf8PvVNRgNq7i698nBQZgURZ/lJOplJ5Pejzk5ynaUcPiu8zwkHhqUP3S3mxvpbm8HQlDas/mu4AYNMnFlRkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772553276; c=relaxed/simple;
-	bh=TGmZI4OHu6X3hdFVkQgFuNn6YSaOlqILJxc5Y6vn/8M=;
+	s=arc-20240116; t=1772553759; c=relaxed/simple;
+	bh=9GTxoPFm60nrBf/Iq0cAmUqQnqTieulX7wXH71jwZSI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mA75F2r7P1HKCa8wDFwtq9QIvDK9uc5j0V8JHdR8/1w/JxwnUVSboepJML/Dvj9rAkCfgqynnGteuBrXXVlY7koG2NarE/oChNQsZ8QKG3rC6jNd+BFgj02iKDjLjb417zpuohhCU6q0jDPD4wmaCI2pBC1gWPPKmiCI4EeKJgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UGdXA+Ii; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FD3EC116C6;
-	Tue,  3 Mar 2026 15:54:36 +0000 (UTC)
+	 MIME-Version:Content-Type; b=X7nYnTgc45DwtJyUYhC2fJyKQl/QHlJOIQbZAZlRFmXiiK3X5jVMd8YtPwyIPxtYEwkSOafLHi5xk8Ck1sHD56xSCipZ7R6tVXVAXLXdcUACwOOVb8GCiD8x/oVpEuJemDO8v4hcUn4HUmCYjdvhAmE3d6agrkfgb/gVEfq8oss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AnTRyR/q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99EAFC116C6;
+	Tue,  3 Mar 2026 16:02:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772553276;
-	bh=TGmZI4OHu6X3hdFVkQgFuNn6YSaOlqILJxc5Y6vn/8M=;
+	s=k20201202; t=1772553759;
+	bh=9GTxoPFm60nrBf/Iq0cAmUqQnqTieulX7wXH71jwZSI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UGdXA+IiU/6rlC3VdfBfeBXwJZoYYNW/MTSviqSHhYi4ZUVnPBFFtXUiIflqHsXoh
-	 fa0ZRJ4H11e55Y1FeG7Fh6Bv5LOzjIGKP39KroO7K2tsDy9OzsslGicgz8+9hHQ4f+
-	 3/ORLbifRPB7fMILBLkO1oXUs7wF65WHmyXamUUeDkPsIaRNasw9KuRFtHoBtL0mQb
-	 ATPixK1K1QSzCqd2/TQhX6C0tAo0tkdQqwGm1Kw2hEsr1rhdDFvTM/3N0ZVbkOum1b
-	 Qptztcg8WpJpO1avNuBNmToPoPA04qDTB871hODjymfp4IA5NhJDY9kEf8cIr1RY6R
-	 0ZdiUjfyl3rXw==
+	b=AnTRyR/quwr3kHVi1iQrT4FoxLDBThUmIJRsNcJH4vKLpYlxzY+XYJB9BQcr22+d4
+	 1PNJZRkeE+o/N+AlPawrGz3RY9KXOBLIDEx8AH4X/G2JIWhj8xhNrKroHY8tCSbj/L
+	 +6d9BzuvAQjh3sIYZDDcKAzQI1fPh8xK+In7aIiIMn/oIxY2TmeHQTzByPFiMjqOYE
+	 moP+eT899HVESHWPOTnZ1Qn43jmEq13zxTdL2hRE8LKgiIIDLw0ESiGGg+7FU0ADmK
+	 tJXq06s5qA5GUV5w3Kk/BoiPcuaIQZWkdTUIVGII2NIbomV1YtG/KYkPVKRRu7DgH5
+	 cMVYc2u28FH8g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vxS4v-0000000FhF6-3588;
-	Tue, 03 Mar 2026 15:54:33 +0000
-Date: Tue, 03 Mar 2026 15:54:33 +0000
-Message-ID: <86a4wo9adi.wl-maz@kernel.org>
+	id 1vxSCj-0000000FhU2-19fZ;
+	Tue, 03 Mar 2026 16:02:37 +0000
+Date: Tue, 03 Mar 2026 16:02:36 +0000
+Message-ID: <868qc89a03.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 Cc: "linux-arm-kernel@lists.infradead.org"
@@ -71,10 +71,10 @@ Cc: "linux-arm-kernel@lists.infradead.org"
 	Timothy Hayes <Timothy.Hayes@arm.com>,
 	"jonathan.cameron@huawei.com"
 	<jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v5 10/36] KVM: arm64: gic-v5: Sanitize ID_AA64PFR2_EL1.GCIE
-In-Reply-To: <20260226155515.1164292-11-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v5 12/36] KVM: arm64: gic-v5: Add emulation for ICC_IAFFIDR_EL1 accesses
+In-Reply-To: <20260226155515.1164292-13-sascha.bischoff@arm.com>
 References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
-	<20260226155515.1164292-11-sascha.bischoff@arm.com>
+	<20260226155515.1164292-13-sascha.bischoff@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -89,13 +89,13 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Rspamd-Queue-Id: 3D8091F306E
+X-Rspamd-Queue-Id: 2FD571F34FE
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -104,7 +104,7 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72540-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72541-lists,kvm=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -112,271 +112,87 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,arm.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Thu, 26 Feb 2026 15:58:00 +0000,
+On Thu, 26 Feb 2026 15:58:31 +0000,
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> Add in a sanitization function for ID_AA64PFR2_EL1, preserving the
-> already-present behaviour for the FPMR, MTEFAR, and MTESTOREONLY
-> fields. Add sanitisation for the GCIE field, which is set to IMP if
-> the host supports a GICv5 guest and NI, otherwise.
+> GICv5 doesn't provide an ICV_IAFFIDR_EL1 or ICH_IAFFIDR_EL2 for
+> providing the IAFFID to the guest. A guest access to the
+> ICC_IAFFIDR_EL1 must therefore be trapped and emulated to avoid the
+> guest accessing the host's ICC_IAFFIDR_EL1.
 > 
-> Extend the sanitisation that takes place in kvm_vgic_create() to zero
-> the ID_AA64PFR2.GCIE field when a non-GICv5 GIC is created. More
-> importantly, move this sanitisation to a separate function,
-> kvm_vgic_finalize_sysregs(), and call it from kvm_finalize_sys_regs().
+> The virtual IAFFID is provided to the guest when it reads
+> ICC_IAFFIDR_EL1 (which always traps back to the hypervisor). Writes are
+> rightly ignored. KVM treats the GICv5 VPEID, the virtual IAFFID, and
+> the vcpu_id as the same, and so the vcpu_id is returned.
 > 
-> We are required to finalize the GIC and GCIE fields a second time in
-> kvm_finalize_sys_regs() due to how QEMU blindly reads out then
-> verbatim restores the system register state. This avoids the issue
-> where both the GCIE and GIC features are marked as present (an
-> architecturally invalid combination), and hence guests fall over. See
-> the comment in kvm_finalize_sys_regs() for more details.
+> The trapping for the ICC_IAFFIDR_EL1 is always enabled when in a guest
+> context.
 > 
-> Overall, the following happens:
-> 
-> * Before an irqchip is created, FEAT_GCIE is presented if the host
->   supports GICv5-based guests.
-> * Once an irqchip is created, all other supported irqchips are hidden
->   from the guest; system register state reflects the guest's irqchip.
-> * Userspace is allowed to set invalid irqchip feature combinations in
->   the system registers, but...
-> * ...invalid combinations are removed a second time prior to the first
->   run of the guest, and things hopefully just work.
-> 
-> All of this extra work is required to make sure that "legacy" GICv3
-> guests based on QEMU transparently work on compatible GICv5 hosts
-> without modification.
-> 
+> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  arch/arm64/kvm/sys_regs.c       | 70 +++++++++++++++++++++++++++++----
->  arch/arm64/kvm/vgic/vgic-init.c | 43 +++++++++++++-------
->  include/kvm/arm_vgic.h          |  1 +
->  3 files changed, 92 insertions(+), 22 deletions(-)
+>  arch/arm64/kvm/config.c    | 10 +++++++++-
+>  arch/arm64/kvm/sys_regs.c  | 19 +++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.h |  5 +++++
+>  3 files changed, 33 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 11e75f2522f95..1039150716d43 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1758,6 +1758,7 @@ static u8 pmuver_to_perfmon(u8 pmuver)
->  
->  static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
->  static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val);
-> +static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu, u64 val);
->  static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
->  
->  /* Read a sanitised cpufeature ID register by sys_reg_desc */
-> @@ -1783,10 +1784,7 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
->  		val = sanitise_id_aa64pfr1_el1(vcpu, val);
->  		break;
->  	case SYS_ID_AA64PFR2_EL1:
-> -		val &= ID_AA64PFR2_EL1_FPMR |
-> -			(kvm_has_mte(vcpu->kvm) ?
-> -			 ID_AA64PFR2_EL1_MTEFAR | ID_AA64PFR2_EL1_MTESTOREONLY :
-> -			 0);
-> +		val = sanitise_id_aa64pfr2_el1(vcpu, val);
->  		break;
->  	case SYS_ID_AA64ISAR1_EL1:
->  		if (!vcpu_has_ptrauth(vcpu))
-> @@ -2024,6 +2022,23 @@ static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val)
->  	return val;
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index e4ec1bda8dfcb..bac5f49fdbdef 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -1684,6 +1684,14 @@ static void __compute_hdfgwtr(struct kvm_vcpu *vcpu)
+>  		*vcpu_fgt(vcpu, HDFGWTR_EL2) |= HDFGWTR_EL2_MDSCR_EL1;
 >  }
 >  
-> +static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu, u64 val)
+> +static void __compute_ich_hfgrtr(struct kvm_vcpu *vcpu)
 > +{
-> +	val &= ID_AA64PFR2_EL1_FPMR |
-> +	       ID_AA64PFR2_EL1_MTEFAR |
-> +	       ID_AA64PFR2_EL1_MTESTOREONLY;
+> +	__compute_fgt(vcpu, ICH_HFGRTR_EL2);
 > +
-> +	if (!kvm_has_mte(vcpu->kvm)) {
-> +		val &= ~ID_AA64PFR2_EL1_MTEFAR;
-> +		val &= ~ID_AA64PFR2_EL1_MTESTOREONLY;
-> +	}
-> +
-> +	if (vgic_host_has_gicv5())
-> +		val |= SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
-> +
-> +	return val;
+> +	/* ICC_IAFFIDR_EL1 *always* needs to be trapped when running a guest */
+> +	*vcpu_fgt(vcpu, ICH_HFGRTR_EL2) &= ~ICH_HFGRTR_EL2_ICC_IAFFIDR_EL1;
 > +}
 > +
->  static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+>  void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
 >  {
->  	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
-> @@ -2213,6 +2228,12 @@ static int set_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
->  	return set_id_reg(vcpu, rd, user_val);
->  }
->  
-> +static int set_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
-> +			       const struct sys_reg_desc *rd, u64 user_val)
-> +{
-> +	return set_id_reg(vcpu, rd, user_val);
-> +}
-> +
->  /*
->   * Allow userspace to de-feature a stage-2 translation granule but prevent it
->   * from claiming the impossible.
-> @@ -3194,10 +3215,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  				       ID_AA64PFR1_EL1_RES0 |
->  				       ID_AA64PFR1_EL1_MPAM_frac |
->  				       ID_AA64PFR1_EL1_MTE)),
-> -	ID_WRITABLE(ID_AA64PFR2_EL1,
-> -		    ID_AA64PFR2_EL1_FPMR |
-> -		    ID_AA64PFR2_EL1_MTEFAR |
-> -		    ID_AA64PFR2_EL1_MTESTOREONLY),
-> +	ID_FILTERED(ID_AA64PFR2_EL1, id_aa64pfr2_el1,
-> +		    ~(ID_AA64PFR2_EL1_FPMR |
-> +		      ID_AA64PFR2_EL1_MTEFAR |
-> +		      ID_AA64PFR2_EL1_MTESTOREONLY |
-> +		      ID_AA64PFR2_EL1_GCIE)),
->  	ID_UNALLOCATED(4,3),
->  	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
->  	ID_HIDDEN(ID_AA64SMFR0_EL1),
-> @@ -5668,8 +5690,40 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
->  
->  		val = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
->  		kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1, val);
-> +		val = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1) & ~ID_AA64PFR2_EL1_GCIE;
-> +		kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1, val);
->  		val = kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
->  		kvm_set_vm_id_reg(kvm, SYS_ID_PFR1_EL1, val);
-> +	} else {
-> +		/*
-> +		 * Certain userspace software - QEMU - samples the system
-> +		 * register state without creating an irqchip, then blindly
-> +		 * restores the state prior to running the final guest. This
-> +		 * means that it restores the virtualization & emulation
-> +		 * capabilities of the host system, rather than something that
-> +		 * reflects the final guest state. Moreover, it checks that the
-> +		 * state was "correctly" restored (i.e., verbatim), bailing if
-> +		 * it isn't, so masking off invalid state isn't an option.
-> +		 *
-> +		 * On GICv5 hardware that supports FEAT_GCIE_LEGACY we can run
-> +		 * both GICv3- and GICv5-based guests. Therefore, we initially
-> +		 * present both ID_AA64PFR0.GIC and ID_AA64PFR2.GCIE as IMP to
-> +		 * reflect that userspace can create EITHER a vGICv3 or a
-> +		 * vGICv5. This is an architecturally invalid combination, of
-> +		 * course. Once an in-kernel GIC is created, the sysreg state is
-> +		 * updated to reflect the actual, valid configuration.
-> +		 *
-> +		 * Setting both the GIC and GCIE features to IMP unsurprisingly
-> +		 * results in guests falling over, and hence we need to fix up
-> +		 * this mess in KVM. Before running for the first time we yet
-> +		 * again ensure that the GIC and GCIE fields accurately reflect
-> +		 * the actual hardware the guest should see.
-> +		 *
-> +		 * This hack allows legacy QEMU-based GICv3 guests to run
-> +		 * unmodified on compatible GICv5 hosts, and avoids the inverse
-> +		 * problem for GICv5-based guests in the future.
-> +		 */
-> +		kvm_vgic_finalize_sysregs(kvm);
-
-An alternative to this sorry hack would be to have a separate view of
-the idregs for luserspace to get whatever expected. But you then need
-to invalidate that copy at some point so that you can migrate the
-guest safely, and you'd probably end-up doing a similar thing.
-
-I appreciate that you are doing this for the sake of preserving SW
-compatibility, but do you foresee a way out of this mess that does not
-involve asking the QEMU folks to fix their stuff? I don't think we can
-paper over their over-simplistic design forever.
-
+>  	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+> @@ -1705,7 +1713,7 @@ void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
 >  	}
 >  
->  	if (vcpu_has_nv(vcpu)) {
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index 9b3091ad868cf..d1db384698238 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> @@ -71,7 +71,6 @@ static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type);
->  int kvm_vgic_create(struct kvm *kvm, u32 type)
->  {
->  	struct kvm_vcpu *vcpu;
-> -	u64 aa64pfr0, pfr1;
->  	unsigned long i;
->  	int ret;
->  
-> @@ -162,19 +161,11 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
->  
->  	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
->  
-> -	aa64pfr0 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
-> -	pfr1 = kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
-> -
-> -	if (type == KVM_DEV_TYPE_ARM_VGIC_V2) {
-> -		kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
-> -	} else {
-> -		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
-> -		aa64pfr0 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
-> -		pfr1 |= SYS_FIELD_PREP_ENUM(ID_PFR1_EL1, GIC, GICv3);
-> -	}
-> -
-> -	kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1, aa64pfr0);
-> -	kvm_set_vm_id_reg(kvm, SYS_ID_PFR1_EL1, pfr1);
-> +	/*
-> +	 * We've now created the GIC. Update the system register state
-> +	 * to accurately reflect what we've created.
-> +	 */
-> +	kvm_vgic_finalize_sysregs(kvm);
-
-As pointed out f2f, this will conflict with the patch posted at
-https://patch.msgid.link/20260228164559.936268-1-maz@kernel.org
-
->  
->  	if (type == KVM_DEV_TYPE_ARM_VGIC_V3)
->  		kvm->arch.vgic.nassgicap = system_supports_direct_sgis();
-> @@ -617,6 +608,30 @@ int kvm_vgic_map_resources(struct kvm *kvm)
->  	return ret;
+>  	if (cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
+> -		__compute_fgt(vcpu, ICH_HFGRTR_EL2);
+> +		__compute_ich_hfgrtr(vcpu);
+>  		__compute_fgt(vcpu, ICH_HFGWTR_EL2);
+>  		__compute_fgt(vcpu, ICH_HFGITR_EL2);
+>  	}
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index b8b86f5e1adc1..384824e875603 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -681,6 +681,24 @@ static bool access_gic_dir(struct kvm_vcpu *vcpu,
+>  	return true;
 >  }
 >  
-> +void kvm_vgic_finalize_sysregs(struct kvm *kvm)
-
-nit: could you rename this to kvm_vgic_finalize_idregs()?
-
+> +static bool access_gicv5_iaffid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> +				const struct sys_reg_desc *r)
 > +{
-> +	u32 type = kvm->arch.vgic.vgic_model;
-> +	u64 aa64pfr0, aa64pfr2, pfr1;
-> +
-> +	aa64pfr0 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
-> +	aa64pfr2 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1) & ~ID_AA64PFR2_EL1_GCIE;
-> +	pfr1 = kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
-> +
-> +	if (type == KVM_DEV_TYPE_ARM_VGIC_V2) {
-> +		kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
-> +	} else if (type == KVM_DEV_TYPE_ARM_VGIC_V3) {
-> +		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
-> +		aa64pfr0 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
-> +		pfr1 |= SYS_FIELD_PREP_ENUM(ID_PFR1_EL1, GIC, GICv3);
-> +	} else {
-> +		aa64pfr2 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
-> +	}
+> +	if (!kvm_has_gicv5(vcpu->kvm))
+> +		return undef_access(vcpu, p, r);
 
-I'd rather see this written as:
+Do we really need this? If the guest doesn't have FEAT_GCIE, then we
+should have an FGU bit set for any FGT bit that control a GCIE
+register, and that register should UNDEF at the point of triaging the
+trap, and never reach this handler.
 
-	switch (kvm->arch.vgic.vgic_model) {
-	case KVM_DEV_TYPE_ARM_VGIC_V2:
-		kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
-		break;
-	case KVM_DEV_TYPE_ARM_VGIC_V3:
-		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
-		aa64pfr0 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
-		pfr1 |= SYS_FIELD_PREP_ENUM(ID_PFR1_EL1, GIC, GICv3);
-		break;
-	case KVM_DEV_TYPE_ARM_VGIC_V5:
-		aa64pfr2 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
-		break;
-	default:
-		WARN_ONCE(1, "WTF???\n");
-	}
-
-which I find more readable than the if/else cascade.
+If it doesn't, we have bigger problems, and we should address them.
 
 Thanks,
 
