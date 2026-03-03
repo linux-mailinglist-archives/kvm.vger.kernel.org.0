@@ -1,248 +1,189 @@
-Return-Path: <kvm+bounces-72538-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72539-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cAAGEcr6pmk7bgAAu9opvQ
-	(envelope-from <kvm+bounces-72538-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:14:18 +0100
+	id iBUuG1MDp2k7bgAAu9opvQ
+	(envelope-from <kvm+bounces-72539-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:50:43 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4746E1F231A
-	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:14:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2311A1F2F19
+	for <lists+kvm@lfdr.de>; Tue, 03 Mar 2026 16:50:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 93C7E300C576
-	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 15:10:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7CA63086A7D
+	for <lists+kvm@lfdr.de>; Tue,  3 Mar 2026 15:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9012E3EBF2F;
-	Tue,  3 Mar 2026 15:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 795D1494A14;
+	Tue,  3 Mar 2026 15:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eUQTaImb"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="veD5TKQw"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B169B48033C;
-	Tue,  3 Mar 2026 15:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772550616; cv=none; b=e4Rtb5KLdRtrfwNkQ0mN05MAbQRzDU6bbqvJXkgtPTFoNdhHe67y2Q+Sk3ElfEjFrnwEunT5zassGrDH2wEZhKlGOLuHw08HCYNxJfHcD00g0Aet9XodtoWJCunMx9Af75ezSIvM3AMuGIOJpDnkDqAuZqF/akzggG4x4tQlIZc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772550616; c=relaxed/simple;
-	bh=3VlyXdT6hK30XSxmZHpFyQcWut/XDuGGaq7EOvOoK3Q=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ac3LmZMaZ+8Z1GJV4xeR/bDsOHKgGGpk+l1Pw3ZZ4D0r8EIlGPvpZZbCY1LChBlsPcbyg3e0m+kuU121Lwt08FDEt/6Kb1ETZq/oEOlbgStUOiA02BuljIBUWepjyJHHDUWF11M5RFeZfc8NGNE07ZUz4Kb2Ufdo0WvaNWWPcis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eUQTaImb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EC89C116C6;
-	Tue,  3 Mar 2026 15:10:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772550616;
-	bh=3VlyXdT6hK30XSxmZHpFyQcWut/XDuGGaq7EOvOoK3Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eUQTaImb5PmSB7++pfagwudV4geeVhlBL9Y2FMNQy7gy2/7G+u129iqIQdX+GqIvU
-	 /5slymtI08DJhWQ/PXl8DEQO7XgJBUIFwj4EUgf2Cvv3rYWhA+oJXAXXRRxRQ5LcI/
-	 wudi9niRsq9HIb3EW9r4icqrlUgjGjUWBXv7dJNjpR0m2TYktCIMaFvfpo7QLHo4NM
-	 2ohcwOR6bAyAdc+cwQHYEXSMEugC4YkdyhQ1OPJm7UkhqM21wGDehNM19d0B30va32
-	 9mqyc1EtoFd9lOXOxPCyBWU4lhBz6M1fbohyP/T+1rJJefvBLhBNO6Xwz2GlHgeppa
-	 +I0vV42fT3HKg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vxRO2-0000000FgAa-1gyL;
-	Tue, 03 Mar 2026 15:10:14 +0000
-Date: Tue, 03 Mar 2026 15:10:13 +0000
-Message-ID: <86bjh57xuy.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>,
-	"jonathan.cameron@huawei.com"
-	<jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v5 09/36] KVM: arm64: gic-v5: Detect implemented PPIs on boot
-In-Reply-To: <20260226155515.1164292-10-sascha.bischoff@arm.com>
-References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
-	<20260226155515.1164292-10-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4117288D6
+	for <kvm@vger.kernel.org>; Tue,  3 Mar 2026 15:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772552837; cv=pass; b=j7kjCuYR/K0ExQ607qYgzU/c1wsp8AOke7qU1DS036muzI3DJMmOe/xvfGUoCxguVWLJb7OxOZWGBdHstOKApRkRc4+ycptr/9VJJUd9g2yWDCQO1qMtPMhNaOl0xiHWr1QPQ1Nv5KVhAPhRhJ0IgCTNWKYGB9utn7Bar2hTbrE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772552837; c=relaxed/simple;
+	bh=d5TMbgs1WSF4231wsXXSJxU6n6VNWCH0FsfNgQ8mBQc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IF6HTWzQqhK1qjCpbI9smPZxIpVm55q8vVkdgr5b4usUJfVNEOBOJr5sekxaRtW3BKLL27sbFKsEr+GPmRHQ695DN3ivmK6stE/enCoCTjxR9RPKkn/Al52Vw2a9kVx+ly1C4hF9ZHNqcYzTk8kQm4cXoNTzexorx9zEUdtTBEQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=veD5TKQw; arc=pass smtp.client-ip=209.85.161.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-677bb1c3a9dso2021124eaf.3
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 07:47:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772552835; cv=none;
+        d=google.com; s=arc-20240605;
+        b=SpJBloINgRLA4nIub97ityFv84KhHrzxNv3HWwq/XyW/KhP8XtAgQFoDiP6myrjhRr
+         IVm9Dot4JE2Kl781wsL91hEpySd1nr9teCBvyvbbmJfOrpNMwIlTR2Up2W2IuoMkeF24
+         WLLgwxksebKlTgPFUh9C0idQ8q8qS10w5V37Koayju+WmT5nM4ItrwGDfqvSNiWF725g
+         rt749V2HwX8bf1hD0eJJLAbZ1HLJZIOojbeWlV/r66sH+RA3cDIp3GbWyql5seAclYGR
+         xER4pIQSIAo2OlBLdG3cg1Jvmaxy04y1Tlm6M6puix/UjLXPy0VK9yy9bbbqKHm+W+qC
+         g+IQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=rP5o/eMOPhz1A5eUQwkaAxR1nnewuBUqV7uC86UfM1k=;
+        fh=4xCZx9eV17YgRwBdp77uYRK5In+2e0Zockop5e3D/3U=;
+        b=i94rUIhKr30LrOHb7BbnUKMbFqlbXezv5fXURaZACEYgsvP5TcHCx2n2MZJnKnl4X0
+         U9pweScvHGNN18tldSmVLzo4cCCpooUqwMdwsnktyPOhuOo4kvczUmiBN0TWKkyLNHAz
+         j5udMmZo/eHc/+MDUY8eq/EfO6JlSYRnf5LnidGRaLKUZti/rsmQSoCtGN5fhzbIIdW9
+         XtslIHntFTwzoAy7K6lkZpYGxW1twkDFpR5qRg/Cfod+8GyaOx3jdbj7H3QWS9sBsWmW
+         +PaAxgEkHM2J0Im/WDqnBhg7MbcqJbiaiiIkT2TFUc0y2B9YkhHWXSGSNzaPPycA36Zm
+         0eNQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1772552835; x=1773157635; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rP5o/eMOPhz1A5eUQwkaAxR1nnewuBUqV7uC86UfM1k=;
+        b=veD5TKQwGJgmKvhdR4mtmw83WwdV7fD7STfLwemHWNEdKV8tggi1041rlPSwE1snsn
+         H5/nZ+ngbIMOB15ZK4+MNdiTSqyBZetzoaHPrm8q0h0BeqOHsmp7O2Zyux/YzaJY0Huw
+         Yz8NqP7CEea5NvwXz7kVxjNUzQZhnRXaN3+OlrXVwtT5mmGQA+SYDc4FFFPfrK8d/532
+         1fMRX9WSunf2mHpW6ups0TX6ErtTrWUwvNGzNgVvidMi8IxvsU1ieDMe2y6gGf7kXL1K
+         x4N3Au9tVwhx329F9lL8fZvVz256aF1dPLKpyqytKiN+irRcG9tB4ZczfwsUpz7EY5vt
+         F3eA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772552835; x=1773157635;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=rP5o/eMOPhz1A5eUQwkaAxR1nnewuBUqV7uC86UfM1k=;
+        b=kosPTb73L3MWi0lZRGkoowVy07WzJRGJTW4vi/x4h49DuPNNPMtecfmzPOjXSol8tA
+         wBg+O2lJWxu4Gbb7S7jorjb7I1ljkccnEoMmB7CIyUm5FpYIgOOJJkAndpP3QKp/i+Oj
+         JyLFm9RqPAktmKn4Z6odYW5ybRslj5hNuYC99AuFMTGiFcE31U4SRcGO/jmm+FhOU6b4
+         SIuzmmumSj3uyLa5d8+ghD7GXJemNvH2cT4iJJBazEzrhZrSQ3ni08O3VROs0h6Wr5KL
+         dm9NEfsod7jCvk/BgoKKaMSxHxQzPET1aIufq4WQQD6v348aUdpNa7fm7Fa2OdaJktIq
+         wEzw==
+X-Forwarded-Encrypted: i=1; AJvYcCXEWtcBj8iDP/T6NcciDAuIV7/LgGS2kyDRHayFb+HITB/2FlIlUxAAb7j7MpWPwxamwnw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8MzjtqDGs1/FyyBrmzPP7VCQRUSyRsfzliRRdG4jXPqY2rHdK
+	r4j5nOcNAeUctnOmgSOvjEVaDGq4tj1uf5aHSRvJeWoXg6I4rCLmvkSRrTxKCUFKe3nK9i17lhR
+	+PFqLkWDXeZBgtuPcsVXnICakGgNUG4mdC2Pc2i1Fvg==
+X-Gm-Gg: ATEYQzzEfI+rLzgLhcdUO1zSRphDuDOOUmA0EcahrckWL7FDCjFFZyNtfc3Gpv4XlK7
+	Xab9xCshS3n9r2u7jM8d2672IGoYMghT0vDxvKLoeladxdMawvSM6w4h8qt7fY3d8UsMXf1SbHa
+	BO7k0+dzhChIv5c6EMd14UeCGJHsUcp03O918cS1qn31DOy8rhQhJQQv3Ffls/b3VIoub2yfces
+	eOkqNiPOtTffgfxcX/wfn4O5h47b0ue1o3Pibr8snq4+zLfHL17MQj2YpJI7Rj10UdpRxdEHYPG
+	ujPvxSmJ8LCykYuc0NVCNny4Eg4wPWadASEsQN53KNWD3n/aNi2oEBGq8kdtQPNgVWnApsasAc2
+	g/BL8Ujh4tnW0a06EAern+fhWsw==
+X-Received: by 2002:a05:6820:e03:b0:67a:2e3:2236 with SMTP id
+ 006d021491bc7-67a02e33328mr4850345eaf.23.1772552834606; Tue, 03 Mar 2026
+ 07:47:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Rspamd-Queue-Id: 4746E1F231A
+MIME-Version: 1.0
+References: <20260226191231140_X1Juus7s2kgVlc0ZyW_K@zte.com.cn>
+In-Reply-To: <20260226191231140_X1Juus7s2kgVlc0ZyW_K@zte.com.cn>
+From: Anup Patel <anup@brainfault.org>
+Date: Tue, 3 Mar 2026 21:17:00 +0530
+X-Gm-Features: AaiRm53Tv0HzLC60XnuOQhFibZnnDvaLlp6Dmpq9sGHC5_WRwzY-t4oW2N6N_TA
+Message-ID: <CAAhSdy1Z_rWHW6ra3DTR1h2NeVJoM72SZ85ph-TKWRQqYzrEmA@mail.gmail.com>
+Subject: Re: [PATCH] RISC-V: KVM: Skip THP support check during dirty logging
+To: wang.yechao255@zte.com.cn
+Cc: atish.patra@linux.dev, pjw@kernel.org, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, alex@ghiti.fr, liu.xuemei1@zte.com.cn, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 2311A1F2F19
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[brainfault-org.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72538-lists,kvm=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[brainfault-org.20230601.gappssmtp.com:+];
+	TAGGED_FROM(0.00)[bounces-72539-lists,kvm=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[brainfault.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anup@brainfault.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:email,huawei.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,brainfault-org.20230601.gappssmtp.com:dkim,zte.com.cn:email,brainfault.org:email]
 X-Rspamd-Action: no action
 
-On Thu, 26 Feb 2026 15:57:45 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> 
-> As part of booting the system and initialising KVM, create and
-> populate a mask of the implemented PPIs. This mask allows future PPI
-> operations (such as save/restore or state, or syncing back into the
-> shadow state) to only consider PPIs that are actually implemented on
-> the host.
-> 
-> The set of implemented virtual PPIs matches the set of implemented
-> physical PPIs for a GICv5 host. Therefore, this mask represents all
-> PPIs that could ever by used by a GICv5-based guest on a specific
-> host.
-> 
-> Only architected PPIs are currently supported in KVM with
-> GICv5. Moreover, as KVM only supports a subset of all possible PPIS
-> (Timers, PMU, GICv5 SW_PPI) the PPI mask only includes these PPIs, if
-> present. The timers are always assumed to be present; if we have KVM
-> we have EL2, which means that we have the EL1 & EL2 Timer PPIs. If we
-> have a PMU (v3), then the PMUIRQ is present. The GICv5 SW_PPI is
-> always assumed to be present.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-v5.c      | 30 ++++++++++++++++++++++++++++++
->  include/kvm/arm_vgic.h             |  5 +++++
->  include/linux/irqchip/arm-gic-v5.h | 10 ++++++++++
->  3 files changed, 45 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 9d9aa5774e634..2c51b9ba4f118 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -8,6 +8,34 @@
->  
->  #include "vgic.h"
->  
-> +static struct vgic_v5_ppi_caps ppi_caps;
-> +
-> +/*
-> + * Not all PPIs are guaranteed to be implemented for GICv5. Deterermine which
-> + * ones are, and generate a mask.
-> + */
-> +static void vgic_v5_get_implemented_ppis(void)
-> +{
-> +	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF))
-> +		return;
-> +
-> +	/*
-> +	 * If we have KVM, we have EL2, which means that we have support for the
-> +	 * EL1 and EL2 P & V timers.
+On Thu, Feb 26, 2026 at 4:42=E2=80=AFPM <wang.yechao255@zte.com.cn> wrote:
+>
+> From: Wang Yechao <wang.yechao255@zte.com.cn>
+>
+> When dirty logging is enabled, guest stage mappings are forced to
+> PAGE_SIZE granularity. Changing the mapping page size at this point
+> is incorrect.
+>
+> Fixes: ed7ae7a34bea ("RISC-V: KVM: Transparent huge page support")
+> Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
 
-nit: please spell out physical and virtual.
+LGTM.
 
-> +	 */
-> +	ppi_caps.impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_CNTHP);
-> +	ppi_caps.impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_CNTV);
-> +	ppi_caps.impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_CNTHV);
-> +	ppi_caps.impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_CNTP);
-> +
-> +	/* The SW_PPI should be available */
-> +	ppi_caps.impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_SW_PPI);
-> +
-> +	/* The PMUIRQ is available if we have the PMU */
-> +	if (system_supports_pmuv3())
-> +		ppi_caps.impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_PMUIRQ);
-> +}
-> +
->  /*
->   * Probe for a vGICv5 compatible interrupt controller, returning 0 on success.
->   * Currently only supports GICv3-based VMs on a GICv5 host, and hence only
-> @@ -18,6 +46,8 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  	u64 ich_vtr_el2;
->  	int ret;
->  
-> +	vgic_v5_get_implemented_ppis();
-> +
->  	if (!cpus_have_final_cap(ARM64_HAS_GICV5_LEGACY))
->  		return -ENODEV;
->  
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index f12b47e589abc..9e4798333b46c 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -410,6 +410,11 @@ struct vgic_v3_cpu_if {
->  	unsigned int used_lrs;
->  };
->  
-> +/* What PPI capabilities does a GICv5 host have */
-> +struct vgic_v5_ppi_caps {
-> +	u64	impl_ppi_mask[2];
-> +};
-> +
->  struct vgic_cpu {
->  	/* CPU vif control registers for world switch */
->  	union {
-> diff --git a/include/linux/irqchip/arm-gic-v5.h b/include/linux/irqchip/arm-gic-v5.h
-> index b78488df6c989..1dc05afcab53e 100644
-> --- a/include/linux/irqchip/arm-gic-v5.h
-> +++ b/include/linux/irqchip/arm-gic-v5.h
-> @@ -24,6 +24,16 @@
->  #define GICV5_HWIRQ_TYPE_LPI		UL(0x2)
->  #define GICV5_HWIRQ_TYPE_SPI		UL(0x3)
->  
-> +/*
-> + * Architected PPIs
-> + */
-> +#define GICV5_ARCH_PPI_SW_PPI		0x3
-> +#define GICV5_ARCH_PPI_PMUIRQ		0x17
-> +#define GICV5_ARCH_PPI_CNTHP		0x1a
-> +#define GICV5_ARCH_PPI_CNTV		0x1b
-> +#define GICV5_ARCH_PPI_CNTHV		0x1c
-> +#define GICV5_ARCH_PPI_CNTP		0x1e
+Reviewed-by: Anup Patel <anup@brainfault.org>
 
-Could you dump all the architected PPI numbers from R_XDVCM here, even
-if they are not directly relevant to KVM? I'm pretty sure someone will
-find them useful at some point...
+Queued this patch as fix for Linux-7.0-rcX
 
 Thanks,
+Anup
 
-	M.
 
--- 
-Without deviation from the norm, progress is not possible.
+> ---
+>  arch/riscv/kvm/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> index 0b75eb2a1820..c3539f660142 100644
+> --- a/arch/riscv/kvm/mmu.c
+> +++ b/arch/riscv/kvm/mmu.c
+> @@ -535,7 +535,7 @@ int kvm_riscv_mmu_map(struct kvm_vcpu *vcpu, struct k=
+vm_memory_slot *memslot,
+>                 goto out_unlock;
+>
+>         /* Check if we are backed by a THP and thus use block mapping if =
+possible */
+> -       if (vma_pagesize =3D=3D PAGE_SIZE)
+> +       if (!logging && (vma_pagesize =3D=3D PAGE_SIZE))
+>                 vma_pagesize =3D transparent_hugepage_adjust(kvm, memslot=
+, hva, &hfn, &gpa);
+>
+>         if (writable) {
+> --
+> 2.27.0
 
