@@ -1,243 +1,369 @@
-Return-Path: <kvm+bounces-72672-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72673-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WC14Kr/9p2mlnAAAu9opvQ
-	(envelope-from <kvm+bounces-72672-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 10:39:11 +0100
+	id oBu6NLkBqGkRnQAAu9opvQ
+	(envelope-from <kvm+bounces-72673-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 10:56:09 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48C8D1FDBD6
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 10:39:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B1ED1FDF4D
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 10:56:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 28BE1309A2E9
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 09:35:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9B6D1301E6DF
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 09:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED9423976AA;
-	Wed,  4 Mar 2026 09:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4954339EF2E;
+	Wed,  4 Mar 2026 09:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jAAAOGE3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="louJSz7w"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307781ACEDE;
-	Wed,  4 Mar 2026 09:35:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772616933; cv=none; b=NNodN0M2/+8jgVN2MlIE8Q7oyDwUxQKncHm/Diycvb3JxXNwYPn7v+MnNuuj1clJ/2H1Q+IPA48LXcncqfVou53pXspnYDoLxu8v1EmZYOdVWREpAa7AuMCB0XdPvaiGu1Gkv3WoAVRMjdbix3D1lWDby3mIb5ykIrcwU+3Ogw4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772616933; c=relaxed/simple;
-	bh=fcQPpx8aXl/bNZmJJr4UNqNuegofLcCcrPHmWDmwHeM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K1K73O1ZtW8X0M86LcwYpGEwz8YWNrSsAsTW4FNcDwIMEBjhMP3jJ21eg/JhZGr9U81ct8Tj29djM3DyUljkouCD9h5QqEm1jh1LZUeAQskslikj8klEdtrYawOv16auSnwPaDut5+WoyYaxGBfFC5Z6640W4xYSOX6yY7v29oE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jAAAOGE3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3771C19423;
-	Wed,  4 Mar 2026 09:35:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772616933;
-	bh=fcQPpx8aXl/bNZmJJr4UNqNuegofLcCcrPHmWDmwHeM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jAAAOGE3yEaLrrLntuxDP4H0mebq4t+SmQ5VHnBBo3slVvJte1dhqls/6yLwgccPj
-	 JGhp+O05g7UxK+18O7ErIEpLcfmVlKe3YaD2LSycrMQs/h8/FGkJSL/uC25dYkS1hd
-	 0mEB9FT6J1C/tStohhvhX07snjfQp79h8RsKwhD+J2EJ9bX+E6jaAojpDX0ayG+j24
-	 94Bg4T+9U1Tt+NXm8oRxArfvm/PXDREZWT02eOEpUU361uHOF3TF9eTLKMMBtO8dDD
-	 AvOc3HHq3RJ4nUW5QtJrnV/sfO+AU+2XzFeLUHzUDeed9X83iE9epPg8dJfI+xX75K
-	 W6qVuInzp8ABg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vxide-0000000FyTI-31HL;
-	Wed, 04 Mar 2026 09:35:30 +0000
-Date: Wed, 04 Mar 2026 09:35:30 +0000
-Message-ID: <864imw7x99.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>,
-	"jonathan.cameron@huawei.com"
-	<jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v5 16/36] KVM: arm64: gic-v5: Implement direct injection of PPIs
-In-Reply-To: <20260226155515.1164292-17-sascha.bischoff@arm.com>
-References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
-	<20260226155515.1164292-17-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5043988FB
+	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 09:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772617918; cv=fail; b=qObnEkCaLi5MV+3Bk2idhx+s+NnhJlI6sb7GKEOBSI14bnmKhAQix1L+QpMntaCOlS2xNvoE5K/F1MRdv8yEf+F5zeqUNZjA6hMzqm+kL5zzmKDcBHGnPg/fhYSWn/2QWf1VD8QzPOC7pktJWPimf37U/eUyb4Os+2rd/0/fh3Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772617918; c=relaxed/simple;
+	bh=QlhW3IR2QmslmcYVHT+BLB+fpGuwVFoHfy/jcEH2+cg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=fKRd/mew+IO87sodSfM3elvGvZcF1URX9NObdLZY9vkfy3Ibhfdbb0MYJIf/ZlTVYqXDSXwc4nwOTwgv/clNXV0Gd9aPRvz5O2Nl/I/GjCfGJ7G+kaVDIxSt6e9gSqr0Uqbhznx0dE/Ln8xfukeB7mZiYzwheCCcdBII8pxuDSg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=louJSz7w; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772617917; x=1804153917;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=QlhW3IR2QmslmcYVHT+BLB+fpGuwVFoHfy/jcEH2+cg=;
+  b=louJSz7wxBA8N2qGW9Qgjo/Xfp4InKsmGLg6kx4HPDjaI7pFUBPBYoNN
+   TdqwQ+1BFUvcB/VkRqEjEXLOJlvYCw6CyeXU7uhpXG9kgIAvq7mRTZ9SK
+   XrsFSucGnJMxNpbSOFjOkPN3vRsEW1Pyj3ZSynuBUVatM9/PvR2J8Xvhu
+   zhjYI4nKUiw5AbgMAqE/zTq6NrZk0K5wp5P1RHeXLwHlhWKijNA0+PQOE
+   8ZxSupnBbdjvSJKPiF69M20Mnv1k6rrh7oAImL/kbZh+6o0BrfsYoT2cj
+   2jQWeJ3+GIHUCiCu4m8d4PyZ00TcS4OzP2W6mG8WCqM/fgSMu8QjQhC4R
+   g==;
+X-CSE-ConnectionGUID: wUnzze7nTT+8y8ap2CsweQ==
+X-CSE-MsgGUID: ogKLojpEQSWTcTf3zgEfyw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11718"; a="73640923"
+X-IronPort-AV: E=Sophos;i="6.21,323,1763452800"; 
+   d="scan'208";a="73640923"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 01:51:57 -0800
+X-CSE-ConnectionGUID: nREJ6x0GQ1612+u65qRC/A==
+X-CSE-MsgGUID: S8m+aqKISNm6J+Ygdo49Gg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,323,1763452800"; 
+   d="scan'208";a="223285900"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 01:51:57 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 4 Mar 2026 01:51:56 -0800
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Wed, 4 Mar 2026 01:51:56 -0800
+Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.42) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Wed, 4 Mar 2026 01:51:56 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BCnrdZ9HhR0f48P73jUQXA68Prrf36pB3CSudss+WtIIfRiWm1ZOBMAX88e1UR37uESZDdvWvr5cMUAXL6V7qmugEH2NPAzgMzWp/RAxhwi+ZOBiI7vcSejpHWmEk1dF2Pm2eemhI41s2BXGfk4Q+T/EyycXcx43RiUhUQQzQNqYc8OvmTzs1Fs2V7JZ7O8P7lBQbWQ44Vhd8EQMGDYQhNbh6VnoCHLiEM7a/oM1Y3EruxmTNbDYdXXEexpI+fUIeHynzJTPOcnmL9hmsrJChpO3VluLGooRSr4ARLvTaFuUlYiA/jAvqKZGMyEIMRprL+HSgjgtItShYhdo534KYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TDVzC1yhGWlSJz4ULlrl3aqYI23d/qPsjkRwqG9Bdgc=;
+ b=mnYCYtHx4iIlQpukVAJEU1I+bHMdQbQSthF9IOXXCtNsJW9D5khBmTsgShDwSjEVLIy18I0PWTiTKp/enNbCGdEezd8asLwDib2QgAJVlFXyjsLPAJjolfmbEaVHVBlY+5ReGzxQTg7yIAWDR2SdVDseY83j0ugWNn4IW0NUrhhVp6MYuw/LTdk13JPQmFayi++1SuLVvlq7jd+wj5ihOCjk7tEJqapgNgBAdJZL1lexKiG/1CREZYEm4YyrUAW3P8qRHuP5AxPsmz9p8KNf1SvqbcfAyVG+Hb1MC7SeiqXx2q//VQWS/n58h1gjsK9ZEjMEFmKdRKrFz06yGg306g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM3PR11MB8735.namprd11.prod.outlook.com (2603:10b6:0:4b::20) by
+ PH8PR11MB7022.namprd11.prod.outlook.com (2603:10b6:510:222::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.17; Wed, 4 Mar
+ 2026 09:51:53 +0000
+Received: from DM3PR11MB8735.namprd11.prod.outlook.com
+ ([fe80::8f1e:49f4:122c:c675]) by DM3PR11MB8735.namprd11.prod.outlook.com
+ ([fe80::8f1e:49f4:122c:c675%4]) with mapi id 15.20.9678.016; Wed, 4 Mar 2026
+ 09:51:52 +0000
+Message-ID: <02381fd6-dd40-45e7-bd7c-f97de5618df1@intel.com>
+Date: Wed, 4 Mar 2026 17:51:43 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 06/15] system/memory: split RamDiscardManager into
+ source and manager
+To: <marcandre.lureau@redhat.com>, <qemu-devel@nongnu.org>
+CC: Ben Chaney <bchaney@akamai.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, Alex Williamson <alex@shazbot.org>, Fabiano Rosas
+	<farosas@suse.de>, David Hildenbrand <david@kernel.org>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>, Peter Xu
+	<peterx@redhat.com>, <kvm@vger.kernel.org>, Mark Kanda
+	<mark.kanda@oracle.com>
+References: <20260226140001.3622334-1-marcandre.lureau@redhat.com>
+ <20260226140001.3622334-7-marcandre.lureau@redhat.com>
+From: Chenyi Qiang <chenyi.qiang@intel.com>
+Content-Language: en-US
+In-Reply-To: <20260226140001.3622334-7-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI2P153CA0026.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:190::18) To DM3PR11MB8735.namprd11.prod.outlook.com
+ (2603:10b6:0:4b::20)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Rspamd-Queue-Id: 48C8D1FDBD6
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM3PR11MB8735:EE_|PH8PR11MB7022:EE_
+X-MS-Office365-Filtering-Correlation-Id: e37dbe17-e971-455f-a333-08de79d3a9ad
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: 7hYsvEeEK5LsT7NgkxA3WBJpJbECAt63Hf7pZl1LHMtt0ig3coCPb0ruqCU9U1YG1oS9dKQCEOgg8BMqJirkkYq/lBj6pOh78xHVjifKOylljo+5nHwQh31gIw2ttnnStYHo6n3aDNcJO0uL1I2u+WJKQHYR89Ka1pnFZHo7LwBbcmiQu8Wt8q2uV3R2lsWPrRLJeRbiU7N/Qyx+EIRVG1mjnyf+pB95ULITNpHWnE0P1uyt9nybYkTuva6TdOJSj2ys+DvDqSjw4ccCgiuoJOMmg/Pfi+1B46HYxscJn98O1aYoMMqMjIfNHJHV/Vf8HuDm1Vd49jVP5dTBJtCHIwsZAju79X4pQLWd8amDMqExIE81LpsevbqbKjn7xomLswvh1mTfyIEpqXqEEnlOSj0u+Z8kqhy5hm7ZxdPGARzbz7KNjVauOzNOJr9dxMuUxSZSEyhHcTMV1CGRs2CDkwpa3qb/dgNAYESPAUkxROHDxwCPh3M4y3TKZf99NFNcY3JZN1QLWla74HvSsGIZzOijhAZf0Xml1j7ZNcmJcE+HzB+FO2tuiNXBtjmLGqTGBDea/8Qqao/YBrfyqfW6Rq4/YnItJd6CqsPGl38ke/xtGz/exH6C4qCo8bJWDht5n0tYgj3fr7491XIj7y8vrDRuc7tEzqAv1D3aOWHgkNoe4DCBxBNsAOpLJmNyQrLO2e2vqO1u8WU3duV1fsO8boVeIHd72Me5BKMGU+QCT9U=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8735.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TlMyc1lyMFIxSzZ6UWRJeXRZbzRVZzRUOTV2RHRxcFZwUklRakcrSWV3aWZI?=
+ =?utf-8?B?MWdEdlJsQmFmOG4rMWI1cHhjczhZSFhGNnRuYW1MbkpEZU4xbjVVMkZYN2dO?=
+ =?utf-8?B?Rk9qWjJlbytZWEMwc3ZYeWlPZmtZWHRHZThvWEJVLzVJNU1ZTzNOOFZqbU82?=
+ =?utf-8?B?VVNjSUJXYVMrODhaT1VxV2RJb2J6VGpncVQ3Q2FjaFpnZHZnYkNTQytxbHpy?=
+ =?utf-8?B?bjdRUjVkZXhWbWV3VStRWnFBTzlHTDluYXlYcVBLcmRXZy90MnE4WkFuYStI?=
+ =?utf-8?B?N3Z1N3d4cUNsWDUxWHlKWVBXUy94VVAxME53Q3FZWkQ1ekc3NWNIZW1sK0J0?=
+ =?utf-8?B?ZEs4dk1iaVV1cktiTUUySXJZeDJtQjJGZXI3RDJVWjdJaHJuREJmNmJ4bW5L?=
+ =?utf-8?B?ZHczOE1lVnRDOFlUTzBXWkhKQXNoL2pBQk1PaVc4ZS95SEFNQUlWNmRZVy9O?=
+ =?utf-8?B?NG9GZXNPSWg1enJvS3NkUGM2enN1NXRjTFhoa2ZQTUJPU09zT2tEZ2pUSlh5?=
+ =?utf-8?B?cTc4Q2EyU3lqQ2l0Vi93L2ZOVWdBZk4wRUxrZW9mTFRzcnpva1JLbTRYOFNI?=
+ =?utf-8?B?U0tPTTJXVjFIL1gya0xMeG5FVDJLbXgvY25ybE9kZmNnZUxmK2kyTkpWcE82?=
+ =?utf-8?B?QUdScU9rU2dxKzFNMHRqSmJ0NnZ5cGJJNUo0bGl1VWtrSkZYZ0dndGxJZW45?=
+ =?utf-8?B?Qyt4eHJob1ByMnJTdUFESDdzUDAwNHpONG1ONVY0K29UeUNHZHZEWjk4SDl3?=
+ =?utf-8?B?S1BXcU8zTVhyMlhRSXFWd0FUUW1HWG5LSTdQSS83VW9hUklmSHo3V2VBZnBm?=
+ =?utf-8?B?bUg1ejhOVFZYZndWUHl2WnBDOWc2MGNzd25hei9OcnBnMHRRUXl4QUxxdXZO?=
+ =?utf-8?B?Q0xzZk9WSGtPY1l1UVZGdGg5T2t0NW5Gb2IwbFRJNDZTZnE0eUNKaVVxZXcw?=
+ =?utf-8?B?QWR3c3FPZUJEa3hxb253M0tQNWE0QU5oNVd1UGhnVGp4WGkyUlVlL1B5T0oy?=
+ =?utf-8?B?cnBYVVFFdlBkSFlPemprcWR5MkhaT3NCdkFlTERRelVCZkVGS1F0T1RFVVFw?=
+ =?utf-8?B?eExJTTdzcVJqYU53TEsxb204bTJ0QmV0cFJsVUxMRlA5SzRaTTRBUmdjTjJB?=
+ =?utf-8?B?a2JIeVVieTJJRVBmc29nNzB6R3hvazh4c1hkZGtIMHcwOEx0ZnZFeVJERU11?=
+ =?utf-8?B?L1FuSDNRdTdRT3lJRUNaOFNIN3RTSnNDb3FvQW1qLzFCV25PbHViYTViTUl2?=
+ =?utf-8?B?TGVCeEJCeFBoNTlURng0eGZ4a0szam1NQmhhc2hCQlZiWEpRbFZ2QVppV3FG?=
+ =?utf-8?B?NVpqbFZ1N2ZIWkZYczl6UEx5ZkRDMWtQT3VqN2ZSYVBLQUZRbStjdm5CQlBP?=
+ =?utf-8?B?eEhXL1ozZHNiTnozTWd1VGVaUXF6U25FaFY1MVJXSWxxNzRZRWlQOEo2WlQ5?=
+ =?utf-8?B?ZDZjV01SQ0dTSUxuNDdZWWxEeGtWUy9mU1I2MDJJNHVJUldKa2JYT01zZFA4?=
+ =?utf-8?B?aDFKK1NSSVVlMjZUTkQrb1JSTk9obm1uMHBJUEY1S2F2aVZuTUYwanRLb2tt?=
+ =?utf-8?B?eVpnL3FtQlJGYmpMcEhuY2xEbHM4THRlNUxJVzlabkViWTJ0dDV6c1BGRkxi?=
+ =?utf-8?B?SlJCUU9UYUVsUnBZZHk3WHRleENCRzV1UnhpR3hJSktvOXhQZ3F5TUsvQTh2?=
+ =?utf-8?B?M1pOYjZKM1J6V1FrRUVsc0Mxc1p6WlNHTXcwV2tsVDY1dkh2allkaWdPRGpB?=
+ =?utf-8?B?Q0NjVHBteGlWRkE3SGlNKzBiN0J6ZXJXK0F6czRkU256Vy8zalJCY2w3TlJn?=
+ =?utf-8?B?Nm1XQ0dxZ3Yza3lVK0V5L2NxeUZxa2lyOWJ5S0hiYUdhR2VRSVkyWTJpaVpD?=
+ =?utf-8?B?dldvVUpoaVpDUjRpVG1aL00rQmV3UW1HakNCWW9ycStLV28xTm1SQjYwVSt6?=
+ =?utf-8?B?M3lUU25XVTFXN1pHbkxMdDNlR3F3dHc5ZDZad3FONlRLNk1mYjZPb2dXVVgz?=
+ =?utf-8?B?eDI4dEVzM3NmMSsvK3V4UTdBY1pHZUQyN05VUDRlNlhXSzJuWnJNVzBXcWxJ?=
+ =?utf-8?B?L1JqdTFpWEljV2p1MVJNMTJscXpWS09qbmt3ZUd0MERZWFpHWVM2Y1N6c2oz?=
+ =?utf-8?B?U1JvWEF5SFBrSHlFNWFQajF3emV3N3g4bWNwMm9FWmJGbFljakdta2F5MUdO?=
+ =?utf-8?B?Y3lsZTZ3aXpCQmQ4NExQUzdoa2t4azdJU3d6d2hzVUZLQVdVZzhSUHZVaW1a?=
+ =?utf-8?B?R2hNcU1IdlpvbTkyRHRmcTdjUjdGRUtZZ0h1cmZwNmw4THJ4TzV4bm9rdTdR?=
+ =?utf-8?B?UlJKTlJKYnpBNXFudnNTTDUra3RDaXd0R0FtNjdRMDhxcHM2MndvUT09?=
+X-Exchange-RoutingPolicyChecked: USzFtFnEYTxRdUpytlB1zIlyf9vRHtJjaml8ORSXgyA/cB60BCF4n1+uRtXtneDFv/4w5FcvHQ2Ks37dbCCsK0nrcJJkwbM5PTZsO4YfqooXJuDxMUmS0fATAoppMMyX1aQHBSOSiXIv/jKACtAhZGEql3CMEFPH6riyrb9aTB/7T6DomBKib7vgT9KzmsfEosXOWUlNWzicpa/T9WhjWoXexWLgRxpke5aQU5RXAc3UYUfNjCShTx8IUEVQs06U0Vwc/c3f81Alb3LhhHZYSXlNtu3g9dg06HGVTWOD8ijEpYyiMHx14OxjooFEk9ZQyszZPYat+uRp1PhS+r5g3Q==
+X-MS-Exchange-CrossTenant-Network-Message-Id: e37dbe17-e971-455f-a333-08de79d3a9ad
+X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8735.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2026 09:51:52.8526
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vmnhD3uKueSweRa+Sdg24vK4neMyFz8oT5+QeOIFKIEBRl4HL/J6ww5MZC3ADiLZG1pMYLaUwl+kKrI+WrXg4w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7022
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 4B1ED1FDF4D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72673-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72672-lists,kvm=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:mid];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[chenyi.qiang@intel.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,huawei.com:email]
+	TAGGED_RCPT(0.00)[kvm];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-On Thu, 26 Feb 2026 15:59:33 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+
+
+On 2/26/2026 9:59 PM, marcandre.lureau@redhat.com wrote:
+> From: Marc-André Lureau <marcandre.lureau@redhat.com>
 > 
-> GICv5 is able to directly inject PPI pending state into a guest using
-> a mechanism called DVI whereby the pending bit for a paticular PPI is
-> driven directly by the physically-connected hardware. This mechanism
-> itself doesn't allow for any ID translation, so the host interrupt is
-> directly mapped into a guest with the same interrupt ID.
+> Refactor the RamDiscardManager interface into two distinct components:
+> - RamDiscardSource: An interface that state providers (virtio-mem,
+>   RamBlockAttributes) implement to provide discard state information
+>   (granularity, populated/discarded ranges, replay callbacks).
+> - RamDiscardManager: A concrete QOM object that wraps a source, owns
+>   the listener list, and handles listener registration/unregistration
+>   and notifications.
 > 
-> When mapping a virtual interrupt to a physical interrupt via
-> kvm_vgic_map_irq for a GICv5 guest, check if the interrupt itself is a
-> PPI or not. If it is, and the host's interrupt ID matches that used
-> for the guest DVI is enabled, and the interrupt itself is marked as
-> directly_injected.
+> This separation moves the listener management logic from individual
+> source implementations into the central RamDiscardManager, reducing
+> code duplication between virtio-mem and RamBlockAttributes.
 > 
-> When the interrupt is unmapped again, this process is reversed, and
-> DVI is disabled for the interrupt again.
+> The change prepares for future work where a RamDiscardManager could
+> aggregate multiple sources.
 > 
-> Note: the expectation is that a directly injected PPI is disabled on
-> the host while the guest state is loaded. The reason is that although
-> DVI is enabled to drive the guest's pending state directly, the host
-> pending state also remains driven. In order to avoid the same PPI
-> firing on both the host and the guest, the host's interrupt must be
-> disabled (masked). This is left up to the code that owns the device
-> generating the PPI as this needs to be handled on a per-VM basis. One
-> VM might use DVI, while another might not, in which case the physical
-> PPI should be enabled for the latter.
+> Note, the original virtio-mem code had conditions before discard:
+>   if (vmem->size) {
+>       rdl->notify_discard(rdl, rdl->section);
+>   }
+> however, the new code calls discard unconditionally. This is considered
+> safe, since the populate/discard of sections are already asymmetrical
+> (unplug & unregister all listener section unconditionally).
 > 
-> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-v5.c | 15 +++++++++++++++
->  arch/arm64/kvm/vgic/vgic.c    | 10 ++++++++++
->  arch/arm64/kvm/vgic/vgic.h    |  1 +
->  include/kvm/arm_vgic.h        |  1 +
->  4 files changed, 27 insertions(+)
+>  include/hw/virtio/virtio-mem.h |   3 -
+>  include/system/memory.h        | 197 ++++++++++++++++-------------
+>  include/system/ramblock.h      |   3 +-
+>  hw/virtio/virtio-mem.c         | 163 +++++-------------------
+>  system/memory.c                | 218 +++++++++++++++++++++++++++++----
+>  system/ram-block-attributes.c  | 171 ++++++++------------------
+>  6 files changed, 386 insertions(+), 369 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 5b35c756887a9..f5cd9decfc26e 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -86,6 +86,21 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  	return 0;
+
+[...]
+
+> diff --git a/system/memory.c b/system/memory.c
+> index c51d0798a84..3e7fd759692 100644
+> --- a/system/memory.c
+> +++ b/system/memory.c
+> @@ -2105,34 +2105,88 @@ RamDiscardManager *memory_region_get_ram_discard_manager(MemoryRegion *mr)
+>      return mr->rdm;
 >  }
 >  
-> +/*
-> + * Sets/clears the corresponding bit in the ICH_PPI_DVIR register.
-> + */
-> +int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi)
+> -int memory_region_set_ram_discard_manager(MemoryRegion *mr,
+> -                                          RamDiscardManager *rdm)
+> +static RamDiscardManager *ram_discard_manager_new(MemoryRegion *mr,
+> +                                                  RamDiscardSource *rds)
 > +{
-> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +	u32 ppi = FIELD_GET(GICV5_HWIRQ_ID, irq);
-> +	unsigned long *p;
+> +    RamDiscardManager *rdm = RAM_DISCARD_MANAGER(object_new(TYPE_RAM_DISCARD_MANAGER));
 > +
-> +	p = (unsigned long *)&cpu_if->vgic_ppi_dvir[ppi / 64];
-> +	__assign_bit(ppi % 64, p, dvi);
-> +
-> +	return 0;
+> +    rdm->rds = rds;
+> +    rdm->mr = mr;
+> +    QLIST_INIT(&rdm->rdl_list);
+
+Is this QLIST_INIT() redundant since it is already called in ram_discard_manager_initfn()?
+
+> +    return rdm;
 > +}
 > +
->  void vgic_v5_load(struct kvm_vcpu *vcpu)
+
+[...]
+
+> +}
+> +
+> +static void ram_discard_manager_initfn(Object *obj)
+> +{
+> +    RamDiscardManager *rdm = RAM_DISCARD_MANAGER(obj);
+> +
+> +    QLIST_INIT(&rdm->rdl_list);
+> +}
+> +
+> +static void ram_discard_manager_finalize(Object *obj)
+> +{
+> +    RamDiscardManager *rdm = RAM_DISCARD_MANAGER(obj);
+>  
+> -    g_assert(rdmc->replay_discarded);
+> -    return rdmc->replay_discarded(rdm, section, replay_fn, opaque);
+> +    g_assert(QLIST_EMPTY(&rdm->rdl_list));
+> +}
+> +
+> +int ram_discard_manager_notify_populate(RamDiscardManager *rdm,
+> +                                        uint64_t offset, uint64_t size)
+> +{
+> +    RamDiscardListener *rdl, *rdl2;
+> +    int ret = 0;
+> +
+> +    QLIST_FOREACH(rdl, &rdm->rdl_list, next) {
+> +        MemoryRegionSection tmp = *rdl->section;
+> +
+> +        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
+> +            continue;
+> +        }
+> +        ret = rdl->notify_populate(rdl, &tmp);
+> +        if (ret) {
+> +            break;
+> +        }
+> +    }
+> +
+> +    if (ret) {
+> +        /* Notify all already-notified listeners about discard. */
+> +        QLIST_FOREACH(rdl2, &rdm->rdl_list, next) {
+> +            MemoryRegionSection tmp = *rdl2->section;
+> +
+> +            if (rdl2 == rdl) {
+> +                break;
+> +            }
+> +            if (!memory_region_section_intersect_range(&tmp, offset, size)) {
+> +                continue;
+> +            }
+> +            rdl2->notify_discard(rdl2, &tmp);
+> +        }
+> +    }
+> +    return ret;
+> +}
+> +
+
+[...]
+
+>  
+>  static int
+>  ram_block_attributes_notify_populate(RamBlockAttributes *attr,
+>                                       uint64_t offset, uint64_t size)
 >  {
->  	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 1005ff5f36235..62e58fdf611d3 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -577,12 +577,22 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->  	irq->host_irq = host_irq;
->  	irq->hwintid = data->hwirq;
->  	irq->ops = ops;
-> +
-> +	if (vgic_is_v5(vcpu->kvm) &&
-> +	    __irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, irq->intid))
-> +		irq->directly_injected = !vgic_v5_set_ppi_dvi(vcpu, irq->hwintid,
-> +							      true);
-> +
-
-Huh. A couple of things here:
-
-- under what conditions would irq->directly_injected not be set to
-  true for a PPI? That can never happen here AFAICT.
-
-- we have per-IRQ operations, and PPIs do have such ops attached to
-  them. Why can't this be moved to such a callback?
-
->  	return 0;
+> -    RamDiscardListener *rdl;
+> -    int ret = 0;
+> -
+> -    QLIST_FOREACH(rdl, &attr->rdl_list, next) {
+> -        MemoryRegionSection tmp = *rdl->section;
+> -
+> -        if (!memory_region_section_intersect_range(&tmp, offset, size)) {
+> -            continue;
+> -        }
+> -        ret = rdl->notify_populate(rdl, &tmp);
+> -        if (ret) {
+> -            break;
+> -        }
+> -    }
+> +    RamDiscardManager *rdm = memory_region_get_ram_discard_manager(attr->ram_block->mr);
+>  
+> -    return ret;
+> +    return ram_discard_manager_notify_populate(rdm, offset, size);
 >  }
->  
->  /* @irq->irq_lock must be held */
->  static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
->  {
-> +	if (irq->directly_injected && vgic_is_v5(irq->target_vcpu->kvm))
-> +		WARN_ON(vgic_v5_set_ppi_dvi(irq->target_vcpu, irq->hwintid, false));
-> +
-> +	irq->directly_injected = false;
->  	irq->hw = false;
->  	irq->hwintid = 0;
->  	irq->ops = NULL;
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index 81d464d26534f..d7fe867a27b64 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -364,6 +364,7 @@ void vgic_debug_init(struct kvm *kvm);
->  void vgic_debug_destroy(struct kvm *kvm);
->  
->  int vgic_v5_probe(const struct gic_kvm_info *info);
-> +int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi);
 
-Doing the above would keep these things private to the vgic-v5
-implementation.
+This change introduces a slight difference, as it will perform a rollback if ->notify_populate() fails.
+I believe this is acceptable since, currently, memory conversion failures result in QEMU terminating
+rather than resuming the guest or retrying the operation. And this rollback is necessary if we plan to support
+retry operations in the future. Therefore, we can retain this modification.
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
