@@ -1,149 +1,132 @@
-Return-Path: <kvm+bounces-72632-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72633-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eGdBESaBp2liiAAAu9opvQ
-	(envelope-from <kvm+bounces-72632-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 01:47:34 +0100
+	id 4MSRN4WBp2liiAAAu9opvQ
+	(envelope-from <kvm+bounces-72633-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 01:49:09 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 076381F8FCF
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 01:47:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DC281F900B
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 01:49:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 269C7302C75D
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 00:47:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D39F630A4A7C
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 00:48:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E481448E0;
-	Wed,  4 Mar 2026 00:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5DA21A6821;
+	Wed,  4 Mar 2026 00:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="iokcO/JE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZXaNmIVD"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35EB322A;
-	Wed,  4 Mar 2026 00:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D61347DD
+	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 00:48:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772585249; cv=none; b=NVt0YOUHSbJFbDXBumFR2Uq86LaWSkmXOlkO7lSk6L16RPz+XArh8A+Bz7XvT7TLsbMoUHLwqRWePk4H62V+QbhJAqhJ+Q0G4j+Q43xVz/nIV8c0xVj3vOxiCpqxnahDnoGescPbcrGZ6kyK2lwdkD9LbYOh6PPA2FngTyyuyy8=
+	t=1772585331; cv=none; b=o1pUg3r0YbZ7XICVfOc+knPtBTvIlgNL4orxjr9SxdvDBBYI5oeRNhd+/MIgAJ8ozgamdzLc27IYhcpinH83XcawK2e9sPINWhb3nOJgsT4wzcb13faESeE00qNhCGBkRVT2h6qqfsbkkTZ4GQ6QIyjep73km6/H/UOglKDGk9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772585249; c=relaxed/simple;
-	bh=+L7SUxV5+ZgZqW2wk1K5g+AlZf4y17v2y0NfpGKOCFU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k4erPdQ7PhKI3rT2CXM2mgBb8ialVdirNDI2BwRPGJzbqLk43wfQJyBOMKyHt3PkrsE1X3ks5s/XSigQGhDbJ2w1gYFAs9lQEAMyU0DpQxZZHpnHcYyEFdpu3Lqnf24R8ddLZtFdXnvAywHt34aq4AYpgK6azDadLQBtnknnWzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=iokcO/JE; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1772585236; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=b5u3CcUv0pgAolzm4rEmwpoEocfcJX1iiE9qFfZsikE=;
-	b=iokcO/JEn+R2MBMTfwecYJLFP25EVGeija/tAoAeTHqQhwFHutZRS06kbJSV1kxhzLiISDqW1SZEcrNLwaDJNUYOlKHYgQdsE9+MK1Oi++vD21dI+lGs9PDULU8PWIhSudCJVV9sUdqjXQij8XIgzsExza/9D64jbW4kvIyi9DM=
-Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0X-B3A1p_1772585235 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 04 Mar 2026 08:47:16 +0800
-Date: Wed, 4 Mar 2026 08:47:15 +0800
-From: Yao Yuan <yaoyuan@linux.alibaba.com>
-To: Alex Mastro <amastro@fb.com>
-Cc: Alex Williamson <alex@shazbot.org>, 
-	David Matlack <dmatlack@google.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio: selftests: fix crash in vfio_dma_mapping_mmio_test
-Message-ID: <vps7in2ph6yyb2vl3zuxie7sp2cyzh4endrvdsdjgtqhjxvoqp@po4m7zddafi5>
-References: <20260303-fix-mmio-test-v1-1-78b4a9e46a4e@fb.com>
+	s=arc-20240116; t=1772585331; c=relaxed/simple;
+	bh=srNCTgIzwqrp/TQebCwJ10Pl9GUqhQRWYVtu5EDbofc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BAKFeM5l0zEdsyJfHzRRH81p8b9qB4hhdzhBKJkxp4hLpexWPX8jM4HgyJ9xPEDi2QvBwrWq+LFiFPuoitiXHhdzAJc04ir3ADlwzYY0ZOy2JV4HMd32mrz5aksp4GJlxKI6o2bazFucZs7GoFtCHAe57smC8lUzso9PVFllVsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZXaNmIVD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3810C2BCAF
+	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 00:48:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772585330;
+	bh=srNCTgIzwqrp/TQebCwJ10Pl9GUqhQRWYVtu5EDbofc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=ZXaNmIVD3E7aiOiGOqNFKUSOuE0skRVD9JgqpDduL5bwZDx88zHGugr471I+GrfBs
+	 6k1SGBjPAthLeJeOhR07WuyA1/gH54Wdtqnm4o8XQUHSkBHaqwBOak76L8PAdBMDkE
+	 h+zv5cgLmR4JoP9hhu7XsI9VpW7+8Fi3mh8IIx6ztFVnX3+XJ+pjcu2XZvmhCWFMcr
+	 Kjq69+j/v0YTtz+Vrs+1vQFFJfWWHQ+PYqs1Q3V+moptGFRWDSOBFMj47YNjGe9cjG
+	 kSmt5SX72hO2dbV1sDhK99SSE3kUNg8IeI+gLL7qPh65KuXcgPliahY6zcoboJTvNv
+	 ZlmCLVGv1cSpA==
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b93718302beso616608966b.3
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 16:48:50 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU9A5lfvYvgFSSp9Zj4FsKp9s2t9hTEXvrZBGZZAYbG/OUhdSIB0FOQOYS36yWDxGl7gbg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxvc8PtwVTYh7XhcPKL1Zd0nXEROk3YFGoTWD9aIlmIQv4QvpYN
+	B0N1pQ6o4mYOYuJB9PhrsmbEQh02/XdOVuIjo0kpQsYA7EXPWTaw3+1zukeU2yp7VHfHcUecNvQ
+	c8x8KquPfHBxQqsZYJM+s37/9Er958DI=
+X-Received: by 2002:a17:906:ee86:b0:b83:e7e:3732 with SMTP id
+ a640c23a62f3a-b93f13f100cmr4213966b.30.1772585329458; Tue, 03 Mar 2026
+ 16:48:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260303-fix-mmio-test-v1-1-78b4a9e46a4e@fb.com>
-X-Rspamd-Queue-Id: 076381F8FCF
+References: <20260303003421.2185681-1-yosry@kernel.org> <20260303003421.2185681-4-yosry@kernel.org>
+ <aacOPmIS7HUtzJA6@google.com> <CAO9r8zMDQkHAMKVewDgvH6_WAHo5eL4=Xwf7h=87JPOJPYQAFQ@mail.gmail.com>
+ <aaeAYv2i7wjGahY4@google.com>
+In-Reply-To: <aaeAYv2i7wjGahY4@google.com>
+From: Yosry Ahmed <yosry@kernel.org>
+Date: Tue, 3 Mar 2026 16:48:37 -0800
+X-Gmail-Original-Message-ID: <CAO9r8zN8f1o7nRv7DKMt2d4p6ztR6jETGeX1XbMze=fUcYpZrQ@mail.gmail.com>
+X-Gm-Features: AaiRm510OOg5AYMSGYnGxcomlla2uxiUYaXv3s-lTkb0zvsn67wqnt6OxrmhX20
+Message-ID: <CAO9r8zN8f1o7nRv7DKMt2d4p6ztR6jETGeX1XbMze=fUcYpZrQ@mail.gmail.com>
+Subject: Re: [PATCH v7 03/26] KVM: SVM: Add missing save/restore handling of
+ LBR MSRs
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 4DC281F900B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-8.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-72633-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72632-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yaoyuan@linux.alibaba.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.alibaba.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,fb.com:email,alibaba.com:email]
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 11:46:24AM +0800, Alex Mastro wrote:
-> Remove the __iommu_unmap() call on a region that was never mapped.
-> When __iommu_map() fails (expected for MMIO vaddrs in non-VFIO
-> modes), the region is not added to the dma_regions list, leaving its
-> list_head zero-initialized. If the unmap ioctl returns success,
-> __iommu_unmap() calls list_del_init() on this zeroed node and crashes.
+> > There's so much repeated code here.
 >
-> This fixes the iommufd_compat_type1 and iommufd_compat_type1v2
-> test variants.
+> Ya :-(
 >
-> Fixes: 080723f4d4c3 ("vfio: selftests: Add vfio_dma_mapping_mmio_test")
-> Signed-off-by: Alex Mastro <amastro@fb.com>
-> ---
-> The bug was missed because the test was originally run against a kernel
-> without commit afb47765f923 ("iommufd: Make vfio_compat's unmap succeed
-> if the range is already empty"). Without that fix, the unmap ioctl
-> returned -ENOENT, taking the early return before list_del_init().
-> ---
->  tools/testing/selftests/vfio/vfio_dma_mapping_mmio_test.c | 1 -
->  1 file changed, 1 deletion(-)
+> > We can use gotos to share code, but I am not sure if that's a strict
+> > improvement. We can also use a helper, perhaps?
 >
-> diff --git a/tools/testing/selftests/vfio/vfio_dma_mapping_mmio_test.c b/tools/testing/selftests/vfio/vfio_dma_mapping_mmio_test.c
-> index 957a89ce7b3a..d7f25ef77671 100644
-> --- a/tools/testing/selftests/vfio/vfio_dma_mapping_mmio_test.c
-> +++ b/tools/testing/selftests/vfio/vfio_dma_mapping_mmio_test.c
-> @@ -100,7 +100,6 @@ static void do_mmio_map_test(struct iommu *iommu,
->  		iommu_unmap(iommu, &region);
->  	} else {
+>
+> Where's your sense of adventure?
+>
+>         case MSR_IA32_LASTBRANCHFROMIP:
+>         case MSR_IA32_LASTBRANCHTOIP:
+>         case MSR_IA32_LASTINTFROMIP:
+>         case MSR_IA32_LASTINTTOIP:
+>                 if (!lbrv)
+>                         return KVM_MSR_RET_UNSUPPORTED;
+>                 if (!msr->host_initiated)
+>                         return 1;
+>                 *(&svm->vmcb->save.br_from + (ecx - MSR_IA32_LASTBRANCHFROMIP)) = data;
+>                 vmcb_mark_dirty(svm->vmcb, VMCB_LBR);
+>                 break;
+>
+> Jokes aside, maybe this, to dedup get() at the same time?
 
-Hi Alex,
-
->  		VFIO_ASSERT_NE(__iommu_map(iommu, &region), 0);
-> -		VFIO_ASSERT_NE(__iommu_unmap(iommu, &region, NULL), 0);
-
-This is the more simply way to work w/ or w/o commit
-afb47765f923 ("iommufd: Make vfio_compat's unmap succeed if
-the range is already empty"), may worth to add this point
-into the commit message.
-
-For the changes:
-
-Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
-
->  	}
->  }
->
->
-> ---
-> base-commit: 96ca4caf9066f5ebd35b561a521af588a8eb0215
-> change-id: 20260303-fix-mmio-test-d3bd688105f3
->
-> Best regards,
-> --
-> Alex Mastro <amastro@fb.com>
->
+Looks good to me!
 
