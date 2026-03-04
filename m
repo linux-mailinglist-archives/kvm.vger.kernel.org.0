@@ -1,93 +1,97 @@
-Return-Path: <kvm+bounces-72699-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72700-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cPhZHztfqGmduAAAu9opvQ
-	(envelope-from <kvm+bounces-72699-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 17:35:07 +0100
+	id qKNfGC9iqGk3uQAAu9opvQ
+	(envelope-from <kvm+bounces-72700-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 17:47:43 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A81252045E4
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 17:35:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5656204903
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 17:47:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 491D2310968C
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 16:23:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D6BFF30A1E3A
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 16:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A003365A05;
-	Wed,  4 Mar 2026 16:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 054B336F41B;
+	Wed,  4 Mar 2026 16:42:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qttMyaJY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ewe1IPmo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC21134DCFD
-	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 16:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A57436D507
+	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 16:42:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772641416; cv=none; b=XdY0L1f4+ZeS10+BNsj0uD2rY1ADZwjq9MZHd2Nyllqpc+4G/hus1yUxObWTGawyPNyM0ZDDXqx2OXMsnIA/ouR3B5hYUnCY1QjlaJiFe5K8Nr7jf5Hrcq1T2YOk1l6UzUtoiuFwOqk9on2JXnJ0qvQTSuDiQ+BD+SSDaquQ8Rw=
+	t=1772642561; cv=none; b=dB4eWLaFAuKlen9rNu+X+usnRZqikZssLq8c+CtpZH+fvtHhUPgHStkvmYRIPMg7+wsWFSlsEKMOylPyikEnJZz2L+kbtBwZtGm/vKKYGGknBDx9d3FWFtk1R7MiKNl/0L7gzTBkhqwT/n3hGiPOSz4PbrbyeIX3u5gg1MBLvVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772641416; c=relaxed/simple;
-	bh=+59wknHGTRW+W9SSh+h7PF3GSLLzGVapIaIAou5Ber0=;
+	s=arc-20240116; t=1772642561; c=relaxed/simple;
+	bh=EXdvy/X2qckXmE4Fn4pxUupwjsevzcJ8qc5ZO33j78o=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IufNJeLMPRka7qaaIDkoS+Xl/NIwPcnM/USpnDeORbgBBM5e2NZ9gaHQrqu4j4++vB4rWFv7WEm++3QQI659h44DluRO1OAhXOthMC8cyL6lO4u54qF5LtJuhT0EXLl9C8edQPeh9TYqa5yTJF2KAJUOs/fnu46lsFDgK8Px1So=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qttMyaJY; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=VrPDE+TrAK4xgace3pU7k9P6Cw3G/0DA3EEg5txMvyRl1h5kuPG9MBqD0xTs/eM96iqT5nphPihuZmEQTRHpJR6WqW42WUc0qWZugBFcYAXuZj5CKYSzxWw31EBT+YXyhR/egyKvVTZmDWVCuYb6iSM4Mkxs0MdTzzuCyZA6lj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ewe1IPmo; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae57228f64so33020375ad.0
-        for <kvm@vger.kernel.org>; Wed, 04 Mar 2026 08:23:34 -0800 (PST)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c503d6be76fso28290860a12.0
+        for <kvm@vger.kernel.org>; Wed, 04 Mar 2026 08:42:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772641414; x=1773246214; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yrzSKo5+wXzomm7lL9SdcMFqNMmtfJshxUqsLyJWiLk=;
-        b=qttMyaJYEkbbGPVshz/281IVwU/9Xus572XoR7cZ/lJhVdLZwGGGo0qSNqOi7zd+kO
-         8dxI/FIHnMJYBd64NhGYhgGdTB2O7L0RhpejDVKzVeMyCou2bfPsuoZDKdZsQ+Dv/lVS
-         mLunqPQAYUupxi/U/PmgW5EowL9CQKCqarelt4pb2Aoche0PNojPzSaRVE0ZeeZFcK7K
-         uVa4u6OQF/hZMowLwsxmU3VBwL3Fk0xqP+Mat9Kgn1Dff5KvYA4gDwlHplL9GMM9gS0f
-         SS+QSWGs28kxsys8+SYuYOLO5rsricW3+MH7T8ovNGXhVmvy66/nyXOqFEEHhcIC9h3R
-         l0Nw==
+        d=google.com; s=20230601; t=1772642558; x=1773247358; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LKOTPS+x5qyyOBePt2E7Wo7x4Cp+H26djNH9mCsw8A8=;
+        b=ewe1IPmo8NfNn85vq3td323umUZgOzwxSyXxc4Q/SQhssL2JZLmy5JjnRDW1pkTZwM
+         nAX6uUGqkLDaqUt/M2mwLu8wN7ueKRZUHvI8cKe4Zr4tUWK3bu330U7x0S3dgGC9wsIE
+         E0CVNo5NZzeUXVmw6q8guWpM/2iicWNs8uwGHy2BvT5AHAaaoc+krL9wWwf2oJI2uGB4
+         xcUsCSJp+F1J1cynoBnGpwAyu7NogIYf/Ak2vutV0KFpR2RnRikKcFzzS3Ft0LM+EmHu
+         lcSgM1Fv8+aMOullztu8yVWrhn+4TWG+/AtcuBnevaQ8RieiQ9/dTz+JTNwXen4HJ+Bg
+         EIAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772641414; x=1773246214;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yrzSKo5+wXzomm7lL9SdcMFqNMmtfJshxUqsLyJWiLk=;
-        b=LzypLqBo65jdP+tHSncC2vw4oYlpgrDdBN0dBUCWYeY1IPmYDcm/o4FCdS4X9iOTYq
-         hCRZEC7pfKlNfrcbBDiqtAWcLeXPxePS9I/DucPqLTdGwuCOwwA/HMRyxH5dLcfjQ9yL
-         gsDV4PkelkrYTnBDMzPZgY3ndKP63mVA/wWou7Dq9lRSvJH8YRNqCEHdHkhV/emTDZWa
-         g0Zpi0wCRIrpNhZXQ6pehSTjr7dW1u25O9Se0HQkMV7roIVJGouJbzfJunIrNHxJjWo9
-         uChxn/NS9uis+wusU6Yz0rzFfoWh1W2BcoSlNUsm51ucxlmw6sQXmnOh8kY+LLnqk9XY
-         rC2w==
-X-Forwarded-Encrypted: i=1; AJvYcCX+vcoamhsrJo5ssaEYQ34JPsgP27QneP0yebxsmuq6Du/6Ki1NUpmPoZRzSyfnibcjJLg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwI6rQm9mitFm0QxqxKjKCr74uia7jwTckuU4Ouaxb3CWc2jRNr
-	cRNUS1gZksVwuAVR5DJmf6HhFEYDHXA2tC93RykWPFrnlPPnCP+D/5ywRCWk2NYpy3Uv0aqKkAX
-	/TAfbYw==
-X-Received: from play21.prod.google.com ([2002:a17:902:e195:b0:2ae:5075:50d4])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:b4f:b0:2ae:3b9b:db41
- with SMTP id d9443c01a7336-2ae6ab4305fmr29611105ad.38.1772641413940; Wed, 04
- Mar 2026 08:23:33 -0800 (PST)
-Date: Wed, 4 Mar 2026 08:23:32 -0800
-In-Reply-To: <8731e234-22b8-4ccf-89ef-63feed09e9c5@linux.intel.com>
+        d=1e100.net; s=20230601; t=1772642558; x=1773247358;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LKOTPS+x5qyyOBePt2E7Wo7x4Cp+H26djNH9mCsw8A8=;
+        b=gn3acaLMSap/GiWDqe3/32a50RYkBmX9epBfypZScU14sjl0jhgdVcTeHTLPu6J8Iz
+         zdDZj+szY1rhy4XPSWjMmevDTMprWT5k7TXylRwrdQv3CvRfS7+GhDo3SYvltusMYbCU
+         VPXLB7WXWf64Zi9/Rz/rRHWOasQpQ97j5lfc2oXRsa3S7Q4UQzkIeCEg9+AWao43upnP
+         6pP0GryGqfGbUVu/Kdljw53xz1B0mDce5LwTuteSQsvn/GxCo8uvhA+B6WojW5q6Jdvr
+         Cvi6ZeczOLaVAPl0wGXlAFUjYHMaWkiB0AFK+ZsgZxfx9Q9dwz8vtz6TBmpPhEROQUIE
+         ZFCg==
+X-Forwarded-Encrypted: i=1; AJvYcCUMteVKwAQBMipu/nNHFyikRVKlWdBG0bN4iH015y9TZFDBKFuCCD6Bd6Pwo+sX4M9dZ90=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzquBCZOpZUOGMiP0j+p0JVPNC3pdGFXfF8nkik9dQrMTHArQ2j
+	aCh90lru4yYwjfSfjDpBFu8lpeSKLCFE4U3E/zg+91tNLXrD6vuO6v0Hk8zAbWh8N2imA3i6sUH
+	GBHHJKQ==
+X-Received: from pggq20.prod.google.com ([2002:a63:d614:0:b0:c73:8741:7555])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:d703:b0:38e:90ca:5a2b
+ with SMTP id adf61e73a8af0-3982deb4e22mr2628840637.17.1772642557478; Wed, 04
+ Mar 2026 08:42:37 -0800 (PST)
+Date: Wed, 4 Mar 2026 08:42:36 -0800
+In-Reply-To: <A7B34157-A5CA-430C-A459-E8E142951ECB@zytor.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251026201911.505204-1-xin@zytor.com> <20251026201911.505204-8-xin@zytor.com>
- <8731e234-22b8-4ccf-89ef-63feed09e9c5@linux.intel.com>
-Message-ID: <aahchI7oiFrjFAmb@google.com>
-Subject: Re: [PATCH v9 07/22] KVM: VMX: Initialize VMCS FRED fields
+References: <20251026201911.505204-1-xin@zytor.com> <20251026201911.505204-13-xin@zytor.com>
+ <aR04V4VVg+p4RsdT@intel.com> <60C180BF-AD13-48EF-9BA8-CEACF57965EF@zytor.com>
+ <1EA97017-82D2-4C43-B617-D39C68D7BC6F@zytor.com> <A7B34157-A5CA-430C-A459-E8E142951ECB@zytor.com>
+Message-ID: <aahg_PgO5mwjArZ6@google.com>
+Subject: Re: [PATCH v9 12/22] KVM: VMX: Virtualize FRED event_data
 From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org, 
-	peterz@infradead.org, andrew.cooper3@citrix.com, chao.gao@intel.com, 
-	hch@infradead.org, sohil.mehta@intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Rspamd-Queue-Id: A81252045E4
+To: Xin Li <xin@zytor.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Chao Gao <chao.gao@intel.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-doc@vger.kernel.org, pbonzini@redhat.com, 
+	corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, luto@kernel.org, 
+	peterz@infradead.org, andrew.cooper3@citrix.com, hch@infradead.org, 
+	sohil.mehta@intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: C5656204903
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -98,13 +102,13 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72699-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72700-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	DKIM_TRACE(0.00)[google.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
@@ -115,62 +119,108 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,zytor.com:email]
 X-Rspamd-Action: no action
 
-On Wed, Jan 21, 2026, Binbin Wu wrote:
-> On 10/27/2025 4:18 AM, Xin Li (Intel) wrote:
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index fcfa99160018..c8b5359123bf 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -1459,6 +1459,15 @@ void vmx_vcpu_load_vmcs(struct kvm_vcpu *vcpu, int cpu)
-> >  				    (unsigned long)(cpu_entry_stack(cpu) + 1));
-> >  		}
-> >  
-> > +		/* Per-CPU FRED MSRs */
+On Thu, Jan 29, 2026, Xin Li wrote:
+> > On Jan 29, 2026, at 9:21=E2=80=AFAM, H. Peter Anvin <hpa@zytor.com> wro=
+te:
+> >=20
+> >> Just to confirm, you are referring to requeueing an original event
+> >> via vmx_complete_interrupts(), right?
+> >>=20
+> >> Regardless of whether FRED or IDT is in use, the event payload is deli=
+vered
+> >> into the appropriate guest state and then invalidated in
+> >> kvm_deliver_exception_payload():
+> >>=20
+> >>       1) CR2 for #PF
+> >>=20
+> >>       2) DR6 for #DB
+> >>=20
+> >>       3) guest_fpu.xfd_err for #NM (in handle_nm_fault_irqoff())
+> >>=20
+> >> We should be able to recover the FRED event data from there.
+> >>=20
+> >> Alternatively, we could drop the original event and allow the hardware=
+ to
+> >> regenerate it upon resuming the guest.  However, this breaks #DB deliv=
+ery,
+> >> as debug exceptions sometimes are triggered post-instruction.
+> >>=20
+> >> Sean, does it make sense to recover the FRED event data from guest CPU=
+ state?
 
-Meh, this is pretty self-explanatory code.
+No?  As Peter points out, the payload is tied to the exception and shouldn'=
+t
+change.
 
-> > +		if (kvm_cpu_cap_has(X86_FEATURE_FRED)) {
-> > +#ifdef CONFIG_X86_64
-> 
-> Nit:
-> 
-> Is this needed?
-> 
-> FRED is initialized by X86_64_F(), if CONFIG_X86_64 is not enabled, this
-> path is not reachable.
-> There should be no compilation issue without #ifdef CONFIG_X86_64 / #endif.
-> 
-> There are several similar patterns in this patch, using  #ifdef CONFIG_X86_64 / 
-> #endif or not seems not consistent. E.g. __vmx_vcpu_reset() and init_vmcs()
-> doesn't check the config, but here does.
-> 
-> > +			vmcs_write64(HOST_IA32_FRED_RSP1, __this_cpu_ist_top_va(ESTACK_DB));
-> > +			vmcs_write64(HOST_IA32_FRED_RSP2, __this_cpu_ist_top_va(ESTACK_NMI));
-> > +			vmcs_write64(HOST_IA32_FRED_RSP3, __this_cpu_ist_top_va(ESTACK_DF));
+> > I think some bits in DR6 are "sticky", and so unless the guest has
+> > explicitly cleared DR6 the event data isn't necessarily derivable from =
+DR6.
+> > However, the FRED event data for #DB is directly based on the data alre=
+ady
+> > reported by VTx (for exactly the same reason =E2=80=93 knowing what the=
+ *currently
+> > taken* trap represents.)
+>=20
+> Yeah, it's important to keep in mind that DR6 bits are 'sticky'.
+>=20
+> Regarding vmx_complete_interrupts(), when a VM migration occurs immediate=
+ly
+> following a VM exit with a valid original event saved in the VMCS, we can
+> safely assume the guest DR6 state remains consistent with the original ev=
+ent
+> data because there is no chance for guest OS to modify DR6.
 
-IMO, this is flawed for other reasons.  KVM shouldn't be relying on kernel
-implementation details with respect to what FRED stack handles what event.
+There's a different problem though.  If there's a re-injected exception at =
+the
+time of save/restore, the destination vCPU won't see a valid payload and th=
+us
+won't set the appropriate FRED VMCS fields.
 
-The simplest approach would be to read the actual MSR.  _If_ using a per-CPU read
-provides meaningful performance benefits over RDMSR (or RDMSR w/ immediate?  I
-don't see an API for that...), then have the kernel provide a dedicated accessor.
+We _could_ extend KVM's uAPI to save/restore event_data, but ugh.  Rather t=
+han
+add event_data, what if we reuse payload, and then simply skip updating reg=
+ister
+state on re-injection?  E.g.
 
-Then the accessor can be a non-inlined functions, and this code can be e.g.:
-
-	if (IS_ENABLED(CONFIG_X86_64) && kvm_cpu_cap_has(X86_FEATURE_FRED)) {
-		vmcs_write64(HOST_IA32_FRED_RSP1, fred_rsp(MSR_IA32_FRED_RSP1));
-		vmcs_write64(HOST_IA32_FRED_RSP2, fred_rsp(MSR_IA32_FRED_RSP2));
-		vmcs_write64(HOST_IA32_FRED_RSP3, fred_rsp(MSR_IA32_FRED_RSP2));
-	}
-
-where fred_rsp() is _declared_ unconditionally, but implemented only for 64-bit.
-That way the compiler will be happy, and the actual usage will be dropped before
-linking via dead-code elimination.
-
-Actually, we can probably do one better?
-
-	if (cpu_feature_enabled(X86_FEATURE_FRED) && kvm_cpu_cap_has(X86_FEATURE_FRED)) {
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 967b58a8ab9d..b79d545d69c7 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1941,6 +1941,9 @@ void vmx_inject_exception(struct kvm_vcpu *vcpu)
+        u32 intr_info =3D ex->vector | INTR_INFO_VALID_MASK;
+        struct vcpu_vmx *vmx =3D to_vmx(vcpu);
+=20
++       if (ex->has_payload)
++               <do fred>;
++
+        kvm_deliver_exception_payload(vcpu, ex);
+=20
+        if (ex->has_error_code) {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index db3f393192d9..485eec337203 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -773,6 +773,9 @@ void kvm_deliver_exception_payload(struct kvm_vcpu *vcp=
+u,
+        if (!ex->has_payload)
+                return;
+=20
++       if (ex->injected)
++               goto clear_payload;
++
+        switch (ex->vector) {
+        case DB_VECTOR:
+                /*
+@@ -814,6 +817,7 @@ void kvm_deliver_exception_payload(struct kvm_vcpu *vcp=
+u,
+                break;
+        }
+=20
++clear_payload:
+        ex->has_payload =3D false;
+        ex->payload =3D 0;
+ }
 
