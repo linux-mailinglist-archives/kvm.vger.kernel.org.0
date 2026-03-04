@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-72719-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72720-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uIxuM+95qGl0uwAAu9opvQ
-	(envelope-from <kvm+bounces-72719-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 19:29:03 +0100
+	id mP+MOqx6qGmHuwAAu9opvQ
+	(envelope-from <kvm+bounces-72720-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 19:32:12 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D160C206566
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 19:29:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EEF0206639
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 19:32:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 02B87304F03E
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 18:15:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 45EB730D77C3
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 18:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CECB3D3CEA;
-	Wed,  4 Mar 2026 18:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD0E3D524A;
+	Wed,  4 Mar 2026 18:15:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m4DHmWTr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TYe54S3z"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AAB3C6A43
-	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 18:15:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB6C1FCFFC
+	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 18:15:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772648105; cv=none; b=qHbbllqxwHeiQoJViQTGqn/jeEO29BhBEVpO+6TsD0Okrqta4GoG8ndIpMqB//BSMx8wbSPoqJQjg95Ixp9vuvjx5vjL2/kpAVZr2VhP8VTOKOdzYR2ji2m9xompiYRJlNRyjazO7x0HrYHicXyO4OuC+y2Nhz4A7pT6GzX/6Ik=
+	t=1772648111; cv=none; b=Q4/zqmHi46Rz7KzeZEvzYmznmSe3lWWzUSuME5FLSCwKzK+Bokq6Nncahmo1/fuJjYzS5jcxDdSFLFrlqcPbQpMI6enzNDXn2Ao9vH6pkUcz+aZeTNtbUVCjRiPQF1/MmoIIuFoxZqRrct2eI+5oL99cfHQcDMd6NoH3X/tALRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772648105; c=relaxed/simple;
-	bh=B0G4zOn0Aq8wL+6thBXZpp/WgAVLsoCHdMf7+BmI3vw=;
+	s=arc-20240116; t=1772648111; c=relaxed/simple;
+	bh=0GOre7qKpzWJwAVBuNWzorXCo0i/pxRSHUotXKbkydo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LJ9YvLbyMQA9rBlKXjFJEif777WvxC2d7TvJ8pcwuCB+k3rhVty+rTS/ZWtM2lftnMnGy6Qga4D70cKq+fpC4uyjkmWncQb6xDIOIWbTUt4iNrBqzGG/htiQk4teP9XlNTt66nCTVQK+cgK7VPeAWoMPotb8r5rRifCooW/uNv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m4DHmWTr; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=ryFo1IHr+mljLi2R71+JI5zu0czsfYT9LMkgxZMbkGCL7bDjU4UpwhPHEWAfI8ouCzz8+UJlhSf3Z7v0CUtv8BT8ymIOObl5J1REGyQlchaWV3Er897kBdMx24bAoOKkKZaihFbf0jFDcBAv1YyGPJS89cjmfieaRQuRyiEpB2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TYe54S3z; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772648105; x=1804184105;
+  t=1772648110; x=1804184110;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=B0G4zOn0Aq8wL+6thBXZpp/WgAVLsoCHdMf7+BmI3vw=;
-  b=m4DHmWTrjgdmXc0W4q1hpAtf6drO8l2ICBeDTUj3DHu4GT9iGaqEEkvR
-   pMf3ucd2vU8VE4OhMOUJxlq9y+/FweKdh8OIF2NdGqdMPU2131c8eX7+8
-   b/IRNE1f56G28qaIM5YN7VeIxXEntDmihpyb1XGQn9CQ04M7pdi4mmfat
-   UKbkJJ77evH/8v6S/Xq0ayA7NUYCMdy2TJI1qYpcVvyqIAY1ReWNo+mH6
-   U9Mxzc/mYWYJ6pW3WprvPwAsKLnfcQZFcgox54UD8eRyYshKDdK31cexg
-   o5BeRq7cupxfHUCIUon1F6MtKByw/MqoLGlB66uVU4WaBfttG13R5SiOc
-   A==;
-X-CSE-ConnectionGUID: GK02D+3BTBq2SEG39LDHdg==
-X-CSE-MsgGUID: JighCLEDTp+Uin3lG4HO4w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="73909270"
+  bh=0GOre7qKpzWJwAVBuNWzorXCo0i/pxRSHUotXKbkydo=;
+  b=TYe54S3zsvC8wm3x9N8D/iEvZaUNKQA1blN0hMOcDgt+sRpdZ2wlsZF5
+   OCGaI433bvbvn6LrTH2V0lpv0fYRlQpv6J1WbzGYs2CTZJKgzeS8onV2j
+   GN/3EPz83CbWXogzU9Wk8bZGCzgpiRZcOr0oAVfBL0hQ/aQ3nYLhkFhSv
+   eMmCzJ8CJOuMUoNrNjzxJa18/kL0v87vrJCzwcgaHyOckOrhcBN61v5dj
+   yCGj3XcJCM96tz+SE20SDAAt6oEJ7wk0D9pukFCICEsQRuHyFQnyvoymg
+   xkQnV5wrVQuwOaRfiGQ4uGQzSqmDVmVsGTm/bvF33/b3ZDpfGrM//jNvn
+   w==;
+X-CSE-ConnectionGUID: lajJN3APQ6qRPyOUaIjyqA==
+X-CSE-MsgGUID: MrDnS+UqSiGFxFEkcOpAuA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="73909294"
 X-IronPort-AV: E=Sophos;i="6.21,324,1763452800"; 
-   d="scan'208";a="73909270"
+   d="scan'208";a="73909294"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 10:15:05 -0800
-X-CSE-ConnectionGUID: p5I6NyclTCmZ4If9YJ49nQ==
-X-CSE-MsgGUID: festpwoYQguhSWKRf0ptYQ==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 10:15:10 -0800
+X-CSE-ConnectionGUID: M+LsFPKQQ4uhJhFnuLtQJQ==
+X-CSE-MsgGUID: h6EC6ouGTjeGI/QGea5xbQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,324,1763452800"; 
-   d="scan'208";a="214542769"
+   d="scan'208";a="214542788"
 Received: from 9cc2c43eec6b.jf.intel.com ([10.54.77.43])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 10:15:04 -0800
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 10:15:09 -0800
 From: Zide Chen <zide.chen@intel.com>
 To: qemu-devel@nongnu.org,
 	kvm@vger.kernel.org,
@@ -73,9 +73,9 @@ Cc: Xiaoyao Li <xiaoyao.li@intel.com>,
 	Dongli Zhang <dongli.zhang@oracle.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Zide Chen <zide.chen@intel.com>
-Subject: [PATCH V3 01/13] target/i386: Disable unsupported BTS for guest
-Date: Wed,  4 Mar 2026 10:07:00 -0800
-Message-ID: <20260304180713.360471-2-zide.chen@intel.com>
+Subject: [PATCH V3 02/13] target/i386: Don't save/restore PERF_GLOBAL_OVF_CTRL MSRs
+Date: Wed,  4 Mar 2026 10:07:01 -0800
+Message-ID: <20260304180713.360471-3-zide.chen@intel.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260304180713.360471-1-zide.chen@intel.com>
 References: <20260304180713.360471-1-zide.chen@intel.com>
@@ -86,20 +86,20 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: D160C206566
+X-Rspamd-Queue-Id: 4EEF0206639
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72719-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72720-lists,kvm=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -111,53 +111,130 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	DKIM_TRACE(0.00)[intel.com:+];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,amd.com:email,oracle.com:email]
 X-Rspamd-Action: no action
 
-BTS (Branch Trace Store), enumerated by IA32_MISC_ENABLE.BTS_UNAVAILABLE
-(bit 11), is deprecated and has been superseded by LBR and Intel PT.
+From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 
-KVM yields control of this bit to userspace since KVM commit
-9fc222967a39 ("KVM: x86: Give host userspace full control of
-MSR_IA32_MISC_ENABLES").
+MSR_CORE_PERF_GLOBAL_OVF_CTRL and MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR
+are write-only MSRs and reads always return zero.
 
-However, QEMU does not set this bit, which allows guests to write the
-BTS and BTINT bits in IA32_DEBUGCTL.  Since KVM doesn't support BTS,
-this may lead to unexpected MSR access errors.
+Saving and restoring these MSRs is therefore unnecessary.  Replace
+VMSTATE_UINT64 with VMSTATE_UNUSED in the VMStateDescription to ignore
+env.msr_global_ovf_ctrl during migration.  This avoids the need to bump
+version_id and does not introduce any migration incompatibility.
 
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+cc: Dongli Zhang <dongli.zhang@oracle.com>
+cc: Sandipan Das <sandipan.das@amd.com>
+Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Co-developed-by: Zide Chen <zide.chen@intel.com>
 Signed-off-by: Zide Chen <zide.chen@intel.com>
 ---
 V3:
-- Add two Reviewed-by.
-
-V2:
-- Address review comments.
-- Remove mention of VMState version_id from the commit message.
+- Remove MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR.
 ---
- target/i386/cpu.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ target/i386/cpu.h     |  3 ---
+ target/i386/kvm/kvm.c | 10 ----------
+ target/i386/machine.c |  4 ++--
+ 3 files changed, 2 insertions(+), 15 deletions(-)
 
 diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 9f222a0c9fe0..016fb1b30bbd 100644
+index 016fb1b30bbd..6d3e70395dbd 100644
 --- a/target/i386/cpu.h
 +++ b/target/i386/cpu.h
-@@ -474,8 +474,11 @@ typedef enum X86Seg {
+@@ -507,11 +507,9 @@ typedef enum X86Seg {
+ #define MSR_CORE_PERF_FIXED_CTR_CTRL    0x38d
+ #define MSR_CORE_PERF_GLOBAL_STATUS     0x38e
+ #define MSR_CORE_PERF_GLOBAL_CTRL       0x38f
+-#define MSR_CORE_PERF_GLOBAL_OVF_CTRL   0x390
  
- #define MSR_IA32_MISC_ENABLE            0x1a0
- /* Indicates good rep/movs microcode on some processors: */
--#define MSR_IA32_MISC_ENABLE_DEFAULT    1
-+#define MSR_IA32_MISC_ENABLE_FASTSTRING    (1ULL << 0)
-+#define MSR_IA32_MISC_ENABLE_BTS_UNAVAIL   (1ULL << 11)
- #define MSR_IA32_MISC_ENABLE_MWAIT      (1ULL << 18)
-+#define MSR_IA32_MISC_ENABLE_DEFAULT    (MSR_IA32_MISC_ENABLE_FASTSTRING     | \
-+                                         MSR_IA32_MISC_ENABLE_BTS_UNAVAIL)
+ #define MSR_AMD64_PERF_CNTR_GLOBAL_STATUS       0xc0000300
+ #define MSR_AMD64_PERF_CNTR_GLOBAL_CTL          0xc0000301
+-#define MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR   0xc0000302
  
- #define MSR_MTRRphysBase(reg)           (0x200 + 2 * (reg))
- #define MSR_MTRRphysMask(reg)           (0x200 + 2 * (reg) + 1)
+ #define MSR_K7_EVNTSEL0                 0xc0010000
+ #define MSR_K7_PERFCTR0                 0xc0010004
+@@ -2102,7 +2100,6 @@ typedef struct CPUArchState {
+     uint64_t msr_fixed_ctr_ctrl;
+     uint64_t msr_global_ctrl;
+     uint64_t msr_global_status;
+-    uint64_t msr_global_ovf_ctrl;
+     uint64_t msr_fixed_counters[MAX_FIXED_COUNTERS];
+     uint64_t msr_gp_counters[MAX_GP_COUNTERS];
+     uint64_t msr_gp_evtsel[MAX_GP_COUNTERS];
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 3b66ec8c42b2..1131c350d352 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -4207,8 +4207,6 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
+             if (pmu_version > 1) {
+                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS,
+                                   env->msr_global_status);
+-                kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL,
+-                                  env->msr_global_ovf_ctrl);
+ 
+                 /* Now start the PMU.  */
+                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL,
+@@ -4252,8 +4250,6 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
+             if (pmu_version > 1) {
+                 kvm_msr_entry_add(cpu, MSR_AMD64_PERF_CNTR_GLOBAL_STATUS,
+                                   env->msr_global_status);
+-                kvm_msr_entry_add(cpu, MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR,
+-                                  env->msr_global_ovf_ctrl);
+                 kvm_msr_entry_add(cpu, MSR_AMD64_PERF_CNTR_GLOBAL_CTL,
+                                   env->msr_global_ctrl);
+             }
+@@ -4769,7 +4765,6 @@ static int kvm_get_msrs(X86CPU *cpu)
+             kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
+             kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
+             kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS, 0);
+-            kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL, 0);
+         }
+         for (i = 0; i < num_pmu_fixed_counters; i++) {
+             kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i, 0);
+@@ -4812,7 +4807,6 @@ static int kvm_get_msrs(X86CPU *cpu)
+         if (pmu_version > 1) {
+             kvm_msr_entry_add(cpu, MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
+             kvm_msr_entry_add(cpu, MSR_AMD64_PERF_CNTR_GLOBAL_STATUS, 0);
+-            kvm_msr_entry_add(cpu, MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, 0);
+         }
+     }
+ 
+@@ -5135,10 +5129,6 @@ static int kvm_get_msrs(X86CPU *cpu)
+         case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS:
+             env->msr_global_status = msrs[i].data;
+             break;
+-        case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
+-        case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR:
+-            env->msr_global_ovf_ctrl = msrs[i].data;
+-            break;
+         case MSR_CORE_PERF_FIXED_CTR0 ... MSR_CORE_PERF_FIXED_CTR0 + MAX_FIXED_COUNTERS - 1:
+             env->msr_fixed_counters[index - MSR_CORE_PERF_FIXED_CTR0] = msrs[i].data;
+             break;
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index c9139612813b..1125c8a64ec5 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -666,7 +666,7 @@ static bool pmu_enable_needed(void *opaque)
+     int i;
+ 
+     if (env->msr_fixed_ctr_ctrl || env->msr_global_ctrl ||
+-        env->msr_global_status || env->msr_global_ovf_ctrl) {
++        env->msr_global_status) {
+         return true;
+     }
+     for (i = 0; i < MAX_FIXED_COUNTERS; i++) {
+@@ -692,7 +692,7 @@ static const VMStateDescription vmstate_msr_architectural_pmu = {
+         VMSTATE_UINT64(env.msr_fixed_ctr_ctrl, X86CPU),
+         VMSTATE_UINT64(env.msr_global_ctrl, X86CPU),
+         VMSTATE_UINT64(env.msr_global_status, X86CPU),
+-        VMSTATE_UINT64(env.msr_global_ovf_ctrl, X86CPU),
++        VMSTATE_UNUSED(sizeof(uint64_t)),
+         VMSTATE_UINT64_ARRAY(env.msr_fixed_counters, X86CPU, MAX_FIXED_COUNTERS),
+         VMSTATE_UINT64_ARRAY(env.msr_gp_counters, X86CPU, MAX_GP_COUNTERS),
+         VMSTATE_UINT64_ARRAY(env.msr_gp_evtsel, X86CPU, MAX_GP_COUNTERS),
 -- 
 2.53.0
 
