@@ -1,310 +1,182 @@
-Return-Path: <kvm+bounces-72674-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72675-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kGmSLZcOqGk8ngAAu9opvQ
-	(envelope-from <kvm+bounces-72674-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 11:51:03 +0100
+	id GHy7AAcTqGnUngAAu9opvQ
+	(envelope-from <kvm+bounces-72675-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 12:09:59 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B24D1FE8DB
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 11:51:02 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6190F1FEB51
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 12:09:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 30A573076B65
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 10:50:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 614B8306EC8A
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 11:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91ADD3A5E93;
-	Wed,  4 Mar 2026 10:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1DD03A451B;
+	Wed,  4 Mar 2026 11:08:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iyJtX6s5"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="wKVKucdm"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D5639EF37;
-	Wed,  4 Mar 2026 10:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772621430; cv=none; b=dv+y5RPipQrxCTIWulQ2kMo56eVlgS/PvtcAlTlYPF2gLIWRuHIND3fKcT73o0oKSmkO9GW0TnZrqjZ3NplbP0GYUXkyOlOU/Epqyen9Ca2RBybhP6Fux23RlZao0Az2bK476zfrXsCaS3PssazCLmBNgpcuTejQnIBdCuoqC2k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772621430; c=relaxed/simple;
-	bh=WiCOzsgPlo193jDtqXT2H5mukZhrn1N9GJxmlGUBen8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cos+CHhPamgOyB2+KZHiYbr4R4NzXZ32DJ7m2hVDz5Rt98s3h9nNGQNE6m2h4pb+CNwo3Mkvn9Ir7yfM0dGoFbXYAtZI1ej7Hxb3RbKcUApmmwyQ1z4+BeV2mRlLtiRQ+FvafeeLzcKdilg/HHP/ibXJWsTN+sGRStriHg7r570=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iyJtX6s5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E371C19423;
-	Wed,  4 Mar 2026 10:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772621430;
-	bh=WiCOzsgPlo193jDtqXT2H5mukZhrn1N9GJxmlGUBen8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iyJtX6s5qWtCR6yK2a+yyDKfwamoTRFTtzx8/U8YZrDVo71tvyzbYAihA51/6bKsr
-	 eXDpfAQTbbE9KI0g+swoK/M14moLcJU+nGtJ1OQIVofBYl+bU8PvfWH/sm0afMIDjz
-	 rz2ZVIABeeKXPZhwlGYkTcEc4x85SuXAfglQI6NVEo3xpdAfeNrdO42TmOC/lcNIot
-	 X/LrNRQSYxZ1Mcv1nTmPpyd1KSgMTD7WMzK2660YYOGhz9kY4P9nrAeqlaNjIXtl6f
-	 62MrKOeI+9h6B/HY3os/uZEfcvDfWyiP4Vz3GR5WHpWKNeu+1cVAeFW2+j9mKTAUop
-	 qZIuwdnDgBRPA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vxjoC-0000000G04O-1NAh;
-	Wed, 04 Mar 2026 10:50:28 +0000
-Date: Wed, 04 Mar 2026 10:50:27 +0000
-Message-ID: <86342f98cs.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>,
-	"jonathan.cameron@huawei.com"
-	<jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v5 17/36] KVM: arm64: gic-v5: Finalize GICv5 PPIs and generate mask
-In-Reply-To: <20260226155515.1164292-18-sascha.bischoff@arm.com>
-References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
-	<20260226155515.1164292-18-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18B1371D02
+	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 11:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772622523; cv=pass; b=U07HsrK/+IvvNR4n+TnzStNPfSObUMY2soI8moPP6yJSxPxC22TBAHYS9flx95b1ssjTtzNTJCIOX33JAQA87EzjRBnxIsNh/O0z8M5YKhtponI0Uf/hgzQGJUvW0x0AN/R+PhNSQHE3eSqYq5h2MGHa0zm4IHRKksJ7xZc++qc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772622523; c=relaxed/simple;
+	bh=yPFRCqSpC1utRemlhmSQ/DbqYMDSKyFMjd3b8amLWOE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iUoygX2vxFeun4JeJkgQrfeWhGP3EQ+uSCYb0NW3KUxt7knwyR0oAKCyM4kyjf3R1SVqTqdXromvnWvBhOw2FEM5KFh4e+jgXkzZwpAa79P2/kkt8udArnZIyzYv8/g854nJjSeumXGiEvV7zGAmQwCGS7pTo2dFexTdbWysNyc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=wKVKucdm; arc=pass smtp.client-ip=209.85.161.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-66e3100515dso3973858eaf.2
+        for <kvm@vger.kernel.org>; Wed, 04 Mar 2026 03:08:41 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772622521; cv=none;
+        d=google.com; s=arc-20240605;
+        b=SbEAiMCZqHI6dDsUF1qTrbmdLGilfMfgoswDDAbNDfpmx7BPpwmlF5jtQ/xCSy5+i0
+         3WBnC7ZBaUvhcbkhoW7oFpLxjdDvTjrlV12rIw2GbEyzNbto4Cz6dkU0dOCqXYHkoqpN
+         Cgak9gwNiaEMFttEBxO3w9aJUbxdbyG2u6aJGRofdD15alcIauzsY7ymtJvG6P+SrkkM
+         5BRdpbrYoV4ewSPgbshSOyIwVYjrocGqk6ZeXjataobVgKXnWaVOul6onk9fkA9OFnzP
+         RzT/+f6WIiedLQ2Ol5dUsyiEDXFn5/walUBLf9i6R4CgmW9r+P7R4uQONYVQFICCEtvw
+         SH5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=20V0HsiRCM8u2CycbPAhWN5bAO7CHOUhSKzXrUPLlhE=;
+        fh=Egwyma4Aa6Ajqf6t92DuIio1yeXsoBgKJNuqdR86xJc=;
+        b=Wbc6PIg4tbJAmc8ckCI18Wo9zlBzlKbsHV9eT9CTotKWp+irEXiSrAqUV4fELOP9pr
+         we1bkkIuxSJpNTE2gosOgLw/VDD0EiQBD6EVampFyyW2FeRiqekmW7XiTIUB8lKXHAYg
+         YWVwTdqCpEtMlfoCUVwCYkxJHJJidZHMhpq7R+Fopa+LaoUsSXDeW6mK60rL2hUhdO4q
+         C64iUT+MP4GAXajeqEyvi37ubVlz4YN+FAi66ZPyfZAC8sfjckf2soBGck8SCNGAnzmi
+         JdbY7TujqFz4qYU57FMf/+3ydABAJzBCTE+ID6KlwNlXcsX4yqnb3dghOV8TCd+eXKxl
+         A4fw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1772622521; x=1773227321; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=20V0HsiRCM8u2CycbPAhWN5bAO7CHOUhSKzXrUPLlhE=;
+        b=wKVKucdmuxp9OT8acexSvWMJO8/D69tFdlU5p4Q1qyZBalQf+zRMqqMeoAApW6Onw8
+         cfED1iH+kmPorVtvX+ZE/J/qUSPgtEA4O5KPTCnXjo8/Ht3IpfOoiF+8wmDXTr+Bxtrj
+         +1IUPbYwKwKEiumXyur2y/3Abeo2Zlryvx4Bg/azkQIpm/TkCpgcuw4pfiliBbeq+959
+         PVHY+oknbcg93FldGcj7LJGud/hm2jECsgRkuf4mU0/T+OPp3z7hCTBTgSzLjh7e5L7G
+         MS8qgLv8/9MUKQINo+Tvt0Uxuwc11r+D1YWOxqcUrdJEHn1TP8dcrR3Qj8Q9MPex9v5y
+         OGNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772622521; x=1773227321;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=20V0HsiRCM8u2CycbPAhWN5bAO7CHOUhSKzXrUPLlhE=;
+        b=fB5fnHgu949o8jAJH7kgtp0Hk8Pq8DSlIjT4iLBCgZvbUbRGEh1YVh0ifPeSwkoV5Q
+         ki7ycnlBp/RGFuAIFvyMiUkc9TLuxr9P1usROlfF8nLyOIU/ZDOIfnkwcMxsypdwBkDe
+         N28RBdJ7LRbkzun4h+S/5bl1T33HNYCtEvK5ZokYEupLQGOCUD2eMPZj7qbKBJvJ4fsg
+         gjxPHNB9sDcZMvrYCXCAIsaBWemsCwaehJ1U6a1ElNjsRvJ/umwqK1DbFY3/5rsRPYeZ
+         A4rq4F7lxYO2HTcEsuddLtFNuFpiYMK5QvEYdzFc1mVVW4XHs/hntlgEYwTDSJJaxmDH
+         fdow==
+X-Forwarded-Encrypted: i=1; AJvYcCX7ih0DVeZIdCZvsJfKDHmHATskiGfpRchd9UH1UFn/T0pfZTAozVoaxwN+YD/WntePeSM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykDI4wgD/GivDfSQ31PokNRdyb6bymxiP6F3GYk7cCbqADL4fN
+	MoMWvPndM4Aekf/jwSj7gb/kphjzZcpD5dI2v3yuaPwX6mx2QegvV494bREC4i6aNPb5Vd5sdyB
+	w/rAZuJJe3Eeqis4tSwMgCuPrpM/xenq5AzgsDHDtYA==
+X-Gm-Gg: ATEYQzxTyk/fTR30qcp89jVY5EWqtb8PhwC+n6RrMk4cF9LVM9tOhOg+lYe2Iu2XB/z
+	iHUtz5IAW/0yrE0h08VI8Hw24G0Cl79z0eQEMId0n3KJ6l+i9d50JGr2TIKAp0L+EYD1glD89Gp
+	qNMgofZuwpbKEKu/3/zbyrFPWTj1xkH24ZvG3WaP2x10cSBjafmcii2YvnyYyQE30NxO+dLm1EM
+	TUqNrnouIUSQJda2f9sxw7Ltj6lqcPL2K6DG4nvj3VR+Ao9WAZhE8ESUnEdIn8hBbHi39D1Tv/W
+	GjqwyCOKDp/7S3w/cgKgfx3l0XZiPHtvdb1+4BlnsWywQNtTKRXGTHLrxstovL7/TXcoNPCAQRR
+	kwYRy30EcYU9KeTv+2IoOEAPYQlg=
+X-Received: by 2002:a05:6820:f021:b0:679:a463:c933 with SMTP id
+ 006d021491bc7-67b1e932124mr914892eaf.71.1772622520701; Wed, 04 Mar 2026
+ 03:08:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Rspamd-Queue-Id: 3B24D1FE8DB
+MIME-Version: 1.0
+References: <20260303-kvm-riscv-spectre-v1-v2-0-192caab8e0dc@cispa.de>
+In-Reply-To: <20260303-kvm-riscv-spectre-v1-v2-0-192caab8e0dc@cispa.de>
+From: Anup Patel <anup@brainfault.org>
+Date: Wed, 4 Mar 2026 16:38:29 +0530
+X-Gm-Features: AaiRm50FApq9ik0ETo3HXP7rfW4o3U8qtmgzjhKd-QdWkzujkTa_K8xattka4x8
+Message-ID: <CAAhSdy0nkke8sJR-wV9nrzc=VqdY4igYu9c8g14qudbEeR=27g@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] KVM: riscv: Fix Spectre-v1 vulnerabilities in
+ register access
+To: Lukas Gerlach <lukas.gerlach@cispa.de>
+Cc: Atish Patra <atish.patra@linux.dev>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alex@ghiti.fr>, Andrew Jones <ajones@ventanamicro.com>, 
+	=?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <radim.krcmar@oss.qualcomm.com>, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Daniel Weber <daniel.weber@cispa.de>, Michael Schwarz <michael.schwarz@cispa.de>, 
+	Marton Bognar <marton.bognar@kuleuven.be>, Jo Van Bulck <jo.vanbulck@kuleuven.be>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 6190F1FEB51
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[brainfault-org.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72674-lists,kvm=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[brainfault.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-72675-lists,kvm=lfdr.de];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anup@brainfault.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[brainfault-org.20230601.gappssmtp.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,arm.com:email,huawei.com:email]
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid,cispa.de:email,brainfault-org.20230601.gappssmtp.com:dkim]
 X-Rspamd-Action: no action
 
-On Thu, 26 Feb 2026 15:59:48 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> 
-> We only want to expose a subset of the PPIs to a guest. If a PPI does
-> not have an owner, it is not being actively driven by a device. The
-> SW_PPI is a special case, as it is likely for userspace to wish to
-> inject that.
-> 
-> Therefore, just prior to running the guest for the first time, we need
-> to finalize the PPIs. A mask is generated which, when combined with
-> trapping a guest's PPI accesses, allows for the guest's view of the
-> PPI to be filtered. This mask is global to the VM as all VCPUs PPI
-> configurations must match.
-> 
-> In addition, the PPI HMR is calculated.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+On Tue, Mar 3, 2026 at 7:49=E2=80=AFPM Lukas Gerlach <lukas.gerlach@cispa.d=
+e> wrote:
+>
+> This series adds array_index_nospec() to RISC-V KVM to prevent
+> speculative out-of-bounds access to kernel memory.
+>
+> Similar fixes exist for x86 (ioapic, lapic, PMU) and arm64 (vgic).
+>
+> Signed-off-by: Lukas Gerlach <lukas.gerlach@cispa.de>
 > ---
->  arch/arm64/kvm/arm.c               |  4 +++
->  arch/arm64/kvm/vgic/vgic-v5.c      | 46 ++++++++++++++++++++++++++++++
->  include/kvm/arm_vgic.h             |  9 ++++++
->  include/linux/irqchip/arm-gic-v5.h | 17 +++++++++++
->  4 files changed, 76 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index eb2ca65dc7297..8290c5df0616e 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -935,6 +935,10 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
->  			return ret;
->  	}
->  
-> +	ret = vgic_v5_finalize_ppi_state(kvm);
-> +	if (ret)
-> +		return ret;
-> +
->  	if (is_protected_kvm_enabled()) {
->  		ret = pkvm_create_hyp_vm(kvm);
->  		if (ret)
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index f5cd9decfc26e..db2225aefb130 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -86,6 +86,52 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  	return 0;
->  }
->  
-> +int vgic_v5_finalize_ppi_state(struct kvm *kvm)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +
-> +	if (!vgic_is_v5(kvm))
-> +		return 0;
-> +
-> +	/* The PPI state for all VCPUs should be the same. Pick the first. */
-> +	vcpu = kvm_get_vcpu(kvm, 0);
-> +
-> +	vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_mask[0] = 0;
-> +	vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_mask[1] = 0;
-> +	vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_hmr[0] = 0;
-> +	vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_hmr[1] = 0;
+> Changes in v2:
+> Add array_index_nospec() to four additional sites in vcpu_pmu.c
+> (Radim Kr=C4=8Dm=C3=A1=C5=99)
+>
+> ---
+> Lukas Gerlach (4):
+>       KVM: riscv: Fix Spectre-v1 in ONE_REG register access
+>       KVM: riscv: Fix Spectre-v1 in AIA CSR access
+>       KVM: riscv: Fix Spectre-v1 in floating-point register access
+>       KVM: riscv: Fix Spectre-v1 in PMU counter access
+>
+>  arch/riscv/kvm/aia.c         | 11 +++++++++--
+>  arch/riscv/kvm/vcpu_fp.c     | 17 +++++++++++++----
+>  arch/riscv/kvm/vcpu_onereg.c | 36 ++++++++++++++++++++++++++++--------
+>  arch/riscv/kvm/vcpu_pmu.c    | 14 +++++++++++---
+>  4 files changed, 61 insertions(+), 17 deletions(-)
 
-vcpu->kvm == kvm. You don't need the indirection (same in most of the
-function).
-
-> +
-> +	for (int i = 0; i < VGIC_V5_NR_PRIVATE_IRQS; i++) {
-> +		int reg = i / 64;
-> +		u64 bit = BIT_ULL(i % 64);
-> +		struct vgic_irq *irq = &vcpu->arch.vgic_cpu.private_irqs[i];
-
-vgic_get_vcpu_irq()?
-
-> +
-> +		guard(raw_spinlock_irqsave)(&irq->irq_lock);
-> +
-> +		/*
-> +		 * We only expose PPIs with an owner or the SW_PPI to the
-> +		 * guest.
-> +		 */
-> +		if (!irq->owner &&
-> +		    FIELD_GET(GICV5_HWIRQ_ID, irq->intid) != GICV5_ARCH_PPI_SW_PPI)
-> +			continue;
-
-This sort of construct is rather cumbersome, and I see it replicated
-in quite a few places. How about introducing a couple of basic
-accessors:
-
-#define vgic_v5_get_hwirq_id(x) FIELD_GET(GICV5_HWIRQ_ID, (x))
-#define vgic_v5_set_hwirq_id(x) FIELD_PREP(GICV5_HWIRQ_ID, (x))
-
-which is a bit easier on the eye?
-
-> +
-> +		/*
-> +		 * If the PPI isn't implemented, we can't pass it through to a
-> +		 * guest anyhow.
-> +		 */
-> +		if (!(ppi_caps.impl_ppi_mask[reg] & bit))
-> +			continue;
-> +
-> +		vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_mask[reg] |= bit;
-> +
-> +		if (irq->config == VGIC_CONFIG_LEVEL)
-> +			vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_hmr[reg] |= bit;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  /*
->   * Sets/clears the corresponding bit in the ICH_PPI_DVIR register.
->   */
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index d828861f8298a..a4416afca5efc 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -32,6 +32,8 @@
->  #define VGIC_MIN_LPI		8192
->  #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
->  
-> +#define VGIC_V5_NR_PRIVATE_IRQS	128
-> +
->  #define is_v5_type(t, i)	(FIELD_GET(GICV5_HWIRQ_TYPE, (i)) == (t))
->  
->  #define __irq_is_sgi(t, i)						\
-> @@ -381,6 +383,11 @@ struct vgic_dist {
->  	 * else.
->  	 */
->  	struct its_vm		its_vm;
-> +
-> +	/*
-> +	 * GICv5 per-VM data.
-> +	 */
-> +	struct gicv5_vm		gicv5_vm;
-
-Depending how this grows, we may have to move that as part of a union
-with the previous member (which is obviously v4 specific).
-
->  };
->  
->  struct vgic_v2_cpu_if {
-> @@ -567,6 +574,8 @@ int vgic_v4_load(struct kvm_vcpu *vcpu);
->  void vgic_v4_commit(struct kvm_vcpu *vcpu);
->  int vgic_v4_put(struct kvm_vcpu *vcpu);
->  
-> +int vgic_v5_finalize_ppi_state(struct kvm *kvm);
-> +
->  bool vgic_state_is_nested(struct kvm_vcpu *vcpu);
->  
->  /* CPU HP callbacks */
-> diff --git a/include/linux/irqchip/arm-gic-v5.h b/include/linux/irqchip/arm-gic-v5.h
-> index 3e838a3058861..30a1b656daa35 100644
-> --- a/include/linux/irqchip/arm-gic-v5.h
-> +++ b/include/linux/irqchip/arm-gic-v5.h
-> @@ -380,6 +380,23 @@ struct gicv5_vpe {
->  	bool			resident;
->  };
->  
-> +struct gicv5_vm {
-> +	/*
-> +	 * We only expose a subset of PPIs to the guest. This subset
-> +	 * is a combination of the PPIs that are actually implemented
-> +	 * and what we actually choose to expose.
-> +	 */
-> +	u64			vgic_ppi_mask[2];
-> +
-> +	/*
-> +	 * The HMR itself is handled by the hardware, but we still need to have
-> +	 * a mask that we can use when merging in pending state (only the state
-> +	 * of Edge PPIs is merged back in from the guest an the HMR provides a
-> +	 * convenient way to do that).
-> +	 */
-> +	u64			vgic_ppi_hmr[2];
-> +};
-> +
->  struct gicv5_its_devtab_cfg {
->  	union {
->  		struct {
+Queued these patches as fixes for Linux-7.0-rcX
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Anup
 
