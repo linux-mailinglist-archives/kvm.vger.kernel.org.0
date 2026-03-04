@@ -1,530 +1,269 @@
-Return-Path: <kvm+bounces-72704-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72705-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YGb3GWxlqGl3uQAAu9opvQ
-	(envelope-from <kvm+bounces-72704-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 18:01:32 +0100
+	id WJW8AA1pqGl3uQAAu9opvQ
+	(envelope-from <kvm+bounces-72705-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 18:17:01 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 934D9204C35
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 18:01:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4358E205026
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 18:16:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 27CD33053747
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 16:58:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CA2B931314DF
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 17:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2062A36AB46;
-	Wed,  4 Mar 2026 16:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A91AA37AA7F;
+	Wed,  4 Mar 2026 17:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LE39/pb7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MlvDXOBM"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E0C4279DAF;
-	Wed,  4 Mar 2026 16:58:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE12637A498
+	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 17:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772643511; cv=none; b=aG8+B3Ro6iTmLrVwFpuchFAVw2yJtjGLb5m3ygCU4fdQggOYw4Sy3XpdTrHoS5O0UtpdEbwyV857FksRk452y+5Y78OFstFcjt6Re7HHJa3XCOKHdcFgPHtIITMYEv1oR8JoQpxxzfu6SodUrT1Jlbbg8ASPBhIbjxo4YkPOg7M=
+	t=1772644316; cv=none; b=UqKmXmmFfwKcmYCKmTqIrioXUTYpol4zlMiPToDynA2wjKqylsCbsIrJcDnjr5Fv3PGMVfJ1Bxu7NrbPoIrbJscZ6T4+hj3V+oTlbavzEEExbJAWclS18eOS7u150Y5EGu83m1xbQuvCm0oodYfUS9lIQZZ40KrdBNXshS5CeUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772643511; c=relaxed/simple;
-	bh=gt8PqqovFf1xLv4Q1zVMfYqYqUK+EQak4A80Hc02NSI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BXofiCfEx4for4Nwu7jUrOtUjVL8Vx3vGbLrI9Xvsw+F74fJ0k0f1ZMWi0VGnHpv5RzyHtLWuQftOUoy7RoAT1olTaL2FMyk0J63RpbSHhBV6y1UIp2E1/Dgk+7F84c2atTS4i5Do1tgvUKyoqQTGccMxx0Mp0u9b43yVeFrhDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LE39/pb7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 506DAC2BC87;
-	Wed,  4 Mar 2026 16:58:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772643510;
-	bh=gt8PqqovFf1xLv4Q1zVMfYqYqUK+EQak4A80Hc02NSI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LE39/pb7RAXXwTk/mO6o0YD6l/cJEy06Z7h9wmDYPF0vzF96PCX1vxT/dVeD0yVen
-	 flpPxEgM8VbsEJseiAcr5h93ppXp+39Rm3wfGgoW96u812DuLAcCDud9UGBiKa9UGV
-	 GMKh+UPgO4HVRyZOefc10YdzRFG4R6yY/DtZdVbD2mffN0kB2flzFUfyFdGmG/dRcC
-	 YjRBJ2pD24GGvbkaGYriHDmS5BjdlgV51L3irEmEiLhB19/ssE6lg7LRIbF+QIPrru
-	 uzPgIRDr2PNuSWqrRpXSKUmqvPPeL0RBbYudyrtxV7IxIJjPex2gHSaJOGpEH527vv
-	 W+suMeggt8Bqw==
-Date: Wed, 4 Mar 2026 16:58:27 +0000
-From: "Lorenzo Stoakes (Oracle)" <ljs@kernel.org>
-To: Suren Baghdasaryan <surenb@google.com>
-Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-	akpm@linux-foundation.org, willy@infradead.org, david@kernel.org, ziy@nvidia.com, 
-	matthew.brost@intel.com, joshua.hahnjy@gmail.com, rakie.kim@sk.com, byungchul@sk.com, 
-	gourry@gourry.net, ying.huang@linux.alibaba.com, apopple@nvidia.com, 
-	baolin.wang@linux.alibaba.com, Liam.Howlett@oracle.com, npache@redhat.com, ryan.roberts@arm.com, 
-	dev.jain@arm.com, baohua@kernel.org, lance.yang@linux.dev, vbabka@suse.cz, 
-	jannh@google.com, rppt@kernel.org, mhocko@suse.com, pfalcato@suse.de, 
-	kees@kernel.org, maddy@linux.ibm.com, npiggin@gmail.com, mpe@ellerman.id.au, 
-	chleroy@kernel.org, borntraeger@linux.ibm.com, frankja@linux.ibm.com, 
-	imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com, 
-	svens@linux.ibm.com, gerald.schaefer@linux.ibm.com, linux-mm@kvack.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3 3/3] mm: use vma_start_write_killable() in
- process_vma_walk_lock()
-Message-ID: <50987b7f-39ec-479d-9700-317cb0b95e6e@lucifer.local>
-References: <20260226070609.3072570-1-surenb@google.com>
- <20260226070609.3072570-4-surenb@google.com>
- <72ff2fc0-07fe-4964-9a1e-eccf8c7ed6a7@lucifer.local>
- <CAJuCfpG_bekxrHd49qyUBR2K7V8o7DrOvc-ZR7M8dAC-Hyp5ng@mail.gmail.com>
+	s=arc-20240116; t=1772644316; c=relaxed/simple;
+	bh=/cr+TZvz4nMQXK3VhxoBpQPSuiKI1gHj3FHUS+VETN8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kRfyfjCt4pVMI8j+4GHyBBTO4T8zyPGE8x7iWQOdDyVzJMC9sSTvNiCA4m8dbmpy1xLejwi2iW2gp+wjJn4recx0pKWviNYsP63cRb2jTBuXFVpB5hAHkl22yUHQOSvU8jwKiep0LBAIn8dmxRzb9yOIEEH4veF6w0Dei6lunrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MlvDXOBM; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae65d5cc57so77974395ad.2
+        for <kvm@vger.kernel.org>; Wed, 04 Mar 2026 09:11:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772644315; x=1773249115; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EHQlqz3/R8SNWRfWXbHO7qOOJnbiFSL7FXZONNoHgbA=;
+        b=MlvDXOBML3wAsjevd8OsLJqwuODYbdI6QPKdaYVV53gy9lrpfZH5xjr0PkL3TUIeW4
+         1W1EohqJtWh+Pg6Z1LVQiyxdOZvOWENZrKbQhAdfiz8hKSyAWAMn6pjaBvCuS/PGCAK4
+         fWSY/bGoz/VxbKHvd/WU1J6ZI2iaDnSDCl+Nm16Slan4or8Fu9Nmjc2uFn1TN6WLT+D7
+         XxuyDBhMugQtv/irKKGHJC8lxj2OhYg3RpkM0FeVyNSikShaEimhL+J1G63ngTsIrWuD
+         mjnUcjdKlKRsPIbX56oGs2iICGHrbU16dgx6IE2btNp6XSHcPomqRXYhEP6R6+QP6ajb
+         ru3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772644315; x=1773249115;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EHQlqz3/R8SNWRfWXbHO7qOOJnbiFSL7FXZONNoHgbA=;
+        b=upoySHMFUe8hockmmYPpp/xNvJRwbXGAdQuDSiEzBq9oDH6gi+6dzwZWmuFbA2lsOF
+         kt0b/y/9QE0pJUMYdEjmuV5rMYe/NVuWlMxnC4pNtiw4S2RqRwSIi+9+F1NKe5dlt3zO
+         SLJ0jpz73fiC6/LJnx6l6irf3WOr8NeIGKO7PkjAUX4hF3zcEJdz6NzdiEyyt5rf1VXc
+         ASZK6aSmOakHd/BKng8o99fPmVH7JR4ZGdKaBzYthVYJ2szl80WDd19Qz333Um23c6S4
+         qQ9yQv7JkpF1/UJ8dNvChsE2SgoJLkqvTVTd/Ys+idrvgqSm+fBQ+0BY6PRd4nGNL2zr
+         rLOg==
+X-Forwarded-Encrypted: i=1; AJvYcCVsNvZOOBtQULhY6bRMic+0Cr4qOFCpGOocGoKF+XaAQURVm5cd1EbE32lGRuSK8LoTBFc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVimqHlL1RopQhHojpnqhSspbSA/pWv7JxYRj3jgyDuEH9fe27
+	qg6WrMZ0HGTZf4wnWd1N55eU7UMD68btx7aFK4MLTTcHAraP3dbTVxpM6c6JScn7fYiKnR97rFO
+	uyNtDAg==
+X-Received: from plov20.prod.google.com ([2002:a17:902:8d94:b0:2ab:3ae7:5481])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cecf:b0:2ae:5a76:e26c
+ with SMTP id d9443c01a7336-2ae6ab67292mr24664785ad.55.1772644314855; Wed, 04
+ Mar 2026 09:11:54 -0800 (PST)
+Date: Wed, 4 Mar 2026 09:11:53 -0800
+In-Reply-To: <20260224005500.1471972-9-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJuCfpG_bekxrHd49qyUBR2K7V8o7DrOvc-ZR7M8dAC-Hyp5ng@mail.gmail.com>
-X-Rspamd-Queue-Id: 934D9204C35
+Mime-Version: 1.0
+References: <20260224005500.1471972-1-jmattson@google.com> <20260224005500.1471972-9-jmattson@google.com>
+Message-ID: <aahn2ZfDAJTj-Afn@google.com>
+Subject: Re: [PATCH v5 08/10] KVM: x86: nSVM: Save/restore gPAT with KVM_{GET,SET}_NESTED_STATE
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Yosry Ahmed <yosry@kernel.org>, Yosry Ahmed <yosry.ahmed@linux.dev>
+Content-Type: text/plain; charset="us-ascii"
+X-Rspamd-Queue-Id: 4358E205026
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-72705-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72704-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[oracle.com,linux-foundation.org,infradead.org,kernel.org,nvidia.com,intel.com,gmail.com,sk.com,gourry.net,linux.alibaba.com,redhat.com,arm.com,linux.dev,suse.cz,google.com,suse.com,suse.de,linux.ibm.com,ellerman.id.au,kvack.org,lists.ozlabs.org,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[43];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ljs@kernel.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[kvm];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[google.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,lucifer.local:mid,oracle.com:email]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, Mar 03, 2026 at 03:59:17PM -0800, Suren Baghdasaryan wrote:
-> On Mon, Mar 2, 2026 at 7:25 AM Lorenzo Stoakes
-> <lorenzo.stoakes@oracle.com> wrote:
-> >
-> > On Wed, Feb 25, 2026 at 11:06:09PM -0800, Suren Baghdasaryan wrote:
-> > > Replace vma_start_write() with vma_start_write_killable() when
-> > > process_vma_walk_lock() is used with PGWALK_WRLOCK option.
-> > > Adjust its direct and indirect users to check for a possible error
-> > > and handle it. Ensure users handle EINTR correctly and do not ignore
-> > > it.
-> > >
-> > > Signed-off-by: Suren Baghdasaryan <surenb@google.com>
-> >
-> > Have raised concerns below but also this feels like you're trying to do a bit
-> > too much in one patch here, probably worth splitting out based on the different
-> > parts you changed.
-> >
-> > > ---
-> > >  arch/s390/kvm/kvm-s390.c |  2 +-
-> > >  fs/proc/task_mmu.c       |  5 ++++-
-> > >  mm/mempolicy.c           | 14 +++++++++++---
-> > >  mm/pagewalk.c            | 20 ++++++++++++++------
-> > >  mm/vma.c                 | 22 ++++++++++++++--------
-> > >  mm/vma.h                 |  6 ++++++
-> > >  6 files changed, 50 insertions(+), 19 deletions(-)
-> > >
-> > > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> > > index 7a175d86cef0..337e4f7db63a 100644
-> > > --- a/arch/s390/kvm/kvm-s390.c
-> > > +++ b/arch/s390/kvm/kvm-s390.c
-> > > @@ -2948,7 +2948,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
-> > >               }
-> > >               /* must be called without kvm->lock */
-> > >               r = kvm_s390_handle_pv(kvm, &args);
-> > > -             if (copy_to_user(argp, &args, sizeof(args))) {
-> > > +             if (r != -EINTR && copy_to_user(argp, &args, sizeof(args))) {
-> >
-> > This is horribly ugly, and if we were already filtering any other instance of
-> > -EINTR (if they're even possible from copy_to_user()) why is -EINTR being
-> > treated in a special way?
-> >
-> > I honestly _hate_ this if (errcode != -EINTR) { ... } pattern in general, I'd
-> > really rather we didn't.
-> >
-> > It's going to bitrot and people are going to assume it's for some _very good
-> > reason_ and nobody will understand why it's getting special treatment...
-> >
-> > Surely a fatal signal would have previously resulted in -EFAULT before which is
-> > a similar situation so most consistent would be to keep filtering no?
->
-> Current code ignores any error coming from kvm_s390_handle_pv() and
-> proceeds with copy_to_user(), possibly overriding the former error. I
-> don't really know if this is an oversight or an intentional behavior,
-> so I wanted to minimize possible side effects. I guess I should try to
-> fix it properly (or learn why this was done this way). I'll post a
-> separate patch to error out immediately if kvm_s390_handle_pv() fails
-> and will ask s390 experts for review.
+On Mon, Feb 23, 2026, Jim Mattson wrote:
+> Add a 'flags' field to the SVM nested state header, and use bit 0 of the
+> flags to indicate that gPAT is stored in the nested state.
+> 
+> If in guest mode with NPT enabled, store the current vmcb->save.g_pat value
+> into the header of the nested state, and set the flag.
+> 
+> Note that struct kvm_svm_nested_state_hdr is included in a union padded to
+> 120 bytes, so there is room to add the flags field and the gpat field
+> without changing any offsets.
+> 
+> Fixes: cc440cdad5b7 ("KVM: nSVM: implement KVM_GET_NESTED_STATE and KVM_SET_NESTED_STATE")
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Reviewed-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> ---
+>  arch/x86/include/uapi/asm/kvm.h |  5 +++++
+>  arch/x86/kvm/svm/nested.c       | 17 +++++++++++++++++
+>  2 files changed, 22 insertions(+)
+> 
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index 846a63215ce1..664d04d1db3f 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -495,6 +495,8 @@ struct kvm_sync_regs {
+>  
+>  #define KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE	0x00000001
+>  
+> +#define KVM_STATE_SVM_VALID_GPAT	0x00000001
+> +
+>  /* vendor-independent attributes for system fd (group 0) */
+>  #define KVM_X86_GRP_SYSTEM		0
+>  #  define KVM_X86_XCOMP_GUEST_SUPP	0
+> @@ -531,6 +533,9 @@ struct kvm_svm_nested_state_data {
+>  
+>  struct kvm_svm_nested_state_hdr {
+>  	__u64 vmcb_pa;
+> +	__u32 flags;
+> +	__u32 reserved;
+> +	__u64 gpat;
+>  };
+>  
+>  /* for KVM_CAP_NESTED_STATE */
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index 26f758e294ab..5a35277f2364 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -1893,6 +1893,10 @@ static int svm_get_nested_state(struct kvm_vcpu *vcpu,
+>  	/* First fill in the header and copy it out.  */
+>  	if (is_guest_mode(vcpu)) {
+>  		kvm_state.hdr.svm.vmcb_pa = svm->nested.vmcb12_gpa;
+> +		if (nested_npt_enabled(svm)) {
+> +			kvm_state.hdr.svm.flags |= KVM_STATE_SVM_VALID_GPAT;
 
-Thanks!
+Bugger.  This isn't going to work.  KVM doesn't reserve any bytes in the header
+for SVM, so there's no guarantee/requirement that old userspace won't provide
+garbage.  The flag needs to go in kvm_nested_state.flags.  We only reserved space
+for 16 flags between VMX and SVM, but that's a future problem as we can always
+add e.g. KVM_STATE_NESTED_EXT_FLAGS when we've exausted the current space.
 
->
-> >
-> > >                       r = -EFAULT;
-> > >                       break;
-> > >               }
-> > > diff --git a/fs/proc/task_mmu.c b/fs/proc/task_mmu.c
-> > > index e091931d7ca1..1238a2988eb6 100644
-> > > --- a/fs/proc/task_mmu.c
-> > > +++ b/fs/proc/task_mmu.c
-> > > @@ -1797,6 +1797,7 @@ static ssize_t clear_refs_write(struct file *file, const char __user *buf,
-> > >               struct clear_refs_private cp = {
-> > >                       .type = type,
-> > >               };
-> > > +             int err;
-> > >
-> > >               if (mmap_write_lock_killable(mm)) {
-> > >                       count = -EINTR;
-> > > @@ -1824,7 +1825,9 @@ static ssize_t clear_refs_write(struct file *file, const char __user *buf,
-> > >                                               0, mm, 0, -1UL);
-> > >                       mmu_notifier_invalidate_range_start(&range);
-> > >               }
-> > > -             walk_page_range(mm, 0, -1, &clear_refs_walk_ops, &cp);
-> > > +             err = walk_page_range(mm, 0, -1, &clear_refs_walk_ops, &cp);
-> > > +             if (err < 0)
-> >
-> > Again with this < 0 :) let's be consistent, if (err).
->
-> Ack.
+Ugh.  And vmx_set_nested_state() doesn't check for unsupported flags, at all.
+But that too is largely a future problem though, i.e. is a non-issue until nVMX
+wants to add a new flag.  *sigh*
 
-Thanks!
+Anyways, for gPAT, unless I'm missing something, I'm going to squash this:
 
->
-> >
-> > > +                     count = err;
-> > >               if (type == CLEAR_REFS_SOFT_DIRTY) {
-> > >                       mmu_notifier_invalidate_range_end(&range);
-> > >                       flush_tlb_mm(mm);
-> > > diff --git a/mm/mempolicy.c b/mm/mempolicy.c
-> > > index 90939f5bde02..3c8b3dfc9c56 100644
-> > > --- a/mm/mempolicy.c
-> > > +++ b/mm/mempolicy.c
-> > > @@ -988,6 +988,8 @@ queue_pages_range(struct mm_struct *mm, unsigned long start, unsigned long end,
-> > >                       &queue_pages_lock_vma_walk_ops : &queue_pages_walk_ops;
-> >
-> > There's a comment above:
-> >
-> >  * queue_pages_range() may return:
-> >  * 0 - all pages already on the right node, or successfully queued for moving
-> >  *     (or neither strict checking nor moving requested: only range checking).
-> >  * >0 - this number of misplaced folios could not be queued for moving
-> >  *      (a hugetlbfs page or a transparent huge page being counted as 1).
-> >  * -EIO - a misplaced page found, when MPOL_MF_STRICT specified without MOVEs.
-> >  * -EFAULT - a hole in the memory range, when MPOL_MF_DISCONTIG_OK unspecified.
-> >  */
-> >
-> > You should add the -EINTR to it.
->
-> Ack.
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 664d04d1db3f..0c1f97c9a2d8 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -485,6 +485,7 @@ struct kvm_sync_regs {
+ #define KVM_STATE_NESTED_EVMCS         0x00000004
+ #define KVM_STATE_NESTED_MTF_PENDING   0x00000008
+ #define KVM_STATE_NESTED_GIF_SET       0x00000100
++#define KVM_STATE_NESTED_GPAT_VALID    0x00000200
+ 
+ #define KVM_STATE_NESTED_SMM_GUEST_MODE        0x00000001
+ #define KVM_STATE_NESTED_SMM_VMXON     0x00000002
+@@ -495,8 +496,6 @@ struct kvm_sync_regs {
+ 
+ #define KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE        0x00000001
+ 
+-#define KVM_STATE_SVM_VALID_GPAT       0x00000001
+-
+ /* vendor-independent attributes for system fd (group 0) */
+ #define KVM_X86_GRP_SYSTEM             0
+ #  define KVM_X86_XCOMP_GUEST_SUPP     0
+@@ -533,8 +532,6 @@ struct kvm_svm_nested_state_data {
+ 
+ struct kvm_svm_nested_state_hdr {
+        __u64 vmcb_pa;
+-       __u32 flags;
+-       __u32 reserved;
+        __u64 gpat;
+ };
+ 
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 991ee4c03363..099bf8ac10ee 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -1848,7 +1848,7 @@ static int svm_get_nested_state(struct kvm_vcpu *vcpu,
+        if (is_guest_mode(vcpu)) {
+                kvm_state.hdr.svm.vmcb_pa = svm->nested.vmcb12_gpa;
+                if (nested_npt_enabled(svm)) {
+-                       kvm_state.hdr.svm.flags |= KVM_STATE_SVM_VALID_GPAT;
++                       kvm_state->flags |= KVM_STATE_NESTED_GPAT_VALID;
+                        kvm_state.hdr.svm.gpat = svm->vmcb->save.g_pat;
+                }
+                kvm_state.size += KVM_STATE_NESTED_SVM_VMCB_SIZE;
+@@ -1914,7 +1914,8 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 
+        if (kvm_state->flags & ~(KVM_STATE_NESTED_GUEST_MODE |
+                                 KVM_STATE_NESTED_RUN_PENDING |
+-                                KVM_STATE_NESTED_GIF_SET))
++                                KVM_STATE_NESTED_GIF_SET |
++                                KVM_STATE_NESTED_GPAT_VALID))
+                return -EINVAL;
+ 
+        /*
+@@ -1984,7 +1985,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+         * vmcb_save_area_cached validation above, because gPAT is L2
+         * state, but the vmcb_save_area_cached is populated with L1 state.
+         */
+-       if ((kvm_state->hdr.svm.flags & KVM_STATE_SVM_VALID_GPAT) &&
++       if ((kvm_state->flags & KVM_STATE_NESTED_GPAT_VALID) &&
+            !kvm_pat_valid(kvm_state->hdr.svm.gpat))
+                goto out_free;
+ 
+@@ -2013,7 +2014,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+        svm_switch_vmcb(svm, &svm->nested.vmcb02);
+ 
+        if (nested_npt_enabled(svm)) {
+-               if (kvm_state->hdr.svm.flags & KVM_STATE_SVM_VALID_GPAT)
++               if (kvm_state->flags & KVM_STATE_NESTED_GPAT_VALID)
+                        vmcb_set_gpat(svm->vmcb, kvm_state->hdr.svm.gpat);
+        }
+--
 
-Thanks!
+One could argue we should even be more paranoid and do this as well:
 
->
-> >
-> > >
-> > >       err = walk_page_range(mm, start, end, ops, &qp);
-> > > +     if (err == -EINTR)
-> > > +             return err;
-> >
-> > Again, you're special casing without really any justification here. Let's please
-> > not special case -EINTR unless you have a _really good_ reason to.
-> >
-> > And also - if we fail to walk the page range because we couldn't get a VMA write
-> > lock, that's ok. The walk failed. There's nothing to unlock, because we didn't
-> > even get the write lock in the first place, so there's no broken state, it's as
-> > if we failed at some other point right?
-> >
-> > So I don't see why we're special casing this _at all_.
->
-> I want to avoid possible -EINTR code override with -EFAULT in the code below.
-> walk_page_range() can return -EINVAL and any other error that
-> ops->pte_hole or ops->test_walk might return. We might be fine
-> treating all of them as -EFAULT but masking -EINTR seems wrong to me.
-> I don't really know a better way to deal with this but if you have a
-> good alternative I would really appreciate it.
+	if (!(kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE)) {
+		if (kvm_state->flags & KVM_STATE_NESTED_GPAT_VALID)
+			return -EINVAL:
 
-As per Matthew we needn't worry, and in any case if we want to check for fatal
-signal early exit we can do if (fatal_signal_pending(current)) {} I think?
+		svm_leave_nested(vcpu);
+		svm_set_gif(svm, !!(kvm_state->flags & KVM_STATE_NESTED_GIF_SET));
+		return 0;
+	}
 
->
-> >
-> > >
-> > >       if (!qp.first)
-> > >               /* whole range in hole */
-> > > @@ -1309,9 +1311,14 @@ static long migrate_to_node(struct mm_struct *mm, int source, int dest,
-> > >                                     flags | MPOL_MF_DISCONTIG_OK, &pagelist);
-> > >       mmap_read_unlock(mm);
-> >
-> >
-> > >
-> > > +     if (nr_failed == -EINTR)
-> > > +             err = nr_failed;
-> >
-> > Ugh please don't, that's REALLY horrible.
-> >
-> > Actually the only way you'd get a write lock happening in the walk_page_range()
-> > is if flags & MPOL_MF_WRLOCK, menaing queue_pages_lock_vma_walk_ops are used
-> > which specifies .walk_lock = PGWALK_WRLOCK.
-> >
-> > And this flag is only set in do_mbind(), not in migrate_to_node().
-> >
-> > So this check is actually totally unnecessary. You'll never get -EINTR here.
->
-> Ah, good point. I'll drop this part.
-
-Thanks!
-
->
-> >
-> > Maybe this code needs some refactoring though in general... yikes.
->
-> Right.
->
-> >
-> > > +
-> > >       if (!list_empty(&pagelist)) {
-> > > -             err = migrate_pages(&pagelist, alloc_migration_target, NULL,
-> > > -                     (unsigned long)&mtc, MIGRATE_SYNC, MR_SYSCALL, NULL);
-> > > +             if (!err)
-> > > +                     err = migrate_pages(&pagelist, alloc_migration_target,
-> > > +                                         NULL, (unsigned long)&mtc,
-> > > +                                         MIGRATE_SYNC, MR_SYSCALL, NULL);
-> >
-> > Given the above, this is unnecessary too.
->
-> Ack. Will drop.
-
-Thanks!
-
->
-> >
-> > >               if (err)
-> > >                       putback_movable_pages(&pagelist);
-> > >       }
-> > > @@ -1611,7 +1618,8 @@ static long do_mbind(unsigned long start, unsigned long len,
-> > >                               MR_MEMPOLICY_MBIND, NULL);
-> > >       }
-> > >
-> > > -     if (nr_failed && (flags & MPOL_MF_STRICT))
-> > > +     /* Do not mask EINTR */
-> >
-> > Useless comment... You're not explaining why, and it's obvious what you're doing.
-> >
-> > > +     if ((err != -EINTR) && (nr_failed && (flags & MPOL_MF_STRICT)))
-> >
-> > Weird use of parens...
-> >
-> > And again why are we treating -EINTR in a special way?
->
-> Ah, actually I don't think I need this here. If queue_pages_range()
-> fails nr_failed gets reset to 0, so the original error won't be masked
-> as -EIO. I'll drop this part.
-
-Thanks!
-
->
-> >
-> > >               err = -EIO;
-> > >       if (!list_empty(&pagelist))
-> > >               putback_movable_pages(&pagelist);
-> > > diff --git a/mm/pagewalk.c b/mm/pagewalk.c
-> > > index a94c401ab2cf..dc9f7a7709c6 100644
-> > > --- a/mm/pagewalk.c
-> > > +++ b/mm/pagewalk.c
-> > > @@ -425,14 +425,13 @@ static inline void process_mm_walk_lock(struct mm_struct *mm,
-> > >               mmap_assert_write_locked(mm);
-> > >  }
-> > >
-> > > -static inline void process_vma_walk_lock(struct vm_area_struct *vma,
-> > > +static inline int process_vma_walk_lock(struct vm_area_struct *vma,
-> > >                                        enum page_walk_lock walk_lock)
-> > >  {
-> > >  #ifdef CONFIG_PER_VMA_LOCK
-> > >       switch (walk_lock) {
-> > >       case PGWALK_WRLOCK:
-> > > -             vma_start_write(vma);
-> > > -             break;
-> > > +             return vma_start_write_killable(vma);
-> > >       case PGWALK_WRLOCK_VERIFY:
-> > >               vma_assert_write_locked(vma);
-> > >               break;
-> > > @@ -444,6 +443,7 @@ static inline void process_vma_walk_lock(struct vm_area_struct *vma,
-> > >               break;
-> > >       }
-> > >  #endif
-> > > +     return 0;
-> > >  }
-> > >
-> > >  /*
-> > > @@ -487,7 +487,9 @@ int walk_page_range_mm_unsafe(struct mm_struct *mm, unsigned long start,
-> > >                       if (ops->pte_hole)
-> > >                               err = ops->pte_hole(start, next, -1, &walk);
-> > >               } else { /* inside vma */
-> > > -                     process_vma_walk_lock(vma, ops->walk_lock);
-> > > +                     err = process_vma_walk_lock(vma, ops->walk_lock);
-> > > +                     if (err)
-> > > +                             break;
-> > >                       walk.vma = vma;
-> > >                       next = min(end, vma->vm_end);
-> > >                       vma = find_vma(mm, vma->vm_end);
-> > > @@ -704,6 +706,7 @@ int walk_page_range_vma_unsafe(struct vm_area_struct *vma, unsigned long start,
-> > >               .vma            = vma,
-> > >               .private        = private,
-> > >       };
-> > > +     int err;
-> > >
-> > >       if (start >= end || !walk.mm)
-> > >               return -EINVAL;
-> > > @@ -711,7 +714,9 @@ int walk_page_range_vma_unsafe(struct vm_area_struct *vma, unsigned long start,
-> > >               return -EINVAL;
-> > >
-> > >       process_mm_walk_lock(walk.mm, ops->walk_lock);
-> > > -     process_vma_walk_lock(vma, ops->walk_lock);
-> > > +     err = process_vma_walk_lock(vma, ops->walk_lock);
-> > > +     if (err)
-> > > +             return err;
-> > >       return __walk_page_range(start, end, &walk);
-> > >  }
-> > >
-> > > @@ -734,6 +739,7 @@ int walk_page_vma(struct vm_area_struct *vma, const struct mm_walk_ops *ops,
-> > >               .vma            = vma,
-> > >               .private        = private,
-> > >       };
-> > > +     int err;
-> > >
-> > >       if (!walk.mm)
-> > >               return -EINVAL;
-> > > @@ -741,7 +747,9 @@ int walk_page_vma(struct vm_area_struct *vma, const struct mm_walk_ops *ops,
-> > >               return -EINVAL;
-> > >
-> > >       process_mm_walk_lock(walk.mm, ops->walk_lock);
-> > > -     process_vma_walk_lock(vma, ops->walk_lock);
-> > > +     err = process_vma_walk_lock(vma, ops->walk_lock);
-> > > +     if (err)
-> > > +             return err;
-> > >       return __walk_page_range(vma->vm_start, vma->vm_end, &walk);
-> > >  }
-> > >
-> > > diff --git a/mm/vma.c b/mm/vma.c
-> > > index 9f2664f1d078..46bbad6e64a4 100644
-> > > --- a/mm/vma.c
-> > > +++ b/mm/vma.c
-> > > @@ -998,14 +998,18 @@ static __must_check struct vm_area_struct *vma_merge_existing_range(
-> > >       if (anon_dup)
-> > >               unlink_anon_vmas(anon_dup);
-> > >
-> > > -     /*
-> > > -      * This means we have failed to clone anon_vma's correctly, but no
-> > > -      * actual changes to VMAs have occurred, so no harm no foul - if the
-> > > -      * user doesn't want this reported and instead just wants to give up on
-> > > -      * the merge, allow it.
-> > > -      */
-> > > -     if (!vmg->give_up_on_oom)
-> > > -             vmg->state = VMA_MERGE_ERROR_NOMEM;
-> > > +     if (err == -EINTR) {
-> > > +             vmg->state = VMA_MERGE_ERROR_INTR;
-> >
-> > Yeah this is incorrect. You seem adament in passing through -EINTR _no
-> > matter what_ :)
->
-> You got me figured out ;)
->
-> >
-> > There are callers that don't care at all if the merge failed, whether through
-> > oom or VMA write lock not being acquired.
->
-> Ah, I see. I was a bit puzzled by this vmg->give_up_on_oom flag. I
-> think what you are saying is that errors from
-> vma_merge_existing_range() are ignored unless this flag is set and
-> even then the only possible error is ENOMEM.
->
-> >
-> > There's really no benefit in exiting early here I don't think, the subsequent
-> > split will call vma_start_write_killable() anyway.
->
-> But are we always calling split after the merge?
-
-We wouldn't if start == vma->vm_start and end == vma->vm_end but that'd be a nop
-anyway :) [in vma_modify(), the only caller].
-
->
-> >
-> > So I think this adds a lot of complexity and mess for nothing.
-> >
-> > So can we drop all this change to the merge logic please?
->
-> Ok but is there a good reason for this unusual error handling logic in
-> vma_merge_existing_range()?
-
-It's specifically so we can indicate _why_ the merge didn't succeed, because the
-function returns NULL. Is checked in vma_modify().
-
-Better this way than an ERR_PTR().
-
-
->
-> >
-> > > +     } else {
-> > > +             /*
-> > > +              * This means we have failed to clone anon_vma's correctly,
-> > > +              * but no actual changes to VMAs have occurred, so no harm no
-> > > +              * foul - if the user doesn't want this reported and instead
-> > > +              * just wants to give up on the merge, allow it.
-> > > +              */
-> > > +             if (!vmg->give_up_on_oom)
-> > > +                     vmg->state = VMA_MERGE_ERROR_NOMEM;
-> > > +     }
-> > >       return NULL;
-> > >  }
-> > >
-> > > @@ -1681,6 +1685,8 @@ static struct vm_area_struct *vma_modify(struct vma_merge_struct *vmg)
-> > >       merged = vma_merge_existing_range(vmg);
-> > >       if (merged)
-> > >               return merged;
-> > > +     if (vmg_intr(vmg))
-> > > +             return ERR_PTR(-EINTR);
-> > >       if (vmg_nomem(vmg))
-> > >               return ERR_PTR(-ENOMEM);
-> > >
-> > > diff --git a/mm/vma.h b/mm/vma.h
-> > > index eba388c61ef4..fe4560f81f4f 100644
-> > > --- a/mm/vma.h
-> > > +++ b/mm/vma.h
-> > > @@ -56,6 +56,7 @@ struct vma_munmap_struct {
-> > >  enum vma_merge_state {
-> > >       VMA_MERGE_START,
-> > >       VMA_MERGE_ERROR_NOMEM,
-> > > +     VMA_MERGE_ERROR_INTR,
-> > >       VMA_MERGE_NOMERGE,
-> > >       VMA_MERGE_SUCCESS,
-> > >  };
-> > > @@ -226,6 +227,11 @@ static inline bool vmg_nomem(struct vma_merge_struct *vmg)
-> > >       return vmg->state == VMA_MERGE_ERROR_NOMEM;
-> > >  }
-> > >
-> > > +static inline bool vmg_intr(struct vma_merge_struct *vmg)
-> > > +{
-> > > +     return vmg->state == VMA_MERGE_ERROR_INTR;
-> > > +}
-> > > +
-> > >  /* Assumes addr >= vma->vm_start. */
-> > >  static inline pgoff_t vma_pgoff_offset(struct vm_area_struct *vma,
-> > >                                      unsigned long addr)
-> > > --
-> > > 2.53.0.414.gf7e9f6c205-goog
-> > >
-> >
-
-Cheers, Lorenzo
+but KVM doesn't enforce GUEST_MODE for KVM_STATE_NESTED_RUN_PENDING, and it's
+easy to just ignore gPAT, so I'm inclined to not bother.
 
