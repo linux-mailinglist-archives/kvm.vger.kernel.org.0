@@ -1,86 +1,90 @@
-Return-Path: <kvm+bounces-72628-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72629-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cDYyHSN9p2nYhwAAu9opvQ
-	(envelope-from <kvm+bounces-72628-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 01:30:27 +0100
+	id eOvXHlZ9p2nYhwAAu9opvQ
+	(envelope-from <kvm+bounces-72629-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 01:31:18 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD671F8E95
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 01:30:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB5A91F8EB2
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 01:31:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 734AE301CA99
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 00:30:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 73A36311473C
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 00:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80AE62FAC0E;
-	Wed,  4 Mar 2026 00:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9703D3033FB;
+	Wed,  4 Mar 2026 00:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fLkkth2d"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YAmlabUg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA5F2F6925
-	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 00:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5072FE591
+	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 00:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772584214; cv=none; b=DvGCyv6Xuy4GlIg25+bk8n53LfbtQUPbhhDbqHF4bTbJpNoA0HrSCK6xP6FhPy2M9i0nT6hQHT5Rb/H4IInnvaDr0iGYoDz6SWNK9D/p1uIrP2wuR7wmsSi6Sfytupx6lS8ZOqvjfXGnlfHjBCroj3la0zms8wRB8xd8BZWBXUU=
+	t=1772584215; cv=none; b=FfOyH6hj335FY8L1pmmdg9rcMxpgvpByGXvycqQGVTATuJEEPvHZ+UIk9n/eoo9a97WecfWKIvZ+eGMUnt8tgXaOH8iJIAstXNwRinjCpsKXOzolsGkzjTcJZf0UXTLjw/WtmlDdHQFLN6jUUE+C1dhLXxun3KQ5D2ekkHLSIjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772584214; c=relaxed/simple;
-	bh=3tPhoIC6Bu08Eim7X/y0ycnEkAVtQrk7kENmz9hQFhI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=XbkwqHDGzjVJZcUrqrYbwSfa4z9QhQT/iMDv71DXW/mvcG89ik1pWuY1nU+2rM5PGd6iaHUbwLORlhytjzU8KNew6wb/ioVb5fNYFJESu+Ub/w0Pr5ZJJYY/y0ts6qh7Lk87L7h1XHOC3prrDK5YAPfh0geUAV8dEPzLEpaDlJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fLkkth2d; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1772584215; c=relaxed/simple;
+	bh=ccMqsZsH0pOqdPvh+M4o4tLZ05ryk2Pk3IVrCCxCeo4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dZIjEr4zHBQpP7PYlGsDkGOVLJ+3Catd8qeooc/06AdBYJyJgSJFRhm4eFt9gZLXUVXnIzenq2cQXbells1MFTWtjC/shLMFHnoQAH9q9L4e4KphLQzBBWpXF0A8Od4/1h3TPOXxEpUBbXktgQoOkFBD9d5t/ZGRUiMGC9PWeGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YAmlabUg; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae4e20a414so140772395ad.3
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 16:30:12 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-358e425c261so5380474a91.3
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 16:30:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772584212; x=1773189012; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vN42vQciUoJdrWBNVw0ChEaojXRkmaJ1ILHWzzE+t7o=;
-        b=fLkkth2d7UKpGE8FWBJ+oucBHZpmo6hmeuJZi0ykCVPrcQcNz0eRsWICe4BbjK4ggk
-         6cjn7tPuBJ2inKYBoG+4DpqSwEZkgxp5oLrViwTFyQSAIUSj4mdchfyYROk629dgQmwj
-         e1fvv0bLIsj9KsVcyYPR5WAwOzjB0nFDfAL07B81HMmtDJACUn2Ho7Ff3BqK8vlDsaov
-         8vvpJ4I45OkmK0cU7jL4+kVipT2FoNBBPdt58zutNzdZ4mp+RR5vVDZEGywMmazRsFzJ
-         6gOAwt7kta1XaNaEsE6VWSQWPRDtPPY7GxzUAsxEfmSYXatClSfZSnQR08KBplRaHwXD
-         gxJA==
+        d=google.com; s=20230601; t=1772584214; x=1773189014; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dq1B0TYlqPwxiWVLtbESTI9zQiKluvKfUnpH6I/C/Wk=;
+        b=YAmlabUgyrGlGEIEWdFPJCZ1mbY4gQW9Y/IPgjGzBTPRxW3CbyfAb+l91mGtYRg8iH
+         0hBhmjUv6iZOuk/v2jguwX5OLtJFiu3LiPExmEWJHspsuk0sXcCEpHJE5oZrKUkCwkwW
+         MiUVNgu6qxDjcI4zXNRohWz+lEj3Kas70cRHUmWMFuRccjf3mJBalb0uJ1saPrcNxKYV
+         9y9FgQzLedYktumIf+J+8VNDNfR5yri7zKIwqeMdBdEsOJvLaQQe9PIa3CHrKrp0k3Uf
+         8BgT5UsWyNdKwbZkis3vuxx8WgaqNjELYUIjWLZ7DciL/yEFsFF887XYmZVTeGMu5s0q
+         toOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772584212; x=1773189012;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vN42vQciUoJdrWBNVw0ChEaojXRkmaJ1ILHWzzE+t7o=;
-        b=SjxvuoNcMzv/Pa0ZzrfkSGQbRQmYIt2MtdT6uTd7cDc0jU5ZAngTyP+Si4aWBu0OaN
-         BwUemsuN+bVAOU2bCcRCMXTyASQXaKAMGUywJX4SfYs1XEdyNqq9OUjXKEeeSTd/SZgh
-         z7TpMESu38rfP4g0qmQS1AqYvAr2J23ri3KRHgskI5+y2eFMOAdoSbqeSrcRCRuMFcaK
-         FMs63YLL+wBImFy0sSlSJJGI9RTBd63l63fwzgALD+RnIUgmIgX3WhLwK44+HBJdASiG
-         uK14zGwEPwWvJMMzyPuPEzfkN5Y6YuUqSUS8+Mb+qhmNCgR3rELQ+CS2YdGsRWc7mVl+
-         wT9g==
-X-Gm-Message-State: AOJu0Yw/OEPZS/1Rs0xRBn7+HP/OaZpl7Km1eiSG75OYIAa/YTZt9u12
-	y8YK+Dc3LeDT8ij5aG+K92kdBmGxfALVdYdcqDf1oZFI0W4XL3cwuVconVKJ6xlQVlUs6+TmtYR
-	IO2NPUA==
-X-Received: from plho18.prod.google.com ([2002:a17:903:23d2:b0:2ae:5645:97f9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3201:b0:2aa:d11d:5c36
- with SMTP id d9443c01a7336-2ae6aaf2100mr3173705ad.30.1772584212206; Tue, 03
- Mar 2026 16:30:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772584214; x=1773189014;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Dq1B0TYlqPwxiWVLtbESTI9zQiKluvKfUnpH6I/C/Wk=;
+        b=IonesuwrGVizggjjvaBo7Z4JdKevXvRAmAJDiDPTKl6nJ4M72h9JIyN3Ji172S8FCC
+         KUhciHkROIDPP+seyi4X4kgYHxPD9ZDkSrrNJ/sw4X9V1t0qEuVMLQCEoHYiAVyx9eAX
+         IAZcV6Wozng+GVLKHYfIk8q5Rk6lmMfaTmlJHlTIzF2G1DYmUtMtyl2gnYT1nLSlqx1M
+         KekBSfQ/VhzKPO2Mt2tZYNAeDaeNV1abNPyYLCet38ZWaQ5ecjEadyH2j1OnKZiBdyew
+         ajRdgyQuPlBZ/MY6PXzaVgpxvHVvLhLTcrMjBSottqd/3ImM+5f1FWU/ZOlYqdiqWYqU
+         /Brg==
+X-Gm-Message-State: AOJu0YwbmJrh3VQ5toejQU0pBsWpsypbHElXURGG7b33vyOAGCb/JzM0
+	rtZEFZSJ9p3wqB/b0W+XdttaFHRP4fLH7VKccz2fqJ9+uUPd6ZDszMeDkaH1GAQM9hHMHdR89Tc
+	W764Img==
+X-Received: from pjbms20.prod.google.com ([2002:a17:90b:2354:b0:359:8d4a:7276])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1344:b0:359:8e59:16e6
+ with SMTP id 98e67ed59e1d1-359a6a9f792mr190498a91.32.1772584213821; Tue, 03
+ Mar 2026 16:30:13 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  3 Mar 2026 16:30:08 -0800
+Date: Tue,  3 Mar 2026 16:30:09 -0800
+In-Reply-To: <20260304003010.1108257-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260304003010.1108257-1-seanjc@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260304003010.1108257-1-seanjc@google.com>
-Subject: [PATCH v5 0/2] KVM: nSVM: Intercept STGI/CLGI as needed to inject #UD
+Message-ID: <20260304003010.1108257-2-seanjc@google.com>
+Subject: [PATCH v5 1/2] KVM: SVM: Move STGI and CLGI intercept handling
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Kevin Cheng <chengkev@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 5BD671F8E95
+X-Rspamd-Queue-Id: CB5A91F8EB2
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
@@ -88,18 +92,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72628-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72629-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -112,62 +116,97 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	REPLYTO_EQ_FROM(0.00)[]
 X-Rspamd-Action: no action
 
-The STGI/CLGI fixes from Kevin's broader "Align SVM with APM defined behaviors"
-series.
+From: Kevin Cheng <chengkev@google.com>
 
-v5:
- - Separate the STGI/CLGI fixes from everything else.
- - Apply the Intel compatibiliy weirdness only to VMLOAD/VMSAVE (to fixup
-   SYSENTER MSRs).
- - Re-remove STGI/CLGI intercept clearing in init_vmcb().
+Move STGI/CLGI intercept handling to svm_recalc_instruction_intercepts()
+in preparation for making the function EFER.SVME-aware.  This will allow
+configuring STGI/CLGI intercepts along with other intercepts for other SVM
+instructions when EFER.SVME is toggled (KVM needs to intercept SVM
+instructions when EFER.SVME=0 to inject #UD).
 
-v4:
-  - https://lore.kernel.org/all/20260228033328.2285047-1-chengkev@google.com
-  - Dropped "KVM: SVM: Inject #UD for STGI if EFER.SVME=0 and SVM Lock
-    and DEV are not available" as per Sean
-  - Added back STGI and CLGI intercept clearing in init_vmcb to maintain
-    previous behavior on intel guests. Previously intel guests always
-    had STGI and CLGI intercepts cleared if vgif was enabled. In V3,
-    because the clearing of the intercepts was moved from init_vmcb() to
-    the !guest_cpuid_is_intel_compatible() case in
-    svm_recalc_instruction_intercepts(), the CLGI intercept would be
-    indefinitely set on intel guests. I added back the clearing to
-    init_vmcb() to retain intel guest behavior before this patch.
-  - In "Raise #UD if VMMCALL instruction is not intercepted" patch:
-      - Exempt Hyper-V L2 TLB flush hypercalls from the #UD injection,
-        as L0 intentionally intercepts these VMMCALLs on behalf of L1
-	via the direct hypercall enlightenment.
-      - Added nested_svm_is_l2_tlb_flush_hcall() which just returns true
-        if the hypercall was a Hyper-V L2 TLB flush hypercall.
+When clearing the STGI intercept in particular, request KVM_REQ_EVENT if
+there is at least one a pending GIF-controlled event. This avoids breaking
+NMI/SMI window tracking, as enable_{nmi,smi}_window() sets INTERCEPT_STGI
+to detect when NMIs become unblocked. KVM_REQ_EVENT forces
+kvm_check_and_inject_events() to re-evaluate pending events and re-enable
+the intercept if needed.
 
-v3:
-  - https://lore.kernel.org/kvm/20260122045755.205203-1-chengkev@google.com/
-  - Elaborated on 'Move STGI and CLGI intercept handling' commit message
-    as per Sean
-  - Fixed bug due to interaction with svm_enable_nmi_window() and 'Move
-    STGI and CLGI intercept handling' as pointed out by Yosry. Code
-    changes suggested by Sean/Yosry.
-  - Removed open-coded nested_svm_check_permissions() in STGI
-    interception function as per Yosry
+Extract the pending GIF event check into a helper function
+svm_has_pending_gif_event() to deduplicate the logic between
+svm_recalc_instruction_intercepts() and svm_set_gif().
 
-v2:
-  - https://lore.kernel.org/all/20260112174535.3132800-1-chengkev@google.com
-  - Split up the series into smaller more logical changes as suggested
-    by Sean
-  - Added patch for injecting #UD for STGI under APM defined conditions
-    as suggested by Sean
-  - Combined EFER.SVME=0 conditional with intel CPU logic in
-    svm_recalc_instruction_intercepts
+Signed-off-by: Kevin Cheng <chengkev@google.com>
+[sean: keep vgif handling out of the "Intel CPU model" path]
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/svm.c | 32 ++++++++++++++++++++++++--------
+ 1 file changed, 24 insertions(+), 8 deletions(-)
 
-Kevin Cheng (2):
-  KVM: SVM: Move STGI and CLGI intercept handling
-  KVM: SVM: Recalc instructions intercepts when EFER.SVME is toggled
-
- arch/x86/kvm/svm/svm.c | 53 +++++++++++++++++++++++++++++++-----------
- 1 file changed, 40 insertions(+), 13 deletions(-)
-
-
-base-commit: 11439c4635edd669ae435eec308f4ab8a0804808
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 8f8bc863e214..5975a1e14ac9 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1009,6 +1009,14 @@ void svm_write_tsc_multiplier(struct kvm_vcpu *vcpu)
+ 	preempt_enable();
+ }
+ 
++static bool svm_has_pending_gif_event(struct vcpu_svm *svm)
++{
++	return svm->vcpu.arch.smi_pending ||
++	       svm->vcpu.arch.nmi_pending ||
++	       kvm_cpu_has_injectable_intr(&svm->vcpu) ||
++	       kvm_apic_has_pending_init_or_sipi(&svm->vcpu);
++}
++
+ /* Evaluate instruction intercepts that depend on guest CPUID features. */
+ static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu)
+ {
+@@ -1052,6 +1060,20 @@ static void svm_recalc_instruction_intercepts(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+ 
++	if (vgif) {
++		svm_clr_intercept(svm, INTERCEPT_STGI);
++		svm_clr_intercept(svm, INTERCEPT_CLGI);
++
++		/*
++		 * Process pending events when clearing STGI/CLGI intercepts if
++		 * there's at least one pending event that is masked by GIF, so
++		 * that KVM re-evaluates if the intercept needs to be set again
++		 * to track when GIF is re-enabled (e.g. for NMI injection).
++		 */
++		if (svm_has_pending_gif_event(svm))
++			kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
++	}
++
+ 	if (kvm_need_rdpmc_intercept(vcpu))
+ 		svm_set_intercept(svm, INTERCEPT_RDPMC);
+ 	else
+@@ -1195,11 +1217,8 @@ static void init_vmcb(struct kvm_vcpu *vcpu, bool init_event)
+ 	if (vnmi)
+ 		svm->vmcb->control.int_ctl |= V_NMI_ENABLE_MASK;
+ 
+-	if (vgif) {
+-		svm_clr_intercept(svm, INTERCEPT_STGI);
+-		svm_clr_intercept(svm, INTERCEPT_CLGI);
++	if (vgif)
+ 		svm->vmcb->control.int_ctl |= V_GIF_ENABLE_MASK;
+-	}
+ 
+ 	if (vls)
+ 		svm->vmcb->control.virt_ext |= VIRTUAL_VMLOAD_VMSAVE_ENABLE_MASK;
+@@ -2320,10 +2339,7 @@ void svm_set_gif(struct vcpu_svm *svm, bool value)
+ 			svm_clear_vintr(svm);
+ 
+ 		enable_gif(svm);
+-		if (svm->vcpu.arch.smi_pending ||
+-		    svm->vcpu.arch.nmi_pending ||
+-		    kvm_cpu_has_injectable_intr(&svm->vcpu) ||
+-		    kvm_apic_has_pending_init_or_sipi(&svm->vcpu))
++		if (svm_has_pending_gif_event(svm))
+ 			kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+ 	} else {
+ 		disable_gif(svm);
 -- 
 2.53.0.473.g4a7958ca14-goog
 
