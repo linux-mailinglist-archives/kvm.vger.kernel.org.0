@@ -1,53 +1,56 @@
-Return-Path: <kvm+bounces-72667-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72668-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GEYvBDz6p2mtmwAAu9opvQ
-	(envelope-from <kvm+bounces-72667-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 10:24:12 +0100
+	id SPa7LcP6p2mtmwAAu9opvQ
+	(envelope-from <kvm+bounces-72668-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 10:26:27 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ED271FD85B
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 10:24:11 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 641161FD8C4
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 10:26:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 15B7B307EFC1
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 09:22:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 461EA3040DAD
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 09:26:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B2C3947A4;
-	Wed,  4 Mar 2026 09:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2BA396B7F;
+	Wed,  4 Mar 2026 09:26:20 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9BC3090F5;
-	Wed,  4 Mar 2026 09:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B52E35CB70;
+	Wed,  4 Mar 2026 09:26:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772616121; cv=none; b=hdDA5nO7w7oGHGa+nRY4LXu8CSIWemwS8VfG/ARehCthmi8L0Ebs7hYEQSkNhAgnAEYD2p02Zuq+sUFkb9GNM9XLkVWmfUeKbPxHb6rMK1g+FDUsA6AamrXGmSw847x7mVN/Hy1K6dbz+/D2WUwO/ayOIRjEaZU+3NIKOmEUSEA=
+	t=1772616380; cv=none; b=HpylmyTEmjw/cLA2QPvZo6pgCyzxiVbB3NR8AzLQ4sG9OAptagwpRyH0hqad4DRDhl/x0LI7Lhr22nCdWdp5Yy3GUIWKZbBkkqNCf87uXM6kMrGNB4dpB1xMYXJk2bY1j+3oXo9l/hwiEz6yBmlF5LuT62jkQz2JBVMbh2x53pY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772616121; c=relaxed/simple;
-	bh=nzErDn7XbBB7iPUEQuBgB1WvLudKA1xYNN25LjEsIWY=;
-	h=Message-ID:Date:Mime-Version:From:To:Cc:Subject:Content-Type; b=Q/xck/FkaU8XPQcniYlJBZkwhM9pMECyLH/0b80dOVsmLTGbvCBFpkrVTe7TRocm3cXQDb86+ogcU3yf3be0abqKFzxZJ+/2/5mi2jthjasfaApSt9oCOV9rfIKNB5WEHB9Th3WpmEPIjkOzg+nqt1S2Nj+cegp6lCK0XRiuEdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
+	s=arc-20240116; t=1772616380; c=relaxed/simple;
+	bh=eKJCJEl2Ht+aniDNfplngtE/vhaYlBUnaWl07XDbyIk=;
+	h=Message-ID:In-Reply-To:References:Date:Mime-Version:From:To:Cc:
+	 Subject:Content-Type; b=BRXE59W8Aooh7eX+5RYl02El2yk4HxVOwH9mORJbgiZlooc+fWf7N07c6wkTDiZqKhSwR1Z3E+otNcCUqOjhqBrLinCUOUj0Qx8/EcR0s8LHaqXkMrO/VWvPwQdC8IvzKwAbjQDNfYcxok67gk0DnN0F9uwzCctrDil1mtWID1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4fQnHG51clz4xQXM;
-	Wed, 04 Mar 2026 17:21:46 +0800 (CST)
-Received: from szxlzmapp03.zte.com.cn ([10.5.231.207])
-	by mse-fl2.zte.com.cn with SMTP id 6249LaoC048377;
-	Wed, 4 Mar 2026 17:21:36 +0800 (+08)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4fQnNM1Dmvz5B12g;
+	Wed, 04 Mar 2026 17:26:11 +0800 (CST)
+Received: from szxl2zmapp07.zte.com.cn ([10.1.32.52])
+	by mse-fl1.zte.com.cn with SMTP id 6249PwJO088803;
+	Wed, 4 Mar 2026 17:25:58 +0800 (+08)
 	(envelope-from wang.yechao255@zte.com.cn)
-Received: from mapi (szxlzmapp03[null])
+Received: from mapi (szxlzmapp01[null])
 	by mapi (Zmail) with MAPI id mid12;
-	Wed, 4 Mar 2026 17:21:39 +0800 (CST)
-X-Zmail-TransId: 2b0569a7f9a33a2-214cb
+	Wed, 4 Mar 2026 17:26:01 +0800 (CST)
+X-Zmail-TransId: 2b0369a7faa9f44-4504a
 X-Mailer: Zmail v1.0
-Message-ID: <20260304172139131ChDubMSpGDUB03lY4UCbK@zte.com.cn>
-Date: Wed, 4 Mar 2026 17:21:39 +0800 (CST)
+Message-ID: <20260304172601396IhMZyDqdV3dRmc2rVopfJ@zte.com.cn>
+In-Reply-To: <20260304172139131ChDubMSpGDUB03lY4UCbK@zte.com.cn>
+References: 20260304172139131ChDubMSpGDUB03lY4UCbK@zte.com.cn
+Date: Wed, 4 Mar 2026 17:26:01 +0800 (CST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -60,34 +63,34 @@ To: <anup@brainfault.org>, <atish.patra@linux.dev>, <pjw@kernel.org>,
 Cc: <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
         <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
         <wang.yechao255@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIHYyIDAvM10gUklTQy1WOiBLVk06IEZpeCBodWdlcGFnZSBtYXBwaW5nIGhhbmRsaW5nIGR1cmluZyBkaXJ0eSBsb2dnaW5n?=
+Subject: =?UTF-8?B?W1BBVENIIHYyIDEvM10gUklTQy1WOiBLVk06IEZpeCBsb3N0IHdyaXRlIHByb3RlY3Rpb24gb24gaHVnZSBwYWdlcwogZHVyaW5nIGRpcnR5IGxvZ2dpbmc=?=
 Content-Type: text/plain;
 	charset="UTF-8"
-X-MAIL:mse-fl2.zte.com.cn 6249LaoC048377
+X-MAIL:mse-fl1.zte.com.cn 6249PwJO088803
 X-TLS: YES
 X-SPF-DOMAIN: zte.com.cn
 X-ENVELOPE-SENDER: wang.yechao255@zte.com.cn
 X-SPF: None
-X-SOURCE-IP: 10.5.228.133 unknown Wed, 04 Mar 2026 17:21:46 +0800
+X-SOURCE-IP: 10.5.228.132 unknown Wed, 04 Mar 2026 17:26:11 +0800
 X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 69A7F9AA.000/4fQnHG51clz4xQXM
-X-Rspamd-Queue-Id: 5ED271FD85B
+X-Fangmail-MID-QID: 69A7FAB3.000/4fQnNM1Dmvz5B12g
+X-Rspamd-Queue-Id: 641161FD8C4
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.64 / 15.00];
 	SUBJ_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72667-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72668-lists,kvm=lfdr.de];
 	FROM_NEQ_ENVFROM(0.00)[wang.yechao255@zte.com.cn,kvm@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_NONE(0.00)[];
@@ -98,31 +101,49 @@ X-Spamd-Result: default: False [0.64 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,zte.com.cn:mid,zte.com.cn:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[zte.com.cn:mid,zte.com.cn:email,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
 From: Wang Yechao <wang.yechao255@zte.com.cn>
 
-This series fixes an issue where dirty logging fails to work correctly
-with huge pages.
+When enabling dirty log in small chunks (e.g., QEMU default chunk
+size of 256K), the chunk size is always smaller than the page size
+of huge pages (1G or 2M) used in the gstage page tables. This caused
+the write protection to be incorrectly skipped for huge PTEs because
+the condition `(end - addr) >= page_size` was not satisfied.
 
-v1 -> v2:
-  - fix the lost write protection on huge pages
-  - split huge pages before handling the write protection fault.
+Remove the size check in `kvm_riscv_gstage_wp_range()` to ensure huge
+PTEs are always write-protected regardless of the chunk size. Additionally,
+explicitly align the address down to the page size before invoking
+`kvm_riscv_gstage_op_pte()` to guarantee that the address passed to the
+operation function is page-aligned.
 
-  - Link to v1:
-  https://lore.kernel.org/linux-riscv/20260226172245358qVZavIykLL2QC0KoqTO-I@zte.com.cn/T/#u
+This fixes the issue where dirty pages might not be tracked correctly
+when using huge pages.
 
-Wang Yechao (3):
-  RISC-V: KVM: Fix lost write protection on huge pages during dirty
-    logging
-  RISC-V: KVM: Allow splitting huge pages to arbitrary level
-  RISC-V: KVM: Split huge pages during fault handling for dirty logging
+Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
+---
+ arch/riscv/kvm/gstage.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
- arch/riscv/include/asm/kvm_gstage.h |  4 ++
- arch/riscv/kvm/gstage.c             | 85 +++++++++++++++++++++++++++--
- 2 files changed, 85 insertions(+), 4 deletions(-)
+diff --git a/arch/riscv/kvm/gstage.c b/arch/riscv/kvm/gstage.c
+index b67d60d722c2..d2001d508046 100644
+--- a/arch/riscv/kvm/gstage.c
++++ b/arch/riscv/kvm/gstage.c
+@@ -304,10 +304,9 @@ void kvm_riscv_gstage_wp_range(struct kvm_gstage *gstage, gpa_t start, gpa_t end
+ 		if (!found_leaf)
+ 			goto next;
 
+-		if (!(addr & (page_size - 1)) && ((end - addr) >= page_size))
+-			kvm_riscv_gstage_op_pte(gstage, addr, ptep,
+-						ptep_level, GSTAGE_OP_WP);
+-
++		addr = ALIGN_DOWN(addr, page_size);
++		kvm_riscv_gstage_op_pte(gstage, addr, ptep,
++					ptep_level, GSTAGE_OP_WP);
+ next:
+ 		addr += page_size;
+ 	}
 -- 
 2.47.3
 
