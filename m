@@ -1,139 +1,243 @@
-Return-Path: <kvm+bounces-72737-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72738-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YFzoAO2CqGmYvAAAu9opvQ
-	(envelope-from <kvm+bounces-72737-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 20:07:25 +0100
+	id qOu5B9CCqGmYvAAAu9opvQ
+	(envelope-from <kvm+bounces-72738-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 20:06:56 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A9EA206E4D
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 20:07:24 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20737206E3F
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 20:06:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BED2E31593ED
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 19:01:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DBF50301F696
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 19:06:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD683DA5BB;
-	Wed,  4 Mar 2026 19:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07383DA5D8;
+	Wed,  4 Mar 2026 19:06:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ux/svElR"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="J5cGG0Qn";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="s6nzvTtp"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9679D352F87;
-	Wed,  4 Mar 2026 19:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A46F3CCA0A;
+	Wed,  4 Mar 2026 19:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772650873; cv=none; b=tzlC8qGRBOITVsh6EH80vHqHDKDPHMGrWJjwT9mQTn6ynccokTiLxh2RHhgMzuLJqiLxaRg74CsfM/mrrgoT1JNWZ0iXMEZ3jfVbHIWImQYdn/fNT3TlpSs+jro6B6YdxQ0z15emudnmoMyu5JzbLZM/RubqwPzwaMeBPmgI9pI=
+	t=1772651174; cv=none; b=UXI9C7xG3f3eZ6fxPGpbVjee1UxsUv/cfTyGKNjaOZwo21hpPyjysIbea5JyMTpGltSD/5HwbP8gc8Cn90P8YCLEMA9na/RTcmlPkwYA6MP7bBrM9SvV3FOPbbYl8Cjw89/uXighX2WoW4PKk3o/gVHq+1qOA3cd8NRVIR/aoAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772650873; c=relaxed/simple;
-	bh=lwP2L98nHTKfys118P4hGp0JhG7RVkMqDOnarwcsXRE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bunXGACmnn0ZAaI8E+Vtk3mmme2Cz7N4G4TSaXUCt9k30EUz7DdyOuMtTssDFHNYvDqSr5v/Q2lUKt73W5ThqNfzbDv+fzxQ5hVcfR6czsKFoLwb4qYp8sEdlAKpVqL4IZdpJtrDZblu+WRInhtlGa9xs2sM6Cy98YkNX0RSQbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Ux/svElR; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Wh9qbG+FlyiO8UJnUIqCRxZKnSQBC+n2Ht087H8Gkjc=; b=Ux/svElRXHueLOyBqfF1CjH034
-	pVIaaWu+XZ2IzFCkCimQhpcWBz9HZWxXo3fVhBUVfsKzd83PTHdpBmtxIBz/2mEOeJwJMgHCUTHYY
-	zPBWTxPIV4MAJw9I8nQsZAl2i/EIG2gVB/J7B7ks4SVOi2uD4WQdtxAPSGwNJpKbiEYLofE5P1cNw
-	dG5JNemsOusR9NtxvbnEYiu3NLsng+pstSqqwC//Jq1omGSBxGMvOZNQi1if8OH7Awpt9YFIxf5u8
-	gl/KAQsccjpTpyVG559RaXJAx58uOAdor3zwhjmi1zoJUGXCJCAxO1aPyYGmZS/S754Y4GFoZ8vQz
-	cSkTSC1A==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vxrSh-0000000Dl6K-15gd;
-	Wed, 04 Mar 2026 19:00:47 +0000
-Date: Wed, 4 Mar 2026 19:00:47 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: "Lorenzo Stoakes (Oracle)" <ljs@kernel.org>
-Cc: Suren Baghdasaryan <surenb@google.com>,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	akpm@linux-foundation.org, david@kernel.org, ziy@nvidia.com,
-	matthew.brost@intel.com, joshua.hahnjy@gmail.com, rakie.kim@sk.com,
-	byungchul@sk.com, gourry@gourry.net, ying.huang@linux.alibaba.com,
-	apopple@nvidia.com, baolin.wang@linux.alibaba.com,
-	Liam.Howlett@oracle.com, npache@redhat.com, ryan.roberts@arm.com,
-	dev.jain@arm.com, baohua@kernel.org, lance.yang@linux.dev,
-	vbabka@suse.cz, jannh@google.com, rppt@kernel.org, mhocko@suse.com,
-	pfalcato@suse.de, kees@kernel.org, maddy@linux.ibm.com,
-	npiggin@gmail.com, mpe@ellerman.id.au, chleroy@kernel.org,
-	borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-	imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-	agordeev@linux.ibm.com, svens@linux.ibm.com,
-	gerald.schaefer@linux.ibm.com, linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
-Subject: Re: [PATCH v3 2/3] mm: replace vma_start_write() with
- vma_start_write_killable()
-Message-ID: <aaiBX5Mm36Kg0wq1@casper.infradead.org>
-References: <20260226070609.3072570-1-surenb@google.com>
- <20260226070609.3072570-3-surenb@google.com>
- <74bffc7a-2b8c-40ae-ab02-cd0ced082e18@lucifer.local>
- <CAJuCfpHBfhKFeWAtQo4r-ofVtO=5MvG+OToEgc2DEY+cuZDSGw@mail.gmail.com>
- <aadeHiMqhHF0EQkt@casper.infradead.org>
- <CAJuCfpFB1ON8=rkqu3MkrbD2mVBeHLK4122nm9RH31fH3hT2Hw@mail.gmail.com>
- <aael1XWaOJN134la@casper.infradead.org>
- <76aff8f9-1c08-449a-a034-f3b93440d1a8@lucifer.local>
+	s=arc-20240116; t=1772651174; c=relaxed/simple;
+	bh=RFBv8YwuEATNPVoLbeOgyN1xp695KYra6Xxis5eFQaA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N4PTC1U/UotLFg2GJjOVfnL5CId9kWypBNnRRkvz6ckoMpTknUf0eHQCRZx57iG6veLNIR4TzRKajdrycu3VYPe0IJmcTHxv8UHMG6ltusfpGjaX2u0SzfDWEMRR+lb/frC5iDWjw4tIEOpWkVNB1MKsEyYhO8X0YOEb+mqsom0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=J5cGG0Qn; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=s6nzvTtp; arc=none smtp.client-ip=202.12.124.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 1711B7A01F3;
+	Wed,  4 Mar 2026 14:06:12 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Wed, 04 Mar 2026 14:06:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1772651171;
+	 x=1772737571; bh=qCX0fETb7LppqJFm0Ooo/gF9iA4aj4iETpmuW38yLUo=; b=
+	J5cGG0QnjYNIJbFY9/QFzTx/LoiA7Hekl8JrlfBF/u91a4htaCeH7cWMh4oGYeYL
+	uegAvOocPdLI9Wavp8nEQpCCwaLiHnZn9ToTnfC7HlGOGRkPgyLX1SJqIBdExOnB
+	hPR5548qbFe2zuX+Y+SbhNqM/cCM7tXz98a5xCTZ80QX7XTXueu7CG4XXiAmPmS9
+	wKRwWoLsL4lPDlzPWjC/vqUoPbZJIP/lujah/1RMOzYWuJ6mAYM6MAf9Gtn6psSp
+	FNhEDsZOGA3L2rcWb5FR9sZDLdQ4pePh24iq6NoaXWIct3eiapHAiOAeCpXgtQPB
+	hMsBZADJa8IHRzXi3si/fw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1772651171; x=
+	1772737571; bh=qCX0fETb7LppqJFm0Ooo/gF9iA4aj4iETpmuW38yLUo=; b=s
+	6nzvTtpBqH82ivNYLovM4VSInHyVAhTS9x9CZI4bUO4nrSO0pfkvMET/J+zq0dEH
+	IP9kWOiGGPMXQQRV3+3W0HAjfsPtuAC5uD5niGiwZzw6e8nM1dTrrz+2BP0HY5I7
+	BMBe3hGrhf/kQOU5Yh0gaOQPMzR1JWRoGLhNKLHLrPlBl80J6LOPVUTs4JQTtwg3
+	Ub7uiSGwdh4PsjvFdYgEFPsT8m/OnDPw9RLfWvmvOQjAG2qeI6VwNq0akS0qfyHA
+	kMZjUvQyMQsrVBXGLVdLFSfU2iK/ILyk2dUfZzqlKjEsAUBuGdnW5QtwtWc+odSr
+	LMlsAMLIWrYrhhJJ9wm6Q==
+X-ME-Sender: <xms:o4KoaYbEUOGLmhALC8icVHpDOT1S438ENW5QCqOHIP-GywzmlY1t3w>
+    <xme:o4KoaR6Z5v45JPMXnOiogT0-TzVDBNF68J-FnfWlvxNI4h0JAV6ZDlv2aAwR9coGt
+    XkmBqbUwr_Aomu0YuQxiBYXXZJHW8ZaU8G7zw7EKYvKbZWVVdtSHQ>
+X-ME-Received: <xmr:o4Koaedkhn-zMBZauvy8vcu3MDHXq1_iYsiinS4d_b6RBP94GHmCExjZqhw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvieegfedtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfgjfhfogggtgfesthejre
+    dtredtvdenucfhrhhomheptehlvgigucghihhllhhirghmshhonhcuoegrlhgvgiesshhh
+    rgiisghothdrohhrgheqnecuggftrfgrthhtvghrnhepvdekfeejkedvudfhudfhteekud
+    fgudeiteetvdeukedvheetvdekgfdugeevueeunecuvehluhhsthgvrhfuihiivgeptden
+    ucfrrghrrghmpehmrghilhhfrhhomheprghlvgigsehshhgriigsohhtrdhorhhgpdhnsg
+    gprhgtphhtthhopedugedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnkhhi
+    thgrsehnvhhiughirgdrtghomhdprhgtphhtthhopehvshgvthhhihesnhhvihguihgrrd
+    gtohhmpdhrtghpthhtohepjhhgghesnhhvihguihgrrdgtohhmpdhrtghpthhtohepmhho
+    tghhshesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpd
+    hrtghpthhtohepshhkohhlohhthhhumhhthhhosehnvhhiughirgdrtghomhdprhgtphht
+    thhopegtjhhirgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepiihhihifsehnvhhiug
+    hirgdrtghomhdprhgtphhtthhopehkjhgrjhhusehnvhhiughirgdrtghomh
+X-ME-Proxy: <xmx:o4KoacwTUEQBTAzmZAtxLyBFqDj0s7Pu1krJnjphElBvv5aW1DbUTQ>
+    <xmx:o4Koaco10nD57Gf9clP1e0nfdjb9UZqmHEjguojZoCmVA8W7mGvYrg>
+    <xmx:o4KoaSz0x-rBCR0dfcPGxI2cyO6RyE58lo48j7_q3vEz9HUo9d6C0A>
+    <xmx:o4KoaYqTR2TJRH4x2AHD1lNz29ZusarFu5YiU-SaRsmV_U9XuzgvGw>
+    <xmx:o4KoaTNWn0ZE7R5gzToIJquRi5f4d3_R3M7lckYtnbIdzLUq-a9l8Lxf>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 4 Mar 2026 14:06:10 -0500 (EST)
+Date: Wed, 4 Mar 2026 12:06:08 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: <ankita@nvidia.com>
+Cc: <vsethi@nvidia.com>, <jgg@nvidia.com>, <mochs@nvidia.com>,
+ <jgg@ziepe.ca>, <skolothumtho@nvidia.com>, <cjia@nvidia.com>,
+ <zhiw@nvidia.com>, <kjaju@nvidia.com>, <yishaih@nvidia.com>,
+ <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, alex@shazbot.org
+Subject: Re: [PATCH RFC v2 07/15] vfio/nvgrace-egm: Register auxiliary
+ driver ops
+Message-ID: <20260304120608.141f6c90@shazbot.org>
+In-Reply-To: <20260223155514.152435-8-ankita@nvidia.com>
+References: <20260223155514.152435-1-ankita@nvidia.com>
+	<20260223155514.152435-8-ankita@nvidia.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <76aff8f9-1c08-449a-a034-f3b93440d1a8@lucifer.local>
-X-Rspamd-Queue-Id: 5A9EA206E4D
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 20737206E3F
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=casper.20170209];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm3,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72737-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,oracle.com,linux-foundation.org,kernel.org,nvidia.com,intel.com,gmail.com,sk.com,gourry.net,linux.alibaba.com,redhat.com,arm.com,linux.dev,suse.cz,suse.com,suse.de,linux.ibm.com,ellerman.id.au,kvack.org,lists.ozlabs.org,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willy@infradead.org,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72738-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,casper.infradead.org:mid,infradead.org:dkim]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,nvidia.com:email,messagingengine.com:dkim,shazbot.org:dkim,shazbot.org:mid]
 X-Rspamd-Action: no action
 
-On Wed, Mar 04, 2026 at 04:53:27PM +0000, Lorenzo Stoakes (Oracle) wrote:
-> On Wed, Mar 04, 2026 at 03:24:05AM +0000, Matthew Wilcox wrote:
-> > We could literally return any error code -- it never makes it to
-> > userspace.  I forget where it is, but if you follow the syscall
-> > return to user path, a dying task never makes it to running a single
-> > instruction.
-> 
-> Thanks for that Matthew, that makes life easier then.
-> 
-> We can probably replace some of the more horrid if (err == -EINTR) stuff with
-> fatal_signal_pending(current) to be clearer as a result.
+On Mon, 23 Feb 2026 15:55:06 +0000
+<ankita@nvidia.com> wrote:
 
-Umm.  Be careful?  fatal_signal_pending() may become true at a later
-point, so you may have acquired the lock _and_ fatal_signal_pending()
-can be true.  I'd need to audit a patch to be sure that it's a
-reasonable replacement.
+> From: Ankit Agrawal <ankita@nvidia.com>
+> 
+> Setup dummy auxiliary device ops to be able to get probed by
+> the nvgrace-egm auxiliary driver.
+> 
+> Both nvgrace-gpu and the out-of-tree nvidia-vgpu-vfio will make
+> use of the EGM for device assignment and the SRIOV vGPU virtualization
+> solutions respectively. Hence allow auxiliary device probing for both.
+
+But only one is added?
+
+Can you point to any other in-tree drivers that include out-of-tree
+device entries in their ID table?
+
+Isn't this ID table what should make the module soft-dep unnecessary?
+
+> 
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  drivers/vfio/pci/nvgrace-gpu/egm.c | 38 +++++++++++++++++++++++++++---
+>  1 file changed, 35 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/egm.c b/drivers/vfio/pci/nvgrace-gpu/egm.c
+> index 6bab4d94cb99..6fd6302a004a 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/egm.c
+> +++ b/drivers/vfio/pci/nvgrace-gpu/egm.c
+> @@ -11,6 +11,29 @@
+>  static dev_t dev;
+>  static struct class *class;
+>  
+> +static int egm_driver_probe(struct auxiliary_device *aux_dev,
+> +			    const struct auxiliary_device_id *id)
+> +{
+> +	return 0;
+> +}
+> +
+> +static void egm_driver_remove(struct auxiliary_device *aux_dev)
+> +{
+> +}
+> +
+> +static const struct auxiliary_device_id egm_id_table[] = {
+> +	{ .name = "nvgrace_gpu_vfio_pci.egm" },
+> +	{ },
+> +};
+> +MODULE_DEVICE_TABLE(auxiliary, egm_id_table);
+> +
+> +static struct auxiliary_driver egm_driver = {
+> +	.name = KBUILD_MODNAME,
+> +	.id_table = egm_id_table,
+> +	.probe = egm_driver_probe,
+> +	.remove = egm_driver_remove,
+> +};
+> +
+>  static char *egm_devnode(const struct device *device, umode_t *mode)
+>  {
+>  	if (mode)
+> @@ -35,17 +58,26 @@ static int __init nvgrace_egm_init(void)
+>  
+>  	class = class_create(NVGRACE_EGM_DEV_NAME);
+>  	if (IS_ERR(class)) {
+> -		unregister_chrdev_region(dev, MAX_EGM_NODES);
+> -		return PTR_ERR(class);
+> +		ret = PTR_ERR(class);
+> +		goto unregister_chrdev;
+>  	}
+>  
+>  	class->devnode = egm_devnode;
+>  
+> -	return 0;
+> +	ret = auxiliary_driver_register(&egm_driver);
+> +	if (!ret)
+> +		goto fn_exit;
+
+This is not a good success oriented flow.  The error condition should
+goto the unwind, the success condition can just fall through to return.
+Thanks,
+
+Alex
+
+> +
+> +	class_destroy(class);
+> +unregister_chrdev:
+> +	unregister_chrdev_region(dev, MAX_EGM_NODES);
+> +fn_exit:
+> +	return ret;
+>  }
+>  
+>  static void __exit nvgrace_egm_cleanup(void)
+>  {
+> +	auxiliary_driver_unregister(&egm_driver);
+>  	class_destroy(class);
+>  	unregister_chrdev_region(dev, MAX_EGM_NODES);
+>  }
+
 
