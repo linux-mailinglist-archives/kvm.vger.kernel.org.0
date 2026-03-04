@@ -1,151 +1,243 @@
-Return-Path: <kvm+bounces-72671-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72672-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GFxCHNr7p2mvnAAAu9opvQ
-	(envelope-from <kvm+bounces-72671-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 10:31:06 +0100
+	id WC14Kr/9p2mlnAAAu9opvQ
+	(envelope-from <kvm+bounces-72672-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 10:39:11 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E6DF1FD99F
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 10:31:06 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C8D1FDBD6
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 10:39:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C1D6B3046AB8
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 09:31:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 28BE1309A2E9
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 09:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1F13988ED;
-	Wed,  4 Mar 2026 09:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED9423976AA;
+	Wed,  4 Mar 2026 09:35:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jAAAOGE3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECF53542E1;
-	Wed,  4 Mar 2026 09:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307781ACEDE;
+	Wed,  4 Mar 2026 09:35:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772616658; cv=none; b=j4E1qw2XikzPSo0AIyLj4H8RFvDSyIpEZRilwwcnjTgltwD31qt8r2zeCZePoozIlo3UXrqe/Ejr/DeQ0CZRYITIa1Za+AyuCQWU2RX7M310K1su5LaQlzK1dS2G/vdGWi2hBokDTh0SyZ8m4g/fsoPtBDoW3EpAdXq1LcgQdPg=
+	t=1772616933; cv=none; b=NNodN0M2/+8jgVN2MlIE8Q7oyDwUxQKncHm/Diycvb3JxXNwYPn7v+MnNuuj1clJ/2H1Q+IPA48LXcncqfVou53pXspnYDoLxu8v1EmZYOdVWREpAa7AuMCB0XdPvaiGu1Gkv3WoAVRMjdbix3D1lWDby3mIb5ykIrcwU+3Ogw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772616658; c=relaxed/simple;
-	bh=nMell/kkU0VvEVuaTGzTi4X9ynwOzwk/jFX27NlmQYs=;
-	h=Message-ID:In-Reply-To:References:Date:Mime-Version:From:To:Cc:
-	 Subject:Content-Type; b=M5LFs79yVGkMgtwT1YIR6ehT7UwjBCttdp5nNGiQulXzzFW7h1nHjAmPZ3v/+PB2YzomkZ240ZHGHlxLUdXw+hIP1wkoU+xoYOEJTC/z89dyEALpkwlKdLimT5efFOi8onCvgOY30kd8YHupEFQChjKbwqgM70fQDRz7sz3kdLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4fQnTq1RMmz8Xs72;
-	Wed, 04 Mar 2026 17:30:55 +0800 (CST)
-Received: from szxlzmapp02.zte.com.cn ([10.5.231.79])
-	by mse-fl1.zte.com.cn with SMTP id 6249Uk2v099658;
-	Wed, 4 Mar 2026 17:30:46 +0800 (+08)
-	(envelope-from wang.yechao255@zte.com.cn)
-Received: from mapi (szxl2zmapp06[null])
-	by mapi (Zmail) with MAPI id mid12;
-	Wed, 4 Mar 2026 17:30:49 +0800 (CST)
-X-Zmail-TransId: 2b0869a7fbc9022-35137
-X-Mailer: Zmail v1.0
-Message-ID: <20260304173049328qFHOTh8G2sgzCY7pyCVpr@zte.com.cn>
-In-Reply-To: <20260304172139131ChDubMSpGDUB03lY4UCbK@zte.com.cn>
-References: 20260304172139131ChDubMSpGDUB03lY4UCbK@zte.com.cn
-Date: Wed, 4 Mar 2026 17:30:49 +0800 (CST)
+	s=arc-20240116; t=1772616933; c=relaxed/simple;
+	bh=fcQPpx8aXl/bNZmJJr4UNqNuegofLcCcrPHmWDmwHeM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K1K73O1ZtW8X0M86LcwYpGEwz8YWNrSsAsTW4FNcDwIMEBjhMP3jJ21eg/JhZGr9U81ct8Tj29djM3DyUljkouCD9h5QqEm1jh1LZUeAQskslikj8klEdtrYawOv16auSnwPaDut5+WoyYaxGBfFC5Z6640W4xYSOX6yY7v29oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jAAAOGE3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3771C19423;
+	Wed,  4 Mar 2026 09:35:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772616933;
+	bh=fcQPpx8aXl/bNZmJJr4UNqNuegofLcCcrPHmWDmwHeM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jAAAOGE3yEaLrrLntuxDP4H0mebq4t+SmQ5VHnBBo3slVvJte1dhqls/6yLwgccPj
+	 JGhp+O05g7UxK+18O7ErIEpLcfmVlKe3YaD2LSycrMQs/h8/FGkJSL/uC25dYkS1hd
+	 0mEB9FT6J1C/tStohhvhX07snjfQp79h8RsKwhD+J2EJ9bX+E6jaAojpDX0ayG+j24
+	 94Bg4T+9U1Tt+NXm8oRxArfvm/PXDREZWT02eOEpUU361uHOF3TF9eTLKMMBtO8dDD
+	 AvOc3HHq3RJ4nUW5QtJrnV/sfO+AU+2XzFeLUHzUDeed9X83iE9epPg8dJfI+xX75K
+	 W6qVuInzp8ABg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vxide-0000000FyTI-31HL;
+	Wed, 04 Mar 2026 09:35:30 +0000
+Date: Wed, 04 Mar 2026 09:35:30 +0000
+Message-ID: <864imw7x99.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com"
+	<jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v5 16/36] KVM: arm64: gic-v5: Implement direct injection of PPIs
+In-Reply-To: <20260226155515.1164292-17-sascha.bischoff@arm.com>
+References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
+	<20260226155515.1164292-17-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <wang.yechao255@zte.com.cn>
-To: <anup@brainfault.org>, <atish.patra@linux.dev>, <pjw@kernel.org>,
-        <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>, <alex@ghiti.fr>
-Cc: <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
-        <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <wang.yechao255@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIHYyIDMvM10gUklTQy1WOiBLVk06IFNwbGl0IGh1Z2UgcGFnZXMgZHVyaW5nIGZhdWx0IGhhbmRsaW5nIGZvcgoKIGRpcnR5IGxvZ2dpbmc=?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 6249Uk2v099658
-X-TLS: YES
-X-SPF-DOMAIN: zte.com.cn
-X-ENVELOPE-SENDER: wang.yechao255@zte.com.cn
-X-SPF: None
-X-SOURCE-IP: 10.5.228.132 unknown Wed, 04 Mar 2026 17:30:55 +0800
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 69A7FBCF.000/4fQnTq1RMmz8Xs72
-X-Rspamd-Queue-Id: 0E6DF1FD99F
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Rspamd-Queue-Id: 48C8D1FDBD6
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.64 / 15.00];
-	SUBJ_EXCESS_BASE64(1.50)[];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[zte.com.cn : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-72672-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72671-lists,kvm=lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[wang.yechao255@zte.com.cn,kvm@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	R_DKIM_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,zte.com.cn:mid,zte.com.cn:email]
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arm.com:email,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,huawei.com:email]
 X-Rspamd-Action: no action
 
-From: Wang Yechao <wang.yechao255@zte.com.cn>
+On Thu, 26 Feb 2026 15:59:33 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+> 
+> GICv5 is able to directly inject PPI pending state into a guest using
+> a mechanism called DVI whereby the pending bit for a paticular PPI is
+> driven directly by the physically-connected hardware. This mechanism
+> itself doesn't allow for any ID translation, so the host interrupt is
+> directly mapped into a guest with the same interrupt ID.
+> 
+> When mapping a virtual interrupt to a physical interrupt via
+> kvm_vgic_map_irq for a GICv5 guest, check if the interrupt itself is a
+> PPI or not. If it is, and the host's interrupt ID matches that used
+> for the guest DVI is enabled, and the interrupt itself is marked as
+> directly_injected.
+> 
+> When the interrupt is unmapped again, this process is reversed, and
+> DVI is disabled for the interrupt again.
+> 
+> Note: the expectation is that a directly injected PPI is disabled on
+> the host while the guest state is loaded. The reason is that although
+> DVI is enabled to drive the guest's pending state directly, the host
+> pending state also remains driven. In order to avoid the same PPI
+> firing on both the host and the guest, the host's interrupt must be
+> disabled (masked). This is left up to the code that owns the device
+> generating the PPI as this needs to be handled on a per-VM basis. One
+> VM might use DVI, while another might not, in which case the physical
+> PPI should be enabled for the latter.
+> 
+> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v5.c | 15 +++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.c    | 10 ++++++++++
+>  arch/arm64/kvm/vgic/vgic.h    |  1 +
+>  include/kvm/arm_vgic.h        |  1 +
+>  4 files changed, 27 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 5b35c756887a9..f5cd9decfc26e 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -86,6 +86,21 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
+>  	return 0;
+>  }
+>  
+> +/*
+> + * Sets/clears the corresponding bit in the ICH_PPI_DVIR register.
+> + */
+> +int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	u32 ppi = FIELD_GET(GICV5_HWIRQ_ID, irq);
+> +	unsigned long *p;
+> +
+> +	p = (unsigned long *)&cpu_if->vgic_ppi_dvir[ppi / 64];
+> +	__assign_bit(ppi % 64, p, dvi);
+> +
+> +	return 0;
+> +}
+> +
+>  void vgic_v5_load(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index 1005ff5f36235..62e58fdf611d3 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -577,12 +577,22 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>  	irq->host_irq = host_irq;
+>  	irq->hwintid = data->hwirq;
+>  	irq->ops = ops;
+> +
+> +	if (vgic_is_v5(vcpu->kvm) &&
+> +	    __irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, irq->intid))
+> +		irq->directly_injected = !vgic_v5_set_ppi_dvi(vcpu, irq->hwintid,
+> +							      true);
+> +
 
-During dirty logging, all huge pages are write-protected. When the guest
-writes to a write-protected huge page, a page fault is triggered. Before
-recovering the write permission, the huge page must be split into smaller
-pages (e.g., 4K). After splitting, the normal mapping process proceeds,
-allowing write permission to be restored at the smaller page granularity.
+Huh. A couple of things here:
 
-This ensures that dirty logging works correctly with huge pages.
+- under what conditions would irq->directly_injected not be set to
+  true for a PPI? That can never happen here AFAICT.
 
-Signed-off-by: Wang Yechao <wang.yechao255@zte.com.cn>
----
- arch/riscv/kvm/gstage.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+- we have per-IRQ operations, and PPIs do have such ops attached to
+  them. Why can't this be moved to such a callback?
 
-diff --git a/arch/riscv/kvm/gstage.c b/arch/riscv/kvm/gstage.c
-index 92331e9b0bb8..27ea6bb81553 100644
---- a/arch/riscv/kvm/gstage.c
-+++ b/arch/riscv/kvm/gstage.c
-@@ -171,6 +171,9 @@ int kvm_riscv_gstage_map_page(struct kvm_gstage *gstage,
- {
- 	pgprot_t prot;
- 	int ret;
-+	pte_t *ptep;
-+	u32 ptep_level;
-+	bool found_leaf;
+>  	return 0;
+>  }
+>  
+>  /* @irq->irq_lock must be held */
+>  static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
+>  {
+> +	if (irq->directly_injected && vgic_is_v5(irq->target_vcpu->kvm))
+> +		WARN_ON(vgic_v5_set_ppi_dvi(irq->target_vcpu, irq->hwintid, false));
+> +
+> +	irq->directly_injected = false;
+>  	irq->hw = false;
+>  	irq->hwintid = 0;
+>  	irq->ops = NULL;
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index 81d464d26534f..d7fe867a27b64 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -364,6 +364,7 @@ void vgic_debug_init(struct kvm *kvm);
+>  void vgic_debug_destroy(struct kvm *kvm);
+>  
+>  int vgic_v5_probe(const struct gic_kvm_info *info);
+> +int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi);
 
- 	out_map->addr = gpa;
- 	out_map->level = 0;
-@@ -179,6 +182,12 @@ int kvm_riscv_gstage_map_page(struct kvm_gstage *gstage,
- 	if (ret)
- 		return ret;
+Doing the above would keep these things private to the vgic-v5
+implementation.
 
-+	found_leaf = kvm_riscv_gstage_get_leaf(gstage, gpa, &ptep, &ptep_level);
-+	if (found_leaf && ptep_level > out_map->level) {
-+		kvm_riscv_gstage_split_huge(gstage, pcache, gpa,
-+					    out_map->level, true);
-+	}
-+
- 	/*
- 	 * A RISC-V implementation can choose to either:
- 	 * 1) Update 'A' and 'D' PTE bits in hardware
+Thanks,
+
+	M.
+
 -- 
-2.47.3
+Without deviation from the norm, progress is not possible.
 
