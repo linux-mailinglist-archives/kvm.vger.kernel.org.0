@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-72748-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72749-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yCg9BKSvqGmfwQAAu9opvQ
-	(envelope-from <kvm+bounces-72748-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 23:18:12 +0100
+	id YM3cLOiuqGmfwQAAu9opvQ
+	(envelope-from <kvm+bounces-72749-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 23:15:04 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F25320869F
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 23:18:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27EAF208627
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 23:15:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7EF40309F6F1
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 22:06:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 89C063022549
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 22:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6202B39B954;
-	Wed,  4 Mar 2026 22:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C78A38C2D5;
+	Wed,  4 Mar 2026 22:14:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="rtesIB1D";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UVUaebiN"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="TTMtMoYP";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="KvKVso4o"
 X-Original-To: kvm@vger.kernel.org
-Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
+Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FD436D9FB;
-	Wed,  4 Mar 2026 22:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0D83542E1;
+	Wed,  4 Mar 2026 22:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772661884; cv=none; b=W0/q+ra+Z5o7moWlWg+3gmjAXfdlyl/VtWu07rVMPB7lzh719kpi42UuVHWVCJXinIyNbc4klw855sJjXKK7xRDvyQTSqOYBIOZYd3/EJrrF2zpD0KrGp1oaiPuPij9R+lB3qO9XH+udc9pP2BnBVm/1IJ5MMaEG8pYq8bEgHYE=
+	t=1772662488; cv=none; b=A3eePzhpSwkjJ7Dt46JXwShRXpCP/i1OoWFPjDh3+zYCdgM+8wI4Gz1/sZGqctn3bAHd9+oCyXi58cQ8nHZ1Eb0cj3grBJEIehiF2Cu8t2lc7wNuLOx79gbhHfGhqRcptM4HAZodd0BmhiR6U5G6xtc9ftwScE+8YTShs6eehVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772661884; c=relaxed/simple;
-	bh=ZJiGD84DzBfUTbqzmlDxZ7pnB01F8l8SBBEGCfy1Yyg=;
+	s=arc-20240116; t=1772662488; c=relaxed/simple;
+	bh=zS5wactH0c+aZMGnILpmV9xQhUB7NhvMKwTRwD7yhOk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IELnRdajrgSVVarR4IuzQUhXq7Jp1QtTfxWQMozhC+zvHUcPMC1IbJvgYZKdPPnGNVfI8JlRb67qqQuSJmqF7sLXRJ6L1IvcSW7gUpGGsQKvg5MR1MPUQT1CSAgoqvepnxZ09C64MTmLdXay2BsYRHCVR+0oGPRHqDZ1HAk3BSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=rtesIB1D; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UVUaebiN; arc=none smtp.client-ip=202.12.124.145
+	 MIME-Version:Content-Type; b=qyZTBclvZOWnxdCotvVF1vwIjgzpKogXID9/vRwq6XdyKu0iUhMzGiQ14V2lO/AZ8se/8bBVDApw0uaiJX8T06+LgRQNsKiyeis+e1AidEm/C+RN26y24S9jrqUpH+czmf7iVZadIU9S36j+fbfrC2ovCYSOekqEYE6mMtL8zw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=TTMtMoYP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=KvKVso4o; arc=none smtp.client-ip=202.12.124.153
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
 Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
-	by mailfout.stl.internal (Postfix) with ESMTP id 627171D00238;
-	Wed,  4 Mar 2026 17:04:40 -0500 (EST)
+	by mailfhigh.stl.internal (Postfix) with ESMTP id BEBCA7A014B;
+	Wed,  4 Mar 2026 17:14:45 -0500 (EST)
 Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-07.internal (MEProxy); Wed, 04 Mar 2026 17:04:40 -0500
+  by phl-compute-07.internal (MEProxy); Wed, 04 Mar 2026 17:14:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
 	cc:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1772661880;
-	 x=1772748280; bh=Xfp8hP8zU5VEktYbpj1A0zt7oRH6k1QGpsbAoxunKPo=; b=
-	rtesIB1DqxEJYE1NxUPZUAUU77MLtpp3VWcpOJ+UsBRMP7/aDjtDkNWuTkn9ISUI
-	rY9W/fKTnrTUgGxHMa31xNEDR1keAJtID52DACPMMNu+1Bpq9ylOTkG4FLcHEInT
-	g+eVdk9gtXmuYngWh0BGdNKUimWTQlAWXzxMdbuED9QxcymTFPKggabPYnA/6dvF
-	gQD9b0+a1whRe1RMQXW8X19EKVo6eMgSivt5GNomFwVv/NHk2kLsI60QR70zcaVF
-	S4fxNsgjSLqkp0TA1gNDzeH2pJ8IcPzFJPQX8qXRCx0ew/cPuFTXovyNxeUCaG58
-	dNRWKcKXozsdH2zGydAR2g==
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1772662485;
+	 x=1772748885; bh=XMEDMfVN8UQr/tBQ2ylyKHqSSktj29Lsx+eea8cPjmw=; b=
+	TTMtMoYPcwgbYLbxd8RE/l971xH8WofDOTsegSlfxtJM5clr9wubMGSMr+81nP8M
+	T9c7Hw7tbcXRybDBoThXP+51hCjRs/tgcF7anodvqhwylVtGpXfF34gF1iqFhyCg
+	0TcTwStOfNynt0Umcno9GMSIGF/3SM1pmP8DT7QkKZj6UhhtckWmSs2/DGCfOAWv
+	bSUAiJoM8HjteA2b5YM2xE/ybRUg/FA3uSaz6I2tBOsuuhmSVZFYKVlxcRr2GEH8
+	jF09rhjjYOw+5Lhw2GFVoQGNlog3k4ldjQgwGTfi/Jwc1Rz2nbK2ZLG2iTuKiRJm
+	+W6KrH99w2OdABfcPP7izA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1772661880; x=
-	1772748280; bh=Xfp8hP8zU5VEktYbpj1A0zt7oRH6k1QGpsbAoxunKPo=; b=U
-	VUaebiNBseQVfeuWVEU9hyuzK9e55hSgUS4yL3nMAPmy1dXDu5xX9ww6k8CQhezE
-	FQQx1RA2+VsTdfyUXmnnjfw6ziWTMc2UiNxQs3qoWtRYhcDLvEcitTxJcgDvUNKG
-	2zdLV4UAvgKAeWlRXNH4jl2hORBwhwcu8JN9/IhllmxCWTEig4TT1uapagdxKlWM
-	W+2+UkZls4fua0qLMP7d6La8x2xcqnDGTghMBjCH9iaDMAFHB/ZfsqlNmXOEBB1C
-	X5gqrypf/KF9DHEPsuIEkV4JXMJSPGnjmqrSnE7Xwd9UJTFP94VnwJnEurG6J4aB
-	zynudYl/aXFcmyNCeDpdQ==
-X-ME-Sender: <xms:d6yoaZ2OkjeRQEG0Y2_se0ahZk4sTxUTcTdje5xkq1ou7wpluzzfIw>
-    <xme:d6yoaVQOxCRGX4hk45bSNohQK1dsOx-tHe06v639HmZhmceWBlI5oEBQMPZ_Te_gK
-    fvTgjSUD5I796Pfnrf_KB6ODWddYPrZZK2i5v984_SLSCUEavb5Ig>
-X-ME-Received: <xmr:d6yoadQZNPkOscy1WYeF5jtFtKIEMNUJDn2lUCnXNBMwQDPy6TPPUx9ZTdQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvieegieehucetufdoteggodetrf
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1772662485; x=
+	1772748885; bh=XMEDMfVN8UQr/tBQ2ylyKHqSSktj29Lsx+eea8cPjmw=; b=K
+	vKVso4oyWnc/IKv5MUd+VvGe3qsGBD4d2m1AO7Kxo09se5UZjtcNf7LNmGgda7hc
+	Q0wFjC1W7KQaqdH54XSSx+TfaI/Rp4pa2yYpR7T4H23YM1I/2Freb9Z3ylj/iAwB
+	bcwLV0RYoXGvlffnEcsjWbXTusBERAeJW7bUBwHKENwc38uJB88vJd4jLOIacK47
+	IgqaNLUhMKA+YNcyPrLg8aOQVfXRWO9cBfyG+rhlCkCHzq2+zf/dMA5Ieewm3FeL
+	TsK23rYcasEPualACAXIDZQc+XAdmmd1Q6VQ0dJIZSkITQf08IBKxzEZF3J0MPqn
+	0v4xOd+4Ht/BIEzBTUQQw==
+X-ME-Sender: <xms:1a6oaUBO5EK8MM7drT1RIOPm0su6FGKD0maBEZdYyUWzCU6bLNYTXw>
+    <xme:1a6oaVBZ7VstO_Lu2Zsf-rOPmxOpb-bQ4XhefpEzt8nK2bgr9KFAljkUvvEWBScB4
+    V3C2ds_WwW8Juym6XSJs3zdTleQckMtQxbkTsOF1IN2AQkjZ8WRPw>
+X-ME-Received: <xmr:1a6oaTEmK7ZxJzz6XQX0xDK5CgkaT6yONo36VV_gYZGq6HVw51AOAikP5Vo>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvieegieejucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfgjfhfogggtgfesthejre
     dtredtvdenucfhrhhomheptehlvgigucghihhllhhirghmshhonhcuoegrlhgvgiesshhh
@@ -82,15 +82,15 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvieegieehucetufdote
     hrtghpthhtohepshhkohhlohhthhhumhhthhhosehnvhhiughirgdrtghomhdprhgtphht
     thhopegtjhhirgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepiihhihifsehnvhhiug
     hirgdrtghomhdprhgtphhtthhopehkjhgrjhhusehnvhhiughirgdrtghomh
-X-ME-Proxy: <xmx:d6yoaWW28S-R4Vn53zvpZA5LEjHfNbjAiSiab9vy66FjoE7Y2Ls_Sg>
-    <xmx:d6yoaXL6YDEyBpcBkkYxlTuM7YMgeIudxn2lBNLn2zoGHB9Db5S9aw>
-    <xmx:d6yoaXiORSU0Ziwn2sYpQjB0pq6qE1vglUpPqSMUEVWbN4uyymqyyA>
-    <xmx:d6yoaUIK-QWtKslKyxlFQdzjr_LqV-fVk8sRAPD0Td9TLYUAGzqwLA>
-    <xmx:eKyoaRjnvBrfZBImQ6rwIzGZahcPiGJIZjto93hrFC_-VlMrUjIOd3Jc>
+X-ME-Proxy: <xmx:1a6oaU7cVuoyUCfHRN97L2ZQiBS6djlMgSHcyND_YrFUbMcFBMV4-g>
+    <xmx:1a6oaSRhss06FAHv99J8UiIWbvKMT8W9BKOK_sVJkx8J95BJul-DxQ>
+    <xmx:1a6oaX5FJeABajaGbrLJ7wVgJvBYrBKfPE6opkPMv2pQU8GPh3vhNA>
+    <xmx:1a6oaXTfqscMjW59cTECtxMUE37J6i9msu2GhmyJC_bRPZWArRNgSA>
+    <xmx:1a6oabRDJbB8f4bBl9cgVONg7let4MZfbNYLVatBVsoMvaimEaI3BLto>
 Feedback-ID: i03f14258:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 4 Mar 2026 17:04:38 -0500 (EST)
-Date: Wed, 4 Mar 2026 15:04:37 -0700
+ 4 Mar 2026 17:14:44 -0500 (EST)
+Date: Wed, 4 Mar 2026 15:14:43 -0700
 From: Alex Williamson <alex@shazbot.org>
 To: <ankita@nvidia.com>
 Cc: <vsethi@nvidia.com>, <jgg@nvidia.com>, <mochs@nvidia.com>,
@@ -98,12 +98,12 @@ Cc: <vsethi@nvidia.com>, <jgg@nvidia.com>, <mochs@nvidia.com>,
  <zhiw@nvidia.com>, <kjaju@nvidia.com>, <yishaih@nvidia.com>,
  <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
  <linux-kernel@vger.kernel.org>, alex@shazbot.org
-Subject: Re: [PATCH RFC v2 09/15] vfio/nvgrace-egm: Add chardev ops for EGM
- management
-Message-ID: <20260304150437.50503b55@shazbot.org>
-In-Reply-To: <20260223155514.152435-10-ankita@nvidia.com>
+Subject: Re: [PATCH RFC v2 10/15] vfio/nvgrace-egm: Clear Memory before
+ handing out to VM
+Message-ID: <20260304151443.26eb33f0@shazbot.org>
+In-Reply-To: <20260223155514.152435-11-ankita@nvidia.com>
 References: <20260223155514.152435-1-ankita@nvidia.com>
-	<20260223155514.152435-10-ankita@nvidia.com>
+	<20260223155514.152435-11-ankita@nvidia.com>
 X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -113,12 +113,12 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 1F25320869F
+X-Rspamd-Queue-Id: 27EAF208627
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm3,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -127,10 +127,10 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72748-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72749-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	PRECEDENCE_BULK(0.00)[];
@@ -140,124 +140,118 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_NONE(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,shazbot.org:dkim,shazbot.org:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,messagingengine.com:dkim]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,shazbot.org:dkim,shazbot.org:mid,messagingengine.com:dkim,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Mon, 23 Feb 2026 15:55:08 +0000
+On Mon, 23 Feb 2026 15:55:09 +0000
 <ankita@nvidia.com> wrote:
 
 > From: Ankit Agrawal <ankita@nvidia.com>
 > 
-> EGM module implements the mmap file_ops to manage the usermode app's
-> VMA mapping to the EGM region. The appropriate region is determined
-> from the minor number.
+> The EGM region is invisible to the host Linux kernel and it does not
+> manage the region. The EGM module manages the EGM memory and thus is
+> responsible to clear out the region before handing out to the VM.
 > 
-> Note that the EGM memory region is invisible to the host kernel as it
-> is not present in the host EFI map. The host Linux MM thus cannot manage
-> the memory, even though it is accessible on the host SPA. The EGM module
-> thus use remap_pfn_range() to perform the VMA mapping to the EGM region.
+> Clear EGM region on EGM chardev open. To avoid CPU lockup logs,
+> zap the region in 1G chunks.
 > 
-> Suggested-by: Aniket Agashe <aniketa@nvidia.com>
+> Suggested-by: Vikram Sethi <vsethi@nvidia.com>
 > Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
 > ---
->  drivers/vfio/pci/nvgrace-gpu/egm.c | 41 +++++++++++++++++++++++++++++-
->  include/linux/nvgrace-egm.h        |  1 +
->  2 files changed, 41 insertions(+), 1 deletion(-)
+>  drivers/vfio/pci/nvgrace-gpu/egm.c | 43 ++++++++++++++++++++++++++++++
+>  1 file changed, 43 insertions(+)
 > 
 > diff --git a/drivers/vfio/pci/nvgrace-gpu/egm.c b/drivers/vfio/pci/nvgrace-gpu/egm.c
-> index d7e4f61a241c..5786ebe374a5 100644
+> index 5786ebe374a5..de7771a4145d 100644
 > --- a/drivers/vfio/pci/nvgrace-gpu/egm.c
 > +++ b/drivers/vfio/pci/nvgrace-gpu/egm.c
-> @@ -17,19 +17,58 @@ struct chardev {
+> @@ -15,6 +15,7 @@ static DEFINE_XARRAY(egm_chardevs);
+>  struct chardev {
+>  	struct device device;
 >  	struct cdev cdev;
+> +	atomic_t open_count;
 >  };
 >  
-> +static struct nvgrace_egm_dev *
-> +egm_chardev_to_nvgrace_egm_dev(struct chardev *egm_chardev)
-> +{
-> +	struct auxiliary_device *aux_dev =
-> +		container_of(egm_chardev->device.parent, struct auxiliary_device, dev);
+>  static struct nvgrace_egm_dev *
+> @@ -30,6 +31,42 @@ static int nvgrace_egm_open(struct inode *inode, struct file *file)
+>  {
+>  	struct chardev *egm_chardev =
+>  		container_of(inode->i_cdev, struct chardev, cdev);
+> +	struct nvgrace_egm_dev *egm_dev =
+> +		egm_chardev_to_nvgrace_egm_dev(egm_chardev);
+> +	void *memaddr;
 > +
-> +	return container_of(aux_dev, struct nvgrace_egm_dev, aux_dev);
-> +}
+> +	if (atomic_cmpxchg(&egm_chardev->open_count, 0, 1) != 0)
+> +		return -EBUSY;
 > +
->  static int nvgrace_egm_open(struct inode *inode, struct file *file)
+> +	/*
+> +	 * nvgrace-egm module is responsible to manage the EGM memory as
+> +	 * the host kernel has no knowledge of it. Clear the region before
+> +	 * handing over to userspace.
+> +	 */
+> +	memaddr = memremap(egm_dev->egmphys, egm_dev->egmlength, MEMREMAP_WB);
+> +	if (!memaddr) {
+> +		atomic_dec(&egm_chardev->open_count);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	/*
+> +	 * Clear in chunks of 1G to avoid CPU lockup logs.
+> +	 */
+> +	{
+> +		size_t remaining = egm_dev->egmlength;
+> +		u8 *chunk_addr = (u8 *)memaddr;
+> +		size_t chunk_size;
+
+Declare at the start of the function and remove this scope hack.
+
+> +
+> +		while (remaining > 0) {
+> +			chunk_size = min(remaining, SZ_1G);
+
+min_t(size_t,,);
+
+> +			memset(chunk_addr, 0, chunk_size);
+> +			cond_resched();
+> +			chunk_addr += chunk_size;
+> +			remaining -= chunk_size;
+> +		}
+> +	}
+
+Aren't we going to want to do this asynchronously or run multiple
+threads to avoid stalling VM launch? 
+
+> +
+> +	memunmap(memaddr);
+>  
+>  	file->private_data = egm_chardev;
+>  
+> @@ -38,8 +75,13 @@ static int nvgrace_egm_open(struct inode *inode, struct file *file)
+>  
+>  static int nvgrace_egm_release(struct inode *inode, struct file *file)
 >  {
 > +	struct chardev *egm_chardev =
 > +		container_of(inode->i_cdev, struct chardev, cdev);
 > +
-> +	file->private_data = egm_chardev;
-> +
-
-No reference taken to egm device, nothing blocks it being removed.
-
->  	return 0;
->  }
+>  	file->private_data = NULL;
 >  
->  static int nvgrace_egm_release(struct inode *inode, struct file *file)
->  {
-> +	file->private_data = NULL;
-
-Unnecessary.
-
+> +	atomic_dec(&egm_chardev->open_count);
 > +
 >  	return 0;
 >  }
 >  
->  static int nvgrace_egm_mmap(struct file *file, struct vm_area_struct *vma)
->  {
-> -	return 0;
-> +	struct chardev *egm_chardev = file->private_data;
-> +	struct nvgrace_egm_dev *egm_dev =
-> +		egm_chardev_to_nvgrace_egm_dev(egm_chardev);
-> +	u64 req_len, pgoff, end;
-> +	unsigned long start_pfn;
-> +
-> +	pgoff = vma->vm_pgoff &
-> +		((1U << (EGM_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+> @@ -108,6 +150,7 @@ setup_egm_chardev(struct nvgrace_egm_dev *egm_dev)
+>  	egm_chardev->device.parent = &egm_dev->aux_dev.dev;
+>  	cdev_init(&egm_chardev->cdev, &file_ops);
+>  	egm_chardev->cdev.owner = THIS_MODULE;
+> +	atomic_set(&egm_chardev->open_count, 0);
 
-I don't know what you're doing here with EGM_OFFSET_SHIFT other than
-ignoring the high bits and creating aliases across the device file
-address space for no(?) reason.  Looks like pointlessly copying vfio's
-region segmentation.
-
-> +
-> +	if (check_sub_overflow(vma->vm_end, vma->vm_start, &req_len) ||
-> +	    check_add_overflow(PHYS_PFN(egm_dev->egmphys), pgoff, &start_pfn) ||
-> +	    check_add_overflow(PFN_PHYS(pgoff), req_len, &end))
-> +		return -EOVERFLOW;
-> +
-> +	if (end > egm_dev->egmlength)
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * EGM memory is invisible to the host kernel and is not managed
-> +	 * by it. Map the usermode VMA to the EGM region.
-> +	 */
-> +	return remap_pfn_range(vma, vma->vm_start,
-> +			       start_pfn, req_len,
-> +			       vma->vm_page_prot);
-
-Obviously there are concerns about how this relates not only to the
-state of the device in routing access, but also the lifetime of this as
-there's no reference tracking whatsoever.  Thanks,
+Already zero from kzalloc.  Thanks,
 
 Alex
 
->  }
 >  
->  static const struct file_operations file_ops = {
-> diff --git a/include/linux/nvgrace-egm.h b/include/linux/nvgrace-egm.h
-> index a66906753267..b9956e7e5a0e 100644
-> --- a/include/linux/nvgrace-egm.h
-> +++ b/include/linux/nvgrace-egm.h
-> @@ -9,6 +9,7 @@
->  #include <linux/auxiliary_bus.h>
->  
->  #define NVGRACE_EGM_DEV_NAME "egm"
-> +#define EGM_OFFSET_SHIFT   40
->  
->  struct gpu_node {
->  	struct list_head list;
+>  	ret = dev_set_name(&egm_chardev->device, "egm%lld", egm_dev->egmpxm);
+>  	if (ret)
 
 
