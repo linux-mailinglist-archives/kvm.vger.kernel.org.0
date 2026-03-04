@@ -1,177 +1,173 @@
-Return-Path: <kvm+bounces-72627-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72628-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CC2jE3h7p2kshwAAu9opvQ
-	(envelope-from <kvm+bounces-72627-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 01:23:20 +0100
+	id cDYyHSN9p2nYhwAAu9opvQ
+	(envelope-from <kvm+bounces-72628-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 01:30:27 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 668A81F8DDC
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 01:23:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BD671F8E95
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 01:30:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 32E7630314C9
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 00:22:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 734AE301CA99
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 00:30:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD9AF2F6170;
-	Wed,  4 Mar 2026 00:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80AE62FAC0E;
+	Wed,  4 Mar 2026 00:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bXhmFLjX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fLkkth2d"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5E72EFDA4
-	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 00:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA5F2F6925
+	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 00:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772583752; cv=none; b=tdzKcuGTltcexRONiOgbfsb6BchrLqpwAxDXa+/ljetqHTkCfhCK3AoMQMOxsS8XBNwu0fmCqkFTzUFPIdkDGykL1PowUYOHNUCz+xsZCobtn1nN9gw4zXPK6PXce5K0q2UdKHJV+DBX8QoF7WQwTQIgCA7ryCa/xm7RyFI6GU0=
+	t=1772584214; cv=none; b=DvGCyv6Xuy4GlIg25+bk8n53LfbtQUPbhhDbqHF4bTbJpNoA0HrSCK6xP6FhPy2M9i0nT6hQHT5Rb/H4IInnvaDr0iGYoDz6SWNK9D/p1uIrP2wuR7wmsSi6Sfytupx6lS8ZOqvjfXGnlfHjBCroj3la0zms8wRB8xd8BZWBXUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772583752; c=relaxed/simple;
-	bh=NPX7a4G73+QzySINrUOAjawzHqN9/zKfXL/heyEw3GA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rTPPaE0sXWLONwE2+sfHizIZ8/sDomGGXGn2EFUaFOTiKTaV/xqgLVRiY3lcbAFxbYTFNCBM+W9GPY76EWWYFWWhqYEBBwBpooDizz1Zse2Nk22LwhnEhRMq5+bFrRBA16fd7ge88o6sH+RdscFx0y3sWuNtfDvVe1Hxk3+7G9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bXhmFLjX; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1772584214; c=relaxed/simple;
+	bh=3tPhoIC6Bu08Eim7X/y0ycnEkAVtQrk7kENmz9hQFhI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=XbkwqHDGzjVJZcUrqrYbwSfa4z9QhQT/iMDv71DXW/mvcG89ik1pWuY1nU+2rM5PGd6iaHUbwLORlhytjzU8KNew6wb/ioVb5fNYFJESu+Ub/w0Pr5ZJJYY/y0ts6qh7Lk87L7h1XHOC3prrDK5YAPfh0geUAV8dEPzLEpaDlJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fLkkth2d; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c70f137aa4aso3656874a12.2
-        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 16:22:30 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae4e20a414so140772395ad.3
+        for <kvm@vger.kernel.org>; Tue, 03 Mar 2026 16:30:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772583750; x=1773188550; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=kDpA+UvHfqu2KXcEE0BeLwUh8qWoHNo3iiEgddOUlSA=;
-        b=bXhmFLjXMt+jLLcLnKC2YEU2Gnh2U1iyyAa8t65BE5dhOjbRzMMY4b344ChMsOSfMO
-         tFq3Ef2v6rhqpSYBBVRwc9ecplKQ+pHU7e/593QMeaZnY1bFUbI7YVNhbo2DOr+DyvCv
-         e3Gj4L/Hhpb0rmfr/aT3HazUyTYD2Ot00x/vzpod9/SZzPAkjA1/YRqFtEZm1Nvd/RTn
-         5gl8H/PLZTFwJwxKvp8veQCsl4l/oADvwgex0MYsdDJPJerU76UFrL1j8Eh8RHPIdEWQ
-         2/3MWAwNSo7elG1HRt9ILmL0LSkZ0iQGN+AfWJFOj5+RvOEjxPZp9EsYu4JsjFgDYhOZ
-         ZdRg==
+        d=google.com; s=20230601; t=1772584212; x=1773189012; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vN42vQciUoJdrWBNVw0ChEaojXRkmaJ1ILHWzzE+t7o=;
+        b=fLkkth2d7UKpGE8FWBJ+oucBHZpmo6hmeuJZi0ykCVPrcQcNz0eRsWICe4BbjK4ggk
+         6cjn7tPuBJ2inKYBoG+4DpqSwEZkgxp5oLrViwTFyQSAIUSj4mdchfyYROk629dgQmwj
+         e1fvv0bLIsj9KsVcyYPR5WAwOzjB0nFDfAL07B81HMmtDJACUn2Ho7Ff3BqK8vlDsaov
+         8vvpJ4I45OkmK0cU7jL4+kVipT2FoNBBPdt58zutNzdZ4mp+RR5vVDZEGywMmazRsFzJ
+         6gOAwt7kta1XaNaEsE6VWSQWPRDtPPY7GxzUAsxEfmSYXatClSfZSnQR08KBplRaHwXD
+         gxJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772583750; x=1773188550;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kDpA+UvHfqu2KXcEE0BeLwUh8qWoHNo3iiEgddOUlSA=;
-        b=Lor/2XNDE65PvzaMKL5x3Ek6VQ5d5o6oGGdu9cIqNf6iTIdUgvQJOnbUHBLdPZQjiC
-         Y8oNyw4EJt3u5Wk0GZ1KOlxFWE5+jnOnePr8VPbPY6qQ3SzryoWofY6+bll0QBlierxZ
-         psXdwn6c18X3BP0gPPc/8l5V8uDQcmWQ+baB4+hADdRI/apkJry2HgmikW2VE/jMh782
-         AAUBj2iXu9QjAzBA1OgBM9IjxL7ADkFVcIVSJvv4zBLGspiGkZaHFlsMxDsXpyY113KU
-         rmOQMlr4fB6hBbjE7lA7JO9sjCZuiDfZZF1q0n0IH+7JOoqv5qq3kWYJQRuGzZKC1Lvj
-         niqg==
-X-Gm-Message-State: AOJu0YwHDdJBEXX91kfmKlb1UwB60e8rHjWp6igFNOgBiTFNHGCKT6/Z
-	lwgMIkzuX3Yhmp88rFl4hD2qR95x33kNTJO2bAlrMeVIdeXYrB08wsb0Mb3bXjn1EPZQ8IYWVrP
-	rv5KMNw==
-X-Received: from pgpc1.prod.google.com ([2002:a63:a441:0:b0:bc0:ea34:538])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:4598:b0:395:cb87:dd6b
- with SMTP id adf61e73a8af0-3982ded303emr99556637.28.1772583749893; Tue, 03
- Mar 2026 16:22:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1772584212; x=1773189012;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vN42vQciUoJdrWBNVw0ChEaojXRkmaJ1ILHWzzE+t7o=;
+        b=SjxvuoNcMzv/Pa0ZzrfkSGQbRQmYIt2MtdT6uTd7cDc0jU5ZAngTyP+Si4aWBu0OaN
+         BwUemsuN+bVAOU2bCcRCMXTyASQXaKAMGUywJX4SfYs1XEdyNqq9OUjXKEeeSTd/SZgh
+         z7TpMESu38rfP4g0qmQS1AqYvAr2J23ri3KRHgskI5+y2eFMOAdoSbqeSrcRCRuMFcaK
+         FMs63YLL+wBImFy0sSlSJJGI9RTBd63l63fwzgALD+RnIUgmIgX3WhLwK44+HBJdASiG
+         uK14zGwEPwWvJMMzyPuPEzfkN5Y6YuUqSUS8+Mb+qhmNCgR3rELQ+CS2YdGsRWc7mVl+
+         wT9g==
+X-Gm-Message-State: AOJu0Yw/OEPZS/1Rs0xRBn7+HP/OaZpl7Km1eiSG75OYIAa/YTZt9u12
+	y8YK+Dc3LeDT8ij5aG+K92kdBmGxfALVdYdcqDf1oZFI0W4XL3cwuVconVKJ6xlQVlUs6+TmtYR
+	IO2NPUA==
+X-Received: from plho18.prod.google.com ([2002:a17:903:23d2:b0:2ae:5645:97f9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3201:b0:2aa:d11d:5c36
+ with SMTP id d9443c01a7336-2ae6aaf2100mr3173705ad.30.1772584212206; Tue, 03
+ Mar 2026 16:30:12 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue,  3 Mar 2026 16:22:23 -0800
-In-Reply-To: <20260304002223.1105129-1-seanjc@google.com>
+Date: Tue,  3 Mar 2026 16:30:08 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260304002223.1105129-1-seanjc@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260304002223.1105129-3-seanjc@google.com>
-Subject: [PATCH v5 2/2] KVM: nSVM: Always intercept VMMCALL when L2 is active
+Message-ID: <20260304003010.1108257-1-seanjc@google.com>
+Subject: [PATCH v5 0/2] KVM: nSVM: Intercept STGI/CLGI as needed to inject #UD
 From: Sean Christopherson <seanjc@google.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Kevin Cheng <chengkev@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 668A81F8DDC
+X-Rspamd-Queue-Id: 5BD671F8E95
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72627-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-72628-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[google.com:+];
 	HAS_REPLYTO(0.00)[seanjc@google.com];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_FIVE(0.00)[5];
 	REPLYTO_EQ_FROM(0.00)[]
 X-Rspamd-Action: no action
 
-Always intercept VMMCALL now that KVM properly synthesizes a #UD as
-appropriate, i.e. when L1 doesn't want to intercept VMMCALL, to avoid
-putting L2 into an infinite #UD loop if KVM_X86_QUIRK_FIX_HYPERCALL_INSN
-is enabled.
+The STGI/CLGI fixes from Kevin's broader "Align SVM with APM defined behaviors"
+series.
 
-By letting L2 execute VMMCALL natively and thus #UD, for all intents and
-purposes KVM morphs the VMMCALL intercept into a #UD intercept (KVM always
-intercepts #UD).  When the hypercall quirk is enabled, KVM "emulates"
-VMMCALL in response to the #UD by trying to fixup the opcode to the "right"
-vendor, then restarts the guest, without skipping the VMMCALL.  As a
-result, the guest sees an endless stream of #UDs since it's already
-executing the correct vendor hypercall instruction, i.e. the emulator
-doesn't anticipate that the #UD could be due to lack of interception, as
-opposed to a truly undefined opcode.
+v5:
+ - Separate the STGI/CLGI fixes from everything else.
+ - Apply the Intel compatibiliy weirdness only to VMLOAD/VMSAVE (to fixup
+   SYSENTER MSRs).
+ - Re-remove STGI/CLGI intercept clearing in init_vmcb().
 
-Fixes: 0d945bd93511 ("KVM: SVM: Don't allow nested guest to VMMCALL into host")
-Cc: stable@vger.kernel.org
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/hyperv.h | 4 ----
- arch/x86/kvm/svm/nested.c | 7 -------
- 2 files changed, 11 deletions(-)
+v4:
+  - https://lore.kernel.org/all/20260228033328.2285047-1-chengkev@google.com
+  - Dropped "KVM: SVM: Inject #UD for STGI if EFER.SVME=0 and SVM Lock
+    and DEV are not available" as per Sean
+  - Added back STGI and CLGI intercept clearing in init_vmcb to maintain
+    previous behavior on intel guests. Previously intel guests always
+    had STGI and CLGI intercepts cleared if vgif was enabled. In V3,
+    because the clearing of the intercepts was moved from init_vmcb() to
+    the !guest_cpuid_is_intel_compatible() case in
+    svm_recalc_instruction_intercepts(), the CLGI intercept would be
+    indefinitely set on intel guests. I added back the clearing to
+    init_vmcb() to retain intel guest behavior before this patch.
+  - In "Raise #UD if VMMCALL instruction is not intercepted" patch:
+      - Exempt Hyper-V L2 TLB flush hypercalls from the #UD injection,
+        as L0 intentionally intercepts these VMMCALLs on behalf of L1
+	via the direct hypercall enlightenment.
+      - Added nested_svm_is_l2_tlb_flush_hcall() which just returns true
+        if the hypercall was a Hyper-V L2 TLB flush hypercall.
 
-diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
-index 9af03970d40c..f70d076911a6 100644
---- a/arch/x86/kvm/svm/hyperv.h
-+++ b/arch/x86/kvm/svm/hyperv.h
-@@ -51,10 +51,6 @@ static inline bool nested_svm_is_l2_tlb_flush_hcall(struct kvm_vcpu *vcpu)
- void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
- #else /* CONFIG_KVM_HYPERV */
- static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu) {}
--static inline bool nested_svm_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu)
--{
--	return false;
--}
- static inline bool nested_svm_is_l2_tlb_flush_hcall(struct kvm_vcpu *vcpu)
- {
- 	return false;
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 750bf93c5341..2ac28d2c34ca 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -156,13 +156,6 @@ void recalc_intercepts(struct vcpu_svm *svm)
- 			vmcb_clr_intercept(c, INTERCEPT_VINTR);
- 	}
- 
--	/*
--	 * We want to see VMMCALLs from a nested guest only when Hyper-V L2 TLB
--	 * flush feature is enabled.
--	 */
--	if (!nested_svm_l2_tlb_flush_enabled(&svm->vcpu))
--		vmcb_clr_intercept(c, INTERCEPT_VMMCALL);
--
- 	for (i = 0; i < MAX_INTERCEPT; i++)
- 		c->intercepts[i] |= g->intercepts[i];
- 
+v3:
+  - https://lore.kernel.org/kvm/20260122045755.205203-1-chengkev@google.com/
+  - Elaborated on 'Move STGI and CLGI intercept handling' commit message
+    as per Sean
+  - Fixed bug due to interaction with svm_enable_nmi_window() and 'Move
+    STGI and CLGI intercept handling' as pointed out by Yosry. Code
+    changes suggested by Sean/Yosry.
+  - Removed open-coded nested_svm_check_permissions() in STGI
+    interception function as per Yosry
+
+v2:
+  - https://lore.kernel.org/all/20260112174535.3132800-1-chengkev@google.com
+  - Split up the series into smaller more logical changes as suggested
+    by Sean
+  - Added patch for injecting #UD for STGI under APM defined conditions
+    as suggested by Sean
+  - Combined EFER.SVME=0 conditional with intel CPU logic in
+    svm_recalc_instruction_intercepts
+
+Kevin Cheng (2):
+  KVM: SVM: Move STGI and CLGI intercept handling
+  KVM: SVM: Recalc instructions intercepts when EFER.SVME is toggled
+
+ arch/x86/kvm/svm/svm.c | 53 +++++++++++++++++++++++++++++++-----------
+ 1 file changed, 40 insertions(+), 13 deletions(-)
+
+
+base-commit: 11439c4635edd669ae435eec308f4ab8a0804808
 -- 
 2.53.0.473.g4a7958ca14-goog
 
