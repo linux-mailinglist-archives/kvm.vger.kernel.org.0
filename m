@@ -1,269 +1,272 @@
-Return-Path: <kvm+bounces-72705-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72706-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJW8AA1pqGl3uQAAu9opvQ
-	(envelope-from <kvm+bounces-72705-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 18:17:01 +0100
+	id eM8RJDlpqGl3uQAAu9opvQ
+	(envelope-from <kvm+bounces-72706-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 18:17:45 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4358E205026
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 18:16:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A492205090
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 18:17:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CA2B931314DF
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 17:12:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9F074302E426
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 17:13:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A91AA37AA7F;
-	Wed,  4 Mar 2026 17:11:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 300D537AA7F;
+	Wed,  4 Mar 2026 17:13:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MlvDXOBM"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="IG832i3R"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fra-out-015.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-015.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.158.153.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE12637A498
-	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 17:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C0037A4BD;
+	Wed,  4 Mar 2026 17:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.158.153.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772644316; cv=none; b=UqKmXmmFfwKcmYCKmTqIrioXUTYpol4zlMiPToDynA2wjKqylsCbsIrJcDnjr5Fv3PGMVfJ1Bxu7NrbPoIrbJscZ6T4+hj3V+oTlbavzEEExbJAWclS18eOS7u150Y5EGu83m1xbQuvCm0oodYfUS9lIQZZ40KrdBNXshS5CeUM=
+	t=1772644393; cv=none; b=TY3zffo0edkgBsQbc6B5BCzU6VBPBB2uXJS0h4JbUMms/Ykt1FONHtqE+05edFUVuOckShoXpty2xBpVyxBB8Ijb7C0rCrIlgZ1RGvNBXs8mM4qoyGN8Qaqc93GKkzqbI9oLJ2Cy4ZS6uiWAFO02s7Rc2L8OBs2z39EH8wZXqwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772644316; c=relaxed/simple;
-	bh=/cr+TZvz4nMQXK3VhxoBpQPSuiKI1gHj3FHUS+VETN8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kRfyfjCt4pVMI8j+4GHyBBTO4T8zyPGE8x7iWQOdDyVzJMC9sSTvNiCA4m8dbmpy1xLejwi2iW2gp+wjJn4recx0pKWviNYsP63cRb2jTBuXFVpB5hAHkl22yUHQOSvU8jwKiep0LBAIn8dmxRzb9yOIEEH4veF6w0Dei6lunrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MlvDXOBM; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae65d5cc57so77974395ad.2
-        for <kvm@vger.kernel.org>; Wed, 04 Mar 2026 09:11:55 -0800 (PST)
+	s=arc-20240116; t=1772644393; c=relaxed/simple;
+	bh=5/bQ/twgJ+hQHANZmy/rMEaa+DObPC4rHILqYL/5CBk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=UZ7XxA6ruUC6UXzLhjGWg72PaCKJ/Al+MwL4ldXGjQB8DlCT/ScF/CK8cPQOBreyU0p5zqG6w1Uca/kG5htfkfe5WLabXWGAsCF0azN9fcYJhS9xDe1WXekviy8s+zEwfKhtmAIHmdfTbfA87dfQeOk9ZCPymH+q8cjZzLzaQwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=IG832i3R; arc=none smtp.client-ip=18.158.153.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772644315; x=1773249115; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EHQlqz3/R8SNWRfWXbHO7qOOJnbiFSL7FXZONNoHgbA=;
-        b=MlvDXOBML3wAsjevd8OsLJqwuODYbdI6QPKdaYVV53gy9lrpfZH5xjr0PkL3TUIeW4
-         1W1EohqJtWh+Pg6Z1LVQiyxdOZvOWENZrKbQhAdfiz8hKSyAWAMn6pjaBvCuS/PGCAK4
-         fWSY/bGoz/VxbKHvd/WU1J6ZI2iaDnSDCl+Nm16Slan4or8Fu9Nmjc2uFn1TN6WLT+D7
-         XxuyDBhMugQtv/irKKGHJC8lxj2OhYg3RpkM0FeVyNSikShaEimhL+J1G63ngTsIrWuD
-         mjnUcjdKlKRsPIbX56oGs2iICGHrbU16dgx6IE2btNp6XSHcPomqRXYhEP6R6+QP6ajb
-         ru3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772644315; x=1773249115;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EHQlqz3/R8SNWRfWXbHO7qOOJnbiFSL7FXZONNoHgbA=;
-        b=upoySHMFUe8hockmmYPpp/xNvJRwbXGAdQuDSiEzBq9oDH6gi+6dzwZWmuFbA2lsOF
-         kt0b/y/9QE0pJUMYdEjmuV5rMYe/NVuWlMxnC4pNtiw4S2RqRwSIi+9+F1NKe5dlt3zO
-         SLJ0jpz73fiC6/LJnx6l6irf3WOr8NeIGKO7PkjAUX4hF3zcEJdz6NzdiEyyt5rf1VXc
-         ASZK6aSmOakHd/BKng8o99fPmVH7JR4ZGdKaBzYthVYJ2szl80WDd19Qz333Um23c6S4
-         qQ9yQv7JkpF1/UJ8dNvChsE2SgoJLkqvTVTd/Ys+idrvgqSm+fBQ+0BY6PRd4nGNL2zr
-         rLOg==
-X-Forwarded-Encrypted: i=1; AJvYcCVsNvZOOBtQULhY6bRMic+0Cr4qOFCpGOocGoKF+XaAQURVm5cd1EbE32lGRuSK8LoTBFc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVimqHlL1RopQhHojpnqhSspbSA/pWv7JxYRj3jgyDuEH9fe27
-	qg6WrMZ0HGTZf4wnWd1N55eU7UMD68btx7aFK4MLTTcHAraP3dbTVxpM6c6JScn7fYiKnR97rFO
-	uyNtDAg==
-X-Received: from plov20.prod.google.com ([2002:a17:902:8d94:b0:2ab:3ae7:5481])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cecf:b0:2ae:5a76:e26c
- with SMTP id d9443c01a7336-2ae6ab67292mr24664785ad.55.1772644314855; Wed, 04
- Mar 2026 09:11:54 -0800 (PST)
-Date: Wed, 4 Mar 2026 09:11:53 -0800
-In-Reply-To: <20260224005500.1471972-9-jmattson@google.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1772644391; x=1804180391;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=GOyFbmGrjwCzzxO3kPvRp3gPk09ea9B/RkcYvfV3U7w=;
+  b=IG832i3R7y/mIuqdkP0/6zptYMPPBs+Mx7RXVD/G9E9nSx3KEAAkDpr+
+   +ffiUX0v88Frbj+JPngjOmuteksVFrnj2aClQsi3LYhkSocB9yO4sRHYW
+   e1M/Eo2S2q7FwG9Ph2Vos1GnLSmdnmgfd48wCT3kaHzdiS+yKZtdOogys
+   iKs2Tapoa+yAuxwo93B0Zl6GIi6KgXL1fjHH7NFYkWJoTAbthVf5PT/Fv
+   dIj5TJdV7gkdiwJjcyOIHCYlo/bVSyCXqdlN8TZ0138byZL2JsdW7gnAU
+   xHvhcMBERVdIOv/zrg08ThRX94hLFYcA8irbZk1+E5FOfysq+Ui5GtYip
+   w==;
+X-CSE-ConnectionGUID: UYsfpQ/XTKGj1mLFxoxIhw==
+X-CSE-MsgGUID: vkl+gh6YQl+E7Yf9zukrFQ==
+X-IronPort-AV: E=Sophos;i="6.21,324,1763424000"; 
+   d="scan'208";a="10202501"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-015.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 17:13:06 +0000
+Received: from EX19MTAEUC002.ant.amazon.com [54.240.197.228:21320]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.16.189:2525] with esmtp (Farcaster)
+ id 9f0d1b18-a341-4a05-a845-dd316410b6b5; Wed, 4 Mar 2026 17:13:06 +0000 (UTC)
+X-Farcaster-Flow-ID: 9f0d1b18-a341-4a05-a845-dd316410b6b5
+Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Wed, 4 Mar 2026 17:13:06 +0000
+Received: from [192.168.5.225] (10.106.83.18) by EX19D005EUB003.ant.amazon.com
+ (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Wed, 4 Mar 2026
+ 17:13:05 +0000
+Message-ID: <90cf68db-2e21-4153-8eb6-2c8ffb398d0d@amazon.com>
+Date: Wed, 4 Mar 2026 17:12:59 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260224005500.1471972-1-jmattson@google.com> <20260224005500.1471972-9-jmattson@google.com>
-Message-ID: <aahn2ZfDAJTj-Afn@google.com>
-Subject: Re: [PATCH v5 08/10] KVM: x86: nSVM: Save/restore gPAT with KVM_{GET,SET}_NESTED_STATE
-From: Sean Christopherson <seanjc@google.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Yosry Ahmed <yosry@kernel.org>, Yosry Ahmed <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="us-ascii"
-X-Rspamd-Queue-Id: 4358E205026
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH RFC 15/17] KVM: guest_memfd: implement userfaultfd missing
+ mode
+To: Mike Rapoport <rppt@kernel.org>, <linux-mm@kvack.org>
+CC: Andrea Arcangeli <aarcange@redhat.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Axel Rasmussen <axelrasmussen@google.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>, David Hildenbrand
+	<david@redhat.com>, Hugh Dickins <hughd@google.com>, James Houghton
+	<jthoughton@google.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	"Lorenzo Stoakes" <lorenzo.stoakes@oracle.com>, Michal Hocko
+	<mhocko@suse.com>, "Muchun Song" <muchun.song@linux.dev>, Oscar Salvador
+	<osalvador@suse.de>, "Paolo Bonzini" <pbonzini@redhat.com>, Peter Xu
+	<peterx@redhat.com>, "Sean Christopherson" <seanjc@google.com>, Shuah Khan
+	<shuah@kernel.org>, "Suren Baghdasaryan" <surenb@google.com>, Vlastimil Babka
+	<vbabka@suse.cz>, <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+References: <20260127192936.1250096-1-rppt@kernel.org>
+ <20260127192936.1250096-16-rppt@kernel.org>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+In-Reply-To: <20260127192936.1250096-16-rppt@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D011EUB003.ant.amazon.com (10.252.51.108) To
+ EX19D005EUB003.ant.amazon.com (10.252.51.31)
+X-Rspamd-Queue-Id: 3A492205090
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-9.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72705-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCPT_COUNT_TWELVE(0.00)[23];
+	TAGGED_FROM(0.00)[bounces-72706-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[amazon.com:+];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kalyazin@amazon.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	HAS_REPLYTO(0.00)[kalyazin@amazon.com];
+	TAGGED_RCPT(0.00)[kvm];
+	RCVD_COUNT_SEVEN(0.00)[7]
 X-Rspamd-Action: no action
 
-On Mon, Feb 23, 2026, Jim Mattson wrote:
-> Add a 'flags' field to the SVM nested state header, and use bit 0 of the
-> flags to indicate that gPAT is stored in the nested state.
+
+
+On 27/01/2026 19:29, Mike Rapoport wrote:
+> From: Nikita Kalyazin <kalyazin@amazon.com>
 > 
-> If in guest mode with NPT enabled, store the current vmcb->save.g_pat value
-> into the header of the nested state, and set the flag.
+> userfaultfd missing mode allows populating guest memory with the content
+> supplied by userspace on demand.
 > 
-> Note that struct kvm_svm_nested_state_hdr is included in a union padded to
-> 120 bytes, so there is room to add the flags field and the gpat field
-> without changing any offsets.
+> Extend guest_memfd implementation of vm_uffd_ops to support MISSING
+> mode.
 > 
-> Fixes: cc440cdad5b7 ("KVM: nSVM: implement KVM_GET_NESTED_STATE and KVM_SET_NESTED_STATE")
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
+> Co-developed-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
+> Signed-off-by: Mike Rapoport (Microsoft) <rppt@kernel.org>
 > ---
->  arch/x86/include/uapi/asm/kvm.h |  5 +++++
->  arch/x86/kvm/svm/nested.c       | 17 +++++++++++++++++
->  2 files changed, 22 insertions(+)
+>   virt/kvm/guest_memfd.c | 60 +++++++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 59 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 846a63215ce1..664d04d1db3f 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -495,6 +495,8 @@ struct kvm_sync_regs {
->  
->  #define KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE	0x00000001
->  
-> +#define KVM_STATE_SVM_VALID_GPAT	0x00000001
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 087e7632bf70..14cca057fc0e 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -431,6 +431,14 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
+>                          ret = VM_FAULT_UFFD_MINOR;
+>                          goto out_folio;
+>                  }
 > +
->  /* vendor-independent attributes for system fd (group 0) */
->  #define KVM_X86_GRP_SYSTEM		0
->  #  define KVM_X86_XCOMP_GUEST_SUPP	0
-> @@ -531,6 +533,9 @@ struct kvm_svm_nested_state_data {
->  
->  struct kvm_svm_nested_state_hdr {
->  	__u64 vmcb_pa;
-> +	__u32 flags;
-> +	__u32 reserved;
-> +	__u64 gpat;
->  };
->  
->  /* for KVM_CAP_NESTED_STATE */
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 26f758e294ab..5a35277f2364 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -1893,6 +1893,10 @@ static int svm_get_nested_state(struct kvm_vcpu *vcpu,
->  	/* First fill in the header and copy it out.  */
->  	if (is_guest_mode(vcpu)) {
->  		kvm_state.hdr.svm.vmcb_pa = svm->nested.vmcb12_gpa;
-> +		if (nested_npt_enabled(svm)) {
-> +			kvm_state.hdr.svm.flags |= KVM_STATE_SVM_VALID_GPAT;
+> +               /*
+> +                * Check if userfaultfd is registered in missing mode. If so,
+> +                * check if a folio exists in the page cache. If not, return
+> +                * VM_FAULT_UFFD_MISSING to trigger the userfaultfd handler.
+> +                */
+> +               if (userfaultfd_missing(vmf->vma) && IS_ERR_OR_NULL(folio))
+> +                       return VM_FAULT_UFFD_MISSING;
+>          }
+> 
+>          /* folio not in the pagecache, try to allocate */
+> @@ -507,9 +515,59 @@ static bool kvm_gmem_can_userfault(struct vm_area_struct *vma, vm_flags_t vm_fla
+>          return true;
+>   }
+> 
+> +static struct folio *kvm_gmem_folio_alloc(struct vm_area_struct *vma,
+> +                                         unsigned long addr)
+> +{
+> +       struct inode *inode = file_inode(vma->vm_file);
+> +       pgoff_t pgoff = linear_page_index(vma, addr);
+> +       struct mempolicy *mpol;
+> +       struct folio *folio;
+> +       gfp_t gfp;
+> +
+> +       if (unlikely(pgoff >= (i_size_read(inode) >> PAGE_SHIFT)))
+> +               return NULL;
+> +
+> +       gfp = mapping_gfp_mask(inode->i_mapping);
+> +       mpol = mpol_shared_policy_lookup(&GMEM_I(inode)->policy, pgoff);
+> +       mpol = mpol ?: get_task_policy(current);
+> +       folio = folio_alloc_mpol(gfp, 0, mpol, pgoff, numa_node_id());
 
-Bugger.  This isn't going to work.  KVM doesn't reserve any bytes in the header
-for SVM, so there's no guarantee/requirement that old userspace won't provide
-garbage.  The flag needs to go in kvm_nested_state.flags.  We only reserved space
-for 16 flags between VMX and SVM, but that's a future problem as we can always
-add e.g. KVM_STATE_NESTED_EXT_FLAGS when we've exausted the current space.
+It looks like folio_alloc_mpol_noprof() and filemap_remove_folio() are 
+not actually exported to modules.  Would it be ok to export them similar 
+to how it was done in f634f10809ec ("mm/mempolicy: Export memory policy 
+symbols")?
 
-Ugh.  And vmx_set_nested_state() doesn't check for unsupported flags, at all.
-But that too is largely a future problem though, i.e. is a non-issue until nVMX
-wants to add a new flag.  *sigh*
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 3e4579e4b8bb..041c7719e524 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -261,6 +261,7 @@ void filemap_remove_folio(struct folio *folio)
 
-Anyways, for gPAT, unless I'm missing something, I'm going to squash this:
+         filemap_free_folio(mapping, folio);
+  }
++EXPORT_SYMBOL_FOR_MODULES(filemap_remove_folio, "kvm");
 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 664d04d1db3f..0c1f97c9a2d8 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -485,6 +485,7 @@ struct kvm_sync_regs {
- #define KVM_STATE_NESTED_EVMCS         0x00000004
- #define KVM_STATE_NESTED_MTF_PENDING   0x00000008
- #define KVM_STATE_NESTED_GIF_SET       0x00000100
-+#define KVM_STATE_NESTED_GPAT_VALID    0x00000200
- 
- #define KVM_STATE_NESTED_SMM_GUEST_MODE        0x00000001
- #define KVM_STATE_NESTED_SMM_VMXON     0x00000002
-@@ -495,8 +496,6 @@ struct kvm_sync_regs {
- 
- #define KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE        0x00000001
- 
--#define KVM_STATE_SVM_VALID_GPAT       0x00000001
--
- /* vendor-independent attributes for system fd (group 0) */
- #define KVM_X86_GRP_SYSTEM             0
- #  define KVM_X86_XCOMP_GUEST_SUPP     0
-@@ -533,8 +532,6 @@ struct kvm_svm_nested_state_data {
- 
- struct kvm_svm_nested_state_hdr {
-        __u64 vmcb_pa;
--       __u32 flags;
--       __u32 reserved;
-        __u64 gpat;
- };
- 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 991ee4c03363..099bf8ac10ee 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -1848,7 +1848,7 @@ static int svm_get_nested_state(struct kvm_vcpu *vcpu,
-        if (is_guest_mode(vcpu)) {
-                kvm_state.hdr.svm.vmcb_pa = svm->nested.vmcb12_gpa;
-                if (nested_npt_enabled(svm)) {
--                       kvm_state.hdr.svm.flags |= KVM_STATE_SVM_VALID_GPAT;
-+                       kvm_state->flags |= KVM_STATE_NESTED_GPAT_VALID;
-                        kvm_state.hdr.svm.gpat = svm->vmcb->save.g_pat;
-                }
-                kvm_state.size += KVM_STATE_NESTED_SVM_VMCB_SIZE;
-@@ -1914,7 +1914,8 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 
-        if (kvm_state->flags & ~(KVM_STATE_NESTED_GUEST_MODE |
-                                 KVM_STATE_NESTED_RUN_PENDING |
--                                KVM_STATE_NESTED_GIF_SET))
-+                                KVM_STATE_NESTED_GIF_SET |
-+                                KVM_STATE_NESTED_GPAT_VALID))
-                return -EINVAL;
- 
-        /*
-@@ -1984,7 +1985,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
-         * vmcb_save_area_cached validation above, because gPAT is L2
-         * state, but the vmcb_save_area_cached is populated with L1 state.
-         */
--       if ((kvm_state->hdr.svm.flags & KVM_STATE_SVM_VALID_GPAT) &&
-+       if ((kvm_state->flags & KVM_STATE_NESTED_GPAT_VALID) &&
-            !kvm_pat_valid(kvm_state->hdr.svm.gpat))
-                goto out_free;
- 
-@@ -2013,7 +2014,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
-        svm_switch_vmcb(svm, &svm->nested.vmcb02);
- 
-        if (nested_npt_enabled(svm)) {
--               if (kvm_state->hdr.svm.flags & KVM_STATE_SVM_VALID_GPAT)
-+               if (kvm_state->flags & KVM_STATE_NESTED_GPAT_VALID)
-                        vmcb_set_gpat(svm->vmcb, kvm_state->hdr.svm.gpat);
-        }
---
+  /*
+   * page_cache_delete_batch - delete several folios from page cache
+diff --git a/mm/mempolicy.c b/mm/mempolicy.c
+index 3d797d47a040..1dbbbb28a36e 100644
+--- a/mm/mempolicy.c
++++ b/mm/mempolicy.c
+@@ -2442,6 +2442,7 @@ struct folio *folio_alloc_mpol_noprof(gfp_t gfp, 
+unsigned int order,
+         set_page_refcounted(page);
+         return page_rmappable_folio(page);
+  }
++EXPORT_SYMBOL_FOR_MODULES(folio_alloc_mpol_noprof, "kvm");
 
-One could argue we should even be more paranoid and do this as well:
+  /**
+   * vma_alloc_folio - Allocate a folio for a VMA.
 
-	if (!(kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE)) {
-		if (kvm_state->flags & KVM_STATE_NESTED_GPAT_VALID)
-			return -EINVAL:
+[1] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f634f10809ec3d51d9529dfb0f99bc7cec1b5eff
 
-		svm_leave_nested(vcpu);
-		svm_set_gif(svm, !!(kvm_state->flags & KVM_STATE_NESTED_GIF_SET));
-		return 0;
-	}
+> +       mpol_cond_put(mpol);
+> +
+> +       return folio;
+> +}
+> +
+> +static int kvm_gmem_filemap_add(struct folio *folio,
+> +                               struct vm_area_struct *vma,
+> +                               unsigned long addr)
+> +{
+> +       struct inode *inode = file_inode(vma->vm_file);
+> +       struct address_space *mapping = inode->i_mapping;
+> +       pgoff_t pgoff = linear_page_index(vma, addr);
+> +       int err;
+> +
+> +       __folio_set_locked(folio);
+> +       err = filemap_add_folio(mapping, folio, pgoff, GFP_KERNEL);
+> +       if (err) {
+> +               folio_unlock(folio);
+> +               return err;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static void kvm_gmem_filemap_remove(struct folio *folio,
+> +                                   struct vm_area_struct *vma)
+> +{
+> +       filemap_remove_folio(folio);
+> +       folio_unlock(folio);
+> +}
+> +
+>   static const struct vm_uffd_ops kvm_gmem_uffd_ops = {
+> -       .can_userfault = kvm_gmem_can_userfault,
+> +       .can_userfault     = kvm_gmem_can_userfault,
+>          .get_folio_noalloc = kvm_gmem_get_folio_noalloc,
+> +       .alloc_folio       = kvm_gmem_folio_alloc,
+> +       .filemap_add       = kvm_gmem_filemap_add,
+> +       .filemap_remove    = kvm_gmem_filemap_remove,
+>   };
+>   #endif /* CONFIG_USERFAULTFD */
+> 
+> --
+> 2.51.0
+> 
 
-but KVM doesn't enforce GUEST_MODE for KVM_STATE_NESTED_RUN_PENDING, and it's
-easy to just ignore gPAT, so I'm inclined to not bother.
 
