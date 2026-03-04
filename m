@@ -1,261 +1,329 @@
-Return-Path: <kvm+bounces-72731-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72717-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aLEeLDN6qGl0uwAAu9opvQ
-	(envelope-from <kvm+bounces-72731-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 19:30:11 +0100
+	id mKUDAD13qGkLuwAAu9opvQ
+	(envelope-from <kvm+bounces-72717-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 19:17:33 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1594E2065B9
-	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 19:30:11 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B325020622E
+	for <lists+kvm@lfdr.de>; Wed, 04 Mar 2026 19:17:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9229531E25D2
-	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 18:16:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id ED4C03078F0C
+	for <lists+kvm@lfdr.de>; Wed,  4 Mar 2026 18:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 808133D1CD5;
-	Wed,  4 Mar 2026 18:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8815E3D3D12;
+	Wed,  4 Mar 2026 18:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FHbMeaqt"
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="W2u/vM5b";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="2W+epVkR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E3B3D5228
-	for <kvm@vger.kernel.org>; Wed,  4 Mar 2026 18:15:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A636A345CCD;
+	Wed,  4 Mar 2026 18:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772648129; cv=none; b=t7XzKMmxt3Joop0ky3AhaiPqJvFS+M0wKc+hn7D83mcVcGUXw4GoE982gkXuMOcbcoGwOwHsi2VfNCNrZNC081m2AuAnXQkTHL9Y5JBYmh2M2fz1iZyPKdHmAPH5qFOt4uqSUzufhlcGWB/f1275j9p6p3jeuqzDn3oMi4BB8Cc=
+	t=1772647746; cv=none; b=bJAQwbV1EZ1gPvbxr/NWW8Ezzzq9UnkvooFBeTyM9r44chhQwApgsETkgd/DDAPO4eexHo6c7zSmKp8c5rdcWwleqTmzXlebByu1PXUaNKdiOwXJWP///0/KvBbTKg9OHnT0RTkkgtGeVQDgDhkXkyG2MKX1uwbUPbRqKfXBnDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772648129; c=relaxed/simple;
-	bh=VZJX/cbeax9wgy2Ci5nCoiNVdgNf6qrvDnITxrEY52M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o1KMN+a0+aIaNOvRLzgC+nPDCPuNaGwOtdEEnzNLWqA838Mpm9NXoWXZxIVdNIPNDTZvD+O8u7GRErlkokZNruN2mMVhu8tdWpLpLQA4pMMRh07FQUWXhJXW5MvcjNGX5j3oXnWvvx+Fh8vRzDIRBRPQYyBYaZt4Rk4EDXf24jM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FHbMeaqt; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772648127; x=1804184127;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=VZJX/cbeax9wgy2Ci5nCoiNVdgNf6qrvDnITxrEY52M=;
-  b=FHbMeaqtLOeni7XR9FthOWFyh35EiqNKFj/M5aekIvq6Dcp05IVffU7v
-   M3gGotN22JwXk+8NT/bo7dPr1PmqGRSOlm9k610Mbqnq4CpzVzAehdZ7j
-   GCd5uW8a9nWa8bV7mf+UOzFJsd7yf1o4jYOGnONHsTSkUIrry8FHBTEF/
-   xNXFPhkfaGq/GrQG9j74DvDGFsefV2p9dYJy52E67Ut9/s3QGqJxQvXzi
-   +tx3UqnzXgpVXlKq6WtcLvaGJr8IKOJ2E9gOqM7AYK1bYaN/wb2IoEBg3
-   ysLXlkOP4wUqXkQbeatkEZDLHgrrRw3duvPMPnzYFL0Lyc1W5aBxj+swa
-   g==;
-X-CSE-ConnectionGUID: IqhLYiFzQNqkHZkakDMtkg==
-X-CSE-MsgGUID: EY6KFf+OSXC1VUUpkzhhOg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="73909404"
-X-IronPort-AV: E=Sophos;i="6.21,324,1763452800"; 
-   d="scan'208";a="73909404"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 10:15:26 -0800
-X-CSE-ConnectionGUID: Yn6q0i+jQ4yfIrXTiqiRsQ==
-X-CSE-MsgGUID: wgySaHQIR42rBkpgqzh75g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,324,1763452800"; 
-   d="scan'208";a="214542866"
-Received: from 9cc2c43eec6b.jf.intel.com ([10.54.77.43])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 10:15:25 -0800
-From: Zide Chen <zide.chen@intel.com>
-To: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Zhao Liu <zhao1.liu@intel.com>,
-	Peter Xu <peterx@redhat.com>,
-	Fabiano Rosas <farosas@suse.de>,
-	Sandipan Das <sandipan.das@amd.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>,
-	Dongli Zhang <dongli.zhang@oracle.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Zide Chen <zide.chen@intel.com>
-Subject: [PATCH V3 13/13] target/i386: Add Topdown metrics feature support
-Date: Wed,  4 Mar 2026 10:07:12 -0800
-Message-ID: <20260304180713.360471-14-zide.chen@intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260304180713.360471-1-zide.chen@intel.com>
-References: <20260304180713.360471-1-zide.chen@intel.com>
+	s=arc-20240116; t=1772647746; c=relaxed/simple;
+	bh=OGC+EenJ845Wlw134ixacvcp63TuPzlu5ztD9r3t6XY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UotfEe8HohfDY0/LZnute0V/qLrhfqFP/99ZkBjF0MWoIpLtJ90tqcAFwXs4+oZzu9KilyeKoc4BAcF+Bed2cOEUJ2HRmr8svsrSzra/Lt8yBeJUVpkVoNM7OL0dm1J3R6Xf8+ytH3/Ry0e4q5Ghxf8oabiHNmAdiWkWBp2oZTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=W2u/vM5b; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=2W+epVkR; arc=none smtp.client-ip=202.12.124.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
+	by mailfout.stl.internal (Postfix) with ESMTP id 309171D00173;
+	Wed,  4 Mar 2026 13:09:03 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Wed, 04 Mar 2026 13:09:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1772647742;
+	 x=1772734142; bh=HWf9FeNm6sIENyq4ht0InEdflnyGyn1wn6KJliPEu9g=; b=
+	W2u/vM5blxDvie5F0MHnfEnPIo1VLZa+3XM1cTGP1WulKSDsMGUeDpcgijOUvjBP
+	TY4piTTytj7L2Po8rRm4I31kSJ8X9DcYx8cwf/WADK0nK9zvizri8veXWK/ziMKe
+	LEukOINZOuXIBiB1DxuKNbfmnpxJLhcN7sCs3ykpwtKCYEmwyrxradvMKksXoTkL
+	LxD9N9nMxVO8Q5A3aBE6S+kQERLVun64O8UpXP6wWh1qNebDgdrsoh6W9JNdqn82
+	pV2CJX70Il/Pgzl+PKdYR4VMkDzomY2pQQF17KPMbsPaEHfeBjIpKP7aUd0C5D99
+	XsNDjnL031gAv6igkz3RPQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1772647742; x=
+	1772734142; bh=HWf9FeNm6sIENyq4ht0InEdflnyGyn1wn6KJliPEu9g=; b=2
+	W+epVkRCxikeYclVLwIHWQFsTDo0MjujhnEC62/0InFlIQpeh2KZBKORXOsDpUAh
+	l8z0zrG4jTIZz6T4IbsalxjLNNw5t/34MMRtTJObFZQp1NohytcWs1af5CmpkQ85
+	a4Mb/boNOJpDBKt0YhQXgKIHbGJd3F0u0n6ggraWTgmsrrusjLIqfZLfG+PRp3j4
+	WH2CfwbHLLQGBY+lc5U7NfzQvQC6AmUdqcx6AF9LlYXxJe42oQwuytlQe7U3IGZ4
+	LcKtJaTcTg2ZuAMLod0fbcuD+2GTtFiV5YuQzLWqQqKDBNToTkmllMonFVwe6jid
+	BXCXTFZaQpO+JvWK2QFZQ==
+X-ME-Sender: <xms:PnWoaWdrME59lLPgYEYoz-Zq9oZcizByU9RqaSZXu6OVlPopO0Kdtw>
+    <xme:PnWoaVaMkFDV3eDum_C1x0IQdmEoA0-vGdGeH1iCvLHN3QSHJGd0prUm3cJbFMZcs
+    sGJ_D_a8MyXxuKGhLzfADSIo88PIlLyjr8CjslzRHiqkY4O3Yg>
+X-ME-Received: <xmr:PnWoaa6MUz6FJiXwIremDY2LybzS5tUW9mySrDw4iMGb5EJ8zVbNZhD0N5k>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvieegudekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfgjfhfogggtgfesthejre
+    dtredtvdenucfhrhhomheptehlvgigucghihhllhhirghmshhonhcuoegrlhgvgiesshhh
+    rgiisghothdrohhrgheqnecuggftrfgrthhtvghrnhepvdekfeejkedvudfhudfhteekud
+    fgudeiteetvdeukedvheetvdekgfdugeevueeunecuvehluhhsthgvrhfuihiivgeptden
+    ucfrrghrrghmpehmrghilhhfrhhomheprghlvgigsehshhgriigsohhtrdhorhhgpdhnsg
+    gprhgtphhtthhopedugedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnkhhi
+    thgrsehnvhhiughirgdrtghomhdprhgtphhtthhopehvshgvthhhihesnhhvihguihgrrd
+    gtohhmpdhrtghpthhtohepjhhgghesnhhvihguihgrrdgtohhmpdhrtghpthhtohepmhho
+    tghhshesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggrpd
+    hrtghpthhtohepshhkohhlohhthhhumhhthhhosehnvhhiughirgdrtghomhdprhgtphht
+    thhopegtjhhirgesnhhvihguihgrrdgtohhmpdhrtghpthhtohepiihhihifsehnvhhiug
+    hirgdrtghomhdprhgtphhtthhopehkjhgrjhhusehnvhhiughirgdrtghomh
+X-ME-Proxy: <xmx:PnWoaTd5fczA4teZ7YFuPh40NUXM_AxSbm0WIM8eRztxGufV38_fyA>
+    <xmx:PnWoadyZgx_kT1XNeaXmHfjDilJcCX3cA8g0fauQn8eed11Rv4Rzug>
+    <xmx:PnWoaZqq9IaP3FCo4wVUXLWQcNtMh5n7J9OmQRemWnM3SF5VyZwvAg>
+    <xmx:PnWoabyQJlxy3NkRuHbuVW2MM4n8Lnq4jEL50-W_RGzhgh_jHeOZ4w>
+    <xmx:PnWoaUpU1hFbNI2w5gkt0aulrCvGxn9gdBWXreLV4JxW7dy3F8L1EMex>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 4 Mar 2026 13:09:01 -0500 (EST)
+Date: Wed, 4 Mar 2026 11:09:00 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: <ankita@nvidia.com>
+Cc: <vsethi@nvidia.com>, <jgg@nvidia.com>, <mochs@nvidia.com>,
+ <jgg@ziepe.ca>, <skolothumtho@nvidia.com>, <cjia@nvidia.com>,
+ <zhiw@nvidia.com>, <kjaju@nvidia.com>, <yishaih@nvidia.com>,
+ <kevin.tian@intel.com>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, alex@shazbot.org
+Subject: Re: [PATCH RFC v2 05/15] vfio/nvgrace-egm: Introduce module to
+ manage EGM
+Message-ID: <20260304110900.47151cc8@shazbot.org>
+In-Reply-To: <20260223155514.152435-6-ankita@nvidia.com>
+References: <20260223155514.152435-1-ankita@nvidia.com>
+	<20260223155514.152435-6-ankita@nvidia.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 1594E2065B9
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: B325020622E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[shazbot.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[shazbot.org:s=fm3,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72731-lists,kvm=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[zide.chen@intel.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[intel.com:+];
+	DKIM_TRACE(0.00)[shazbot.org:+,messagingengine.com:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72717-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alex@shazbot.org,kvm@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,shazbot.org:dkim,shazbot.org:mid,nvidia.com:email,messagingengine.com:dkim]
 X-Rspamd-Action: no action
 
-From: Dapeng Mi <dapeng1.mi@linux.intel.com>
+On Mon, 23 Feb 2026 15:55:04 +0000
+<ankita@nvidia.com> wrote:
 
-IA32_PERF_CAPABILITIES.PERF_METRICS_AVAILABLE (bit 15) indicates that
-the CPU provides built-in support for TMA L1 metrics through
-the PERF_METRICS MSR.  Expose it as a user-visible CPU feature
-("perf-metrics"), allowing it to be explicitly enabled or disabled and
-used with migratable guests.
+> From: Ankit Agrawal <ankita@nvidia.com>
+> 
+> The Extended GPU Memory (EGM) feature that enables the GPU to access
+> the system memory allocations within and across nodes through high
+> bandwidth path on Grace Based systems. The GPU can utilize the
+> system memory located on the same socket or from a different socket
+> or even on a different node in a multi-node system [1].
+> 
+> When the EGM mode is enabled through SBIOS, the host system memory is
+> partitioned into 2 parts: One partition for the Host OS usage
+> called Hypervisor region, and a second Hypervisor-Invisible (HI) region
+> for the VM. Only the hypervisor region is part of the host EFI map
+> and is thus visible to the host OS on bootup. Since the entire VM
+> sysmem is eligible for EGM allocations within the VM, the HI partition
+> is interchangeably called as EGM region in the series. This HI/EGM region
+> range base SPA and size is exposed through the ACPI DSDT properties.
+> 
+> Whilst the EGM region is accessible on the host, it is not added to
+> the kernel. The HI region is assigned to a VM by mapping the QEMU VMA
+> to the SPA using remap_pfn_range().
+> 
+> The following figure shows the memory map in the virtualization
+> environment.
+> 
+> |---- Sysmem ----|                  |--- GPU mem ---|  VM Memory
+> |                |                  |               |
+> |IPA <-> SPA map |                  |IPA <-> SPA map|
+> |                |                  |               |
+> |--- HI / EGM ---|-- Host Mem --|   |--- GPU mem ---|  Host Memory
+> 
+> Introduce a new nvgrace-egm auxiliary driver module to manage and
+> map the HI/EGM region in the Grace Blackwell systems. This binds to
+> the auxiliary device created by the parent nvgrace-gpu (in-tree
+> module for device assignment) / nvidia-vgpu-vfio (out-of-tree open
+> source module for SRIOV vGPU) to manage the EGM region for the VM.
+> Note that there is a unique EGM region per socket and the auxiliary
+> device gets created for every region. The parent module fetches the
+> EGM region information from the ACPI tables and populate to the data
+> structures shared with the auxiliary nvgrace-egm module.
+> 
+> nvgrace-egm module handles the following:
 
-Plumb IA32_PERF_METRICS through the KVM MSR get/put paths to be able
-to save and restore this MSR.
+Or it will eventually, not in this commit.
 
-Migrate IA32_PERF_METRICS MSR using a new subsection of
-vmstate_msr_architectural_pmu.
+> 1. Fetch the EGM memory properties (base HPA, length, proximity domain)
+> from the parent device shared EGM region structure.
+> 2. Create a char device that can be used as memory-backend-file by Qemu
+> for the VM and implement file operations. The char device is /dev/egmX,
+> where X is the PXM node ID of the EGM being mapped fetched in 1.
+> 3. Zero the EGM memory on first device open().
+> 4. Map the QEMU VMA to the EGM region using remap_pfn_range.
+> 5. Cleaning up state and destroying the chardev on device unbind.
+> 6. Handle presence of retired ECC pages on the EGM region.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Ankit Agrawal <ankita@nvidia.com>
+> ---
+>  MAINTAINERS                           |  6 ++++++
+>  drivers/vfio/pci/nvgrace-gpu/Kconfig  | 12 ++++++++++++
+>  drivers/vfio/pci/nvgrace-gpu/Makefile |  3 +++
+>  drivers/vfio/pci/nvgrace-gpu/egm.c    | 22 ++++++++++++++++++++++
+>  drivers/vfio/pci/nvgrace-gpu/main.c   |  1 +
+>  5 files changed, 44 insertions(+)
+>  create mode 100644 drivers/vfio/pci/nvgrace-gpu/egm.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 5b3d86de9ec0..1fc551d7d667 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -27384,6 +27384,12 @@ F:	drivers/vfio/pci/nvgrace-gpu/egm_dev.h
+>  F:	drivers/vfio/pci/nvgrace-gpu/main.c
+>  F:	include/linux/nvgrace-egm.h
+>  
+> +VFIO NVIDIA GRACE EGM DRIVER
+> +M:	Ankit Agrawal <ankita@nvidia.com>
+> +L:	kvm@vger.kernel.org
+> +S:	Supported
+> +F:	drivers/vfio/pci/nvgrace-gpu/egm.c
 
-Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Co-developed-by: Zide Chen <zide.chen@intel.com>
-Signed-off-by: Zide Chen <zide.chen@intel.com>
----
-V3: New patch
----
- target/i386/cpu.c     |  2 +-
- target/i386/cpu.h     |  3 +++
- target/i386/kvm/kvm.c | 10 ++++++++++
- target/i386/machine.c | 19 +++++++++++++++++++
- 4 files changed, 33 insertions(+), 1 deletion(-)
+I'm not sure a separate MAINTAINERS entry is warranted here, these are
+intertwined, even if constructed to allow this EGM driver to be used by
+an out-of-tree driver.  It's also an unclean split, with Makefile and
+Kconfig dependencies under the nvgrace-gpu heading.  It should probably
+be self contained in a separate sub-dir to justify a new MAINTAINERS
+entry.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 3ff9f76cf7da..88cfd3529851 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1620,7 +1620,7 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, "pebs-trap", "pebs-arch-reg",
-             NULL, NULL, NULL, NULL,
--            NULL, "full-width-write", "pebs-baseline", NULL,
-+            NULL, "full-width-write", "pebs-baseline", "perf-metrics",
-             NULL, "pebs-timing-info", NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 6a9820c4041a..5d0ed692ae06 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -428,6 +428,7 @@ typedef enum X86Seg {
-                                          PERF_CAP_PEBS_FMT_SHIFT)
- #define PERF_CAP_FULL_WRITE             (1U << 13)
- #define PERF_CAP_PEBS_BASELINE          (1U << 14)
-+#define PERF_CAP_TOPDOWN                (1U << 15)
- 
- #define MSR_IA32_TSX_CTRL		0x122
- #define MSR_IA32_TSCDEADLINE            0x6e0
-@@ -514,6 +515,7 @@ typedef enum X86Seg {
- #define MSR_CORE_PERF_FIXED_CTR0        0x309
- #define MSR_CORE_PERF_FIXED_CTR1        0x30a
- #define MSR_CORE_PERF_FIXED_CTR2        0x30b
-+#define MSR_PERF_METRICS                0x329
- #define MSR_CORE_PERF_FIXED_CTR_CTRL    0x38d
- #define MSR_CORE_PERF_GLOBAL_STATUS     0x38e
- #define MSR_CORE_PERF_GLOBAL_CTRL       0x38f
-@@ -2111,6 +2113,7 @@ typedef struct CPUArchState {
-     uint64_t msr_fixed_ctr_ctrl;
-     uint64_t msr_global_ctrl;
-     uint64_t msr_global_status;
-+    uint64_t msr_perf_metrics;
-     uint64_t msr_ds_area;
-     uint64_t msr_pebs_data_cfg;
-     uint64_t msr_pebs_enable;
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 8c4564bcbb9e..3f533cd65708 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -4295,6 +4295,10 @@ static int kvm_put_msrs(X86CPU *cpu, KvmPutState level)
-                 kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i,
-                                   env->msr_fixed_counters[i]);
-             }
-+            /* SDM: Write IA32_PERF_METRICS after fixed counter 3. */
-+            if (env->features[FEAT_PERF_CAPABILITIES] & PERF_CAP_TOPDOWN) {
-+                    kvm_msr_entry_add(cpu, MSR_PERF_METRICS, env->msr_perf_metrics);
-+            }
-             for (i = 0; i < num_pmu_gp_counters; i++) {
-                 kvm_msr_entry_add(cpu, perf_cntr_base + i,
-                                   env->msr_gp_counters[i]);
-@@ -4868,6 +4872,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-             kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_CTRL, 0);
-             kvm_msr_entry_add(cpu, MSR_CORE_PERF_GLOBAL_STATUS, 0);
-         }
-+        if (env->features[FEAT_PERF_CAPABILITIES] & PERF_CAP_TOPDOWN) {
-+            kvm_msr_entry_add(cpu, MSR_PERF_METRICS, 0);
-+        }
-         for (i = 0; i < num_pmu_fixed_counters; i++) {
-             kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR0 + i, 0);
-         }
-@@ -5234,6 +5241,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS:
-             env->msr_global_status = msrs[i].data;
-             break;
-+        case MSR_PERF_METRICS:
-+            env->msr_perf_metrics = msrs[i].data;
-+            break;
-         case MSR_CORE_PERF_FIXED_CTR0 ... MSR_CORE_PERF_FIXED_CTR0 + MAX_FIXED_COUNTERS - 1:
-             env->msr_fixed_counters[index - MSR_CORE_PERF_FIXED_CTR0] = msrs[i].data;
-             break;
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 5cff5d5a9db5..6b7141cfead7 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -680,6 +680,24 @@ static const VMStateDescription vmstate_msr_ds_pebs = {
-         VMSTATE_END_OF_LIST()}
- };
- 
-+static bool perf_metrics_enabled(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return !!env->msr_perf_metrics;
-+}
-+
-+static const VMStateDescription vmstate_msr_perf_metrics = {
-+    .name = "cpu/msr_architectural_pmu/msr_perf_metrics",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = perf_metrics_enabled,
-+    .fields = (const VMStateField[]){
-+        VMSTATE_UINT64(env.msr_perf_metrics, X86CPU),
-+        VMSTATE_END_OF_LIST()}
-+};
-+
- static bool pmu_enable_needed(void *opaque)
- {
-     X86CPU *cpu = opaque;
-@@ -721,6 +739,7 @@ static const VMStateDescription vmstate_msr_architectural_pmu = {
-     },
-     .subsections = (const VMStateDescription * const []) {
-         &vmstate_msr_ds_pebs,
-+        &vmstate_msr_perf_metrics,
-         NULL,
-     },
- };
--- 
-2.53.0
+> +
+>  VFIO PCI DEVICE SPECIFIC DRIVERS
+>  R:	Jason Gunthorpe <jgg@nvidia.com>
+>  R:	Yishai Hadas <yishaih@nvidia.com>
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/Kconfig b/drivers/vfio/pci/nvgrace-gpu/Kconfig
+> index a7f624b37e41..7989d8d1c377 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/Kconfig
+> +++ b/drivers/vfio/pci/nvgrace-gpu/Kconfig
+> @@ -1,8 +1,20 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+> +config NVGRACE_EGM
+> +	tristate "EGM driver for NVIDIA Grace Hopper and Blackwell Superchip"
+> +	depends on ARM64 || (COMPILE_TEST && 64BIT)
+> +	depends on NVGRACE_GPU_VFIO_PCI
+> +	help
+> +	  Extended GPU Memory (EGM) support for the GPU in the NVIDIA Grace
+> +	  based chips required to avail the CPU memory as additional
+> +	  cross-node/cross-socket memory for GPU using KVM/qemu.
+> +
+> +	  If you don't know what to do here, say N.
+> +
+>  config NVGRACE_GPU_VFIO_PCI
+>  	tristate "VFIO support for the GPU in the NVIDIA Grace Hopper Superchip"
+>  	depends on ARM64 || (COMPILE_TEST && 64BIT)
+>  	select VFIO_PCI_CORE
+> +	select NVGRACE_EGM
 
+This should be dropped, it creates a circular dependency where we
+cannot actually unselect NVGRACE_EGM with NVGRACE_GPU_VFIO_PCI
+selected.
+
+>  	help
+>  	  VFIO support for the GPU in the NVIDIA Grace Hopper Superchip is
+>  	  required to assign the GPU device to userspace using KVM/qemu/etc.
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/Makefile b/drivers/vfio/pci/nvgrace-gpu/Makefile
+> index e72cc6739ef8..d0d191be56b9 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/Makefile
+> +++ b/drivers/vfio/pci/nvgrace-gpu/Makefile
+> @@ -1,3 +1,6 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+>  obj-$(CONFIG_NVGRACE_GPU_VFIO_PCI) += nvgrace-gpu-vfio-pci.o
+>  nvgrace-gpu-vfio-pci-y := main.o egm_dev.o
+> +
+> +obj-$(CONFIG_NVGRACE_EGM) += nvgrace-egm.o
+> +nvgrace-egm-y := egm.o
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/egm.c b/drivers/vfio/pci/nvgrace-gpu/egm.c
+> new file mode 100644
+> index 000000000000..999808807019
+> --- /dev/null
+> +++ b/drivers/vfio/pci/nvgrace-gpu/egm.c
+> @@ -0,0 +1,22 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved
+
+2026
+
+> + */
+> +
+> +#include <linux/vfio_pci_core.h>
+
+Premature?
+
+> +
+> +static int __init nvgrace_egm_init(void)
+> +{
+> +	return 0;
+> +}
+> +
+> +static void __exit nvgrace_egm_cleanup(void)
+> +{
+> +}
+> +
+> +module_init(nvgrace_egm_init);
+> +module_exit(nvgrace_egm_cleanup);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Ankit Agrawal <ankita@nvidia.com>");
+> +MODULE_DESCRIPTION("NVGRACE EGM - Module to support Extended GPU Memory on NVIDIA Grace Based systems");
+> diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
+> index b356e941340a..0bb427cca31f 100644
+> --- a/drivers/vfio/pci/nvgrace-gpu/main.c
+> +++ b/drivers/vfio/pci/nvgrace-gpu/main.c
+> @@ -1410,3 +1410,4 @@ MODULE_LICENSE("GPL");
+>  MODULE_AUTHOR("Ankit Agrawal <ankita@nvidia.com>");
+>  MODULE_AUTHOR("Aniket Agashe <aniketa@nvidia.com>");
+>  MODULE_DESCRIPTION("VFIO NVGRACE GPU PF - User Level driver for NVIDIA devices with CPU coherently accessible device memory");
+> +MODULE_SOFTDEP("pre: nvgrace-egm");
+
+Premature and wrong if necessary.  AIUI the aux device created should
+generate uevents and modules loaded automatically via device tables.
+Thanks,
+
+Alex
 
