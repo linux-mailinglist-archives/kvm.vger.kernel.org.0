@@ -1,77 +1,76 @@
-Return-Path: <kvm+bounces-72908-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72913-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KBswFFTDqWl3EQEAu9opvQ
-	(envelope-from <kvm+bounces-72908-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:54:28 +0100
+	id AHjZF5TCqWkhEQEAu9opvQ
+	(envelope-from <kvm+bounces-72913-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:51:16 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 647AD2169A5
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:54:27 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 498192168B0
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:51:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3BD973071002
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:47:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8B825307DCBF
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BF4242669E;
-	Thu,  5 Mar 2026 17:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E60E4301DA;
+	Thu,  5 Mar 2026 17:44:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gI+XYczt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XHexieip"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FB9411632;
-	Thu,  5 Mar 2026 17:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD472428823;
+	Thu,  5 Mar 2026 17:44:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772732685; cv=none; b=Tn3Osde07KTr3gU1+W9RhkzENk98Bf8J7WameK5kGtlOoqPEO6I/b0uc5d3lNt/zwHL4VpGFJfguUrpY/5DvQvELEBugSiqtTCkm+Y+Jfnxd//MT9UbzJGHGVd3c4jNeztv0Q2yLFOPwTEoQtSOgy42lSTllDeYdafmwCG/BpM4=
+	t=1772732692; cv=none; b=ZUM7g18QxUWzP16cS+REzwBWnYDvxrJ1iLK4V4yHujy07jmqOnYUSesUf4ciBxQcAR/24eG8PJZwQ+7htyk7tOSbhjbYY93x1zumgtz4fUAqpm5Kk1SXdNHI4uYb+ogRK1B3FtaUMzCb0U/YOit9+1eJcm905zgDtQ+7I+yi0bQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772732685; c=relaxed/simple;
-	bh=veZLFw252ZuZG/1W+qVgSJzBNoneJh//dkRFwAcadfo=;
+	s=arc-20240116; t=1772732692; c=relaxed/simple;
+	bh=DpdvT4loSRtnqsfH5MCvFkTqHKXLyWdscTJIsNn82z0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mzW1tjGe9u/vstsSyhiYc/wnW5vCNum8YC+aNKwdkkBE5J+bFeu7j0xZs16lmUdROyBV6DwiixAFiPegBGrUk/JuJfljoqkeTSJ3KLNaPrJNnfbAaBa5kqg4OhJxR1BJDNGO27mGeN8gk1W8tyi1h5HQe1K5h+kbUbhsTLkTAw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gI+XYczt; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=Ug/gmJE1FeM7S9Aa8qXbYOmC/LZoPasrE/AN0XBn3fGo3RX10D+ohZyg2v5FjNw9Bog9QYgexNSLHxSgpwgo7yM27+AEqXeVDODyZEsNookdDZyz/zf6o9R4g06zlrK5TZ2UYLvxiORD5IDpsTnPkQ0wqrxFmPR3g4g5xWmJ9FU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XHexieip; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772732684; x=1804268684;
+  t=1772732690; x=1804268690;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=veZLFw252ZuZG/1W+qVgSJzBNoneJh//dkRFwAcadfo=;
-  b=gI+XYczt4MmWOTTdWthWcdDQlu/43EmQVVinwf5c3nrfKIaIS1kK2+KQ
-   nz9zKaS0Dn78rO7qHE7eCyTVcYUBA2+WuABWR96RYCk3RWDrCCDu+tr9K
-   Yv8lEP1mvRJ4p35frxbPdXJ8ZPSESMOBAwtmaYCxKaSYkt2edf0oMWwqN
-   aY1S3c6d2vYSQn2u+j1xPQVJ/GoweEhApghBhfMcxSiTXNNporn3VStAt
-   DHli6Hl2BYjtiYO52U+GUFW2KWYrMSoQRrpW+3Dt2LpwCEavXnaDaj7CG
-   P1dueohryC2NaRTNuH0fW/FVe2EFxPUiIh4SPug1lHm64+krH2jxEgg2d
-   g==;
-X-CSE-ConnectionGUID: gq5MYFKvRA26F7XRm/ioMg==
-X-CSE-MsgGUID: aSsLhDE5Sheh4gx+MUpvfQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11720"; a="77701127"
+  bh=DpdvT4loSRtnqsfH5MCvFkTqHKXLyWdscTJIsNn82z0=;
+  b=XHexieipkYAmqwtNIOkygGim3dlflrRNVtTfqTuDiiwPscNjjrG1O8Cu
+   f7vGC+nj/wDwb0bkExxePCcRJlvsnGsyHhLxvLQ76M82zpALIIjfZW5B8
+   ZFIcAR4dD7e8R85aCJYvDncFaA4G8ohJDfJL99pzjEaERQjTZ9YgBGPk8
+   Z4l8viFoKvc8/EcE16GqFny0VHa4u5JZHyTIcI7Hkl5r/vXyK3J2yLQtH
+   frQpI6pFMV2ym8DY144HHpExBF/lw1At1NQCl38PUG4Vp9sLIkIagLWP6
+   j0BX91oLXNKxfDbnjTDuXmrzVNNjnkCxMXQs8aYMq7AB68Xo6vQixdA11
+   Q==;
+X-CSE-ConnectionGUID: xvX6Bre6SZ6x28QzwbWIbA==
+X-CSE-MsgGUID: 5TKVszEmRgW+kZuI4MFZnw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11720"; a="85301946"
 X-IronPort-AV: E=Sophos;i="6.23,103,1770624000"; 
-   d="scan'208";a="77701127"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 09:44:43 -0800
-X-CSE-ConnectionGUID: i5rKjPoWT520bQQ3U1osNw==
-X-CSE-MsgGUID: GLSzLUnMQySJbIFIUKMrNg==
+   d="scan'208";a="85301946"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 09:44:47 -0800
+X-CSE-ConnectionGUID: ZO75T+yNS26b3/26mqgKPg==
+X-CSE-MsgGUID: w0SNUiuzRGCiEqHZ+rEwKQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,103,1770624000"; 
-   d="scan'208";a="256647619"
+   d="scan'208";a="222896514"
 Received: from mdroper-mobl2.amr.corp.intel.com (HELO localhost) ([10.124.220.244])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 09:44:43 -0800
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 09:44:43 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org
 Cc: isaku.yamahata@intel.com,
 	isaku.yamahata@gmail.com,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
-	linux-kernel@vger.kernel.org,
-	Yang Zhong <yang.zhong@linux.intel.com>
-Subject: [PATCH v2 21/36] KVM: VMX: dump_vmcs() support the guest virt timer
-Date: Thu,  5 Mar 2026 09:44:01 -0800
-Message-ID: <dc183f91744647b2f6ed7512076b2835705e6959.1772732517.git.isaku.yamahata@intel.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 22/36] KVM: VMX: Enable APIC timer virtualization
+Date: Thu,  5 Mar 2026 09:44:02 -0800
+Message-ID: <9a50051868ffc58a831e784f6fefe31968f062fc.1772732517.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <cover.1772732517.git.isaku.yamahata@intel.com>
 References: <cover.1772732517.git.isaku.yamahata@intel.com>
@@ -82,64 +81,74 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 647AD2169A5
+X-Rspamd-Queue-Id: 498192168B0
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[intel.com,gmail.com,redhat.com,google.com,vger.kernel.org,linux.intel.com];
-	TAGGED_FROM(0.00)[bounces-72908-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,gmail.com,redhat.com,google.com,vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72913-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NO_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[6];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
+	FROM_NO_DN(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[isaku.yamahata@intel.com,kvm@vger.kernel.org]
 X-Rspamd-Action: no action
 
-From: Yang Zhong <yang.zhong@linux.intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Add three VMCS fields from the guest virt timer into dump_vmcs().
+Don't clear TERTIARY_EXEC_GUEST_APIC_TIMER bit unconditionally from
+KVM_OPTIONAL_VMX_TERTIARY_VM_EXEC_CONTROL when calculating supported bit.
 
-Signed-off-by: Yang Zhong <yang.zhong@linux.intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Changes:
+v1 -> v2:
+- Move the bit disable to the caller of adjust_vmx_controls64() to avoid
+  compile time error because KVM_OPTIONAL_VMX_TERTIARY_VM_EXEC_CONTROL is
+  used for compile time check.
+---
+ arch/x86/kvm/vmx/vmx.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 8c2ab0164714..e665fc7f3377 100644
+index e665fc7f3377..b3974125a902 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6594,6 +6594,12 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
- 		vmx_dump_msrs("guest autoload", &vmx->msr_autoload.guest);
- 	if (vmcs_read32(VM_EXIT_MSR_STORE_COUNT) > 0)
- 		vmx_dump_msrs("autostore", &vmx->msr_autostore);
-+	if (tertiary_exec_control & TERTIARY_EXEC_GUEST_APIC_TIMER) {
-+		pr_err("DeadlinePhy = 0x%016llx\n", vmcs_read64(GUEST_DEADLINE_PHY));
-+		pr_err("DeadlineVir = 0x%016llx\n", vmcs_read64(GUEST_DEADLINE_VIR));
-+		pr_err("GuestApicTimerVector = 0x%04x\n",
-+		       vmcs_read16(GUEST_APIC_TIMER_VECTOR));
-+	}
+@@ -2801,15 +2801,7 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
  
- 	if (vmentry_ctl & VM_ENTRY_LOAD_CET_STATE)
- 		pr_err("S_CET = 0x%016lx, SSP = 0x%016lx, SSP TABLE = 0x%016lx\n",
+ 	if (_cpu_based_exec_control & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS)
+ 		_cpu_based_3rd_exec_control =
+-			adjust_vmx_controls64(KVM_OPTIONAL_VMX_TERTIARY_VM_EXEC_CONTROL
+-					      /*
+-					       * Disable apic timer
+-					       * virtualization until the logic
+-					       * is imlemented.
+-					       * Once it's supported, add
+-					       * TERTIARY_EXEC_GUEST_APIC_TIMER.
+-					       */
+-					      & ~TERTIARY_EXEC_GUEST_APIC_TIMER,
++			adjust_vmx_controls64(KVM_OPTIONAL_VMX_TERTIARY_VM_EXEC_CONTROL,
+ 					      MSR_IA32_VMX_PROCBASED_CTLS3);
+ 
+ 	if (!IS_ENABLED(CONFIG_X86_64) ||
 -- 
 2.45.2
 
