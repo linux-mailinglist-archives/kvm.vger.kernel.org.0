@@ -1,181 +1,218 @@
-Return-Path: <kvm+bounces-72940-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72941-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iGM5F7fYqWl5GAEAu9opvQ
-	(envelope-from <kvm+bounces-72940-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 20:25:43 +0100
+	id KL2vJAHaqWneGQEAu9opvQ
+	(envelope-from <kvm+bounces-72941-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 20:31:13 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 018752177B6
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 20:25:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40FC42178F1
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 20:31:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EA4FA3005A86
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 19:25:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A5413056DA1
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 19:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8620137E2EE;
-	Thu,  5 Mar 2026 19:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D24A73CF691;
+	Thu,  5 Mar 2026 19:30:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dLjeM4LE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JfNHyv7m"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF773148D0;
-	Thu,  5 Mar 2026 19:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4EB3C3BE9
+	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 19:30:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772738730; cv=none; b=EuATIRvr0P2ssfc8PesAR9eOwqZ4OhBSuKB8D+5fIpQ/GWS6XvRxX9xoeeKjnF1TvnlYIE0RRJ6pboDLXlChT6vKkB3lEI+Mwfh+ec/G1HCD1F9IVqCXNtScK4LCKB/NlijZreGnjvqgqnnBXsaUdex98AMAkEEVbnh/W5rJNRg=
+	t=1772739059; cv=none; b=MJ9kls+ftrkIUjE+2Cxv52HUfaQn5nIqw2MbchQ9mfKchebrseE9ziJOM3ypKhrnN3+u4x18AUoogwjwwBtvY72mU859+ytgCOnDrflU4xXCbINt/9n3xdzvCShNhvJeQDVP/naiZm12aK5eodTFyflwQGw43Ev3juXsNNLUcx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772738730; c=relaxed/simple;
-	bh=ln+zmT6dVmCfKEb11g1BjE/cjuoBJVgUvWUSnOfgvmc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YsO7aFuCqY6hE4e2Q7cDYOhUlMUpTwzqijsFOVbfB50tTlIm066Siwj+YtlD+zqxmnfTK9MiiLuOmaMHJ6GALgLgzQAZyaLfL9WKlKhijTC+nL7P84yqv1/+ukqSVZ/CdaeYJU4RLpef/9nX43glBk/B4f0WWccFWgC8XklcQsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dLjeM4LE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9412C116C6;
-	Thu,  5 Mar 2026 19:25:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772738730;
-	bh=ln+zmT6dVmCfKEb11g1BjE/cjuoBJVgUvWUSnOfgvmc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=dLjeM4LE5dXR9m0xHLTdkzFdRU6WH5jM6sBt6bzgqmW/m1pCV1fgnxhtQ2vxfnQms
-	 lIGU1Pgqcrs0hGxEeqFBI2JOIInj1sdmbdDRuBYfadSL9HAfeu44vbjmZxV9XVqxsu
-	 4C7ekz8VQ87LFqLjcf3PWU32/mie8n5MOMtDpoUghFjAp+chM4CkkDwKwSZiFxLNLl
-	 n8u8HRhxDwFJ/qBA55nIwevYUCM+2DEL2RNTGVDIuGZ8NXVJFBE8FpD9HNZk2OAS2d
-	 Pz43CzlW1m78aO0KJB5qYNmiJvoxI7Z+3/LU80vHz0mDONbdHsIRnU3mKCsa8r2KVZ
-	 RNawaEMbOkqcQ==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Jiri Slaby <jirislaby@kernel.org>, Peter Zijlstra <peterz@infradead.org>
-Cc: Matthieu Baerts <matttbe@kernel.org>, Stefan Hajnoczi
- <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
- kvm@vger.kernel.org, virtualization@lists.linux.dev, Netdev
- <netdev@vger.kernel.org>, rcu@vger.kernel.org, MPTCP Linux
- <mptcp@lists.linux.dev>, Linux Kernel <linux-kernel@vger.kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, "Paul E. McKenney"
- <paulmck@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>,
- "luto@kernel.org" <luto@kernel.org>, Michal =?utf-8?Q?Koutn=C3=BD?=
- <MKoutny@suse.com>,
- Waiman Long <longman@redhat.com>
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups,
- RCU stalls, timeout
-In-Reply-To: <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org>
-References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
- <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
- <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
- <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
- <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org>
-Date: Thu, 05 Mar 2026 20:25:22 +0100
-Message-ID: <87tsuu2i59.ffs@tglx>
+	s=arc-20240116; t=1772739059; c=relaxed/simple;
+	bh=yA95gkOE4t9PwHAyzG4TvsXtYQDX6bXnChl0a0dTVLE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=aBFeBMT7aRnflqwHdPGYflAgJi8VDMdGUQB+G7P2s7oXJUjAyxn+fa/6zdkadP2Ix1XOm0zOwStaWcZ4AhdVP/PT6KUrjou/TiONKisTk0tmmDtWnRQk8cgOtT7FH8EwUdDVxpio8wzIsdi8P4E8t0tq5rWJb01MMZo0CduYiq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JfNHyv7m; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae61939fa5so79032465ad.0
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 11:30:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772739057; x=1773343857; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SDFPsOZmn5xrrcLNeUFRi+SA57UNTjbvnubUmG/QNUk=;
+        b=JfNHyv7mdmx3GSVkN19kH08NoexPdyr1PEYphdtdmxmLa2mpGDbma3o6Zu+IVlKCtR
+         40gBSd9mZ+cfdBQOFP/VQ9jCfpmCmsBfN9CjjWPVSWRnfYZtsV0SdcqJun0HBuVI/5Q7
+         Ksh3Mgiln4LZNipoPvTZHDFBeCQwe2h8Kf9Gz4nHm05hJY5aXTMmmfb/MwAmC9wWEXDQ
+         tkZCx6K/yBQT/SUeJULedMaKgOues+89oo5T6iabFO15t86lrgzrnvYPbuOTcRWgrBba
+         NknLN7nW4cbFoM4NCtk+ETi7yjGQZ9HUJFWeIOgK0OyW8gRJIBomi5M96N/irFzFjmfq
+         0qqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772739057; x=1773343857;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SDFPsOZmn5xrrcLNeUFRi+SA57UNTjbvnubUmG/QNUk=;
+        b=NRBVHLh0LEZnQMYzx6ey1pTL6FE800FzC/Vh2ayOPIJt2aygHu5tzkOUMPK+TjHCIo
+         E61Q/mr/zK1pDt8IPCbnA9tandKenGA+75e3Pirawop5VPb1eN0zo35BZl5F4Tfe/NZn
+         F+bd5CEr518c6g4Pmq+jD6WtSc5nmql6p0Wq+XuRlE5K64kwZ1X0DE29n6eTOxRKlmZ/
+         cix9QR3csS33h/gfyveE0NBUZJoIxu7HkcHzD4Tpe7PfJKAp8emBWlmIbZPKBmUV5rpR
+         iRUHV5BMGDbcpsS41oc1cdRfNdys3x6FbamVln7wWPP7/MIjAOy/0L7tmwF8ZZIafDXD
+         rRNA==
+X-Gm-Message-State: AOJu0Yzve6E9E0zUJ7oH9Rxaapw+9p0yi8YpN1+sY/UfBSKqvhdJpogS
+	SUH5sgpq0dlbafXxNU1jajIM548uictCdbBU8x12v9hVWoO6lD0NthulERJjCSgRtTEapQtr1dX
+	EyCtgxQ==
+X-Received: from plsk6.prod.google.com ([2002:a17:902:ba86:b0:29f:1738:99f3])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ef49:b0:2ae:4fc7:8053
+ with SMTP id d9443c01a7336-2ae6ab6ae41mr65903015ad.46.1772739057151; Thu, 05
+ Mar 2026 11:30:57 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu,  5 Mar 2026 11:30:51 -0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Rspamd-Queue-Id: 018752177B6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260305193053.1643463-1-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86 (and a PPC) fixes for 7.0-rc3+
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 40FC42178F1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-72940-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72941-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	RCPT_COUNT_THREE(0.00)[4];
+	HAS_REPLYTO(0.00)[seanjc@google.com];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	REPLYTO_EQ_FROM(0.00)[]
 X-Rspamd-Action: no action
 
-On Thu, Mar 05 2026 at 18:33, Jiri Slaby wrote:
-> On 05. 03. 26, 17:16, Thomas Gleixner wrote:
->
-> ====== PID 7680 (spinning in mm_get_cid()) ======
-> 4 tasks with
->    mm = 0xffff8cc406824680
->      mm_cid.pcpu = 0x66222619df00,
->
->
-> crash> task -x -R mm_cid ffff8cc4038525c0 ffff8cc40ad40000 
-> ffff8cc40683cb80 ffff8cc418424b80
-> PID: 7680     TASK: ffff8cc4038525c0  CPU: 1    COMMAND: "asm"
->    mm_cid = {
->      active = 0x1,
->      cid = 0x80000000
->    },
+Please pull a larger-than-normal set of fixes for 7.0.  The PMU fix from
+Namhyung is the only one that absolutely _needs_ to get into 7.0 (only beca=
+use
+no one cares about PPC e500).  The rest are fairly urgent stable@ fixes (an=
+d
+most of 'em _just_ missed the merge window).
 
-So CID 3 has gone AWOL...
+The following changes since commit 11439c4635edd669ae435eec308f4ab8a0804808=
+:
 
-> PID: 7681     TASK: ffff8cc40ad40000  CPU: 3    COMMAND: "asm"
->    mm_cid = {
->      active = 0x1,
->      cid = 0x40000000
->    },
->
-> PID: 7682     TASK: ffff8cc40683cb80  CPU: 0    COMMAND: "asm"
->    mm_cid = {
->      active = 0x1,
->      cid = 0x40000002
->    },
->
-> PID: 7684     TASK: ffff8cc418424b80  CPU: 2    COMMAND: "asm"
->    mm_cid = {
->      active = 0x1,
->      cid = 0x40000001
->    },
->
-> crash> struct mm_cid_pcpu -x 0xfffff2e9bfc09f00
-> struct mm_cid_pcpu {
->    cid = 0x40000002
-> }
-> crash> struct mm_cid_pcpu -x 0xfffff2e9bfc89f00
-> struct mm_cid_pcpu {
->    cid = 0x0
-> }
-> crash> struct mm_cid_pcpu -x 0xfffff2e9bfd09f00
-> struct mm_cid_pcpu {
->    cid = 0x40000001
-> }
-> crash> struct mm_cid_pcpu -x 0xfffff2e9bfd89f00
-> struct mm_cid_pcpu {
->    cid = 0x40000000
-> }
+  Linux 7.0-rc2 (2026-03-01 15:39:31 -0800)
 
-... as 0, 1, 2 are owned by CPUs 3, 2, 0. 
+are available in the Git repository at:
 
-The other process is not relevant. That's just fallout and has a
-different CID space, which is consistent.
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-fixes-7.0-rc3
 
-Is there simple way to reproduce?
+for you to fetch changes up to 3271085a7f1030ba9897cab60452acd370423ff1:
 
-Thanks,
+  KVM: PPC: e500: Rip out "struct tlbe_ref" (2026-03-03 12:29:07 -0800)
 
-        tglx
+----------------------------------------------------------------
+KVM x86 (and PPC e500) fixes for 7.0-rc3+
 
+ - Synthesize features into KVM's set of supported CPU caps if and only if =
+the
+  feature is actually "enabled" by the kernel.
 
+ - Validate _all_ GVAs when processing a range of GVAs for a PV Hyper-V TLB
+   flush, not just the first GVA.
 
+ - Fix a brown paper bug add_atomic_switch_msr().
 
+ - Use hlist_for_each_entry_srcu() when traversing mask_notifier_list to fi=
+x a
+   lockdep warning (KVM doesn't hold RCU, just irq_srcu).
+
+ - Ensure AVIC VMCB fields are initialized if the VM has an in-kernel local
+   APIC (and AVIC is enabled at the module level).
+
+ - Update CR8 write interception when AVIC is (de)activated to fix a bug wh=
+ere
+   KVM can run with the CR8 intercept in perpetuity.
+
+ - Add a quirk to skip the consistency check on FREEZE_IN_SMM, i.e. to allo=
+w L1
+   hypervisors to set FREEZE_IN_SMM to provide some amount of backwards
+   compatibility with setups where L1 was freezing PMCs on VM-Entry to L2.
+
+ - Increase the maximum number of NUMA nodes in the guest_memfd selftest to
+   64 (from 8).
+
+ - Fix a PPC e500 build error due to a long-standing wart that was exposed =
+by
+   the recent conversion to kmalloc_obj(), and rip out the underlying uglin=
+ess
+   that led to the wart.
+
+----------------------------------------------------------------
+Carlos L=C3=B3pez (1):
+      KVM: x86: synthesize CPUID bits only if CPU capability is set
+
+Jim Mattson (1):
+      KVM: x86: Introduce KVM_X86_QUIRK_VMCS12_FREEZE_IN_SMM_CC
+
+Kai Huang (1):
+      KVM: selftests: Increase 'maxnode' for guest_memfd tests
+
+Li RongQing (1):
+      KVM: x86: Fix SRCU list traversal in kvm_fire_mask_notifiers()
+
+Manuel Andreas (1):
+      KVM: x86: hyper-v: Validate all GVAs during PV TLB flush
+
+Namhyung Kim (1):
+      KVM: VMX: Fix a wrong MSR update in add_atomic_switch_msr()
+
+Sean Christopherson (4):
+      KVM: SVM: Initialize AVIC VMCB fields if AVIC is enabled with in-kern=
+el APIC
+      KVM: SVM: Set/clear CR8 write interception when AVIC is (de)activated
+      KVM: PPC: e500: Fix build error due to using kmalloc_obj() with wrong=
+ type
+      KVM: PPC: e500: Rip out "struct tlbe_ref"
+
+ Documentation/virt/kvm/api.rst                 |  8 ++++++++
+ arch/powerpc/kvm/e500.h                        |  6 +-----
+ arch/powerpc/kvm/e500_mmu.c                    |  4 ++--
+ arch/powerpc/kvm/e500_mmu_host.c               | 91 ++++++++++++++++++++++=
+++++++++++++++++++++++-----------------------------------------------
+ arch/x86/include/asm/kvm_host.h                |  3 ++-
+ arch/x86/include/uapi/asm/kvm.h                |  1 +
+ arch/x86/kvm/cpuid.c                           |  5 ++++-
+ arch/x86/kvm/hyperv.c                          |  9 +++++----
+ arch/x86/kvm/ioapic.c                          |  3 ++-
+ arch/x86/kvm/svm/avic.c                        |  8 +++++---
+ arch/x86/kvm/svm/svm.c                         | 11 ++++++-----
+ arch/x86/kvm/vmx/nested.c                      | 22 ++++++++++++++++++----
+ arch/x86/kvm/vmx/vmx.c                         |  2 +-
+ tools/testing/selftests/kvm/guest_memfd_test.c |  2 +-
+ 14 files changed, 100 insertions(+), 75 deletions(-)
 
