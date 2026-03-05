@@ -1,139 +1,138 @@
-Return-Path: <kvm+bounces-72870-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72871-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WEhsDA+7qWnNDQEAu9opvQ
-	(envelope-from <kvm+bounces-72870-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:19:11 +0100
+	id MChLB9S7qWlzDgEAu9opvQ
+	(envelope-from <kvm+bounces-72871-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:22:28 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6B092160D8
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:19:10 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46B3A216170
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:22:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7D5263070BA0
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:14:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 26C9C30766E4
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:14:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05A693EB7EF;
-	Thu,  5 Mar 2026 17:13:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312F73E7157;
+	Thu,  5 Mar 2026 17:13:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iRcOiIbF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CKiQ/uvZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474F93E3D91
-	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 17:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793263E3D9D
+	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 17:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772730791; cv=none; b=iZ7iibQExo527WH0YYi/xgbYXYEq83cFNopI2vW0vpMchuBKHFEqrGZSUtKYlg3UBEtEzoJZ8HE4G2LIn4rEnoTnzZBB26CVqCaZfPc7Q3kfbDIkPYCwGxmkKUw4Z0djPnBbaGzIRVrUQMUIzoTPFZi1Nbmu/1cO3ILQHEg6LK4=
+	t=1772730797; cv=none; b=Qnay6K4WJ+AQcOmLhFgyRHuqt2BYhIolymYiCq9rlCQDYbm5Iu4znBA0aVxnniWxhgX7U3RWop/aH8xpy8kLj54NvlV77DYh9aJBfPfcXVivZuxAWRqCu2dirTH+CuouWgjqL2b7spLcyA2Gy98VuNY+oAVQ0SOtXKDak/Un760=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772730791; c=relaxed/simple;
-	bh=Fz3G3Z5CUb5GrsRoilSsxcmoG+VPiuH3K0kyK3aJ/zk=;
+	s=arc-20240116; t=1772730797; c=relaxed/simple;
+	bh=W/r3dwP6bXFVtGKujLs+8VnddyYvLsyKE464gcZ7qbY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=szPQ81YGNfdbfgTowOg/F4L+4OjZQck3v2NfiDA1q30+0RBMxAGdFEowrPflsK2fj7SvHAzFuJBRWYcWlo7pMG4pBVtYQjmEbDAXWIPETaxONeMNhSBVfPXMf2A9+3L7a32fu12b7JxVz+hnhZ0EObZqYy+xXUDUaMKscLR3y2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iRcOiIbF; arc=none smtp.client-ip=209.85.216.73
+	 To:Content-Type; b=UBZM8AvvejFTsRA12f7pgrpg6wCqDuG8omqhGgvpks1P5+zRrbgreWwsV7oFIef0rGJ5ma38HKzgjwNVKMM2yWA06KsMhy8bPpV7r7PgMuO97YaS2lNPlIXVybzVcWzpMLalWQBpSnDu9wlbP0RxeHoneMDQ+0u/0ccDRm9LDjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CKiQ/uvZ; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-35983ee9f3bso5150363a91.1
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 09:13:10 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3598d3e3bc7so4228659a91.3
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 09:13:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772730790; x=1773335590; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=toKHjbhSQYEtn1NXwk4TcR5FSrtPRj/vRbKjJXmaJuw=;
-        b=iRcOiIbF1TD/VbAG04Q0sYrVGoUMcZyEHRTZ51na5FBjnRFkefqLuIT0eqollq7mmH
-         0sR5KmRfw4bkbZZjMo/9FKgoPLSSlsUtGni3ZtegTh+VXzY77gjw+Id3FqgJjh4j5Sur
-         fThXtEolT4Xhyv08jUUT0BwV1tH1D18iMdQmkMc78SlLcxA5K0VJtw1eSChiQm839Y0Q
-         du0R/GuzdnoLm792wr4lfwMQPPtr4/aDiUmvuewaleCax0/AzSqSyNnunry1b2X6EOwB
-         SCezFmYPLjzNBSP7FwcfAte7cgHtNjl8wwaDMEmRXKhIoqP15I/qtwh+wd1mUyIqxy4y
-         Q+OQ==
+        d=google.com; s=20230601; t=1772730796; x=1773335596; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zMq62r48M5GsRj1/5/v+Np0zZZ8DbhH+mNzDWiPVhuU=;
+        b=CKiQ/uvZNM4jZfz7kBebShR05llqzBoiLw5DXyppxkphguykQmnYERbP5o+gB527Iz
+         92zzbPWdJ/xt8mNhFfufKBHZ0bx7GgpYUZqt5NMSCsMNT4d1W63Jk9trMpagh5zFX0RB
+         cgho9b8pjz2HBQjncKGmXNDyDHGVhkdGWP28wYRfaAQg8jGTsatoObArqdTCc0EdTGJV
+         GsRVaZ1SHql+los3oOqd1tDdbHzx5WXoZAYbKRR7ZkVP+qX9RM3hHXu/pz6CTHJvtIFy
+         zoXWUyF/10bIaOl6aFwudlaAOLwcC15sqi5PAWbusVRs8t9wa/TgQgTvsSpiNJYAoR6R
+         jPSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772730790; x=1773335590;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=toKHjbhSQYEtn1NXwk4TcR5FSrtPRj/vRbKjJXmaJuw=;
-        b=I2DNUwsGCHj2fcvlUrCZI4fOG+Zepsp01uSqaZ58/fx8IVy6P6SyBE6OM0blBRp3iI
-         9CEDPfo+l0wxzx8t223WoJkirMrXvMgQg+xTns/3quz3Q3muLxpiyB6g/EOMMHa5DVQa
-         VKMUfOcXUf8Zg/wZxRv50csRnxY+N5I+7JG/V/jpEfEUIdiajuRpTOd1T6q0zoC6N4Vs
-         9AW31dCDDCtvI4KnCLT+rR5J68BD6nxp18OXbW6DAnTNAcJvcebaNL6/AmrmauwfHYQB
-         r7NyNApWlccngN0UNOkeVgPvaGu+JRs3FLhpUmSeR/Vx0lrnE9BG61gnKguNgkD+gbqW
-         zErA==
-X-Gm-Message-State: AOJu0YwQVPrtONehaNLatjLde7aD5Dd9rNKQ2e+3ubYqYZC16o1m4+NG
-	GINM6LcSL04a7yz9OhzimtBfODFbBAVZcGPJ4KZ40lrOREMDFEB7yz1Q0zy8frw4yV9xVcZu87T
-	XARcyUw==
-X-Received: from pjat8.prod.google.com ([2002:a17:90a:d08:b0:359:8e19:6edb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4ace:b0:356:22ef:57b9
- with SMTP id 98e67ed59e1d1-359a69b5602mr6363722a91.3.1772730789529; Thu, 05
- Mar 2026 09:13:09 -0800 (PST)
-Date: Thu,  5 Mar 2026 09:08:29 -0800
-In-Reply-To: <20260212103841.171459-1-zhiquan_li@163.com>
+        d=1e100.net; s=20230601; t=1772730796; x=1773335596;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zMq62r48M5GsRj1/5/v+Np0zZZ8DbhH+mNzDWiPVhuU=;
+        b=JQ3QzKYAn3jbRZINUvYM/8a3jnlZfxYvSsZY8p52lA0ylUSysGLJG8rCnr2YDB6nPa
+         f5lgpy0jb3iDU/sLLVVPyS4WzKQXZqUHrho+qbayL8ZXHLUIYvNBb5nN5mV9EqeV8BGz
+         mK4oll4oBQYesJl4vbIGUDWoWa1EN+JPt0bjHmXQdIE1xiRZAEtdmfS5glpBtgxoxEpF
+         syt3CKXEa2Ai9Dd9Ca+AoyGqJy4b/PwF3PziHhF9Afo9uyrCh/5QC/kOPI67enWLQjyM
+         mL1gFLcwK7gbotKj3m9DNgabsKf29LeDzcUIc9XIjHVw507Y9XtpzCsEVPETDUTluV42
+         mOjg==
+X-Forwarded-Encrypted: i=1; AJvYcCXf+IStaUxLHOvv12twC9bNJm2ooswn9NsESi4SkI/4IEXq8+Grn3qtDr4HFXaud4wUHlQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyExfE5SS6gs+lGfFHgPEZHQ9/zXTHXz3fJs1C5rpa5w+St+qsF
+	Zah0R9xysYRwE7Qa9HD9MjXdfJXECNflWj3egnOfrIItygjhWwap0Udlrw8H9Z15EDnDAGrvCqY
+	9wk9zuw==
+X-Received: from pjqx18.prod.google.com ([2002:a17:90a:b012:b0:359:7c35:fda7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1848:b0:359:8c89:96e5
+ with SMTP id 98e67ed59e1d1-359bb375be5mr244510a91.12.1772730795784; Thu, 05
+ Mar 2026 09:13:15 -0800 (PST)
+Date: Thu,  5 Mar 2026 09:08:31 -0800
+In-Reply-To: <20260225145050.2350278-1-gal@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260212103841.171459-1-zhiquan_li@163.com>
+References: <20260225145050.2350278-1-gal@nvidia.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <177272958168.1565880.614050090321272252.b4-ty@google.com>
-Subject: Re: [PATCH v2 0/4] KVM: x86: selftests: Add Hygon CPUs support and
- fix failures
+Message-ID: <177272734484.1548728.2810524761723768496.b4-ty@google.com>
+Subject: Re: [PATCH v2 0/2] KVM: x86: Fix UBSAN bool warnings in module parameters
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, shuah@kernel.org, 
-	Zhiquan Li <zhiquan_li@163.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Naveen N Rao <naveen@kernel.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>
 Content-Type: text/plain; charset="utf-8"
-X-Rspamd-Queue-Id: D6B092160D8
+X-Rspamd-Queue-Id: 46B3A216170
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72870-lists,kvm=lfdr.de];
-	FREEMAIL_TO(0.00)[google.com,redhat.com,kernel.org,163.com];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72871-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Thu, 12 Feb 2026 18:38:37 +0800, Zhiquan Li wrote:
-> This series to add support for Hygon CPUs and fix 11 KVM selftest failures
-> on Hygon architecture.
+On Wed, 25 Feb 2026 16:50:48 +0200, Gal Pressman wrote:
+> Several KVM module parameters use int to support a special -1 (auto)
+> value, but rely on param_get_bool() for the sysfs getter.
+> When userspace reads these parameters before the auto value is resolved,
+> param_get_bool() interprets the int as a bool, triggering UBSAN "load of
+> value 255 is not a valid value for type '_Bool'" warnings.
 > 
-> Patch 1 add CPU vendor detection for Hygon and add a global variable
-> "host_cpu_is_hygon" to identify if the test is running on a Hygon CPU.
-> It is the prerequisite for the following fixes.
+> Fix both instances by implementing getter functions that handle the -1
+> case before falling through to param_get_bool().
 > 
 > [...]
 
-Applied to kvm-x86 selftests, thanks!
+Applied patch 1 to kvm-x86 svm, and patch 2 to kvm-x86 mmu.  Thanks!
 
-[1/4] KVM: x86: selftests: Add CPU vendor detection for Hygon
-      https://github.com/kvm-x86/linux/commit/0c96c47d4345
-[2/4] KVM: x86: selftests: Add a flag to identify AMD compatible test cases
-      https://github.com/kvm-x86/linux/commit/53b2869231d3
-[3/4] KVM: x86: selftests: Allow the PMU event filter test for Hygon
-      https://github.com/kvm-x86/linux/commit/6b8b11ba4715
-[4/4] KVM: selftests: Fix reserved value WRMSR testcase for multi-feature MSRs
-      https://github.com/kvm-x86/linux/commit/9396cc1e282a
+[1/2] KVM: SVM: Fix UBSAN warning when reading avic parameter
+      https://github.com/kvm-x86/linux/commit/2b1a59f7ef96
+[2/2] KVM: x86/mmu: Fix UBSAN warning when reading nx_huge_pages parameter
+      https://github.com/kvm-x86/linux/commit/1450ab08108c
 
 --
 https://github.com/kvm-x86/linux/tree/next
