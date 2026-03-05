@@ -1,141 +1,132 @@
-Return-Path: <kvm+bounces-72852-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72853-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kMzGLIC6qWnNDQEAu9opvQ
-	(envelope-from <kvm+bounces-72852-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:16:48 +0100
+	id wDElAuW6qWnNDQEAu9opvQ
+	(envelope-from <kvm+bounces-72853-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:18:29 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3429021602D
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:16:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D27B2160A1
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:18:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9458E31DE544
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:11:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8CDB9319D292
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:11:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3EA3E5599;
-	Thu,  5 Mar 2026 17:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA113E3DB7;
+	Thu,  5 Mar 2026 17:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T2NCgSWb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wgzE1b5L"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B243E1208
-	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 17:10:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63DE3E3DAD
+	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 17:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772730643; cv=none; b=FzWYyuCm17Qf6CeMd+T4CdJiIbF1XjthsPlMOyBmtkACb1YJi9Avj7dEGnt5VgbgL+wl8CEZxWoasaQm+zddVCIutwC67ZY+qwTotF+pRH84vbBBm13xEMOEmVeobFGuazPUbv6yWU/N06cp+1I9oU1a5uGSQRBsdD15KhM04Mc=
+	t=1772730651; cv=none; b=nmufjhMdISl3cpGllRGA3NchMoBXYvA849YUw7qwmtI+VW8ouFqDEAEluBH3HOYIuQiIvkpEkxCowP/XnxUmdMkiiQ2r6CEsNs91L8fMfXZxiETO20IF8704LrY8ifCbOZPuqa38N2AKmUPsiOguNctlsF23uogowGcZJ7jWM7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772730643; c=relaxed/simple;
-	bh=BgXCe+EccglOVSlP/bo2iG4iGCrk8Y0BFtDD24vZGWs=;
+	s=arc-20240116; t=1772730651; c=relaxed/simple;
+	bh=AlDtxc7Bihsnc3dPHOZLblr1JaL+P3MAUHUD3Xov9Qc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YXB3W7wBeKW0kBmudWfeAAY9tb+6iPhwZ6/nfRgifPe5I6YF6+w2yWIKq4mk4lcjvBbX8HQ3U6eg1LmefxPLH/RsVegQZ86/GgOPwuL2aynXPG1QQMaWG+sSdLqfKtdq8XcyM0Y3nM0YvMPjtBADrSd4fdvI4b32kqLG45kHsDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T2NCgSWb; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=d4RgRbBPxRgZC99KOHBVeCklKjqoEUl/58qG6K1pvUuVL9yw8RhgjGrmCylIzxDfOJ7xVuVvjRLAcojuRUiudlO+0BNTcI158K4pkU1t9rqwXKtc0WuSnSmEFxVRoU1dD+ap/bfl7puxymXS5eBVTzAxtDEVfZqKmAO/WadwGes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wgzE1b5L; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c7398e393a6so86081a12.1
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 09:10:42 -0800 (PST)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c6e7f45e2ddso29345492a12.1
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 09:10:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772730642; x=1773335442; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772730649; x=1773335449; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+htKiNWdniqhpURRDUFSHaItriT9yQJbQMXUKWYvD7w=;
-        b=T2NCgSWbHLjUNZMYqQPFNjtYGyac/sKlv7J7zmSMea98KQWxOmoUknsdBzlTX40KuE
-         ZJ6vEJVoXFR8togUZJ9L2J4i4J1TjhDpJHlqKlvhPVjLt1TddTBDsleMCojkXh8B3UrU
-         L55kwww1feZ+BHFCMYWwxXgIHyEAigutrkRpmSVRtxwoMuIjMN0b7aoSL9ZNoKV2dR2X
-         1J4NM80wUIvt3qeKDWwRaZUhO7j1mVOeFcjKy3KdnDRHDuhJJ+0A41dXBZRiqN0xOPLT
-         a+S6Mu3BCQRxK/u1Y6rUIds/yLbr6X7MFBH4jo27eoKVcQZ9ezQChBvVm/ku4363P7Yg
-         gV1Q==
+        bh=JgnKfLZM0W1XovRDdtNuu2zU+kanU41FEanEQ1F7nA8=;
+        b=wgzE1b5Lw31pTdNVawta0vopxthUwDisukga+NsagZa6pDdAcbO2DqdZ/BoXdbiJ14
+         Y6RzQNhSITQ9ZDXFqrhnEb9KW4I4J1S0sBEBHtdDxhg41OAnfAKiznH6abJ6RlyhBDSa
+         aH01va8l3yoB9PTDNe5svJazM/ijAPvxe1fNFKRaMqi2wgE67jEy1xvcNl7A1IbB7+io
+         F8c84Ej9Mhs1I4gxYXJa3QUH1zEQ7lLF5+F0aPB58GIawtjUK4/Hn8ijlGc94/qJKH+H
+         wzLo72MQ1iCXJDs5ERlhXy6A23EzyfADG97jfIDIC2ytnE1+1juUiFlBXHjDjSdudKzc
+         lmbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772730642; x=1773335442;
+        d=1e100.net; s=20230601; t=1772730649; x=1773335449;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+htKiNWdniqhpURRDUFSHaItriT9yQJbQMXUKWYvD7w=;
-        b=bBEq4zm2ABwqCrdGtoFUAiYhwso3lGOBYpOBmflczr/KhkuJxTnx9PDT4kwt9xprr/
-         XxVBzlHeoR+G2wb0uu6zGoN9McW6TVtIpSXHyeUjm97r5mRz5nHPdQjvv/jCD7C8kbMR
-         m3/7IFVZiJ/7s3cSMu8853TRiy3XYspAYzyC1TzV0eN4B27yd6FMNnpmVvBlTY327cFs
-         maSfwQotK2hkC5s1uZEPZxfq7OPb9GMCjsYqZjpUkn61Km+dVkYmjOHjgARMnwYk6xn0
-         TfDqEitcI/Adek6HU9+/ja5Tez47YqLJgAVZA4U/Kcxm4RJSFQABQ9YMfNgI4U8A8NIv
-         j1HQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUptrPMURFL8rVUun2LfiEzMILEYUOXTCNI5w9yxGkWPDK6JPO/kS4x0JxXqc25Wz85UCY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygcuidNjtsLYOnk+xlLgwJ9sqtngjiRJnpKWgKzyLbrpNVx9Dm
-	VxJ8iZPAZp6U6mMkSrWeNUCKt6293QCh+YsF89TXeHRM9DV7Vd3XUNywTX3RLtQ28EKn5OTQLLY
-	+RGeK9A==
-X-Received: from pge20.prod.google.com ([2002:a05:6a02:2d14:b0:c73:7c6b:a192])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:c91b:b0:395:d33:8460
- with SMTP id adf61e73a8af0-3982e226184mr6337214637.52.1772730641961; Thu, 05
- Mar 2026 09:10:41 -0800 (PST)
-Date: Thu,  5 Mar 2026 09:07:53 -0800
-In-Reply-To: <20260212212457.24483-1-ubizjak@gmail.com>
+        bh=JgnKfLZM0W1XovRDdtNuu2zU+kanU41FEanEQ1F7nA8=;
+        b=mIa1xg9xJgc0l70mU+tnJ4N833deEiw0DJ6DRWbhVq5O9LjyrnfOZGse946jRTh44w
+         e59rFyu1vTptojSsNu0uBpMF2IZ+nr+bh8xjO7Vj/Ne2WADR14a/NWLCk/7PghwKYfDd
+         xU8s75dz0KG4OYRARDNu0K1zxFHMVLAlB2qm5ufjCIwrGs4aY1QCABbPqvoqIkv9fyPz
+         GRbspSrtD7mWn9FrlEvIRFDih3iyZ2rLx3/moX12m04T+/EVI4A5LVFRnaUUDFTNE8ND
+         ly1dchcCgfZKzPnZUIth6nNyBF6m22yuOB9SZtchCJcaqMR+71nVXfJWDdW6W0DI0JhL
+         LW4w==
+X-Forwarded-Encrypted: i=1; AJvYcCUXiuy7w2vuFA8e3v1FhCIGf7ifxNkbm2x2bjA6uTes/1AWlZJsFS4GX/aPPRa8Olz/kxo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRZL18CJUj1l5jABDErzdPPtg9row/EGBHLK5EEKE7Ac8ak5Hs
+	kKbkfx5FRJptFu7O/eVU5Vg1pt31TcZ4Kdugi1W7i0VgM6Qgxo/FVm6U/EYLxQvP/3+3ZupEVJR
+	GBExB/Q==
+X-Received: from pgcy13.prod.google.com ([2002:a63:7d0d:0:b0:c6d:ce4c:d0f1])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6300:6182:b0:387:5daf:b302
+ with SMTP id adf61e73a8af0-39854add03fmr221314637.65.1772730649120; Thu, 05
+ Mar 2026 09:10:49 -0800 (PST)
+Date: Thu,  5 Mar 2026 09:07:55 -0800
+In-Reply-To: <20260302154249.784529-1-yosry@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260212212457.24483-1-ubizjak@gmail.com>
+References: <20260302154249.784529-1-yosry@kernel.org>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <177272957575.1565689.14934592520888621130.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: x86: Zero-initialize temporary fxregs_state buffers
- in FXSAVE emulation
+Message-ID: <177272514565.1531888.4887575677908302121.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: x86: Drop redundant call to kvm_deliver_exception_payload()
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, Uros Bizjak <ubizjak@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>
+To: Sean Christopherson <seanjc@google.com>, Yosry Ahmed <yosry@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Cheng <chengkev@google.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
-X-Rspamd-Queue-Id: 3429021602D
+X-Rspamd-Queue-Id: 5D27B2160A1
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72852-lists,kvm=lfdr.de];
-	FREEMAIL_TO(0.00)[google.com,vger.kernel.org,kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72853-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[google.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_FIVE(0.00)[6];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Thu, 12 Feb 2026 22:24:04 +0100, Uros Bizjak wrote:
-> Explicitly zero-initialize stack-allocated struct fxregs_state
-> variables in em_fxsave() and fxregs_fixup() to ensure all padding and
-> unused fields are cleared before use.
-> 
-> Both functions declare temporary fxregs_state buffers that may be
-> partially written by fxsave. Although the emulator copies only the
-> architecturally defined portion of the state to userspace, any padding
-> or otherwise untouched bytes in the structure can remain uninitialized.
-> This can lead to the use of uninitialized stack data and may trigger
-> KMSAN reports. In the worst case, it could result in leaking stack
-> contents if such bytes are ever exposed.
+On Mon, 02 Mar 2026 15:42:49 +0000, Yosry Ahmed wrote:
+> In kvm_check_and_inject_events(), kvm_deliver_exception_payload() is
+> called for pending #DB exceptions. However, shortly after, the
+> per-vendor inject_exception callbacks are made. Both
+> vmx_inject_exception() and svm_inject_exception() unconditionally call
+> kvm_deliver_exception_payload(), so the call in
+> kvm_check_and_inject_events() is redundant.
 > 
 > [...]
 
 Applied to kvm-x86 misc, thanks!
 
-[1/1] KVM: x86: Zero-initialize temporary fxregs_state buffers in FXSAVE emulation
-      https://github.com/kvm-x86/linux/commit/e1df128dc00b
+[1/1] KVM: x86: Drop redundant call to kvm_deliver_exception_payload()
+      https://github.com/kvm-x86/linux/commit/43e41846ac7e
 
 --
 https://github.com/kvm-x86/linux/tree/next
