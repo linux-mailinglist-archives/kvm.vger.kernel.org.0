@@ -1,309 +1,152 @@
-Return-Path: <kvm+bounces-72801-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72802-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UKZVBPdJqWlZ3wAAu9opvQ
-	(envelope-from <kvm+bounces-72801-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 10:16:39 +0100
+	id OBYsCJpMqWk14AAAu9opvQ
+	(envelope-from <kvm+bounces-72802-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 10:27:54 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7CAE20E260
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 10:16:38 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C81FB20E628
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 10:27:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3B4A3302BF6B
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 09:16:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 772023078157
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 09:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AE42376BCC;
-	Thu,  5 Mar 2026 09:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC1B378838;
+	Thu,  5 Mar 2026 09:25:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vYTlFh5P"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gDQp1cpH"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC94374E53
-	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 09:16:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3CABA3D;
+	Thu,  5 Mar 2026 09:25:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772702191; cv=none; b=DHzeOcuRTUDF3by3PsqNC/KEphZWEWiQudS14A66Vu6IAAk99yaUv/oLrFleSWNSqqGp/9lT8/1er/iyiHVTD9R21Y3YZ21jYkqIz5po0Fb1DlMkTqZQFyAPzNjqFQc96/gWGdgoWYDeNtvltAklVMrI7PDgfjbOlT8jri14zvw=
+	t=1772702705; cv=none; b=d1RGfOb/NJMKUvE+gzRs5pMX3m3He4JWTk2Y/P9GJkvSM13ss809JHyHrrirrQmx8Wf7vcZzMT8eU90ouoaOxV0Hpx+IO8X9kA/yb0MSwgl1GLobKFz2G3pih9/QvheMSwDvYHLdZrvat00x5OMblIIj3M8B6Tfspn80j6AJss0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772702191; c=relaxed/simple;
-	bh=UMnrDwdAX1GIWTBc+oDF/W1dnRUB+o0y/Pccvdlj3XA=;
+	s=arc-20240116; t=1772702705; c=relaxed/simple;
+	bh=i7xx5fCE1pXU3hn232oNCbEw2z88WqGprgpNgwMewlA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GaNbnOeKpVY05Q4wNyOQKPEKZErgwuv9yNfNEAKOR6YhXHgD50lyy5Up0BOFulV6EpJnohDZb6VSlffcPiWn1JlLOr/v1rYD/Grv+EPkHCYWC9mxLDjdyWpMoNVQQ8WtGfh2QrjROP+cgEot6UygcjLEb7izzCGEg1lZALKFW/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vYTlFh5P; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5f0aea3d-3189-4712-a6e4-aaf70af3d830@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772702188;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fzXNnVl41rhrnz38phC4X7315ncIjw8uI7oB1uumDrY=;
-	b=vYTlFh5P4RnXap2bKi5iM3bSYos1avkWrWoyZ6S9ovnLXURX6Ng1OmFgRSMpye96k1cbwW
-	V1trl4Jl8R5kqscSzYNlyJ7l2iGMGX+aMJdR4/9OGfmBJnSnUmIPVuQ11NwJTaUGC8xEWM
-	A2pGtpUi3RscntX+HprODuj4hL30rkk=
-Date: Thu, 5 Mar 2026 17:16:12 +0800
+	 In-Reply-To:Content-Type; b=CazMMFEzCPmadIjKq9OjPaITlnNRrk9izqeln0dn/dYrK8PjYULdXgAb93XcVh3dt0oX9hl6fOpu7uSS+cug++yZfLZcJ6onJx3C4I3vM5YRB3yV8ajh6JmDCw102TdJQ5poJlaOxvA+7EQ394QddO0vsiS0Ca4YGOEhowz6jOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gDQp1cpH; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772702704; x=1804238704;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=i7xx5fCE1pXU3hn232oNCbEw2z88WqGprgpNgwMewlA=;
+  b=gDQp1cpHSMRVb7bNYAt3/a5NPiSjPVweVe+elMlwldKFpy6Lgxf0XOzd
+   M4Gm/mHx98t6NcM5jq8Q3pP2Lw6yl2ZhAmBomJqFLwt+WL88pPuQvsdBX
+   Gl4Dh6VwFPrLQCEncGS70Qi7ZKMWRhdYSjAdyP/kMFC45RquEZAJpUHU8
+   eFp3eTu4HSUYmiIEKxPMyBPHktXW+ZoVXKLOlYJ4hQekSz3XlfE1k+sCm
+   UBqhuTYOyJpT4wmW9Ng9zpMN8jphhzXo3Ij6nWvPL4K2W5crZ+BEIf5xz
+   Hpm6m6IAjvJz7wrvTMR35iCaM72I6gSDiUd2kSvrilzKiV5CinbfTyOsp
+   A==;
+X-CSE-ConnectionGUID: MtRnHNpnRPevu2emkU2qMQ==
+X-CSE-MsgGUID: TKS0R3i3RZGBC/7Pp9MRQA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="61356592"
+X-IronPort-AV: E=Sophos;i="6.23,102,1770624000"; 
+   d="scan'208";a="61356592"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 01:24:47 -0800
+X-CSE-ConnectionGUID: ZkbojYpZR2WP7PSbA3ShnQ==
+X-CSE-MsgGUID: bQgJFqcLTXGbymInrDl0hw==
+X-ExtLoop1: 1
+Received: from unknown (HELO [10.238.1.83]) ([10.238.1.83])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 01:24:42 -0800
+Message-ID: <7fbbea65-597b-4158-ac86-5dd3b7af067b@linux.intel.com>
+Date: Thu, 5 Mar 2026 17:24:40 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v6 2/2] x86/tlb: skip redundant sync IPIs for native TLB
- flush
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 01/24] x86/virt/tdx: Move low level SEAMCALL helpers
+ out of <asm/tdx.h>
+To: Chao Gao <chao.gao@intel.com>
+Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, x86@kernel.org, reinette.chatre@intel.com,
+ ira.weiny@intel.com, kai.huang@intel.com, dan.j.williams@intel.com,
+ yilun.xu@linux.intel.com, sagis@google.com, vannapurve@google.com,
+ paulmck@kernel.org, nik.borisov@suse.com, zhenzhong.duan@intel.com,
+ seanjc@google.com, rick.p.edgecombe@intel.com, kas@kernel.org,
+ dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
+ tony.lindgren@linux.intel.com, Thomas Gleixner <tglx@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ "H. Peter Anvin" <hpa@zytor.com>
+References: <20260212143606.534586-1-chao.gao@intel.com>
+ <20260212143606.534586-2-chao.gao@intel.com>
 Content-Language: en-US
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: peterz@infradead.org, david@kernel.org, dave.hansen@linux.intel.com,
- ypodemsk@redhat.com, hughd@google.com, will@kernel.org,
- aneesh.kumar@kernel.org, npiggin@gmail.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
- arnd@arndb.de, lorenzo.stoakes@oracle.com, ziy@nvidia.com,
- baolin.wang@linux.alibaba.com, Liam.Howlett@oracle.com, npache@redhat.com,
- ryan.roberts@arm.com, dev.jain@arm.com, baohua@kernel.org,
- akpm@linux-foundation.org, shy828301@gmail.com, riel@surriel.com,
- jannh@google.com, jgross@suse.com, seanjc@google.com, pbonzini@redhat.com,
- boris.ostrovsky@oracle.com, virtualization@lists.linux.dev,
- kvm@vger.kernel.org, linux-arch@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, ioworker0@gmail.com
-References: <20260304021046.18550-1-lance.yang@linux.dev>
- <20260304021046.18550-3-lance.yang@linux.dev>
- <7dc30fbf-17c0-47db-8457-24b531cd0071@intel.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Lance Yang <lance.yang@linux.dev>
-In-Reply-To: <7dc30fbf-17c0-47db-8457-24b531cd0071@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20260212143606.534586-2-chao.gao@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Rspamd-Queue-Id: A7CAE20E260
+X-Rspamd-Queue-Id: C81FB20E628
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72801-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[infradead.org,kernel.org,linux.intel.com,redhat.com,google.com,gmail.com,linutronix.de,alien8.de,zytor.com,arndb.de,oracle.com,nvidia.com,linux.alibaba.com,arm.com,linux-foundation.org,surriel.com,suse.com,lists.linux.dev,vger.kernel.org,kvack.org];
-	RCPT_COUNT_TWELVE(0.00)[37];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	TAGGED_FROM(0.00)[bounces-72802-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lance.yang@linux.dev,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,linux.dev:dkim,linux.dev:mid]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[binbin.wu@linux.intel.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linux.intel.com:mid,intel.com:dkim,intel.com:email]
 X-Rspamd-Action: no action
 
-Hi Dave,
 
-Thanks for taking time to review!
 
-On 2026/3/5 01:59, Dave Hansen wrote:
-> On 3/3/26 18:10, Lance Yang wrote:
-> ...
->> +	if (pv_ops.mmu.flush_tlb_multi == native_flush_tlb_multi &&
->> +	    !cpu_feature_enabled(X86_FEATURE_INVLPGB)) {
->> +		pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast = true;
->> +		static_branch_enable(&tlb_ipi_broadcast_key);
->> +	}
->> +}
-> ...
->> +#ifndef CONFIG_PARAVIRT
->> +void __init native_pv_tlb_init(void)
->> +{
->> +	/*
->> +	 * For non-PARAVIRT builds, check if native TLB flush sends real IPIs
->> +	 * (i.e., not using INVLPGB broadcast invalidation).
->> +	 */
->> +	if (!cpu_feature_enabled(X86_FEATURE_INVLPGB))
->> +		static_branch_enable(&tlb_ipi_broadcast_key);
->> +}
->> +#endif
+On 2/12/2026 10:35 PM, Chao Gao wrote:
+> From: Kai Huang <kai.huang@intel.com>
 > 
-> I really despise duplicated logic. The X86_FEATURE_INVLPGB check is
-> small, but it is duplicated. You're also setting the static branch in a
-> *bunch* of different places.
-
-Sorry for the mess :(
-
-> Can this be arranged so that the PV code just tells the core code that
-> it is compatible with flush_tlb_multi_implies_ipi_broadcast?
-
-Yeah, much much better and cleaner!
-
-> void __init bool is_pv_ok(void)
-> {
-> 	/* This check is super sketchy an unexplained: */
-> 	if (pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast)
-> 		return true;
+> TDX host core code implements three seamcall*() helpers to make SEAMCALL
+> to the TDX module.  Currently, they are implemented in <asm/tdx.h> and
+> are exposed to other kernel code which includes <asm/tdx.h>.
 > 
-> 	if (pv_ops.mmu.flush_tlb_multi != native_flush_tlb_multi)
-> 		return false;
+> However, other than the TDX host core, seamcall*() are not expected to
+> be used by other kernel code directly.  For instance, for all SEAMCALLs
+> that are used by KVM, the TDX host core exports a wrapper function for
+> each of them.
 > 
-> 	pv_ops.mmu.flush_tlb_multi_implies_ipi_broadcast = true;
+> Move seamcall*() and related code out of <asm/tdx.h> and make them only
+> visible to TDX host core.
 > 
-> 	return true;
-> }
-> 
-> void __init tlb_init(void)
-> {
-> 	if (!is_pv_ok())
-> 		return;
-> 
-> 	if (cpu_feature_enabled(X86_FEATURE_INVLPGB))
-> 		return;
-> 		
-> 	static_branch_enable(&tlb_ipi_broadcast_key);
-> }
-> 
-> Isn't that like a billion times more readable? It has one
-> X86_FEATURE_INVLPGB check and one static_branch_enable() point and no
-> #ifdeffery other than defining a stub is_pv_ok().
+> Since TDX host core tdx.c is already very heavy, don't put low level
+> seamcall*() code there but to a new dedicated "seamcall.h".  Also,
 
-Yep, absolutely ;) Will rework it for v7 as you suggested.
+Nit:
+seamcall.h is now seamcall_internal.h in this version.
 
-> BTW, why is there even an early return for the case where
-> flush_tlb_multi_implies_ipi_broadcast is already set? Isn't this
-> decision made once on the boot CPU and then never touched again? Do any
-> PV instances actually set the bit?
+> currently tdx.c has seamcall_prerr*() helpers which additionally print
+> error message when calling seamcall*() fails.  Move them to "seamcall.h"
 
-Good point. No PV backend sets it today, so we don't need that check or
-even the property. I'll drop them. If a PV backend ever needs to
-indicate it sends real IPIs, we can add the property back then.
+Ditto.
 
-Does the following look reasonable?
+> as well.  In such way all low level SEAMCALL helpers are in a dedicated
+> place, which is much more readable.
 
----8<---
-diff --git a/arch/x86/include/asm/tlb.h b/arch/x86/include/asm/tlb.h
-index 866ea78ba156..74292abe8852 100644
---- a/arch/x86/include/asm/tlb.h
-+++ b/arch/x86/include/asm/tlb.h
-@@ -5,11 +5,19 @@
-  #define tlb_flush tlb_flush
-  static inline void tlb_flush(struct mmu_gather *tlb);
-
-+#define tlb_table_flush_implies_ipi_broadcast 
-tlb_table_flush_implies_ipi_broadcast
-+static inline bool tlb_table_flush_implies_ipi_broadcast(void);
-+
-  #include <asm-generic/tlb.h>
-  #include <linux/kernel.h>
-  #include <vdso/bits.h>
-  #include <vdso/page.h>
-
-+static inline bool tlb_table_flush_implies_ipi_broadcast(void)
-+{
-+	return static_branch_likely(&tlb_ipi_broadcast_key);
-+}
-+
-  static inline void tlb_flush(struct mmu_gather *tlb)
-  {
-  	unsigned long start = 0UL, end = TLB_FLUSH_ALL;
-@@ -20,7 +28,12 @@ static inline void tlb_flush(struct mmu_gather *tlb)
-  		end = tlb->end;
-  	}
-
--	flush_tlb_mm_range(tlb->mm, start, end, stride_shift, tlb->freed_tables);
-+	/*
-+	 * Pass both freed_tables and unshared_tables so that lazy-TLB CPUs
-+	 * also receive IPIs during unsharing page tables.
-+	 */
-+	flush_tlb_mm_range(tlb->mm, start, end, stride_shift,
-+			   tlb->freed_tables || tlb->unshared_tables);
-  }
-
-  static inline void invlpg(unsigned long addr)
-diff --git a/arch/x86/include/asm/tlbflush.h 
-b/arch/x86/include/asm/tlbflush.h
-index 5a3cdc439e38..d086454eb760 100644
---- a/arch/x86/include/asm/tlbflush.h
-+++ b/arch/x86/include/asm/tlbflush.h
-@@ -5,6 +5,7 @@
-  #include <linux/mm_types.h>
-  #include <linux/mmu_notifier.h>
-  #include <linux/sched.h>
-+#include <linux/jump_label.h>
-
-  #include <asm/barrier.h>
-  #include <asm/processor.h>
-@@ -15,9 +16,35 @@
-  #include <asm/pti.h>
-  #include <asm/processor-flags.h>
-  #include <asm/pgtable.h>
-+#include <asm/paravirt.h>
-
-  DECLARE_PER_CPU(u64, tlbstate_untag_mask);
-
-+DECLARE_STATIC_KEY_FALSE(tlb_ipi_broadcast_key);
-+
-+#ifdef CONFIG_PARAVIRT
-+static inline bool __init pv_tlb_is_native(void)
-+{
-+	return pv_ops.mmu.flush_tlb_multi == native_flush_tlb_multi;
-+}
-+#else
-+static inline bool __init pv_tlb_is_native(void)
-+{
-+	return true;
-+}
-+#endif
-+
-+static inline void __init native_pv_tlb_init(void)
-+{
-+	if (!pv_tlb_is_native())
-+		return;
-+
-+	if (cpu_feature_enabled(X86_FEATURE_INVLPGB))
-+		return;
-+
-+	static_branch_enable(&tlb_ipi_broadcast_key);
-+}
-+
-  void __flush_tlb_all(void);
-
-  #define TLB_FLUSH_ALL	-1UL
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index 5cd6950ab672..3cdb04162843 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -1167,6 +1167,7 @@ void __init native_smp_prepare_boot_cpu(void)
-  		switch_gdt_and_percpu_base(me);
-
-  	native_pv_lock_init();
-+	native_pv_tlb_init();
-  }
-
-  void __init native_smp_cpus_done(unsigned int max_cpus)
-diff --git a/arch/x86/mm/tlb.c b/arch/x86/mm/tlb.c
-index 621e09d049cb..43e60cca38f1 100644
---- a/arch/x86/mm/tlb.c
-+++ b/arch/x86/mm/tlb.c
-@@ -26,6 +26,8 @@
-
-  #include "mm_internal.h"
-
-+DEFINE_STATIC_KEY_FALSE(tlb_ipi_broadcast_key);
-+
-  #ifdef CONFIG_PARAVIRT
-  # define STATIC_NOPV
-  #else
----
-
-
-Thanks,
-Lance
+[...]
 
