@@ -1,140 +1,130 @@
-Return-Path: <kvm+bounces-72876-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72846-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GGr3Nb27qWlzDgEAu9opvQ
-	(envelope-from <kvm+bounces-72876-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:22:05 +0100
+	id oJlUA/O4qWlEDAEAu9opvQ
+	(envelope-from <kvm+bounces-72846-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:10:11 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 484F7216162
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:22:04 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3745215E6D
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:10:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F2570324F9FA
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:15:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C08523012530
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:10:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C1353ECBC0;
-	Thu,  5 Mar 2026 17:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE1F03E1219;
+	Thu,  5 Mar 2026 17:10:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Iyii2bst"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="aM7XMe3Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E72F3E1229
-	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 17:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DEF2215075;
+	Thu,  5 Mar 2026 17:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772730833; cv=none; b=ld7SJ9hQsP7pv2jSjlS6LUApokSUeBh42rUTSrCz0GMZTgWZhHOGgFa4qL31YgN4yeZDwdC/Q/emmAEBP6kFcpnSRt4y8GZrXmXVgcay3K2+epdPZmBZyBL4v7rpTrHT9Q4AqkPaNSTFanrI/zaIwFAq3M4AAG7Z2ZotBr4tbnk=
+	t=1772730605; cv=none; b=dhMHDiplVXLQpbXOwO5o2QN2KS6Vb+hY20HeY4RnA4JzwzAj5E5AxOszxUTeZO74hWi8juxSLT8NZx4NK5Zp/YvRI7sCyWavA8Dh/UFG+oOmghnTaZLc6c68dHwBLyCC9asg7z9GnzBImLK5AMWN2BSyao4iRGpG+pAUy4q9u/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772730833; c=relaxed/simple;
-	bh=0XUD5BAnUCRqJrt5J3VfKN54QNwr0xLXKDTL1rvjViE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=C3ltTFH8RtquRXT7nRo0BKFhNy4+EnB/KfCMDPD+C7kGQGZ62KME9IM9BVkcA5jKTAa7mtIfAzJ9egO9+aiyred2/1tEWjU2SFJDio9akFn08Ova04IbEFolPTofXYYdykxx13o2S3macVEWojKuQBEAxw/j7bTwTAPRPQg4648=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Iyii2bst; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-359812e4fefso3529125a91.1
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 09:13:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772730832; x=1773335632; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CRZNdKY8tcJVfQEc8w3qKnNfGaHAS44lUi77zj94QkM=;
-        b=Iyii2bstoZp520uCQzk25DnB1mZ7R2cMiBWbD/+XfBe8Z+3nvE+MfMsFmJ8Msg/nYX
-         w7DRV4m1ymWbrNmMJbtqshc1Eb6pTY3fwWu4RfoWm7cghT8lksenxPJXMIYV/0iDzaGk
-         agu9Wk/z5aNmxjv0O9JjQQWpafp0ZHkuVuk8iYmrWu3Ks3YW/kzS7Z6KYnJASmWStEe5
-         gICOoAG32G+GfQFqHtnlxsmNCRGYUC2AUT2vae+H3MFUW98FJOL8kaUp5I8zAmlZEcR9
-         ZWmFEEZr8PpyjTDzUG1Hbhhyha/yKwEZpo0NJgEtNzpusJxC9LvRiX2NnciU7gJTV3K9
-         OkJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772730832; x=1773335632;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CRZNdKY8tcJVfQEc8w3qKnNfGaHAS44lUi77zj94QkM=;
-        b=pk7TSTuOTS9S1YntGf7fexlxberVDGRY3N4gEmkUnaxXZ0UhXZl33BbwGTwO9TBwSz
-         fzoSAwvE2b6NqKZo5xbdEnc8zSGmH40krFemL5gXK8s/W94ocXa8bUjz2kSkS+ALaSkY
-         UcpoeE7p3fMpCr1f+INDqerz3WeuLFvItZ6oLtzrFQWWsLf/sLwr9whhYo8Qvyc5tQzz
-         YhvpSpyRHBQB7k9BGsihAUngU+knPCU1GWeC0DTttas3pvbPSbCYVUzEzRKEXmgFuRTC
-         Zc2XLZW4KgwcXL0aCjrREZR1S4itMy5C6wiCUrRqbfnqNhW+ucX3EfJz8WXcs1tH0yrr
-         J1gQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWHqohc3PXiMkGYJ7aU+SAuNi1iXhs6vX3qjSq07nq6Vnu6dGFvfsAsmPHgsD+mQE6RSPU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwltpFgnUKGX723vRSAiI9ZVOxWfHh5nCYkPoUowHqeL6vDbt72
-	x1pHKs/jBuKYTiq8aSOEGNYaUhWETjuXFpEapYU+9EB5TU3XznyK7Gh5G1mUtE5TAVy9m9RKPit
-	2Mdla0Q==
-X-Received: from plbbh8.prod.google.com ([2002:a17:902:a988:b0:2ae:3c5d:ec0e])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:c410:b0:2ae:5346:d4e6
- with SMTP id d9443c01a7336-2ae75c6c932mr33611435ad.28.1772730831639; Thu, 05
- Mar 2026 09:13:51 -0800 (PST)
-Date: Thu,  5 Mar 2026 09:08:41 -0800
-In-Reply-To: <20260211102928.100944-1-ubizjak@gmail.com>
+	s=arc-20240116; t=1772730605; c=relaxed/simple;
+	bh=RfT0f7vWA2mrexhTtUJsQeiXxCqLubDPU4wLv5jwW1M=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=joOnADr4SIH/BjDiMB3IMGP4u8pXxRQIjXZggHxO5yJtYiDmQBvJosFCoktghCHJN7BTXudeuNIKjSO0l2Jpm53KzH2pLDiJi3mVAELwQCEJ4zST3lER0+jPjz/LkpZFksgNgejk1KjgkShOGlEptLoPElM9aqHd9G0NMkFUDR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=aM7XMe3Y; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from smtpclient.apple (c-24-130-165-117.hsd1.ca.comcast.net [24.130.165.117])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 625H9J2E3494905
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 5 Mar 2026 09:09:19 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 625H9J2E3494905
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2026022301; t=1772730560;
+	bh=+1y5MvbjQL4jaYiB+MHx6KKMMG1bQpE5wCYGmarD9Uw=;
+	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
+	b=aM7XMe3Y1sDknDpx0TJimpHX98NwEYNxWVd4j87Ona8HCjHxe7L1Y4b6XVAX38GG8
+	 dzFjxQGPCM+CAU9lUIfO+46rErEm9n62AdC5z6Sy0c+eLgSlI7tUzMcRTF9wylya58
+	 xeMtJ5iDNklEFF+iYkqP4qsc0gUWS9qVLvAbjYGoGtVCgMHVVwIeOuGgH3PCUuYXvh
+	 vdyXB75RCZ9CxLEEJvVq5UWV9aWA7Nu7tc29yBrjvArTZcI7MI9Rhp9QVTnu5P/zs8
+	 gcWZua364pcUWcFdjvl5f/K9NEWyinOsouZquUlXAEa8Td449AmNuKgE/7WqmO/YOh
+	 0mdE1R0cqFDxA==
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260211102928.100944-1-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <177272954596.1565167.8442601996349101861.b4-ty@google.com>
-Subject: Re: [PATCH 1/2] KVM: VMX: Drop obsolete branch hint prefixes from
- inline asm
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, Uros Bizjak <ubizjak@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@kernel.org>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="utf-8"
-X-Rspamd-Queue-Id: 484F7216162
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.400.21\))
+Subject: Re: [PATCH v9 15/22] KVM: x86: Mark CR4.FRED as not reserved
+From: Xin Li <xin@zytor.com>
+In-Reply-To: <aamisPkG1JZ2UDdQ@google.com>
+Date: Thu, 5 Mar 2026 09:09:08 -0800
+Cc: Chao Gao <chao.gao@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org, pbonzini@redhat.com,
+        corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com,
+        hch@infradead.org, sohil.mehta@intel.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <B07CDF1A-1FD2-4EC5-BEB3-3D906A880153@zytor.com>
+References: <20251026201911.505204-1-xin@zytor.com>
+ <20251026201911.505204-16-xin@zytor.com> <aR1xNLrhqEWu+rmE@intel.com>
+ <aajVJlU2Zg4Djqqz@google.com>
+ <263F364B-D516-40B3-B065-A5369BFB1A7F@zytor.com>
+ <aamisPkG1JZ2UDdQ@google.com>
+To: Sean Christopherson <seanjc@google.com>
+X-Mailer: Apple Mail (2.3864.400.21)
+X-Rspamd-Queue-Id: A3745215E6D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[zytor.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[zytor.com:s=2026022301];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-72846-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72876-lists,kvm=lfdr.de];
-	FREEMAIL_TO(0.00)[google.com,vger.kernel.org,kernel.org,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[zytor.com:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[xin@zytor.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	APPLE_MAILER_COMMON(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,zytor.com:dkim,zytor.com:mid]
 X-Rspamd-Action: no action
 
-On Wed, 11 Feb 2026 11:28:49 +0100, Uros Bizjak wrote:
-> Remove explicit branch hint prefixes (.byte 0x2e / 0x3e) from VMX
-> inline assembly sequences.
-> 
-> These prefixes (CS/DS segment overrides used as branch hints on
-> very old x86 CPUs) have been ignored by modern processors for a
-> long time. Keeping them provides no measurable benefit and only
-> enlarges the generated code.
-> 
-> [...]
 
-Applied to kvm-x86 vmx, thanks!
+>> I planned to send out these new kvm unit tests (not just FRED tests) =
+after
+>> KVM FRED patch series gets merged.
+>=20
+> Definitely send them before.  Even if no one outside of Intel can run =
+them (I
+> forget when FRED hardware is coming), people like me can at least see =
+what you're
+> testing, which makes it more likely that we'll spot bugs.  E.g. in =
+this case, the
+> lack of negative tests for CR4.FRED is a big red flag.
 
-[1/2] KVM: VMX: Drop obsolete branch hint prefixes from inline asm
-      https://github.com/kvm-x86/linux/commit/6dad59124e15
-[2/2] KVM: VMX: Use ASM_INPUT_RM in __vmcs_writel
-      https://github.com/kvm-x86/linux/commit/192f777b3af0
+No excuse, sadly mk_cr_64() completely escaped my notice.
 
---
-https://github.com/kvm-x86/linux/tree/next
+And I didn=E2=80=99t even think about adding a CR4 test for FRED.
+
+And as you expected, the happy path doesn=E2=80=99t expose it at all.
+
 
