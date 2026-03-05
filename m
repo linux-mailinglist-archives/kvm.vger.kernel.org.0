@@ -1,216 +1,149 @@
-Return-Path: <kvm+bounces-72809-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72808-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KB5JL0VlqWlN6wAAu9opvQ
-	(envelope-from <kvm+bounces-72809-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 12:13:09 +0100
+	id uMTWLpJkqWmB6gAAu9opvQ
+	(envelope-from <kvm+bounces-72808-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 12:10:10 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28E12210641
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 12:13:08 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EC1C2105A4
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 12:10:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 255CB30C7330
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 11:08:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D95273024BF1
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 11:08:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9372315D3E;
-	Thu,  5 Mar 2026 11:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52DEF3845D2;
+	Thu,  5 Mar 2026 11:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="u8XH++Ny"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [61.152.208.219])
+Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47354374745
-	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 11:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.152.208.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17FA53859E8;
+	Thu,  5 Mar 2026 11:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772708915; cv=none; b=Ve/SBOnErttoeAgXQPqOljiOThkgLnboEflOLFMBgnu+Wjl1iQHbiTxtoCGxWOtxAUnIfXDEOahXcBPbGhPTbkFZUQPt0BPHdMIqBN78DiFEWJS4x+eG0i+ND3v9NPmfwAKS3NnF9/Q3+ZkdQ/lX8yqygQKDEekQ0I+gyCozwq4=
+	t=1772708899; cv=none; b=kevz7S0bAIshLHRFKsMiqNIbRuft/xzMf6hzDVPM8eywz4R6PTH5/RN9sl8LbjRZ7G/AtAHiX7Iac1kg91KbqvYVt2+qB45zv3WBBpuKjyzP1svwv049pL7l4BWR7ptzxpzyz3IwLl5QYsstecaoONv7PcEjgcNNuLIX4YYkp5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772708915; c=relaxed/simple;
-	bh=zBc9PRKN+MIyuZ+ZbzzSoKwLmB/YeSKOUhuShP6fTzw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OYwLaQT4Ggjp1thlOp0Dw/1+zdV9+mUhZkr67HQjQwvjGCf9OXk3r0ASFJiIug+7YK2juXF0WcH8V2FM+AzmbGx0j70XyuwX1tFi6+8AaBmwAYVVbZzp8GOTsOfjpJBXXI9nU9rsxRlSM106uZ0t8kRApqR2oKQcwhk3zboVJmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=61.152.208.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1772708905-1eb14e758427d50001-HEqcsx
-Received: from zxbjmbx1.zhaoxin.com (zxbjmbx1.zhaoxin.com [10.29.252.163]) by mx2.zhaoxin.com with ESMTP id NDK15eeJDHBY6M3y (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Thu, 05 Mar 2026 19:08:25 +0800 (CST)
-X-Barracuda-Envelope-From: EwanHai-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.29.252.163
-Received: from ZXSHMBX1.zhaoxin.com (10.28.252.163) by zxbjmbx1.zhaoxin.com
- (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.59; Thu, 5 Mar
- 2026 19:08:25 +0800
-Received: from ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85]) by
- ZXSHMBX1.zhaoxin.com ([fe80::936:f2f9:9efa:3c85%7]) with mapi id
- 15.01.2507.059; Thu, 5 Mar 2026 19:08:24 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.29.252.163
-Received: from ewan-server.zhaoxin.com (10.28.44.15) by zxbjmbx1.zhaoxin.com
- (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.59; Thu, 5 Mar
- 2026 19:05:19 +0800
-Received: by ewan-server.zhaoxin.com (Postfix, from userid 1000)
-	id 661592D00050; Thu,  5 Mar 2026 06:05:19 -0500 (EST)
-From: Ewan Hai <ewanhai-oc@zhaoxin.com>
-To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@kernel.org>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<x86@kernel.org>, <hpa@zytor.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <cobechen@zhaoxin.com>, <tonywwang@zhaoxin.com>
-Subject: [PATCH] KVM: x86: Add KVM-only CPUID.0xC0000001:EDX feature bits
-Date: Thu, 5 Mar 2026 06:05:19 -0500
-X-ASG-Orig-Subj: [PATCH] KVM: x86: Add KVM-only CPUID.0xC0000001:EDX feature bits
-Message-ID: <20260305110519.308860-1-ewanhai-oc@zhaoxin.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1772708899; c=relaxed/simple;
+	bh=UXb4sZI8YwnhUH/PBfc/DXgXZISTku4AtPXoV74Lmao=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=UxCE6vuV4tfHUAD8N48HaUFSkmwhEcqnobZe/Zux1MhdfaFnVRgrcSedL73uIHPZu4VPOR9yxu13FpiGuLGzTUqHnvXQHF3K+24jlxBJhWWDtpQe8wguM2pV+Iss7lIl19rgH5rhVOd7EdSLfFWPNzZ+NpQEYSF4e0eGlMoNzss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=u8XH++Ny; arc=none smtp.client-ip=162.62.57.252
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1772708886; bh=aJ0+7T1qICbCK7VFbFhr3fYHwEbG3O9P5mFrYabjhdI=;
+	h=From:To:Cc:Subject:Date;
+	b=u8XH++NyB/h3To7h9bD9XsuCraYDW3Z4rdyCeoxGg7OXOXF4ARfZbRFwqPRHxuv9C
+	 b4S+VZNqG+nmQDsCVSkOOds7WQeDLxnjf77ikbpTAkp4wFJHDLCo7JafihCAWAi3my
+	 RncozI1MjQCm9rZVT5glyLoYzQM7+pYjA6wv8/08=
+Received: from localhost.localdomain ([101.6.30.191])
+	by newxmesmtplogicsvrsza53-0.qq.com (NewEsmtp) with SMTP
+	id 1F9B10F5; Thu, 05 Mar 2026 19:07:57 +0800
+X-QQ-mid: xmsmtpt1772708877tee0fkhag
+Message-ID: <tencent_4897299F3F479A188C8C19A7BD58D2A40608@qq.com>
+X-QQ-XMAILINFO: NwU6Bou9okj/qNygOt772l9yfwiVhzW4IQ0Ag/yV27/BsK2WwZrax1e+/EomqE
+	 5zgluaeMcgh4wqw9diaywDUo/b5beP8jTc6dZjwouYWRw/48PkY95s6FgF/eD1mpwGmynBsr28qT
+	 lJS77XRP/aCHy7gLmlrK4IwLYbQzappLoy1SBRwifanYZV6Fbx2+L4oSWnxLDs0KwndJNmy9pHiG
+	 AZ9OmrZcl1fVEumCsED8Ih/Zk6MFm3SdkneeeS3jW4FUNE3VfEjfMyO/vFLbzBOx/o2z1MvOHiAY
+	 S3cfE7mJtRdTSs76L1AqVGA5M/BaY5O/2EkRnaJH6p1pzKc/6EYWCbs1wP7ppEkhE0aIBeAOAaB/
+	 KH6TCHQrgek57lgma3wCQ/ZMWrIBFfVGImeKXVpIfmUV2nofgkWo7N2JDGUZoZt6doCk1O8MGuci
+	 rxqtarzr2QC0B05tuURfNc0iB9KxDxWZ4Ie68eEDr5fS33uQjKU+W48aM6BPjj5JhtZbSbFwmHfx
+	 v+EaAGefG8BYml7jX+76Wa080j1gvs/h3GW4s4N0GSsU/kErzwdQsogjlvfgVy1YPQmQ47fDPeaS
+	 zOzO49WElNdIXw5O4ye2KPrG9P5dUX1TsFJ/Wo1elmVLFnwm7wX+gpsrX5bsGWbe5FfXKuxkX2fy
+	 mqT3+SrebfkuSd1gndbbeA4Wu/K4Cl+79s/7UjKfQKHFWVdsXpSYmVxSFAq+9YWNbmg5CASQkS1Z
+	 pyAt3QY+Jb8FN/DbaAk8SNG+nf8kMzlYauwWCo+csu6vlPDY1+Vq9zsEufq9O1OyBODb42cp1eP5
+	 4AbdtZfMBNCoImQme+GovnyukWwjf9kuAcjq1sUY7AmMJj8UTKgecZgyO3h7I4eGOONZS5J6E6LX
+	 IvF0bQvQy2u01kVhdW9LQO8cyAtxk4rFdgxcO8D8ZpXzbL4WKEVCaCj2KnW6wrrQGDRHwLV27zzN
+	 LBr7/O37lzSaT7VuvKvy4x1quZjXZNPhHIgZJEcLF7WyuuBG3IEkwU2jk5QrihR4x6P8/bGluHv2
+	 UQJKIQYg==
+X-QQ-XMRINFO: MSVp+SPm3vtSI1QTLgDHQqIV1w2oNKDqfg==
+From: xuanqingshi <1356292400@qq.com>
+To: seanjc@google.com,
+	pbonzini@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	xuanqingshi <1356292400@qq.com>
+Subject: [PATCH] KVM: x86: Add LAPIC guard in kvm_apic_write_nodecode()
+Date: Thu,  5 Mar 2026 19:07:53 +0800
+X-OQ-MSGID: <20260305110753.2709162-1-1356292400@qq.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
- zxbjmbx1.zhaoxin.com (10.29.252.163)
-X-Moderation-Data: 3/5/2026 7:08:23 PM
-X-Barracuda-Connect: zxbjmbx1.zhaoxin.com[10.29.252.163]
-X-Barracuda-Start-Time: 1772708905
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 3101
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.155408
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
-X-Rspamd-Queue-Id: 28E12210641
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 0EC1C2105A4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DMARC_NA(0.00)[zhaoxin.com];
+	FREEMAIL_FROM(0.00)[qq.com];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72808-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,qq.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72809-lists,kvm=lfdr.de];
-	TAGGED_RCPT(0.00)[kvm];
-	R_DKIM_NA(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ewanhai-oc@zhaoxin.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8];
-	TO_DN_NONE(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[zhaoxin.com:mid,zhaoxin.com:email]
+	FROM_NEQ_ENVFROM(0.00)[1356292400@qq.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[qq.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[kvm];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,qq.com:dkim,qq.com:email,qq.com:mid]
 X-Rspamd-Action: no action
 
-Per Paolo's suggestion, add the missing CPUID.0xC0000001:EDX feature
-bits as KVM-only X86_FEATURE_* definitions, so KVM can expose them to
-userspace before they are added to the generic cpufeatures definitions.
+kvm_apic_write_nodecode() dereferences vcpu->arch.apic without first
+checking whether the in-kernel LAPIC has been initialized.  If it has
+not (e.g. the vCPU was created without an in-kernel LAPIC), the
+dereference results in a NULL pointer access.
 
-Wire the new bits into kvm_set_cpu_caps() for CPUID_C000_0001_EDX.
+While APIC-write VM-Exits are not expected to occur on a vCPU without
+an in-kernel LAPIC, kvm_apic_write_nodecode() should be robust against
+such a scenario as a defense-in-depth measure, e.g. to guard against
+KVM bugs or CPU errata that could generate a spurious APIC-write
+VM-Exit.
 
-As a result, KVM_GET_SUPPORTED_CPUID reports these bits according to
-host capability, allowing VMMs to advertise only host-supported
-features to guests.
+Add a WARN_ON_ONCE() guard and bail early if vcpu->arch.apic is NULL.
 
-Link: https://lore.kernel.org/all/b3632083-f8ff-4127-a488-05a2c7acf1ad@redh=
-at.com/
-Signed-off-by: Ewan Hai <ewanhai-oc@zhaoxin.com>
+Found by a VMCS-targeted fuzzer based on syzkaller.
+
+Signed-off-by: xuanqingshi <1356292400@qq.com>
 ---
- arch/x86/kvm/cpuid.c         | 14 ++++++++++++++
- arch/x86/kvm/reverse_cpuid.h | 19 +++++++++++++++++++
- 2 files changed, 33 insertions(+)
+ arch/x86/kvm/lapic.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 88a5426674a1..529705079904 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -1242,8 +1242,12 @@ void kvm_set_cpu_caps(void)
- 		kvm_cpu_cap_set(X86_FEATURE_NULL_SEL_CLR_BASE);
-=20
- 	kvm_cpu_cap_init(CPUID_C000_0001_EDX,
-+		F(SM2),
-+		F(SM2_EN),
- 		F(XSTORE),
- 		F(XSTORE_EN),
-+		F(CCS),
-+		F(CCS_EN),
- 		F(XCRYPT),
- 		F(XCRYPT_EN),
- 		F(ACE2),
-@@ -1252,6 +1256,16 @@ void kvm_set_cpu_caps(void)
- 		F(PHE_EN),
- 		F(PMM),
- 		F(PMM_EN),
-+		F(PARALLAX),
-+		F(PARALLAX_EN),
-+		F(TM3),
-+		F(TM3_EN),
-+		F(RNG2),
-+		F(RNG2_EN),
-+		F(PHE2),
-+		F(PHE2_EN),
-+		F(RSA),
-+		F(RSA_EN),
- 	);
-=20
- 	/*
-diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
-index 81b4a7acf72e..33e6a2755c84 100644
---- a/arch/x86/kvm/reverse_cpuid.h
-+++ b/arch/x86/kvm/reverse_cpuid.h
-@@ -59,6 +59,25 @@
- #define KVM_X86_FEATURE_TSA_SQ_NO	KVM_X86_FEATURE(CPUID_8000_0021_ECX, 1)
- #define KVM_X86_FEATURE_TSA_L1_NO	KVM_X86_FEATURE(CPUID_8000_0021_ECX, 2)
-=20
-+/*
-+ * Zhaoxin/Centaur-defined CPUID level 0xC0000001 (EDX) features that are
-+ * currently KVM-only and not defined in cpufeatures.h.
-+ */
-+#define X86_FEATURE_SM2             KVM_X86_FEATURE(CPUID_C000_0001_EDX, 0=
-)
-+#define X86_FEATURE_SM2_EN          KVM_X86_FEATURE(CPUID_C000_0001_EDX, 1=
-)
-+#define X86_FEATURE_CCS             KVM_X86_FEATURE(CPUID_C000_0001_EDX, 4=
-)
-+#define X86_FEATURE_CCS_EN          KVM_X86_FEATURE(CPUID_C000_0001_EDX, 5=
-)
-+#define X86_FEATURE_PARALLAX        KVM_X86_FEATURE(CPUID_C000_0001_EDX, 1=
-6)
-+#define X86_FEATURE_PARALLAX_EN     KVM_X86_FEATURE(CPUID_C000_0001_EDX, 1=
-7)
-+#define X86_FEATURE_TM3             KVM_X86_FEATURE(CPUID_C000_0001_EDX, 2=
-0)
-+#define X86_FEATURE_TM3_EN          KVM_X86_FEATURE(CPUID_C000_0001_EDX, 2=
-1)
-+#define X86_FEATURE_RNG2            KVM_X86_FEATURE(CPUID_C000_0001_EDX, 2=
-2)
-+#define X86_FEATURE_RNG2_EN         KVM_X86_FEATURE(CPUID_C000_0001_EDX, 2=
-3)
-+#define X86_FEATURE_PHE2            KVM_X86_FEATURE(CPUID_C000_0001_EDX, 2=
-5)
-+#define X86_FEATURE_PHE2_EN         KVM_X86_FEATURE(CPUID_C000_0001_EDX, 2=
-6)
-+#define X86_FEATURE_RSA             KVM_X86_FEATURE(CPUID_C000_0001_EDX, 2=
-7)
-+#define X86_FEATURE_RSA_EN          KVM_X86_FEATURE(CPUID_C000_0001_EDX, 2=
-8)
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 9381c58d4c85..0f9d314dfa2a 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2657,6 +2657,9 @@ void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
+ {
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
+ 
++	if (WARN_ON_ONCE(!apic))
++		return;
 +
- struct cpuid_reg {
- 	u32 function;
- 	u32 index;
---=20
-2.34.1
+ 	/*
+ 	 * ICR is a single 64-bit register when x2APIC is enabled, all others
+ 	 * registers hold 32-bit values.  For legacy xAPIC, ICR writes need to
+-- 
+2.25.1
 
 
