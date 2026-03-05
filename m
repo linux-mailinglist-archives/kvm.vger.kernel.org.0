@@ -1,134 +1,133 @@
-Return-Path: <kvm+bounces-72845-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72847-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OJETKOK4qWlEDAEAu9opvQ
-	(envelope-from <kvm+bounces-72845-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:09:54 +0100
+	id KG43FAC5qWlEDAEAu9opvQ
+	(envelope-from <kvm+bounces-72847-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:10:24 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6543A215E4F
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:09:54 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5380215E93
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:10:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7D55A30300CF
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:09:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CC85F3014A12
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B583E0C78;
-	Thu,  5 Mar 2026 17:09:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E083B3E0C54;
+	Thu,  5 Mar 2026 17:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qkHZ4CXT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Juu/zVXj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF78B3DBD6F
-	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 17:09:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF7E3CE4A0
+	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 17:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772730568; cv=none; b=pK3EUNE+YV2GBowaDJG+p9K36+uGZr4dnV4LLAKzdU8t90kmlhGj30ebyUym2rI1DadqB2AFFQCLyF+tQ8ueRPhU5uDG1JrESep5/zM7EANUS2Bwja8ECST6FurB4cC9/q9FOIjvxyc3cwLV5cKA9ETAAtU821UfTspc5Q7QUuo=
+	t=1772730606; cv=none; b=A4uHo9ZYcwz7DMuy91sUlHfRO1HIUhkXmpIVmmgse3+XH9/Smz3Vzdm4XAh/RkP/aqVHVdafo33Tny9FTHU4D+qfnuzpWGwDL63R47UbAlj4cEJFrJg2t6/azh59U+l4tq3e/T1/0S6axlvZqmVZGVCmo6PotYh2L6jf0jqGQ8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772730568; c=relaxed/simple;
-	bh=IOxD4RMWl0XT1BquGevJUbg9V0DTPXIxl+uwM6zy6DM=;
+	s=arc-20240116; t=1772730606; c=relaxed/simple;
+	bh=L3RYSu1T2N19K0U1xTMmiGCiOFUx1IC/oSSIOr8cyKE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NePNeD7CPsZKDs4QvXMIvRPO+4WzMKNrWrHEqBSAM4H23YhJzFihC0Ix7QJ8hYclyPQ3Z0WXl3CSHOwQuXZlnq0tpwzZRhk0+bmzYWjepIiwwFzgz1V7gQ7ivRy3Wzw/0YJSZw/1+zSlIEu3jnK60brZD4ZyjbL8JwtVOUyHzQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qkHZ4CXT; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=TUMIJdrRd1HaGySdi1OpYuJ3wj1oHHC7pdaGVhP4VoBX7BUOgLyVcsBEH2kXLisTfMRN0mj/ZQTM3ezpl84/YUtr+Zn/k/wt4j7ftdG5CnEppNN2PCKFYdHJbdc2v3pfYW09Bt/9LnNWHsUmUYdiKmdZ/UFnk65mRuiRCMSRtZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Juu/zVXj; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c7387c70046so841179a12.0
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 09:09:27 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae3f446ccfso51330965ad.2
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 09:10:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772730567; x=1773335367; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772730604; x=1773335404; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jvpCZZ0a9Yq+2yPdrdKB9QY+RilUr22l4yi9tVPddtU=;
-        b=qkHZ4CXTx+Kn3hle6nnUwY1Pdhho+2AMAirDWyKM+RernKDZB0bP+N/k90rExohiKh
-         OMfcIr8GCK/lz5WlXfYSJZOsH3iA4+yo0gcNIlyZ6knwUM0XOWrYlfsbxjMKVw9Mc5TS
-         UFCNVsRBiKULuHx/htUS2wsC54fM6mq7uOf7qdWSj2ADs/uGqcfltvUJ0lkJy1o4Mj2e
-         1qvWarKWoDaP4GXhWnfQw+qiolRKuuGRR8kXLGbATfi7/0O6K8tRwc2SzpX5dhCj3Yqr
-         zat6+tm73JC9dsLF05J+uvmYk4xyRLIa/FEtFhZW4qbt64ubrEchEzKUd6LuxMQYqX3W
-         x/Lw==
+        bh=JJ+V04ocRWIJudwBCiZNPVDH3Kw+t4jmYStMiZHQYXQ=;
+        b=Juu/zVXjgJLfcgeeHd6JGCg4yoU3+sz2x5QJzT1++sjHkIePvF90wpekxCKqY+RrO1
+         cF1ZW7rxkBzJgMw/CCRKGQEcpAx0vM320mkvQgjyt/el/AUeJfamNvNeWdG8vRYbQ2mE
+         DfwvHZYbz7xKRJN96QDsUyhy6RBqNVjBfGb6y2lZwmvF5A7ZvZBA3ss5U5UfqQzO4NQi
+         kX9a+i2/lcKBdfLwTNkuN5p5NTrJQbZdJ4/L3GsDQM5jEvyPXU4TFm3OPUAH64W9broo
+         mCi3yrpjPUG6apn/FUKFchS6NIhA5l0uNJ1AK0ARU+7KcoIVo6yScnSl30fOICd5cLNb
+         QZRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772730567; x=1773335367;
+        d=1e100.net; s=20230601; t=1772730604; x=1773335404;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jvpCZZ0a9Yq+2yPdrdKB9QY+RilUr22l4yi9tVPddtU=;
-        b=uX+noxcMxFmk7EIb5K/q3mmXbP+kbFk4ujgFT7lNgsvRVcdtErPF5X1p63p/g8iUjh
-         6bvgYLE2McUq9llFuH2bVrv10rAyLuvVzj8EOx0b7hWnAEot+Zjjozl91FxnZeW+lDS7
-         1M4A9eKBg1vz8L1ryHD6aUF14CWCRiG93vj+XDSEp9Q2lEp1wcV6UQDI4cz4fLTmQbgF
-         UyjISR4JbYh4aOFwiJzT1ptvEm1hlwxRIdrTZ1cLNXL2DlWgMKEfDOg15G1vQ7ib21N5
-         s1+770Vnkrpg4MHbjyV5yatkAotzQ1Q2dIuw3WI5g6ALf5VViGAKfEvloEffPcK3pSdH
-         Hzfw==
-X-Gm-Message-State: AOJu0YzvcWe1wlsyGE7jSsb6LNW0dc3aFpCFHI4eMqoOZmGygU0WbHwQ
-	MsWOFPFDNVTdLAWJStj1PSK+KAj/u9hY5V8ihwJQoGqI9bOXX/ccLg+WSu+ptCHs+hvyP3gAISq
-	ChnN8dw==
-X-Received: from pfjj9.prod.google.com ([2002:a05:6a00:2349:b0:829:9475:6dd])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:21c9:b0:824:36f8:3461
- with SMTP id d2e1a72fcca58-82972b67282mr5893351b3a.23.1772730566836; Thu, 05
- Mar 2026 09:09:26 -0800 (PST)
-Date: Thu,  5 Mar 2026 09:07:41 -0800
-In-Reply-To: <20260203190711.458413-1-seanjc@google.com>
+        bh=JJ+V04ocRWIJudwBCiZNPVDH3Kw+t4jmYStMiZHQYXQ=;
+        b=GctusS4asBbv8HhyaCFzihCQvnCBIeNa3AQgywAAk5ykte+vMCb2cjpmNy76VbHDPz
+         JEbT9qZ1e5Wbid/FEvB1geGZ0brBK/O8Vh5Sbgq8lnK3R59Nef3e2tcIrVCqO1nQtZBm
+         YpIiH5ZFb09jU1VYHaV9tmktPzu0zBXdqb8ydsAjWUn7hvYnCuKXGOu2h4B7ciK18O1L
+         s51oPbcPVqm6oIMnPpFizuxkpHp4PRia2KIYvZ9n21bVhD60WBZa6h15QPpcUvRruogd
+         9cPJpsDqQOhF3IHig8hL2QqiUifqq49JrYQx7ycUCwkZlhvnoC0MiemIOG91llTiudlt
+         oiog==
+X-Gm-Message-State: AOJu0Yz/fZZo9sD7Cciqes5s4h34D3pnwCXnOZjOEAW/f3fWPOT3WF18
+	hnbUs+wdmmKLH0OQYjqYfveDP83f4xP9rE+nt+okkOw2ECojgilyAF0+T0G1HeeUG5c2C/SfJAT
+	DiuCR0Q==
+X-Received: from plrd24.prod.google.com ([2002:a17:902:aa98:b0:2ae:4655:2b3b])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:190:b0:2a0:8ca7:69de
+ with SMTP id d9443c01a7336-2ae6ab1f727mr65695835ad.41.1772730604332; Thu, 05
+ Mar 2026 09:10:04 -0800 (PST)
+Date: Thu,  5 Mar 2026 09:07:43 -0800
+In-Reply-To: <20260302170239.596810-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260203190711.458413-1-seanjc@google.com>
+References: <20260302170239.596810-1-seanjc@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <177273040930.1572436.340994491480957114.b4-ty@google.com>
-Subject: Re: [PATCH 0/2] KVM: SVM: Fix CR8 intercpetion woes with AVIC
+Message-ID: <177273035456.1571669.11141510645130203244.b4-ty@google.com>
+Subject: Re: [PATCH v2] Documentation: KVM: Formalizing taking vcpu->mutex
+ *outside* of kvm->slots_lock
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jim Mattson <jmattson@google.com>, Naveen N Rao <naveen@kernel.org>, 
-	"Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>
 Content-Type: text/plain; charset="utf-8"
-X-Rspamd-Queue-Id: 6543A215E4F
+X-Rspamd-Queue-Id: E5380215E93
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72845-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72847-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DKIM_TRACE(0.00)[google.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Tue, 03 Feb 2026 11:07:08 -0800, Sean Christopherson wrote:
-> Fix a bug (or rather, a class of bugs) where SVM leaves the CR8 write
-> intercept enabled after AVIC is enabled.  On its own, the dangling CR8
-> intercept is "just" a performance issue.  But combined with the TPR sync bug
-> fixed by commit d02e48830e3f ("KVM: SVM: Sync TPR from LAPIC into VMCB::V_TPR
-> even if AVIC is active"), the danging intercept is fatal to Windows guests as
-> the TPR seen by hardware gets wildly out of sync with reality.
+On Mon, 02 Mar 2026 09:02:39 -0800, Sean Christopherson wrote:
+> Explicitly document the ordering of vcpu->mutex being taken *outside* of
+> kvm->slots_lock.  While somewhat unintuitive since vCPUs conceptually have
+> narrower scope than VMs, the scope of the owning object (vCPU versus VM)
+> doesn't automatically carry over to the lock.  In this case, vcpu->mutex
+> has far broader scope than kvm->slots_lock.  As Paolo put it, it's a
+> "don't worry about multiple ioctls at the same time" mutex that's intended
+> to be taken at the outer edges of KVM.
 > 
 > [...]
 
-Applied to kvm-x86 fixes, thanks!
+Applied to kvm-x86 generic.
 
-[1/2] KVM: SVM: Initialize AVIC VMCB fields if AVIC is enabled with in-kernel APIC
-      https://github.com/kvm-x86/linux/commit/9071d0eb6955
-[2/2] KVM: SVM: Set/clear CR8 write interception when AVIC is (de)activated
-      https://github.com/kvm-x86/linux/commit/e992bf67bcba
+[1/1] Documentation: KVM: Formalizing taking vcpu->mutex *outside* of kvm->slots_lock
+      https://github.com/kvm-x86/linux/commit/f8211e95dfda
 
 --
 https://github.com/kvm-x86/linux/tree/next
