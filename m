@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-72834-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72835-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EEolJuitqWn+CAEAu9opvQ
-	(envelope-from <kvm+bounces-72834-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 17:23:04 +0100
+	id 6AhDDbm0qWkZCwEAu9opvQ
+	(envelope-from <kvm+bounces-72835-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 17:52:09 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19134215619
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 17:23:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF3A121593D
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 17:52:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F3E4730460B5
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 16:22:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 117813061AEB
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 16:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49582331A57;
-	Thu,  5 Mar 2026 16:22:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EFF13CF676;
+	Thu,  5 Mar 2026 16:51:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lD47VTeb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="moM108pl"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40973CE49F;
-	Thu,  5 Mar 2026 16:22:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DFA3CB2C5;
+	Thu,  5 Mar 2026 16:51:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772727725; cv=none; b=rYj6JHrpFtCX1gOX3CZ+ChwyUW0c97ut2NYAHVFIuz9ZEjEw7yBLaCNSHFlyW4UsOQXnRMfHv70JPLYLRZIbF7C6FLirCcEUtm8a6aYaZ65UpXq0zVsnVmhkmxDABLn3uA+CoRyGwKOL22hxCqQom5GQpXWWIKTDnO4xVajWb1o=
+	t=1772729514; cv=none; b=XDz9YlOWrHxtAwsbE0Ik9EQi5VW/g6jgG/rHbGafY1XiS+aY9SANxU967SEkCa4Xv4uTjxy0hYeuHUTLcJCr58K8Zkq9bM5Z0QBdDsw3v8olen4US7DIzgEU9tOeNpEJLd8a4pJNHeGu4tpraLfJGbFhBX2pZF4LO5XJlraTE9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772727725; c=relaxed/simple;
-	bh=hPWaiZQkURcBYGdXokPMW62Jof8BcCJ3U+PevWfi8YI=;
+	s=arc-20240116; t=1772729514; c=relaxed/simple;
+	bh=oqOA+tmfWR/3o3GnKvVmaJw8vJLjDXFAY6myXgfJMys=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XdeqLxDC4Nlq+wb2J3L1AFX4skr/5gNdVr6p+p7L4L4ncNO8hrGjwbUmUP2p6rkOQildmZqK4XmLV/IbasWB0Natb71sz1F4mGQKgtI3d4uvsYlX6tnxyrl/IlW2R9365TkxqRtvfdXMcRDEBIFbacE446fMzqsJCFksXV3HEGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lD47VTeb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12DE0C116C6;
-	Thu,  5 Mar 2026 16:22:04 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ENupLSnYZBlPoCf4yYuXJa9U+Kxit3j4+WcHIV9JSCxHoBslMcqW7+GYSOOjFti47pgC6oM3NLpWdHNjh4YXhxATDCT3VwSvIh0cVDukwNTq7xuDMi5ew0EXBOY+JBlnL0Rp+mR+6E9buVmu4iXTxIyonqTublueO1XOUk0kiyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=moM108pl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DBE0C116C6;
+	Thu,  5 Mar 2026 16:51:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772727724;
-	bh=hPWaiZQkURcBYGdXokPMW62Jof8BcCJ3U+PevWfi8YI=;
+	s=k20201202; t=1772729514;
+	bh=oqOA+tmfWR/3o3GnKvVmaJw8vJLjDXFAY6myXgfJMys=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lD47VTeb7TSWq2q5RNFtPI6pyRXzBVaysvoruNmv/SpVgCv/AGontBHZzPEMOvXcW
-	 6ER/u+nCtsmjHkIMLIuOuonom9ZYkIeKw3tBQ1EcM+s92RdieejufkVLnJGTpiuW0i
-	 CH7uB7fhI66QHkHdeOPU6xZJbYjcVBe/E4NiSwfPGBsCYc/xeS0Gnj/uWClkbDwsrT
-	 pVosvYPHLOy5CSBT69VvItUQSIuMrhVM+8/IysadP2GszaudA5xRx5lYHg4rSyPIr7
-	 z65HpRlPOOr0Iln3j3Q6Qutd1O/oZalVeRflsNkwaywlYz5eoAapKKfdTS9MxBFF6Z
-	 LcTiK5tdno7jg==
+	b=moM108plUmV/G37engsMy4GFUzqDGqzF8whhdWesfjVVbT9tInS7er92/tfDqURoY
+	 gXxTbux74YQ8hmfSphEl4EStZXsfKCcf71SmOC8x+Nw+dSDC0PICKSTecz2LBipClb
+	 s+TNSV7lh9WrMhuMLRORHcA0Rr9+mPCJ3Fez0/yv6Rh4HkpkNyB68CbwwtkS4fhAI+
+	 SiY7qXk+y1cHJojCDdzAEFIBjxc7+fugCsgW6JoeGn434ltkjapK49/fwFPExJYJVm
+	 oit1Cd8WYK1oY320OGkhtkjftPZxwn3k2A/jg7tZ5m8lUK6UHeEaJb75pYtTHq1XWw
+	 2TMtsFYZxG9jw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vyBSb-0000000GWk5-3BHT;
-	Thu, 05 Mar 2026 16:22:01 +0000
-Date: Thu, 05 Mar 2026 16:22:01 +0000
-Message-ID: <86ldg66yc6.wl-maz@kernel.org>
+	id 1vyBvU-0000000GXE2-0TSs;
+	Thu, 05 Mar 2026 16:51:52 +0000
+Date: Thu, 05 Mar 2026 16:51:51 +0000
+Message-ID: <86jyvq6wyg.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvm@vger.kernel.org,
@@ -65,12 +65,9 @@ Cc: kvm@vger.kernel.org,
 	will@kernel.org,
 	yangyicong@hisilicon.com,
 	wangzhou1@hisilicon.com
-Subject: Re: [PATCH v1 2/2] KVM: arm64: Fix vma_shift staleness on nested hwpoison path
-In-Reply-To: <CA+EHjTwQP=sXJ=SJE3OqByHKm7Si3S41BfuFO827_ZVwaygC9g@mail.gmail.com>
+Subject: Re: [PATCH v1 0/2] KVM: arm64: Fix a couple of latent bugs in user_mem_abort()
+In-Reply-To: <20260304162222.836152-1-tabba@google.com>
 References: <20260304162222.836152-1-tabba@google.com>
-	<20260304162222.836152-3-tabba@google.com>
-	<86ms0m6yzk.wl-maz@kernel.org>
-	<CA+EHjTwQP=sXJ=SJE3OqByHKm7Si3S41BfuFO827_ZVwaygC9g@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -85,25 +82,25 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: tabba@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, yangyicong@hisilicon.com, wangzhou1@hisilicon.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Rspamd-Queue-Id: 19134215619
+X-Rspamd-Queue-Id: AF3A121593D
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72834-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72835-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
@@ -112,62 +109,24 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Thu, 05 Mar 2026 16:13:43 +0000,
+On Wed, 04 Mar 2026 16:22:20 +0000,
 Fuad Tabba <tabba@google.com> wrote:
 > 
-> On Thu, 5 Mar 2026 at 16:08, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > Hi Fuad,
-> >
-> > On Wed, 04 Mar 2026 16:22:22 +0000,
-> > Fuad Tabba <tabba@google.com> wrote:
-> > >
-> > > When user_mem_abort() handles a nested stage-2 fault, it truncates
-> > > vma_pagesize to respect the guest's mapping size. However, the local
-> > > variable vma_shift is never updated to match this new size.
-> > >
-> > > If the underlying host page turns out to be hardware poisoned,
-> > > kvm_send_hwpoison_signal() is called with the original, larger
-> > > vma_shift instead of the actual mapping size. This signals incorrect
-> > > poison boundaries to userspace and breaks hugepage memory poison
-> > > containment for nested VMs.
-> > >
-> > > Update vma_shift to match the truncated vma_pagesize when operating
-> > > on behalf of a nested hypervisor.
-> > >
-> > > Fixes: fd276e71d1e7 ("KVM: arm64: nv: Handle shadow stage 2 page faults")
-> > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > ---
-> > >  arch/arm64/kvm/mmu.c | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > index e1d6a4f591a9..b08240e0cab1 100644
-> > > --- a/arch/arm64/kvm/mmu.c
-> > > +++ b/arch/arm64/kvm/mmu.c
-> > > @@ -1751,6 +1751,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> > >
-> > >               force_pte = (max_map_size == PAGE_SIZE);
-> > >               vma_pagesize = min_t(long, vma_pagesize, max_map_size);
-> > > +             vma_shift = force_pte ? PAGE_SHIFT : __ffs(vma_pagesize);
-> >
-> > If force_pte is set, then we know that max_map_size == PAGE_SIZE. From
-> > there, vma_pagesize == PAGE_SIZE, since nothing can be smaller.
-> >
-> > Is there anything preventing us from having:
-> >
-> >                 vma_shift = __ffs(vma_pagesize);
-> >
-> > and be done with it?
-> 
-> Nope, nothing prevents that. Even simpler and better.
-> 
-> Would you like me to respin it?
+> Finding these issues just reinforces how fragile this 300-line function
+> has become. We really need to refactor it to make the state flow easier
+> to reason about. I'm currently putting together a series to do just that
+> (introducing a proper fault state object), so stay tuned for an RFC on
+> that front.
 
-Nah, I'll fix that locally. Thanks for having given it a look.
+If you have such patches, please post them sooner rather than later,
+even if the rework is incomplete. I'd be happy take small patches that
+start add infrastructure early and work out the full refactoring over
+time.
+
+Thanks,
 
 	M.
 
