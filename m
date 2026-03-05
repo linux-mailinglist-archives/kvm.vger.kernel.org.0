@@ -1,246 +1,264 @@
-Return-Path: <kvm+bounces-72953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72954-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4LOGISrpqWnuHQEAu9opvQ
-	(envelope-from <kvm+bounces-72953-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 21:35:54 +0100
+	id MEVyGErqqWmLHwEAu9opvQ
+	(envelope-from <kvm+bounces-72954-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 21:40:42 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E05BB218346
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 21:35:53 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95013218410
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 21:40:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8CE3431AD05C
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 20:31:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4C57C30508DF
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 20:38:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CFB42F1FEF;
-	Thu,  5 Mar 2026 20:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0E7345CA2;
+	Thu,  5 Mar 2026 20:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aFxZoi9K"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0UxFGhNh"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011044.outbound.protection.outlook.com [52.101.62.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DC533B6CB
-	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 20:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772742662; cv=none; b=jCVdVUrSrIr2Os68U06uLsonzjBPU4gxAbswt2EhPRtDZGpHvFKG6fVD20UBOOia4On2f2cX0E0X5ZKRuXBg9hWaYub1Z2eSS5GNLIr7O9Sg7gavGcuh3DCvQPHlbcIycJMAM03k/afx7ZObaT/SSDw77z8055jWGPHjbuVyyj4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772742662; c=relaxed/simple;
-	bh=GXcVhzG7Nm5Lhx0mBY/gzXFNXdZiC5T1kDhAfE66+PI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iqdyZhzrtGANx7aA+5L0PCw0jsx2IONXiu+Jw0ycJTWFGF1c4jMPDraC6bOw5GdNNWAo31HuRIjNP9TNljA1McuuKeEupnEvCaGZVmLQsKV3afJddYilUhFTdaVo4mzNKT/OJmmxMtlKeOm3FGwgp/o27Z1sKqNdH6QTgymgJ30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=aFxZoi9K; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=GxRantZBzTib2PuIHx5xDl8MFsRE5Nk1LBrpSG5uiVo=; b=aFxZoi9K0PrYCdrot9CEUAylxa
-	r4IotXXPmBijDNv9PenrJdNRM9czSxUVUYPAmT9CF5jX63gYRqvmIuIAcLHDtO7vk7H7LFBYccLDh
-	JeqWDGxJ6SBgZQ6NfGx+d7TKxnV55LjNosrBlBjs35Kx/0J/Q6BiN2QY0q9vSVL540I5TLYEDanYk
-	9cXORzhTA/tAD6jUx6PJDm9477rzPwBMgzLJFUwfq6Timc18ujqf6S5ewZllQ49HqobNZHL4fIUk4
-	3vNVZL1Ljses7wc/ppZ28LnDMqozXEpJ3n6TZ1soK+Ju+vCLB4KbTgJU//1XjW0Tk6rUcAYR1LSqD
-	t5Pj1DkA==;
-Received: from [54.239.6.184] (helo=freeip.amazon.com)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vyFLJ-00000007dOH-3CBw;
-	Thu, 05 Mar 2026 20:30:51 +0000
-Message-ID: <ac94394405bf7e878c8ff0acf87db922dc4af48c.camel@infradead.org>
-Subject: Re: [PATCH v3] KVM: x86: use array_index_nospec with indices that
- come from guest
-From: David Woodhouse <dwmw2@infradead.org>
-To: Thijs Raymakers <thijs@raymakers.nl>, kvm@vger.kernel.org, 
- "Orazgaliyeva, Anel"
-	 <anelkz@amazon.de>
-Cc: stable <stable@kernel.org>, Sean Christopherson <seanjc@google.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>
-Date: Thu, 05 Mar 2026 21:30:44 +0100
-In-Reply-To: <20250804064405.4802-1-thijs@raymakers.nl>
-References: <20250804064405.4802-1-thijs@raymakers.nl>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-VFm5hQrG8Y4bc3i0k9SJ"
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680B8344D88;
+	Thu,  5 Mar 2026 20:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772743077; cv=fail; b=DZglfyqatjG3fI6ASHrppT0Gk+/tf+g7zkwhb0699w/ZYYtK2eWKevIFsQ57YxXQBUBCcB3h0ftNA5mRBBo3ECrCgPNhwO78mvm/CrXctLQV8JJfzEWRh4bE1pG2MixGTrJ3Dc2MwebGQLkw7c09KLYmVq37h3BDP7rQnfmyAjY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772743077; c=relaxed/simple;
+	bh=AjSmawU17eyphsbpRzCiLPok01ESFU5peDSkiLCdHoc=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=n5v9Jk8K5XXaigpMbN0hMDT6blxl/Du27+AAo7F06HLIK9jO55NfgwpjxdZEcP2qTofBTvs0Teaz6qloDiQHrR33N3OZ0QmO20NN/Q3JmQM8O29GZt0GUbQr246ZkxhxKkWFkaIY2vU1v/fHlAIBqA5moWD+I9BKxNUDXme7joE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0UxFGhNh; arc=fail smtp.client-ip=52.101.62.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=N9ryjaAENDSsg4/+mde/KvaholKaJYqy2Q7B9VzUHstlFTIdubNCEyIJnxYqa4dVXSaHACOc3+YKPsmU09AV3sGLb7j3v92ndjgZ2FJe+aB/oYwDphRarTNCXGLkbQCOM2g5pz3rqiyuzt4iNcAL6HGNXWjS4aEH7TtmZYk24G6x617vczc7yqaec+Mep7w+pf/Su+f+kscpysef4kAjK45eDzHLPw1xTAVkuij7CG97yywqr85qfzREzhZd4cW83oEcBHWWRfNc1TuONw0hBvXufaNSI7r5s/STAwq8ItzzuPamJpbxvkqEUveUUnmVDhdBLswd3JunPqGjmOTjHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fiKzLPswhOzPzGVK1fAkLi3/ZXAFgnZS3n7EzIVL7Fw=;
+ b=o1AxulfOFHNH0Tezlf7fhSOMFiAEEi687LPVVgnbi2jsh/3PpiM23IiUWiy/EjPgOV0FPXG2gR3umB8wHvER7jSK/GokgoBnpg+nmfPO67yK6wgoATwH3cbiMbxZcMd+IHFrjLr5Q7fNvmGsroHNTnWyDpmDiW5HKKgom9Q7rGr19EMPbf1NZBpWrEgM/RZC8qhvEYtDcA+Y3/V6Sha4rXCmZm1jH0f1pE/l7F+h9Qr3SgH+NxmFTiR7QYvj1FtghRCZUIdkZuq+UnGH+SeiXQfS3AVl+w3hR3QO8GE50LSrI7jouEz9I4td3UlU/+cuVkB330F9wQwjz3Y9Peit9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fiKzLPswhOzPzGVK1fAkLi3/ZXAFgnZS3n7EzIVL7Fw=;
+ b=0UxFGhNh8n3IbU0gNQpEfYjagbe2tjWTeVUukTdQhq0D+BpHFHKSfUuqr7pYtzDSNU3qW0zwyE89AsoxeuUF84DaO4BRojAS/U7FaFNf/Yj1pQxEXfqEK2f8FEcERERE26PNNaRA6r8rBjPZRhRg9VD9R0ctOTkGajb9Q4fAAZY=
+Received: from BN0PR03CA0029.namprd03.prod.outlook.com (2603:10b6:408:e6::34)
+ by CH3PR12MB7595.namprd12.prod.outlook.com (2603:10b6:610:14c::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9678.18; Thu, 5 Mar
+ 2026 20:37:50 +0000
+Received: from BL6PEPF0001AB4A.namprd04.prod.outlook.com
+ (2603:10b6:408:e6:cafe::74) by BN0PR03CA0029.outlook.office365.com
+ (2603:10b6:408:e6::34) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.22 via Frontend Transport; Thu,
+ 5 Mar 2026 20:37:20 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
+Received: from satlexmb08.amd.com (165.204.84.17) by
+ BL6PEPF0001AB4A.mail.protection.outlook.com (10.167.242.68) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9678.18 via Frontend Transport; Thu, 5 Mar 2026 20:37:49 +0000
+Received: from satlexmb10.amd.com (10.181.42.219) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 5 Mar
+ 2026 14:37:49 -0600
+Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb10.amd.com
+ (10.181.42.219) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 5 Mar
+ 2026 14:37:49 -0600
+Received: from [10.143.199.149] (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Thu, 5 Mar 2026 14:37:44 -0600
+Message-ID: <8c25adff-1230-479b-b56d-784cdedd8758@amd.com>
+Date: Fri, 6 Mar 2026 02:07:42 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Rspamd-Queue-Id: E05BB218346
+User-Agent: Mozilla Thunderbird
+From: Shivansh Dhiman <shivansh.dhiman@amd.com>
+Subject: Re: [PATCH 3/7] KVM: SVM: Save restore FRED_RSP0 for FRED supported
+ guests
+To: <seanjc@google.com>, <pbonzini@redhat.com>,
+	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+CC: <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
+	<xin@zytor.com>, <nikunj.dadhania@amd.com>
+References: <20260129063653.3553076-1-shivansh.dhiman@amd.com>
+ <20260129063653.3553076-4-shivansh.dhiman@amd.com>
+Content-Language: en-US
+In-Reply-To: <20260129063653.3553076-4-shivansh.dhiman@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB4A:EE_|CH3PR12MB7595:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9c4d7178-9712-460c-c631-08de7af7114b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700016|82310400026|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	hAytkLMpO1JyVc0dOVoXPL3W0/vHh9BHU2FIArEpPoigTBrw16AeV3Hny7wEpLXpLrUT+7WuxlRMCIchBF5866aimmeryKrMEpeTW6S7PfUEMD2vS9Y6GZnymH/A4ZdrYScJ1Ld02vveOs/yImLgTN/EjJXKsndczwfrlSOUCI4VbI+/SD2h/pPHEiQeHAYQXkZv1aRwxsW2tGuC1JjyCoXS8QgQe7VpXArxFJmHut4clfzGmcSPRj6+Qxd2X0dq7tbAYVGUMumE6Q6KDQEE8fOakAqlq1pw3ho+pYqFQiAm+WMLTyzNTS/4k8CyShIMZ7D1jbrXmcfuDbyMXzH6OqX4ZFexdUIo3rgKqo8N82SEV0CBVgYFtsnAwrw8jNAvL9SyblFcublgy/+Kyp052p465C8pYo1iudMKeRNlC16uoxSJTcfRJc8OU3Z5agcmyGOX+R2ydz1q7gx4eQOjGmooLp65DTacQ2WC07dV2xeKADpi+Wej091bLv50sZ5t2w7nf2X7aOdWLUCSztZbEZbfHiYniCbV0L7Ewdv06ERWKVtTPLYDtpIaUUrs1wLmMAPxOsENgNQsSAg6fVtHNcrutdcNdJVoXrWxJc1QK7K54mghr9R32gdeGSf/8ILFv+EJxo8wY5CeBlU/W4NjmvVS4buTnUJDcUsamA8/uRkqjWEo3THxTtIUe8ShMMqLfG5c0tD6hKBWbySKv/POmrg7/j8zkG02S9IHbZyDc+UIDbbVx8C9XDdo7JiAAxTnGWbLG+xiubzGeZe4hiPs9A==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700016)(82310400026)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	TPNGHTv1i5Aq6ThpbEMgEnAens3HC1vBUvADOKNMrXD6HhQxXPO4WHdMv19h5GYJFQSBMTWD5IY8HJUbCgwd6m84MjxORLlzFpgb2J+qeiKWA2dSJClsreIyNU21nllHa7p+oqoLKdGIVdo1zzBkeWYv8ytG2AiIWPS1vzCHn8lUBkTihMprKHiokb1Oc2vT9dY4oQL/DzxG37E0N1F7/pVI1PQh8jeyo2oLIB/yy0tLM6Ctc0wqFeZhLyx2Pme2KINMjnk0frP76mxEZIsRpWiOLlIayb1fA7AXI2VAGTHBK9kTTyJI52xG0Jy1Cx2u6Ru4MSJRa1RZCJHgbiFLllfm4UF/V1LA8QSA0yvp0SSxE1xIUZ30h53YgTZyaDPjEBtqDr10mVNUasmvuZp5AfZhxger48ZP0fnYFJ8guVZFoCn5P93bp4znoULwMZ8K
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2026 20:37:49.8428
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9c4d7178-9712-460c-c631-08de7af7114b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB4A.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7595
+X-Rspamd-Queue-Id: 95013218410
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-4.26 / 15.00];
-	SIGNED_SMIME(-2.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72953-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[amd.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-72954-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:dkim,amd.com:email,amd.com:mid,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,kvm@vger.kernel.org];
-	HAS_ATTACHMENT(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shivansh.dhiman@amd.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	TO_DN_NONE(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCVD_COUNT_SEVEN(0.00)[9]
 X-Rspamd-Action: no action
 
+Hi,
 
---=-VFm5hQrG8Y4bc3i0k9SJ
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 29-01-2026 12:06, Shivansh Dhiman wrote:
+> From: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+> 
+> Hardware does not save/restore FRED_RSP0 for Non-SEV-ES guests.
+> Save/restore it early in svm_vcpu_enter_exit() so that the
+> correct physical CPU state is updated.
 
-On Mon, 2025-08-04 at 08:44 +0200, Thijs Raymakers wrote:
-> min and dest_id are guest-controlled indices. Using array_index_nospec()
-> after the bounds checks clamps these values to mitigate speculative execu=
-tion
-> side-channels.
->=20
 
-(commit c87bd4dd43a6)
+I'm planning to improve this path in v2 of this series, by moving the
+restoring/saving of FRED RSP0 to svm_prepare_[switch_to_guest/host_switch]
+respectively, thus saving some MSR accesses. Any comments are welcome.
 
-Is this sufficient in the __pv_send_ipi() case?
-
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -852,6 +852,8 @@ static int __pv_send_ipi(unsigned long *ipi_bitmap, s=
-truct kvm_apic_map *map,
-> =C2=A0	if (min > map->max_apic_id)
-> =C2=A0		return 0;
-> =C2=A0
-> +	min =3D array_index_nospec(min, map->max_apic_id + 1);
+> 
+> Synchronize the current value of MSR_IA32_FRED_RSP0 in hardware to the kernel's
+> local cache. Note that the desired host's RSP0 will be set when the CPU exits to
+> userspace for servicing vCPU tasks.
+> 
+> Signed-off-by: Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>
+> Co-developed-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
+> Signed-off-by: Shivansh Dhiman <shivansh.dhiman@amd.com>
+> ---
+>  arch/x86/kvm/svm/svm.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 05e44e804aba..ddd8941af6f0 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4192,6 +4192,15 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu, bool spec_ctrl_in
+>  {
+>  	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, vcpu->cpu);
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+> +	bool update_fred_rsp0;
 > +
-> =C2=A0	for_each_set_bit(i, ipi_bitmap,
-> =C2=A0		min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
-> =C2=A0		if (map->phys_map[min + i]) {
-                        vcpu =3D map->phys_map[min + i]->vcpu;
-                        count +=3D kvm_apic_set_irq(vcpu, irq, NULL);
-                }
+> +	/*
+> +	 * Hardware does not save/restore FRED_RSP0 for Non-SEV-ES guests.
+> +	 */
+> +	update_fred_rsp0 = !sev_es_guest(vcpu->kvm) && guest_cpu_cap_has(vcpu, X86_FEATURE_FRED);
+> +
+> +	if (update_fred_rsp0)
+> +		wrmsrq(MSR_IA32_FRED_RSP0, svm->vmcb->save.fred_rsp0);
+>  
+>  	guest_state_enter_irqoff();
+>  
+
+@@ -1391,12 +1433,34 @@ static void svm_prepare_switch_to_guest(struct kvm_vcpu
+*vcpu)
+                sd->bp_spec_reduce_set = true;
+                msr_set_bit(MSR_ZEN4_BP_CFG, MSR_ZEN4_BP_CFG_BP_SPEC_REDUCE_BIT);
         }
++
++       /*
++        * Hardware does not save/restore FRED_RSP0 for Non-SEV-ES guests.
++        */
++       if (!sev_es_guest(vcpu->kvm) && guest_cpu_cap_has(vcpu, X86_FEATURE_FRED))
++               wrmsrq(MSR_IA32_FRED_RSP0, svm->vmcb->save.fred_rsp0);
++
+        svm->guest_state_loaded = true;
+ }
 
-Do we need to protect [min + i] in the loop, rather than just [min]?
+> @@ -4218,6 +4227,15 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu, bool spec_ctrl_in
+>  	raw_local_irq_disable();
+>  
+>  	guest_state_exit_irqoff();
+> +
+> +	if (update_fred_rsp0) {
+> +		rdmsrq(MSR_IA32_FRED_RSP0, svm->vmcb->save.fred_rsp0);
+> +		/*
+> +		 * Sync hardware MSR value to per-CPU cache. This helps in restoring
+> +		 * Host RSP0 when exiting to userspace in fred_update_rsp0().
+> +		 */
+> +		fred_sync_rsp0(svm->vmcb->save.fred_rsp0);
+> +	}
+>  }
+>  
+>  static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
 
-The end condition for the for_each_set_bit() loop does mean that it
-won't actually execute past max_apic_id but is that sufficient to
-protect against *speculative* execution?
+ static void svm_prepare_host_switch(struct kvm_vcpu *vcpu)
+ {
+-       to_svm(vcpu)->guest_state_loaded = false;
++       struct vcpu_svm *svm = to_svm(vcpu);
++
++       if (!svm->guest_state_loaded)
++               return;
++
++       /*
++        * Hardware does not save/restore FRED_RSP0 for Non-SEV-ES guests.
++        * Also, sync hardware MSR value to per-CPU cache. This helps in
++        * restoring Host RSP0 when exiting to userspace in fred_update_rsp0().
++        */
++       if (!sev_es_guest(vcpu->kvm) && guest_cpu_cap_has(vcpu, X86_FEATURE_FRED)) {
++               rdmsrq(MSR_IA32_FRED_RSP0, svm->vmcb->save.fred_rsp0);
++               fred_sync_rsp0(svm->vmcb->save.fred_rsp0);
++       }
++
++       svm->guest_state_loaded = false;
+ }
 
-I have a variant of this which uses array_index_nospec(min+i, ...)
-*inside* the loop.
+Thanks,
+Shivansh
 
-
---=-VFm5hQrG8Y4bc3i0k9SJ
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDMwNTIwMzA0
-NFowLwYJKoZIhvcNAQkEMSIEIKE/BN7/J5//kfK6TYiXbiYtewGcnyaxd61BRy11b7N+MGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAFPx13X+xBxK3
-0mtMfhloiw29VtaIEZ3ruUyjc9aQu5oSqA+SPIWRvCD2Dc6yD6+yh3BFZk9sY2QEo4KDzmkj27+I
-VutxYAYDCV92pugDQubXaMWKqhXbveBl2wVt/2rUzGu526IlMjQbBGjrmJjP4MnG6KaZ+2r72L3r
-mcRuf/U6OQjOLXP/hkm6W0yja6sIIywFmniEMFFtHLFhEH/Q2GUr7+NycQO4Gx4yqh5tQagquG4h
-8Xors2O5+wdqt1qGG8uFfBG+iGBwgyugXwROWYPTzalz/37YsBCTJJsfMtlIBH39hVGpM3kVrwUH
-iS1TS2QGN6h9rIYjM+D5fblSGHmuHjNg8N/Jf99NTlXjTx0hTrEYrRFa2BB9XudiWLOz4TVaGu7A
-9UQ1t3x2BNvMNmcEoAGsL/QbHwLeVYl92byu0EogeSLzn8/iOBb/A2By6Nie+7kNL43k6L5l/xIP
-GV/SWvohtHAoJZap2VmLdkWDyi/vFY4Q3Lm14QLY5vuyOzGEkHo8TVgOunSnzWhL4VZEYiQzjp0z
-RJlzKGKtOdtvy2HMHcKgz0uRlPxgM/WEbMDSAzmXiHHrWpYiHSmQh0efoELQYAy+A1OHBk0h0IkB
-aVKVMrih9jZKlfb1VQfsZDVUiKk9T3kWuvIQ+BDIBYu57+rS28afrk7xNJsmU/EAAAAAAAA=
-
-
---=-VFm5hQrG8Y4bc3i0k9SJ--
 
