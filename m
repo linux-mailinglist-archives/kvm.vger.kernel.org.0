@@ -1,170 +1,163 @@
-Return-Path: <kvm+bounces-72962-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72963-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uHcpC40EqmliJgEAu9opvQ
-	(envelope-from <kvm+bounces-72962-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 23:32:45 +0100
+	id 2JkSF/IGqmldJwEAu9opvQ
+	(envelope-from <kvm+bounces-72963-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 23:42:58 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9F80218EE2
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 23:32:44 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 344E4218FDA
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 23:42:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9BAFA309B09D
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 22:30:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EFBD63006829
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 22:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3176A364054;
-	Thu,  5 Mar 2026 22:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E77FC3644B7;
+	Thu,  5 Mar 2026 22:42:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fWHZzlQ8"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eiM6oAwr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB5123C516
-	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 22:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772749846; cv=pass; b=Sx20e3+q8/J7ocPl+ptWRYwFV5GeXWwF5aew+ABWCAb126j8BkH4mz72nEhb+VtgzkrRcpIXk9n58nVUq0wJ2Wn9GB0LHjBcjZh8z/QyTXGtRUrgHcFY89r21TvWn8LSOzGAG7xDfhRSCiBZ0D2BXMVUwE44QHmtikcGng0qAFI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772749846; c=relaxed/simple;
-	bh=hGZ9iSCiQXqfmITrvyrOee2hXh3veHJd7rWOfEPMp7o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iZCHKCs7WTHM1WVSmvcM9B31WG5z7ZsvEQ61i4WvhdTOq9XcTqsKThpaeXLDB8DB5Bwlsu5JesB1aQWsOi6ldLSzUbrdVoyhglFUwaZyTgVyGEFgy+5IsnGsFIEkB/CZlPXKsuare7LIvKc5T7Z/l6s/Y6cSaYXniLfrpQVKJ8c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fWHZzlQ8; arc=pass smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6614615fde6so1776a12.1
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 14:30:44 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772749843; cv=none;
-        d=google.com; s=arc-20240605;
-        b=A5HD/NfaYG9Ce/cyboEZ4WGYR5JXsLATFjjM7wpmiH9dq5PdNpBkVPAcea7g306MX0
-         BPqH1IC3/mkw0NTa9OGgc5MxeDc9MR8O06sayjSiG3h0WC8Cz47HfrbzdAcP3qdfAlH5
-         iGLBICJk8tiDx1r6bOmzpQYZNcj2r5iPdc0qcgDtcV3ILfbhl91D2NNBt+nYIH1xx3m2
-         XH1OHHu5TtfCbprp0NSF+UUBi9eSwgs7X7l87qXK1Ju3Tb7rS1S+s54daDwKIzDn6fEl
-         MJJ9ltjNvCf2+HRxM2asInkE8BDxbm6R4bIZaDqVOEFaxIn8d15vxuXJOkx6DnfouBkT
-         PUsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=REKwqu+YZznLvXOpxEfD8znxXd8x89wuTrIuRHIuZVU=;
-        fh=1eNPo8kb8gJE2/P9agVi33dMHxsZYYYofXUvJ0ukwU8=;
-        b=iTR75bDwevforgCY4oiTbijdZeDkgRVO57mCLD90uEMsb5jNjBTn+s7771pb/gUuMm
-         IxK0bOtcGYp/wiclnsSi8uqDw0imxqSxeGKhLBFYVfV9hOindTMZIUqLC0DAITEvRLsL
-         hsF/7d3TbNAuBmQp5xc4mesbyIN9631GHwMyvcUyrpVMXqWB0SkcXzH7fCWe2CrcIFwd
-         qjdim5r8Wd6CKpsquXwk50cv/wxRHKEBGZ7bbGcqTC3ZLPAXHacAEqTaHg7wypcHLdFn
-         TmUiz85Vjuyt6xW2xj4obZLqdJhFrxzxFovJCopdfxzOz4ZKDMEBvvHz8LWSkyDbj9NJ
-         83fA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772749843; x=1773354643; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=REKwqu+YZznLvXOpxEfD8znxXd8x89wuTrIuRHIuZVU=;
-        b=fWHZzlQ8Gik7slOLeecqfPBEmg9e8UYYPAWOmI5C/jOU7qAPAx5GGjS1dgoNhqBObA
-         IdSbCr9eXkIk3uQD02wfHbr9L8xVN14CLmE0GqtwjUm6QbW462AoHX3uh1PBRKFduPgI
-         dQjoIVFuwQBMmdedqQf5whoK+YGf4Q1Gaq6xSLfpurDy9GJUKmzckAeTtJOWXHlbdN5D
-         ztCIyUG7bPGmkzzLwHTIOW29yCl9pmcOzFpcAXkl1b1CXfSW6qpRynDYs5TBqkXmt9fK
-         4g6IfqZFQBfLqXvOtRg0Tid1fi0uRVeu70yfYFL0OUW5NPaTZNOq1Q9rfXowwqy1ejOv
-         MrXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772749843; x=1773354643;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=REKwqu+YZznLvXOpxEfD8znxXd8x89wuTrIuRHIuZVU=;
-        b=GgqrzWTIBgpqQ9cn06IgbZJ18bDSrK2a3C4hqfzFI5X1Bwb35zggkPNpPn8uO2CuQy
-         F3JNb1AXFXl9i1rbAZgwOtCsURUbjtpiBTGAHFRtROHlSpikzKKAZMbSgfJ916YTs44C
-         zoxpxBNlBqzwLsvlF/4k6qo12gLzfNxwZhZ+R4FZFtlENiqNjuQ8MwEn3JT/YxW7Tgfc
-         6dO1fByX+e5sw8Wo2sw6ggJv0+lpZ9EKCVE4Dmlo8yZuqddFN8RyFokj2JMsg0qwzYqk
-         +XcH5B/YmpeblLUc54Aj5OMz7VY7Lk1EHVhYUqzpgUHmuI+2KrWGywDYbiie91bQRfAv
-         5kXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUmAiYouI2NW9yA8grm8IqXh19G7AQklHAJS/ZHrlB2PnaF55jekMQseHj0V50GS5i0XDM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxJ4waxflbSjrvdHM5oF6/XW8A9kapsdo+HjuVf3WAK60gfrzo
-	mdvBGDvEmRb6wOPLnb83a2xPjjrhRtdeBrxTjduqfq16LIper3US26WMhIB3R+XFIsg8JYwejVD
-	4EireJ0QBSavX0KpXuvn6oN5Q3WQpdNrTfLO2qJ6X
-X-Gm-Gg: ATEYQzxhjrL0wcEFTaQ0cbCGr1dxDzp6O1gp/PbyuyPUIz94jtb+pHNl7H8uv3pi/Xk
-	0yGo4U9lQxRFhaxgufhsKoT7vBPFyqWVHYdfLMV2SNHrrQx1olRcC7oP69sScZzVNkRxSQxgWry
-	JmN1olKfoeSv+GbjGNHRpgSX5ra5ZD3cGAhKB0Wbiln7oZGADH7F595DnyzhLHuyCwEagmSngpa
-	iEd20RbQCvNgkysCxaaUOiVtFsBOy40VBvtYKCbxc98L76GKRe/UnnmQmS9hdpsMXYVqkU21SRL
-	LQ2pu/sXRDg1GKL9QA==
-X-Received: by 2002:aa7:c686:0:b0:660:f90b:a19b with SMTP id
- 4fb4d7f45d1cf-6618db518c7mr13996a12.8.1772749843068; Thu, 05 Mar 2026
- 14:30:43 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A8E3630B4
+	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 22:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772750536; cv=none; b=qgYogmaQUtGh1nsdEVn6dpm8qX1d1pshNBn4tkNymCw1yTE5rElCJoRHsfyJS42Rt86e4DJRi7Wl4cj7tXuSfHJxmFB+NzWaaJy5SLZXhXTtHxmnFLiBCY0G3GDP1w7QsTcBe+qGvS70eCfTOkoKULbbjPtjgpWiJgC+CpCuAvE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772750536; c=relaxed/simple;
+	bh=npSNg3v2yycDEMTtySW0fuZDjyOddQv2uEbrj74QBAc=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=i60ERArAXI84VOxvsybpWWe5sTs//5kVEyjz0t9r4ltyCM10dO+afy/Ak7ajpWnPeB4sfpBlgsWUYvortnj0lcQDEFQSq7e8nX1KX7HTkZeJOt+nOW05joAkf/E7kwifEawyYT+kT39MMOxBm6CKwnHFdr7wYdpEsSbxMJWojXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=eiM6oAwr; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=wU669UK/MaDf6Sopmk8cKY+ZtgZpKM9JjNI4MmZZGrM=; b=eiM6oAwrAY23nBseTj6IE02Wyq
+	bPE/5VtOh79IO5RAzZlcoYIvBH9GKCTCNeWFg+X3G2dBrk2JQ8nHzVs5bW5v6fgOzbGmo4gUjESea
+	1m1EzOW//sY7fIRq4BXOlyhF5cBTA7HyIlfqSOnPp9OJhh8fPRRHkZicTQdBzAaz0eHCMW/H6W/Wg
+	MukZteL5f9fwHT1H5uN0z9fl9BZdjH+YBvpFsTjr8h+3C4DQo/nXOQpStvK4o3x2MSd7XssePaBlL
+	pwKqsFkOf106/oAxzUGHZUN6WJgxmcldxrzdhGQhypl0DYF7WwLd/BpYeD2HklImfTxozuNspYM++
+	zm2UJJcg==;
+Received: from business-178-013-028-021.static.arcor-ip.net ([178.13.28.21] helo=ehlo.thunderbird.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vyHOL-00000007j8y-2Gew;
+	Thu, 05 Mar 2026 22:42:05 +0000
+Date: Thu, 05 Mar 2026 23:42:01 +0100
+From: David Woodhouse <dwmw2@infradead.org>
+To: Sean Christopherson <seanjc@google.com>, Jim Mattson <jmattson@google.com>
+CC: Thijs Raymakers <thijs@raymakers.nl>, kvm@vger.kernel.org,
+ Anel Orazgaliyeva <anelkz@amazon.de>, stable <stable@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v3=5D_KVM=3A_x86=3A_use_array=5Findex?=
+ =?US-ASCII?Q?=5Fnospec_with_indices_that_come_from_guest?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <aaoDtzpY-2y-c-66@google.com>
+References: <20250804064405.4802-1-thijs@raymakers.nl> <ac94394405bf7e878c8ff0acf87db922dc4af48c.camel@infradead.org> <CALMp9eTSb3YrLRxnSbYQmAsK1SKA3Job6z2VjUWcKpPOGbWvRw@mail.gmail.com> <aaoDtzpY-2y-c-66@google.com>
+Message-ID: <FFDA9F60-F0AD-4A92-8203-40DE82A921A7@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260303003421.2185681-1-yosry@kernel.org> <20260303003421.2185681-27-yosry@kernel.org>
-In-Reply-To: <20260303003421.2185681-27-yosry@kernel.org>
-From: Jim Mattson <jmattson@google.com>
-Date: Thu, 5 Mar 2026 14:30:30 -0800
-X-Gm-Features: AaiRm538b03chwllMwxglI-m0-GkljGOUWEF9yv_DduXXgi6KTvJOzlgz2JRUUY
-Message-ID: <CALMp9eSMtzDJn7tGtbj=zLYpcU7Tc7XjcWBRZH7Aa5YihSmN7g@mail.gmail.com>
-Subject: Re: [PATCH v7 26/26] KVM: selftest: Add a selftest for VMRUN/#VMEXIT
- with unmappable vmcb12
-To: Yosry Ahmed <yosry@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: C9F80218EE2
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-Rspamd-Queue-Id: 344E4218FDA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+X-Spamd-Result: default: False [-0.96 / 15.00];
+	SUBJ_EXCESS_QP(1.20)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DKIM_TRACE(0.00)[infradead.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-72962-lists,kvm=lfdr.de];
-	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-72963-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+]
+	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On Mon, Mar 2, 2026 at 4:43=E2=80=AFPM Yosry Ahmed <yosry@kernel.org> wrote=
-:
+On 5 March 2026 23:29:11 CET, Sean Christopherson <seanjc@google=2Ecom> wro=
+te:
+>On Thu, Mar 05, 2026, Jim Mattson wrote:
+>> On Thu, Mar 5, 2026 at 12:31=E2=80=AFPM David Woodhouse <dwmw2@infradea=
+d=2Eorg> wrote:
+>> >
+>> > On Mon, 2025-08-04 at 08:44 +0200, Thijs Raymakers wrote:
+>> > > min and dest_id are guest-controlled indices=2E Using array_index_n=
+ospec()
+>> > > after the bounds checks clamps these values to mitigate speculative=
+ execution
+>> > > side-channels=2E
+>> > >
+>> >
+>> > (commit c87bd4dd43a6)
+>> >
+>> > Is this sufficient in the __pv_send_ipi() case?
+>> >
+>> > > --- a/arch/x86/kvm/lapic=2Ec
+>> > > +++ b/arch/x86/kvm/lapic=2Ec
+>> > > @@ -852,6 +852,8 @@ static int __pv_send_ipi(unsigned long *ipi_bit=
+map, struct kvm_apic_map *map,
+>> > >       if (min > map->max_apic_id)
+>> > >               return 0;
+>> > >
+>> > > +     min =3D array_index_nospec(min, map->max_apic_id + 1);
+>> > > +
+>> > >       for_each_set_bit(i, ipi_bitmap,
+>> > >               min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))=
+) {
+>> > >               if (map->phys_map[min + i]) {
+>> >                         vcpu =3D map->phys_map[min + i]->vcpu;
+>> >                         count +=3D kvm_apic_set_irq(vcpu, irq, NULL);
+>> >                 }
+>> >         }
+>> >
+>> > Do we need to protect [min + i] in the loop, rather than just [min]?
+>> >
+>> > The end condition for the for_each_set_bit() loop does mean that it
+>> > won't actually execute past max_apic_id but is that sufficient to
+>> > protect against *speculative* execution?
+>> >
+>> > I have a variant of this which uses array_index_nospec(min+i, =2E=2E=
+=2E)
+>> > *inside* the loop=2E
+>>=20
+>> Heh=2E Me too!
 >
-> Add a test that verifies that KVM correctly injects a #GP for nested
-> VMRUN and a shutdown for nested #VMEXIT, if the GPA of vmcb12 cannot be
-> mapped.
->
-> Signed-off-by: Yosry Ahmed <yosry@kernel.org>
-> ...
-> +       /*
-> +        * Find the max legal GPA that is not backed by a memslot (i.e. c=
-annot
-> +        * be mapped by KVM).
-> +        */
-> +       maxphyaddr =3D kvm_cpuid_property(vcpu->cpuid, X86_PROPERTY_MAX_P=
-HY_ADDR);
-> +       max_legal_gpa =3D BIT_ULL(maxphyaddr) - PAGE_SIZE;
-> +       vcpu_alloc_svm(vm, &nested_gva);
-> +       vcpu_args_set(vcpu, 2, nested_gva, max_legal_gpa);
-> +
-> +       /* VMRUN with max_legal_gpa, KVM injects a #GP */
-> +       vcpu_run(vcpu);
-> +       TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-> +       TEST_ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_SYNC);
-> +       TEST_ASSERT_EQ(uc.args[1], SYNC_GP);
+>LOL, OMG, get off your high horses you two and someone send a damn patch!=
+ =20
 
-Why would this raise #GP? That isn't architected behavior.
+Heh, happy to, but it was actually a genuine question=2E Our pre-embargo p=
+atches did it in the loop but the most likely explanation seemed to be that=
+ upstream changed it as a valid optimization (because somehow the loop wasn=
+'t vulnerable?), and that we *can* drop the old patches in favour of the up=
+stream one=2E
+
+If no such reason exists for why the patch got changed, I'm happy to post =
+the delta=2E
 
