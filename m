@@ -1,115 +1,109 @@
-Return-Path: <kvm+bounces-72849-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72850-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aJVgBli6qWlEDAEAu9opvQ
-	(envelope-from <kvm+bounces-72849-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:16:08 +0100
+	id CH/dDoC5qWlEDAEAu9opvQ
+	(envelope-from <kvm+bounces-72850-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:12:32 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72038215FF3
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:16:07 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 574D5215EDE
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:12:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A9B7A3175AF3
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:10:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EDE49302B741
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:11:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B36D3E1222;
-	Thu,  5 Mar 2026 17:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262503E5562;
+	Thu,  5 Mar 2026 17:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="auVOJC8b"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TKTS0hDw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF093E3D9E
-	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 17:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C99F3CE4A0
+	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 17:10:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772730620; cv=none; b=nXxD/AkCQtNNVBgGaQliHTYPkzWEC5hbbtd0iX1E57gFknJfDGsymZ3gEeNrf05O9O6kLovgr0Frj2SiizjzIZ0q4qxzs4r/2HPK2D13bHNXfTPqnm/979GUg9fFbHhMywcRvctc3VVdMDHBCoYSjdZgVoYzc9LA3FSJpNA0z3k=
+	t=1772730627; cv=none; b=T/doZjRyQi4yK37fqh9Jz5rxlc7ang1kriZ7SBw2RxuGIRBd72+iHCaRiBkIDrYMHt8qP2wuqWWR0pG4Tm8aXuaiembwcfGOfDSoEur5c1njAwITaDXJAx+ozyZL98esLr+LsaShYLdQjH0qya2wkMTTRO5+2PNoDmm7IM9VKgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772730620; c=relaxed/simple;
-	bh=1dRtbSL0z2ytbckj6wSLUUOGGrIOP3G0d+3V5VkDtc8=;
+	s=arc-20240116; t=1772730627; c=relaxed/simple;
+	bh=X0md63byT501RHUj1lioKqQW9yTEX1AyB+HzFd8OGOU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PotqONTd89nR+ChEIXGhZjl1IHzB9OTos8tHNSjumDX/a35P0sBzPhW93gGyR/DLJoIZHKrjZtngc+dbQbmM0EVOzZT6/6Cxmo8FJHcuZzFz4h40joIb/juCU3GvGMtpG2/PxYpSFN1Zjt+usX7YsVASvzeD+0eEAq9/zxtURFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=auVOJC8b; arc=none smtp.client-ip=209.85.214.202
+	 To:Content-Type; b=Gc02cwS3QmH91ulzSh85VfoGVf6G5kMWF2QA6iw31lAcmH73aRS973vO94FUIC8NTFb9yEA2iySSJpaggTb2+dweD77GEWy5PGxIdcSo+ggqAYjp2fBoLgpoagmbwv6nuG6TukSfyBEOsyU0A4gMCWPgBO3QlSiFXQVwpSJQicU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TKTS0hDw; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae3badc00dso60552705ad.3
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 09:10:19 -0800 (PST)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-358df8fbd1cso7658460a91.0
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 09:10:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772730619; x=1773335419; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5eRREj8B726P8wv+ghDGF6Dj3pEBAyYOHAidGVCV8Tg=;
-        b=auVOJC8bHck87F4HM5e5x+TetsKim1cdkekP0YETd7F27R0c6M083u01Ai2XRYT4+d
-         9ZoWZpQpjElS959Suf0p0jI0D4nr+Jjxw1uSKFJJLd5v0Qe9DP6bWdaTm8fwaU/fZDgz
-         Bl5sdMyeIl7UEdMU2EEAbohnNHQz0ifeIqT3oPQ3keHGLpN1qJMH4jazTB9jqMtHofhY
-         G+8aYz0RIVftVvyot68kFaNeMMKtop2AHsnir5+W31i9F8DwZdCqun6IKie1H+fYLKyU
-         hWiiuSdAxjP/FcRSxlafvtMrhsKLWw9R00ThpQBBmVg3CmZ3m9ldDNyItLeydbX/AXBs
-         y6lA==
+        d=google.com; s=20230601; t=1772730625; x=1773335425; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dUsMeyLQ2UY3LWiFVo8pb6h/K8U2JaXxnAh0XjBCYdw=;
+        b=TKTS0hDw/5T/F130KNA8CqEeHuzjTVffPOXNDpY+cGa0RpUjF9TqG4nmZPqG9MsM44
+         JNYtt3JGiIZuP4Su+pXgYsX4BAwYSwB3Vs1QasPT2u3N1xp2KkaAqlS5FHUI6oiVC9Oz
+         BMGT+DPfywRL/J/brn51iIZs9tYATSa7VRLYK4eHlnlYrEzkF/2poLKu6PEXNrpACDyN
+         AVAgV6hc9qFPkl2wvZ3kZG/0P8sk56g8+j6w6+jyLzEzQ9hctJ/fcw3ADlo+uE9ZV1n6
+         X3D+5/TTUlvsju2xpa2KSR+adZnBsHhAKZOZonCkTKDzAhZPeQBzJnltwVGC+X9r3fj0
+         Dn1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772730619; x=1773335419;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5eRREj8B726P8wv+ghDGF6Dj3pEBAyYOHAidGVCV8Tg=;
-        b=Emv+C6To34rlZsYkDd6P4EDpP1lrRWBbh/vs08qvKy6BMjfhl6vqI3ggN1v/zgAAPP
-         8aR5H+B0RKQ0bpLygqrJAkDcAqPh7w0FV7EpdkuXDhJm2csx2zLO7+23DbCOLwtw7v9Y
-         vmKllNZ/XEW1jS/n6PLwr2zVR8ZT3Ev+hApqMn5oh4QF6jG3pOKRLYYMU7X9K+v3RSI7
-         SuNHpF46C2ooGoD5+pjAow8407ih90lnqKNqDktAu57iAfl1GFmnpbu4GQsJHaN6yByr
-         TKufUux9jza8AVUBjbjHojI8DSmBRQZzWTtACnY2oSBJ4bojsOwzV9DbHMsPIgz7a30o
-         LyTA==
-X-Forwarded-Encrypted: i=1; AJvYcCU18B2LJfZWRg6t78SKdcqwXsioqIMZ8UB3JbHQbeWSAou/yMSxHzTxC5n238H/P47q7Pk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx06i4MVYSjWlBatxSeYX6Qoz9kwKzmamrNSe1DoHKYRFZJvcAS
-	3jvLHXLoMwxYpTiIj6zwzKpiP5+XlMfwfZIMyrYCyQRK0YhkmIUQjpJs4QBTQYoCLioan19j/2D
-	QWRV4yg==
-X-Received: from pllg11.prod.google.com ([2002:a17:902:740b:b0:2ae:3fb2:f203])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e947:b0:2aa:e3c2:f920
- with SMTP id d9443c01a7336-2ae6ab0f5a7mr70937115ad.36.1772730618593; Thu, 05
- Mar 2026 09:10:18 -0800 (PST)
-Date: Thu,  5 Mar 2026 09:07:47 -0800
-In-Reply-To: <20260212140556.3883030-2-clopez@suse.de>
+        d=1e100.net; s=20230601; t=1772730625; x=1773335425;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dUsMeyLQ2UY3LWiFVo8pb6h/K8U2JaXxnAh0XjBCYdw=;
+        b=I+VY/1nwfvJ9PZK8HNxm6skzGHW6FUcqbOe931U55ge0ldNbcMqziE/dCzxN1CIeBX
+         hFRmZZlBLQAYHJb9DQXfZ8VBJeDCuNDL4XEY32YLblHQfGyZgvi0lx6patWyLsck68rN
+         QJmpqGppWglSkssFzT2LIuL3OS5oVccihDZV2ZiUZdTd5X/OqWTIo0qIusaJt3x3gZw+
+         8kDkHacYUCbyZUPiZ8qKptoeTxS0RzdEqK0WHCh8UqVoRS5qpLU1mDXQ8SEy2YTBbqbf
+         W82PCS7e0U7pgmte0pGxEJlykoMrhW3M/UVBS9KQyQAXoZQMwQzxszudGaq5Uc7iS6Xi
+         yuHg==
+X-Forwarded-Encrypted: i=1; AJvYcCUWN7FIIVmd5pWu9DusVo+ZS7X/d0xmsqjU0ONsEW4pyB6MM82hRjhWng4lnEGRIOXjr14=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtLQuSjY09nf0YFDUzdwpVzFQqg8ixSfO2IAbhI0Igf8RsLXRq
+	Bl8hrn/iPUmBowYJNCgCyyCHkVBzrb2KP470Se2lE/eToHoG6hOG+xBL/SRS0HI3ZsLhrGrwtNt
+	qFNsNyA==
+X-Received: from plan1.prod.google.com ([2002:a17:903:4041:b0:2ae:41f3:1614])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:fa5:b0:2ae:5848:bada
+ with SMTP id d9443c01a7336-2ae8012e5dfmr3270845ad.10.1772730625238; Thu, 05
+ Mar 2026 09:10:25 -0800 (PST)
+Date: Thu,  5 Mar 2026 09:07:49 -0800
+In-Reply-To: <20260210234613.1383279-1-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20260212140556.3883030-2-clopez@suse.de>
+References: <20260210234613.1383279-1-jmattson@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <177272956967.1565536.690492075978150495.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: x86/pmu: annotate struct kvm_x86_pmu_event_filter
- with __counted_by()
+Message-ID: <177272951368.1564818.13503975701518727580.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: x86: Ignore cpuid faulting in SMM
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, pbonzini@redhat.com, 
-	"=?UTF-8?q?Carlos=20L=C3=B3pez?=" <clopez@suse.de>
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Kees Cook <kees@kernel.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jamie Liu <jamieliu@google.com>, Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 72038215FF3
+X-Rspamd-Queue-Id: 574D5215EDE
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72849-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72850-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -118,24 +112,23 @@ X-Spamd-Result: default: False [-1.66 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Thu, 12 Feb 2026 15:05:56 +0100, Carlos L=C3=B3pez wrote:
-> struct kvm_x86_pmu_event_filter has a flexible array member, so annotate
-> it with the field that describes the amount of entries in such array.
-> Opportunistically replace the open-coded array size calculation with
-> flex_array_size() when copying the array portion of the struct from
-> userspace.
->=20
->=20
+On Tue, 10 Feb 2026 15:45:42 -0800, Jim Mattson wrote:
+> The Intel Virtualization Technology FlexMigration Application Note says,
+> "When CPUID faulting is enabled, all executions of the CPUID instruction
+> outside system-management mode (SMM) cause a general-protection exception
+> (#GP(0)) if the current privilege level (CPL) is greater than 0."
+> 
+> Always allow the execution of CPUID in SMM.
+> 
 > [...]
 
 Applied to kvm-x86 misc, thanks!
 
-[1/1] KVM: x86/pmu: annotate struct kvm_x86_pmu_event_filter with __counted=
-_by()
-      https://github.com/kvm-x86/linux/commit/c522ac04ba9d
+[1/1] KVM: x86: Ignore cpuid faulting in SMM
+      https://github.com/kvm-x86/linux/commit/690dc03859e7
 
 --
 https://github.com/kvm-x86/linux/tree/next
