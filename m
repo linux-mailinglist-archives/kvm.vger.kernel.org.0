@@ -1,139 +1,152 @@
-Return-Path: <kvm+bounces-72780-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72786-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2i+DAO0CqWlW0QAAu9opvQ
-	(envelope-from <kvm+bounces-72780-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 05:13:33 +0100
+	id yNrELtQHqWlW0QAAu9opvQ
+	(envelope-from <kvm+bounces-72786-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 05:34:28 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47A9320AB3E
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 05:13:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40DD420AD68
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 05:34:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 13D86305B29A
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 04:13:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8987B30479D3
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 04:34:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09A08277818;
-	Thu,  5 Mar 2026 04:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CC83283C9D;
+	Thu,  5 Mar 2026 04:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mJva8Rof"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gSG84/4W"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47BE229CE9
-	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 04:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2C97262B;
+	Thu,  5 Mar 2026 04:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772684003; cv=none; b=lbdoQYIa92K+lgq2Dm/qLF/3HV/vpmzedl1sMK0Xs+w74HtJg85tv7qv/ZGQzNJhvjmu8p6eTF5apTcBIQqek7yMWgVq/W0sRe2h3GWDGll6Cy+mhur/UJWMQsVcutOkH0GSkNnLn+zyN5NWa5iXmiCpR1CcLAU7Oi6oQ8z3824=
+	t=1772685245; cv=none; b=o62f/QNpd+0px9BAVL3gdREx/C1fOLPO2pENKcCoG6xbFNRxcG03CPJjdodbmNYX+U7aRMicbMLodbGlrJwEdGA5EAo9RMc6FeNqoROlOpynyXfj6QXJTb2avtWaDEelQdR2dZbzhjVRMGeB7GqZmQKTZ4aJRZVBBe6an0TAXWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772684003; c=relaxed/simple;
-	bh=AkqKdpJFlu9VvgneMwXHF/K6ZvvF1MnE/U9EvQP4AUo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=a6Qv60szjcdECBqVNLk3qaX8E9vrT4xSuM9Ob+PXtg76YFbZIN1rVs8TGudy23zIfTA472rhEqJwISzqdlPTokfqWfAUaBYreUfMhOBwPSORNACzb6o2jRd1csZZmmX57BxA+tPG9fouPyWed4sHQ632tzHT41TX7AiWOeBUmeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mJva8Rof; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2ae3f446ccfso44965215ad.2
-        for <kvm@vger.kernel.org>; Wed, 04 Mar 2026 20:13:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772684001; x=1773288801; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=r7aMNOVuHCTQUpbeRrQMBlsIPyGfseKCHq+MThP/6yU=;
-        b=mJva8RofXgB2Io4nudkUhkyilCB+Xc8jzJh2AMPR0IR17c9F4taHVTUojTFEfx1ieQ
-         PJZvOnWLlLgmr/HAQWooj37SWmaKwgc3WfhJxCzftqj6i1WNVg52wZnnMPTAvgqP94da
-         uBv29/aXSRQR690IeennNahyZzMRAJbUx0uNsxQCeYfcrfJIQat1cWQp/TIvcNnnMKnI
-         /fqtKYZaoqiQU/yPK4W4nJwP+qg4rc23GQYhe6OdPMev6cX+jqZHCclXjNurZE7NAS1N
-         eArpsTNRnlgfaMUBBYMeLv1KgyjszY9iSfAU1XVDqsePuZ+eol5izaFtuKozD8dark2o
-         6DWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772684001; x=1773288801;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r7aMNOVuHCTQUpbeRrQMBlsIPyGfseKCHq+MThP/6yU=;
-        b=HvKVmXIShIUEqYG9ZKs2KM8W4tuP5b7a6ZDNXxO2CUNNQHbM2qpa1c3MMtYmG7dEse
-         M0cGY9sYby3rn+ld3eGY1youpjXirKzioZBw+VfmO59xBUhU+kUMPqNUTgP3vIyYqU25
-         iPQQmHEYkyXDxsbmn3ZDNp2U5tlenkl06UeVN8Lrw9MJakKbq8RavRXuDAZaqWT67plz
-         0PlrrnCfP+/L2e4UqjkeaNm/iBpDk1Tuh95m0uTsoPfURUHNlTVEPX6bGJiUTRdCYP8B
-         dpPc7KvWoPf0wzzoguKy7rq7vm/kEprsTeFF1Z6cvEsn0ddLq42DjE3OmtllIooNNUwM
-         s6fw==
-X-Forwarded-Encrypted: i=1; AJvYcCU3nG24beWdHv2dzIlqALScfhWSo/trWvG2eOg3S6rCJYKtMNmvw8v2Wmjr8Lox0unUvPo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6YtxW0L5/CRg5RZWZfqwo4IGMqTqKFR6jJ/pyKLrRxJg37+0X
-	3hF9B9DSwDLEmkox8AcvClI2VYn6GVvJ4ThpGe3MnF1BTml46p+FtsypI5xKdDOYd8LF11PuErJ
-	WvmAZMw==
-X-Received: from plxl5.prod.google.com ([2002:a17:902:db45:b0:2ae:5132:8641])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f70c:b0:2ae:5848:bade
- with SMTP id d9443c01a7336-2ae6a9cdad7mr35198935ad.12.1772684001321; Wed, 04
- Mar 2026 20:13:21 -0800 (PST)
-Date: Wed, 4 Mar 2026 20:13:14 -0800
-In-Reply-To: <20260112235408.168200-7-chang.seok.bae@intel.com>
+	s=arc-20240116; t=1772685245; c=relaxed/simple;
+	bh=eEz5/0jovylPA//uVZYAy/Ene0IoTQrrdKDJa+cuFGA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BeMGEAbL26JUIEs/L1NeWMpC9NZ2QvsCpWtjvJReF4ASaHDm+qWNn/rd261hlyXIO2kSsKUV1I0xulHw3sBiV58DSWTR7alUvvCEpumOsQSSfVxiUzc9/BwlOwEp0LSSWcWt0Sc7Lg2pO7IzTmKcV3GTs8CvwqzDjKy81H+e0Pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gSG84/4W; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772685244; x=1804221244;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=eEz5/0jovylPA//uVZYAy/Ene0IoTQrrdKDJa+cuFGA=;
+  b=gSG84/4WAKeC82nhNuv7aWkdQZBCmyZgqWKFzvURgoijMe8BWtEZENp1
+   VL83qX1tXe3ztig9SoVYulkkA5ViweguxnybR6DiSDhCDA08jyCypXvU7
+   oI9+S7NF10wskOsUa8NtueYKcJJT9KZ195H/fWJY0N1MUzUOLUDk674+A
+   Zq1/fufTmy3+QS3naUm16udqzStlImUou5lF28R7eLmCesSNNskjWwme3
+   FNHE3EhJODMXhJ08Kjxew6j87V7lzB9oN8YCa3twFUfRWZdrRsjTOKLQ3
+   fOjSeWb4BVAVdyj4cNTq3Q4miROIa3ARoHzAOoR2rk9qcDKvT+ove9sVH
+   A==;
+X-CSE-ConnectionGUID: Tnr0nck6S+ujNBH0iWGH2w==
+X-CSE-MsgGUID: SsQZGD8YTmSvIzpE98kVqQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="84096462"
+X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
+   d="scan'208";a="84096462"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 20:34:04 -0800
+X-CSE-ConnectionGUID: ybLtseiyTMK1KYU6Ywsymg==
+X-CSE-MsgGUID: afjerOnpSzatybJ4UCZw4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
+   d="scan'208";a="218550152"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa008.jf.intel.com with ESMTP; 04 Mar 2026 20:33:57 -0800
+Date: Thu, 5 Mar 2026 12:14:04 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, x86@kernel.org, reinette.chatre@intel.com,
+	ira.weiny@intel.com, kai.huang@intel.com, dan.j.williams@intel.com,
+	sagis@google.com, vannapurve@google.com, paulmck@kernel.org,
+	nik.borisov@suse.com, zhenzhong.duan@intel.com, seanjc@google.com,
+	rick.p.edgecombe@intel.com, kas@kernel.org,
+	dave.hansen@linux.intel.com, vishal.l.verma@intel.com,
+	binbin.wu@linux.intel.com, tony.lindgren@linux.intel.com,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH v4 13/24] x86/virt/seamldr: Shut down the current TDX
+ module
+Message-ID: <aakDDKqpmXdKCrYm@yilunxu-OptiPlex-7050>
+References: <20260212143606.534586-1-chao.gao@intel.com>
+ <20260212143606.534586-14-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260112235408.168200-1-chang.seok.bae@intel.com> <20260112235408.168200-7-chang.seok.bae@intel.com>
-Message-ID: <aakC2g-8f76OqUjp@google.com>
-Subject: Re: [PATCH v2 06/16] KVM: VMX: Refactor GPR index retrieval from exit qualification
-From: Sean Christopherson <seanjc@google.com>
-To: "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	chao.gao@intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Rspamd-Queue-Id: 47A9320AB3E
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260212143606.534586-14-chao.gao@intel.com>
+X-Rspamd-Queue-Id: 40DD420AD68
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72780-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72786-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[25];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[yilun.xu@linux.intel.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Mon, Jan 12, 2026, Chang S. Bae wrote:
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 2bb3ac8c5b8b..8d3e0aff2e13 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -411,6 +411,11 @@ static __always_inline unsigned long vmx_get_exit_qual(struct kvm_vcpu *vcpu)
->  	return vt->exit_qualification;
->  }
->  
-> +static inline int vmx_get_exit_qual_gpr(struct kvm_vcpu *vcpu)
-
-s/gpr/reg
-
-> +{
-> +	return (vmx_get_exit_qual(vcpu) >> 8) & 0xf;
-> +}
-> +
->  static __always_inline u32 vmx_get_intr_info(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_vt *vt = to_vt(vcpu);
-> -- 
-> 2.51.0
+On Thu, Feb 12, 2026 at 06:35:16AM -0800, Chao Gao wrote:
+> The first step of TDX Module updates is shutting down the current TDX
+> Module. This step also packs state information that needs to be
+> preserved across updates as handoff data, which will be consumed by the
+> updated module. The handoff data is stored internally in the SEAM range
+> and is hidden from the kernel.
 > 
+> To ensure a successful update, the new module must be able to consume
+> the handoff data generated by the old module. Since handoff data layout
+> may change between modules, the handoff data is versioned. Each module
+> has a native handoff version and provides backward support for several
+> older versions.
+> 
+> The complete handoff versioning protocol is complex as it supports both
+> module upgrades and downgrades. See details in Intel® Trust Domain
+> Extensions (Intel® TDX) Module Base Architecture Specification, Revision
+> 348549-007, Chapter 4.5.3 "Handoff Versioning".
+> 
+> Ideally, the kernel needs to retrieve the handoff versions supported by
+> the current module and the new module and select a version supported by
+> both. But, since the Linux kernel only supports module upgrades, simply
+> request the current module to generate handoff data using its highest
+> supported version, expecting that the new module will likely support it.
+> 
+> Note that only one CPU needs to call the TDX Module's shutdown API.
+> 
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Reviewed-by: Tony Lindgren <tony.lindgren@linux.intel.com>
+
+Reviewed-by: Xu Yilun <yilun.xu@linux.intel.com>
 
