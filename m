@@ -1,209 +1,194 @@
-Return-Path: <kvm+bounces-72944-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72945-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EyorIU/cqWm4GgEAu9opvQ
-	(envelope-from <kvm+bounces-72944-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 20:41:03 +0100
+	id KHxwGNXcqWm4GgEAu9opvQ
+	(envelope-from <kvm+bounces-72945-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 20:43:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC92D217A81
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 20:41:02 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB6C4217AEA
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 20:43:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3DB3F3078386
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 19:40:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EC4A8302E0C1
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 19:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 721B63D1CDB;
-	Thu,  5 Mar 2026 19:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25EFB3E0C66;
+	Thu,  5 Mar 2026 19:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gzxamwZe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J7y/Lq1I"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56532F5A36;
-	Thu,  5 Mar 2026 19:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772739645; cv=none; b=KWdFuwP2uYafiMTeHbXP5PJk65TPVb8Zqid2FKaLSA4WZIyjxUcWJemSZNSYkPZJABV4VeumOoT5M5acQY8RMw9eRKyEVT5f294G4GNVljO2WycL8VB4OXuAyGVJEE9V9Ljz8qokRGYUwwTRRxRTeV+OPwy1lwYV+OM3fNn4VlI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772739645; c=relaxed/simple;
-	bh=dX7+M7aZQQC360idkIppyO3g5g/oBHH6aOJ0+WaVOyo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uhGIKV7Iqpbqr5sqjDqfOq/Dh6MVoANVo7xOYtQ1AEaLOsCAs/dntxfxGzP+BgciVuU7cRXuj3tisEr1z1BPtgpccsALdfjVbqbQmSRaZCG2vZyufLvFzaZ+eOA0wyT0sfigGhU70zeCF2HJh0sL6TcDzsdt9CAhP5omRKZnShw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gzxamwZe; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772739644; x=1804275644;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=dX7+M7aZQQC360idkIppyO3g5g/oBHH6aOJ0+WaVOyo=;
-  b=gzxamwZeTnpTH/iRu8S9V+3V+O0AcD/eU/BnPY67kBylANB1gBI86fZs
-   dWXF4MeKfQvVwPzOwEP4OSe+e4OCZxZTFamKuCuhiUbxnwgAWHPF+dumk
-   +//QI2AMUvr8F7lJa111BP56jDT8XcrxAoVajm9LG0eKTAVbOg2eP8Beb
-   gagZikdhJ6KwVlAFT8PM1E6XyUzEnZn9kw3K8DGN26YbehGngSuA4sIEj
-   TN5RImJwl685nJSvpdKy2HNOVi9EDt0oAwHONP4rDCyxOyuAWdgEXAlW6
-   y3xd/WycX78nZYWipg8ERBGv7shfaiL8EefkH2priJBJxH2jEY/4yFYrm
-   w==;
-X-CSE-ConnectionGUID: CqwBrgROQYCYyTPWul+ehw==
-X-CSE-MsgGUID: WZVBR6paQ9iSRz+bIevCvw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11720"; a="73713193"
-X-IronPort-AV: E=Sophos;i="6.23,103,1770624000"; 
-   d="scan'208";a="73713193"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 11:40:44 -0800
-X-CSE-ConnectionGUID: xOWA3BYFSdSZvicbVVeSQA==
-X-CSE-MsgGUID: BJniGFQuT3+e0kmbfPpX/g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,103,1770624000"; 
-   d="scan'208";a="215975788"
-Received: from gabaabhi-mobl2.amr.corp.intel.com (HELO [10.125.109.20]) ([10.125.109.20])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 11:40:42 -0800
-Message-ID: <d7ba3790-a959-4150-87e0-c87dea4d09c5@intel.com>
-Date: Thu, 5 Mar 2026 11:40:49 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12EE37AA95
+	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 19:42:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772739768; cv=pass; b=TcFr+XgTL46zdr6owdqVkQFnf9GlbDE0zFC4ontMzloZqdlsOdai+7oknaLWQqiFXPxDFJDUrcsuwU+dSi0FJVyiRk+fIuKgfVDwO71jWY3z0Ypjj9q+F/a71XVewwohGwq5J7kLhwhyWyq0U+IuyvGiJOyWgB2j32n5/vdSKp4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772739768; c=relaxed/simple;
+	bh=BFL2J/Icfk5z6sblaLG86L1o2xcdsDyOfso7V9JzEr4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UKx82dffhCFZ4Ja06fNkdvP8souYa7VG9RTvKfFJovKWYVNLU7F3sMLObTC5xOMh5ZqBRGMVLMfRZFG4dRwASaest//tQrA4p51Nxayy3CMx035EhbCw7P8f29dBOqFlOa+P5O85s+8b/2SsTXNriggA4t/5ioyC168Gek5EOlw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J7y/Lq1I; arc=pass smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5a12fbbd9d2so1231090e87.3
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 11:42:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772739765; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ekWjk9NeUPg0zO4Nb/GQlvpJq1Kqe6fmSjdLP9dacqdbKgoeRdiyu0mvDjzIfJ3dx8
+         pucCHktj3vnJErKZ6JvsUTJGopws5+K9DKceOvlrci0Tm9DGIBp6t5Hna+UH+Mw1WIUd
+         GhQgBgGGbfu4B2/cYR6DmLMMjU6hueeLAY5MmxiOZt4KUwGDEHyepCjlrgIgjGMSfpgj
+         sZyJU2JAob2D7Cg6V+T2eHB8N9uZtDqh/eahaPQryDt8Xmw7maeW4MUXkXRSBt2b+z3N
+         JKj5SIWHdMmvECsS9S9VlYZgt95XmXsSsUpf1CsOWXNPhre0cBhJGOx3szuDebz+UmtL
+         wN5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=BFL2J/Icfk5z6sblaLG86L1o2xcdsDyOfso7V9JzEr4=;
+        fh=qz7YQOjGzdSq4VXaoKF6PpjQFKYLH/JwfmstHwb1GRg=;
+        b=Ogs7Z/E7WW1GiQdazk3hJ4tgONXgRSYBeUNjXfLEmIMzL78OWbK70QyReJuNOLPJUV
+         h5gLPRoNzUAuH6kCHimoHZUQLh2GNYKWYk0tolIwvX0XL3k3SP3Kp+xAH8YeYn7xkDBF
+         QuM5oLznkWqkawze9XVq8JPYEuZ/b1HEu8ixkTFS6UxNAJ6LmUOhtBuHizDH5Z8FiHd6
+         7rPvvm2ipgKMM3JNQ+ya4FLOG7yyrq0C0n6n5+73JONtBcsqmx5u+HiaCBbdsa/jbKPl
+         uz6D3We59ksvN52tBpvEh9nShKuIwVlgaJvbfH5ik2PAesOfE42eTws7vVomIl9YqBHK
+         0UTQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772739765; x=1773344565; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BFL2J/Icfk5z6sblaLG86L1o2xcdsDyOfso7V9JzEr4=;
+        b=J7y/Lq1IxLU+Dz/yjyvb/dPGPWnJbQob8Q2QuxVwDq6DrAe8KOLBbCw/RJH28ZsIVm
+         eLzXtNQcCvkAEH7bpRZF/pHYbvI0NuBd2MgR2c/Tmts2IWoPoUSUjur+tO8lJhe/JPu+
+         wNIM01PysIEn8QP4iLyrMtWwOGswInpVK2slbAeLvCixJcS5Jcfm/YXy9W33WHWUlNiP
+         +p8C9bhO6HnUerwsZkWaI2Fa4KQlt131xsUL2xLViCepC/XpkT2ZzP5F5tcH1trI7ll+
+         91MgpSRqDkP3dwwPHNc+cwgxgozBIsjP9eh+BAsVQOwjVYYakt93rQClSztQIsXMrt+/
+         C4Lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772739765; x=1773344565;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=BFL2J/Icfk5z6sblaLG86L1o2xcdsDyOfso7V9JzEr4=;
+        b=dj6jcrPUAkF91s1UVBTRAkIhBMEfcWzZ+pxyEl5KOoSnfITmlo2zo8c4gJNO7a8eG1
+         veLXjapz4DXsJa9k7ZIcmvFnwKP69zHFXTNF50C23wGVHRmHxKiqCZj4kNYMjoj8kW1q
+         Nd43LnIasXa+uQTbOxLKe6B00FRbb/14zStw+lDTHQ7JM4fHQ/bD+xFLGofkIAt6x1Ab
+         9hcIe2OfXrRMtvG/1szZoH67UYZXR7KUIFN0BepP5uS5GTUPg3ICodoH6TVqskMYECnb
+         El8xB5VjV/FH2NonnCbjDloc34Kf9F5KMEF+oayCGD80seCGg8939vhqgXc99i23L/Cp
+         7r1A==
+X-Forwarded-Encrypted: i=1; AJvYcCXLLoHkTmap39gCZSa4sm8/atgJuHDFJwz2EbsYBi4YEjepUrH6IfIWhkHfajJcPzVKn78=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvQKGOzJXrnf1+xME+erSTt3p+5vg8B5M5fUEhAaj10o/f5Nvx
+	eU4VPpvwzYFTNGL5BcJlSKshce+sqZT2f9BijtUxT5W3dsQKzTjy7bqKj0u2bJfhaBK/yY11T1l
+	HL+yMy7wd6+BY6PK2EdJkYxwsLT5/JScPYf3NHTey
+X-Gm-Gg: ATEYQzxD4LcyjUlX8d0H+AeICNwMExJ7eLqGlF64rX8OWo3WQDAlQCxPeVA1jjkaRdt
+	7neZhyUcmjS9JXSmpHCr2ZP27fRqtwQYjkyO+aVc6BaHwqKzEqY09djmS46N2vm4cNS5AVDxpe5
+	NHxHlGfDD0NUF4DP6xOhM7oFmh/IW5xipztN6neQ6euu4A0N+kijUOoIcVbULVeQ8bwkklzlKlB
+	LZjARJKBh1+/TlIC19q7PrCEDRLtbDyI/UFtKnWXWy39R1q6iRlDP0WGQ+xU1bTwa3u7a+Mxycl
+	Ju/MXvQU
+X-Received: by 2002:a05:651c:1587:b0:38a:6f5:4b54 with SMTP id
+ 38308e7fff4ca-38a3c815300mr2046311fa.4.1772739764639; Thu, 05 Mar 2026
+ 11:42:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/7] x86/sev: add support for RMPOPT instruction
-To: "Kalra, Ashish" <ashish.kalra@amd.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: tglx@kernel.org, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- peterz@infradead.org, thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
- davem@davemloft.net, ardb@kernel.org, pbonzini@redhat.com, aik@amd.com,
- Michael.Roth@amd.com, KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
- Nathan.Fontenot@amd.com, jackyli@google.com, pgonda@google.com,
- rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
- pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com, dyoung@redhat.com,
- nikunj@amd.com, john.allen@amd.com, darwi@linutronix.de,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- kvm@vger.kernel.org, linux-coco@lists.linux.dev
-References: <cover.1772486459.git.ashish.kalra@amd.com>
- <8dc0198f1261f5ae4b16388fc1ffad5ddb3895f9.1772486459.git.ashish.kalra@amd.com>
- <aahH4XARlftClMrQ@google.com>
- <7ab8d3af-b4f5-481c-ab2e-059ddd7e718e@intel.com>
- <0fbb94ad-bfcf-4fbe-bf40-d79051d67ad8@amd.com>
- <6a4f4ecf-ffc0-43a9-98d4-06235b42063e@amd.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <6a4f4ecf-ffc0-43a9-98d4-06235b42063e@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: EC92D217A81
+References: <20260129212510.967611-3-dmatlack@google.com> <20260225224651.GA3711085@bhelgaas>
+ <aZ-TrC8P0tLYhxXO@google.com> <20260227093233.45891424@shazbot.org>
+ <CALzav=dxthSXYo13rOjY710uNbu=6UjzD-OJKm-Xt=wR7oc0mg@mail.gmail.com>
+ <20260227112501.465e2a86@shazbot.org> <20260301192924.GR5933@nvidia.com>
+In-Reply-To: <20260301192924.GR5933@nvidia.com>
+From: David Matlack <dmatlack@google.com>
+Date: Thu, 5 Mar 2026 11:42:16 -0800
+X-Gm-Features: AaiRm52QizUmbxb_ZZJRNIFYAvXcIrsVMR2oGVyxQJsUboHWoi4G3a03BNBWEM8
+Message-ID: <CALzav=deyfyzGXzSGmEbjvLr8Nn9Rpeh9w9JVk0vmb9FcURYPw@mail.gmail.com>
+Subject: Re: [PATCH v2 02/22] PCI: Add API to track PCI devices preserved
+ across Live Update
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Alex Williamson <alex@shazbot.org>, Bjorn Helgaas <helgaas@kernel.org>, 
+	Adithya Jayachandran <ajayachandra@nvidia.com>, Alexander Graf <graf@amazon.com>, Alex Mastro <amastro@fb.com>, 
+	Alistair Popple <apopple@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Ankit Agrawal <ankita@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>, Chris Li <chrisl@kernel.org>, 
+	David Rientjes <rientjes@google.com>, Jacob Pan <jacob.pan@linux.microsoft.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Josh Hilke <jrhilke@google.com>, Kevin Tian <kevin.tian@intel.com>, 
+	kexec@lists.infradead.org, kvm@vger.kernel.org, 
+	Leon Romanovsky <leon@kernel.org>, Leon Romanovsky <leonro@nvidia.com>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-mm@kvack.org, linux-pci@vger.kernel.org, Lukas Wunner <lukas@wunner.de>, 
+	=?UTF-8?Q?Micha=C5=82_Winiarski?= <michal.winiarski@intel.com>, 
+	Mike Rapoport <rppt@kernel.org>, Parav Pandit <parav@nvidia.com>, 
+	Pasha Tatashin <pasha.tatashin@soleen.com>, Pranjal Shrivastava <praan@google.com>, 
+	Pratyush Yadav <pratyush@kernel.org>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Rodrigo Vivi <rodrigo.vivi@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Samiullah Khawaja <skhawaja@google.com>, Shuah Khan <skhan@linuxfoundation.org>, 
+	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
+	Tomita Moeko <tomitamoeko@gmail.com>, Vipin Sharma <vipinsh@google.com>, 
+	Vivek Kasireddy <vivek.kasireddy@intel.com>, William Tu <witu@nvidia.com>, Yi Liu <yi.l.liu@intel.com>, 
+	Zhu Yanjun <yanjun.zhu@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: CB6C4217AEA
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	TAGGED_FROM(0.00)[bounces-72944-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72945-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[shazbot.org,kernel.org,nvidia.com,amazon.com,fb.com,linux-foundation.org,google.com,linux.microsoft.com,lwn.net,intel.com,lists.infradead.org,vger.kernel.org,kvack.org,wunner.de,soleen.com,linuxfoundation.org,linux.intel.com,gmail.com,linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[44];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dmatlack@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,nvidia.com:email]
 X-Rspamd-Action: no action
 
-On 3/5/26 11:22, Kalra, Ashish wrote:
-> But, these are the performance numbers you should be considering : 
-> 
-> RMPOPT during boot: 
-> 
-> [   49.913402] SEV-SNP: RMPOPT largest cycles 1143020
-> [   49.913407] SEV-SNP: RMPOPT smallest cycles 60
-> [   49.913408] SEV-SNP: RMPOPT average cycles 5226
-> 
-> RMPOPT after SNP guest shutdown: 
-> 
-> [  276.435091] SEV-SNP: RMPOPT largest cycles 83680
-> [  276.435096] SEV-SNP: RMPOPT smallest cycles 60
-> [  276.435097] SEV-SNP: RMPOPT average cycles 5658
+On Sun, Mar 1, 2026 at 11:29=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> wr=
+ote:
+>
+> On Fri, Feb 27, 2026 at 11:25:01AM -0700, Alex Williamson wrote:
+>
+> > There's obviously a knee jerk reaction that moving PF drivers into
+> > userspace is a means to circumvent the GPL that was evident at LPC,
+> > even if the real reason is "in-kernel is hard".
+>
+> Given we already have GPL licensed kernel drivers for the PFs it
+> doesn't seem like a reasonable worry to me to fret about some cut down
+> version of a kernel driver running in userspace.
+>
+> Further, let's be honest here, the people most interested in all of
+> this are doing it to support their proprietary VMMs. I'm pushing that
+> we must have at least a reference implementation in qemu before the
+> kernel parts should be merged..
 
-First of all, I'd really appreciate wall clock measurements on these.
-It's just less math and guesswork. Cycles are easy to measure but hard
-to read. Please make these easier to read. Also, the per-RMPOPT numbers
-don't mean much. You have to scale it by the number of CPUs and memory
-(or 2TB) to get to a real, useful number.
+Yes, this is why we built VFIO selftests with the driver framework
+[1]. We wanted to ensure Live Update support could be well tested
+upstream independent of VMM adoption and without requiring complex
+orchestration.
 
-The thing that matters is how long this loop takes:
+Google is also working on upstreaming Live Update support into Cloud
+Hypervisor and the kernel pieces land.
 
-	for (pa = pa_start; pa < pa_end; pa += PUD_SIZE)
-
-and *especially* how long it takes per-cpu and when the system has a
-full 2TB load of memory.
-
-That will tell us how many resources this RMPOPT thing is going to take,
-which is the _real_ thing we need to know.
-
-Also, to some degree, the thing we care about here the *most* is the
-worst case scenario. I think the worst possible case is that there's one
-4k private page in each 1GB of memory, and that it's the last 4k page.
-I'd like to see numbers for something close to *that*, not when there
-are no private pages.
-
-The two things you measured above are interesting, but they're only part
-of the story.
+[1] https://lore.kernel.org/kvm/20250523233018.1702151-1-dmatlack@google.co=
+m/
 
