@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-72912-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72909-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNLsNtrDqWm2EQEAu9opvQ
-	(envelope-from <kvm+bounces-72912-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:56:42 +0100
+	id mEsRFVvCqWnNDQEAu9opvQ
+	(envelope-from <kvm+bounces-72909-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:50:19 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E13C7216A15
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:56:41 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB091216818
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:50:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3907C3042455
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:48:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1472E3033D7D
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 17:47:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0A04301D9;
-	Thu,  5 Mar 2026 17:44:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 671633EB7E1;
+	Thu,  5 Mar 2026 17:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RPbYZlkA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jn4PDc+h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9423EB7E6;
-	Thu,  5 Mar 2026 17:44:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7EC3E5590;
+	Thu,  5 Mar 2026 17:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772732692; cv=none; b=lmgh4NYZZfUTnrR1ISA+XvZKALdrCSVSP6B32Zj8QrYhI/Nff0oMXams5Y7vLPeW8obsxwd9rxx+qHKeiOWcxC1+pcjvy0Y0IgXJ7VgfIiiAmUzwDxbQN5QyoZ1ISRXxKduTYPXO8aUwXvHn4xcuOz8m0zn/46NMA6Qzf4GCpZM=
+	t=1772732689; cv=none; b=bOzRPEAfiE629MDbrcpJv6JJtFtcFOhU+eUKmvtYPaLFPicdHT7K7UVBB/DjdDuQjlB5CM/iibnYMwemkl1jdg9ZWYDeuAME5C5iPezmkApKCVSWk6KLzrmM+BQDscmEGIp8QsIM26b9l5pK3LOotJa26p1wvLLynQE0SRVuzzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772732692; c=relaxed/simple;
-	bh=yBvXSCWCFU+Hikr0EvHDTy04mJGDwR9u1MTzGHv1i38=;
+	s=arc-20240116; t=1772732689; c=relaxed/simple;
+	bh=Cg8yTdzn0rVU0yuzC7yjQWzMKwtPf0ak3PApZmuzZ08=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HOEWkaFSpBIsk4R/XbEjNNIV6PJnWOXvKR4VOpqcrv9hOzcPlQjZiw+Q8R5kXUS3xZMKYDMu0AnpCDKIxb5RK+WOQkvnowAPASJJYIFaARz6ycx+O6q9/ILprpcgbnnXdBpfOqYl18pkDB3XykYHKaErJkS72vXiOJmo0024IAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RPbYZlkA; arc=none smtp.client-ip=198.175.65.12
+	 MIME-Version; b=hnilIWDwumx3Aaki35WVL+zk/hhF8JUvWy2LA7PjaXzJ9FkyZCMdkIKfFZlCempSYQNlmJ/F6ML8ZlcUvsAsgu4b1CFFKgTpkwLnFMj9qH9WgFII5ucTbmF6caBJqDm3ERj221s9Jij81ECjEILW3tqr9Kgs5Q5ew0nD0SmzmeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jn4PDc+h; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772732691; x=1804268691;
+  t=1772732687; x=1804268687;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=yBvXSCWCFU+Hikr0EvHDTy04mJGDwR9u1MTzGHv1i38=;
-  b=RPbYZlkAYYufAmWA33fCI77A4j1SZi5IQLtOYMgXfrbvFn7aED5bSU/3
-   Qlmeodpdkg9thLkqqtRZ7rYYIWnGp0Ei1cXiIDFKgVWde0qmKEeC577nC
-   5csDaZYEuLA1Shtav54uPVYiAmagi/Orfp8MGKwmgYp6QAvwthDyRhLI3
-   IDF7y1iL7ar3G9YdMsfKIUKWsnGHS9eV2rojT/0bjTzC0l+Gkpn99JClV
-   ksc80bfowcQXqK/m/sojJUPXHx1UzCJ5S2hVXz3GOwsOyQtZ0ZUo87lIr
-   6dbPG+QUOaDg8gTlgiLmhS2s3+nkq4STTEOoSuf+8j3zuBaOCzJSttjSq
+  bh=Cg8yTdzn0rVU0yuzC7yjQWzMKwtPf0ak3PApZmuzZ08=;
+  b=jn4PDc+hM2bwwABHH6mKGB+j7WEJGBiD6VFL4gIzxCa2K/tS72plFnGp
+   OmIRPBDVAlh9M8SB7NinIO9CZglRYwjrxyA3l0BHhzDPNypxR7+Rp8ysX
+   DtQ3IBger42tY+Jm+PTozs+HI7gxpIY9Qw9ABUKhQObS9ZlnN/zuUysr9
+   /n67kPapj6+g6A6Na8NYwkfUscII8oN4sR8TGgvkozWy2uLkPifEaqo5M
+   Cobu9TsFcpfJUUTN/hXa4+rSUtWvN4Hq4HckujnOcGuWo2xw8RzdZdR8n
+   aloYFO3IHm8+Mvqr5ybKtFx55bVxm4NUC8/Q+WNs2GOvplnxm5VUucMdw
    A==;
-X-CSE-ConnectionGUID: bZQCNbf/THS2IaB+h77cwQ==
-X-CSE-MsgGUID: DuGRrEjHT/SDTMSK+kPXQw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11720"; a="85301952"
+X-CSE-ConnectionGUID: 9QqMZ4m7R/SSNSa/lX0HAw==
+X-CSE-MsgGUID: JOHX32M2Ra6n32Fkk08WgA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11720"; a="77701130"
 X-IronPort-AV: E=Sophos;i="6.23,103,1770624000"; 
-   d="scan'208";a="85301952"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 09:44:47 -0800
-X-CSE-ConnectionGUID: fYxSK8FxQNKPL88aIDF7EA==
-X-CSE-MsgGUID: syGH3bWwQOCnRLiU4dfKmA==
+   d="scan'208";a="77701130"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 09:44:47 -0800
+X-CSE-ConnectionGUID: AiEgxAPoQ5iMy8144HaTgQ==
+X-CSE-MsgGUID: AJ3zKXkDRjasoYeIVUlvsw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,103,1770624000"; 
-   d="scan'208";a="222896521"
+   d="scan'208";a="256647639"
 Received: from mdroper-mobl2.amr.corp.intel.com (HELO localhost) ([10.124.220.244])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 09:44:45 -0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2026 09:44:47 -0800
 From: isaku.yamahata@intel.com
 To: kvm@vger.kernel.org
 Cc: isaku.yamahata@intel.com,
@@ -68,9 +68,9 @@ Cc: isaku.yamahata@intel.com,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 24/36] KVM: nVMX: Introduce module parameter for nested APIC timer virtualization
-Date: Thu,  5 Mar 2026 09:44:04 -0800
-Message-ID: <f892652a926d714fb6c2e35c1fb84ded519751be.1772732517.git.isaku.yamahata@intel.com>
+Subject: [PATCH v2 25/36] KVM: selftests: Add a test to measure local timer latency
+Date: Thu,  5 Mar 2026 09:44:05 -0800
+Message-ID: <b54bdd9878213e06a410db415cc6aaa79000341b.1772732517.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <cover.1772732517.git.isaku.yamahata@intel.com>
 References: <cover.1772732517.git.isaku.yamahata@intel.com>
@@ -81,7 +81,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: E13C7216A15
+X-Rspamd-Queue-Id: EB091216818
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -90,14 +90,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_CC(0.00)[intel.com,gmail.com,redhat.com,google.com,vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72912-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72909-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -106,7 +106,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	FROM_NO_DN(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[isaku.yamahata@intel.com,kvm@vger.kernel.org]
@@ -114,87 +114,626 @@ X-Rspamd-Action: no action
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Introduce a new module parameter, nested_apic_timer_virt, to control the
-nested virtualization of the APIC timer in KVM.
+A test case to measure local timer latency and to confirm that VMExit
+doesn't happen on TSC DEADLINE MSR on the platform that supports VMX APIC
+timer virtualization.  Or VMExit happens on the platform without the
+feature.
 
-The nested_apic_timer_virt parameter is set to true by default on processor
-platforms that support APIC timer virtualization.  On platforms that do not
-support this feature, the parameter will indicate that APIC timer
-virtualization is not available.
+This is inspired by kvm-unit-test x86/tscdeadline_latency.c.  The original
+test records all latency, but this records only the max/min/avg of the
+latency for simplicity.  It sets the local APIC timer (APIC oneshot or TSC
+deadline) and the timer interrupt handler records the delay from the timer
+value.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
 Changes:
 v1 -> v2:
-- use 0444 instead of S_IRUGO.
+- format fix in print_exit_stats() and help().
+- static char * => static const char * const for checkpatch.
+- use safe_halt(), sti(), cli() instead of inline assembly.
 ---
- arch/x86/kvm/vmx/capabilities.h |  1 +
- arch/x86/kvm/vmx/nested.c       | 13 ++++++++++++-
- arch/x86/kvm/vmx/vmx.c          |  2 +-
- 3 files changed, 14 insertions(+), 2 deletions(-)
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../testing/selftests/kvm/x86/timer_latency.c | 578 ++++++++++++++++++
+ 2 files changed, 579 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86/timer_latency.c
 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index 8d67be77f02c..861334e15c01 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -15,6 +15,7 @@ extern bool __read_mostly enable_ept;
- extern bool __read_mostly enable_unrestricted_guest;
- extern bool __read_mostly enable_ept_ad_bits;
- extern bool __read_mostly enable_pml;
-+extern bool __read_mostly enable_apic_timer_virt;
- extern int __read_mostly pt_mode;
- 
- #define PT_MODE_SYSTEM		0
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 3cd29b005afe..60c7256298ce 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -27,6 +27,10 @@ module_param_named(enable_shadow_vmcs, enable_shadow_vmcs, bool, S_IRUGO);
- static bool __ro_after_init warn_on_missed_cc;
- module_param(warn_on_missed_cc, bool, 0444);
- 
-+static bool __read_mostly enable_nested_apic_timer_virt = true;
-+module_param_named(nested_apic_timer_virt, enable_nested_apic_timer_virt, bool,
-+		   0444);
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index ba87cd31872b..3c2a5470c2ca 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -145,6 +145,7 @@ TEST_GEN_PROGS_x86 += x86/max_vcpuid_cap_test
+ TEST_GEN_PROGS_x86 += x86/triple_fault_event_test
+ TEST_GEN_PROGS_x86 += x86/recalc_apic_map_test
+ TEST_GEN_PROGS_x86 += x86/aperfmperf_test
++TEST_GEN_PROGS_x86 += x86/timer_latency
+ TEST_GEN_PROGS_x86 += access_tracking_perf_test
+ TEST_GEN_PROGS_x86 += coalesced_io_test
+ TEST_GEN_PROGS_x86 += dirty_log_perf_test
+diff --git a/tools/testing/selftests/kvm/x86/timer_latency.c b/tools/testing/selftests/kvm/x86/timer_latency.c
+new file mode 100644
+index 000000000000..7c2e8225f299
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86/timer_latency.c
+@@ -0,0 +1,578 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2026 Intel Corporation
++ *
++ * Measure timer interrupt latency between time set to the local timer and
++ * interrupt arrival time.  Optionally print out max/min/avg of the latency.
++ */
 +
- #define CC KVM_NESTED_VMENTER_CONSISTENCY_CHECK
- 
- /*
-@@ -7453,13 +7457,20 @@ static void nested_vmx_setup_secondary_ctls(u32 ept_caps,
- static void nested_vmx_setup_tertiary_ctls(struct vmcs_config *vmcs_conf,
- 					   struct nested_vmx_msrs *msrs)
- {
--	msrs->tertiary_ctls = vmcs_conf->cpu_based_3rd_exec_ctrl;
-+	enable_nested_apic_timer_virt &= enable_apic_timer_virt;
- 
-+	msrs->tertiary_ctls = vmcs_conf->cpu_based_3rd_exec_ctrl;
- 	msrs->tertiary_ctls &= TERTIARY_EXEC_GUEST_APIC_TIMER;
- 
-+	if (!enable_nested_apic_timer_virt)
-+		msrs->tertiary_ctls &= ~TERTIARY_EXEC_GUEST_APIC_TIMER;
++#include <stdio.h>
++#include <string.h>
++#include <stdatomic.h>
++#include <signal.h>
++#include <pthread.h>
 +
- 	if (msrs->tertiary_ctls)
- 		msrs->procbased_ctls_high |=
- 			CPU_BASED_ACTIVATE_TERTIARY_CONTROLS;
++#include "kvm_util.h"
++#include "processor.h"
++#include "apic.h"
 +
-+	if (!(msrs->tertiary_ctls & TERTIARY_EXEC_GUEST_APIC_TIMER))
-+		enable_nested_apic_timer_virt = false;
- }
- 
- static void nested_vmx_setup_misc_data(struct vmcs_config *vmcs_conf,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 0271514162df..4d5414af750b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -119,7 +119,7 @@ module_param(enable_ipiv, bool, 0444);
- 
- module_param(enable_device_posted_irqs, bool, 0444);
- 
--static bool __read_mostly enable_apic_timer_virt = true;
-+bool __read_mostly enable_apic_timer_virt = true;
- module_param_named(apic_timer_virt, enable_apic_timer_virt, bool, 0444);
- 
- /*
++#define LOCAL_TIMER_VECTOR	0xec
++
++#define TEST_DURATION_DEFAULT_IN_SEC   10
++
++/* Random number in ns, appropriate for timer interrupt */
++#define DEFAULT_TIMER_INC_NS	10000
++
++/* Twice 100Hz scheduler tick for nested virtualization. */
++#define DEFAULT_ALLOWED_TIMER_LATENCY_NS	(20 * 1000 * 1000)
++
++struct options {
++	bool use_oneshot_timer;
++	bool use_x2apic;
++	bool use_poll;
++
++	uint64_t timer_inc_ns;
++	uint64_t allowed_timer_latency_ns;
++
++	bool print_result;
++};
++
++static struct options options = {
++	.use_x2apic = true,
++	.timer_inc_ns = DEFAULT_TIMER_INC_NS,
++	.allowed_timer_latency_ns = DEFAULT_ALLOWED_TIMER_LATENCY_NS,
++};
++
++enum event_type {
++	EVENT_TIMER_HANDLER,
++	EVENT_HLT_WAKEUP,
++	EVENT_MAX,
++};
++
++struct test_sample {
++	uint64_t time_stamp;
++	enum event_type etype;
++	uint32_t latency;
++};
++
++struct test_latency_stat {
++	uint64_t sum;
++	uint64_t count;
++	uint32_t min;
++	uint32_t max;
++};
++
++struct test_shared_data {
++	atomic_bool stop_test;
++	atomic_bool terminated;
++	uint64_t tsc_khz;
++	uint64_t apic_bus_cycle_ns;
++	uint64_t allowed_timer_latency_tsc;
++
++	uint64_t timer_inc;
++
++	uint64_t hlt_count;
++	uint64_t timer_interrupt_set;
++	uint64_t timer_interrupt_received;
++
++	struct test_latency_stat latency_stat[EVENT_MAX];
++};
++
++#define GUEST_ASSERT_LATENCY(latency_tsc)				\
++	__GUEST_ASSERT((latency_tsc) <= data->allowed_timer_latency_tsc, \
++		       "too large timer latency %ld ns "		\
++		       "(requires %ld ns) %ld khz tsc",			\
++		       tsc_to_ns(data, latency_tsc),			\
++		       options.allowed_timer_latency_ns,		\
++		       data->tsc_khz)
++
++static struct test_shared_data shared_data;
++
++static u64 tsc_to_ns(struct test_shared_data *data, u64 tsc_delta)
++{
++	return tsc_delta * NSEC_PER_SEC / (data->tsc_khz * 1000);
++}
++
++static u64 ns_to_tsc(struct test_shared_data *data, u64 ns)
++{
++	return ns * (data->tsc_khz * 1000) / NSEC_PER_SEC;
++}
++
++static void latency_init(struct test_latency_stat *stat)
++{
++	stat->sum = 0;
++	stat->count = 0;
++	stat->min = -1;
++	stat->max = 0;
++}
++
++static void shared_data_init(struct test_shared_data *data)
++{
++	int i;
++
++	memset(data, 0, sizeof(*data));
++
++	for (i = 0; i < ARRAY_SIZE(data->latency_stat); i++)
++		latency_init(data->latency_stat + i);
++}
++
++static void stop_test(struct kvm_vm *vm, struct test_shared_data *data)
++{
++	atomic_store(&data->stop_test, true);
++	sync_global_to_guest(vm, data->stop_test);
++}
++
++static void guest_apic_enable(void)
++{
++	if (options.use_x2apic)
++		x2apic_enable();
++	else
++		xapic_enable();
++}
++
++static void guest_apic_write_reg(unsigned int reg, uint64_t val)
++{
++	if (options.use_x2apic)
++		x2apic_write_reg(reg, val);
++	else
++		xapic_write_reg(reg, val);
++}
++
++static void record_sample(struct test_shared_data *data, enum event_type etype,
++			 uint64_t ts, uint64_t latency)
++{
++	struct test_latency_stat *stat;
++
++	stat = &data->latency_stat[etype];
++
++	stat->count++;
++	stat->sum += latency;
++
++	if (stat->min > latency)
++		stat->min = latency;
++	if (stat->max < latency)
++		stat->max = latency;
++
++	if (etype == EVENT_TIMER_HANDLER &&
++	    latency > data->allowed_timer_latency_tsc) {
++		if (options.use_poll) {
++			GUEST_PRINTF("latency is too high %ld ns (> %ld ns)\n",
++				     tsc_to_ns(data, latency),
++				     options.allowed_timer_latency_ns);
++		} else
++			GUEST_ASSERT_LATENCY(latency);
++	}
++}
++
++static atomic_bool timer_interrupted;
++static atomic_uint_fast64_t timer_tsc;
++
++static inline bool tsc_before(u64 a, u64 b)
++{
++	return (s64)(a - b) < 0;
++}
++
++static void guest_timer_interrupt_handler(struct ex_regs *regs)
++{
++	uint64_t now = rdtsc();
++	uint64_t timer_tsc__ = atomic_load(&timer_tsc);
++
++	__GUEST_ASSERT(!atomic_load(&timer_interrupted),
++		       "timer handler is called multiple times per timer");
++	__GUEST_ASSERT(tsc_before(timer_tsc__, now),
++		       "timer is fired before armed time timer_tsc 0x%lx now 0x%lx",
++		       timer_tsc__, now);
++
++	record_sample(&shared_data, EVENT_TIMER_HANDLER, now, now - timer_tsc__);
++
++	shared_data.timer_interrupt_received++;
++	atomic_store(&timer_interrupted, true);
++	guest_apic_write_reg(APIC_EOI, 0);
++}
++
++static void __set_timer(struct test_shared_data *data,
++			uint64_t next_tsc, uint64_t apic_inc)
++{
++	if (options.use_oneshot_timer)
++		guest_apic_write_reg(APIC_TMICT, apic_inc);
++	else
++		wrmsr(MSR_IA32_TSC_DEADLINE, next_tsc);
++}
++
++static void set_timer(struct test_shared_data *data,
++		      uint64_t next_tsc, uint64_t apic_inc)
++{
++	atomic_store(&timer_tsc, next_tsc);
++	data->timer_interrupt_set++;
++	__set_timer(data, next_tsc, apic_inc);
++}
++
++static u64 to_apic_bus_cycle(struct test_shared_data *data, u64 tsc_delta)
++{
++	u64 ret;
++
++	if (!tsc_delta)
++		return 0;
++
++	ret = tsc_to_ns(data, tsc_delta) / data->apic_bus_cycle_ns;
++	if (!ret)
++		ret++;
++
++	return ret;
++}
++
++static void hlt_loop(struct test_shared_data *data)
++{
++	uint64_t inc, now, prev_tsc, next_tsc;
++
++	cli();
++	guest_apic_enable();
++
++	inc = data->timer_inc;
++
++	/* DIVISOR = 1 for oneshot timer case */
++	guest_apic_write_reg(APIC_TDCR, 0xb);
++	guest_apic_write_reg(APIC_LVTT,
++			     (options.use_oneshot_timer ?
++			      APIC_LVT_TIMER_ONESHOT :
++			      APIC_LVT_TIMER_TSCDEADLINE) |
++			     LOCAL_TIMER_VECTOR);
++
++	next_tsc = rdtsc() + inc;
++	if (!next_tsc)
++		next_tsc++;
++	atomic_store(&timer_interrupted, false);
++	set_timer(data, next_tsc, to_apic_bus_cycle(data, inc));
++
++	while (!atomic_load(&data->stop_test)) {
++		prev_tsc = rdtsc();
++
++		if (options.use_poll) {
++			sti();
++			while (!atomic_load(&timer_interrupted) &&
++			       rdtsc() < next_tsc + data->allowed_timer_latency_tsc)
++				cpu_relax();
++			cli();
++		} else {
++			/* "sti; hlt; cli" */
++			safe_halt();
++			cli();
++		}
++
++		now = rdtsc();
++
++		record_sample(data, EVENT_HLT_WAKEUP, now, now - prev_tsc);
++		data->hlt_count++;
++
++		if (atomic_load(&timer_interrupted)) {
++			while (next_tsc <= now)
++				next_tsc += inc;
++			if (!next_tsc)
++				next_tsc++;
++
++			atomic_store(&timer_interrupted, false);
++			set_timer(data, next_tsc,
++				  to_apic_bus_cycle(data, next_tsc - now));
++		} else {
++			uint64_t latency = now - next_tsc;
++
++			GUEST_ASSERT_LATENCY(latency);
++		}
++	}
++
++	/* Wait for the interrupt to arrive. */
++	now = rdtsc();
++	next_tsc = now + inc * 2;
++	sti();
++	while (now < next_tsc || !atomic_load(&timer_interrupted)) {
++		cpu_relax();
++		now = rdtsc();
++	}
++	cli();
++
++	/* Stop timer explicitly just in case. */
++	__set_timer(data, 0, 0);
++}
++
++static void guest_code(void)
++{
++	struct test_shared_data *data = &shared_data;
++
++	hlt_loop(data);
++
++	__GUEST_ASSERT(data->timer_interrupt_set == data->timer_interrupt_received,
++		       "timer interrupt lost set %ld received %ld",
++		       data->timer_interrupt_set, data->timer_interrupt_received);
++
++	GUEST_DONE();
++}
++
++static void __run_vcpu(struct kvm_vcpu *vcpu)
++{
++	struct ucall uc;
++
++	for (;;) {
++		vcpu_run(vcpu);
++
++		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_DONE:
++			pr_info("vcpu id %d passed\n", vcpu->id);
++			return;
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			return;
++		case UCALL_PRINTF:
++			pr_info("%s", uc.buffer);
++			continue;
++		default:
++			TEST_FAIL("Unexpected ucall cmd: %ld", uc.cmd);
++			return;
++		}
++
++		return;
++	}
++}
++
++static void *run_vcpu(void *args)
++{
++	struct kvm_vcpu *vcpu = args;
++
++	__run_vcpu(vcpu);
++
++	return NULL;
++}
++
++static void print_result_type(struct test_shared_data *data,
++			      enum event_type etype, const char *event_name)
++{
++	struct test_latency_stat *stat = &data->latency_stat[etype];
++	uint64_t avg = 0;
++
++	if (stat->count)
++		avg = stat->sum / stat->count;
++
++	pr_info("%s latency (%ld samples)\tmin %ld avg %ld max %ld ns\n",
++		event_name, stat->count,
++		tsc_to_ns(data, stat->min), tsc_to_ns(data, avg),
++		tsc_to_ns(data, stat->max));
++}
++
++static void print_result(struct test_shared_data *data)
++{
++	pr_info("guest timer: %s timer period %ld ns\n",
++		options.use_oneshot_timer ?
++		"APIC oneshot timer" : "tsc deadline",
++		options.timer_inc_ns);
++
++	pr_info("tsc_khz %ld apic_bus_cycle_ns %ld\n",
++		data->tsc_khz, data->apic_bus_cycle_ns);
++
++	pr_info("hlt %ld timer set %ld received %ld\n",
++		data->hlt_count,
++		data->timer_interrupt_set, data->timer_interrupt_received);
++
++	print_result_type(data, EVENT_TIMER_HANDLER, "timer interrupt");
++	print_result_type(data, EVENT_HLT_WAKEUP, "halt wakeup");
++}
++
++static void print_exit_stats(struct kvm_vcpu *vcpu)
++{
++	static const char * const stat_name[] = {
++		"exits",
++		"halt_exits",
++		"irq_exits",
++		"inject_tscdeadline"
++	};
++	uint64_t data;
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(stat_name); i++) {
++		kvm_get_stat(&vcpu->stats, stat_name[i], &data, 1);
++		pr_info("%s: %ld ", stat_name[i], data);
++	}
++	pr_info("\n");
++}
++
++static void setup_timer_freq(struct kvm_vm *vm,
++			     struct test_shared_data *data)
++{
++	data->tsc_khz = __vm_ioctl(vm, KVM_GET_TSC_KHZ, NULL);
++	TEST_ASSERT(data->tsc_khz > 0, "KVM_GET_TSC_KHZ failed..");
++
++	data->apic_bus_cycle_ns = kvm_check_cap(KVM_CAP_X86_APIC_BUS_CYCLES_NS);
++	if (options.use_oneshot_timer)
++		data->timer_inc = options.timer_inc_ns * data->apic_bus_cycle_ns;
++	else
++		data->timer_inc = ns_to_tsc(data, options.timer_inc_ns);
++
++	data->allowed_timer_latency_tsc =
++		ns_to_tsc(data, options.allowed_timer_latency_ns);
++}
++
++static void setup(struct kvm_vm **vm__, struct kvm_vcpu **vcpu__)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++	vm_install_exception_handler(vm, LOCAL_TIMER_VECTOR,
++				     guest_timer_interrupt_handler);
++	setup_timer_freq(vm, &shared_data);
++
++	if (!options.use_oneshot_timer)
++		vcpu_set_cpuid_feature(vcpu, X86_FEATURE_TSC_DEADLINE_TIMER);
++
++	sync_global_to_guest(vm, options);
++	sync_global_to_guest(vm, shared_data);
++
++	*vm__ = vm;
++	*vcpu__ = vcpu;
++}
++
++static void print_stats(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
++{
++	if (options.print_result) {
++		sync_global_from_guest(vm, *&shared_data);
++		print_result(&shared_data);
++		print_exit_stats(vcpu);
++	}
++}
++
++static void sigterm_handler(int signum, siginfo_t *info, void *arg_)
++{
++	atomic_store(&shared_data.terminated, true);
++}
++
++static int run_test(unsigned int duration)
++{
++	struct kvm_vcpu *vcpu;
++	struct sigaction sa;
++	struct kvm_vm *vm;
++	pthread_t thread;
++	int r;
++
++	shared_data_init(&shared_data);
++
++	setup(&vm, &vcpu);
++
++	sa = (struct sigaction) {
++		.sa_sigaction = sigterm_handler,
++	};
++	sigemptyset(&sa.sa_mask);
++	r = sigaction(SIGTERM, &sa, NULL);
++	TEST_ASSERT(!r, "sigaction");
++
++	r = pthread_create(&thread, NULL, run_vcpu, vcpu);
++	TEST_ASSERT(!r, "pthread_create");
++
++	while (duration > 0 && !atomic_load(&shared_data.terminated)) {
++		duration = sleep(duration);
++		TEST_ASSERT(duration >= 0, "sleep");
++	}
++
++	if (atomic_load(&shared_data.terminated)) {
++		pr_info("terminated\n");
++		print_stats(vm, vcpu);
++		return -EINTR;
++	}
++
++	stop_test(vm, &shared_data);
++
++	r = pthread_join(thread, NULL);
++	TEST_ASSERT(!r, "pthread_join");
++
++	print_stats(vm, vcpu);
++
++	kvm_vm_free(vm);
++	return 0;
++}
++
++static void help(const char *name)
++{
++	puts("");
++	printf("usage: %s ", name);
++	printf("[-h] [-l] [-d duration_in_sec] [-a allowed_timer_latency] ");
++	printf("[-p period_in_ns] [-o] [-O] [-x] [-X]\n");
++	puts("");
++	printf("-h: Display this message.");
++	printf("-l: use idle loop instead of hlt\n");
++	printf("-d: specify test to run in second (default %d sec)\n",
++	       TEST_DURATION_DEFAULT_IN_SEC);
++	printf("-p: timer period in ns (default %d nsec)\n",
++	       DEFAULT_TIMER_INC_NS);
++	printf("-a: allowed timer latency in ns (default %d nsec)\n",
++	       DEFAULT_ALLOWED_TIMER_LATENCY_NS);
++	printf("-o: use APIC oneshot timer instead of TSC deadline timer\n");
++	printf("-t: use TSC deadline timer instead of APIC oneshot timer (default)\n");
++	printf("-P: print result stat\n");
++	printf("-x: use xAPIC mode\n");
++	printf("-X: use x2APIC mode (default)\n");
++	puts("");
++
++	exit(EXIT_SUCCESS);
++}
++
++int main(int argc, char **argv)
++{
++	int opt;
++	unsigned int duration = TEST_DURATION_DEFAULT_IN_SEC;
++
++	while ((opt = getopt(argc, argv, "hld:p:a:otxXP")) != -1) {
++		switch (opt) {
++		case 'l':
++			options.use_poll = true;
++			break;
++
++		case 'd':
++			duration = atoi_non_negative("test duration in sec", optarg);
++			break;
++		case 'p':
++			options.timer_inc_ns =
++				atoi_non_negative("timer period in nsec", optarg);
++			break;
++		case 'a':
++			options.allowed_timer_latency_ns =
++				atoi_non_negative("allowed timer latency in nsec",
++						  optarg);
++			break;
++
++
++		case 'x':
++			options.use_x2apic = false;
++			break;
++		case 'X':
++			options.use_x2apic = true;
++			break;
++
++		case 'o':
++			options.use_oneshot_timer = true;
++			break;
++		case 't':
++			options.use_oneshot_timer = false;
++			break;
++
++		case 'P':
++			options.print_result = true;
++			break;
++
++		case 'h':
++		default:
++			help(argv[0]);
++			break;
++		}
++	}
++
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_GET_TSC_KHZ));
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_VM_TSC_CONTROL));
++	if (!options.use_oneshot_timer)
++		TEST_REQUIRE(kvm_has_cap(KVM_CAP_TSC_DEADLINE_TIMER));
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_APIC_BUS_CYCLES_NS));
++	if (options.use_x2apic)
++		TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_X2APIC));
++
++	run_test(duration);
++
++	return 0;
++}
 -- 
 2.45.2
 
