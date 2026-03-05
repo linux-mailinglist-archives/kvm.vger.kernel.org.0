@@ -1,224 +1,223 @@
-Return-Path: <kvm+bounces-72928-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72929-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WKYOIEjNqWl+FQEAu9opvQ
-	(envelope-from <kvm+bounces-72928-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 19:36:56 +0100
+	id oEnjHjHQqWmYFgEAu9opvQ
+	(envelope-from <kvm+bounces-72929-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 19:49:21 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAD8921707F
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 19:36:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C1912171E5
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 19:49:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1CA8D3018415
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 18:36:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5DDD23029A42
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 18:49:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA5B3D5247;
-	Thu,  5 Mar 2026 18:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E71FC2DC35C;
+	Thu,  5 Mar 2026 18:49:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X59brTXW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ynk6jH5H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345CC3A1E84
-	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 18:36:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772735810; cv=none; b=sg7f36B4yZyQ5wWoSUMEuZSBs1iebEP015C0I9VKs665GedduTrNNqd/xEQ8RRErelMHfPkF1YqZAXwT+uc4Rxd9G78ArOGjZkTGVh0vx4HrhAhJVjH7aC8ZHocAsaIrZRPdYMWmnmmyIHuFH9aqAdDcxYW2eHk6U3olK2y3q/c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772735810; c=relaxed/simple;
-	bh=/nCQbIM9WF/udWJhsd5kHZLLjcm5NPQ7KZuVjgfTAQk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tFY4QDqpLHIbtClqVy7XT5R4btyT9bDLR+zeSjvVT6quYdD0Y0P5ReZFJQpjjXY9FjBDELPh65j+Wcltx7Y1eDGhqbvOHsfGEZJgV/t/8uCS3e6MbIj+cpevJ4IRVdUQC9R0crg/qijZ/6ch9AxG/DJmeddrzCoOKVYJs3TOtIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X59brTXW; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C6F27FD52
+	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 18:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772736557; cv=pass; b=Hy6YyBDlK1ID94TR3s9ykzDDz93pou8EPyXniHTYDOg+kVIBAH9xHa16XyUA7vvvVOx4sqlt/+ZBcIs8dTDjAPSPj+JKavx5MJYmRIkWe8K9Pyny+vSvz3kGsTopxFNCe0iRnAugwkBaTMD34/0rFsjZO3GqURT2XJxngoUtDrs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772736557; c=relaxed/simple;
+	bh=eAk+jD9Rcem2AMZY6UAt3WgRdXjAWpdgOQGbMet11qk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XWdyqFBgKL0Gl3EJ50Rl0D3fMv7FElmKi1MONSxTjOi+JU+BNrbbfZ4ZwkYELh9GcuLIQ/8T5dRV/yn/xkT4ruC7jz74AMcIG8d/Brm0CbAbVTf9fwFnBMkF8JygbQMvQqYRLZ/OQhpirLR1VDWHYwsSypRxYm+kGb0XQgWld38=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ynk6jH5H; arc=pass smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae6dd98043so18778775ad.3
-        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 10:36:49 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-661169cd6d8so1045a12.1
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 10:49:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772736554; cv=none;
+        d=google.com; s=arc-20240605;
+        b=YehHBWIcGYHkhkaZji5SzXVIcwgfcPIlbquDe6xLPuWBTfn100IqXh7NQiFA4ZL3po
+         e7NveKF3Xm7fI1ynRye8cSWXG7okryrDeRbdZkN9p6SseCokCX0PhbZIncApwVQTCBOf
+         Ku6BfVJ6rp/O/2HB197b0xjZ2cwh0mbrTKC4vjj42fMI+ToLUoh9nTaJ6/4cOI/kWYgP
+         3Y7Nwi0tU2EKF4A+51OisIhzi3hICF33C2ull8uTil9sOaYJjv8tJbwXdaijQjBoiF0W
+         xel9YcHbgXQmDeYDQLwbcappOUSWIRj2egrCRyOKWS38tMFBczAjTxCjuOjiFPwjm0OE
+         +5FA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=3NngYta4vdsWAWIxQPmUbWutCRgra+ifU7R7mQBuGRQ=;
+        fh=8bCB+Qfc+fvydz/0Jn/6PwJPignilqnBO4Zc4y4/kpg=;
+        b=bTAdio6HtOysne2Gc2vNCx59p1R1CHZymFBkQhToVAXhUPAkNKrk8l4fnVAlXybwmL
+         S8lb1sGilMjCf0w0LuhTEACDEqLlcLJ8+LqrynFKLpeBTCZguDIP72jer+8B/lTNqob/
+         VMvBsqtaTcboo5pLeBhNVH1BJEZ9HOYr07rvf9ryFY1cF5uD6/1ZwxDaZKE1F4p+5x5+
+         bvYCqgJ9b5Geh6Zu/YhlxhMvodn21KCcLnkSI1yZBB1FgpewMdUflG0ZJ9y75sfF/9OQ
+         MM9CgPOZGlQ9OzbSTHdq65oFRj9XpBzMrHinaNeQsMGfaqbM2CgnzclE0EaRdENBThev
+         c7uQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772735808; x=1773340608; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8SIBi7LZpDXEzALEhfUg4rA5WlAeQaGU2tPtYlr/3VA=;
-        b=X59brTXWvkeP9yGA5NDRQwh8Ho2KBhhdtJHwTbnzc7iTs/Fv+M6CplU9BlK5K8/Ezz
-         cvqfxDttg57fiLahuA93ZrpD79L90Hh9hPid59JRwHkCim19pWIw3eZsM9+6O3ywxc7D
-         mnUuZNn37UKNL7SmO931MAKh9wUDm1Ika8/+OGvPoJ6UuAu9fn2XoeKuzcrPMFfSOEIp
-         4obyHzwJQfXNDMuQ7f0K48JLhZ0/u6X9QCa4qCESKrsJkRETLqVTLEdbnOjDu8Hn6aT+
-         Rp5XR+o59EmkVsFE76eIJJhXWxkqMrAJkxxVjOg/XAzgHpMo4HxATt/NrO/hjQrnH+UJ
-         x5oA==
+        d=google.com; s=20230601; t=1772736554; x=1773341354; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3NngYta4vdsWAWIxQPmUbWutCRgra+ifU7R7mQBuGRQ=;
+        b=Ynk6jH5Hwm1P1VxoyaKyXWalxr2MrTSy7RJ9mwO63D0ENhsEY7LkyE7UPUsz71VAI0
+         W7vd9L//7S325Biuj082DGqm51dH50+4YTqcth2Of16iRrCpeysD8FWvzgO88zGJA1zo
+         nWjTtr2FIcibiHGdJ0yahdm2ML1DiKTIX8+ORIHyOmEZcAgf7HoqDdOKOAYAMIcoArhA
+         eRNR6xOmy88wtDpM+73lH1Zd6NGNqntIaqOeEkrYfxnMQsERXdNp47h4MsdOQ9iaRijQ
+         1AqkezKPGauc+CwW3yThcDFiA7ATLKe84+1kVTiR3Klja5Tnhy3Ihu6jOq5fzD3CIOS3
+         YogA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772735808; x=1773340608;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8SIBi7LZpDXEzALEhfUg4rA5WlAeQaGU2tPtYlr/3VA=;
-        b=T94yMg/Fa30qrNLl3Gl4e6LAq8ean1UrxrjXMNqnpGdSE7lO5NVLSIZ5SruFLFu51e
-         iaVUfijSEf7iQLZf06+nQlam5ncL9fBQ4ydEfSvqZw/2xvLo76phHmo7YwIeO+2HqdLa
-         89lBZ9oD76pzqO3oaGHkm0kB6e3mtHQQeRyjLpDQ5/Ui1OfuQtsAE2F1oVyF4jsQkBe5
-         ALxSf+NDgxUY0O1kq9lFWJH7rcgAfwJCzyF/HUnBJi25svE7ZnanICijyVMKBDwIFPjf
-         LpvlD6+DDnKRFXZwTG6219s2aXk4WjNIL9VlntHSgTyGGIeybb57nJ0UiDa7kAPSV/db
-         mtVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUw3srA3wyx7ZoQkyxUMnMjD/UFIKAHRmtkauknbUgpAU5v6GAkxbnBk6EMphhKTr9xm34=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9XMudkXOIGuTEUMU6KZdeHlEapGTSpuw/UDVVPnPgwZ+BaDKp
-	JvNRqsek3omIDEKAGHPvOcYouZTM8iH98ja9M9I9W0rlHwFKFo3FvOiFDcFyxLEjBFu0brQJZn9
-	lr458dw==
-X-Received: from pldq21.prod.google.com ([2002:a17:902:c9d5:b0:2ae:635f:4b2b])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2443:b0:2ae:7f28:124b
- with SMTP id d9443c01a7336-2ae7f281273mr9581445ad.22.1772735808319; Thu, 05
- Mar 2026 10:36:48 -0800 (PST)
-Date: Thu, 5 Mar 2026 10:36:47 -0800
-In-Reply-To: <97d40dd0e6abaf28f43d4d8ccf9c547a16c52e33.camel@infradead.org>
+        d=1e100.net; s=20230601; t=1772736554; x=1773341354;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3NngYta4vdsWAWIxQPmUbWutCRgra+ifU7R7mQBuGRQ=;
+        b=xVUPGYSGF0u/V3oBTyx5IBt1wNhWQv0+YMmN0tsDm670U8XePrBPdz2qoMci/gaepw
+         IW/QIbBBDnZOOs3pdGw3Z+mxpUsTZWvrLjD6NWG21ObNfABBBjO/TUQ4pow/Bq5pKX7G
+         8cJFoRl+3Jo9d+LaAYVxM4AkIl0lyQsvMiK6LcjgFYLavP1rUY6PPDAO/ZoWCX5RWbA+
+         T7WRoWNsWIj4WvA1gX/Y1mRO2dFDTWsqzvKITdL+lg/qMnBTJAzTpz/wlxJO/MBti/zZ
+         LvLgcvjkKhV/g6IeKOHV5+OTsIUq0Fh08kosEYM9AJnJeBKRhteyCP+Uec06Dt6lu1Ve
+         hqxg==
+X-Forwarded-Encrypted: i=1; AJvYcCW6PdALSCf93aExQF1UJ7/j7mPZnP9AcAeTZ592zVu6MQuo3M7YomKlLtrw2Q8TBaBo8HE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKNWO1kSayrVed5Je5dXYBgQF/8jRe3zlyig4um3s/lO6SuxTG
+	tbXdd9Mu9jxRxXqqz6xeY3NNVfBqa6bVfnZ+xXj24TkShAOvA9lUPpXLhnMxCr7jUWNExEGU7yW
+	m/2Hat4tpZ1uHs94xqf2YEuIRxzKLhEMARCLUQWLR
+X-Gm-Gg: ATEYQzzkcSjsuhhbt2oyhfCqzuefwbIWq+1Xg/PDTXskk3aHO+XAUH1N5zpPnPHLxUY
+	033lrivUpqoLM6bFIDFtAXFfyd1AeaFFCyY3E1emk7zZdsKTFwfT1Q20S01iPyhOFWtciyHWi27
+	1uABeZcMehV3cWRxVIALF3tliA6EE72gTRjp097tohCOlQInyZMzKyDcz1z+mkGmegDt2lcTGQj
+	BXq3SEpRdRCErjROrU7XzTUA57EWU6hOl2dfmtJEshc8wAUiyjmqWUoC9RT+xmzl8Ngq9hY1PHD
+	zAMtnVs=
+X-Received: by 2002:a05:6402:794:b0:65f:7099:bc8c with SMTP id
+ 4fb4d7f45d1cf-6618dc4a4b7mr2986a12.8.1772736553564; Thu, 05 Mar 2026 10:49:13
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <aaa7ac93db25459fa5a629d0da5abf13e93d8301.camel@infradead.org>
- <da02314c-e6da-4d9e-a2c8-cd3ee096bc0c@embeddedor.com> <97d40dd0e6abaf28f43d4d8ccf9c547a16c52e33.camel@infradead.org>
-Message-ID: <aanNPwnH7l-j61Ds@google.com>
-Subject: Re: [PATCH] KVM: x86: Fix C++ user API for structures with variable
- length arrays
-From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>, keescook@chromium.org, daniel@iogearbox.net, 
-	gustavoars@kernel.org, jgg@ziepe.ca, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+MIME-Version: 1.0
+References: <20260224005500.1471972-1-jmattson@google.com> <20260224005500.1471972-9-jmattson@google.com>
+ <aahn2ZfDAJTj-Afn@google.com> <CALMp9eR7gKWp8M2Q8Q7vA5hGx5bc12KCh1NZMK33A1dpiKNt+Q@mail.gmail.com>
+ <aaiD0k-BE4RZJPfv@google.com> <CAO9r8zP+tdUtDwxzDVKbtCk7Ui5y=Zw_aZ+ptL4-H6-R5vXWTQ@mail.gmail.com>
+ <aaiOQKHoSrpPNR9b@google.com>
+In-Reply-To: <aaiOQKHoSrpPNR9b@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Thu, 5 Mar 2026 10:49:01 -0800
+X-Gm-Features: AaiRm53Cb21BdMl5XJu3HttHkszR5QTije8R4B0bcLgCFedybvlXLo3WaDLb-sw
+Message-ID: <CALMp9eQ5e_Gdvj=Cc00Puba=-A6rZ-VrV=gkvf_O3_fm9vA=6Q@mail.gmail.com>
+Subject: Re: [PATCH v5 08/10] KVM: x86: nSVM: Save/restore gPAT with KVM_{GET,SET}_NESTED_STATE
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yosry Ahmed <yosry@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="utf-8"
+	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: EAD8921707F
+X-Rspamd-Queue-Id: 3C1912171E5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72928-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72929-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TO_DN_SOME(0.00)[]
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Thu, Feb 26, 2026, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
->=20
-> Commit 94dfc73e7cf4 ("treewide: uapi: Replace zero-length arrays with
-> flexible-array members") broke the userspace API for C++. Not just in
-> the sense of 'userspace needs to be updated, but UAPI is supposed to be
-> stable", but broken in the sense that I can't actually see *how* the
-> structures can be used from C++ in the same way that they were usable
-> before.
->=20
-> These structures ending in VLAs are typically a *header*, which can be
-> followed by an arbitrary number of entries. Userspace typically creates
-> a larger structure with some non-zero number of entries, for example in
-> QEMU's kvm_arch_get_supported_msr_feature():
->=20
->     struct {
->         struct kvm_msrs info;
->         struct kvm_msr_entry entries[1];
->     } msr_data =3D {};
->=20
-> While that works in C, it fails in C++ with an error like:
->  flexible array member =E2=80=98kvm_msrs::entries=E2=80=99 not at end of =
-=E2=80=98struct msr_data=E2=80=99
->=20
-> Fix this by using __DECLARE_FLEX_ARRAY() for the VLA, which is a helper
-> provided by <linux/stddef.h> that already uses [0] for C++ compilation.
->=20
-> Also put the header fields into a struct_group() to provide (in C) a
-> separate struct (e.g 'struct kvm_msrs_hdr') without the trailing VLA.
+On Wed, Mar 4, 2026 at 11:55=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Wed, Mar 04, 2026, Yosry Ahmed wrote:
+> > On Wed, Mar 4, 2026 at 11:11=E2=80=AFAM Sean Christopherson <seanjc@goo=
+gle.com> wrote:
+> > >
+> > > On Wed, Mar 04, 2026, Jim Mattson wrote:
+> > > > On Wed, Mar 4, 2026 at 9:11=E2=80=AFAM Sean Christopherson <seanjc@=
+google.com> wrote:
+> > > > > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.=
+c
+> > > > > index 991ee4c03363..099bf8ac10ee 100644
+> > > > > --- a/arch/x86/kvm/svm/nested.c
+> > > > > +++ b/arch/x86/kvm/svm/nested.c
+> > > > > @@ -1848,7 +1848,7 @@ static int svm_get_nested_state(struct kvm_=
+vcpu *vcpu,
+> > > > >         if (is_guest_mode(vcpu)) {
+> > > > >                 kvm_state.hdr.svm.vmcb_pa =3D svm->nested.vmcb12_=
+gpa;
+> > > > >                 if (nested_npt_enabled(svm)) {
+> > > > > -                       kvm_state.hdr.svm.flags |=3D KVM_STATE_SV=
+M_VALID_GPAT;
+> > > > > +                       kvm_state->flags |=3D KVM_STATE_NESTED_GP=
+AT_VALID;
+> > > > >                         kvm_state.hdr.svm.gpat =3D svm->vmcb->sav=
+e.g_pat;
+> > > > >                 }
+> > > > >                 kvm_state.size +=3D KVM_STATE_NESTED_SVM_VMCB_SIZ=
+E;
+> > > > > @@ -1914,7 +1914,8 @@ static int svm_set_nested_state(struct kvm_=
+vcpu *vcpu,
+> > > > >
+> > > > >         if (kvm_state->flags & ~(KVM_STATE_NESTED_GUEST_MODE |
+> > > > >                                  KVM_STATE_NESTED_RUN_PENDING |
+> > > > > -                                KVM_STATE_NESTED_GIF_SET))
+> > > > > +                                KVM_STATE_NESTED_GIF_SET |
+> > > > > +                                KVM_STATE_NESTED_GPAT_VALID))
+> > > > >                 return -EINVAL;
+> > > >
+> > > > Unless I'm missing something, this breaks forward compatibility
+> > > > completely. An older kernel will refuse to accept a nested state bl=
+ob
+> > > > with GPAT_VALID set.
+> > >
+> > > Argh, so we've painted ourselves into an impossible situation by rest=
+ricting the
+> > > set of valid flags.  I.e. VMX's omission of checks on unknown flags i=
+s a feature,
+> > > not a bug.
+> > >
+> > > Chatted with Jim offlist, and he pointed out that KVM's standard way =
+to deal with
+> > > this is to make setting the flag opt-in, e.g. KVM_CAP_X86_TRIPLE_FAUL=
+T_EVENT and
+> > > KVM_CAP_EXCEPTION_PAYLOAD.
+> > >
+> > > As much as I want to retroactively change KVM's documentation to stat=
+e doing
+> > > KVM_SET_NESTED_STATE with data that didn't come from KVM_GET_NESTED_S=
+TATE is
+> > > unsupported, that feels too restrictive and could really bite us in t=
+he future.
+> > > And it doesn't help if there's already userspace that's putting garba=
+ge into the
+> > > header.
+> > >
+> > > So yeah, I don't see a better option than adding yet another capabili=
+ty.
 
-Unless I'm missing something, this is an entirely optional change that need=
-s to
-be done separately, especialy since I want to tag this for:
+Capability or quirk?
 
-  Cc: stable@vger.kernel.org
-
-I definitely don't hate the __struct_group definitions, but I don't know th=
-at I
-love them either as they make the code a bit harder to read, and more impor=
-tantly
-there's a non-zero chance that defining the new structurs could break users=
-pace
-builds and force an update, e.g. if userspace already concocts its own head=
-er
-overlay, which would be very unpleasant for a stable@ patch.
-
-If we do define headers, I think I'd want a wrapper around __struct_group()=
- to
-prettify the common case and force consistent naming, e.g.
-
-#define kvm_struct_header(NAME, MEMBERS...)				\
-	__struct_group(NAME ##_header, h, /* no attrs */, MEMBERS)
-
-struct kvm_msrs {
-	kvm_struct_header(kvm_msrs,
-		__u32 nmsrs; /* number of msrs in entries */
-		__u32 pad;
-	);
-
-	__DECLARE_FLEX_ARRAY(struct kvm_msr_entry, entries);
-};
-
-But that's likely going to lead to some amount of bikeshedding, e.g. arguab=
-ly
-kvm_header() would be sufficient and easier on the eyes.  Which is all the =
-more
-reason to handle it separately.
-
-> Fixes: 94dfc73e7cf4 ("treewide: uapi: Replace zero-length arrays with fle=
-xible-array members")
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->  arch/x86/include/uapi/asm/kvm.h | 29 ++++++++++++++++++-----------
->  include/uapi/linux/kvm.h        |  9 ++++++---
->  /* for KVM_GET_PIT and KVM_SET_PIT */
-> @@ -397,8 +402,10 @@ struct kvm_xsave {
->  	 * The offsets of the state save areas in struct kvm_xsave follow
->  	 * the contents of CPUID leaf 0xD on the host.
->  	 */
-> -	__u32 region[1024];
-> -	__u32 extra[];
-> +	__struct_group(kvm_xsave_hdr, hdr, /* no attrs */,
-> +		__u32 region[1024];
-> +	);
-
-This is *very* misleading, as XSTATE itself has a header, but this is somet=
-hing
-else entirely (just the always-allocated region).
-
-> +	__DECLARE_FLEX_ARRAY(__u32, extra);
->  };
-
-There are several structs that got missed:
-
-  kvm_pmu_event_filter
-  kvm_reg_list
-  kvm_signal_mask
-  kvm_coalesced_mmio_ring
-  kvm_cpuid
-  kvm_stats_desc
+/me ducks.
 
