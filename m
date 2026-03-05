@@ -1,439 +1,165 @@
-Return-Path: <kvm+bounces-72816-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72817-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UKoHA9l1qWl77wAAu9opvQ
-	(envelope-from <kvm+bounces-72816-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 13:23:53 +0100
+	id SFY2F3l5qWl77wAAu9opvQ
+	(envelope-from <kvm+bounces-72817-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 13:39:21 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FB1C2118FC
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 13:23:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6279C211D04
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 13:39:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 90913305B019
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 12:20:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 636C53024BF8
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 12:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7398239B4B2;
-	Thu,  5 Mar 2026 12:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72B6239B4B7;
+	Thu,  5 Mar 2026 12:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="chw6X8EF"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="ftTR59Xo"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624D839B4A9;
-	Thu,  5 Mar 2026 12:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3234739E196;
+	Thu,  5 Mar 2026 12:37:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772713244; cv=none; b=PKzmcodhc5tA6kyiu8O6bW6qk8GpjZcLvtCih/QaCkmG/Y8Vqq0e7fVxBA+0aXfM5xLxbuMWtOjgbdOgHsOmigfDEd+EBk7gjEFNnuS0aMJVG+82hhfJXdBe0PeJfmVBkkj7Xfyc/NMBVayU3FEpNHnxs9f/mjMHp02lG0UKv38=
+	t=1772714232; cv=none; b=gDiWw1ZUZ8fli5s2BCqxAJmutVANoZfx7E2eJfRiclwuR5nKkgwoL4v7rqk3ao0Yw9Vf0D/yhCFhgcNwrVwUzUxQZL/HE9dhAZlLPCk20lhz9dKsdkFAC1DsPPy7dwp6xIGPHLRy8Zq5OPQMDqMsCIL/lDGcVYtEu6jxrcSkjOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772713244; c=relaxed/simple;
-	bh=U5lxhOuqwUbiy2xkCmrhXkFJSrEQf8eev2E3LnOTsDE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=VSlNC8HHdrgAnpTaMwc5a6m9TZfH6hSwwqjJtRg81mXt4lGOcM5ocRbfj+Y+43XpRuUY77Ii6Ara4s4fxrGxzcC7nAd+aGIQbaMwbBlBZLq6TNC/FkIeOvgzNT6+JpoF99tLuBm19pvADLhisCVc03he7tu4OaUSj0p0eggM33c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=chw6X8EF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A444C116C6;
-	Thu,  5 Mar 2026 12:20:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772713244;
-	bh=U5lxhOuqwUbiy2xkCmrhXkFJSrEQf8eev2E3LnOTsDE=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=chw6X8EFrVIaWJYhJLjegGnZ062oNzPfSUn9kxcD7kfYerdhgwCD3SDs8FvxXH0Yt
-	 rfqGJIPaGyUIPQaI+ZRF4fPE2XOeSau857IacwRvpZ/03krLqQB+WMR/hnNlAX1MlZ
-	 jA7UW5TCOqG2CyJ9VPljINXlJO/cU57jfor1ZFewzBV2pa/znsxShpFJYuuzrgCI0c
-	 Q3o5spVsibwQOpU6qvMOELDrbaZ0pM7P34CK7bepJv4m6oIQvsihmt+vc0TbuYr0EV
-	 RVz6D8zxk65eJ7j/or8fGmWArrKZx3K8gwlbHTHd4jRYXn3YOWes7BGgTJtepAQn8f
-	 H/ntBEx/l2B9Q==
-Message-ID: <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org>
-Date: Thu, 5 Mar 2026 13:20:38 +0100
+	s=arc-20240116; t=1772714232; c=relaxed/simple;
+	bh=RgGyNNdqIjOgrAqL+GlweCLk+LqtKtjZYUw3vDQn6y8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kNKhyiTssfMvZPUsvbpQ5+9iL1+XmctKbC502mneu+zGtPTvGGInkPRMdfMLc8rH9vu6CTYXLWab9JzBUnT16q4NyfTrKxRAZnFBYWpZgQa9qxfokMvpwEoB7+Wy8us4dpmtdFyXxdN2TvdI2TcNrI+o2bENm0rgyD6h3O/oZ5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=ftTR59Xo; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8242D40E0169;
+	Thu,  5 Mar 2026 12:37:03 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id ZuA0T_DorMHJ; Thu,  5 Mar 2026 12:36:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1772714218; bh=FdLGhI+DKtaC+bV/1yMll/XT7I8JFxUD3aTMY78plpA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ftTR59XoXE0SLEETFfVID/cp83ClrywO1Qf9vg3EiTu3FsJlGuwqRs/ZNEbnMizVY
+	 +vk0wC/55+dx8MzeOFHFMDQ4LD04kFDgJrLD2f0dFXOEZEENeEC0e2lAUfbCpdFbI1
+	 tqWAVMNomvwKIgUENf1eqh8A8vMyFPx7pUHHudRMD+BEUldKH+jJA+Q7Ige+BIolbK
+	 ko0rctrW89EM9bGxWhqwEoZ+++/3sXuCGDd3ia3sgm7/F/eYOGFvIQtsOh3z5Y4SxC
+	 62HFqZfqMsDEjwwYBHT6AF3InAvepFU3ZQPV0Ep/VxzxIfWdqlzTQMnnqzibR7ZyqM
+	 fzALAKXDa2TYbruVF+i/DPfwvI3bAQiQkvKhSngLeTxVBMG0riqBxRX58HwuuM7I6e
+	 4hqpuJuFa4SbSvrr3ECtYwkingN6JlgqamFtJFC+Rg3jxxuNpSV6vPJ/0f+i455psz
+	 WWBLYFMXWLPoQ2q6zgZMLoB/72VEETAzy7wyMNlWIc7jVWH1hrKet4ur+uGs7IMvNa
+	 1+QapLbaji1Myah5cX+vkzfuTFXz0Zk6q9rJHTZxhc0B+XMUOyFdvVP/kAAewJxvb+
+	 g/7zprUNfojCgBXgh2NbybOqyAU4PIFN09GZIipzgiZqT2RCil33IQ5JoZo8PDRLSW
+	 RpvqDJo9JLTrpab9Yiq+tay0=
+Received: from zn.tnic (pd9530d5e.dip0.t-ipconnect.de [217.83.13.94])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id CC89940E0031;
+	Thu,  5 Mar 2026 12:36:24 +0000 (UTC)
+Date: Thu, 5 Mar 2026 13:36:18 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Ashish Kalra <Ashish.Kalra@amd.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, peterz@infradead.org,
+	thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, ardb@kernel.org, pbonzini@redhat.com,
+	aik@amd.com, Michael.Roth@amd.com, KPrateek.Nayak@amd.com,
+	Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com, jackyli@google.com,
+	pgonda@google.com, rientjes@google.com, jacobhxu@google.com,
+	xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com,
+	john.allen@amd.com, darwi@linutronix.de,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev
+Subject: Re: [PATCH v2 1/7] x86/cpufeatures: Add X86_FEATURE_AMD_RMPOPT
+ feature flag
+Message-ID: <20260305123618.GFaal4whNN9VMxMWLA@fat_crate.local>
+References: <cover.1772486459.git.ashish.kalra@amd.com>
+ <219ebbd57ac1d99fc5ea055431f7a8396021c2c2.1772486459.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
- stalls, timeout
-From: Jiri Slaby <jirislaby@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@kernel.org>
-Cc: Matthieu Baerts <matttbe@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
- rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
- Linux Kernel <linux-kernel@vger.kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, "luto@kernel.org"
- <luto@kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
- Waiman Long <longman@redhat.com>
-References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
- <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
- <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 0FB1C2118FC
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <219ebbd57ac1d99fc5ea055431f7a8396021c2c2.1772486459.git.ashish.kalra@amd.com>
+X-Rspamd-Queue-Id: 6279C211D04
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[alien8.de,none];
+	R_DKIM_ALLOW(-0.20)[alien8.de:s=alien8];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72816-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72817-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	DKIM_TRACE(0.00)[alien8.de:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jirislaby@kernel.org,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[bp@alien8.de,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[kvm];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,opensuse.org:url]
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,amd.com:url,amd.com:email,alien8.de:dkim]
 X-Rspamd-Action: no action
 
-On 05. 03. 26, 12:53, Jiri Slaby wrote:
-> On 05. 03. 26, 8:00, Jiri Slaby wrote:
->> On 02. 03. 26, 12:46, Peter Zijlstra wrote:
->>> On Mon, Mar 02, 2026 at 06:28:38AM +0100, Jiri Slaby wrote:
->>>
->>>> The state of the lock:
->>>>
->>>> crash> struct rq.__lock -x ffff8d1a6fd35dc0
->>>>    __lock = {
->>>>      raw_lock = {
->>>>        {
->>>>          val = {
->>>>            counter = 0x40003
->>>>          },
->>>>          {
->>>>            locked = 0x3,
->>>>            pending = 0x0
->>>>          },
->>>>          {
->>>>            locked_pending = 0x3,
->>>>            tail = 0x4
->>>>          }
->>>>        }
->>>>      }
->>>>    },
->>>>
->>>
->>>
->>> That had me remember the below patch that never quite made it. I've
->>> rebased it to something more recent so it applies.
->>>
->>> If you stick that in, we might get a clue as to who is owning that lock.
->>> Provided it all wants to reproduce well enough.
->>
->> Thanks, I applied it, but to date it is still not accepted yet:
->> https://build.opensuse.org/requests/1335893
+On Mon, Mar 02, 2026 at 09:35:19PM +0000, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
 > 
-> OK, I have a first dump with the patch applied:
->    __lock = {
->      raw_lock = {
->        {
->          val = {
->            counter = 0x2c0003
->          },
->          {
->            locked = 0x3,
->            pending = 0x0
->          },
->          {
->            locked_pending = 0x3,
->            tail = 0x2c
->          }
->        }
->      }
->    },
+> Add a flag indicating whether RMPOPT instruction is supported.
 > 
-> I am not sure if it is of any help?
+> RMPOPT is a new instruction designed to minimize the performance
+> overhead of RMP checks on the hypervisor and on non-SNP guests by
+> allowing RMP checks to be skipped when 1G regions of memory are known
+> not to contain any SEV-SNP guest memory.
 > 
+> For more information on the RMPOPT instruction, see the AMD64 RMPOPT
+> technical documentation. [1]
 > 
-> 
-> 
-> BUT: I have another dump with LOCKDEP (but NOT the patch above). The 
-> kernel is again spinning in mm_get_cid(), presumably waiting for a free 
-> bit in the map as before [1]:
-> 
-> 
-> [  162.660584] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-> ...
-> [  162.661378] Sending NMI from CPU 3 to CPUs 1:
-> [  162.661398] NMI backtrace for cpu 1
-> ...
-> [  162.661411] RIP: 0010:mm_get_cid+0x54/0xc0
-> 
-> 
-> 7680 is active on CPU 1:
-> PID: 7680     TASK: ffff8cc4038525c0  CPU: 1    COMMAND: "asm"
-> 
-> 
-> CPU3 is waiting for the CPU1's rq_lock:
-> RDX: 0000000000000000  RSI: 0000000000000003  RDI: ffff8cc72fcb8500
-> ...
->   #3 [ffffd2e9c0083da0] raw_spin_rq_lock_nested+0x20 at ffffffff9339e700
-> 
-> crash> struct rq.__lock -x ffff8cc72fcb8500
->    __lock = {
->      raw_lock = {
->        {
->          val = {
->            counter = 0x100003
->          },
->          {
->            locked = 0x3,
->            pending = 0x0
->          },
->          {
->            locked_pending = 0x3,
->            tail = 0x10
->          }
->        }
->      },
->      magic = 0xdead4ead,
->      owner_cpu = 0x1,
->      owner = 0xffff8cc4038b8000,
->      dep_map = {
->        key = 0xffffffff96245970 <__key.7>,
->        class_cache = {0xffffffff9644b488 <lock_classes+10600>, 0x0},
->        name = 0xffffffff94ba3ab3 "&rq->__lock",
->        wait_type_outer = 0x0,
->        wait_type_inner = 0x2,
->        lock_type = 0x0
->      }
->    },
-> 
-> owner_cpu is 1, owner is:
-> PID: 7508     TASK: ffff8cc4038b8000  CPU: 1    COMMAND: "compile"
-> 
-> But as you can see above, CPU1 is occupied with a different task:
-> crash> bt -sxc 1
-> PID: 7680     TASK: ffff8cc4038525c0  CPU: 1    COMMAND: "asm"
-> 
-> spinning in mm_get_cid() as I wrote. See the objdump of mm_get_cid below.
+> Link: https://docs.amd.com/v/u/en-US/69201_1.00_AMD64_RMPOPT_PUB [1]
 
-You might be interested in mm_cid dumps:
+Please do not add URLs to documents on corporate sites because latter change
+notoriously fast, resulting in dead links. Instead, quote the document title
+so that anyone looking for it, can find it after a web search engine has
+indexed it.
 
-====== PID 7508 (sleeping, holding the rq lock) ======
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  arch/x86/include/asm/cpufeatures.h | 2 +-
+>  arch/x86/kernel/cpu/scattered.c    | 1 +
+>  2 files changed, 2 insertions(+), 1 deletion(-)
 
-crash> task -R mm_cid -x 7508
-PID: 7508     TASK: ffff8cc4038b8000  CPU: 1    COMMAND: "compile"
-   mm_cid = {
-     active = 0x1,
-     cid = 0x40000003
-   },
+Btw, looking further in the set, the first several patches are for tip and
+then KVM ones come.
 
-crash> p ((struct task_struct *)(0xffff8cc4038b8000))->mm->mm_cid|head -4
-$6 = {
-   pcpu = 0x66222619df40,
-   mode = 1073741824,
-   max_cids = 4,
+I'm thinking, when the time comes, I'll give you, Sean, an immutable branch
+which you can merge.
 
-
-====== PID 7680 (spinning in mm_get_cid()) ======
-
-crash> task -R mm_cid -x 7680
-PID: 7680     TASK: ffff8cc4038525c0  CPU: 1    COMMAND: "asm"
-   mm_cid = {
-     active = 0x1,
-     cid = 0x80000000
-   },
-
-crash> p ((struct task_struct *)(0xffff8cc4038b8000))->mm->mm_cid|head -4
-$8 = {
-   pcpu = 0x66222619df40,
-   mode = 1073741824,
-   max_cids = 4,
-
-
-====== per-cpu for CPU1 ======
-
-crash> struct mm_cid_pcpu -x fffff2e9bfc89f40
-struct mm_cid_pcpu {
-   cid = 0x40000003
-}
-
-
-
-Dump of any other's mm_cids needed?
-
-> [1] https://bugzilla.suse.com/show_bug.cgi?id=1258936#c17
-> 
-> 
->> ffffffff8139cd40 <mm_get_cid>:
->> mm_get_cid():
->> include/linux/cpumask.h:1020
->> ffffffff8139cd40:       8b 05 9a d7 40 02       mov    
->> 0x240d79a(%rip),%eax        # ffffffff837aa4e0 <nr_cpu_ids>
->> kernel/sched/sched.h:3779
->> ffffffff8139cd46:       55                      push   %rbp
->> ffffffff8139cd47:       53                      push   %rbx
->> include/linux/mm_types.h:1477
->> ffffffff8139cd48:       48 8d 9f 80 0b 00 00    lea    0xb80(%rdi),%rbx
->> kernel/sched/sched.h:3780 (discriminator 2)
->> ffffffff8139cd4f:       8b b7 0c 01 00 00       mov    0x10c(%rdi),%esi
->> include/linux/cpumask.h:1020
->> ffffffff8139cd55:       83 c0 3f                add    $0x3f,%eax
->> ffffffff8139cd58:       c1 e8 03                shr    $0x3,%eax
->> kernel/sched/sched.h:3780 (discriminator 2)
->> ffffffff8139cd5b:       48 89 f5                mov    %rsi,%rbp
->> include/linux/mm_types.h:1479 (discriminator 1)
->> ffffffff8139cd5e:       25 f8 ff ff 1f          and    $0x1ffffff8,%eax
->> include/linux/mm_types.h:1489 (discriminator 1)
->> ffffffff8139cd63:       48 8d 3c 43             lea    (%rbx,%rax,2),%rdi
->> include/linux/find.h:393
->> ffffffff8139cd67:       e8 44 d8 6e 00          call   
->> ffffffff81a8a5b0 <_find_first_zero_bit>
->> kernel/sched/sched.h:3771
->> ffffffff8139cd6c:       39 e8                   cmp    %ebp,%eax
->> ffffffff8139cd6e:       73 7c                   jae    
->> ffffffff8139cdec <mm_get_cid+0xac>
->> ffffffff8139cd70:       89 c1                   mov    %eax,%ecx
->> kernel/sched/sched.h:3773 (discriminator 1)
->> ffffffff8139cd72:       89 c2                   mov    %eax,%edx
->> include/linux/cpumask.h:1020
->> ffffffff8139cd74:       8b 05 66 d7 40 02       mov    
->> 0x240d766(%rip),%eax        # ffffffff837aa4e0 <nr_cpu_ids>
->> ffffffff8139cd7a:       83 c0 3f                add    $0x3f,%eax
->> ffffffff8139cd7d:       c1 e8 03                shr    $0x3,%eax
->> include/linux/mm_types.h:1479 (discriminator 1)
->> ffffffff8139cd80:       25 f8 ff ff 1f          and    $0x1ffffff8,%eax
->> include/linux/mm_types.h:1489 (discriminator 1)
->> ffffffff8139cd85:       48 8d 04 43             lea    (%rbx,%rax,2),%rax
->> arch/x86/include/asm/bitops.h:136
->> ffffffff8139cd89:       f0 48 0f ab 10          lock bts %rdx,(%rax)
->> kernel/sched/sched.h:3773 (discriminator 2)
->> ffffffff8139cd8e:       73 4b                   jae    
->> ffffffff8139cddb <mm_get_cid+0x9b>
->> ffffffff8139cd90:       eb 5a                   jmp    
->> ffffffff8139cdec <mm_get_cid+0xac>
->> arch/x86/include/asm/vdso/processor.h:13
->> ffffffff8139cd92:       f3 90                   pause
->> include/linux/cpumask.h:1020
->> ffffffff8139cd94:       8b 05 46 d7 40 02       mov    
->> 0x240d746(%rip),%eax        # ffffffff837aa4e0 <nr_cpu_ids>
-> 
-> The CPU1 was caught by the NMI here ^^^^^^^^^^^^^^^^^^^^.
-> 
-> 
-> 
-> 
->> In the meantime, me and Michal K. did some digging into qemu dumps. 
->> Details at (and a couple previous comments):
->> https://bugzilla.suse.com/show_bug.cgi?id=1258936#c17
->>
->> tl;dr:
->>
->> In one of the dumps, one process sits in
->>    context_switch
->>      -> mm_get_cid (before switch_to())
->>
->>  > 65 kworker/1:1 SP= 0xffffcf82c022fd98 -> __schedule+0x16ee 
->> (ffffffff820f162e) -> call mm_get_cid
->>
->> Michal extracted the vCPU's RIP and it turned out:
->>  > Hm, I'd say the CPU could be spinning in mm_get_cid() waiting for a 
->> free CID.
->>  > ...
->>  > ffff8a88458137c0:  000000000000000f 000000000000000f
->>  >                                                    ^
->>  > Hm, so indeed CIDs for all four CPUs are occupied.
->>
->> To me (I don't know what CID is either), this might point as a 
->> possible culprit to Thomas' "sched/mmcid: Cure mode transition woes" [1].
->>
->> Funnily enough, 47ee94efccf6 ("sched/mmcid: Protect transition on 
->> weakly ordered systems") spells:
->>  >     As a consequence the task will
->>  >     not drop the CID when scheduling out before the fixup is 
->> completed, which
->>  >     means the CID space can be exhausted and the next task 
->> scheduling in will
->>  >     loop in mm_get_cid() and the fixup thread can livelock on the 
->> held runqueue
->>  >     lock as above.
->>
->> Which sounds like what exactly happens here. Except the patch is from 
->> the series above, so is already in 6.19 obviously.
->>
->>
->> I noticed there is also a 7.0-rc1 fix:
->>    1e83ccd5921a sched/mmcid: Don't assume CID is CPU owned on mode switch
->> But that got into 6.19.1 already (we are at 6.19.3). So does not 
->> improve the situation.
->>
->> Any ideas?
->>
->>
->>
->> [1] https://lore.kernel.org/all/20260201192234.380608594@kernel.org/
->>
->> thanks,
-> 
+Right?
 
 -- 
-js
-suse labs
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
