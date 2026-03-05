@@ -1,148 +1,164 @@
-Return-Path: <kvm+bounces-72788-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72782-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AO8aN/YJqWlc0gAAu9opvQ
-	(envelope-from <kvm+bounces-72788-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 05:43:34 +0100
+	id ENWZNTUFqWlW0QAAu9opvQ
+	(envelope-from <kvm+bounces-72782-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 05:23:17 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4D320AE1A
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 05:43:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 392CE20AC1A
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 05:23:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 847233074118
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 04:42:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 66A0B3062499
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 04:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7322749ED;
-	Thu,  5 Mar 2026 04:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A22323F26A;
+	Thu,  5 Mar 2026 04:22:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N9uLVvgf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aMhWlKPN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C0227A916;
-	Thu,  5 Mar 2026 04:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F681E3DCD
+	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 04:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772685748; cv=none; b=IpfSknXRBX87xjrc8ECR7GW84tsb34nlg8SvMM1ivOPR6klt2hMRbhtx8QlVpN2I8dkDzSCvpNuZGvrOyPB7YpbCNrsBbt68xd6s/RLE92j3Yj/j4BLPqt6GcGNXRD9s7w3c7pfMRUFqsAGmAsu5ds7mmNuNErFHmEagSVBrAIA=
+	t=1772684567; cv=none; b=T67szmsk4ZvXQOWrASnKx1di0ThYFOcBKLF7kxQaZkmrvTmZnokcxZgTjLHCvEPoL0Hi/eIpbUmosfoPbwo3kSbA2e7QNsRTYQlbo5K9NwjqwYHWIuMxASrrAXqWzcl8326xKF698xo2CMMEeQJWQ3zEYIBwoNPD3kwn17N8Nnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772685748; c=relaxed/simple;
-	bh=NLWgvlVt8wEdRkMYr465gb4yvlov99EASllX8462tlc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HpgAumVixqkZnTlb+ofxVpceAf69T4eFNy3h3b8nVorTd3NwHjdtv0UY99KkpEvJnsyjIjfHWjXc/ak0JROfZW1ZfV97NMUMM7mkPCx5bYYpwpgXuovvu2zqj7FOkFCb1tXSO9Qd5/JQnj+oS4VIA7O1JSHl/Wd6I3fQ7Uaun8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N9uLVvgf; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772685747; x=1804221747;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NLWgvlVt8wEdRkMYr465gb4yvlov99EASllX8462tlc=;
-  b=N9uLVvgfAGz9Axh4+wVGqsWhgXpu0KGlhhaMrfifEqzdJTP+geylneFC
-   7AayY7tfHfdVjd3zP9L4deOo136caXm2oH6aLPtMrgrEOVjns92zTrUNR
-   rJnpRai/wgYSDyiDqz7UCxaHZTMeShBGjePOX4eozqzj35k+MwCB0w1ig
-   n8UltvbYJByHYiTMAYy7MTZvdOkpVWOyhLsj8stlBujELKrCu13JLeNx6
-   V5uFTJVKSxfVjUMnQLkVHx9fS4Fke3MoMjSCkbxglAQuGiG9iz933iQvx
-   x4M1SSPFS65Ue6NRWLVEJDvHnCKzLmGco3knZHh5shbm45hePBWVqAwmn
-   w==;
-X-CSE-ConnectionGUID: panqRKz5R5mVkGVdk/N2lA==
-X-CSE-MsgGUID: RhqEXcBhR92Gsw9pwfCsqg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11719"; a="84096919"
-X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
-   d="scan'208";a="84096919"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2026 20:42:27 -0800
-X-CSE-ConnectionGUID: YcoNZ1GoRfiW8I1vhUQwkQ==
-X-CSE-MsgGUID: F2espSgKR8i2QJRW1tYOeg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,325,1763452800"; 
-   d="scan'208";a="218552335"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by orviesa008.jf.intel.com with ESMTP; 04 Mar 2026 20:42:20 -0800
-Date: Thu, 5 Mar 2026 12:22:27 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: "Huang, Kai" <kai.huang@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Gao, Chao" <chao.gao@intel.com>, "x86@kernel.org" <x86@kernel.org>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"tony.lindgren@linux.intel.com" <tony.lindgren@linux.intel.com>,
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"kas@kernel.org" <kas@kernel.org>,
-	"Chatre, Reinette" <reinette.chatre@intel.com>,
-	"Verma, Vishal L" <vishal.l.verma@intel.com>,
-	"nik.borisov@suse.com" <nik.borisov@suse.com>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"Weiny, Ira" <ira.weiny@intel.com>, "hpa@zytor.com" <hpa@zytor.com>,
-	"Annapurve, Vishal" <vannapurve@google.com>,
-	"sagis@google.com" <sagis@google.com>,
-	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-	"Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-	"paulmck@kernel.org" <paulmck@kernel.org>,
-	"tglx@kernel.org" <tglx@kernel.org>,
-	"Williams, Dan J" <dan.j.williams@intel.com>,
-	"bp@alien8.de" <bp@alien8.de>
-Subject: Re: [PATCH v4 16/24] x86/virt/seamldr: Install a new TDX Module
-Message-ID: <aakFA6X74x+8tYGR@yilunxu-OptiPlex-7050>
-References: <20260212143606.534586-1-chao.gao@intel.com>
- <20260212143606.534586-17-chao.gao@intel.com>
- <6f1f835e27bef3462ae419906e25bd887eb8577b.camel@intel.com>
+	s=arc-20240116; t=1772684567; c=relaxed/simple;
+	bh=81yLoi3tXabw0dqSXUmCvROMbXPWzxbqe15oyfoa03k=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=aU5I5QXpFzffp0I4a7jur1Y7ajShQ7lLzqyRSVgKb5Rn+XJCpe+gnz26dRxNuBfPQ3YTs3Azo9ZHNKyKWohGgDZVDBmL/Dfeopdl7CrzT1jpXHrjk0khkQwqEz43Ltn5EZ3fVvGXgDdxFe60CN2GC9P2fgq8f+39FD4+D1iiy7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aMhWlKPN; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-358f058973fso7217657a91.1
+        for <kvm@vger.kernel.org>; Wed, 04 Mar 2026 20:22:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772684565; x=1773289365; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5W+vjOw4sHJfZ2ztYmHn3awEcYReG2mo7cvKhP8YlFQ=;
+        b=aMhWlKPN90aycq0h0qZjHK5zbht4c94Y2IYQ2aje0FfaD/vAEZU9/J/ZOLlD6tViYc
+         GH+eYp1bQCWtt631PazBYXz7EnhGhj4nktRkaLCWe0ZkCAycmUjDWUpB7+QqTbx/UH/l
+         sgHYgeiX1KroHEECsdXoLGsuNuOzZv8guC5sznHG14g/HHt/3wYZNZ1g7npXP6Y2Y9qc
+         mErEU7s4yX3oXv+iaLUpEOrSLahEYwKSkZ73ZVF1MkfEjEu2sWxXi7dxc+4Hgj7RCEdr
+         Me3dvyFd6FbNz5yqEbOfro++4wBoR0AAag2F3ulIJzDDr6FZRls1OBXCLhcwFiO1xaee
+         MViA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772684565; x=1773289365;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5W+vjOw4sHJfZ2ztYmHn3awEcYReG2mo7cvKhP8YlFQ=;
+        b=FqGFrN+Jm5gLcCl1BdMaDLEPIipAs1gYYDk9s4LxxQ2xHw8dgrLuNuEZAC23ola6VR
+         3hy9YPWp64sh55gJli/15SMWNDl47ekDoKqN4mW5AqnSq0OB+gUrKt7w7bma46gAysCj
+         I2HEJdPov/T41t2i/8rfxw6RHsmfwABxO0m6jcwDtWtpCRDrTkAcLE/N9AMsB4GC7JJs
+         iaMRskh4p5wut1l2FjJyGbq+4TKSK0gkSLtyRzNDM4FnojpvbNRXHgJmvxwztQpEW2jB
+         bloxRoIzo3WulNIEDryi+fRUDIfEwYYu9aT/PKZBEFhVaKhJLhuC1cybmRlVNNBmU66a
+         rOjg==
+X-Forwarded-Encrypted: i=1; AJvYcCXTJhsv2QivFh2exJmmJYw4bIcRElFriyYNacyWtW0KHEq3Q2H+TT0IlHxKkmlC65PrDCQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyu7Y1gyheEw980AlHiM/8P2gWGIua6OLGaY2RZaq+pBnUspIZH
+	Op3IWQ2d6dlK82FOxyXMvK1zQX23DuPL571qoPYxjPx+808qT7uq0PzUX3yObe/612eAmiC8RsB
+	7HbVyHQ==
+X-Received: from pjd13.prod.google.com ([2002:a17:90b:54cd:b0:358:eda2:4a10])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4fc7:b0:356:7b41:d355
+ with SMTP id 98e67ed59e1d1-359a69a0346mr3119329a91.1.1772684564578; Wed, 04
+ Mar 2026 20:22:44 -0800 (PST)
+Date: Wed, 4 Mar 2026 20:22:43 -0800
+In-Reply-To: <20260112235408.168200-10-chang.seok.bae@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6f1f835e27bef3462ae419906e25bd887eb8577b.camel@intel.com>
-X-Rspamd-Queue-Id: 4B4D320AE1A
+Mime-Version: 1.0
+References: <20260112235408.168200-1-chang.seok.bae@intel.com> <20260112235408.168200-10-chang.seok.bae@intel.com>
+Message-ID: <aakFE4BMwsdOXL55@google.com>
+Subject: Re: [PATCH v2 09/16] KVM: emulate: Support EGPR accessing and tracking
+From: Sean Christopherson <seanjc@google.com>
+To: "Chang S. Bae" <chang.seok.bae@intel.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	chao.gao@intel.com
+Content-Type: text/plain; charset="us-ascii"
+X-Rspamd-Queue-Id: 392CE20AC1A
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72788-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72782-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yilun.xu@linux.intel.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email]
 X-Rspamd-Action: no action
 
-> > -static int do_seamldr_install_module(void *params)
-> > +static int do_seamldr_install_module(void *seamldr_params)
-> 
-> Nit:
-> 
-> IMHO such renaming is just a noise to this patch, since in patch 10/11 it's
+For the scope,
 
-Agree. Otherwise
+KVM: x86:
 
-Reviewed-by: Xu Yilun <yilun.xu@linux.intel.com>
+because other architectures have emulator code, and as is the case here, x86's
+emulator code isn't strictly contained to the emulate.c.
 
-> clear that the 'params' you passed in is seamldr_params.  No?
+On Mon, Jan 12, 2026, Chang S. Bae wrote:
+> Extend the emulator context and GPR accessors to handle EGPRs before
+> adding support for REX2-prefixed instructions.
 > 
-> Perhaps just name it 'seamldr_params' at patch 11?
+> Now the KVM GPR accessors can handle EGPRs. Then, the emulator can
+> uniformly cache and track all GPRs without requiring separate handling.
+> 
+> Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+> ---
+>  arch/x86/kvm/kvm_emulate.h | 10 +++++-----
+>  arch/x86/kvm/x86.c         |  4 ++--
+>  2 files changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+> index fb3dab4b5a53..16b35a796a7f 100644
+> --- a/arch/x86/kvm/kvm_emulate.h
+> +++ b/arch/x86/kvm/kvm_emulate.h
+> @@ -105,13 +105,13 @@ struct x86_instruction_info {
+>  struct x86_emulate_ops {
+>  	void (*vm_bugged)(struct x86_emulate_ctxt *ctxt);
+>  	/*
+> -	 * read_gpr: read a general purpose register (rax - r15)
+> +	 * read_gpr: read a general purpose register (rax - r31)
+>  	 *
+>  	 * @reg: gpr number.
+>  	 */
+>  	ulong (*read_gpr)(struct x86_emulate_ctxt *ctxt, unsigned reg);
+>  	/*
+> -	 * write_gpr: write a general purpose register (rax - r15)
+> +	 * write_gpr: write a general purpose register (rax - r31)
+>  	 *
+>  	 * @reg: gpr number.
+>  	 * @val: value to write.
+> @@ -314,7 +314,7 @@ typedef void (*fastop_t)(struct fastop *);
+>   * a ModRM or SIB byte.
+>   */
+>  #ifdef CONFIG_X86_64
+> -#define NR_EMULATOR_GPRS	16
+> +#define NR_EMULATOR_GPRS	32
+
+If we add Kconfig, this would be the place to use it...
 
