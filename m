@@ -1,203 +1,170 @@
-Return-Path: <kvm+bounces-72836-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72837-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GD15LM20qWkZCwEAu9opvQ
-	(envelope-from <kvm+bounces-72836-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 17:52:29 +0100
+	id KFHlHpO2qWlEDAEAu9opvQ
+	(envelope-from <kvm+bounces-72837-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:00:03 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2642B215952
-	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 17:52:29 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 800C2215C9D
+	for <lists+kvm@lfdr.de>; Thu, 05 Mar 2026 18:00:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C8A413041786
-	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 16:52:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 576D8301DA40
+	for <lists+kvm@lfdr.de>; Thu,  5 Mar 2026 16:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2A83D567F;
-	Thu,  5 Mar 2026 16:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B40E3DEAC1;
+	Thu,  5 Mar 2026 16:56:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rT9UbEND"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nrFjNpCr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63666334373;
-	Thu,  5 Mar 2026 16:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772729538; cv=none; b=gSGfoNJSEq0PcGAbpNfd9Lpwae6RoHyYTtKGAC4UbX9HBuxb2sJI4Ah4gCPIdSCTM5Sz6PAWNCapLyJDk+8qdGTQp8tg3gN3TXlEoa7siNQ2w/GXobRn6j42OzK2fwRidG7p0XgzuE8JTNnAHOAP+CIdVeXIaiUlGsu6D7+Kxrs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772729538; c=relaxed/simple;
-	bh=U8U1ZcaBVXcZiDVbxuUu5UMuJphWudTh/6BKaUhK/ZQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XQe29AT5MzBbjwyZYD2dg/wmcWK22xltYJ/5PdAs97yGGVwHaoJMXobmKAWkBBrceqzr9+HEA4vYYB63qLvi/ORwr2xJWzEHmits/7EPdC9GzxQUf6PTYsV1h8J6KnGhss4a3GGu3vH2SbAOaqH0EJTJcHx4n5ESD76YShMGae4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rT9UbEND; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62525PLB1858431;
-	Thu, 5 Mar 2026 16:52:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=1yCLCp
-	frJynphjqy1T//BPjiIo/Ja19vGPWuvmi3ehY=; b=rT9UbENDBQ+RKxsQrVWQkn
-	mUsbwKtFkwzEDU5lGPsOqvZ+GBYKpG0q3B8XNCOVHViEQSnHMhK8PvDJE7d9Pckg
-	Msn270Z2MD2d5LOcxtbKmyPQXxJq4342b1Rlbh01QF4ymvloeg1K9Yr0y2tjstFH
-	165/CohPNmaamdEwgMEMfBCwnx+89VXiGlUeZg/atBElDlUiYACfIlzUUJ2YME0Z
-	O7d2AE67Igzicz76HNDQUK68E1v94wJH9O9AZxGBGw+01J8epUjbQF0s2xDdcDPZ
-	WtErM2t0tBdCbPwLLdo1gxCeJ4HgsOmIa7OirfpHD7or+SyBrlohBq5nYbqSV8UQ
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4cksrjcr8d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Mar 2026 16:52:16 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 625Dxeqp003275;
-	Thu, 5 Mar 2026 16:52:15 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4cmb2yc8ny-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Mar 2026 16:52:15 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 625GqBId50463156
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 5 Mar 2026 16:52:11 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 30A6120043;
-	Thu,  5 Mar 2026 16:52:11 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C911320040;
-	Thu,  5 Mar 2026 16:52:10 +0000 (GMT)
-Received: from [9.52.200.39] (unknown [9.52.200.39])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  5 Mar 2026 16:52:10 +0000 (GMT)
-Message-ID: <eb741654-e048-4a04-9d4a-0a64e30e5f76@linux.ibm.com>
-Date: Thu, 5 Mar 2026 17:52:10 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3373DBD54
+	for <kvm@vger.kernel.org>; Thu,  5 Mar 2026 16:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772729782; cv=pass; b=Gn7u1YsIfR/VAj5yVQoLGIH+PWK+dWxOJ4ygTYVgvKEgQRla1N97ftK5iGN9g4OH8w+cbQkFZ4/ZFepb8YXy6hIigAWe06NjBKfqOCMGozm1uyunOmyKZqe6jDtYuwFMrRebpH+gvHDDfGiXMWqdMIahE+GGhazld8iMrvMFhBk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772729782; c=relaxed/simple;
+	bh=7+fZuvYjkTWPnYlnF0VNRGUh72MlyQ5Oi5QaZp9Vm1I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FPFx3NADkucG6GLy95C9iSNZ0mZQXMy5u2KfAa3gJO2xMLybe5D7zTxOal1fQVoEiwQAG16EOgEGL0JDxKATGQebs8iOi+T7Xd7oKIdgo591lHZWlT5sLLMf+5qza5uex7makQk/+sFQys7Z1u83tDqnE2dW2CBASE20XrzT22E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nrFjNpCr; arc=pass smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-506a355aedfso632591cf.0
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 08:56:21 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772729780; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gv78c4coHY2FyQITju8LW6hNmVnjyJecxBbl6xiQX7mKqwtSp9SBfmh1nMJTWe8X70
+         wdT5/hirM3xYXJLpMmVury2m7Y6QMUhM8UMjOPyAInBTpwI2FeCLWulquX3Ti5FOd4+M
+         IFw0P3xgJ1kstG1LT3AKF6/zxTHsLGM+/yIjUO+B6g2Cdo0TVMDCVjKfXVyHxepm9BbZ
+         menR1lnRPTaRYGGSpML3I5LFfBrOo7AUJ4POBLMZj2IIphHvPN+pIatvfqkiguVNGC95
+         /TZHa17M7aKDEyLHfR1X3blHK3P0uOV73NCcDf6UFIQmyNDRNM/q0IzXf4dfNFE3uOHu
+         lTKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=w2b4o87Dv8Tqe0cDumD9I6Yls5fZWHSIMLvm+YwvHiU=;
+        fh=1NnkoE44iydqwaKIvZldbbixCVVisB2zZR4hOif3g18=;
+        b=bU4+bLqerOu7vecYDgFhA9agnlqoir1HET0VrkYlsn0Z8jnWJWhVg5u972cJrB1Mkf
+         M/VCcc6bBw+cjcu83ePoGHlihxlv7YTlUKwmP+TahWRzrjCULyZ78ke8VwoUHCRsydji
+         ybxtnuYZeSth+Z/l3mW5eWiJpmAlgRvPaPQGqjB7D091y+MgYi5ZlTGAPcaFO4GkGJcB
+         47zz4kHTwHXhkShrhOEAqkGmvOoYPjyWXCv5XaMmttjoqJ8bQ17ICWJcXYcyJjk6vSCm
+         cWDUhImHbQIoyiw7ehUVLmGTGAkChwQ/LuTIazRqWphhCZDIyrlsFfwWWOvZpOrpaRLv
+         G83g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772729780; x=1773334580; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=w2b4o87Dv8Tqe0cDumD9I6Yls5fZWHSIMLvm+YwvHiU=;
+        b=nrFjNpCr50MpTJUBliW5Yko+XzoE2VAfFiUEQxJZHia0El3SgKWozfz7Jv8p0ZkCc/
+         3ybMuUNpNeAv2AXxcneNyZmyxh6oBclhFwfsw7i7LXkicJ07HsCIMEWmnRxItAifd0fN
+         q9X8QtM7UaMG2fUApZO//MGzvzUavF/rsZoizKg1MZS6rRO53LE/qOLwiIQOuQv8Ypx2
+         UVYCnMhXLD0EhKq2hFdsGJ/+5GVhL0kq86PikGM2a4cBCDNPEnrBpS++xp7aTqsv1Lxb
+         yOUpf609NW4y2ehdoQJkQR6mG0tzya2Lyjj9/Qx9yS8loSnGpxC/idvB7Kr9GUWX2Ayu
+         Oh7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772729780; x=1773334580;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w2b4o87Dv8Tqe0cDumD9I6Yls5fZWHSIMLvm+YwvHiU=;
+        b=ZPvdT9ty+wjOO8LBtOTw+sPTeN1e08iv848taDpDk/mrxgW2naQkSU5dLXtpsUsJ0c
+         wB+ow3sS9Z0EcI0lmj+BZYxTLbd/5HJyWe/WzbMQQk4kO6RVG7WHGIBwLOs3KEZucaHX
+         Aqqodi30MKM2Zckcnybk/gMo6tynKx7XHTzsld+MxBBtiNPVfryHTVwwihXufDenLihK
+         nLIAO6F5c3qP6DDit4TbBite87ivvqyy1snJCn2tpdAFMtaV7G03fi0BpYBsrXMl2X2t
+         rWBJcpJVfKk+MVwJKtVYvtBCnVsMXqf8qTaDuaPLBcXce2z/DbmpTsOQP7tFO0X2lDTf
+         L10w==
+X-Gm-Message-State: AOJu0Yy9JhhjANOugTvDTXh7m8YVf2v7u72dbA+Lbd45+EQ5L5AOd/Cy
+	Gpwlr2rtEK4wHc3PHvySkuYtUBxxGSInECV3DRx8Q/O/mf9i7bJ9EoiEl0l3qXNHruksWufIaYZ
+	iLBPqBWsp4DJWJgvSN0L0HazSQcGbOpGvNsVGQ6h6
+X-Gm-Gg: ATEYQzzZhoC+ODPyJvwd4sXvKJbOs+bejBrlREK/JwQ8uJy4rutf8kaFifoAX7jRkPZ
+	WQDOj3bbOOMRmMzwLSFyw0XLp8avcDuEZgmK7/2iAgHHq4LPWWHBlVTrdW/g0Kr1x9KmRQavQyu
+	tk5jWtFXl7TI59qe/aON9tEmjNQ27AqlVc+jn0+dymWBDfX34P/fGV8eKwMZGSnZfmruCwyAnPB
+	xXqkJAMMlXPGs7W3sQahsKwHJ/PTLpLYw5Nq2OqyEEHzZJLWYiYREKNb84RFpJhZXeFE5HJ1c8F
+	qZMLma15
+X-Received: by 2002:a05:622a:1908:b0:501:5180:3c90 with SMTP id
+ d75a77b69052e-508e78bc5a4mr11348321cf.15.1772729779762; Thu, 05 Mar 2026
+ 08:56:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] KVM: s390: Limit adapter indicator access to
- mapped page
-To: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, mjrosato@linux.ibm.com, freimuth@linux.ibm.com,
-        imbrenda@linux.ibm.com
-References: <20260303135250.3665-1-frankja@linux.ibm.com>
- <20260303135250.3665-2-frankja@linux.ibm.com>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20260303135250.3665-2-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=Rp/I7SmK c=1 sm=1 tr=0 ts=69a9b4c0 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=VnNF1IyMAAAA:8
- a=Wveo7z3TGatblUXlsDUA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA1MDEzNSBTYWx0ZWRfXyau62z0UoMMR
- 2WD4U48b4XXMzHxcojLMQ/MgSpdUgu84xDdkgmoTEUYNbsXtvPSBlJAwLN5/jOyX+qe65cOYaQA
- z84uFyiEvKR0Zen/2V1Fy9CZrs6bY0O7+H/Kl/UkMHspEp2cSp6Tf+eBnalAa0uyLcV95gLe1nC
- 5L01NyyObsiPN2Sv4LOPW8zzaHKDYc/kJOq+B5AUP/4swsK00xw+GcKa6K/i29OsyrB5aY7UnVl
- k/NWX7foKQulf4Ir8FHJPRj/KOhg5g5Xc8Flpj4J0s7x54TYSqvqi45eSK/I2Cre1ZkxC27yd4j
- IBP8U6MvYYxZ2O6w5ziKsjOdxGiPzRLPHlBI8wLQfHia4If6wRj4JqcBgBNX5mCFm6t14FlVpbO
- iXzOSWSilxMlGDncBrsO3tNp0u0+nS1cUjIHO/k5uHc9ej4DTRS1VAjwsGxxbH21zckkhSeFVy5
- DhcR4QjV9o2Eep/u9cw==
-X-Proofpoint-GUID: gttwn3_N0qlsBxkkG0fzRRSx5tftrvQk
-X-Proofpoint-ORIG-GUID: gttwn3_N0qlsBxkkG0fzRRSx5tftrvQk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-05_04,2026-03-04_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 priorityscore=1501 spamscore=0 phishscore=0 adultscore=0
- bulkscore=0 clxscore=1015 impostorscore=0 malwarescore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603050135
-X-Rspamd-Queue-Id: 2642B215952
+References: <20260304162222.836152-1-tabba@google.com> <86jyvq6wyg.wl-maz@kernel.org>
+In-Reply-To: <86jyvq6wyg.wl-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 5 Mar 2026 16:55:43 +0000
+X-Gm-Features: AaiRm51dhM8VzhZriEGSXSixZJNkbyhhRpWwsRm0Q6k3mF9vnEvNvcsMfRmqcbY
+Message-ID: <CA+EHjTyUhBqUGG+TC83rz5W11RcymQuFAr+FhFpRsPZbf--vTw@mail.gmail.com>
+Subject: Re: [PATCH v1 0/2] KVM: arm64: Fix a couple of latent bugs in user_mem_abort()
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, yangyicong@hisilicon.com, 
+	wangzhou1@hisilicon.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 800C2215C9D
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72836-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[borntraeger@linux.ibm.com,kvm@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-72837-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tabba@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_SEVEN(0.00)[11]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-Am 03.03.26 um 14:46 schrieb Janosch Frank:
-> While we check the address for errors, we don't seem to check the bit
-> offsets and since they are 32 and 64 bits a lot of memory can be
-> reached indirectly via those offsets.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Fixes: 84223598778b ("KVM: s390: irq routing for adapter interrupts.")
-> Suggested-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+On Thu, 5 Mar 2026 at 16:51, Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Wed, 04 Mar 2026 16:22:20 +0000,
+> Fuad Tabba <tabba@google.com> wrote:
+> >
+> > Finding these issues just reinforces how fragile this 300-line function
+> > has become. We really need to refactor it to make the state flow easier
+> > to reason about. I'm currently putting together a series to do just that
+> > (introducing a proper fault state object), so stay tuned for an RFC on
+> > that front.
+>
+> If you have such patches, please post them sooner rather than later,
+> even if the rework is incomplete. I'd be happy take small patches that
+> start add infrastructure early and work out the full refactoring over
+> time.
 
-Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+I'll try to have something for you by tomorrow in that case.
 
-> ---
->   arch/s390/kvm/interrupt.c | 12 ++++++++++++
->   1 file changed, 12 insertions(+)
-> 
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index 18932a65ca68..1a702e8ef574 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -2724,6 +2724,9 @@ static unsigned long get_ind_bit(__u64 addr, unsigned long bit_nr, bool swap)
->   
->   	bit = bit_nr + (addr % PAGE_SIZE) * 8;
->   
-> +	/* kvm_set_routing_entry() should never allow this to happen */
-> +	WARN_ON_ONCE(bit > (PAGE_SIZE * BITS_PER_BYTE - 1));
-> +
->   	return swap ? (bit ^ (BITS_PER_LONG - 1)) : bit;
->   }
->   
-> @@ -2852,6 +2855,7 @@ int kvm_set_routing_entry(struct kvm *kvm,
->   			  struct kvm_kernel_irq_routing_entry *e,
->   			  const struct kvm_irq_routing_entry *ue)
->   {
-> +	const struct kvm_irq_routing_s390_adapter *adapter;
->   	u64 uaddr_s, uaddr_i;
->   	int idx;
->   
-> @@ -2862,6 +2866,14 @@ int kvm_set_routing_entry(struct kvm *kvm,
->   			return -EINVAL;
->   		e->set = set_adapter_int;
->   
-> +		adapter = &ue->u.adapter;
-> +		if (adapter->summary_addr + (adapter->summary_offset / 8) >=
-> +		    (adapter->summary_addr & PAGE_MASK) + PAGE_SIZE)
-> +			return -EINVAL;
-> +		if (adapter->ind_addr + (adapter->ind_offset / 8) >=
-> +		    (adapter->ind_addr & PAGE_MASK) + PAGE_SIZE)
-> +			return -EINVAL;
-> +
->   		idx = srcu_read_lock(&kvm->srcu);
->   		uaddr_s = gpa_to_hva(kvm, ue->u.adapter.summary_addr);
->   		uaddr_i = gpa_to_hva(kvm, ue->u.adapter.ind_addr);
+Cheers,
+/fuad
 
-we could consider a follow-on patch to use the local adapter variable here
-and below as well. But not as part of this fix.
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 
