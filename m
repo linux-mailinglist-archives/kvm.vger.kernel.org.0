@@ -1,258 +1,264 @@
-Return-Path: <kvm+bounces-73087-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73088-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oP5MBZf2qmlaZAEAu9opvQ
-	(envelope-from <kvm+bounces-73087-lists+kvm=lfdr.de@vger.kernel.org>)
+	id yLuRJpf2qmlaZAEAu9opvQ
+	(envelope-from <kvm+bounces-73088-lists+kvm=lfdr.de@vger.kernel.org>)
 	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 16:45:27 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 841172241E3
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 16:45:26 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FC8D2241EA
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 16:45:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B41F63095210
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 15:42:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 20231300B9C7
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 15:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4143E9F9B;
-	Fri,  6 Mar 2026 15:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C53D336A00D;
+	Fri,  6 Mar 2026 15:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="HjUgjvU3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kCBVlRaw"
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-003.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-003.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.72.182.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC61A29B76F;
-	Fri,  6 Mar 2026 15:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.72.182.33
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772811735; cv=none; b=LKsC9d3Tfsm2+jVNtv0mxIdtlztHPmy9Cb1+c04BaoUE+oYdo2e2rHZRJ3PbPHKuEJ5hjw7DGjPNutzuHmbqvG7ife2PA9BwAzZjEHLe14HVR8eHqAoP4ecCgkSsaSt3r7dZ8v3Uig2YyvSd2Yqo+BfJ0uv/tae1kSjjF+c+iDw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772811735; c=relaxed/simple;
-	bh=fHxvicr/4x2KROO8aKJnuupOmRnTt0JEjdAoxNKC7a0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=NK+EewW1MP2nY5PFdq5Ox+57pLhpQtEIBllSlR03ISN6CyaDAL81wOwMdoPKCAwcQa8pPQ6tuqEC80MMXB4A72JLM3I89EGkcSpWP4Aj2NsMT3oulRNsK1wq1itSmcnBNNJSL7LYn3sEO9bhtBHJugH2mJA7zUJ2+kVMU5i7AVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=HjUgjvU3; arc=none smtp.client-ip=3.72.182.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E8B36C0C4
+	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 15:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772811924; cv=pass; b=Vu7SzTni5UicHnxPgYFaBrllxundEuVQr1jp81CMzyeS+TU/bc3M52mCqVW0vhcGP2+gw06JHpf4xoKIiPowGdIjhoTO9Qz7FZzngVvjdfE3SngtWmyPEvGiqmV4ry1PZUza4vUI66uhS9OvfOhNwbpgknf/hUlicyvx3vSuJgA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772811924; c=relaxed/simple;
+	bh=hsriqer5Wp7EhxGKavjbKgHNP6RubiuMiTVAUlMf2cc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B7u5YcRj8596eLVkqffPVtWw41lHv87liPDUSRzbAschMlhktIRT5MxL6ByEDdAHV0nEj3O272LyQUUw/Xk/TMqMUe6kcowA1JPWcMSc9RzqpnJCQtI9HXmCHSIRQIXtQGXL+wYa1CHSu8cdPolIRF1UEfDUy91tbaLAdf4Qx0s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kCBVlRaw; arc=pass smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-5069a785ed2so439431cf.1
+        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 07:45:22 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772811922; cv=none;
+        d=google.com; s=arc-20240605;
+        b=WZc/mO03c3znBJgCJS7LADxX03JcsjiqguXZ7Ttv6D5dnIUDATDSOiD5mrJgqx2dZ2
+         iGS6HMVYCZ2jGpEZQsXGrK8xovCRCecdvj5sqs8GssZNXnoDA2aZTnjYwkHJfzJyLJVh
+         H7h3DeNJndAHL0F+r+st66yS4rk51XptHgHBzqCeR3DBG4Wi030B6iGboXLyZtsxPW3A
+         RQhm6CeNlZ0EsY6u5wQiyDmoi8yZuoB54fi5AMQsIcNiVEmuvPW6dUXfg0C/ztqYrwr8
+         RNeH/uboz5UkztWIhcqAjRzsaoTasKCHixYIihSIQOnmb0asRk2+ZTlf5G/BPR8P7OqU
+         OiJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=unhg1T2qCPKxpfY/PSePUJ4/CJHWOdFGonXXRJegCXU=;
+        fh=QWVBvisWmT/GMkI1ShlIljKvRXGpif5WlgfA/1ly74k=;
+        b=Q70EszkN4pW4FetbVz65LionJCRklJ22TwfJYRL6a0ADVQVhqHqF1IznMkDWD3KRdx
+         AUVLHtJV7/Yh8fozqHO7J+2Mpge1jAZgrGGOqELIHbqrk3PYfqCGwpR9RzjhASneTpqX
+         RPyzuGRumos/jM8+dfJxxtKkNDbVk14Sto/UAzZpiNwCjUH23L5/GWI/43BtLqXUMkO+
+         5hjRFQPRxDtAT8S5jiyENxi3ceGzZvYV4IRvQK0cX/RW3dk572dVZ+YByeMtWz4dCKZU
+         nmW8soVva8mXTODXWXwIFV5GgFTfSbDQr6N7f/y6Pl3JqGBeWcN/AxIOVLJzTvy05QmY
+         PUxQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1772811734; x=1804347734;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=zlv5A21skW2cpWW+wfG6AmLOagqEDkrIsCoF7K54pBc=;
-  b=HjUgjvU3l8JCmKgYUMw4Ygy9Aim7IUwMscTQgjIYKFQOxN1QCQi3LM9K
-   ZpvWbKNZzIlzvT0SdXoAxPhz2h3U5its1gk5MKhPEVO4j73IR3gwDdtjg
-   1uZxF5FQ+pFTnSOHUSDJN3ygVO+NjEGkVOix0IHzWSti39+6hNK1dMHNj
-   F3ut/ITRAQ+fP58I3H1ZLkMGiesjuWqoQ4KQAqDxH8CL6S5U03xBYX5iH
-   W8FB3OMlqyDjhNo0KEmoVJgZTMVnRYBZxP8vjqcU2KZHyLbA0KKtx0H74
-   xDYhnx+0vn7TqhzNYwbV5V80J6xqT09R+yok7M0sTV820BeTY8XCFor66
-   A==;
-X-CSE-ConnectionGUID: /M9OfjBRTeKqpDhCE8ldMA==
-X-CSE-MsgGUID: 0Bb6xkULS3yW60j2eb25+A==
-X-IronPort-AV: E=Sophos;i="6.23,105,1770595200"; 
-   d="scan'208";a="10435125"
-Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
-  by internal-fra-out-003.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2026 15:42:09 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [54.240.197.226:28153]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.5.165:2525] with esmtp (Farcaster)
- id 8290e714-6a53-45c7-af32-ec04f3406384; Fri, 6 Mar 2026 15:42:09 +0000 (UTC)
-X-Farcaster-Flow-ID: 8290e714-6a53-45c7-af32-ec04f3406384
-Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Fri, 6 Mar 2026 15:42:07 +0000
-Received: from [192.168.2.180] (10.106.83.26) by EX19D005EUB003.ant.amazon.com
- (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Fri, 6 Mar 2026
- 15:42:02 +0000
-Message-ID: <6dcbcdcb-bfdd-43a3-b724-599a717c1054@amazon.com>
-Date: Fri, 6 Mar 2026 15:42:01 +0000
+        d=google.com; s=20230601; t=1772811921; x=1773416721; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=unhg1T2qCPKxpfY/PSePUJ4/CJHWOdFGonXXRJegCXU=;
+        b=kCBVlRawRE/OLKyh9yKwUivtHD54kRflWhqD1WjK6naGwKHpuzjuD0iA+7UafFIl50
+         GZMv8eJqV2fiR5fjBtrmNixIbtk8WMWC6OapqCfSrVPPLPpWwvB/w7CeJGWLwe+HrD0D
+         jyNZ2K74c9lm2YKwwUc+3F5j9FzPgjqLofs3FcZ1sk4Tvvc2lTxBXbgpc4UhQ6SPQl0x
+         eJKP1s0vOYXlVazXOUcoZfYGBtVJveaMWIi8KyGH9hLDLhyd2+Qw3Yz77N1PqkfOyxAi
+         uxjCTqwjcUJATYgS+nVCe6FoKdybcHzW341ihSTW5jlRNe5rmCHLB7h/lQUNcrXKN8PC
+         7ArA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772811921; x=1773416721;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=unhg1T2qCPKxpfY/PSePUJ4/CJHWOdFGonXXRJegCXU=;
+        b=ZEx5LEwN8CJA9hCtkFWnVpQkVtBAJRqiF8Gq0b92Ai3g61k+pag/+sIH58kmdbLTq7
+         /J0eAko3stzeZeNNupTtJAS3suqON5sZUroZDBlO1ch+giRI9QjD44fEJYvX2+5b4Nav
+         30FOTwNqN3cEwh0rSKK7uu0hxt1Ugz0zZ4bIz9XY3AhfkTNELd7P4ri9qOYJjYKot+jJ
+         SVLj+UlReQBJtBMU73M9UNB1oPHdZSjYMi7Kfqx9V3rxP46uxu8vaKOsVoVCA+C9hPFO
+         KRew/x8+xjW1t0KI0m/62hl1wOVeUOtitIFexrV7SHUG7iiOB6x3J5oJtpZaD+W8HcGb
+         6tKw==
+X-Gm-Message-State: AOJu0YyQar1PgUQ8FfwVV/GMRmxMRv/74lG9R60FxP083/z69QGdhd9q
+	gZWJoQY3VBUhLH6M8o0XGPwA44dz31e6p1yTOTWArdvk8G918unnoiNRi8FVhfQtW6Ltw0SJILI
+	4AOWws/PkWVj7tRaNdktkd6fPZjN8cRGceWXnt/Tz
+X-Gm-Gg: ATEYQzzJlt0qlL4KQcc52Lpm9kM6Z6bCKNJW6n+yFLxz/MUq59a8M1FH5G/pSBJgADG
+	C2gIkm1Bak2aKPJynRim2fp3o1+rbNNxv+DonQ05zetG5eWveApYtQKFUIRDjGOTwzBCQvW8Lkm
+	VoUhs9/O2EsVut8Z+AmwHC4tIVf+Eh2bB3+w14ylXpIlXx3950K3ml5s0qLkdEnj7IfL79ZYs4h
+	ik62ociW24P30M7sdIWGBFtJKC0XU/28rB2XjhbZYpxlHFvfRX0hJ9IxR4MBKNC2CB3VtwUKiXL
+	IvAqLGLy
+X-Received: by 2002:a05:622a:1825:b0:501:5180:3c90 with SMTP id
+ d75a77b69052e-508fa666c57mr3491241cf.15.1772811920943; Fri, 06 Mar 2026
+ 07:45:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v10 09/15] KVM: guest_memfd: Add flag to remove from
- direct map
-To: "David Hildenbrand (Arm)" <david@kernel.org>, "Kalyazin, Nikita"
-	<kalyazin@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"kernel@xen0n.name" <kernel@xen0n.name>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
-	<linux-s390@vger.kernel.org>, "loongarch@lists.linux.dev"
-	<loongarch@lists.linux.dev>
-CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
-	<corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org"
-	<oupton@kernel.org>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com"
-	<yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
-	"tglx@kernel.org" <tglx@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
-	"bp@alien8.de" <bp@alien8.de>, "dave.hansen@linux.intel.com"
-	<dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>,
-	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>,
-	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org"
-	<willy@infradead.org>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "lorenzo.stoakes@oracle.com"
-	<lorenzo.stoakes@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
-	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>,
-	"mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org"
-	<andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>,
-	"eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>,
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org"
-	<kpsingh@kernel.org>, "sdf@fomichev.me" <sdf@fomichev.me>,
-	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org"
-	<jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com"
-	<jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>,
-	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
-	"shuah@kernel.org" <shuah@kernel.org>, "riel@surriel.com" <riel@surriel.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "jgross@suse.com"
-	<jgross@suse.com>, "yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>,
-	"kas@kernel.org" <kas@kernel.org>, "coxu@redhat.com" <coxu@redhat.com>,
-	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, "ackerleytng@google.com"
-	<ackerleytng@google.com>, "maobibo@loongson.cn" <maobibo@loongson.cn>,
-	"prsampat@amd.com" <prsampat@amd.com>, "mlevitsk@redhat.com"
-	<mlevitsk@redhat.com>, "jmattson@google.com" <jmattson@google.com>,
-	"jthoughton@google.com" <jthoughton@google.com>, "agordeev@linux.ibm.com"
-	<agordeev@linux.ibm.com>, "alex@ghiti.fr" <alex@ghiti.fr>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "borntraeger@linux.ibm.com"
-	<borntraeger@linux.ibm.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-	"dev.jain@arm.com" <dev.jain@arm.com>, "gor@linux.ibm.com"
-	<gor@linux.ibm.com>, "hca@linux.ibm.com" <hca@linux.ibm.com>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "pjw@kernel.org" <pjw@kernel.org>,
-	"shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>,
-	"svens@linux.ibm.com" <svens@linux.ibm.com>, "thuth@redhat.com"
-	<thuth@redhat.com>, "wyihan@google.com" <wyihan@google.com>,
-	"yang@os.amperecomputing.com" <yang@os.amperecomputing.com>,
-	"Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>,
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "urezki@gmail.com"
-	<urezki@gmail.com>, "zhengqi.arch@bytedance.com"
-	<zhengqi.arch@bytedance.com>, "gerald.schaefer@linux.ibm.com"
-	<gerald.schaefer@linux.ibm.com>, "jiayuan.chen@shopee.com"
-	<jiayuan.chen@shopee.com>, "lenb@kernel.org" <lenb@kernel.org>,
-	"osalvador@suse.de" <osalvador@suse.de>, "pavel@kernel.org"
-	<pavel@kernel.org>, "rafael@kernel.org" <rafael@kernel.org>,
-	"vannapurve@google.com" <vannapurve@google.com>, "jackmanb@google.com"
-	<jackmanb@google.com>, "aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>,
-	"patrick.roy@linux.dev" <patrick.roy@linux.dev>, "Thomson, Jack"
-	<jackabt@amazon.co.uk>, "Itazuri, Takahiro" <itazur@amazon.co.uk>,
-	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco"
-	<xmarcalx@amazon.co.uk>
-References: <20260126164445.11867-1-kalyazin@amazon.com>
- <20260126164445.11867-10-kalyazin@amazon.com>
- <13ed00e1-f0db-4326-a800-2ba306833921@kernel.org>
- <690c22f9-b71a-4f14-9857-008c7c858373@amazon.com>
- <0c0b911c-cda2-44a4-897e-361e02be7da5@kernel.org>
- <936fa782-d937-4b14-b92d-cc8707336e5e@amazon.com>
- <9b4b9f48-595d-46c9-8f77-fc021ac2619c@kernel.org>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-In-Reply-To: <9b4b9f48-595d-46c9-8f77-fc021ac2619c@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D011EUA003.ant.amazon.com (10.252.50.178) To
- EX19D005EUB003.ant.amazon.com (10.252.51.31)
-X-Rspamd-Queue-Id: 841172241E3
+References: <20260306140232.2193802-1-tabba@google.com> <86ikb96kg8.wl-maz@kernel.org>
+In-Reply-To: <86ikb96kg8.wl-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 6 Mar 2026 15:44:44 +0000
+X-Gm-Features: AaiRm52XLBmqNfW9v8Obow2Zg0ILvEXXBAF6YDgU2FBbzIjxzMdGtwXjVc2CnoU
+Message-ID: <CA+EHjTzenq_xFwe8K_g1KFbETqndS3FnxPiwBRKrMvrxH4Z1qg@mail.gmail.com>
+Subject: Re: [PATCH v1 00/13] KVM: arm64: Refactor user_mem_abort() into a
+ state-object model
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, qperret@google.com, 
+	vdonnefort@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 3FC8D2241EA
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73087-lists,kvm=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	FREEMAIL_CC(0.00)[redhat.com,lwn.net,kernel.org,arm.com,huawei.com,google.com,alien8.de,linux.intel.com,zytor.com,infradead.org,linux-foundation.org,oracle.com,suse.cz,suse.com,iogearbox.net,linux.dev,gmail.com,fomichev.me,ziepe.ca,nvidia.com,suse.de,surriel.com,intel.com,loongson.cn,amd.com,linux.ibm.com,ghiti.fr,eecs.berkeley.edu,dabbelt.com,os.amperecomputing.com,bytedance.com,shopee.com,amazon.co.uk,amazon.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73088-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[amazon.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kalyazin@amazon.com,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[104];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	HAS_REPLYTO(0.00)[kalyazin@amazon.com];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tabba@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.950];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
+On Fri, 6 Mar 2026 at 15:34, Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Fuad,
+>
+> On Fri, 06 Mar 2026 14:02:19 +0000,
+> Fuad Tabba <tabba@google.com> wrote:
+> >
+> > As promised in my recent patch series fixing a couple of urgent bugs in
+> > user_mem_abort() [1], here is the actual refactoring to finally clean up this
+> > monolith.
+> >
+> > If you look through the Fixes: history of user_mem_abort(), you will start to
+> > see a very clear pattern of whack-a-mole caused by the sheer size and
+> > complexity of the function. For example:
+> > - We keep leaking struct page references on early error returns because the
+> >   cleanup logic is hard to track (e.g., 5f9466b50c1b and the atomic fault leak
+> >   I just fixed in the previous series).
+> > - We have had uninitialized memcache pointers (157dbc4a321f) because the
+> >   initialization flow jumps around unpredictably.
+> > - We have had subtle TOCTOU and locking boundary bugs (like 13ec9308a857 and
+> >   f587661f21eb) because we drop the mmap_read_lock midway through the function
+> >   but leave the vma pointer and mmu_seq floating around in the same lexical
+> >   scope, tempting people to use them.
+> >
+> > The bulk of the work is in the first 6 patches, which perform a strict,
+> > no-logic-change structural refactoring of user_mem_abort() into a clean,
+> > sequential dispatcher.
+> >
+> > We introduce a state object, struct kvm_s2_fault, which encapsulates
+> > both the input parameters and the intermediate state. Then,
+> > user_mem_abort() is broken down into focused, standalone helpers:
+> > - kvm_s2_resolve_vma_size(): Determines the VMA shift and page size.
+> > - kvm_s2_fault_pin_pfn(): Handles faulting in the physical page.
+> >   - kvm_s2_fault_get_vma_info(): A tightly-scoped sub-helper that isolates the
+> >     mmap_read_lock, VMA lookup, and metadata snapshotting.
+> > - kvm_s2_fault_compute_prot(): Computes stage-2 protections and evaluates
+> >   permission/execution constraints.
+> > - kvm_s2_fault_map(): Manages the KVM MMU lock, mmu_seq retry loops, MTE, and
+> >   the final stage-2 mapping.
+> >
+> > This structural change makes the "danger zone" foolproof. By isolating
+> > the mmap_read_lock region inside a tightly-scoped sub-helper
+> > (kvm_s2_fault_get_vma_info), the vma pointer is confined. It snapshots
+> > the required metadata into the kvm_s2_fault structure before dropping
+> > the lock. Because the pointers scope ends when the sub-helper returns,
+> > accessing a stale VMA in the mapping phase is not possible by design.
+> >
+> > The remaining patches in are localized cleanup patches. With the logic
+> > finally extracted into digestible helpers, these patches take the
+> > opportunity to streamline struct initialization, drop redundant struct
+> > variables, simplify nested math, and hoist validation checks (like MTE)
+> > out of the lock-heavy mapping phase.
+> >
+> > I think that there are still more opportunities to tidy things up some
+> > more, but I'll stop here to see what you think.
+>
+> Thanks a lot for going through this, this looks like a very valuable
+> starting point. From a high-level perspective, the end result is even
+> more shocking:
+>
+> <quote>
+> static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>                           struct kvm_s2_trans *nested,
+>                           struct kvm_memory_slot *memslot, unsigned long hva,
+>                           bool fault_is_perm)
+> {
+>         bool write_fault = kvm_is_write_fault(vcpu);
+>         bool logging_active = memslot_is_logging(memslot);
+>         struct kvm_s2_fault fault = {
+>                 .vcpu = vcpu,
+>                 .fault_ipa = fault_ipa,
+>                 .nested = nested,
+>                 .memslot = memslot,
+>                 .hva = hva,
+>                 .fault_is_perm = fault_is_perm,
+>                 .ipa = fault_ipa,
+>                 .logging_active = logging_active,
+>                 .force_pte = logging_active,
+>                 .prot = KVM_PGTABLE_PROT_R,
+>                 .fault_granule = fault_is_perm ? kvm_vcpu_trap_get_perm_fault_granule(vcpu) : 0,
+>                 .write_fault = write_fault,
+>                 .exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu),
+>                 .topup_memcache = !fault_is_perm || (logging_active && write_fault),
+>         };
+> </quote>
+>
+> This kvm_s2_fault structure is a mess of architectural state (the
+> fault itself), hypervisor context (logging_active, force_pte...), and
+> implementation details (topup_memcache...). Effectively, that's the
+> container for *everything* that was a variable in u_m_a() is now part
+> of the structure that is passed around.
+>
+> The task at hand is now to completely nuke this monster. The
+> architectural fault information should be further split, and directly
+> passed as a parameter to user_mem_abort(). We have a lot of redundant
+> state that is computed, recomputed, derived, and that should probably
+> moved into the exact place where it matters.
 
+Thanks Marc! Like I said, I stopped after 13 patches to see what you
+think, and if this is the right approach. But yes, more can be done
+here.
 
-On 06/03/2026 15:16, David Hildenbrand (Arm) wrote:
-> On 3/6/26 15:49, Nikita Kalyazin wrote:
->>
->>
->> On 06/03/2026 14:22, David Hildenbrand (Arm) wrote:
->>> [...]
->>>
->>>>
->>>> Dave pointed earlier that the failures were possible [1].  Do you think
->>>> we can document it better?
->>>
->>> I'm fine with checking that somewhere (to catch any future problems).
->>>
->>> Why not do the WARN_ON_ONCE() in folio_restore_direct_map()?
->>>
->>> Then, carefully document (in the new kerneldoc for
->>> folio_restore_direct_map() etc) that folio_restore_direct_map() is only
->>> allowed after a prior successful folio_zap_direct_map(), and add a
->>> helpful comment above the WARN_ON_ONCE() in folio_restore_direct_map()
->>> that we don't expect errors etc.
->>
->> My only concern about that is the assumptions we make in KVM may not
->> apply to the general case and the WARN_ON_ONCE may become too
->> restrictive compared to proper error handling in some (rare) cases.  For
->> example, is it possible for the folio to migrate in between?
-> 
-> Not without migration support. But then, migration would have to make
-> sure that the destination folio has the direct map removed. So I
-> wouldn't worry about that.
-> 
-> Once you return an error from folio_restore_direct_map(), you better
-> document when/why it happens and how the caller should handle it.
-> 
-> There is nothing existing callers could really do, so it's an
-> implementation detail of the
-> folio_zap_direct_map()/folio_restore_direct_map() functions to make sure
-> it keeps working.
-> 
-> If it ever fails, we'll have to figure out how to keep the interface
-> working.
-> 
-> You can document any restrictions regarding when
-> folio_zap_direct_map()/folio_restore_direct_map() is allowed to be used
-> in the kerneldoc.
+>
+> I'll have a play with it,
 
-Ok, makes sense to me.
+Sounds good, and if you'd like me to tackle any particular part of
+this, let me know.
 
-> 
+I have to admit, breaking this down into pieces and seeing how much
+tidier and easier to understand it became felt oddly satisfying.
+
+Cheers,
+/fuad
+
+> Thanks,
+>
+>         M.
+>
 > --
-> Cheers,
-> 
-> David
-
+> Without deviation from the norm, progress is not possible.
 
