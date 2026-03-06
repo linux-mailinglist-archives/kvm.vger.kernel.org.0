@@ -1,81 +1,83 @@
-Return-Path: <kvm+bounces-73058-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73059-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2I5pL7XfqmlqXwEAu9opvQ
-	(envelope-from <kvm+bounces-73058-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 15:07:49 +0100
+	id sD6HDMHfqmlqXwEAu9opvQ
+	(envelope-from <kvm+bounces-73059-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 15:08:01 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5445D222509
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 15:07:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79620222510
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 15:08:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ED70131669EF
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 14:03:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E91713098749
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 14:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CAA13A7F6F;
-	Fri,  6 Mar 2026 14:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89F03A6EEC;
+	Fri,  6 Mar 2026 14:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CCvrWdcw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j0XdYPC3"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F1F214A8B
-	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 14:02:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D196738E133
+	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 14:02:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772805759; cv=none; b=s2PEWzHlGXKErR5UQYRJYu12gwb1VoxymyLWkMwgkUgFGKAGfMR2DoIRL9w27OzneJAkJBangK/81T0gOasJQEW9WLNuxTaiCNfjEAQX5VogrTO9DP29KoiaSeDYniiVuqDAPgfX6iy0wLTDJsJ6HDGm+eOuGqDpOCWWjeKJjsM=
+	t=1772805760; cv=none; b=hQD8jJUYpq4O2l1NWKlu9o+7fWDcqSupjafMQucLA+4GdwKGLoraYcCyKwvMseBxsLII4Hqr/UgluY+dNZQXSiKcAeGauwMw2fEJaiqcmTmrApjyWdDyX78Le7JMkzGlL/ZOuftNRp+CBiP7dh4ZwldpqP4yllHb7+gyttCvoqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772805759; c=relaxed/simple;
-	bh=qk5cae16ltKMUDI2zPQaSJkz6t/UCHYIXsZ20NA/4lQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=MgStrAxqiySFJeoXAb1G8iaDWJw85qlBpye1dDhdvw5X6JTwMM/RT8NXIakD3W35BNjXYPeZwkaV1fsOWsbnf1Bl2ViDxGszOImtFRIVgLzQY1g0A63kcUfK/4qVwbXV14nF1jznO1Q3La5eB1Dw2hJ1Tq0TVjEFiT+EgxtmpGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CCvrWdcw; arc=none smtp.client-ip=209.85.208.73
+	s=arc-20240116; t=1772805760; c=relaxed/simple;
+	bh=y8f3MvZGTGVu8W2ARcgIr5C30UatorQ81Y4tWSzmzcU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NeNgg5KdD+pgVNafNIU3JEW7VkNS1XeJt4VSM3qrPhqm6g9G7Xduui6LIPxSBrfYakIOCyILx3wiQGGjlYGDwXFxPaLS3iUuNsUUlvLN2IOPSluoB7KoVin8tiPjzFwhZ5N7FlJxQ214fZ3q1qPnLq8NqJrk1QjPYD7bafQZYvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j0XdYPC3; arc=none smtp.client-ip=209.85.208.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-6613679e8cbso2915276a12.3
-        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 06:02:35 -0800 (PST)
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-66184f62c28so1859121a12.2
+        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 06:02:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772805754; x=1773410554; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BwOlgh6ZUE7+ip/EGV9A/3opBVCZWrRyXJLI+YqAKL0=;
-        b=CCvrWdcwivBSwD99bUGkkY+vsrek08SLwONAQ0DgH0iyjQiKjSWEtlQrYk7VMM48+6
-         N/26RBiM6V8LGRVQcA+eRmflq10/wmxBNKA1cAEtyVNXqEP8xCqog1UZ3nb0PqljBABO
-         OgWxqY2moc5xBTzz19Cld7+KtEL58hNZHYCvKqYSUMSJe+xkcRJdxEc+qoU8A+dVywvb
-         BXSZz1o09pcMZEFIU4D6b9LtVJaAFrmkGC7iUE+ljBracOn7+m3UO96Otc1nZVDBeplM
-         rse9gfn7PtWNCEZbUgAaSjeeRfVj5wv4qINDLvx97LWTHoDD758OFOTE0bebXP3icQO2
-         ZRPw==
+        d=google.com; s=20230601; t=1772805755; x=1773410555; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gF/1dYRQW+uqbPLKzRe8y1L6gtybgCjS8ZQI7GMo3BA=;
+        b=j0XdYPC3V7Gin6Z5JUmOvt7kf9VgPpSLCkmNoHJlngLpAmvpgIjI3o7y7unLO75/ey
+         H5eJPeYa5oSEZEZ7wvGd88WiB48DuOo/3DHGSXngVzc6SplCQQ59b1TLes4Lf6sVQc56
+         N3CenSkz1gSUh3RtJPqUwd+Cw5i0mJIwSFA+36mjf9Y4G3uGXR51R55wMxLtfsFfg+et
+         qTYNJk4QKfEQSYfAiuLYy9blbRr15HBV+GHOW7B+vGimu3m5+5aViDzUdkY4HL4aEthp
+         pm3MXWxwcS7cDzbM5LkNZuJh1vptSjCaJ8IK6nKe2gVlzqGT1MKwWQ83VjJlKsqinzNn
+         fr5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772805754; x=1773410554;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BwOlgh6ZUE7+ip/EGV9A/3opBVCZWrRyXJLI+YqAKL0=;
-        b=oub4uGJAmhF0hTGUoHj8HvCN9Sshk1V3Rxed113+QiN6Hyao9njAVbnc7rHLQixcKz
-         YggC+CXbnGC03/5EcdJSENhABNYsszhcC2HXwdUiWjhnYtqTTNn1F8M8rAYrCSuFrJN9
-         XKDBfJenwkiO/FeBA3+7XW8JU8x0p/jXbicsG1XdMjUfLtyYjRjLPeeq51D1+A3BI19a
-         vTjRuthhqjDgtAub6ORX1N87LCYgNer/zhClsvqEuryC9mMoGjHkwGQjwRLJThNVHMaW
-         8U7tqvKbpY5Wu0fgOU4J+JuAmbURaXHx/Wv9Zg3nBljJIxoRtiAYbOGp9eE2hN9pRAS7
-         4Vog==
-X-Gm-Message-State: AOJu0YwXrbO3bhYQ9OkhkSmb5mSqKlXdjX+Qr2ufNI1cwbFUU1DwGY1w
-	d5PpNPL48KOhyvYhDcPZ4QFbgcrdsfonl/VR99PPa+aIp7+f4Wq4tCwg6eb9tmRwfiymRLTB+27
-	gqSRWirlmEFKj/iC46gnW7syH8kWnlJK2zGTWmrq7GLyVu3pAcYY5a0XbtpRvV0NY22Nfgonug8
-	EYanzJNB3ci5ATjmiZPruGvQxHMzo=
-X-Received: from edb22.prod.google.com ([2002:a05:6402:2396:b0:661:257c:8537])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:354a:b0:65b:f3d5:ae79
- with SMTP id 4fb4d7f45d1cf-6619d4650damr1116541a12.10.1772805753773; Fri, 06
- Mar 2026 06:02:33 -0800 (PST)
-Date: Fri,  6 Mar 2026 14:02:19 +0000
+        d=1e100.net; s=20230601; t=1772805755; x=1773410555;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gF/1dYRQW+uqbPLKzRe8y1L6gtybgCjS8ZQI7GMo3BA=;
+        b=PhHJATwfQ2dlfvrb1MY9YUz3o4mQbsRb4Z5bNSOoY63kkjCY+b7wqrf4ckxd+0/ZcJ
+         Y4PZcqErpNSeJXbWW7L2JNLonCjTb9cKxBLnrwD2vKB1k5uEVmArCFpQHyAxYw9W7Fh4
+         AeSsbp069rAkZBP0guo56fxpRwxu3Vt3WtNtm5jtKH/1I1SOStQ5xolvV/GDbmojZIkY
+         d3kHVhb1+pXBcQJ51KrNAM3lBaReU675izUDPlhPzcFU6dhPEU3yaGvFF7XDU/FXD2dk
+         MNyggUUJuWaUdB04EqWO3+gHxggmDbY1ZZGMt5mTTQh1F2ZlrgYYiIB1JHZPd1DSZF9C
+         P6Sw==
+X-Gm-Message-State: AOJu0YyOD0bMjTgb2I9wNqpyKMv1/4bhh0bhao6JDW2jRxmRM8jDl1Ku
+	wbRGPQwcYx0Q2SnMk76U4gsE3vQ9Yh1AqnKSnWV6jOD/BADYtAglYqWQKDG9CH5q045ez863+PJ
+	bEMl6Q5PeA1XYc1buE93afVdJ84H+Kp1XCEJ4VGsJugRSXZk/xhcfNpIrFk3zkrstScMA8qLpOM
+	pyHlyMv39Yj8stDtvQU++FR+DLs+Q=
+X-Received: from edge19-n1.prod.google.com ([2002:a05:6402:a553:10b0:661:1c9f:b877])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:3990:b0:659:3ff1:58fa
+ with SMTP id 4fb4d7f45d1cf-6619d5205camr821175a12.29.1772805754847; Fri, 06
+ Mar 2026 06:02:34 -0800 (PST)
+Date: Fri,  6 Mar 2026 14:02:20 +0000
+In-Reply-To: <20260306140232.2193802-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260306140232.2193802-1-tabba@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260306140232.2193802-1-tabba@google.com>
-Subject: [PATCH v1 00/13] KVM: arm64: Refactor user_mem_abort() into a
- state-object model
+Message-ID: <20260306140232.2193802-2-tabba@google.com>
+Subject: [PATCH v1 01/13] KVM: arm64: Extract VMA size resolution in user_mem_abort()
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -83,25 +85,25 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
 	will@kernel.org, qperret@google.com, vdonnefort@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 5445D222509
+X-Rspamd-Queue-Id: 79620222510
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-73058-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-73059-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[tabba@google.com,kvm@vger.kernel.org];
@@ -113,83 +115,166 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-As promised in my recent patch series fixing a couple of urgent bugs in
-user_mem_abort() [1], here is the actual refactoring to finally clean up this
-monolith.
+As part of an effort to refactor user_mem_abort() into smaller, more
+focused helper functions, extract the logic responsible for determining
+the VMA shift and page size into a new static helper,
+kvm_s2_resolve_vma_size().
 
-If you look through the Fixes: history of user_mem_abort(), you will start to
-see a very clear pattern of whack-a-mole caused by the sheer size and
-complexity of the function. For example:
-- We keep leaking struct page references on early error returns because the
-  cleanup logic is hard to track (e.g., 5f9466b50c1b and the atomic fault leak
-  I just fixed in the previous series).
-- We have had uninitialized memcache pointers (157dbc4a321f) because the
-  initialization flow jumps around unpredictably.
-- We have had subtle TOCTOU and locking boundary bugs (like 13ec9308a857 and
-  f587661f21eb) because we drop the mmap_read_lock midway through the function
-  but leave the vma pointer and mmu_seq floating around in the same lexical
-  scope, tempting people to use them.
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/kvm/mmu.c | 130 ++++++++++++++++++++++++-------------------
+ 1 file changed, 73 insertions(+), 57 deletions(-)
 
-The bulk of the work is in the first 6 patches, which perform a strict,
-no-logic-change structural refactoring of user_mem_abort() into a clean,
-sequential dispatcher.
-
-We introduce a state object, struct kvm_s2_fault, which encapsulates
-both the input parameters and the intermediate state. Then,
-user_mem_abort() is broken down into focused, standalone helpers:
-- kvm_s2_resolve_vma_size(): Determines the VMA shift and page size.
-- kvm_s2_fault_pin_pfn(): Handles faulting in the physical page.
-  - kvm_s2_fault_get_vma_info(): A tightly-scoped sub-helper that isolates the
-    mmap_read_lock, VMA lookup, and metadata snapshotting.
-- kvm_s2_fault_compute_prot(): Computes stage-2 protections and evaluates
-  permission/execution constraints.
-- kvm_s2_fault_map(): Manages the KVM MMU lock, mmu_seq retry loops, MTE, and
-  the final stage-2 mapping.
-
-This structural change makes the "danger zone" foolproof. By isolating
-the mmap_read_lock region inside a tightly-scoped sub-helper
-(kvm_s2_fault_get_vma_info), the vma pointer is confined. It snapshots
-the required metadata into the kvm_s2_fault structure before dropping
-the lock. Because the pointers scope ends when the sub-helper returns,
-accessing a stale VMA in the mapping phase is not possible by design.
-
-The remaining patches in are localized cleanup patches. With the logic
-finally extracted into digestible helpers, these patches take the
-opportunity to streamline struct initialization, drop redundant struct
-variables, simplify nested math, and hoist validation checks (like MTE)
-out of the lock-heavy mapping phase.
-
-I think that there are still more opportunities to tidy things up some
-more, but I'll stop here to see what you think.
-
-Based on Linux 7.0-rc2 and my previous fixes series [1].
-
-[1] https://lore.kernel.org/all/20260304162222.836152-1-tabba@google.com/
-
-Cheers,
-/fuad
-
-Fuad Tabba (13):
-  KVM: arm64: Extract VMA size resolution in user_mem_abort()
-  KVM: arm64: Introduce struct kvm_s2_fault to user_mem_abort()
-  KVM: arm64: Extract PFN resolution in user_mem_abort()
-  KVM: arm64: Isolate mmap_read_lock inside new
-    kvm_s2_fault_get_vma_info() helper
-  KVM: arm64: Extract stage-2 permission logic in user_mem_abort()
-  KVM: arm64: Extract page table mapping in user_mem_abort()
-  KVM: arm64: Simplify nested VMA shift calculation
-  KVM: arm64: Remove redundant state variables from struct kvm_s2_fault
-  KVM: arm64: Simplify return logic in user_mem_abort()
-  KVM: arm64: Initialize struct kvm_s2_fault completely at declaration
-  KVM: arm64: Optimize early exit checks in kvm_s2_fault_pin_pfn()
-  KVM: arm64: Hoist MTE validation check out of MMU lock path
-  KVM: arm64: Clean up control flow in kvm_s2_fault_map()
-
- arch/arm64/kvm/mmu.c | 379 +++++++++++++++++++++++++------------------
- 1 file changed, 224 insertions(+), 155 deletions(-)
-
-
-base-commit: f9985be5e1985930c2d2cf2752e36bb145b3ff7c
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 17d64a1e11e5..f8064b2d3204 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1639,6 +1639,77 @@ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	return ret != -EAGAIN ? ret : 0;
+ }
+ 
++static short kvm_s2_resolve_vma_size(struct vm_area_struct *vma,
++				     unsigned long hva,
++				     struct kvm_memory_slot *memslot,
++				     struct kvm_s2_trans *nested,
++				     bool *force_pte, phys_addr_t *ipa)
++{
++	short vma_shift;
++	long vma_pagesize;
++
++	if (*force_pte)
++		vma_shift = PAGE_SHIFT;
++	else
++		vma_shift = get_vma_page_shift(vma, hva);
++
++	switch (vma_shift) {
++#ifndef __PAGETABLE_PMD_FOLDED
++	case PUD_SHIFT:
++		if (fault_supports_stage2_huge_mapping(memslot, hva, PUD_SIZE))
++			break;
++		fallthrough;
++#endif
++	case CONT_PMD_SHIFT:
++		vma_shift = PMD_SHIFT;
++		fallthrough;
++	case PMD_SHIFT:
++		if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE))
++			break;
++		fallthrough;
++	case CONT_PTE_SHIFT:
++		vma_shift = PAGE_SHIFT;
++		*force_pte = true;
++		fallthrough;
++	case PAGE_SHIFT:
++		break;
++	default:
++		WARN_ONCE(1, "Unknown vma_shift %d", vma_shift);
++	}
++
++	vma_pagesize = 1UL << vma_shift;
++
++	if (nested) {
++		unsigned long max_map_size;
++
++		max_map_size = *force_pte ? PAGE_SIZE : PUD_SIZE;
++
++		*ipa = kvm_s2_trans_output(nested);
++
++		/*
++		 * If we're about to create a shadow stage 2 entry, then we
++		 * can only create a block mapping if the guest stage 2 page
++		 * table uses at least as big a mapping.
++		 */
++		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
++
++		/*
++		 * Be careful that if the mapping size falls between
++		 * two host sizes, take the smallest of the two.
++		 */
++		if (max_map_size >= PMD_SIZE && max_map_size < PUD_SIZE)
++			max_map_size = PMD_SIZE;
++		else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
++			max_map_size = PAGE_SIZE;
++
++		*force_pte = (max_map_size == PAGE_SIZE);
++		vma_pagesize = min_t(long, vma_pagesize, max_map_size);
++		vma_shift = __ffs(vma_pagesize);
++	}
++
++	return vma_shift;
++}
++
+ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			  struct kvm_s2_trans *nested,
+ 			  struct kvm_memory_slot *memslot, unsigned long hva,
+@@ -1695,65 +1766,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		return -EFAULT;
+ 	}
+ 
+-	if (force_pte)
+-		vma_shift = PAGE_SHIFT;
+-	else
+-		vma_shift = get_vma_page_shift(vma, hva);
+-
+-	switch (vma_shift) {
+-#ifndef __PAGETABLE_PMD_FOLDED
+-	case PUD_SHIFT:
+-		if (fault_supports_stage2_huge_mapping(memslot, hva, PUD_SIZE))
+-			break;
+-		fallthrough;
+-#endif
+-	case CONT_PMD_SHIFT:
+-		vma_shift = PMD_SHIFT;
+-		fallthrough;
+-	case PMD_SHIFT:
+-		if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE))
+-			break;
+-		fallthrough;
+-	case CONT_PTE_SHIFT:
+-		vma_shift = PAGE_SHIFT;
+-		force_pte = true;
+-		fallthrough;
+-	case PAGE_SHIFT:
+-		break;
+-	default:
+-		WARN_ONCE(1, "Unknown vma_shift %d", vma_shift);
+-	}
+-
++	vma_shift = kvm_s2_resolve_vma_size(vma, hva, memslot, nested,
++					    &force_pte, &ipa);
+ 	vma_pagesize = 1UL << vma_shift;
+ 
+-	if (nested) {
+-		unsigned long max_map_size;
+-
+-		max_map_size = force_pte ? PAGE_SIZE : PUD_SIZE;
+-
+-		ipa = kvm_s2_trans_output(nested);
+-
+-		/*
+-		 * If we're about to create a shadow stage 2 entry, then we
+-		 * can only create a block mapping if the guest stage 2 page
+-		 * table uses at least as big a mapping.
+-		 */
+-		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
+-
+-		/*
+-		 * Be careful that if the mapping size falls between
+-		 * two host sizes, take the smallest of the two.
+-		 */
+-		if (max_map_size >= PMD_SIZE && max_map_size < PUD_SIZE)
+-			max_map_size = PMD_SIZE;
+-		else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
+-			max_map_size = PAGE_SIZE;
+-
+-		force_pte = (max_map_size == PAGE_SIZE);
+-		vma_pagesize = min_t(long, vma_pagesize, max_map_size);
+-		vma_shift = __ffs(vma_pagesize);
+-	}
+-
+ 	/*
+ 	 * Both the canonical IPA and fault IPA must be aligned to the
+ 	 * mapping size to ensure we find the right PFN and lay down the
 -- 
 2.53.0.473.g4a7958ca14-goog
 
