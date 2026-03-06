@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-73053-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73054-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SMNdCiDTqmn3XQEAu9opvQ
-	(envelope-from <kvm+bounces-73053-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 14:14:08 +0100
+	id QKaZAhvUqmn3XQEAu9opvQ
+	(envelope-from <kvm+bounces-73054-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 14:18:19 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89A59221727
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 14:14:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CC8122179E
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 14:18:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1664F3032F7E
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 13:13:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1CDAF30EE92F
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 13:16:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 633AA386C39;
-	Fri,  6 Mar 2026 13:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D312F3988EE;
+	Fri,  6 Mar 2026 13:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nWpDUj1P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iIIEqtJ3"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A1239446B;
-	Fri,  6 Mar 2026 13:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DB519D081;
+	Fri,  6 Mar 2026 13:16:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772802781; cv=none; b=Ya2R+CaJ+VPiXp88ssXXsCqo/6Na2Zd48kMMVzmjnmLQg9Clgx40SkUJfM8uK2b/5F1+MAFkRrlU65tmwiyRiAlJhexWFUEyC3j2YfIu1mKuEsws7xTtX8EQMRK7QMtZRaRW6rlZX1k1QG4fqoD4H3J5ytREUrRyCFy+NctIHAE=
+	t=1772803011; cv=none; b=MDkaJBuHLYeBZT1/GzCXtQdDrYhi/K7b6lTtH5GytWS+1MlZssZXMJ37ZR1xhYIabStu7wM1hh1DOSHxx3RqnJHpuaj2lAloX5/WyqAdiTj5/zjHfiWfm6ALpW2xNyB//FXeZnqvCX6Hor/9BEfGVlrzEhdDRaolJlkVoEbcuuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772802781; c=relaxed/simple;
-	bh=izAH7dOf8eqdf91LErrTFaY5YvIH5GE/JtUI+1Y7mtA=;
+	s=arc-20240116; t=1772803011; c=relaxed/simple;
+	bh=1s6QLN/ghCrLJXZlKMxpYlFZehpnA7MCuk3K8EQdMlY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oqYewk1oznclvQhjyVPrx9KOP5mmnqGERYzpT3OeA8OoiZ2bbG/3RHPANjuJFeqoNJyncJK/2Fbyx7rAGoz4up8mwe9YijOOe6rTWfw5TSenMJaos7qPTnvQcvdAwE93gIYX3zselBG0prEkr7oZtgkkL1NI1yjHvowM+7VvjTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nWpDUj1P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCEDFC4CEF7;
-	Fri,  6 Mar 2026 13:12:54 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=iB7VtbbOcTJa/43rWBF5BHmE52rIDYjZmK0JgcSCLI3/5oc4sqGTB/cBFy3RorRsO/IDI4OnUNfXHu6Kbusf81j89xmIh9rPM/p/KgjBUQKJqJvSsRLgfdhR5XxTwrNXl3xOeWnMEtE5wHLChVGO9An9elB6/D0tIA2ic+eNweE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iIIEqtJ3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6669FC2BC86;
+	Fri,  6 Mar 2026 13:16:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772802780;
-	bh=izAH7dOf8eqdf91LErrTFaY5YvIH5GE/JtUI+1Y7mtA=;
+	s=k20201202; t=1772803010;
+	bh=1s6QLN/ghCrLJXZlKMxpYlFZehpnA7MCuk3K8EQdMlY=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nWpDUj1PH6Agz8kEDINJ/DTPJoUdefAnjHjlMfer1lZXMWDScb8iVkE9sC/l83qoR
-	 blwBJ/DMmmvEkHljMsbppZB9hnCdVdNm86pHe/hzz8Y/IiHed6dKlqWLJ3ggGz2K7f
-	 m6uYXBclsRpE2FgeB9AasWCp5WRKoQjVDhLo8y9oHsO+fI08bBLMpCbw0bEbk0KW61
-	 DvmdltJJHBSSmGuzS9QLD2zMYhkLC6kS5ZXtj0Dy/8W8O1RvO9STgGlTDxT1ka2oWy
-	 qy0DO4zM+bTNZzwL4zxZOJMiFqoERgA8VtbUho+fzCXlrS4+RsWEARvuPaM92yFS0x
-	 WQ81jcztD1kcg==
-Message-ID: <5eae6c52-c3f9-407e-8fb8-01a950b282bf@kernel.org>
-Date: Fri, 6 Mar 2026 14:12:50 +0100
+	b=iIIEqtJ3tRMZ/QwYlyeMDf3S9PjzkVQkuz2ZOMvO4eTfkXzL8qKoudLNUlR5NEwQD
+	 8FNqliqMzEOtiPWm6TIg7UUBnmrYObcaHyEepfOoLaAtXjffktNCOYCvabXVOP1m8L
+	 WJWa/LFj2mYn+sTemJgm9xHc/mm1r4dw2qOUR4BC6BQDtNsfRS2HCk7BhPy2gHFDrM
+	 CKBuhXifw+SCwzUcqO1D7W/TEfS/I5MBdPyFBT1LQbyQbzFAGTL26JGaPzs1Dl7ZPx
+	 ban9iQy4V/ZbzDBUMQy/CEPCUCXZ2WyARWnTuLMg+eRLJIQUk3cWU2Qe3v1kpB6X3N
+	 pJOexzVCg18Yg==
+Message-ID: <bc5cfcc4-5e51-4da1-9ce9-ea0831bec400@kernel.org>
+Date: Fri, 6 Mar 2026 14:16:26 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -53,25 +53,57 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 0/4] mm: move vma_(kernel|mmu)_pagesize() out of
- hugetlb.c
-To: "Lorenzo Stoakes (Oracle)" <ljs@kernel.org>,
- Pedro Falcato <pfalcato@suse.de>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- Andrew Morton <akpm@linux-foundation.org>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- Muchun Song <muchun.song@linux.dev>, Oscar Salvador <osalvador@suse.de>,
+Subject: Re: [PATCH v1 11/16] mm/memory: inline unmap_page_range() into
+ __zap_vma_range()
+To: "Lorenzo Stoakes (Oracle)" <ljs@kernel.org>
+Cc: linux-kernel@vger.kernel.org, "linux-mm @ kvack . org"
+ <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
  "Liam R. Howlett" <Liam.Howlett@oracle.com>,
  Vlastimil Babka <vbabka@kernel.org>, Mike Rapoport <rppt@kernel.org>,
  Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
- Jann Horn <jannh@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Dan Williams <dan.j.williams@intel.com>
-References: <20260306101600.57355-1-david@kernel.org>
- <4rzf46kw6hq3b5ivv7cvgyza4yfrvk2shrncytobabxef644nm@wzu2bw63co37>
- <371cf0f7-4b30-4d8c-99e7-ae0543f8be23@lucifer.local>
+ Jann Horn <jannh@google.com>, Pedro Falcato <pfalcato@suse.de>,
+ David Rientjes <rientjes@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Alice Ryhl <aliceryhl@google.com>, Madhavan Srinivasan
+ <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ =?UTF-8?Q?Arve_Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
+ Todd Kjos <tkjos@android.com>, Christian Brauner <brauner@kernel.org>,
+ Carlos Llamas <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>,
+ H Hartley Sweeten <hsweeten@visionengravers.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Leon Romanovsky <leon@kernel.org>,
+ Dimitri Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Miguel Ojeda <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
+References: <20260227200848.114019-1-david@kernel.org>
+ <20260227200848.114019-12-david@kernel.org>
+ <a5765cac-69d6-4314-82d5-80ee363906de@lucifer.local>
 From: "David Hildenbrand (Arm)" <david@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=david@kernel.org; keydata=
@@ -118,88 +150,109 @@ Autocrypt: addr=david@kernel.org; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <371cf0f7-4b30-4d8c-99e7-ae0543f8be23@lucifer.local>
+In-Reply-To: <a5765cac-69d6-4314-82d5-80ee363906de@lucifer.local>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 89A59221727
+X-Rspamd-Queue-Id: 6CC8122179E
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73053-lists,kvm=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,lists.ozlabs.org,linux-foundation.org,linux.ibm.com,gmail.com,ellerman.id.au,kernel.org,linux.dev,suse.de,oracle.com,google.com,suse.com,redhat.com,intel.com];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kvack.org,linux-foundation.org,oracle.com,kernel.org,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,lists.freedesktop.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73054-lists,kvm=lfdr.de];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[74];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 3/6/26 12:19, Lorenzo Stoakes (Oracle) wrote:
-> On Fri, Mar 06, 2026 at 11:13:41AM +0000, Pedro Falcato wrote:
->> On Fri, Mar 06, 2026 at 11:15:56AM +0100, David Hildenbrand (Arm) wrote:
->>> Looking into vma_(kernel|mmu)_pagesize(), I realized that there is one
->>> scenario where DAX would not do the right thing when the kernel is
->>> not compiled with hugetlb support.
->>>
->>> Without hugetlb support, vma_(kernel|mmu)_pagesize() will always return
->>> PAGE_SIZE instead of using the ->pagesize() result provided by dax-device
->>> code.
->>>
->>> Fix that by moving vma_kernel_pagesize() to core MM code, where it belongs.
->>> I don't think this is stable material, but am not 100% sure.
->>>
->>> Also, move vma_mmu_pagesize() while at it. Remove the unnecessary hugetlb.h
->>> inclusion from KVM code.
->>>
->>> Cross-compiled heavily.
->>>
->>> Cc: Andrew Morton <akpm@linux-foundation.org>
->>> Cc: Madhavan Srinivasan <maddy@linux.ibm.com>
->>> Cc: Nicholas Piggin <npiggin@gmail.com>
->>> Cc: Michael Ellerman <mpe@ellerman.id.au>
->>> Cc: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
->>> Cc: Muchun Song <muchun.song@linux.dev>
->>> Cc: Oscar Salvador <osalvador@suse.de>
->>> Cc: Lorenzo Stoakes <ljs@kernel.org>
->>> Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>
->>> Cc: Vlastimil Babka <vbabka@kernel.org>
->>> Cc: Mike Rapoport <rppt@kernel.org>
->>> Cc: Suren Baghdasaryan <surenb@google.com>
->>> Cc: Michal Hocko <mhocko@suse.com>
->>> Cc: Jann Horn <jannh@google.com>
->>> Cc: Pedro Falcato <pfalcato@suse.de>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Dan Williams <dan.j.williams@intel.com>
+On 3/6/26 13:29, Lorenzo Stoakes (Oracle) wrote:
+> On Fri, Feb 27, 2026 at 09:08:42PM +0100, David Hildenbrand (Arm) wrote:
+>> Let's inline it into the single caller to reduce the number of confusing
+>> unmap/zap helpers.
 >>
->> Although we all love less mail, FYI it seems like this didn't work properly
->> for the patches (no CC's on there).
+>> Get rid of the unnecessary BUG_ON().
 >>
->> Did you try git-email --cc-cover?
+>> Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
 > 
-> Yeah I noticed this also :>) Assumed it was a new way of doing things somehow?
-> :P
+> Small nits below, but overall LGTM so:
+> 
+> Reviewed-by: Lorenzo Stoakes (Oracle) <ljs@kernel.org>
+> 
+>> ---
+>>  mm/memory.c | 32 ++++++++++++--------------------
+>>  1 file changed, 12 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/mm/memory.c b/mm/memory.c
+>> index 394b2e931974..1c0bcdfc73b7 100644
+>> --- a/mm/memory.c
+>> +++ b/mm/memory.c
+>> @@ -2056,25 +2056,6 @@ static inline unsigned long zap_p4d_range(struct mmu_gather *tlb,
+>>  	return addr;
+>>  }
+>>
+>> -static void unmap_page_range(struct mmu_gather *tlb, struct vm_area_struct *vma,
+>> -		unsigned long addr, unsigned long end,
+>> -		struct zap_details *details)
+>> -{
+>> -	pgd_t *pgd;
+>> -	unsigned long next;
+>> -
+>> -	BUG_ON(addr >= end);
+>> -	tlb_start_vma(tlb, vma);
+>> -	pgd = pgd_offset(vma->vm_mm, addr);
+>> -	do {
+>> -		next = pgd_addr_end(addr, end);
+>> -		if (pgd_none_or_clear_bad(pgd))
+>> -			continue;
+>> -		next = zap_p4d_range(tlb, vma, pgd, addr, next, details);
+>> -	} while (pgd++, addr = next, addr != end);
+>> -	tlb_end_vma(tlb, vma);
+>> -}
+>> -
+>>  static void __zap_vma_range(struct mmu_gather *tlb, struct vm_area_struct *vma,
+>>  		unsigned long start, unsigned long end,
+>>  		struct zap_details *details)
+>> @@ -2100,7 +2081,18 @@ static void __zap_vma_range(struct mmu_gather *tlb, struct vm_area_struct *vma,
+>>  			return;
+>>  		__unmap_hugepage_range(tlb, vma, start, end, NULL, zap_flags);
+>>  	} else {
+>> -		unmap_page_range(tlb, vma, start, end, details);
+>> +		unsigned long next, cur = start;
+> 
+> VERY nitty, but generally current is abbreviated to curr not cur.
+> 
 
-"--cc-cover" is apparently not the git default on my new machine.
+The following might not be fully expressive (but simple to grep):
 
-"See, I CCed you, I totally did not try to sneak something in. Oh, I
-messed up my tooling, stupid me ...". :)
+$ git grep "cur_" | wc -l
+24261
+$ git grep "curr_" | wc -l
+9288
+
+Tells me that "cur" is rather common.
+
+> It's not a big deal, but why not addr?
+
+Good question, I can just do that. :)
 
 -- 
 Cheers,
