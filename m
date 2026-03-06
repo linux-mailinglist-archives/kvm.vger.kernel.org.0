@@ -1,279 +1,748 @@
-Return-Path: <kvm+bounces-73075-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73076-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yBnvBu3rqmmOYAEAu9opvQ
-	(envelope-from <kvm+bounces-73075-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 15:59:57 +0100
+	id eFmnMWDtqmmOYAEAu9opvQ
+	(envelope-from <kvm+bounces-73076-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 16:06:08 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ED652233F6
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 15:59:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E5D92236EB
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 16:06:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3B76B315CBCD
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 14:49:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0E24C3085B6E
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 15:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A7D3ACA6F;
-	Fri,  6 Mar 2026 14:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="PV2FiYyU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 131723AEF40;
+	Fri,  6 Mar 2026 15:01:39 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.197.217.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07029372671;
-	Fri,  6 Mar 2026 14:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.197.217.180
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98E13AE1A5;
+	Fri,  6 Mar 2026 15:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772808571; cv=none; b=pT8sGb1cTVFpV357036Q3uY8ZQfchEwC+RpZEy5oCqiQdvPHi2LLax+jQ9HVneUVgQQklS8a1p/hGm4DX6hBG2OFfOV004v4OyBy4qdly4UB3yDHviW8oBhTHPS2XfMnzOSmc1ochjPlHZVT5eEuRa5m9BuczFnDQadvsPkrKH8=
+	t=1772809298; cv=none; b=mAEcoSIUeX5K51bB7Jt2iP+juC2NDf0aB0DCrEBCQGi+81iFJrJwItre8ass0o7H5cYPCZvysxtiO6lTF27U8BQ7GkHvLGoavS+yOHBdN2swlHPJMdzKt1L14el4P6py02B3z5eANtyMvdjOUeMB75+VdYclEjGpU1ibj19yHoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772808571; c=relaxed/simple;
-	bh=laNYli1TF2KqJ1NK09RHrGK14IKe8N3u2ap5ELxvYaA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=BpeAQjiI+6ciQvr9Un4V0GiPByxZJ+Iplc1b2xOGZelSb/UurF5O1/PPRSslqBR82DWKLjAmOGo7gW0IbcfpKrTbkzQgWCqS5iuaDCD7BKBlfCNXrQMQTj4Me2iTZm0MkHdX/f1j6Excxh7KGnR/pC/I0GiPxXgvF82ND6DgB1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=PV2FiYyU; arc=none smtp.client-ip=18.197.217.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1772808570; x=1804344570;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=NrzHXx0Lp7Elw8ALF5D0u+kNkH3P0Dcowz8U+9XDncM=;
-  b=PV2FiYyUcSj/Ph2peJYSeE+UvdfwoCCv2lcJaDCk502nTuviKEvPJjy1
-   Qdm0ZHtaTIzJTdLIlYVblDkh0kkyo3Hwx0X9sQEu4yMVL116+MsO5Fdsv
-   3xCL0RJFNH2+sXlWwbFVcojNO/9D6VfCsOI+50QGfJQsm6+i79A8I5Y+u
-   36xjcCYkDzVb2XOH4pR20uhqjJXdwOtWXF/hNaBCChkbtw1/IariBX9Zu
-   i5tl/G7si+UQUtE8EE7cRi9Ba8EbW03gdJvonbraqYad64dUhOmQKXZua
-   ECuByklrf5lDZkwc+RcQ5yTHTdAoz3g1WjvL6ROtBpIrJk8grIXtiWI7d
-   w==;
-X-CSE-ConnectionGUID: 5IccaEBNQVSWRB5rNmqQOQ==
-X-CSE-MsgGUID: 2TQ5H7tGR3uCD8Jr0npB8Q==
-X-IronPort-AV: E=Sophos;i="6.23,105,1770595200"; 
-   d="scan'208";a="10436907"
-Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
-  by internal-fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2026 14:49:25 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.224:3701]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.26.205:2525] with esmtp (Farcaster)
- id 00a2718f-a0c4-43d5-bed7-970a51d610b2; Fri, 6 Mar 2026 14:49:25 +0000 (UTC)
-X-Farcaster-Flow-ID: 00a2718f-a0c4-43d5-bed7-970a51d610b2
-Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Fri, 6 Mar 2026 14:49:24 +0000
-Received: from [192.168.2.180] (10.106.83.26) by EX19D005EUB003.ant.amazon.com
- (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Fri, 6 Mar 2026
- 14:49:19 +0000
-Message-ID: <936fa782-d937-4b14-b92d-cc8707336e5e@amazon.com>
-Date: Fri, 6 Mar 2026 14:49:18 +0000
+	s=arc-20240116; t=1772809298; c=relaxed/simple;
+	bh=inQx9ULltanDKXnHmipqdw68NU2XTYF3mZ2jkWWEltc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=lgdK9eGRTgNtg7XPnT1ad0plAvqNEMJUr6flkINzQlt0YBmQudxtCDEjJt5wcoUueMuZWTiy5kg1wjDwwj4MIdM8W37xNdW50npw4ZqBjcfBFDQLfBhXrOl6TTA99BV0+3QQikgSiQkIEpiMR6eE9ckyXm2YnHJEiqY8b2B96MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4FA0497;
+	Fri,  6 Mar 2026 07:01:28 -0800 (PST)
+Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 50DC93F7BD;
+	Fri,  6 Mar 2026 07:01:32 -0800 (PST)
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	liuyonglong@huawei.com,
+	Jonathan.Cameron@huawei.com,
+	yezhenyu2@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH v3 4/5] KVM: arm64: Enable HDBSS support and handle HDBSSF events
+Date: Fri,  6 Mar 2026 15:01:23 +0000
+Message-ID: <aarsQwKrNB7HQgbj@devkitleo>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <ee584a49-ce69-443b-97c0-37f24f78bdbb@huawei.com>
+References: <20260225040421.2683931-1-zhengtian10@huawei.com> <20260225040421.2683931-5-zhengtian10@huawei.com> <aahSaJTVeMBoRbUE@devkitleo> <ee584a49-ce69-443b-97c0-37f24f78bdbb@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v10 09/15] KVM: guest_memfd: Add flag to remove from
- direct map
-To: "David Hildenbrand (Arm)" <david@kernel.org>, "Kalyazin, Nikita"
-	<kalyazin@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"kernel@xen0n.name" <kernel@xen0n.name>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
-	<linux-s390@vger.kernel.org>, "loongarch@lists.linux.dev"
-	<loongarch@lists.linux.dev>
-CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
-	<corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org"
-	<oupton@kernel.org>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com"
-	<yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
-	"tglx@kernel.org" <tglx@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
-	"bp@alien8.de" <bp@alien8.de>, "dave.hansen@linux.intel.com"
-	<dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>,
-	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>,
-	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org"
-	<willy@infradead.org>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "lorenzo.stoakes@oracle.com"
-	<lorenzo.stoakes@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
-	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>,
-	"mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org"
-	<andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>,
-	"eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>,
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org"
-	<kpsingh@kernel.org>, "sdf@fomichev.me" <sdf@fomichev.me>,
-	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org"
-	<jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com"
-	<jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>,
-	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
-	"shuah@kernel.org" <shuah@kernel.org>, "riel@surriel.com" <riel@surriel.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "jgross@suse.com"
-	<jgross@suse.com>, "yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>,
-	"kas@kernel.org" <kas@kernel.org>, "coxu@redhat.com" <coxu@redhat.com>,
-	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, "ackerleytng@google.com"
-	<ackerleytng@google.com>, "maobibo@loongson.cn" <maobibo@loongson.cn>,
-	"prsampat@amd.com" <prsampat@amd.com>, "mlevitsk@redhat.com"
-	<mlevitsk@redhat.com>, "jmattson@google.com" <jmattson@google.com>,
-	"jthoughton@google.com" <jthoughton@google.com>, "agordeev@linux.ibm.com"
-	<agordeev@linux.ibm.com>, "alex@ghiti.fr" <alex@ghiti.fr>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "borntraeger@linux.ibm.com"
-	<borntraeger@linux.ibm.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-	"dev.jain@arm.com" <dev.jain@arm.com>, "gor@linux.ibm.com"
-	<gor@linux.ibm.com>, "hca@linux.ibm.com" <hca@linux.ibm.com>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "pjw@kernel.org" <pjw@kernel.org>,
-	"shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>,
-	"svens@linux.ibm.com" <svens@linux.ibm.com>, "thuth@redhat.com"
-	<thuth@redhat.com>, "wyihan@google.com" <wyihan@google.com>,
-	"yang@os.amperecomputing.com" <yang@os.amperecomputing.com>,
-	"Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>,
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "urezki@gmail.com"
-	<urezki@gmail.com>, "zhengqi.arch@bytedance.com"
-	<zhengqi.arch@bytedance.com>, "gerald.schaefer@linux.ibm.com"
-	<gerald.schaefer@linux.ibm.com>, "jiayuan.chen@shopee.com"
-	<jiayuan.chen@shopee.com>, "lenb@kernel.org" <lenb@kernel.org>,
-	"osalvador@suse.de" <osalvador@suse.de>, "pavel@kernel.org"
-	<pavel@kernel.org>, "rafael@kernel.org" <rafael@kernel.org>,
-	"vannapurve@google.com" <vannapurve@google.com>, "jackmanb@google.com"
-	<jackmanb@google.com>, "aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>,
-	"patrick.roy@linux.dev" <patrick.roy@linux.dev>, "Thomson, Jack"
-	<jackabt@amazon.co.uk>, "Itazuri, Takahiro" <itazur@amazon.co.uk>,
-	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco"
-	<xmarcalx@amazon.co.uk>
-References: <20260126164445.11867-1-kalyazin@amazon.com>
- <20260126164445.11867-10-kalyazin@amazon.com>
- <13ed00e1-f0db-4326-a800-2ba306833921@kernel.org>
- <690c22f9-b71a-4f14-9857-008c7c858373@amazon.com>
- <0c0b911c-cda2-44a4-897e-361e02be7da5@kernel.org>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-In-Reply-To: <0c0b911c-cda2-44a4-897e-361e02be7da5@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D001EUB001.ant.amazon.com (10.252.51.16) To
- EX19D005EUB003.ant.amazon.com (10.252.51.31)
-X-Rspamd-Queue-Id: 6ED652233F6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 7E5D92236EB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-7.66 / 15.00];
-	WHITELIST_DMARC(-7.00)[amazon.com:D:+];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.86 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[amazon.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[amazon.com:s=amazoncorp2];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[arm.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73075-lists,kvm=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
-	FREEMAIL_CC(0.00)[redhat.com,lwn.net,kernel.org,arm.com,huawei.com,google.com,alien8.de,linux.intel.com,zytor.com,infradead.org,linux-foundation.org,oracle.com,suse.cz,suse.com,iogearbox.net,linux.dev,gmail.com,fomichev.me,ziepe.ca,nvidia.com,suse.de,surriel.com,intel.com,loongson.cn,amd.com,linux.ibm.com,ghiti.fr,eecs.berkeley.edu,dabbelt.com,os.amperecomputing.com,bytedance.com,shopee.com,amazon.co.uk,amazon.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[amazon.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kalyazin@amazon.com,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-73076-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[104];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	HAS_REPLYTO(0.00)[kalyazin@amazon.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leo.bras@arm.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.989];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_SEVEN(0.00)[7]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,huawei.com:email]
 X-Rspamd-Action: no action
 
+On Fri, Mar 06, 2026 at 05:27:58PM +0800, Tian Zheng wrote:
+> Hi Leo,
+> 
+> On 3/4/2026 11:40 PM, Leonardo Bras wrote:
+> > Hi Tian,
+> > 
+> > Few extra notes/questions below
+> > 
+> > On Wed, Feb 25, 2026 at 12:04:20PM +0800, Tian Zheng wrote:
+> > > From: eillon<yezhenyu2@huawei.com>
+> > > 
+> > > HDBSS is enabled via an ioctl from userspace (e.g. QEMU) at the start of
+> > > migration. This feature is only supported in VHE mode.
+> > > 
+> > > Initially, S2 PTEs doesn't contain the DBM attribute. During migration,
+> > > write faults are handled by user_mem_abort, which relaxes permissions
+> > > and adds the DBM bit when HDBSS is active. Once DBM is set, subsequent
+> > > writes no longer trap, as the hardware automatically transitions the page
+> > > from writable-clean to writable-dirty.
+> > > 
+> > > KVM does not scan S2 page tables to consume DBM. Instead, when HDBSS is
+> > > enabled, the hardware observes the clean->dirty transition and records
+> > > the corresponding page into the HDBSS buffer.
+> > > 
+> > > During sync_dirty_log, KVM kicks all vCPUs to force VM-Exit, ensuring
+> > > that check_vcpu_requests flushes the HDBSS buffer and propagates the
+> > > accumulated dirty information into the userspace-visible dirty bitmap.
+> > > 
+> > > Add fault handling for HDBSS including buffer full, external abort, and
+> > > general protection fault (GPF).
+> > > 
+> > > Signed-off-by: eillon<yezhenyu2@huawei.com>
+> > > Signed-off-by: Tian Zheng<zhengtian10@huawei.com>
+> > > ---
+> > >   arch/arm64/include/asm/esr.h      |   5 ++
+> > >   arch/arm64/include/asm/kvm_host.h |  17 +++++
+> > >   arch/arm64/include/asm/kvm_mmu.h  |   1 +
+> > >   arch/arm64/include/asm/sysreg.h   |  11 ++++
+> > >   arch/arm64/kvm/arm.c              | 102 ++++++++++++++++++++++++++++++
+> > >   arch/arm64/kvm/hyp/vhe/switch.c   |  19 ++++++
+> > >   arch/arm64/kvm/mmu.c              |  70 ++++++++++++++++++++
+> > >   arch/arm64/kvm/reset.c            |   3 +
+> > >   8 files changed, 228 insertions(+)
+> > > 
+> > > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> > > index 81c17320a588..2e6b679b5908 100644
+> > > --- a/arch/arm64/include/asm/esr.h
+> > > +++ b/arch/arm64/include/asm/esr.h
+> > > @@ -437,6 +437,11 @@
+> > >   #ifndef __ASSEMBLER__
+> > >   #include <asm/types.h>
+> > > 
+> > > +static inline bool esr_iss2_is_hdbssf(unsigned long esr)
+> > > +{
+> > > +	return ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF;
+> > > +}
+> > > +
+> > >   static inline unsigned long esr_brk_comment(unsigned long esr)
+> > >   {
+> > >   	return esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index 5d5a3bbdb95e..57ee6b53e061 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -55,12 +55,17 @@
+> > >   #define KVM_REQ_GUEST_HYP_IRQ_PENDING	KVM_ARCH_REQ(9)
+> > >   #define KVM_REQ_MAP_L1_VNCR_EL2		KVM_ARCH_REQ(10)
+> > >   #define KVM_REQ_VGIC_PROCESS_UPDATE	KVM_ARCH_REQ(11)
+> > > +#define KVM_REQ_FLUSH_HDBSS			KVM_ARCH_REQ(12)
+> > > 
+> > >   #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+> > >   				     KVM_DIRTY_LOG_INITIALLY_SET)
+> > > 
+> > >   #define KVM_HAVE_MMU_RWLOCK
+> > > 
+> > > +/* HDBSS entry field definitions */
+> > > +#define HDBSS_ENTRY_VALID BIT(0)
+> > > +#define HDBSS_ENTRY_IPA GENMASK_ULL(55, 12)
+> > > +
+> > >   /*
+> > >    * Mode of operation configurable with kvm-arm.mode early param.
+> > >    * See Documentation/admin-guide/kernel-parameters.txt for more information.
+> > > @@ -84,6 +89,7 @@ int __init kvm_arm_init_sve(void);
+> > >   u32 __attribute_const__ kvm_target_cpu(void);
+> > >   void kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+> > >   void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu);
+> > > +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
+> > > 
+> > >   struct kvm_hyp_memcache {
+> > >   	phys_addr_t head;
+> > > @@ -405,6 +411,8 @@ struct kvm_arch {
+> > >   	 * the associated pKVM instance in the hypervisor.
+> > >   	 */
+> > >   	struct kvm_protected_vm pkvm;
+> > > +
+> > > +	bool enable_hdbss;
+> > >   };
+> > > 
+> > >   struct kvm_vcpu_fault_info {
+> > > @@ -816,6 +824,12 @@ struct vcpu_reset_state {
+> > >   	bool		reset;
+> > >   };
+> > > 
+> > > +struct vcpu_hdbss_state {
+> > > +	phys_addr_t base_phys;
+> > > +	u32 size;
+> > > +	u32 next_index;
+> > > +};
+> > > +
+> > IIUC this is used once both on enable/disable and massively on
+> > vcpu_put/get.
+> > 
+> > What if we actually save just HDBSSBR_EL2 and HDBSSPROD_EL2 instead?
+> > That way we avoid having masking operations in put/get as well as any
+> > possible error we may have formatting those.
+> > 
+> > The cost is doing those operations once for enable and once for disable,
+> > which should be fine.
+
+Hi Tian,
+
+> 
+> 
+> Thanks for the suggestion. I actually started with storing the raw system
+> register
+> 
+> values, as you proposed.
+> 
+> 
+> However, after discussing it with Oliver Upton in v1, we felt that keeping
+> the base address,
+> 
+> size, and index as separate fields makes the state easier to understand.
+> 
+> 
+> Discussion
+> link:https://lore.kernel.org/linux-arm-kernel/Z8_usklidqnerurc@linux.dev/
+> <https://lore.kernel.org/linux-arm-kernel/Z8_usklidqnerurc@linux.dev/>
+> 
+> 
+> That's why I ended up changing the storage approach in the end.
+> 
+> 
+
+Humm, FWIW I disagree with the above argument.
+I would argue that vcpu_put should save the registers, and not 
+actually know what they are about or how are they formatted at this point.
+
+The responsibility of understanding it's fields and usage value should be 
+in the code that actually uses it.
+
+IIUC on kvm_vcpu_put_vhe and kvm_vcpu_load_vhe there are calls to other 
+functions than only save the register as it is.
+
+> > >   struct vncr_tlb;
+> > > 
+> > >   struct kvm_vcpu_arch {
+> > > @@ -920,6 +934,9 @@ struct kvm_vcpu_arch {
+> > > 
+> > >   	/* Per-vcpu TLB for VNCR_EL2 -- NULL when !NV */
+> > >   	struct vncr_tlb	*vncr_tlb;
+> > > +
+> > > +	/* HDBSS registers info */
+> > > +	struct vcpu_hdbss_state hdbss;
+> > >   };
+> > > 
+> > >   /*
+> > > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> > > index d968aca0461a..3fea8cfe8869 100644
+> > > --- a/arch/arm64/include/asm/kvm_mmu.h
+> > > +++ b/arch/arm64/include/asm/kvm_mmu.h
+> > > @@ -183,6 +183,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+> > > 
+> > >   int kvm_handle_guest_sea(struct kvm_vcpu *vcpu);
+> > >   int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
+> > > +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu);
+> > > 
+> > >   phys_addr_t kvm_mmu_get_httbr(void);
+> > >   phys_addr_t kvm_get_idmap_vector(void);
+> > > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > > index f4436ecc630c..d11f4d0dd4e7 100644
+> > > --- a/arch/arm64/include/asm/sysreg.h
+> > > +++ b/arch/arm64/include/asm/sysreg.h
+> > > @@ -1039,6 +1039,17 @@
+> > > 
+> > >   #define GCS_CAP(x)	((((unsigned long)x) & GCS_CAP_ADDR_MASK) | \
+> > >   					       GCS_CAP_VALID_TOKEN)
+> > > +
+> > > +/*
+> > > + * Definitions for the HDBSS feature
+> > > + */
+> > > +#define HDBSS_MAX_SIZE		HDBSSBR_EL2_SZ_2MB
+> > > +
+> > > +#define HDBSSBR_EL2(baddr, sz)	(((baddr) & GENMASK(55, 12 + sz)) | \
+> > > +				 FIELD_PREP(HDBSSBR_EL2_SZ_MASK, sz))
+> > > +
+> > > +#define HDBSSPROD_IDX(prod)	FIELD_GET(HDBSSPROD_EL2_INDEX_MASK, prod)
+> > > +
+> > >   /*
+> > >    * Definitions for GICv5 instructions
+> > >    */
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index 29f0326f7e00..d64da05e25c4 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -125,6 +125,87 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+> > >   	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
+> > >   }
+> > > 
+> > > +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	struct page *hdbss_pg;
+> > > +
+> > > +	hdbss_pg = phys_to_page(vcpu->arch.hdbss.base_phys);
+> > > +	if (hdbss_pg)
+> > > +		__free_pages(hdbss_pg, vcpu->arch.hdbss.size);
+> > > +
+> > > +	vcpu->arch.hdbss.size = 0;
+> > > +}
+> > > +
+> > > +static int kvm_cap_arm_enable_hdbss(struct kvm *kvm,
+> > > +				    struct kvm_enable_cap *cap)
+> > > +{
+> > > +	unsigned long i;
+> > > +	struct kvm_vcpu *vcpu;
+> > > +	struct page *hdbss_pg = NULL;
+> > > +	__u64 size = cap->args[0];
+> > > +	bool enable = cap->args[1] ? true : false;
+> > > +
+> > > +	if (!system_supports_hdbss())
+> > > +		return -EINVAL;
+> > > +
+> > > +	if (size > HDBSS_MAX_SIZE)
+> > > +		return -EINVAL;
+> > > +
+> > > +	if (!enable && !kvm->arch.enable_hdbss) /* Already Off */
+> > > +		return 0;
+> > > +
+> > > +	if (enable && kvm->arch.enable_hdbss) /* Already On, can't set size */
+> > > +		return -EINVAL;
+> > > +
+> > > +	if (!enable) { /* Turn it off */
+> > > +		kvm->arch.mmu.vtcr &= ~(VTCR_EL2_HD | VTCR_EL2_HDBSS | VTCR_EL2_HA);
+> > > +
+> > > +		kvm_for_each_vcpu(i, vcpu, kvm) {
+> > > +			/* Kick vcpus to flush hdbss buffer. */
+> > > +			kvm_vcpu_kick(vcpu);
+> > > +
+> > > +			kvm_arm_vcpu_free_hdbss(vcpu);
+> > > +		}
+> > > +
+> > > +		kvm->arch.enable_hdbss = false;
+> > > +
+> > > +		return 0;
+> > > +	}
+> > > +
+> > > +	/* Turn it on */
+> > > +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> > > +		hdbss_pg = alloc_pages(GFP_KERNEL_ACCOUNT, size);
+> > > +		if (!hdbss_pg)
+> > > +			goto error_alloc;
+> > > +
+> > > +		vcpu->arch.hdbss = (struct vcpu_hdbss_state) {
+> > > +			.base_phys = page_to_phys(hdbss_pg),
+> > > +			.size = size,
+> > > +			.next_index = 0,
+> > > +		};
+> > > +	}
+> > > +
+> > > +	kvm->arch.enable_hdbss = true;
+> > > +	kvm->arch.mmu.vtcr |= VTCR_EL2_HD | VTCR_EL2_HDBSS | VTCR_EL2_HA;
+> > > +
+> > > +	/*
+> > > +	 * We should kick vcpus out of guest mode here to load new
+> > > +	 * vtcr value to vtcr_el2 register when re-enter guest mode.
+> > > +	 */
+> > > +	kvm_for_each_vcpu(i, vcpu, kvm)
+> > > +		kvm_vcpu_kick(vcpu);
+> > > +
+> > > +	return 0;
+> > > +
+> > > +error_alloc:
+> > > +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> > > +		if (vcpu->arch.hdbss.base_phys)
+> > > +			kvm_arm_vcpu_free_hdbss(vcpu);
+> > > +	}
+> > > +
+> > > +	return -ENOMEM;
+> > > +}
+> > > +
+> > >   int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> > >   			    struct kvm_enable_cap *cap)
+> > >   {
+> > > @@ -182,6 +263,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> > >   		r = 0;
+> > >   		set_bit(KVM_ARCH_FLAG_EXIT_SEA, &kvm->arch.flags);
+> > >   		break;
+> > > +	case KVM_CAP_ARM_HW_DIRTY_STATE_TRACK:
+> > > +		mutex_lock(&kvm->lock);
+> > > +		r = kvm_cap_arm_enable_hdbss(kvm, cap);
+> > > +		mutex_unlock(&kvm->lock);
+> > > +		break;
+> > >   	default:
+> > >   		break;
+> > >   	}
+> > > @@ -471,6 +557,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> > >   			r = kvm_supports_cacheable_pfnmap();
+> > >   		break;
+> > > 
+> > > +	case KVM_CAP_ARM_HW_DIRTY_STATE_TRACK:
+> > > +		r = system_supports_hdbss();
+> > > +		break;
+> > >   	default:
+> > >   		r = 0;
+> > >   	}
+> > > @@ -1120,6 +1209,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+> > >   		if (kvm_dirty_ring_check_request(vcpu))
+> > >   			return 0;
+> > > 
+> > > +		if (kvm_check_request(KVM_REQ_FLUSH_HDBSS, vcpu))
+> > > +			kvm_flush_hdbss_buffer(vcpu);
+> > I am curious on why we need a flush-hdbss request,
+> > Don't we have the flush function happening every time we run vcpu_put?
+> > 
+> > Oh, I see, you want to check if there is anything needed inside the inner
+> > loop of vcpu_run, without having to vcpu_put. I think it makes sense.
+> > 
+> > But instead of having this on guest entry, does not it make more sense to
+> > have it in guest exit? This way we flush every time (if needed) we exit the
+> > guest, and instead of having a vcpu request, we just require a vcpu kick
+> > and it should flush if needed.
+> > 
+> > Maybe have vcpu_put just save the registers, and add a the flush before
+> > handle_exit.
+> > 
+> > What do you think?
+> 
+> 
+> Thank you for the feedback.
+> 
+> 
+> Indeed, in the initial version (v1), I placed the flush operation inside
+> handle_exit and
+> 
+> used a vcpu_kick in kvm_arch_sync_dirty_log to trigger the flush of the
+> HDBSS buffer.
+> 
+> 
+> However, during the review, Marc pointed out that calling this function on
+> every exit
+> 
+> event is too frequent if it's not always needed.
+> 
+> 
+> Discussion link:
+> _https://lore.kernel.org/linux-arm-kernel/86senjony9.wl-maz@kernel.org/_
+> 
+> 
+> I agreed with his assessment. Therefore, in the current version, I've
+> separated the flush
+> 
+> operation into more specific and less frequent points:
+> 
+> 
+> 1. In vcpu_put
+> 
+> 2. During dirty log synchronization, by kicking the vCPU to trigger a
+> request that flushes
+> 
+> on its next exit.
+> 
+> 
+> 3. When handling a specific HDBSSF event.
+> 
+> 
+> This ensures the flush happens only when necessary, avoiding the overhead of
+> doing it
+> 
+> on every guest exit.
+> 
+
+Fair enough, calling it every time you go in the inner loop may be too 
+much, even with a check to make sure it needs to run.
+
+Having it as a request means you may do that sometimes without 
+leaving the inner loop. That could be useful if you want to use it with the 
+IRQ handler to deal with full buffer, or any error, as well as dealing with 
+a regular request in the 2nd case.
+
+While I agree it's needed to run before leaving guest context (i.e leaving 
+the inner loop), I am not really sure vcpu_put is the best place to put the 
+flushing. I may be wrong, but for me it looks more like of a place to save 
+registers and context, as well as dropping refcounts or something like 
+that. I would not expect a flush happening in vcpu_put, if I was reading 
+the code.
+
+Would it be too bad if we had it into a call before vcpu_put, at 
+kvm_arch_vcpu_ioctl_run()? 
 
 
-On 06/03/2026 14:22, David Hildenbrand (Arm) wrote:
-> [...]
-> 
->>>> +     /*
->>>> +      * Direct map restoration cannot fail, as the only error condition
->>>> +      * for direct map manipulation is failure to allocate page tables
->>>> +      * when splitting huge pages, but this split would have already
->>>> +      * happened in folio_zap_direct_map() in
->>>> kvm_gmem_folio_zap_direct_map().
->>>> +      * Note that the splitting occurs always because guest_memfd
->>>> +      * currently supports only base pages.
->>>> +      * Thus folio_restore_direct_map() here only updates prot bits.
->>>> +      */
->>>> +     WARN_ON_ONCE(folio_restore_direct_map(folio));
->>>
->>> Which raised the question: why should this function then even return an
->>> error?
->>
->> Dave pointed earlier that the failures were possible [1].  Do you think
->> we can document it better?
-> 
-> I'm fine with checking that somewhere (to catch any future problems).
-> 
-> Why not do the WARN_ON_ONCE() in folio_restore_direct_map()?
-> 
-> Then, carefully document (in the new kerneldoc for
-> folio_restore_direct_map() etc) that folio_restore_direct_map() is only
-> allowed after a prior successful folio_zap_direct_map(), and add a
-> helpful comment above the WARN_ON_ONCE() in folio_restore_direct_map()
-> that we don't expect errors etc.
 
-My only concern about that is the assumptions we make in KVM may not 
-apply to the general case and the WARN_ON_ONCE may become too 
-restrictive compared to proper error handling in some (rare) cases.  For 
-example, is it possible for the folio to migrate in between?
+> > > +
+> > >   		check_nested_vcpu_requests(vcpu);
+> > >   	}
+> > > 
+> > > @@ -1898,7 +1990,17 @@ long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
+> > > 
+> > >   void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+> > >   {
+> > > +	/*
+> > > +	 * Flush all CPUs' dirty log buffers to the dirty_bitmap.  Called
+> > > +	 * before reporting dirty_bitmap to userspace. Send a request with
+> > > +	 * KVM_REQUEST_WAIT to flush buffer synchronously.
+> > > +	 */
+> > > +	struct kvm_vcpu *vcpu;
+> > > +
+> > > +	if (!kvm->arch.enable_hdbss)
+> > > +		return;
+> > > 
+> > > +	kvm_make_all_cpus_request(kvm, KVM_REQ_FLUSH_HDBSS);
+> > >   }
+> > > 
+> > >   static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+> > > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > > index 9db3f11a4754..600cbc4f8ae9 100644
+> > > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > > @@ -213,6 +213,23 @@ static void __vcpu_put_deactivate_traps(struct kvm_vcpu *vcpu)
+> > >   	local_irq_restore(flags);
+> > >   }
+> > > 
+> > > +static void __load_hdbss(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	struct kvm *kvm = vcpu->kvm;
+> > > +	u64 br_el2, prod_el2;
+> > > +
+> > > +	if (!kvm->arch.enable_hdbss)
+> > > +		return;
+> > > +
+> > > +	br_el2 = HDBSSBR_EL2(vcpu->arch.hdbss.base_phys, vcpu->arch.hdbss.size);
+> > > +	prod_el2 = vcpu->arch.hdbss.next_index;
+> > > +
+> > > +	write_sysreg_s(br_el2, SYS_HDBSSBR_EL2);
+> > > +	write_sysreg_s(prod_el2, SYS_HDBSSPROD_EL2);
+> > > +
+> > > +	isb();
+> > > +}
+> > > +
+> > >   void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu)
+> > >   {
+> > >   	host_data_ptr(host_ctxt)->__hyp_running_vcpu = vcpu;
+> > > @@ -220,10 +237,12 @@ void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu)
+> > >   	__vcpu_load_switch_sysregs(vcpu);
+> > >   	__vcpu_load_activate_traps(vcpu);
+> > >   	__load_stage2(vcpu->arch.hw_mmu, vcpu->arch.hw_mmu->arch);
+> > > +	__load_hdbss(vcpu);
+> > >   }
+> > > 
+> > >   void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
+> > >   {
+> > > +	kvm_flush_hdbss_buffer(vcpu);
+> > >   	__vcpu_put_deactivate_traps(vcpu);
+> > >   	__vcpu_put_switch_sysregs(vcpu);
+> > > 
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index 070a01e53fcb..42b0710a16ce 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -1896,6 +1896,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> > >   	if (writable)
+> > >   		prot |= KVM_PGTABLE_PROT_W;
+> > > 
+> > > +	if (writable && kvm->arch.enable_hdbss && logging_active)
+> > > +		prot |= KVM_PGTABLE_PROT_DBM;
+> > > +
+> > >   	if (exec_fault)
+> > >   		prot |= KVM_PGTABLE_PROT_X;
+> > > 
+> > > @@ -2033,6 +2036,70 @@ int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
+> > >   	return 0;
+> > >   }
+> > > 
+> > > +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	int idx, curr_idx;
+> > > +	u64 br_el2;
+> > > +	u64 *hdbss_buf;
+> > > +	struct kvm *kvm = vcpu->kvm;
+> > > +
+> > > +	if (!kvm->arch.enable_hdbss)
+> > > +		return;
+> > > +
+> > > +	curr_idx = HDBSSPROD_IDX(read_sysreg_s(SYS_HDBSSPROD_EL2));
+> > > +	br_el2 = HDBSSBR_EL2(vcpu->arch.hdbss.base_phys, vcpu->arch.hdbss.size);
+> > > +
+> > > +	/* Do nothing if HDBSS buffer is empty or br_el2 is NULL */
+> > > +	if (curr_idx == 0 || br_el2 == 0)
+> > > +		return;
+> > > +
+> > > +	hdbss_buf = page_address(phys_to_page(vcpu->arch.hdbss.base_phys));
+> > > +	if (!hdbss_buf)
+> > > +		return;
+> > > +
+> > > +	guard(write_lock_irqsave)(&vcpu->kvm->mmu_lock);
+> > > +	for (idx = 0; idx < curr_idx; idx++) {
+> > > +		u64 gpa;
+> > > +
+> > > +		gpa = hdbss_buf[idx];
+> > > +		if (!(gpa & HDBSS_ENTRY_VALID))
+> > > +			continue;
+> > > +
+> > > +		gpa &= HDBSS_ENTRY_IPA;
+> > > +		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
+> > > +	}
+> > This will mark a page dirty for both dirty_bitmap or dirty_ring, depending
+> > on what is in use.
+> > 
+> > Out of plain curiosity, have you planned / tested for the dirty-ring as
+> > well, or just for dirty-bitmap?
+> 
+> 
+> Currently, I have only tested this with dirty-bitmap mode.
+> 
+> 
+> I will test and ensure the HDBSS feature works correctly with dirty-ring in
+> the next version.
+> 
+> 
 
-> 
-> [...]
-> 
->>>> -     if (!is_prepared)
->>>> +     if (!is_prepared) {
->>>>                 r = kvm_gmem_prepare_folio(kvm, slot, gfn, folio);
->>>> +             if (r)
->>>> +                     goto out_unlock;
->>>> +     }
->>>> +
->>>> +     if (kvm_gmem_no_direct_map(folio_inode(folio))) {
->>>> +             r = kvm_gmem_folio_zap_direct_map(folio);
->>>> +             if (r)
->>>> +                     goto out_unlock;
->>>> +     }
->>>
->>>
->>> It's a bit nasty that we have two different places where we have to call
->>> this. Smells error prone.
->>
->> We will actually have 2 more: for the write() syscall and UFFDIO_COPY,
->> and 0 once we have [2]
->>
->> [2] https://lore.kernel.org/linux-mm/20260225-page_alloc-unmapped-v1-0-
->> e8808a03cd66@google.com/
->>
->>>
->>> I was wondering why kvm_gmem_get_folio() cannot handle that?
->>
->> Most of the call sites follow the pattern alloc -> write -> zap so
->> they'll need direct map for some time after the allocation.
->>
-> 
-> Okay. Nasty. :)
-> 
-> --
-> Cheers,
-> 
-> David
+Thanks!
 
+> > > +
+> > > +	/* reset HDBSS index */
+> > > +	write_sysreg_s(0, SYS_HDBSSPROD_EL2);
+> > > +	vcpu->arch.hdbss.next_index = 0;
+> > > +	isb();
+> > > +}
+> > > +
+> > > +static int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +	u64 prod;
+> > > +	u64 fsc;
+> > > +
+> > > +	prod = read_sysreg_s(SYS_HDBSSPROD_EL2);
+> > > +	fsc = FIELD_GET(HDBSSPROD_EL2_FSC_MASK, prod);
+> > > +
+> > > +	switch (fsc) {
+> > > +	case HDBSSPROD_EL2_FSC_OK:
+> > > +		/* Buffer full, which is reported as permission fault. */
+> > > +		kvm_flush_hdbss_buffer(vcpu);
+> > > +		return 1;
+> > Humm, flushing in a fault handler means hanging there, in IRQ context, for
+> > a while.
+> > 
+> > Since we already deal with this on guest_exit (vcpu_put IIUC), why not just
+> > return in a way the vcpu has to exit the inner loop and let it flush there
+> > instead?
+> > 
+> > Thanks!
+> > Leo
+> 
+> 
+> Thanks for the feedback.
+> 
+> 
+> If we flush on every guest exit (by moving the flush before handle_exit,
+> then we can
+> 
+> indeed drop the flush from the fault handler and from vcpu_put.
+> 
+> 
+> However, given Marc's earlier concern about not imposing this overhead on
+> all vCPUs,
+> 
+> I'd rather avoid flushing on every exit.
+> 
+> 
+> My current plan is to set a request bit in kvm_handle_hdbss_fault (via
+> kvm_make_request),
+> 
+> and move the actual flush to the normal exit path, where it can execute in a
+> safe context.
+> 
+> This also allows us to remove the flush from the fault handler entirely.
+> 
+> 
+> Does that approach sound reasonable to you?
+> 
+> 
+
+Yes, I think it looks much better, as the fault will cause guest to exit, 
+and it can run the flush on it's way back in.
+
+Thanks!
+Leo
+
+> > > +	case HDBSSPROD_EL2_FSC_ExternalAbort:
+> > > +	case HDBSSPROD_EL2_FSC_GPF:
+> > > +		return -EFAULT;
+> > > +	default:
+> > > +		/* Unknown fault. */
+> > > +		WARN_ONCE(1,
+> > > +				"Unexpected HDBSS fault type, FSC: 0x%llx (prod=0x%llx, vcpu=%d)\n",
+> > > +				fsc, prod, vcpu->vcpu_id);
+> > > +		return -EFAULT;
+> > > +	}
+> > > +}
+> > > +
+> > >   /**
+> > >    * kvm_handle_guest_abort - handles all 2nd stage aborts
+> > >    * @vcpu:	the VCPU pointer
+> > > @@ -2071,6 +2138,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+> > > 
+> > >   	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+> > > 
+> > > +	if (esr_iss2_is_hdbssf(esr))
+> > > +		return kvm_handle_hdbss_fault(vcpu);
+> > > +
+> > >   	if (esr_fsc_is_translation_fault(esr)) {
+> > >   		/* Beyond sanitised PARange (which is the IPA limit) */
+> > >   		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
+> > > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> > > index 959532422d3a..c03a4b310b53 100644
+> > > --- a/arch/arm64/kvm/reset.c
+> > > +++ b/arch/arm64/kvm/reset.c
+> > > @@ -161,6 +161,9 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
+> > >   	free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
+> > >   	kfree(vcpu->arch.vncr_tlb);
+> > >   	kfree(vcpu->arch.ccsidr);
+> > > +
+> > > +	if (vcpu->kvm->arch.enable_hdbss)
+> > > +		kvm_arm_vcpu_free_hdbss(vcpu);
+> > >   }
+> > > 
+> > >   static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+> > > --
+> > > 2.33.0
+> 
+> Thanks!
+> 
+> Tian
+> 
 
