@@ -1,63 +1,72 @@
-Return-Path: <kvm+bounces-72997-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72998-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yFAvIYOKqml0TQEAu9opvQ
-	(envelope-from <kvm+bounces-72997-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 09:04:19 +0100
+	id CMnJMmmLqml0TQEAu9opvQ
+	(envelope-from <kvm+bounces-72998-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 09:08:09 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9DEB21CCE3
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 09:04:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B28B21CDC3
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 09:08:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CFC82305F7D7
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 08:00:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E1B1301F9BE
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 08:05:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E508372EC5;
-	Fri,  6 Mar 2026 08:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D9E1375AAD;
+	Fri,  6 Mar 2026 08:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="E0S5r1zB"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ggRmzN2i"
 X-Original-To: kvm@vger.kernel.org
 Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBBA36AB69
-	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 07:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C8A370D71
+	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 08:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772784000; cv=none; b=rsWtcq1KjMPnd+xp/U4B+LYW5kLZeJiY8NHOQKosE3dkzNlUdsejPfLgEjzTIVtQSyATHOBsRACTd7IdEQr4lQ4d25+++f5YhPgY0scLf+fEAXD4UlB73QT3jG7tN96PQI00lwz50Ijbew/UFRoZpN1azavVGxodw9dlVydITeU=
+	t=1772784316; cv=none; b=EHCaOXWImqot7dwCPTmglSMUZgCQl7qfXLwoq71B7hfwDyKeuUP+gw5su68KTf7kk3LCveYgUshxtKqkcBx1tmvpwbfqJxBsSSKgq3gtASHkG3X+x9MCNwi5zFZ9WQJKsPyk2EYxTt5WUZbv8cBBuAEZpirPs8BvlOTk4eZ7jCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772784000; c=relaxed/simple;
-	bh=X6f1XnV1lVhtqjHoQrpkruy4Q7rXKo4+upu6w1Qge7I=;
-	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=Iffm2Va01YpBVAtBNU3eCmhI29SlbMEyi6D4OSts2GVXZrbqRk1KH7VTCOUTrWC/wkq/UbbzZRGqSGnkikXe2fWMe+sBIAQgS6bdfgtINpERn4B5aDPrplkuwZZ2ScTJ7ZIAkfSPu+5sgtu2KXJ+YWCyrKsdjxyRwtONYgo/f2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=E0S5r1zB; arc=none smtp.client-ip=90.155.92.199
+	s=arc-20240116; t=1772784316; c=relaxed/simple;
+	bh=RNOoq4KBxlEYF3Xx/0KtJkvW99lAxjMeV5QeoHTP4jE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=W+vcKs7YP7LxcRxbHtXrPW/wLForxk9GRc46y7V5fpHCI+862yKiYL+fyLPTYFaLpa9DOJ/TfAiN6RjmJelbdlvcc9JUYeHRRyQa4QaeoYX7KKzcMdSCdKN+B1nYMjbfiS7pLjDXRerMGoeQG2uKD/0s2RZXxRPzrPvD2DftI6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ggRmzN2i; arc=none smtp.client-ip=90.155.92.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:Date:Cc:To:
-	From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=EJOi+FVfC5J8MhwssP09PfYgKkgQCFXXtcN9+fTfP48=; b=E0S5r1zBftgHe4TjupsAh0Wkyn
-	eRwV1us0yXdLEmBEI20DnDvrVAZwMw4Dd1J89FR7fglosNu/Yd9bTLfyre9ItzwEuQ8/ikMjEcYZU
-	VWcWC7Br/AqxRrovnSVvrGkwQ2npQIwKzTwM342VvMRVqpCQOnsvwk1h1I72zeyYVktYqMx/NzAc6
-	jNYk3O3ZDADtRYTs07szhz/cXkCuKIDw+aGfXGUYYInxX2H+eR/mVb08I177AuWBH3dHcjRTfXpzl
-	aky7dE2TWM706iOAoZPms2Ood20ZtbnTormacC+pPFScDkzlIhlIKir7MLSkWOJfQiqIUe75ytTM/
-	I9SQMZOg==;
+	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=RNOoq4KBxlEYF3Xx/0KtJkvW99lAxjMeV5QeoHTP4jE=; b=ggRmzN2iS8XvTEKuYXL0jNDPDT
+	CDw/0d/ozTdgePki08D9YLclldW7fNlfzi/8k+kFN31ZrO/+Q61Cp5MGlbwHfN/ojJz+zC7qrfrHe
+	TmJ1FasCuX5A8ICwpxAm0qmg0FWMSSwFJThP1jDybse9idF2hK1E1+gi0u4ZywzF9obF4uDf3vq5h
+	A8ae4mA5k4JgAUEqVFWJoUCbLFANenSnw79PaZEFedeQqaOubyjq/E+Rm1NyW7BxllqyVzpwva1Y8
+	As1/ppgyEwvnkVoi9grDkFllkRyjquEYkCEAYQx2YpG9dc+p8aF/81EDI6iHns3fnU2zq5nY0CsLQ
+	lBfuKttA==;
 Received: from business-178-013-028-021.static.arcor-ip.net ([178.13.28.21] helo=u09cd745991455d.ant.amazon.com)
 	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vyQ6D-00000008EyA-16b1;
-	Fri, 06 Mar 2026 07:59:53 +0000
-Message-ID: <9d50fc3ca9e8e58f551d015f95d51a3c29ce6ccc.camel@infradead.org>
-Subject: [PATCH] KVM: X86: Fix array_index_nospec protection in __pv_send_ipi
+	id 1vyQBD-00000008FgD-0ktJ;
+	Fri, 06 Mar 2026 08:05:09 +0000
+Message-ID: <cc9d4b2f588babeba21318ce40ec5814d1c19084.camel@infradead.org>
+Subject: Re: [PATCH v3] KVM: x86: use array_index_nospec with indices that
+ come from guest
 From: David Woodhouse <dwmw2@infradead.org>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Jim Mattson <jmattson@google.com>, Thijs Raymakers <thijs@raymakers.nl>,
   kvm@vger.kernel.org, Anel Orazgaliyeva <anelkz@amazon.de>, stable
  <stable@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Greg
  Kroah-Hartman <gregkh@linuxfoundation.org>
-Date: Fri, 06 Mar 2026 08:59:52 +0100
+Date: Fri, 06 Mar 2026 09:05:02 +0100
+In-Reply-To: <aaozvNtzczwlyz_3@google.com>
+References: <20250804064405.4802-1-thijs@raymakers.nl>
+	 <ac94394405bf7e878c8ff0acf87db922dc4af48c.camel@infradead.org>
+	 <CALMp9eTSb3YrLRxnSbYQmAsK1SKA3Job6z2VjUWcKpPOGbWvRw@mail.gmail.com>
+	 <aaoDtzpY-2y-c-66@google.com>
+	 <FFDA9F60-F0AD-4A92-8203-40DE82A921A7@infradead.org>
+	 <aaozvNtzczwlyz_3@google.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-yNkcwtGyWvK0ZCyUGSIf"
+	boundary="=-E/NRh0NJ2U7w6SZ38VP2"
 User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -66,18 +75,18 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Rspamd-Queue-Id: D9DEB21CCE3
+X-Rspamd-Queue-Id: 3B28B21CDC3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-4.26 / 15.00];
 	SIGNED_SMIME(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
 	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-72997-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-72998-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -85,7 +94,7 @@ X-Spamd-Result: default: False [-4.26 / 15.00];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	DKIM_TRACE(0.00)[infradead.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
@@ -95,76 +104,107 @@ X-Spamd-Result: default: False [-4.26 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,amazon.de:email,infradead.org:dkim,infradead.org:mid]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,infradead.org:dkim,infradead.org:email,infradead.org:mid]
 X-Rspamd-Action: no action
 
 
---=-yNkcwtGyWvK0ZCyUGSIf
+--=-E/NRh0NJ2U7w6SZ38VP2
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-From: Anel Orazgaliyeva <anelkz@amazon.de>
+On Thu, 2026-03-05 at 17:54 -0800, Sean Christopherson wrote:
+> On Thu, Mar 05, 2026, David Woodhouse wrote:
+> > On 5 March 2026 23:29:11 CET, Sean Christopherson <seanjc@google.com> w=
+rote:
+> > > On Thu, Mar 05, 2026, Jim Mattson wrote:
+> > > > On Thu, Mar 5, 2026 at 12:31=E2=80=AFPM David Woodhouse <dwmw2@infr=
+adead.org> wrote:
+> > > > >=20
+> > > > > On Mon, 2025-08-04 at 08:44 +0200, Thijs Raymakers wrote:
+> > > > > > min and dest_id are guest-controlled indices. Using array_index=
+_nospec()
+> > > > > > after the bounds checks clamps these values to mitigate specula=
+tive execution
+> > > > > > side-channels.
+> > > > > >=20
+> > > > >=20
+> > > > > (commit c87bd4dd43a6)
+> > > > >=20
+> > > > > Is this sufficient in the __pv_send_ipi() case?
+> > > > >=20
+> > > > > > --- a/arch/x86/kvm/lapic.c
+> > > > > > +++ b/arch/x86/kvm/lapic.c
+> > > > > > @@ -852,6 +852,8 @@ static int __pv_send_ipi(unsigned long *ipi=
+_bitmap, struct kvm_apic_map *map,
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (min > map->max_apic_id)
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 return 0;
+> > > > > >=20
+> > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0 min =3D array_index_nospec(min, map->=
+max_apic_id + 1);
+> > > > > > +
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for_each_set_bit(i, ipi_bitmap,
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
+> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 if (map->phys_map[min + i]) {
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ vcpu =3D map->phys_map[min + i]->vcpu;
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ count +=3D kvm_apic_set_irq(vcpu, irq, NULL);
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> > > > >=20
+> > > > > Do we need to protect [min + i] in the loop, rather than just [mi=
+n]?
+> > > > >=20
+> > > > > The end condition for the for_each_set_bit() loop does mean that =
+it
+> > > > > won't actually execute past max_apic_id but is that sufficient to
+> > > > > protect against *speculative* execution?
+> > > > >=20
+> > > > > I have a variant of this which uses array_index_nospec(min+i, ...=
+)
+> > > > > *inside* the loop.
+> > > >=20
+> > > > Heh. Me too!
+> > >=20
+> > > LOL, OMG, get off your high horses you two and someone send a damn pa=
+tch!=C2=A0=20
+> >=20
+> > Heh, happy to, but it was actually a genuine question. Our pre-embargo
+> > patches did it in the loop but the most likely explanation seemed to be=
+ that
+> > upstream changed it as a valid optimization (because somehow the loop w=
+asn't
+> > vulnerable?), and that we *can* drop the old patches in favour of the
+> > upstream one.
+> >=20
+> > If no such reason exists for why the patch got changed, I'm happy to po=
+st the
+> > delta.
+>=20
+> AFAIK, there was no such justification.=C2=A0 I'm pretty sure the only up=
+stream version
+> I've ever seen is what ended up in-tree.
+>=20
+> Speculation stuff definitely isn't my area of expertise.=C2=A0 Honestly, =
+you, Jim, and
+> a few others are who I'd go bug for answers for this sort of thing, so un=
+less
+> someone chimes in with a strong argument for the current code, I say we g=
+o with
+> the more conservative approach.
 
-The __pv_send_ipi() function iterates over up to BITS_PER_LONG vCPUs
-starting from the APIC ID specified in its 'min' argument, which is
-provided by the guest.
-
-Commit c87bd4dd43a6 used array_index_nospec() to clamp the value of 'min'
-but then the for_each_set_bit() loop dereferences higher indices without
-further protection. Theoretically, a guest can trigger speculative access
-to up to BITS_PER_LONG elements off the end of the phys_map[] array.
-
-(In practice it would probably need aggressive loop unrolling by the
-compiler to go more than one element off the end, and even that seems
-unlikely, but the theoretical possibility exists.)
-
-Move the array_index_nospec() inside the loop to protect the [map + i]
-index which is actually being used each time.
-
-Fixes: c87bd4dd43a6 ("KVM: x86: use array_index_nospec with indices that co=
-me from guest")
-Fixes: bdf7ffc89922 ("KVM: LAPIC: Fix pv ipis out-of-bounds access")
-Fixes: 4180bf1b655a ("KVM: X86: Implement "send IPI" hypercall")
-
-Signed-off-by: Anel Orazgaliyeva <anelkz@amazon.de>
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/x86/kvm/lapic.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 1597dd0b0cc6..6eff9a7b1009 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -810,16 +810,16 @@ static int __pv_send_ipi(unsigned long *ipi_bitmap, s=
-truct kvm_apic_map *map,
- {
- 	int i, count =3D 0;
- 	struct kvm_vcpu *vcpu;
-+	size_t map_index;
-=20
- 	if (min > map->max_apic_id)
- 		return 0;
-=20
--	min =3D array_index_nospec(min, map->max_apic_id + 1);
--
- 	for_each_set_bit(i, ipi_bitmap,
--		min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
--		if (map->phys_map[min + i]) {
--			vcpu =3D map->phys_map[min + i]->vcpu;
-+			 min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
-+		map_index =3D array_index_nospec(min + i, map->max_apic_id + 1);
-+		if (map->phys_map[map_index]) {
-+			vcpu =3D map->phys_map[map_index]->vcpu;
- 			count +=3D kvm_apic_set_irq(vcpu, irq, NULL);
- 		}
- 	}
---=20
-2.43.0
+Posted as
+https://lore.kernel.org/kvm/9d50fc3ca9e8e58f551d015f95d51a3c29ce6ccc.camel@=
+infradead.org
 
 
-
---=-yNkcwtGyWvK0ZCyUGSIf
+--=-E/NRh0NJ2U7w6SZ38VP2
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -243,22 +283,22 @@ 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
-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
+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
-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
+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
 
 
---=-yNkcwtGyWvK0ZCyUGSIf--
+--=-E/NRh0NJ2U7w6SZ38VP2--
 
