@@ -1,205 +1,171 @@
-Return-Path: <kvm+bounces-73184-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73185-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GEmEFc1jq2mmcgEAu9opvQ
-	(envelope-from <kvm+bounces-73184-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 00:31:25 +0100
+	id YB3hNzdnq2kfcwEAu9opvQ
+	(envelope-from <kvm+bounces-73185-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 00:45:59 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B002D228B99
-	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 00:31:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 79211228D45
+	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 00:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A4E8F30CC78D
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 23:29:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 31923303639B
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 23:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D1437A4AB;
-	Fri,  6 Mar 2026 23:29:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF38A38F22C;
+	Fri,  6 Mar 2026 23:45:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lgB9tin+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QifiXDk7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810782E7BD3;
-	Fri,  6 Mar 2026 23:29:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772839768; cv=none; b=Y1Dzl2ISsixu5Xg3yfpno9LeXafkv9QGj35uujjeXGKeNtYwR4XF3fzxABc6shQ/BKrWUfDbVSVhO9K92YRPDPVkty6v3ZX0awjTFBLisFsY0VUbALYq315dS1pvrXPNA41IH5lNvidaY2rrZNJf1Ak0D9x9ijfGgtDD2GGKqyU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772839768; c=relaxed/simple;
-	bh=9J7o/uZV0P+zsj/J+BViTyP5+BBxAlWq3Pn/Z1eK+vo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cw+1N7HvmdMsWLah31jhkcB8XCs7adNpDrjOCPpi98FJEiKVZFK0UjK2kycvGDHgsX1ShedUJXbK26tWj3bTU4e5MGVFNlYj7uLC2/tP8QW8VFl89sfbHVbXQG2OQtRtETvp2aRr6/6Voj0kgJEZkKEdl1g1DDfKqaoXc6bjEMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lgB9tin+; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772839768; x=1804375768;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=9J7o/uZV0P+zsj/J+BViTyP5+BBxAlWq3Pn/Z1eK+vo=;
-  b=lgB9tin+YpsIC3rfHsRVO044mfFpIrEJKHObMXpvhq9VYECsq7yKV+DL
-   SSg7xldWxyy8rPYED3CNBC3c3dQAJfIRbFd9B/cbMf+gWYq17xnib5MVf
-   wUOv6btiGgcnpOJ1+ePjxk6BB+n6zu8SNtM8Dyamb1ub/S4QrCEqEQSM6
-   2ISR6VcUBx4j0tcxreYLj1JIgCKiFfJTtjYaEbO1lSccY36mWJMLPnyVC
-   wb5noJOfSZ1/rZiFvrIfVGB1lGzyXukRT8SrRTCaE5gcJDEUbOkDarjUR
-   84BrrzeITvoF2pH8kXaYk959LP4E4t0sl5wDK52bVns7LE+Zmv1yYc5yr
-   A==;
-X-CSE-ConnectionGUID: l8AQ8JLqRaykUkUP6h8B9w==
-X-CSE-MsgGUID: ZAbgH3gGRN+FHtptErgmMw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11721"; a="85429519"
-X-IronPort-AV: E=Sophos;i="6.23,105,1770624000"; 
-   d="scan'208";a="85429519"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2026 15:29:27 -0800
-X-CSE-ConnectionGUID: 0xwmkCYeTmqoB21PzfICKw==
-X-CSE-MsgGUID: OSk1/5ZFTs+Wvl+bce0vWA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,105,1770624000"; 
-   d="scan'208";a="219261956"
-Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2026 15:29:26 -0800
-Date: Fri, 6 Mar 2026 15:29:20 -0800
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: x86@kernel.org, David Kaplan <david.kaplan@amd.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>, David Dunn <daviddunn@google.com>
-Subject: Re: [PATCH v4 04/11] x86/bhi: Make clear_bhb_loop() effective on
- newer CPUs
-Message-ID: <20260306232920.dja5n7cngrsyj6tk@desk>
-References: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
- <20251119-vmscape-bhb-v4-4-1adad4e69ddc@linux.intel.com>
- <CALMp9eQNBZsJNdfCVwbJ4v1DgCNqRV3DVcEeCPFt=dd29+qy-A@mail.gmail.com>
- <20260306223225.l2beapz3nvmqefou@desk>
- <CALMp9eQoE13d1cqD3PNJtvdKUGZeVm1g-9TWh+M+MJj_sm9CzA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7495358377
+	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 23:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772840738; cv=pass; b=KuS79Yb2WfB2YYw+9WE0YCSh6XRF1G50gABclZhwQlF7LlOQaRknxc1vsJOJCIRTMZlmcF5vsMqpV1auLTxvrJauBZsK2LiCndJ+nMCWrw4ekIJ4qdNeheZmS4vi2ojnWPoz2Dr88MeouMdQtR1VM4f/JwdnshaDOB1CpvzRvzo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772840738; c=relaxed/simple;
+	bh=GJtBB9cbQADjutlg1/84ZCAeyk/fDQtRv94VxILrjkc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DvbSO9HU1qtgpW48XJeZ5Pcb/n8yHMgADkDYyC6sZioouYSwBJIhU/Fe/XvK7JvlnWUt1N67fBB3rx2VgI/P0UAAdb2Tg2SvzpRUTCdQ9wv/H8UexldLuArtOYO5coeTVZWQuTL2+UM1/9gWOJ4S5pGaVHWNwrbKqF2YmIaHc48=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QifiXDk7; arc=pass smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-661169cd6d8so1902a12.1
+        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 15:45:36 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772840735; cv=none;
+        d=google.com; s=arc-20240605;
+        b=J3dAFDync7gB2R6lH/WqQtDX2OSRh0/FZfPfw1v+STIjGMjdQNqMl4kD6zKJU9n0rl
+         gJY2R3fvfx4BEn/aQdRt6TDn7WMS6TJVWh7gK4C8TGpH8k++WOJV2uctiHJIT9LeLXf4
+         MHbjiFiZ94yIHPszDASS2NrPnOVULbB415lwVqxBCvQfWYqoqcq0ksCm8XWwCviIx7U0
+         WE/UZcCoxj5k+cdKA2zB6mc1G00KCwnJBdyR4segkuRJbywOeBOL8nLkb5hnNp0/vu0r
+         Zk2eWTtkHkOBpOCG9SHVYf1dBhNZOtX8KTlLXheeAhnHVfQBKcQvTu+08SR89b9uGJTl
+         b6GA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=GJtBB9cbQADjutlg1/84ZCAeyk/fDQtRv94VxILrjkc=;
+        fh=czHwFJ9lfJkj4DKwNM9RIuRAp12F9Fg+2Gfqn2qZ7bg=;
+        b=IuYiw5MvmEHmEI5z2t16UqrV/yGoUVwkkltQ2XQrTt4rxAw7o1RvDRHar6Hsl9Yes7
+         4iDapfbwCPaOT7cpW/3i8yVOyMnkSb0qVG0PZMx6x8zOaf/eDkpJUUt5gEnCxqqCffz6
+         xh7JDcL5x6ndqZR0K1zdUWeRoMUSs28AqreWh44SCwgmXghSG/jPDl4ydHLE3SWldguS
+         6qbRUVzqI+bpRu3MCTHp9+MFYqlVgN+RvUSYMShwkqH3X8q7ItUqNNT7XpJKOF9ARyIo
+         fPwT2ccohabBrycUaLDMOubpuiEWpSWRD5zh7kcmxxNJpBxyGMWclXD6GDdRwo+bdx4N
+         WL4g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772840735; x=1773445535; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GJtBB9cbQADjutlg1/84ZCAeyk/fDQtRv94VxILrjkc=;
+        b=QifiXDk78JP3ncau1n7FjamvTnyiPlVxjBX8DA8uaXB4uvRQxrig0ZEJT0bko0ciFz
+         AKv+C4NtV27O9fJPGVmiA5OOpoLJa2A1v5kW0qp9gyNLe8PeyqK4BruXLyOv0lidYV4N
+         WeXdlD5V1sGatKVPMHinjBY/M0EXYz3OM4b0VX2bUvzYUnXxDoPJPlJB0aPSFJC0zupW
+         TNkunCmoNBzLpCLlGLWPh3LMkgqgeBD/uOPVrkXATlttgjWtWRpKukAizfjSlhXFDWug
+         pSX5wpxjK1eZlSoRoYdEgbNuf2C4eCGBBwZe5jnt2jpMezTEXGELOvqkl2mFBO/4S0J1
+         p+7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772840735; x=1773445535;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=GJtBB9cbQADjutlg1/84ZCAeyk/fDQtRv94VxILrjkc=;
+        b=HCA+82sVoBg3tnQ8ZJ4jTc6cwUh/MFfjYmhH5ubU2GG2fj2C0ktbHiEBrjEciWWo0A
+         UwagJSnnicO/oYF9IYkONnDvmXXLqcTIZMVY5LJS/fV302xrYR5QRwota0JXo+gQ9Q3h
+         ppAPEccQhhsMLb2qrwvqDqi0QTzlOI07wLfnHBZLJS9eNY8r5oywmWgAjATuIlS5/Ing
+         CYK04uj8OL/vw/HNtpPwFQF/Kdd1fzgPFuf3f2rBlxsoIxmgdFHl7bS+eXS18uockjek
+         MIU6KNwcQVd5Uy5jaG8mgT/JIAhu7LGoIB9uPNoCUJwyHBeuN9LGcLl7WzTsf4hZDgtr
+         Yvww==
+X-Forwarded-Encrypted: i=1; AJvYcCWjXvM4qKTKHXb5nl1Is6WJAgtOxtYC9iEbJmOLzPxGXRZ1BUdXSuCywWSEwPucrml+uiU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8GV+t4IAfCdm1tU9jYfRArGspOqDYyquY9w4ZhOCylYe1UIO7
+	fsykuaTeBr9wcxvX0b0ZkOFH95X1euTuCVbeQ2H95VGyb/55wL8yfzoghTljqDXq42C6adcm/As
+	WxiPEab22G4qwZf2yayZrCsx2K9ejO1H2nQdCszfM
+X-Gm-Gg: ATEYQzxbxmx7UjHmdz2n3DMeL3r15mlh0P9qFy3BD9NpINQTlNgO6z0418a8YYSs3cX
+	VZFl5eQJE4I3aOgjJZQ3MjBBrgsfTRH40TXf8Rf31VEQqIERML3Igdw6H6l3Be73DTvaa2P5BOI
+	qWxeT5u6SIwzrq+miGG5H4CYEq+YRFyvxTMuTmrgxS5bCBQNuiLmn6kgx2Cdduw5a8jR1yoh9uQ
+	qPcqqgqY4KDjl21HOjzJzAQrxsyMolkWqL8t66a4DuWPz6ENE5P8nS3pt9My1EB/ojGnrpk/Ast
+	WmL9NYg=
+X-Received: by 2002:aa7:c245:0:b0:660:ce96:cd8d with SMTP id
+ 4fb4d7f45d1cf-661e70e9f6emr9285a12.2.1772840734706; Fri, 06 Mar 2026 15:45:34
+ -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALMp9eQoE13d1cqD3PNJtvdKUGZeVm1g-9TWh+M+MJj_sm9CzA@mail.gmail.com>
-X-Rspamd-Queue-Id: B002D228B99
+References: <20260306210900.1933788-1-yosry@kernel.org> <20260306210900.1933788-2-yosry@kernel.org>
+ <CALMp9eRWwPwUSyQmizy8i2tF1CVO4iLY6x0vX1OoPUiRdCm4NQ@mail.gmail.com>
+ <CAO9r8zOhaDeYWq_6TNdPGyEE323o_8xsWTozGdro9Oni8310kA@mail.gmail.com>
+ <CALMp9eScswzFak+PMOcaDXM-W+cXtkG7fQ=jadq__+5JeqYcTQ@mail.gmail.com> <CAO9r8zOK5+xmkf3FsWRz2wHcUCN30GJ9kfZx-K7DAa1HNGhRVA@mail.gmail.com>
+In-Reply-To: <CAO9r8zOK5+xmkf3FsWRz2wHcUCN30GJ9kfZx-K7DAa1HNGhRVA@mail.gmail.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Fri, 6 Mar 2026 15:45:22 -0800
+X-Gm-Features: AaiRm50abE4bbOMdoY75xPHADuVduiO8lygtoerodZLT3KKWu_82xp2UdXcy8Dk
+Message-ID: <CALMp9eRZy78fc=8_NtGTeYYX8EU-VEKkSMG=oibTijKC8ANJWQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/6] KVM: SVM: Use maxphyaddr in emulator RAX check for VMRUN/VMLOAD/VMSAVE
+To: Yosry Ahmed <yosry@kernel.org>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 79211228D45
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73184-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73185-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,kvm@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.955];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.957];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[kvm];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Fri, Mar 06, 2026 at 02:57:13PM -0800, Jim Mattson wrote:
-> On Fri, Mar 6, 2026 at 2:32 PM Pawan Gupta
-> <pawan.kumar.gupta@linux.intel.com> wrote:
+On Fri, Mar 6, 2026 at 3:20=E2=80=AFPM Yosry Ahmed <yosry@kernel.org> wrote=
+:
+>
+> > > Right, but I am trying to have the #GP check for VMLOAD/VMSAVE behave
+> > > consistently with vls=3D1, whether it's done by the hardware or the
+> > > emulator.
 > >
-> > On Fri, Mar 06, 2026 at 01:00:15PM -0800, Jim Mattson wrote:
-> > > On Wed, Nov 19, 2025 at 10:19 PM Pawan Gupta
-> > > <pawan.kumar.gupta@linux.intel.com> wrote:
-> > > >
-> > > > As a mitigation for BHI, clear_bhb_loop() executes branches that overwrites
-> > > > the Branch History Buffer (BHB). On Alder Lake and newer parts this
-> > > > sequence is not sufficient because it doesn't clear enough entries. This
-> > > > was not an issue because these CPUs have a hardware control (BHI_DIS_S)
-> > > > that mitigates BHI in kernel.
-> > > >
-> > > > BHI variant of VMSCAPE requires isolating branch history between guests and
-> > > > userspace. Note that there is no equivalent hardware control for userspace.
-> > > > To effectively isolate branch history on newer CPUs, clear_bhb_loop()
-> > > > should execute sufficient number of branches to clear a larger BHB.
-> > > >
-> > > > Dynamically set the loop count of clear_bhb_loop() such that it is
-> > > > effective on newer CPUs too. Use the hardware control enumeration
-> > > > X86_FEATURE_BHI_CTRL to select the appropriate loop count.
-> > >
-> > > I didn't speak up earlier, because I have always considered the change
-> > > in MAXPHYADDR from ICX to SPR a hard barrier for virtual machines
-> > > masquerading as a different platform. Sadly, I am now losing that
-> > > battle. :(
-> > >
-> > > If a heterogeneous migration pool includes hosts with and without
-> > > BHI_CTRL, then BHI_CTRL cannot be advertised to a guest, because it is
-> > > not possible to emulate BHI_DIS_S on a host that doesn't have it.
-> > > Hence, one cannot derive the size of the BHB from the existence of
-> > > this feature bit.
-> >
-> > As far as VMSCAPE mitigation is concerned, mitigation is done by the host
-> > so enumeration of BHI_CTRL is not a problem. The issue that you are
-> > refering to exists with or without this patch.
-> 
-> The hypervisor *should* set IA32_SPEC_CTRL.BHI_DIS_S on the guest's
-> behalf when BHI_CTRL is not advertised to the guest. However, this
-> doesn't actually happen today. KVM does not support the tertiary
-> processor-based VM-execution controls bit 7 (virtualize
-> IA32_SPEC_CTRL), and KVM cedes the IA32_SPEC_CTRL MSR to the guest on
-> the first non-zero write.
+> > Consistency should not be an issue, since VLS cannot be enabled when
+> > the MAXPHYADDRs differ. VLS doesn't work in that scenario.
+>
+> Why? It's only broken if VMLOAD/VMSAVE is executed with a GPA that
+> exceeds the guest's MAXPHYADDR, but not the host's, right? So only
+> broken if the guest is misbehaving.
 
-The first half of the series adds the support for virtualizing
-IA32_SPEC_CTRL. Atleast that part is worth reconsidering.
+"Misbehaving" is a tad pejorative. Faulting behavior is part of the
+architectural specification. A less biased assessment is that VLS is
+partially correct when the MAXPHYADDRs don't match.
 
-https://lore.kernel.org/lkml/20240410143446.797262-1-chao.gao@intel.com/
+People thought it was a big deal when FDIV produced incorrect results
+one out of 10 billion times.
 
-> > I suppose your point is in the context of Native BHI mitigation for the
-> > guests.
-> 
-> Specific vulnerabilities aside, my point is that one cannot infer
-> anything about the underlying hardware from the presence or absence of
-> BHI_CTRL in a VM.
+> Taking a step back, I am not disagreeing that VLS should not be used
+> with different MAXPHYADDRs, I am just saying it might be.
 
-Agree.
-
-> > > I think we need an explicit CPUID bit that a hypervisor can set to
-> > > indicate that the underlying hardware might be SPR or later.
-> >
-> > Something similar was attempted via virtual-MSRs in the below series:
-> >
-> > [RFC PATCH v3 09/10] KVM: VMX: Advertise MITI_CTRL_BHB_CLEAR_SEQ_S_SUPPORT
-> > https://lore.kernel.org/lkml/20240410143446.797262-10-chao.gao@intel.com/
-> >
-> > Do you think a rework of this approach would help?
-> 
-> No, I think that whole idea is ill-conceived.  As I said above, the
-> hypervisor should just set IA32_SPEC_CTRL.BHI_DIS_S on the guest's
-> behalf when BHI_CTRL is not advertised to the guest. I don't see any
-> value in predicating this mitigation on guest usage of the short BHB
-> clearing sequence. Just do it.
-
-There are cases where this would be detrimental:
-
-1. A guest disabling the mitigation in favor of performance.
-2. A guest deploying the long SW sequence would suffer from two mitigations
-   for the same vulnerability.
+That would be wrong.
 
