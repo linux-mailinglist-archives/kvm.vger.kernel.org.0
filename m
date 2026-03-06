@@ -1,145 +1,192 @@
-Return-Path: <kvm+bounces-73101-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73133-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SMXNGisKq2k/ZgEAu9opvQ
-	(envelope-from <kvm+bounces-73101-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 18:08:59 +0100
+	id 8NtYOhkPq2n1ZgEAu9opvQ
+	(envelope-from <kvm+bounces-73133-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 18:30:01 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F773225A61
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 18:08:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 678012262DB
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 18:30:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8D0263019167
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 17:08:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0992431499A8
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 17:19:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A462B4014B8;
-	Fri,  6 Mar 2026 17:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7941041324C;
+	Fri,  6 Mar 2026 17:18:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DyKrolLd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iyJNlXWY"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22693ED5A7;
-	Fri,  6 Mar 2026 17:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7EBC36AB5F;
+	Fri,  6 Mar 2026 17:18:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772816933; cv=none; b=pfKMfp+4IYib1CnIGgVh8Ru/82f8mdEFRvabn1Rw3JrhwPAmyqsHNoSXEuv51r99ApBzZTBK8R9/hNHvfiRaBr7yuKs5K8BHSNJ/nSs1fIjgsfuNoXb4pgOb5OewyMwJ47KAQ4E6DqIQX9l109Tu/2ngg2vFMBOqbgeDAsRIx6o=
+	t=1772817506; cv=none; b=oZQUjX6UWoCdWTqhdHlKdNr4ZUrNqyrFWHy4LRLAfGd0IctuttcKst/50QXMHIMNcULpFcAcqijITdBJ0bO3nSjKjMNDe2ndtJO75sdW38qfs62p+tUQftpeOMZVr80N1DZkvaOYsvCd4Werco7xAcdTvF9rkOmWM2r7hG/k5S4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772816933; c=relaxed/simple;
-	bh=TDFTh7YVO4kn+0E0wS0GDUsWeU0kWry6Q+J9Kpv0oXE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UDyF4q+yZZKCq+PUfNdD04qLNH452rle4q1x14hClasxZD9TpTwn0vlRmf1G0vCvzG3zhqDrNwKa1XUYZCzoRD7UqNmwFjybywVfdzJPkQe3VQRwa16x/Xf0NOw1oW8bwl7IXSbYsPsfA9bKDnjMAvjEI5MqTgslEbaRhakLK8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DyKrolLd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D0DEC4CEF7;
-	Fri,  6 Mar 2026 17:08:49 +0000 (UTC)
+	s=arc-20240116; t=1772817506; c=relaxed/simple;
+	bh=v65cD3N8Br5TyxfaG6Wxwe38me5rZ0c7uZMHqtZlcpM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y8s6mW7DRnQaY4nTEtXX5W+Ii97KprSTLYj9syJ9hyHjb1dGw0e05r3QfKtGKE3FGfFJ8U46PgzHZivhxoYuTcdn3SMCQMAWU/hEh0QjuqV9gQfhBLvSCYtdd5XXENgfLpPd0OjVNNQ+FC8RWJXVJPNIVvDQHS3t8K4FEtoqCDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iyJNlXWY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BA46C4CEF7;
+	Fri,  6 Mar 2026 17:18:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772816933;
-	bh=TDFTh7YVO4kn+0E0wS0GDUsWeU0kWry6Q+J9Kpv0oXE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DyKrolLdqXUStW84WIm2omddYdbUXF+hGZtK802uuQypZj1wK/EQXcD6t3YN99hvd
-	 wjQuiJ1h0mQajkmgMTAycWV/OYevREL7m7TewO+3Aw7mb7QAPC7xSDQr9vjHyoAhXm
-	 dtHZ9YZ56LQf/Xy0j5LkYgFHhUVwzLBMN3+UvCUZpo1iFnAe9Eh2SHiiBnH+goT3R8
-	 mVU24ant/W0ho0G+f1Q8chjXCYsXdmbgmGsj8rUHYLrvr9dFWuhQfBWL6yIDjvUIjR
-	 3ZQ+oNTbXT+ZbXeAiqWvGFXq0v5Sz4SobWdEfxLoFD3vLlmQ7qes11wXgJMWIxWoRY
-	 m0DkJUN9Q2WvA==
-Date: Fri, 6 Mar 2026 17:08:46 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v9 00/30] KVM: arm64: Implement support for SME
-Message-ID: <db2acbaa-704f-42f3-9fa8-aedd769f03e6@sirena.org.uk>
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
- <CA+EHjTxOKDZ+gc9Ru=HpcRb8O-AvRm9UJaWM1fZeoqSz0bLK=g@mail.gmail.com>
+	s=k20201202; t=1772817506;
+	bh=v65cD3N8Br5TyxfaG6Wxwe38me5rZ0c7uZMHqtZlcpM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=iyJNlXWYG+bjR/gJhhrmzh9pBnw8sWL+QBOHdKQNMZ6rpLSb+yHZNoyQoTpLd08NP
+	 T714R3BgPR+lSW+R2gPVak0oKSXdaXOf+qvoLvUza23w6LW0j8/TRZAQM+LgY0oBQI
+	 Je+u50iWrjpTjKzBCHimbGNyMjofwuXW6pyc7U1w3tGzYba/F6eqwI6Q7r7F9sEEcR
+	 AR8U9wY6/xdShFjpFRBmdO5lBXMkhnLYIqyTtzARg+GqetrSO0RDItdFOXx/rS8SGu
+	 bxzY6rqPquiMavoVra2BfGwl9agSz1WpMuIr99Fz+d+HLby5uYJ80q59vUwA0FJCdK
+	 lKa031garTQdA==
+From: Mike Rapoport <rppt@kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Andrea Arcangeli <aarcange@redhat.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	David Hildenbrand <david@kernel.org>,
+	Hugh Dickins <hughd@google.com>,
+	James Houghton <jthoughton@google.com>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Michal Hocko <mhocko@suse.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>,
+	Nikita Kalyazin <kalyazin@amazon.com>,
+	Oscar Salvador <osalvador@suse.de>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Peter Xu <peterx@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	kvm@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: [PATCH v2 00/15]  mm, kvm: allow uffd support in guest_memfd
+Date: Fri,  6 Mar 2026 19:18:00 +0200
+Message-ID: <20260306171815.3160826-1-rppt@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ZcTNpR9PUgKwPiHw"
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTxOKDZ+gc9Ru=HpcRb8O-AvRm9UJaWM1fZeoqSz0bLK=g@mail.gmail.com>
-X-Cookie: A nuclear war can ruin your whole day.
-X-Rspamd-Queue-Id: 0F773225A61
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 678012262DB
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-4.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73101-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73133-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.935];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rppt@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.984];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sirena.org.uk:mid]
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
+From: "Mike Rapoport (Microsoft)" <rppt@kernel.org>
 
---ZcTNpR9PUgKwPiHw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Hi,
 
-On Tue, Jan 13, 2026 at 02:58:37PM +0000, Fuad Tabba wrote:
+These patches enable support for userfaultfd in guest_memfd.
 
-> Looking at copy_sve_reg_indices(), there's a special case for
-> KVM_REG_ARM64_SVE_VLS, which forces it to appear before the other SVE
-> registers. So I wonder if we need to do something at the level of
-> kvm_arm_copy_reg_indices(), or do some sort of post-processing to the
-> list, to avoid this problem.
+As the ground work I refactored userfaultfd handling of PTE-based memory types
+(anonymous and shmem) and converted them to use vm_uffd_ops for allocating a
+folio or getting an existing folio from the page cache. shmem also implements
+callbacks that add a folio to the page cache after the data passed in
+UFFDIO_COPY was copied and remove the folio from the page cache if page table
+update fails.
 
-I did look at this, however I didn't see anything that seemed tasetful
-to implement and as I look at it more I'm not sure any naive VMM is
-going to have a good time with this ABI, the fact that registers can get
-hotplugged depending on the current mode creates all kinds of fun.  I
-left things alone for now, I'll take another look and see if I come up
-with better ideas.
+In order for guest_memfd to notify userspace about page faults, there are new
+VM_FAULT_UFFD_MINOR and VM_FAULT_UFFD_MISSING that a ->fault() handler can
+return to inform the page fault handler that it needs to call
+handle_userfault() to complete the fault.
 
---ZcTNpR9PUgKwPiHw
-Content-Type: application/pgp-signature; name="signature.asc"
+Nikita helped to plumb these new goodies into guest_memfd and provided basic
+tests to verify that guest_memfd works with userfaultfd.
+The handling of UFFDIO_MISSING in guest_memfd requires ability to remove a
+folio from page cache, the best way I could find was exporting
+filemap_remove_folio() to KVM.
 
------BEGIN PGP SIGNATURE-----
+I deliberately left hugetlb out, at least for the most part.
+hugetlb handles acquisition of VMA and more importantly establishing of parent
+page table entry differently than PTE-based memory types. This is a different
+abstraction level than what vm_uffd_ops provides and people objected to
+exposing such low level APIs as a part of VMA operations.
 
-iQEyBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmmrCh0ACgkQJNaLcl1U
-h9Dn8Qf42GYB6VRVYWWy74gXH5yYwfw/Dpc+vc4pcS+Zlnn3oXmF2ou3o843wN81
-+yjHL5yhHYBPUskqw6skN6Cw6rRlIHcN/ETVWdhwxAQzYpwNb2RFFJsO6uRQfIrH
-o9Iwp8jI0A+QdVTo63Aek8dSpgYjQ9q+6ZKBktHL2HxZcfJ1kLYr9FLuBiR2SWJF
-VTTBBywafr8rIXGJAuNJjUynKVczfgUioBByqZy7IvbNX1ddjGXlW41a9ua4IkpG
-64kQ5vTKOR9g9XfIOJKEJE0edOqYSFRo55vCVbYUIN/uvNUuot9RP3OfkXsXk9qJ
-7KyDFAU8Cb8fWNfplV7oyEtVjMG8
-=avJ6
------END PGP SIGNATURE-----
+Also, to enable uffd in guest_memfd refactoring of hugetlb is not needed and I
+prefer to delay it until the dust settles after the changes in this set.
 
---ZcTNpR9PUgKwPiHw--
+v1 changes:
+* instead of returning uffd-specific values from ->fault() handlers add
+  __do_userfault() helper to resolve user faults in __do_fault()
+* address comments from Peter
+* rebased on v7.0-c1
+
+RFC: https://lore.kernel.org/all/20260127192936.1250096-1-rppt@kernel.org
+
+Mike Rapoport (Microsoft) (11):
+  userfaultfd: introduce mfill_copy_folio_locked() helper
+  userfaultfd: introduce struct mfill_state
+  userfaultfd: introduce mfill_get_pmd() helper.
+  userfaultfd: introduce mfill_get_vma() and mfill_put_vma()
+  userfaultfd: retry copying with locks dropped in mfill_atomic_pte_copy()
+  userfaultfd: move vma_can_userfault out of line
+  userfaultfd: introduce vm_uffd_ops
+  shmem, userfaultfd: use a VMA callback to handle UFFDIO_CONTINUE
+  userfaultfd: introduce vm_uffd_ops->alloc_folio()
+  shmem, userfaultfd: implement shmem uffd operations using vm_uffd_ops
+  userfaultfd: mfill_atomic(): remove retry logic
+
+Nikita Kalyazin (3):
+  KVM: guest_memfd: implement userfaultfd operations
+  KVM: selftests: test userfaultfd minor for guest_memfd
+  KVM: selftests: test userfaultfd missing for guest_memfd
+
+Peter Xu (1):
+  mm: generalize handling of userfaults in __do_fault()
+
+ include/linux/mm.h                            |   5 +
+ include/linux/shmem_fs.h                      |  14 -
+ include/linux/userfaultfd_k.h                 |  73 +-
+ mm/filemap.c                                  |   1 +
+ mm/hugetlb.c                                  |  15 +
+ mm/memory.c                                   |  43 ++
+ mm/shmem.c                                    | 188 ++---
+ mm/userfaultfd.c                              | 692 ++++++++++--------
+ .../testing/selftests/kvm/guest_memfd_test.c  | 191 +++++
+ virt/kvm/guest_memfd.c                        |  84 ++-
+ 10 files changed, 858 insertions(+), 448 deletions(-)
+
+
+base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
+--
+2.51.0
 
