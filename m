@@ -1,167 +1,154 @@
-Return-Path: <kvm+bounces-73090-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73091-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AIQHEJf6qmmcZAEAu9opvQ
-	(envelope-from <kvm+bounces-73090-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 17:02:31 +0100
+	id CHX9Ap/6qmmcZAEAu9opvQ
+	(envelope-from <kvm+bounces-73091-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 17:02:39 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98C2B224786
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 17:02:30 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3253224798
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 17:02:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2596E317A946
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 15:54:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3A50330774E4
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 15:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91A53EBF29;
-	Fri,  6 Mar 2026 15:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406503ED5A4;
+	Fri,  6 Mar 2026 15:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kS9SQa4o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GQXZkjH6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13593B8959
-	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 15:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712CC3ECBD9
+	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 15:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772812471; cv=none; b=ZvHMwZG1SATj7DQ0qZ62ku8kbCXmn9SUsul9Oiy3qPkKlM8HxJ2sanfaeVnO7iLTsOxbLM9sImMUy0+Z1FAIcGvNhr1AX7n/QuU5Rrr7Fhsd5iHQyj7wIfvOXJCDKPAGApzFcfZfX86ebvfJEo94mIt9i2YbEadA4NizQpW42DA=
+	t=1772812655; cv=none; b=FPzRLYL9gX4nsqeke0dD8whsCJ2GKV7z8BajD06Hlb0T+IuACyYy8HdefttBCjt6Suy9A2vDMJuCBBdtoJWxMHyHRDTY2r/LHaz0/CfsCcVh+iXqbXXhSFLCT5LETNU+wBFIzzsSZ/2o9NO0D7ErxwnoXbXPoXi7BFbMGDqiWlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772812471; c=relaxed/simple;
-	bh=DCdYafJ1q85ldEBfRTNqL/Y3XaF2wiN51HteaKHK1yo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uWR4kpJfZgy5iPkX80sqCdG9o5Uv3N2BS6fLqEEQWIWJScxJBuw5l7kjAjAQenQ4uyS3mCsxH5uDtFz5asbK/qqbkJff/s4285niiqJ0AyRoz2Fw1FEbiVKqPejLf7A0jBd0AA5/QJkfeKPnhHzoqAF2awmVujymlfWqDDXDFm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kS9SQa4o; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-8297d2c1e64so1005407b3a.2
-        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 07:54:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772812469; x=1773417269; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/X89hp+5U+/q1xbg5uksPepQg6bue5vmq9BCayk/Rl4=;
-        b=kS9SQa4o10cSJ2+NsKla5FLvy1bxQNCsx70vkV8CEU0wNnbpDNa8912g/x6MVME/TV
-         GvL1qHmPaUSnx8FYiHymJJ/di/Mt8wScksgj/mv9IvYrxExH3r/GFgE0MPW9KBDLVCI6
-         7KUOFV872krAkndgS1Qf5GkWOF86fEQH9B5q08TEBuNdbb6M8GRKFetJ9fiGohIvHA0g
-         h4comjQGPbCuu8s6GtHpFjbjNoeP4QyM+pvCtxA7bBvIoizkxTNz+v7MCbIlt9pfzIJa
-         yh0Mt24fw4SX2qkyynKR6gNc0oyETdIIBwybnvyb/Dt2kqVoDfDbmPa5Ga2tB7DkIt9U
-         7ejw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772812469; x=1773417269;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/X89hp+5U+/q1xbg5uksPepQg6bue5vmq9BCayk/Rl4=;
-        b=HAHMPdlMVC1zQr1c0mjomwSaSHn7K/q8OAuS0IG54NNVGozjW5a/CIANGLrIcclvO3
-         o736wDJCN28CpH91igRaHPtJ/0CFQ2K3cFdOi3V/1D2v/35+ywozmyXnGG+EuXdRvBtO
-         CupPEEliWEvTIaxbPj11wcCnkTnsoz6xxroQNBW3p9I6lOKUsQK9FZZpsZwYRpJtsiPy
-         khIas12vEu64ChbISNa5W6fpcAUJcMnhDOm56uwc8Uy6UVlbAPb7BxO06c+0H+lnRI99
-         2GqUi8BG7B+a8AaoC7Mewt7nFMUPWXLkCaPs54pmkXjcCJj9ZI813lvW0onvYtPi+fP2
-         6wdg==
-X-Forwarded-Encrypted: i=1; AJvYcCXTp7Z3BC6ijSGl6u3JeSy9paKT8ikhfs16raqUc3rEh8x7crmqBi01S+WNIOc6bJs13n8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2IIhnIpSdeBbnnROyTUla99BeupQ3304FerM5yqRSMOYdFaAK
-	zvfbtPXm1MzilKvohqxE+IVKIVU65XOUU6Mx/R1tP1+KFT2W+RtVHrjNDhEnz5y58fbehJJQaVb
-	InCIMSA==
-X-Received: from pfbfa30.prod.google.com ([2002:a05:6a00:2d1e:b0:829:9a65:4170])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1a8c:b0:800:8fdf:1a54
- with SMTP id d2e1a72fcca58-829a2f4a0bbmr2373665b3a.34.1772812469067; Fri, 06
- Mar 2026 07:54:29 -0800 (PST)
-Date: Fri, 6 Mar 2026 07:54:27 -0800
-In-Reply-To: <aao8SbZMHT302dDS@intel.com>
+	s=arc-20240116; t=1772812655; c=relaxed/simple;
+	bh=xN/GHYIFBenQ6dbwvffVKRU4ttOhiHEW0puwMhyb9vQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DB9G92VW/Vz5igYT2IeY0dPFnruU9vCTjeKyFxKJ0SvYbQEctZR14vnHtgTLYlIjwA55ik1EkeyZ0SFvq1XG3lKxPgX75b60ChhkDvhPLh03Mja0UUIuJlVYCSFVqPp2ddBMuuRtr533sH5yi+1OpVOxGOHiJFuQpKkMH1HCPpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GQXZkjH6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D718C4CEF7
+	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 15:57:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772812655;
+	bh=xN/GHYIFBenQ6dbwvffVKRU4ttOhiHEW0puwMhyb9vQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=GQXZkjH6lfr3ftTqtJbINUzsQZXqwz0LXSblW5FUZ2a7jFPJiMRO7ZSlgrkYQx2LI
+	 nQfPYUU97tIX4jr+jYKf3jm9zhq5P035fyJEWy+PVkMc7SE9VQDIwqY/i5Upatpo+F
+	 zVmM2hBpGd3ILNkkGt4q86U9Mq5FBf4QK+wHTokG8pgC3OK3qh5Puk7h9s+lsbCbAk
+	 QBRRmr6TuqlCXOQ5A5ytwdXGn4IFKOfr18D3h1KFBI5EH9s/zoDrGCGw7/691DuMAw
+	 WHGY/iTSHEf7bhwLx5umjkCgLCz9BOL603/P057dK0hGYuT4c6jmjqqBMVZkdS5+m1
+	 52LWqkDY7XA7w==
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b93695f7cdcso1254033966b.3
+        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 07:57:35 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWGTVPK97akVvKRsPHPz6BdRzgbfoKID57aIZpxVO0nCtk/tW1K89o6fG4EJShIGl6t2Kk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFM9KnoBSyFMUNR29zMq4j7rMdd9Q+sFVfIPYrkwbgy87UNN+v
+	0R09EtfP3vByQfdaTMPapbe2KtvOeru9YNWxzPaLpuJBwyTqAZV00gtjyGlAnLk4cpgGRhDK1tW
+	42OeZOLdQwKUb4PY9w+Kqt6bP2Jp64TM=
+X-Received: by 2002:a17:906:fe47:b0:b8a:f29e:307a with SMTP id
+ a640c23a62f3a-b942e051f67mr161752966b.57.1772812653932; Fri, 06 Mar 2026
+ 07:57:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251026201911.505204-1-xin@zytor.com> <20251026201911.505204-9-xin@zytor.com>
- <aRQf1sQZ9Z3CTB8i@intel.com> <aajS9HFx5HabmCTq@google.com> <aao8SbZMHT302dDS@intel.com>
-Message-ID: <aar4s6pGYOlKQp4Q@google.com>
-Subject: Re: [PATCH v9 08/22] KVM: VMX: Set FRED MSR intercepts
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: "Xin Li (Intel)" <xin@zytor.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, luto@kernel.org, 
-	peterz@infradead.org, andrew.cooper3@citrix.com, hch@infradead.org, 
-	sohil.mehta@intel.com
-Content-Type: text/plain; charset="us-ascii"
-X-Rspamd-Queue-Id: 98C2B224786
+MIME-Version: 1.0
+References: <20260305203005.1021335-1-yosry@kernel.org>
+In-Reply-To: <20260305203005.1021335-1-yosry@kernel.org>
+From: Yosry Ahmed <yosry@kernel.org>
+Date: Fri, 6 Mar 2026 07:57:22 -0800
+X-Gmail-Original-Message-ID: <CAO9r8zPpC_S2TAc+Kq2JyRwYN2ctTQohRcciLaJTKMXUj3vX+A@mail.gmail.com>
+X-Gm-Features: AaiRm52PkiG3_SwiKwujmtG7snHMkAr5Cz1sX_yOjoc1YSHP4hq77CAoirPMqAg
+Message-ID: <CAO9r8zPpC_S2TAc+Kq2JyRwYN2ctTQohRcciLaJTKMXUj3vX+A@mail.gmail.com>
+Subject: Re: [PATCH 0/2] KVM: nSVM: Minor post-war fixups
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: C3253224798
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73090-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-73091-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.928];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:email]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-0.958];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
-On Fri, Mar 06, 2026, Chao Gao wrote:
-> On Wed, Mar 04, 2026 at 04:48:52PM -0800, Sean Christopherson wrote:
-> >On Wed, Nov 12, 2025, Chao Gao wrote:
-> >> On Sun, Oct 26, 2025 at 01:18:56PM -0700, Xin Li (Intel) wrote:
-> >> >From: Xin Li <xin3.li@intel.com>
-> >> >
-> >> >On a userspace MSR filter change, set FRED MSR intercepts.
-> >> >
-> >> >The eight FRED MSRs, MSR_IA32_FRED_RSP[123], MSR_IA32_FRED_STKLVLS,
-> >> >MSR_IA32_FRED_SSP[123] and MSR_IA32_FRED_CONFIG, are all safe to
-> >> >passthrough, because each has a corresponding host and guest field
-> >> >in VMCS.
-> >> 
-> >> Sean prefers to pass through MSRs only when there is a reason to do that rather
-> >> than just because it is free. My thinking is that RSPs and SSPs are per-task
-> >> and are context-switched frequently, so we need to pass through them. But I am
-> >> not sure if there is a reason for STKLVLS and CONFIG.
-> >
-> >There are VMCS fields, at which point intercepting and emulating is probably
-> >more work than just letting the guest access directly. :-/
-> 
-> Just drop the MSR intercepting code and everything should work, right? KVM
-> needs to handle userspace writes anyway. so, there is no "more work" to me.
+On Thu, Mar 5, 2026 at 12:30=E2=80=AFPM Yosry Ahmed <yosry@kernel.org> wrot=
+e:
+>
+> A couple of fixups in the aftermath of all nSVM patches, the first one
+> is just a cleanup suggested offlist by Sean, and the second is a fix for
+> the test to make sure it's checking #GP on VMRUN not VMLOAD.
+>
+> In all honestly, I am not sure *why* the test was passing and a #GP was
+> generated on VMLOAD with a very large but valid GPA. vls=3D1, so KVM
+> should not be intercepting VMLOAD (in which case it would inject the
+> #GP). A #NPF is generated on the VMLOAD, and through tracing I found out
+> that kvm_mmu_page_fault() returns 1 (RETRY) to npf_interception(). There
+> shouldn't be a corresponding memslot, so I am not sure if KVM stuffed an
+> invalid mapping in the NPTs, or if KVM did nothing and the CPU #GP due
+> to an infinite #NPF loop (although npf_interception() was only called
+> once). Anyway, figuring that out is irrelevant to the fixup, which makes
+> sure we're actually getting #GP on VMRUN.
 
-True.  I was thinking KVM would need to marshall the value to/from the hardware
-MSR, but that's obviously not necessary :-)  (and also would be comically wrong).
+The answer is here:
+https://lore.kernel.org/kvm/CAO9r8zPZ7ezHSHfksZPu4Bj8O7WTmDfO-Wu8fUAEebDFV4=
+EoRw@mail.gmail.com/T/#u.
 
-After working through the various implications, I think it makes to adjust the
-"rule" to be "if necessary for performance OR it's _completely_ free (minus the
-interception toggling)" (and in both cases, obviously disabling interception needs
-to be functionally safe/correct too).  Because I think we'll end up with confusing
-code if we limit disable interception only for performance reasons.
+TL;DR the emulator is injecting the #GP, I didn't catch it initially
+because I was tracing kvm_queue_exception_e() and I think it's being
+inlined into inject_emulated_exception().
 
-E.g. I can't imagine MSR_IA32_S_CET will get modified post-boot, so by the
-performance-only rule, KVM should always intercept S_CET.  But MSR_IA32_U_CET
-can be read/written much more frequency, and so should be passed through.  And
-then we'd end up intercept S_CET but not U_CET, which _looks_ wrong.
+Anyway, ignore this version. I will send a new version with fixes for
+#GP on non-existent vmcb12 GPA on top of patch 1, and then the test
+patch will be replaced with a minor fix (to actually test VMRUN),
+followed by a change to test the new behavior (emulation failure)
+instead of #GP. I will probably also rename it from "invalid" vmcb12
+to "unmappable" since all these discussions made the distinction more
+clear architecturally. The test uses a valid GPA, just not one that
+KVM can map because userspace did not create a memslot for it.
 
-The FRED MSRs fall into the same boat.  Intercepting only STKLVLS and CONFIG is
-likely a-ok from a performance perspective, but once this is all merged and folks
-that weren't part of this discussion come along, readers will likely be wondering
-why STKLVLS and CONFIG are "missing".
-
-All in all, unless someone has an functional or performance argument against
-disabling interception, I think it makes sense to disabling interception for all
-FRED MSRs that are context switched by hardware.
+>
+> Yosry Ahmed (2):
+>   KVM: nSVM: Simplify error handling of
+>     nested_svm_copy_vmcb12_to_cache()
+>   KVM: selftests: Actually check #GP on VMRUN with invalid vmcb12
+>
+>  arch/x86/kvm/svm/nested.c                     | 23 +++++++-------
+>  .../kvm/x86/svm_nested_invalid_vmcb12_gpa.c   | 31 +++++++++----------
+>  2 files changed, 26 insertions(+), 28 deletions(-)
+>
+>
+> base-commit: 5128b972fb2801ad9aca54d990a75611ab5283a9
+> --
+> 2.53.0.473.g4a7958ca14-goog
+>
 
