@@ -1,154 +1,218 @@
-Return-Path: <kvm+bounces-73091-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73092-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CHX9Ap/6qmmcZAEAu9opvQ
-	(envelope-from <kvm+bounces-73091-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 17:02:39 +0100
+	id wMELLL/8qmmcZAEAu9opvQ
+	(envelope-from <kvm+bounces-73092-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 17:11:43 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3253224798
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 17:02:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06DEA2249A1
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 17:11:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3A50330774E4
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 15:58:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 01EC3316F088
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 16:06:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406503ED5A4;
-	Fri,  6 Mar 2026 15:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60B33EF0AA;
+	Fri,  6 Mar 2026 16:06:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GQXZkjH6"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="XX24DolS"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712CC3ECBD9
-	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 15:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772812655; cv=none; b=FPzRLYL9gX4nsqeke0dD8whsCJ2GKV7z8BajD06Hlb0T+IuACyYy8HdefttBCjt6Suy9A2vDMJuCBBdtoJWxMHyHRDTY2r/LHaz0/CfsCcVh+iXqbXXhSFLCT5LETNU+wBFIzzsSZ/2o9NO0D7ErxwnoXbXPoXi7BFbMGDqiWlM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772812655; c=relaxed/simple;
-	bh=xN/GHYIFBenQ6dbwvffVKRU4ttOhiHEW0puwMhyb9vQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DB9G92VW/Vz5igYT2IeY0dPFnruU9vCTjeKyFxKJ0SvYbQEctZR14vnHtgTLYlIjwA55ik1EkeyZ0SFvq1XG3lKxPgX75b60ChhkDvhPLh03Mja0UUIuJlVYCSFVqPp2ddBMuuRtr533sH5yi+1OpVOxGOHiJFuQpKkMH1HCPpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GQXZkjH6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D718C4CEF7
-	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 15:57:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772812655;
-	bh=xN/GHYIFBenQ6dbwvffVKRU4ttOhiHEW0puwMhyb9vQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=GQXZkjH6lfr3ftTqtJbINUzsQZXqwz0LXSblW5FUZ2a7jFPJiMRO7ZSlgrkYQx2LI
-	 nQfPYUU97tIX4jr+jYKf3jm9zhq5P035fyJEWy+PVkMc7SE9VQDIwqY/i5Upatpo+F
-	 zVmM2hBpGd3ILNkkGt4q86U9Mq5FBf4QK+wHTokG8pgC3OK3qh5Puk7h9s+lsbCbAk
-	 QBRRmr6TuqlCXOQ5A5ytwdXGn4IFKOfr18D3h1KFBI5EH9s/zoDrGCGw7/691DuMAw
-	 WHGY/iTSHEf7bhwLx5umjkCgLCz9BOL603/P057dK0hGYuT4c6jmjqqBMVZkdS5+m1
-	 52LWqkDY7XA7w==
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b93695f7cdcso1254033966b.3
-        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 07:57:35 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWGTVPK97akVvKRsPHPz6BdRzgbfoKID57aIZpxVO0nCtk/tW1K89o6fG4EJShIGl6t2Kk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFM9KnoBSyFMUNR29zMq4j7rMdd9Q+sFVfIPYrkwbgy87UNN+v
-	0R09EtfP3vByQfdaTMPapbe2KtvOeru9YNWxzPaLpuJBwyTqAZV00gtjyGlAnLk4cpgGRhDK1tW
-	42OeZOLdQwKUb4PY9w+Kqt6bP2Jp64TM=
-X-Received: by 2002:a17:906:fe47:b0:b8a:f29e:307a with SMTP id
- a640c23a62f3a-b942e051f67mr161752966b.57.1772812653932; Fri, 06 Mar 2026
- 07:57:33 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2A63ED11E
+	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 16:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772813190; cv=pass; b=N8zTSTostMYAeuSQYGYe8xjNCGKunOSUIa+CBkXhqIjRB+8Dl0ZWfyTS6e0C7URhUfzcQV7YGKVLZ9kxCdIeSl3pnKI4mfFRJENYdkaRQ+Tdo1l69Z22HpH/2iASnsjdxG9s9cPEKFIQOIXClCluCmVPoCTd+EMx7nOK7eNtRiU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772813190; c=relaxed/simple;
+	bh=j+ZoKRywQNpXTu14NSiVa3AGDNyglWvE2KX82iiRofE=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=appkJluJTCoxdtXlSsVH9sbT1uJ7n4khgQ759xh3k7w/nENZMebLxiAkVz28Zt2PUh9TmOCmP31NOFaoRaTkM02qIdu3HpNAIPqdvG5TYa0UO7K0avWcijbNFj6DnSub/6g89n8n9KSnUzxJR8Bu3NoAFltBdTvRYeHf3iL7RNM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=XX24DolS; arc=pass smtp.client-ip=209.85.210.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7d598f60eeaso7063991a34.2
+        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 08:06:28 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772813188; cv=none;
+        d=google.com; s=arc-20240605;
+        b=EYRnW4Bo3FgGCoKooaPnBjWHP1sXyYmEBvODN64LaobCfkoUHhux3clz6XO9ReYT5t
+         EaV1mKYsTA3trrA8+NfFY30HwWaq9B8/lLUxsKKmCVMwWWhf1MewMNzkMI7DhNhCL9sd
+         MJuRM2Jv6X+JWA9F+Nxu2FAmu8WFrUOtzISZvsXj5X9Wz6qSlVaqpjffgjXxVQXxsNyo
+         7e0C48+pOfhMcRT8un6OmHHm2CJcs70+xAIJb9bz5idEhx4gNjDQCx7tIpJgpCYb4ysT
+         6V8/aLGmu3gJkmbNfVE2Teyo8HGxZHteZwGpklekv5vOT9XVv4Yab6C6Uj0ekGlASMRk
+         hqcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:dkim-signature;
+        bh=bq/d/mKtXxIR1+HyewF2kjtB/W3rkjxPeNkROtpkMok=;
+        fh=Xp4vnfOoVJlJm0+ltFsc//528Fw6WicuhmhnERJoh5c=;
+        b=Ql2Y4viAkedQdIMYFF0I5KjzdMwk9xuzfBVQMLMfJL33hGWU3hoeKwi5jDSCjppsKu
+         9W64lXT2sPrc2l0R9mAbFchiF0YMsmrpH2RZYaYfvVGPChjj63SoBWA+9SbNyNY5cmlS
+         ATfUjqcg8duxP9AZMSzpsXeeal9E4Txl2ZUexmMH70XhKg7Nzb1SwnDP2cWN7mx26JOZ
+         EJsKJcLPBsExYjw0WQUtVvdXhC8Ck6IhzefyCSQOa74zcdWBm8V5UpUyIMHTld3Nzct/
+         V+G9tHV0sizwuVj9sagkc9zjRVlFgpbIxit9v4jwtgZgOvE4aYF5sE+N+jBtaMDSxHPt
+         h9fw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1772813188; x=1773417988; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=bq/d/mKtXxIR1+HyewF2kjtB/W3rkjxPeNkROtpkMok=;
+        b=XX24DolSt3ZWaZIxF430fyGGbWinV/e8aE/dQFD/5AujAvYC2nMR6EB0O6AM/tiCcl
+         JLZHi2DfK/pN81d74/9qwfAASzd8NR0KuLdtWkaiGc+NCpHdoDbmgOZtssJO0KsGW5pH
+         rhly2iOqwUBbJqWQN/PrCtZ9zrXxFXItA2YD2zMmuQA26Fbrezjh2/1jbnqcSvKBC4IW
+         tPpEbFv4QpxbZt46SRzoRVG1dAV3EhNBpnyObO2uCpGT//uWabnYVjxNzfhLImxf5ewS
+         GMa3k688veDziz4Hpc/N6saspVXnGNYnqp4/D1OGvrvPS4JE+yKl28bGEXy6aWDrYQgF
+         Z3OQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772813188; x=1773417988;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bq/d/mKtXxIR1+HyewF2kjtB/W3rkjxPeNkROtpkMok=;
+        b=e9K47WNQ56QhVwPMrQDwXuCxFd7bplMJQcFsGRGKZSM0rTQiENHrBQuRKIpcX9ZyUV
+         H33h6yDVNVyBKx3MErlEitDoXnHi7RxZJSErenL8mLQpp2eBAc0dk3QREU720Sb0aFOC
+         JKvjojLZ+Fgq6vtBoFINgOwCA84o7iaQEAffq/ow7sYYrtcob1cllBPTj4kJXhdELd1H
+         XD4TQm9C6eaKkaD+y2XFOm3/D5LdyuSuOPY4ZtToxx9hnLOUqVeZBudQO6TvaCtSUew0
+         CiTj+6zXvRiUuSTyAYwkqD4DDiLTQs0TqyVk93SGVAm+mOOBspLmadkDblQlPAr8Y6Ll
+         MvhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVHEUuPghAjJiXFn2X1bB3mr36WlndDr668+3RPbhgZNT9Or6EWrvYciLdcChS4qAMhVsE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGeFq+Zjd0EDNj1/biTdyAMsTDlw1M7cJGEZXergnynxFqAvXi
+	FuZgroiqqsNtLyNOEsk2B2zfyREiLjHXHBet24UnkNuMsMOD0caaEm7KNXKxIS2Ns9HMFgrjoBm
+	fdoAjYYyNU2dPJ0cIaNHp5ce5GcPbLS5vEf4tMiaeig==
+X-Gm-Gg: ATEYQzzTXU4pFc6UMEUxp8X2RYdC9eUF+pnnbCZ1xINey3oyGhDEd/p/ViocX4uI8FT
+	IrRlDZI5coygTvHhKqorXSs4GZekdZ5ShqjlpJN7FO9KpZt/PVf3AwM0BwngbVqMdOyLF5Wa7+q
+	QhIig9n+XZL2/zzNXBeXVa3qCGS9OJ/ZPnN3BgaxF/8z7XTCcgUg3dU40PQRRcIlngMx16Mi7uo
+	sVD8hG6Ktrod1h1pksFm9CrfkAwzTX+EtMvXWavY47BucBKo0o2u7BRn7BNyHugCskqwP3CfnKM
+	x33XItKAKabuexoPhXLkrq9Osuw8/0G7L8pkpNa7TLCqE0gfrzwXyQ2bYnpSpYCWGJGiQX9COA9
+	W9REW1/UW+zJbcwVFiyY8G2RgChg=
+X-Received: by 2002:a05:6820:1843:b0:679:f05e:f13c with SMTP id
+ 006d021491bc7-67b9bd45a8cmr1550538eaf.60.1772813187874; Fri, 06 Mar 2026
+ 08:06:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260305203005.1021335-1-yosry@kernel.org>
-In-Reply-To: <20260305203005.1021335-1-yosry@kernel.org>
-From: Yosry Ahmed <yosry@kernel.org>
-Date: Fri, 6 Mar 2026 07:57:22 -0800
-X-Gmail-Original-Message-ID: <CAO9r8zPpC_S2TAc+Kq2JyRwYN2ctTQohRcciLaJTKMXUj3vX+A@mail.gmail.com>
-X-Gm-Features: AaiRm52PkiG3_SwiKwujmtG7snHMkAr5Cz1sX_yOjoc1YSHP4hq77CAoirPMqAg
-Message-ID: <CAO9r8zPpC_S2TAc+Kq2JyRwYN2ctTQohRcciLaJTKMXUj3vX+A@mail.gmail.com>
-Subject: Re: [PATCH 0/2] KVM: nSVM: Minor post-war fixups
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 6 Mar 2026 21:36:16 +0530
+X-Gm-Features: AaiRm53452UyUTlO6hp4cwRrPvadg006HyyZw7yrDpFC4S4tJGwcfOAoyhE4Kyg
+Message-ID: <CAAhSdy2EuZu_KeZ1RaUEg3shtfSnSVo7eJWOA6-g4j9Hn2oY5A@mail.gmail.com>
+Subject: [GIT PULL] KVM/riscv fixes for 7.0 take #1
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, 
+	Andrew Jones <andrew.jones@oss.qualcomm.com>, Atish Patra <atish.patra@linux.dev>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: C3253224798
+X-Rspamd-Queue-Id: 06DEA2249A1
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[brainfault-org.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_HAS_DN(0.00)[];
+	TO_DN_ALL(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-73091-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[brainfault.org];
+	TAGGED_FROM(0.00)[bounces-73092-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[brainfault-org.20230601.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anup@brainfault.org,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.952];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.958];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,mail.gmail.com:mid,brainfault-org.20230601.gappssmtp.com:dkim]
 X-Rspamd-Action: no action
 
-On Thu, Mar 5, 2026 at 12:30=E2=80=AFPM Yosry Ahmed <yosry@kernel.org> wrot=
-e:
->
-> A couple of fixups in the aftermath of all nSVM patches, the first one
-> is just a cleanup suggested offlist by Sean, and the second is a fix for
-> the test to make sure it's checking #GP on VMRUN not VMLOAD.
->
-> In all honestly, I am not sure *why* the test was passing and a #GP was
-> generated on VMLOAD with a very large but valid GPA. vls=3D1, so KVM
-> should not be intercepting VMLOAD (in which case it would inject the
-> #GP). A #NPF is generated on the VMLOAD, and through tracing I found out
-> that kvm_mmu_page_fault() returns 1 (RETRY) to npf_interception(). There
-> shouldn't be a corresponding memslot, so I am not sure if KVM stuffed an
-> invalid mapping in the NPTs, or if KVM did nothing and the CPU #GP due
-> to an infinite #NPF loop (although npf_interception() was only called
-> once). Anyway, figuring that out is irrelevant to the fixup, which makes
-> sure we're actually getting #GP on VMRUN.
+Hi Paolo,
 
-The answer is here:
-https://lore.kernel.org/kvm/CAO9r8zPZ7ezHSHfksZPu4Bj8O7WTmDfO-Wu8fUAEebDFV4=
-EoRw@mail.gmail.com/T/#u.
+We have quite a few fixes this time for the 7.0 kernel.
+These fixes address potential use-after-free issues, null
+pointer dereferences, speculative out-of-bound accesses,
+and others.
 
-TL;DR the emulator is injecting the #GP, I didn't catch it initially
-because I was tracing kvm_queue_exception_e() and I think it's being
-inlined into inject_emulated_exception().
+Please pull.
 
-Anyway, ignore this version. I will send a new version with fixes for
-#GP on non-existent vmcb12 GPA on top of patch 1, and then the test
-patch will be replaced with a minor fix (to actually test VMRUN),
-followed by a change to test the new behavior (emulation failure)
-instead of #GP. I will probably also rename it from "invalid" vmcb12
-to "unmappable" since all these discussions made the distinction more
-clear architecturally. The test uses a valid GPA, just not one that
-KVM can map because userspace did not create a memslot for it.
+Regards,
+Anup
 
->
-> Yosry Ahmed (2):
->   KVM: nSVM: Simplify error handling of
->     nested_svm_copy_vmcb12_to_cache()
->   KVM: selftests: Actually check #GP on VMRUN with invalid vmcb12
->
->  arch/x86/kvm/svm/nested.c                     | 23 +++++++-------
->  .../kvm/x86/svm_nested_invalid_vmcb12_gpa.c   | 31 +++++++++----------
->  2 files changed, 26 insertions(+), 28 deletions(-)
->
->
-> base-commit: 5128b972fb2801ad9aca54d990a75611ab5283a9
-> --
-> 2.53.0.473.g4a7958ca14-goog
->
+The following changes since commit 11439c4635edd669ae435eec308f4ab8a0804808=
+:
+
+  Linux 7.0-rc2 (2026-03-01 15:39:31 -0800)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-fixes-7.0-1
+
+for you to fetch changes up to c61ec3e8cc5d46fa269434a9ec16ca36d362e0dd:
+
+  RISC-V: KVM: Check host Ssaia extension when creating AIA irqchip
+(2026-03-06 11:20:30 +0530)
+
+----------------------------------------------------------------
+KVM/riscv fixes for 7.0, take #1
+
+- Prevent speculative out-of-bounds access using array_index_nospec()
+  in APLIC interrupt handling, ONE_REG regiser access, AIA CSR access,
+  float register access, and PMU counter access
+- Fix potential use-after-free issues in kvm_riscv_gstage_get_leaf(),
+  kvm_riscv_aia_aplic_has_attr(), and kvm_riscv_aia_imsic_has_attr()
+- Fix potential null pointer dereference in kvm_riscv_vcpu_aia_rmw_topei()
+- Fix off-by-one array access in SBI PMU
+- Skip THP support check during dirty logging
+- Fix error code returned for Smstateen and Ssaia ONE_REG interface
+- Check host Ssaia extension when creating AIA irqchip
+
+----------------------------------------------------------------
+Anup Patel (3):
+      RISC-V: KVM: Fix error code returned for Smstateen ONE_REG
+      RISC-V: KVM: Fix error code returned for Ssaia ONE_REG
+      RISC-V: KVM: Check host Ssaia extension when creating AIA irqchip
+
+Jiakai Xu (4):
+      RISC-V: KVM: Fix use-after-free in kvm_riscv_gstage_get_leaf()
+      RISC-V: KVM: Fix null pointer dereference in
+kvm_riscv_vcpu_aia_rmw_topei()
+      RISC-V: KVM: Fix use-after-free in kvm_riscv_aia_aplic_has_attr()
+      RISC-V: KVM: Fix potential UAF in kvm_riscv_aia_imsic_has_attr()
+
+Lukas Gerlach (5):
+      KVM: riscv: Fix Spectre-v1 in APLIC interrupt handling
+      KVM: riscv: Fix Spectre-v1 in ONE_REG register access
+      KVM: riscv: Fix Spectre-v1 in AIA CSR access
+      KVM: riscv: Fix Spectre-v1 in floating-point register access
+      KVM: riscv: Fix Spectre-v1 in PMU counter access
+
+Radim Kr=C4=8Dm=C3=A1=C5=99 (1):
+      RISC-V: KVM: fix off-by-one array access in SBI PMU
+
+Wang Yechao (1):
+      RISC-V: KVM: Skip THP support check during dirty logging
+
+ arch/riscv/kvm/aia.c         | 15 ++++++++++--
+ arch/riscv/kvm/aia_aplic.c   | 23 ++++++++++---------
+ arch/riscv/kvm/aia_device.c  | 18 +++++++++++----
+ arch/riscv/kvm/aia_imsic.c   |  4 ++++
+ arch/riscv/kvm/mmu.c         |  6 ++++-
+ arch/riscv/kvm/vcpu_fp.c     | 17 ++++++++++----
+ arch/riscv/kvm/vcpu_onereg.c | 54 +++++++++++++++++++++++++++++-----------=
+----
+ arch/riscv/kvm/vcpu_pmu.c    | 16 +++++++++----
+ 8 files changed, 109 insertions(+), 44 deletions(-)
 
