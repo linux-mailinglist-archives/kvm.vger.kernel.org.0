@@ -1,155 +1,239 @@
-Return-Path: <kvm+bounces-72990-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-72991-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WL2LDodxqmmmRgEAu9opvQ
-	(envelope-from <kvm+bounces-72990-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 07:17:43 +0100
+	id ANouFX18qmkqSQEAu9opvQ
+	(envelope-from <kvm+bounces-72991-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 08:04:29 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C18C21BFB0
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 07:17:42 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4218721C418
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 08:04:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 779683038523
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 06:17:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0134A3013FC2
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 07:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB25D370D54;
-	Fri,  6 Mar 2026 06:17:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C18372B39;
+	Fri,  6 Mar 2026 07:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b="Zoloxuc3"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="JcGnauH/"
 X-Original-To: kvm@vger.kernel.org
-Received: from sg-1-36.ptr.blmpb.com (sg-1-36.ptr.blmpb.com [118.26.132.36])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0AD6351C3B
-	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 06:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772777852; cv=none; b=YKbwToQgBcP5QRPLQZk6pix14/0a7SknBNLj8aUfxm9NSAZAPTkl3038mJGeQ9ziAvw5g75lty3Bunk7HWM/QZb/iL4Ycx1JAmc4CMgQz6g0kIXSj79Vb5IwgLHRe/2kgwzpYTRvAf6mYReCi6Ra1CyJuVlFIPFTSSwpOJFuVlk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772777852; c=relaxed/simple;
-	bh=Fli6r8wlAgbwy/oIcoJwpmBmU/A92Zm0IYOtfBLNhZg=;
-	h=References:Cc:Date:Mime-Version:Content-Type:From:Subject:To:
-	 Message-Id:In-Reply-To; b=OXBP3vqsR3k9DEDQ5uYljaCIAIJJ4LtYeyrC3kztvzKhvRkvdSSTtzPYh18/k5djm0wwk6v3dD+ZwjR2EQb/9fGbKqYTonQSXgT7gUey+yU8pLniiBT37WpA2crslOWgRcn0dSxpGcQ5UDLN3GcZ11tnCMGwj0P/knk7gvcre3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lanxincomputing.com; spf=pass smtp.mailfrom=lanxincomputing.com; dkim=pass (2048-bit key) header.d=lanxincomputing-com.20200927.dkim.feishu.cn header.i=@lanxincomputing-com.20200927.dkim.feishu.cn header.b=Zoloxuc3; arc=none smtp.client-ip=118.26.132.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lanxincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lanxincomputing.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=lanxincomputing-com.20200927.dkim.feishu.cn; t=1772777841;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=yN5rn7GLGptMebKvf73Ps4IUabQw/g3Ysx/1ALo9Qq0=;
- b=Zoloxuc3N7cEjeP6U8Yuka1GJ65GRmmQwebEQHEgrN93vgwgSp3ho86TEthu+OjI0nK7t0
- Tyl+XuGQ+Ap9YqbdlG99cH35KTxIgJGYgKYFZClnsLxq3YqErV/JshkFGz/UKTNXHCBBby
- fbBv9WkwtIIYY1IOaAEcjZT4N2cAqJH4xx0KK4y0B6UuTRvGWownCTShj0yPR5e/x801fv
- 7JlL3BZNRruNU7KOE/g+43fmpV3Zv3l5e/o9Ds0NSTTTa8tFhzk4I5wo8FnpzhvWbH7XKh
- SHKq2eKk7ZXAHt9gd6WxLerFsDkLDz/aZWJlSISkOJDH0FleOUX+tdHlPbbyMQ==
-User-Agent: Mozilla Thunderbird
-Received: from [127.0.0.1] ([61.181.102.80]) by smtp.feishu.cn with ESMTPS; Fri, 06 Mar 2026 14:17:19 +0800
-References: <20260305235416.4147213-1-xin@zytor.com>
-X-Lms-Return-Path: <lba+269aa7170+0e4f03+vger.kernel.org+xiangwencheng@lanxincomputing.com>
-Cc: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>, 
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>, 
-	<x86@kernel.org>, <hpa@zytor.com>
-Date: Fri, 6 Mar 2026 14:17:16 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4438120E6E2
+	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 07:04:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772780662; cv=pass; b=FLGwiAlSdmVx+ID6hyAPaz5gA0oki++3IPH9PBL99HItjZr8/wNqaWKs4nQeMzMe3SpuA1SgYE8Dlw9OvKpe2MeHrhLoUdCrmyUoJ1pCOda5wS/ODzYa1P04fYwX6io+1pzKICqWPEp6RpsPSc4KK3wVL1Rjg1z6tST/SUrgHSI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772780662; c=relaxed/simple;
+	bh=lsFUimBeCGgmklTw1L3UbOz6SoEZi8IM6pklxGvk5YI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K41FRwJhR4SDytYrXWWDtLA60GK0nuSPGI2kgGrz0xEz/5LPeXAZ2KcPbXc+01yeOetumLX+liEBJLt7REomvPYJjjx53EkhRvNBfrG1B4SE7DoEuCWAEp28NcjKI/yRn6W6HEm4nmPNs8+ikKmkBN55GhwsgnFVc5hatIlqO+Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=JcGnauH/; arc=pass smtp.client-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-45effa36240so6487776b6e.1
+        for <kvm@vger.kernel.org>; Thu, 05 Mar 2026 23:04:20 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772780660; cv=none;
+        d=google.com; s=arc-20240605;
+        b=SqbSCGrXaLZRYll++MSQsWNzGYGQDv/6ASPead57C6UQl+nfKYe/iPC0s5VF01EFbd
+         jINiRZEHCNyMrvfDxX1Rb/Y2b+Q2N1DPjvBo6X60xvZvF2KvGrS1/cI5rpyag6APfYW3
+         aTVJR0VNi/JjAS3qCjBOV9Jut8s0QK9OS4VG/9El4GqGCb7wU/5r4shDq34hU0IjB0sS
+         QaAH06Vwb/4ItbtXgu4/M9sBgvn5yGsmvZB22cji3CPFKMjoYtnIZtnvC3je2qKQBBAX
+         8T0QSPUEa47Kbm3osP9oUHxDQhh20RW0tJJ31xYTo6nZGcCta01VXlf2KR5fe5Y7LHBz
+         Oz2Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=yREeU4CE/jhwdCxENgT8cCU88WTqOERvy7IPLNknu0s=;
+        fh=BrnESQOsnRwLQGzq7kfPcnSBBvd2vjPI5ggBmayQip4=;
+        b=kIqhuoVcz1FxGOLSTABuXLZtHRJtsLMEASPsxr92t3HxFmDXRjkIbWnZsJTDUdk/XM
+         ea3R1fS28Fr0g2SFSmhnqi8EJkuPTv28vRuYwe9GGjNU3MQkjezhqFt8zdIVH0J5bStL
+         ihu/9EmxsMqHqNSlDgcUCCBGP3mL4E1r6QGt3o+N9u/5EAug9MiBfoLNOLjpPPwBU32K
+         CxMw//WG8HwolpKhBVHWgYOAodbHg3KmAWa6bGrPZAIXf9LfGcoPi9CiXYClCApWDW8E
+         pYcpcv/F0y/N9w2DxY+xg0J8cVBKmIiyiFJrJZK4+gCxy+5wv/B5UPfvAbU7RnP8X3uk
+         tCZg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1772780660; x=1773385460; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yREeU4CE/jhwdCxENgT8cCU88WTqOERvy7IPLNknu0s=;
+        b=JcGnauH/ED44P0zpJan4LSxkA+6CBJO9JIwmBoT2WYcUiEWUOnyORkykLxyCew7QA3
+         vjBbEhOjtfWpVBp9+r3zqSmNWEdB/2nralkgizyH8ylWNeJ3geWiDgzHS8TNbndeElvu
+         uyUDMFPZMs9X1nwHjfQyuMwX9H/3YvdvKCM+1C98OtbB62z6t/WWCvZQ4iN2JRH0JX4U
+         0Q2ZmVQ6YR93zfLlhe81r0VFEn2wbGrj2+hVJ1lJhVC0uwiNhFZcw6GHPFPHxAL0QASm
+         XVeAZgS+a8JWjJWYcVfwfNY55dPP62oDR7u/2VQSaim7vHrQENPh2zlepfw3jMGYEzC2
+         qJQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772780660; x=1773385460;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yREeU4CE/jhwdCxENgT8cCU88WTqOERvy7IPLNknu0s=;
+        b=U1VJS5zsJDgWisQBqf1bcQCAO0yw6zXGXLVYYpVHa1b13bNvF1sDzIilLiugqMWGLP
+         s3jgGfybQu7sTjinURjvPWA2xvCk782vtTYoy3TNGy5RPzoMObQXY/hAjdQDXAO5s8Jl
+         2+EguKjYcIIv82EvzqmiHIqWuF6jlC3MV1NR7LL7aaSaw0d3h8lkAmoA6pdxlQOGz0Tg
+         xgE1y2MiNWfsD/3FbD50gAxw9C/3rDOBCfpB5pgyWWrA3b5zaiQKKT/4RHGaz+ONabMX
+         pAmXdtOa2m9PVdbPfxCKoDzwoOXZNutxkERMLUf2ZY1pp4UL9gdwxpMFu/HYNMBDPRpD
+         qhcg==
+X-Forwarded-Encrypted: i=1; AJvYcCW0K5KvArqNLV59FTlMP3p+IzV1WzbbxhRNFq2oeq4GdBMbbwFIreFdTgzXxnZIhKdTitg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6d+akjcUrxhjuL8a5q5u815lPvGu9Pn01ozggJlZ7txL6qfeW
+	zdDsNaYhWGejLl30XuzeYZNBG0ByVmR5uKGTqj2bEuzA8KCsmA8NmD5A35mMeTaDN6UrQn1MgAy
+	QUXpD0972KLm1qN7qQQAXnlLMGPl3Iq3AjgQnuuje+A==
+X-Gm-Gg: ATEYQzyGq7k7ETrfwkYbHT3UcFNrX23MMfzfg4erwBkqS9S+r2ZcVCGDMHs3DTWWP5Y
+	r4TO0wWZj1bgMqW9WDzXJKOij/X3J5m56GybRKqwC/bqr7DBoMzBTaOiGg1lxfvgSsdY1CJZKG6
+	GAtVRJFFju2ss+1ISG1a2DW5Rzbsh8NLGpcxrwb1h/ThQS4Hk74PYjP+C+1kskVDuZlEiPC9oNw
+	1e2nnRqVW1snMNLeyO9+4Rs3oSptmH4F08iv9Whcyk97u1R5Jb6AIG91Ee0ZUCtTtu2TX5n8wxB
+	k9+P5oVmEXFPUwbJNJgqXECXZPjFTIKfs8CZ8fy3Y9+CK0c1bj4B97oDL6fKnmCyqAc5UO5jCSo
+	EGj02IrcLjoYzgI00GOlyOMbbcQ==
+X-Received: by 2002:a05:6820:1b05:b0:674:62e7:190f with SMTP id
+ 006d021491bc7-67b9bca7baamr925571eaf.17.1772780660047; Thu, 05 Mar 2026
+ 23:04:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-From: "BillXiang" <xiangwencheng@lanxincomputing.com>
-Subject: Re: [PATCH v1] KVM: VMX: Remove unnecessary parentheses
-Content-Transfer-Encoding: 7bit
-To: "Xin Li (Intel)" <xin@zytor.com>, <kvm@vger.kernel.org>, 
-	<linux-kernel@vger.kernel.org>
-Message-Id: <1795684a-b453-440e-88bb-035993d9deab@lanxincomputing.com>
-In-Reply-To: <20260305235416.4147213-1-xin@zytor.com>
-X-Original-From: BillXiang <xiangwencheng@lanxincomputing.com>
-Content-Language: en-US
-X-Rspamd-Queue-Id: 8C18C21BFB0
+MIME-Version: 1.0
+References: <20260120080013.2153519-1-anup.patel@oss.qualcomm.com> <20260120080013.2153519-2-anup.patel@oss.qualcomm.com>
+In-Reply-To: <20260120080013.2153519-2-anup.patel@oss.qualcomm.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 6 Mar 2026 12:34:08 +0530
+X-Gm-Features: AaiRm533kBoYnXDCQRSDQXrP3bNbpBpz22jiDNqrmWLzZZYwaIGtUWbuuXDPWwo
+Message-ID: <CAAhSdy2u3C2JyakhnSZxuSO2ecJsaz9DXWkRp96CArqHz4Ce9w@mail.gmail.com>
+Subject: Re: [PATCH 01/27] RISC-V: KVM: Fix error code returned for Smstateen ONE_REG
+To: Anup Patel <anup.patel@oss.qualcomm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Atish Patra <atish.patra@linux.dev>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, Alexandre Ghiti <alex@ghiti.fr>, 
+	Shuah Khan <shuah@kernel.org>, Andrew Jones <andrew.jones@oss.qualcomm.com>, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 4218721C418
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[lanxincomputing-com.20200927.dkim.feishu.cn:s=s1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[brainfault-org.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[lanxincomputing.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-72990-lists,kvm=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[lanxincomputing-com.20200927.dkim.feishu.cn:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xiangwencheng@lanxincomputing.com,kvm@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[brainfault.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-72991-lists,kvm=lfdr.de];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anup@brainfault.org,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[brainfault-org.20230601.gappssmtp.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,zytor.com:email]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,qualcomm.com:email,sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo,brainfault-org.20230601.gappssmtp.com:dkim]
 X-Rspamd-Action: no action
 
-On 3/6/2026 7:54 AM, Xin Li (Intel) wrote:
-> From: Xin Li <xin@zytor.com>
-> 
-> Drop redundant parentheses; & takes precedence over &&.
+On Tue, Jan 20, 2026 at 1:30=E2=80=AFPM Anup Patel <anup.patel@oss.qualcomm=
+.com> wrote:
+>
+> Return -ENOENT for Smstateen ONE_REG when:
+> 1) Smstateen is not enabled for a VCPU
+> 2) When ONE_REG id is out of range
+>
+> This will make Smstateen ONE_REG error codes consistent
+> with other ONE_REG interfaces of KVM RISC-V.
+>
+> Fixes: c04913f2b54e ("RISCV: KVM: Add sstateen0 to ONE_REG")
+> Signed-off-by: Anup Patel <anup.patel@oss.qualcomm.com>
 
-I would not recommend relying on default operator precedence.
+Queued this as fix for Linux-7.0-rcX
 
-> 
-> Signed-off-by: Xin Li <xin@zytor.com>
+Regards,
+Anup
+
 > ---
->   arch/x86/kvm/vmx/capabilities.h | 10 +++++-----
->   1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-> index 4e371c93ae16..0dad9e7c4ff4 100644
-> --- a/arch/x86/kvm/vmx/capabilities.h
-> +++ b/arch/x86/kvm/vmx/capabilities.h
-> @@ -107,7 +107,7 @@ static inline bool cpu_has_load_perf_global_ctrl(void)
->   
->   static inline bool cpu_has_load_cet_ctrl(void)
->   {
-> -	return (vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_CET_STATE);
-> +	return vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_CET_STATE;
->   }
->   
->   static inline bool cpu_has_save_perf_global_ctrl(void)
-> @@ -162,7 +162,7 @@ static inline bool cpu_has_vmx_ept(void)
->   static inline bool vmx_umip_emulated(void)
->   {
->   	return !boot_cpu_has(X86_FEATURE_UMIP) &&
-> -	       (vmcs_config.cpu_based_2nd_exec_ctrl & SECONDARY_EXEC_DESC);
-> +	       vmcs_config.cpu_based_2nd_exec_ctrl & SECONDARY_EXEC_DESC;
->   }
->   
->   static inline bool cpu_has_vmx_rdtscp(void)
-> @@ -376,9 +376,9 @@ static inline bool cpu_has_vmx_invvpid_global(void)
->   
->   static inline bool cpu_has_vmx_intel_pt(void)
->   {
-> -	return (vmcs_config.misc & VMX_MISC_INTEL_PT) &&
-> -		(vmcs_config.cpu_based_2nd_exec_ctrl & SECONDARY_EXEC_PT_USE_GPA) &&
-> -		(vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_RTIT_CTL);
-> +	return vmcs_config.misc & VMX_MISC_INTEL_PT &&
-> +	       vmcs_config.cpu_based_2nd_exec_ctrl & SECONDARY_EXEC_PT_USE_GPA &&
-> +	       vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_RTIT_CTL;
->   }
-
-Removing the parentheses could significantly reduce code readability here.
-
->   
->   /*
-> 
-> base-commit: 5128b972fb2801ad9aca54d990a75611ab5283a9
+>  arch/riscv/kvm/vcpu_onereg.c | 18 ++++++++----------
+>  1 file changed, 8 insertions(+), 10 deletions(-)
+>
+> diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
+> index e7ab6cb00646..6dab4deed86d 100644
+> --- a/arch/riscv/kvm/vcpu_onereg.c
+> +++ b/arch/riscv/kvm/vcpu_onereg.c
+> @@ -549,9 +549,11 @@ static inline int kvm_riscv_vcpu_smstateen_set_csr(s=
+truct kvm_vcpu *vcpu,
+>  {
+>         struct kvm_vcpu_smstateen_csr *csr =3D &vcpu->arch.smstateen_csr;
+>
+> +       if (!riscv_isa_extension_available(vcpu->arch.isa, SMSTATEEN))
+> +               return -ENOENT;
+>         if (reg_num >=3D sizeof(struct kvm_riscv_smstateen_csr) /
+>                 sizeof(unsigned long))
+> -               return -EINVAL;
+> +               return -ENOENT;
+>
+>         ((unsigned long *)csr)[reg_num] =3D reg_val;
+>         return 0;
+> @@ -563,9 +565,11 @@ static int kvm_riscv_vcpu_smstateen_get_csr(struct k=
+vm_vcpu *vcpu,
+>  {
+>         struct kvm_vcpu_smstateen_csr *csr =3D &vcpu->arch.smstateen_csr;
+>
+> +       if (!riscv_isa_extension_available(vcpu->arch.isa, SMSTATEEN))
+> +               return -ENOENT;
+>         if (reg_num >=3D sizeof(struct kvm_riscv_smstateen_csr) /
+>                 sizeof(unsigned long))
+> -               return -EINVAL;
+> +               return -ENOENT;
+>
+>         *out_val =3D ((unsigned long *)csr)[reg_num];
+>         return 0;
+> @@ -595,10 +599,7 @@ static int kvm_riscv_vcpu_get_reg_csr(struct kvm_vcp=
+u *vcpu,
+>                 rc =3D kvm_riscv_vcpu_aia_get_csr(vcpu, reg_num, &reg_val=
+);
+>                 break;
+>         case KVM_REG_RISCV_CSR_SMSTATEEN:
+> -               rc =3D -EINVAL;
+> -               if (riscv_has_extension_unlikely(RISCV_ISA_EXT_SMSTATEEN)=
+)
+> -                       rc =3D kvm_riscv_vcpu_smstateen_get_csr(vcpu, reg=
+_num,
+> -                                                             &reg_val);
+> +               rc =3D kvm_riscv_vcpu_smstateen_get_csr(vcpu, reg_num, &r=
+eg_val);
+>                 break;
+>         default:
+>                 rc =3D -ENOENT;
+> @@ -640,10 +641,7 @@ static int kvm_riscv_vcpu_set_reg_csr(struct kvm_vcp=
+u *vcpu,
+>                 rc =3D kvm_riscv_vcpu_aia_set_csr(vcpu, reg_num, reg_val)=
+;
+>                 break;
+>         case KVM_REG_RISCV_CSR_SMSTATEEN:
+> -               rc =3D -EINVAL;
+> -               if (riscv_has_extension_unlikely(RISCV_ISA_EXT_SMSTATEEN)=
+)
+> -                       rc =3D kvm_riscv_vcpu_smstateen_set_csr(vcpu, reg=
+_num,
+> -                                                             reg_val);
+> +               rc =3D kvm_riscv_vcpu_smstateen_set_csr(vcpu, reg_num, re=
+g_val);
+>                 break;
+>         default:
+>                 rc =3D -ENOENT;
+> --
+> 2.43.0
+>
 
