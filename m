@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-73065-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73064-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QGt7GvzfqmlqXwEAu9opvQ
-	(envelope-from <kvm+bounces-73065-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 15:09:00 +0100
+	id UD2dL/nfqmlqXwEAu9opvQ
+	(envelope-from <kvm+bounces-73064-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 15:08:57 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1BB3222545
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 15:08:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5680922253D
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 15:08:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1C103318C8D0
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 14:03:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D4EFE318A6CD
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 14:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC0A3AE71D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A183AE6FF;
 	Fri,  6 Mar 2026 14:02:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hkjniBmv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y7bbz/m1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F58E3AE190
-	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 14:02:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A15D3AE19C
+	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 14:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772805768; cv=none; b=G+4pHgqLe3dXKH8+EL9VkyNDAg849hX3rJHaGkeAwlj8QS6lfL0QcQxm0dA1BVcx+yDQkSmw6zzLosLPuxz7Sc6YGN1XcyLjp7aIifEtlFyvVJkh4YjBL1BE/enSCqLYm8lGnq3JmRLp86XyApBDMTEYSfzSNZ1EbE2MjWlNI3g=
+	t=1772805767; cv=none; b=ONqbsPXnjWGqX/ByPAaQxGqTO4uMh+/qPjZ3si6aPx1WX3XAj9Hj1rh3SqflUh6djWiZwlz74h75T1u4JUGHaK0WR6eGZljNu85NpnGrwBa1REqtAHWbFvCI2rtIYl8XeAMsZjwshawMAngiB0+lmfesp1TaZBpTqWOOlG4LaC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772805768; c=relaxed/simple;
-	bh=ulXlCU/gFt1vNFQq7ZcdgkCRx5AlFlt38S6K5GWCz10=;
+	s=arc-20240116; t=1772805767; c=relaxed/simple;
+	bh=BMbVT7miz8KQ7+AZQDsGiqCWygy7M90I6XCpAU+izv0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=N9sgizc43INSjXzmeKEhkQTbN9ujlpnl4hOyc8GMJrxlzc6UE+Mb3s09yG4CxWfjC1G9Doa4wYWHvFUlbwCLjqJo0KGCnX6dnwvJHZK9oO0y0q4/ws9Rexlzk6rm/1LRNBAGhrXuE9jbCslC6K5cInhOXuWLYAIJS61316MJ3fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hkjniBmv; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=nlkLN4mHAzVAUGsUC4T0T6aeB+Lys+XprgkTQXI01iTXhZ6y2zOfnD/oNV86W4PGTmkTAtX/x4NtyJJxhehk/cvpTe7XbIXQIhNTUWplra8tCaJQJ96nlj2re8JJuzPTeAvOLukc1a5nw840g2VMY5d6k6Q69Xrog1e5GJpqZNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y7bbz/m1; arc=none smtp.client-ip=209.85.218.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-483a24db6ecso117033415e9.1
-        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 06:02:43 -0800 (PST)
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b9407779e3fso210615566b.1
+        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 06:02:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772805762; x=1773410562; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1772805763; x=1773410563; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dq2CFWg/s/4LGPe7PH75WI1RwQG3qN/TUDsxF12q5kw=;
-        b=hkjniBmvnSHirbJvUIBshkv3eqh8CkIoX0NU8AxxDGvkhfhZdJwgN19/N2lSaTYWkj
-         BrJoJulgln57U0gMR/UlFY4nF1eXxTD12ESK/EXvOeDLHl0LmqIGWIFMNP3Q8nqrI9H9
-         Isv2N3g7o3jMQXadkFNKKGBgsKw6f2Z5apiofrpzhkXe8jDHFrN/sM+cFqxdidZgwEQ1
-         2WMYXg3SxMDlageHUOhrYUNOXOGJ6gm4ZRdJy3c4M++vBN67233/vdeSR9Syi0MUlzXr
-         MANnizHFibjtwfF/wTluk9y/7FHCHNoIgcZoQbKSAhXD5d3TDdeDKxxu6NrJUAd70pUo
-         vr2w==
+        bh=KT44YeiLTJyOwAcprGitUZ5uZxYG91k2apEts1OjnSo=;
+        b=Y7bbz/m1VfLXrUFV4bqAN2nQdmW84t+uBIDxde3txgMeZ5o9WbZq5ZIzVYJSjhftrA
+         JrV6F0oqjHtrSQyAj6H/CzrtzVHZ0VUGDtAet7Lkq4psHUTeHil+ngzs5fgNLv+IeI/G
+         nPaWzzJIBHPfv5WyVGfHnLRSuD0nXVYJx6V336H1lbMb+YPjlYIhuCk9vJaY1Uu72pBt
+         388/RSYNts/VxgzcXDNTTH93gTcCrX/4LkFvjok+hTdoOlcpAzPV3ELArXYNdw6xXiMc
+         qjVI6gZ+CL9USdOJvkbJQ3A1NsMeOeRpLJwVBmPlBlzhRx3b8ldUWqMKCFEwYNJjLvNE
+         RTIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772805762; x=1773410562;
+        d=1e100.net; s=20230601; t=1772805763; x=1773410563;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dq2CFWg/s/4LGPe7PH75WI1RwQG3qN/TUDsxF12q5kw=;
-        b=B7SPDp7KyquGCwhAofb1UHJRRHsvrlV1MKaDgAxw4+wpfEadyZ8DBi+EsKrfFlpSdZ
-         MGgXnzhR6+5QT1eZvfvC6igSGYnSxcyDAoaOTrEPO0WhlAQ7BvM1/J9e4YIb3n3EaiVQ
-         prOn3jVEFwA/Pild+ovCyAZ3a9W8dF424O94lxuudmmciigw+12DG/G7KadIDzMJzyB7
-         T3ByKOlZY3QmTodVetzTBD8EK3bsEf207wJMWfi8CqYeq3/DLFERrkssMxS3ffl2OEwp
-         7xdpWpzzt/HgXW/ZxqmGL30pwwageHLf6W6cWkxF8NFrLKGdBZWVz7Zzg1Hppmti23s5
-         m89w==
-X-Gm-Message-State: AOJu0Yxv+TRS8K9ANCvdr13fRrP87WklxGWN8iZIPJK3olA3jBBDJKux
-	AAHfOdGNk9p3GdYJEhzMQpR1j5jiHEGTsCp5qqeNkH09UKWxKXOYxPlg4xxIyW2m/K4DZ7DVsDx
-	PqfhHybn3nfe0iMttN5OALt1Ytn4n9MW4XOwm64zK88TcUfUekcB90cdQwYYimHMAjexsxPLh/L
-	hozfjdCu0H6iRnDSphS6Y61tlYWQA=
-X-Received: from wmbjw16.prod.google.com ([2002:a05:600c:5750:b0:480:4a03:7b6f])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:474f:b0:477:af8d:203a
- with SMTP id 5b1f17b1804b1-48526964c79mr37178325e9.27.1772805761667; Fri, 06
- Mar 2026 06:02:41 -0800 (PST)
-Date: Fri,  6 Mar 2026 14:02:25 +0000
+        bh=KT44YeiLTJyOwAcprGitUZ5uZxYG91k2apEts1OjnSo=;
+        b=mZfKq52S209xDoaq2k/ohjiJjP2eVDovXxjVEPo25Y/OfDq9nG7VsjRwM78S1cKG1q
+         X1jkkAh3js5dUukrHp9KRxt2CLXNZZvWVkTvBUo81SaWthaIII4gJWhFGSgf1N4H4nCn
+         fOfLie4IPh+GC5StgsXoeuPJrNA+LWbi1nUNU1O4iSXTRK13pR5T+3SYr/eV72nTkkj+
+         uHZV3YMYIgGVNAmZcrPPNxkqMJ34lPhM221AaXZLcL+0TNm0Z+1Mh5quuXforlPZt83W
+         YM5qaHutxCp/rfnD2tFJhSu5eLW9Qjb4tr8cBPin4iMhSb+AK0YXq1ZV1HHvNa6UhPYG
+         piag==
+X-Gm-Message-State: AOJu0YwM9YzKK6QlwXBgSS5+4v61SG7o5BR3bTRuzjwJtnPHXMCSyvBE
+	qBAL/FwLheYYTHg+AWZ+i4MXwjWf7p/cdwmM9KhKPgRBmYFoLal76qfrG8HQntYb/zyZMQEL232
+	Y9gZpHCdN9D/OD2in1lKt3/6Lsz3AkbFlLLrjJdX3MrMGWMNRkBtj2UqsoJFc2GM4aIS0Xg4mSq
+	d5QqvghvJqORCLrwuHrqXXdT00B/k=
+X-Received: from ejfw12.prod.google.com ([2002:a17:906:a0c:b0:b94:f06:dc6e])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:906:d54b:b0:b93:5ef5:904f
+ with SMTP id a640c23a62f3a-b942d1b1bebmr143967466b.26.1772805762935; Fri, 06
+ Mar 2026 06:02:42 -0800 (PST)
+Date: Fri,  6 Mar 2026 14:02:26 +0000
 In-Reply-To: <20260306140232.2193802-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260306140232.2193802-1-tabba@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260306140232.2193802-7-tabba@google.com>
-Subject: [PATCH v1 06/13] KVM: arm64: Extract page table mapping in user_mem_abort()
+Message-ID: <20260306140232.2193802-8-tabba@google.com>
+Subject: [PATCH v1 07/13] KVM: arm64: Simplify nested VMA shift calculation
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -85,25 +85,25 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
 	will@kernel.org, qperret@google.com, vdonnefort@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: B1BB3222545
+X-Rspamd-Queue-Id: 5680922253D
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-73065-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-73064-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[tabba@google.com,kvm@vger.kernel.org];
@@ -115,179 +115,52 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Extract the code responsible for locking the KVM MMU and mapping the PFN
-into the stage-2 page tables into a new helper, kvm_s2_fault_map().
+In the kvm_s2_resolve_vma_size() helper, the local variable vma_pagesize
+is calculated from vma_shift, only to be used to bound the vma_pagesize
+by max_map_size and subsequently convert it back to a shift via __ffs().
 
-This helper manages the kvm_fault_lock, checks for MMU invalidation
-retries, attempts to adjust for transparent huge pages (THP), handles
-MTE sanitization if needed, and finally maps or relaxes permissions on
-the stage-2 entries.
-
-With this change, the main user_mem_abort() function is now a sequential
-dispatcher that delegates to specialized helper functions.
+Because vma_pagesize and max_map_size are both powers of two, we can
+simplify the logic by omitting vma_pagesize entirely and bounding the
+vma_shift directly using the shift of max_map_size. This achieves the
+same result while keeping the size-to-shift conversion out of the helper
+logic.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/mmu.c | 128 +++++++++++++++++++++++--------------------
- 1 file changed, 68 insertions(+), 60 deletions(-)
+ arch/arm64/kvm/mmu.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index b328299cc0f5..833a7f769467 100644
+index 833a7f769467..090a906d3a12 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1892,68 +1892,13 @@ static int kvm_s2_fault_compute_prot(struct kvm_s2_fault *fault)
- 	return 0;
- }
- 
--static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
--			  struct kvm_s2_trans *nested,
--			  struct kvm_memory_slot *memslot, unsigned long hva,
--			  bool fault_is_perm)
-+static int kvm_s2_fault_map(struct kvm_s2_fault *fault, void *memcache)
+@@ -1646,7 +1646,6 @@ static short kvm_s2_resolve_vma_size(struct vm_area_struct *vma,
+ 				     bool *force_pte, phys_addr_t *ipa)
  {
--	int ret = 0;
--	struct kvm_s2_fault fault_data = {
--		.vcpu = vcpu,
--		.fault_ipa = fault_ipa,
--		.nested = nested,
--		.memslot = memslot,
--		.hva = hva,
--		.fault_is_perm = fault_is_perm,
--		.ipa = fault_ipa,
--		.logging_active = memslot_is_logging(memslot),
--		.force_pte = memslot_is_logging(memslot),
--		.s2_force_noncacheable = false,
--		.vfio_allow_any_uc = false,
--		.prot = KVM_PGTABLE_PROT_R,
--	};
--	struct kvm_s2_fault *fault = &fault_data;
--	struct kvm *kvm = vcpu->kvm;
--	void *memcache;
-+	struct kvm *kvm = fault->vcpu->kvm;
- 	struct kvm_pgtable *pgt;
-+	int ret;
- 	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
+ 	short vma_shift;
+-	long vma_pagesize;
  
--	if (fault->fault_is_perm)
--		fault->fault_granule = kvm_vcpu_trap_get_perm_fault_granule(fault->vcpu);
--	fault->write_fault = kvm_is_write_fault(fault->vcpu);
--	fault->exec_fault = kvm_vcpu_trap_is_exec_fault(fault->vcpu);
--	VM_WARN_ON_ONCE(fault->write_fault && fault->exec_fault);
--
--	/*
--	 * Permission faults just need to update the existing leaf entry,
--	 * and so normally don't require allocations from the memcache. The
--	 * only exception to this is when dirty logging is enabled at runtime
--	 * and a write fault needs to collapse a block entry into a table.
--	 */
--	fault->topup_memcache = !fault->fault_is_perm ||
--				(fault->logging_active && fault->write_fault);
--	ret = prepare_mmu_memcache(fault->vcpu, fault->topup_memcache, &memcache);
--	if (ret)
--		return ret;
--
--	/*
--	 * Let's check if we will get back a huge fault->page backed by hugetlbfs, or
--	 * get block mapping for device MMIO region.
--	 */
--	ret = kvm_s2_fault_pin_pfn(fault);
--	if (ret != 1)
--		return ret;
--
--	ret = 0;
--
--	ret = kvm_s2_fault_compute_prot(fault);
--	if (ret == 1) {
--		ret = 1; /* fault injected */
--		goto out_put_page;
--	}
--	if (ret)
--		goto out_put_page;
--
- 	kvm_fault_lock(kvm);
- 	pgt = fault->vcpu->arch.hw_mmu->pgt;
- 	if (mmu_invalidate_retry(kvm, fault->mmu_seq)) {
-@@ -2001,8 +1946,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		 * PTE, which will be preserved.
- 		 */
- 		fault->prot &= ~KVM_NV_GUEST_MAP_SZ;
--		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, fault->fault_ipa, fault->prot,
--								 flags);
-+		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, fault->fault_ipa,
-+								 fault->prot, flags);
- 	} else {
- 		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, fault->fault_ipa, fault->vma_pagesize,
- 							 __pfn_to_phys(fault->pfn), fault->prot,
-@@ -2018,6 +1963,69 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		mark_page_dirty_in_slot(kvm, fault->memslot, fault->gfn);
+ 	if (*force_pte)
+ 		vma_shift = PAGE_SHIFT;
+@@ -1677,8 +1676,6 @@ static short kvm_s2_resolve_vma_size(struct vm_area_struct *vma,
+ 		WARN_ONCE(1, "Unknown vma_shift %d", vma_shift);
+ 	}
  
- 	return ret != -EAGAIN ? ret : 0;
-+}
-+
-+static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-+			  struct kvm_s2_trans *nested,
-+			  struct kvm_memory_slot *memslot, unsigned long hva,
-+			  bool fault_is_perm)
-+{
-+	int ret = 0;
-+	struct kvm_s2_fault fault_data = {
-+		.vcpu = vcpu,
-+		.fault_ipa = fault_ipa,
-+		.nested = nested,
-+		.memslot = memslot,
-+		.hva = hva,
-+		.fault_is_perm = fault_is_perm,
-+		.ipa = fault_ipa,
-+		.logging_active = memslot_is_logging(memslot),
-+		.force_pte = memslot_is_logging(memslot),
-+		.s2_force_noncacheable = false,
-+		.vfio_allow_any_uc = false,
-+		.prot = KVM_PGTABLE_PROT_R,
-+	};
-+	struct kvm_s2_fault *fault = &fault_data;
-+	void *memcache;
-+
-+	if (fault->fault_is_perm)
-+		fault->fault_granule = kvm_vcpu_trap_get_perm_fault_granule(fault->vcpu);
-+	fault->write_fault = kvm_is_write_fault(fault->vcpu);
-+	fault->exec_fault = kvm_vcpu_trap_is_exec_fault(fault->vcpu);
-+	VM_WARN_ON_ONCE(fault->write_fault && fault->exec_fault);
-+
-+	/*
-+	 * Permission faults just need to update the existing leaf entry,
-+	 * and so normally don't require allocations from the memcache. The
-+	 * only exception to this is when dirty logging is enabled at runtime
-+	 * and a write fault needs to collapse a block entry into a table.
-+	 */
-+	fault->topup_memcache = !fault->fault_is_perm ||
-+				(fault->logging_active && fault->write_fault);
-+	ret = prepare_mmu_memcache(fault->vcpu, fault->topup_memcache, &memcache);
-+	if (ret)
-+		return ret;
-+
-+	/*
-+	 * Let's check if we will get back a huge fault->page backed by hugetlbfs, or
-+	 * get block mapping for device MMIO region.
-+	 */
-+	ret = kvm_s2_fault_pin_pfn(fault);
-+	if (ret != 1)
-+		return ret;
-+
-+	ret = 0;
-+
-+	ret = kvm_s2_fault_compute_prot(fault);
-+	if (ret == 1) {
-+		ret = 1; /* fault injected */
-+		goto out_put_page;
-+	}
-+	if (ret)
-+		goto out_put_page;
-+
-+	ret = kvm_s2_fault_map(fault, memcache);
-+	return ret;
+-	vma_pagesize = 1UL << vma_shift;
+-
+ 	if (nested) {
+ 		unsigned long max_map_size;
  
- out_put_page:
- 	kvm_release_page_unused(fault->page);
+@@ -1703,8 +1700,7 @@ static short kvm_s2_resolve_vma_size(struct vm_area_struct *vma,
+ 			max_map_size = PAGE_SIZE;
+ 
+ 		*force_pte = (max_map_size == PAGE_SIZE);
+-		vma_pagesize = min_t(long, vma_pagesize, max_map_size);
+-		vma_shift = __ffs(vma_pagesize);
++		vma_shift = min_t(short, vma_shift, __ffs(max_map_size));
+ 	}
+ 
+ 	return vma_shift;
 -- 
 2.53.0.473.g4a7958ca14-goog
 
