@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-73166-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73167-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gGeJKuNCq2nJbgEAu9opvQ
-	(envelope-from <kvm+bounces-73166-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 22:10:59 +0100
+	id GLkpKJtCq2nJbgEAu9opvQ
+	(envelope-from <kvm+bounces-73167-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 22:09:47 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AED1227BD5
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 22:10:59 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C640227BB7
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 22:09:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2BD9230F4DF9
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 21:09:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B69A33035011
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 21:09:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B59F48B37E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F292D48BD49;
 	Fri,  6 Mar 2026 21:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dQt1nSsX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mDn2NpkC"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDC248A2AE;
-	Fri,  6 Mar 2026 21:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244D448AE20;
+	Fri,  6 Mar 2026 21:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772831352; cv=none; b=lS17pmHvjcE0uBOgAL3V+m+IYfT0a6xtSRBo5AnLcJWAGvhOTONWjckmoNuRRckIATf8bbNguyPKHZ5+//A8NTvYX+BE/uR/ZNFQBTvsTPi4/eXMOFYTSLrb6129NVIsgJQ0/Oj6tVw0wspPU+amxjvRdkC77sRiJmnIe/azQmg=
+	t=1772831353; cv=none; b=rAUvYc8wkPm4lIxKmm1237VXQ5+hxW1sbeYvNG7qPGfSJ+NAtl+P0h+Ieo93GCwWA5nET2holfPV++qQp4qVNgR1ZGQKH19GFFu7ruQEnKBUjclsxH09L4omkCkdRXzNA9KKwWi2G1f5xBm+T1DpIj07Pbv81O043nwthJH3s0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772831352; c=relaxed/simple;
-	bh=W1GDvhBjURiDIQSdO6sAf7i/CnmSx/BtLxKrERUXc7Y=;
+	s=arc-20240116; t=1772831353; c=relaxed/simple;
+	bh=Av1cyNcaTB4l8UeQo3DpVXvBAlWkTHHvygscY34OLk0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TZv/bKwqbrx7gVAb7qBYKSa4h/48YPf9u43IPoVFF6VqT0OZO0ZMsS72HBp+jyeg7R2bRlDe8XuWbnavgbgdbvaVihpMZuDMxOuLDdBp3TJ6UWU7YKJpSZiGheJvW659K8y9Gcvg63OqvwHFdXw1NObyww6Qn781b+FKyTbVKUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dQt1nSsX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D10DC2BC9E;
+	 MIME-Version; b=AG41CA1W86Y+1L0XUhQg4IakgQXahOxBelw5gPNClzKR+pVb4zPB0aSZ15F1TYiqvQktSyIMnue+CWmGlwPj8PwJ3yLO3UiThd/4lowIJNszLBLd6TDxX4UfGKitt7U/XFUJ+IL40GxupMTiD9zHVvIbzCN3TePA7Sy8txBKMHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mDn2NpkC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1434C2BCB1;
 	Fri,  6 Mar 2026 21:09:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1772831352;
-	bh=W1GDvhBjURiDIQSdO6sAf7i/CnmSx/BtLxKrERUXc7Y=;
+	bh=Av1cyNcaTB4l8UeQo3DpVXvBAlWkTHHvygscY34OLk0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dQt1nSsXr0JyiwaryAGSWx9p2npmCf/1gWOYpifa/dfwWIi8HaEQytM6FPnbbYGyq
-	 sQ52Y4PTgCAyaLWnkR2lu9ubVvsk5MspUqz+2BKvvov8/GgI+zq4OUS8axNds1iD5P
-	 0gQVKmFSFtj/3s44rHf8i8J2HChVP3TMCcuR8LClDsTaAQ6wMgi4jJoniUEkMfgCq4
-	 1VL9H/Ok0lfv9dJOU0+WGMIPFFOi7/4VjvhO/q8aWPJQW7FD4pIkFGejforGK1DZlI
-	 PTFBuAwPGqreOSd7qiZC8/7B2PWemxJVo8x4Tn8ii40B3BEJ2bumBMD1IfU67nS4Wh
-	 PKW7lXRZL6BsA==
+	b=mDn2NpkCUND+DWxA5/u3AR6+RqtDHuJDdAteMk+AiVpeVsplIvsnZhTxAIg8qXc8j
+	 4SyDlSNUpNkCqVgRDJbwSoTi03eEr/rnmv4GG8DmNvAoNihJNpH9aLKK3Ji+iNRrrB
+	 QYEvOmmK3Uz2kc6Y/LO7m5CZA/kSf9inIACk89IB0qxNRAuiNK9IyQNm62U5AAyfWI
+	 HVPQIJCA7FhfpV7tPdlxNYFZntaJXHNOZAeDBqJABTJFF7Zh/+/R9IkBbKWMO8mAo9
+	 TH/w2HYJUk6brY/yx9MX5mBdG8EcB6xrTQHjcbI97US/sCWQXbGQxm5fP0y4IkVSab
+	 F1ZTyymg2w7tQ==
 From: Yosry Ahmed <yosry@kernel.org>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
@@ -51,9 +51,9 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yosry Ahmed <yosry@kernel.org>
-Subject: [PATCH v2 4/6] KVM: nSVM: Fail emulation of VMRUN/VMLOAD/VMSAVE if mapping vmcb12 fails
-Date: Fri,  6 Mar 2026 21:08:58 +0000
-Message-ID: <20260306210900.1933788-5-yosry@kernel.org>
+Subject: [PATCH v2 5/6] KVM: selftests: Rework svm_nested_invalid_vmcb12_gpa
+Date: Fri,  6 Mar 2026 21:08:59 +0000
+Message-ID: <20260306210900.1933788-6-yosry@kernel.org>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
 In-Reply-To: <20260306210900.1933788-1-yosry@kernel.org>
 References: <20260306210900.1933788-1-yosry@kernel.org>
@@ -64,108 +64,310 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 2AED1227BD5
+X-Rspamd-Queue-Id: 4C640227BB7
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73166-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-73167-lists,kvm=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.982];
+	NEURAL_HAM(-0.00)[-0.981];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
 	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-KVM currently injects a #GP if mapping vmcb12 fails when emulating
-VMRUN/VMLOAD/VMSAVE. This is not architectural behavior, as #GP should
-only be injected if the physical address is not supported or not aligned
-(which hardware will do before the VMRUN intercept is checked).
+The test currently allegedly makes sure that VMRUN causes a #GP in
+vmcb12 GPA is valid but unmappable. However, it calls run_guest() with
+an the test vmcb12 GPA, and the #GP is produced from VMLOAD, not VMRUN.
 
-Instead, handle it as an emulation failure, similar to how nVMX handles
-failures to read/write guest memory in several emulation paths.
+Additionally, the underlying just changed to match architectural
+behavior, and all of VMRUN/VMLOAD/VMSAVE fail emulation if vmcb12 cannot
+be mapped. The CPU still injects a #GP if the vmcb12 GPA exceeds
+maxphyaddr.
 
-When virtual VMLOAD/VMSAVE is enabled, if vmcb12's GPA is not mapped in
-the NPTs a VMEXIT(#NPF) will be generated, and KVM will install an MMIO
-SPTE and emulate the instruction if there is no corresponding memslot.
-x86_emulate_insn() will return EMULATION_FAILED as VMLOAD/VMSAVE are not
-handled as part of the twobyte_insn cases.
+Rework the test such to use the KVM_ONE_VCPU_TEST[_SUITE] harness, and
+test all of VMRUN/VMLOAD/VMSAVE with both an invalid GPA (-1ULL) causing
+a #GP, and a valid but unmappable GPA causing emulation failure. Execute
+the instructions directly from L1 instead of run_guest() to make sure
+the #GP or emulation failure is produced by the right instruction.
 
-Even though this will also result in an emulation failure, it will only
-result in a straight return to userspace if
-KVM_CAP_EXIT_ON_EMULATION_FAILURE is set. Otherwise, it would inject #UD
-and only exit to userspace if not in guest mode. So the behavior is
-slightly different if virtual VMLOAD/VMSAVE is enabled.
+Leave the #VMEXIT with unmappable GPA test case as-is, but wrap it with
+a test harness as well.
 
-Fixes: 3d6368ef580a ("KVM: SVM: Add VMRUN handler")
-Reported-by: Jim Mattson <jmattson@google.com>
+Opportunisitically drop gp_triggered, as the test already checks that
+a #GP was injected through a SYNC, and add an assertion that the max
+legal GPA is in fact not mapped by userspace (i.e. KVM cannot map it).
+
 Signed-off-by: Yosry Ahmed <yosry@kernel.org>
 ---
- arch/x86/kvm/svm/nested.c | 13 ++++++-------
- arch/x86/kvm/svm/svm.c    |  6 ++----
- 2 files changed, 8 insertions(+), 11 deletions(-)
+ .../testing/selftests/kvm/include/kvm_util.h  |   1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   6 +
+ .../kvm/x86/svm_nested_invalid_vmcb12_gpa.c   | 153 +++++++++++++-----
+ 3 files changed, 124 insertions(+), 36 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 6d4c053778b21..089cdcfd60340 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -1107,15 +1107,14 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
- 	ret = nested_svm_copy_vmcb12_to_cache(vcpu, vmcb12_gpa);
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index 8b39cb919f4fc..61fb2cb7df288 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -734,6 +734,7 @@ void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa);
+ void *addr_gva2hva(struct kvm_vm *vm, vm_vaddr_t gva);
+ vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva);
+ void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa);
++bool addr_gpa_has_hva(struct kvm_vm *vm, vm_paddr_t gpa);
+ 
+ #ifndef vcpu_arch_put_guest
+ #define vcpu_arch_put_guest(mem, val) do { (mem) = (val); } while (0)
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 1959bf556e88e..9cf68a558c08b 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -1710,6 +1710,12 @@ void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa)
+ 	return (void *) ((uintptr_t) region->host_alias + offset);
+ }
+ 
++bool addr_gpa_has_hva(struct kvm_vm *vm, vm_paddr_t gpa)
++{
++	gpa = vm_untag_gpa(vm, gpa);
++	return !!userspace_mem_region_find(vm, gpa, gpa);
++}
++
+ /* Create an interrupt controller chip for the specified VM. */
+ void vm_create_irqchip(struct kvm_vm *vm)
+ {
+diff --git a/tools/testing/selftests/kvm/x86/svm_nested_invalid_vmcb12_gpa.c b/tools/testing/selftests/kvm/x86/svm_nested_invalid_vmcb12_gpa.c
+index c6d5f712120d1..3eaee8ad90211 100644
+--- a/tools/testing/selftests/kvm/x86/svm_nested_invalid_vmcb12_gpa.c
++++ b/tools/testing/selftests/kvm/x86/svm_nested_invalid_vmcb12_gpa.c
+@@ -6,6 +6,8 @@
+ #include "vmx.h"
+ #include "svm_util.h"
+ #include "kselftest.h"
++#include "kvm_test_harness.h"
++#include "test_util.h"
+ 
+ 
+ #define L2_GUEST_STACK_SIZE 64
+@@ -13,86 +15,165 @@
+ #define SYNC_GP 101
+ #define SYNC_L2_STARTED 102
+ 
+-u64 valid_vmcb12_gpa;
+-int gp_triggered;
++static unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
+ 
+ static void guest_gp_handler(struct ex_regs *regs)
+ {
+-	GUEST_ASSERT(!gp_triggered);
+ 	GUEST_SYNC(SYNC_GP);
+-	gp_triggered = 1;
+-	regs->rax = valid_vmcb12_gpa;
+ }
+ 
+-static void l2_guest_code(void)
++static void l2_code(void)
+ {
+ 	GUEST_SYNC(SYNC_L2_STARTED);
+ 	vmcall();
+ }
+ 
+-static void l1_guest_code(struct svm_test_data *svm, u64 invalid_vmcb12_gpa)
++static void l1_vmrun(struct svm_test_data *svm, u64 gpa)
+ {
+-	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
++	generic_svm_setup(svm, l2_code, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
+ 
+-	generic_svm_setup(svm, l2_guest_code,
+-			  &l2_guest_stack[L2_GUEST_STACK_SIZE]);
++	asm volatile ("vmrun %[gpa]" : : [gpa] "a" (gpa) : "memory");
++}
++
++static void l1_vmload(struct svm_test_data *svm, u64 gpa)
++{
++	generic_svm_setup(svm, l2_code, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
++
++	asm volatile ("vmload %[gpa]" : : [gpa] "a" (gpa) : "memory");
++}
+ 
+-	valid_vmcb12_gpa = svm->vmcb_gpa;
++static void l1_vmsave(struct svm_test_data *svm, u64 gpa)
++{
++	generic_svm_setup(svm, l2_code, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
+ 
+-	run_guest(svm->vmcb, invalid_vmcb12_gpa); /* #GP */
++	asm volatile ("vmsave %[gpa]" : : [gpa] "a" (gpa) : "memory");
++}
+ 
+-	/* GP handler should jump here */
++static void l1_vmexit(struct svm_test_data *svm, u64 gpa)
++{
++	generic_svm_setup(svm, l2_code, &l2_guest_stack[L2_GUEST_STACK_SIZE]);
++
++	run_guest(svm->vmcb, svm->vmcb_gpa);
+ 	GUEST_ASSERT(svm->vmcb->control.exit_code == SVM_EXIT_VMMCALL);
+ 	GUEST_DONE();
+ }
+ 
+-int main(int argc, char *argv[])
++/*
++ * Find the max legal GPA that is not backed by a memslot (i.e. cannot be mapped
++ * by KVM).
++ */
++static u64 unmappable_gpa(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_x86_state *state;
+-	vm_vaddr_t nested_gva = 0;
+-	struct kvm_vcpu *vcpu;
+ 	uint32_t maxphyaddr;
+ 	u64 max_legal_gpa;
+-	struct kvm_vm *vm;
+-	struct ucall uc;
+-
+-	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
+-
+-	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
+-	vm_install_exception_handler(vcpu->vm, GP_VECTOR, guest_gp_handler);
+ 
+-	/*
+-	 * Find the max legal GPA that is not backed by a memslot (i.e. cannot
+-	 * be mapped by KVM).
+-	 */
+ 	maxphyaddr = kvm_cpuid_property(vcpu->cpuid, X86_PROPERTY_MAX_PHY_ADDR);
+ 	max_legal_gpa = BIT_ULL(maxphyaddr) - PAGE_SIZE;
+-	vcpu_alloc_svm(vm, &nested_gva);
+-	vcpu_args_set(vcpu, 2, nested_gva, max_legal_gpa);
++	TEST_ASSERT(!addr_gpa_has_hva(vcpu->vm, max_legal_gpa),
++		    "Expected max_legal_gpa to not be mapped by userspace");
++
++	return max_legal_gpa;
++}
++
++static void test_invalid_vmcb12(struct kvm_vcpu *vcpu)
++{
++	vm_vaddr_t nested_gva = 0;
++	struct ucall uc;
++
+ 
+-	/* VMRUN with max_legal_gpa, KVM injects a #GP */
++	vm_install_exception_handler(vcpu->vm, GP_VECTOR, guest_gp_handler);
++	vcpu_alloc_svm(vcpu->vm, &nested_gva);
++	vcpu_args_set(vcpu, 2, nested_gva, -1ULL);
+ 	vcpu_run(vcpu);
++
+ 	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+ 	TEST_ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_SYNC);
+ 	TEST_ASSERT_EQ(uc.args[1], SYNC_GP);
++}
++
++static void test_unmappable_vmcb12(struct kvm_vcpu *vcpu)
++{
++	vm_vaddr_t nested_gva = 0;
++
++	vcpu_alloc_svm(vcpu->vm, &nested_gva);
++	vcpu_args_set(vcpu, 2, nested_gva, unmappable_gpa(vcpu));
++	vcpu_run(vcpu);
++
++	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_INTERNAL_ERROR);
++	TEST_ASSERT_EQ(vcpu->run->emulation_failure.suberror, KVM_INTERNAL_ERROR_EMULATION);
++}
++
++static void test_unmappable_vmcb12_vmexit(struct kvm_vcpu *vcpu)
++{
++	struct kvm_x86_state *state;
++	vm_vaddr_t nested_gva = 0;
++	struct ucall uc;
  
  	/*
--	 * Advance RIP if #GP or #UD are not injected, but otherwise
--	 * stop if copying and checking vmcb12 failed.
-+	 * Advance RIP if instruction emulation completes, whether it's a
-+	 * successful VMRUN or a failed one with #VMEXIT(INVALID), but not if
-+	 * #GP/#UD is injected, or if reading vmcb12 fails.
+-	 * Enter L2 (with a legit vmcb12 GPA), then overwrite vmcb12 GPA with
+-	 * max_legal_gpa. KVM will fail to map vmcb12 on nested VM-Exit and
++	 * Enter L2 (with a legit vmcb12 GPA), then overwrite vmcb12 GPA with an
++	 * unmappable GPA. KVM will fail to map vmcb12 on nested VM-Exit and
+ 	 * cause a shutdown.
  	 */
--	if (ret == -EFAULT) {
--		kvm_inject_gp(vcpu, 0);
--		return 1;
--	} else if (ret) {
-+	if (ret == -EFAULT)
-+		return kvm_handle_memory_failure(vcpu, X86EMUL_IO_NEEDED, NULL);
-+	else if (ret)
- 		return kvm_skip_emulated_instruction(vcpu);
--	}
++	vcpu_alloc_svm(vcpu->vm, &nested_gva);
++	vcpu_args_set(vcpu, 2, nested_gva, unmappable_gpa(vcpu));
+ 	vcpu_run(vcpu);
+ 	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
+ 	TEST_ASSERT_EQ(get_ucall(vcpu, &uc), UCALL_SYNC);
+ 	TEST_ASSERT_EQ(uc.args[1], SYNC_L2_STARTED);
  
- 	ret = kvm_skip_emulated_instruction(vcpu);
+ 	state = vcpu_save_state(vcpu);
+-	state->nested.hdr.svm.vmcb_pa = max_legal_gpa;
++	state->nested.hdr.svm.vmcb_pa = unmappable_gpa(vcpu);
+ 	vcpu_load_state(vcpu, state);
+ 	vcpu_run(vcpu);
+ 	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_SHUTDOWN);
  
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 7ec0b0e8945fe..35433bd345eff 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2190,10 +2190,8 @@ static int vmload_vmsave_interception(struct kvm_vcpu *vcpu, bool vmload)
- 	if (nested_svm_check_permissions(vcpu))
- 		return 1;
- 
--	if (kvm_vcpu_map(vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map)) {
--		kvm_inject_gp(vcpu, 0);
--		return 1;
--	}
-+	if (kvm_vcpu_map(vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map))
-+		return kvm_handle_memory_failure(vcpu, X86EMUL_IO_NEEDED, NULL);
- 
- 	vmcb12 = map.hva;
- 
+ 	kvm_x86_state_cleanup(state);
+-	kvm_vm_free(vm);
+-	return 0;
++}
++
++KVM_ONE_VCPU_TEST_SUITE(vmcb12_gpa);
++
++KVM_ONE_VCPU_TEST(vmcb12_gpa, vmrun_invalid, l1_vmrun)
++{
++	test_invalid_vmcb12(vcpu);
++}
++
++KVM_ONE_VCPU_TEST(vmcb12_gpa, vmload_invalid, l1_vmload)
++{
++	test_invalid_vmcb12(vcpu);
++}
++
++KVM_ONE_VCPU_TEST(vmcb12_gpa, vmsave_invalid, l1_vmsave)
++{
++	test_invalid_vmcb12(vcpu);
++}
++
++KVM_ONE_VCPU_TEST(vmcb12_gpa, vmrun_unmappable, l1_vmrun)
++{
++	test_unmappable_vmcb12(vcpu);
++}
++
++KVM_ONE_VCPU_TEST(vmcb12_gpa, vmload_unmappable, l1_vmload)
++{
++	test_unmappable_vmcb12(vcpu);
++}
++
++KVM_ONE_VCPU_TEST(vmcb12_gpa, vmsave_unmappable, l1_vmsave)
++{
++	test_unmappable_vmcb12(vcpu);
++}
++
++/*
++ * Invalid vmcb12_gpa cannot be test for #VMEXIT as KVM_SET_NESTED_STATE will
++ * reject it.
++ */
++KVM_ONE_VCPU_TEST(vmcb12_gpa, vmexit_unmappable, l1_vmexit)
++{
++	test_unmappable_vmcb12_vmexit(vcpu);
++}
++
++int main(int argc, char *argv[])
++{
++	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
++
++	return test_harness_run(argc, argv);
+ }
 -- 
 2.53.0.473.g4a7958ca14-goog
 
