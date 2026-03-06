@@ -1,75 +1,62 @@
-Return-Path: <kvm+bounces-73009-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73010-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8BkfO3ypqmnjVAEAu9opvQ
-	(envelope-from <kvm+bounces-73009-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 11:16:28 +0100
+	id KCDxDKapqmniVAEAu9opvQ
+	(envelope-from <kvm+bounces-73010-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 11:17:10 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B99C21E8C4
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 11:16:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE05C21E8F8
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 11:17:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 12589302F254
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 10:16:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6E153055D6F
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 10:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 269BC379EDF;
-	Fri,  6 Mar 2026 10:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B114B37B024;
+	Fri,  6 Mar 2026 10:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHBI0MPc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kU39nsPR"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3A91B4257;
-	Fri,  6 Mar 2026 10:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3AF234F27B;
+	Fri,  6 Mar 2026 10:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772792172; cv=none; b=Jc6jC98gMaNAZr5FLZHAShjkWRaTe9mQA9RdDq04ehNQP/F5c8RvWoY961d8nrY5sG/yMQB770BIuTfYE/FOw8HSlDSEcOFFOMzWVIImI7vEcbImucVemILHVHs+MzmjfvOfUxYTq39A5oZqEb7BTcgeYCWUHK4eu7JqfhlVjQQ=
+	t=1772792188; cv=none; b=MPeUY/zSpHipPTEBZ7Q6hjCDUKb7GBUxTYMsD1z4OU8Ma2uDQSzM/PE+jmA5drM2eHaxewNl/sK31uE62dIbBaryKe4+ya1Bi2QI9EFwCWaMxUBXY9gTMkV/l//qeebCY6QYU9+S7ROcuayy5O+wE5O6voLUDTgVQtPzb9d8cZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772792172; c=relaxed/simple;
-	bh=aN1f11VNXm8TEP7a6s26GhJ/SMe/0NluR98vebxUP6U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GPwbuUsCqhDw2BYmPdoJfAXdaTdlM5xma+ZywQ6zh/PQKfeXvyNSNP0GOOyhdb1laV9tVtpHgwIt2c7aR507WrW+FFu6kZ6PysIHrnuFPfC7/sWOBNCrcM9VDFBtMDL81RDv4jKj8P4b6yI+u2C8gypJWPFuj5aKIChemImJz48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHBI0MPc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A777C4CEF7;
-	Fri,  6 Mar 2026 10:16:05 +0000 (UTC)
+	s=arc-20240116; t=1772792188; c=relaxed/simple;
+	bh=wXe+RSv0ZEZP5PzCGaEji2iLfOC9MuiizNczqfoD3ig=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=M2YoRFBE5B32OAXlQI84NN7vHts85MH34KMFOGRCjW3D/nneAgnAoIrGOSGPfrbiep7RzKraKTZ7qhtQAqcUtQZRBTFX1j3M1mqe5QUntRQDb/kMNdozdnNJmU9YauH/oO4IrsZp7YFx3fmHENskrX7mZNafSZEHB9JN0uEtGKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kU39nsPR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 365D2C19422;
+	Fri,  6 Mar 2026 10:16:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772792172;
-	bh=aN1f11VNXm8TEP7a6s26GhJ/SMe/0NluR98vebxUP6U=;
-	h=From:To:Cc:Subject:Date:From;
-	b=CHBI0MPcs3WqAo1RU5sZKFW8fwe2JFRLkXD2gEBfA05SDEdafzPVDHMH8aw0ejrD1
-	 crqje38RReq5vJVpM1YI1zNvWsClMXXuzPbjwWw2W0Br0k8sZvXTCojMTKdsEYTBoF
-	 TQZEpdbvWip2ZmFiT0To1T7WuSrRK/oAtsAHSsmxayfcl3ww60vjF9VLaepfe0bLPX
-	 d9L6oZeF8Ol+LMb77zqQx3p9ZtaiJ7pb9/WGw38ryflhSGSDKO4NV7WRWCCrWtG+lG
-	 kpXRz5yWs5U5TkzVWGjSi37i/3Xtj+xBxmdbgu53ij+gVc0IPtQbMLSP9cYAJC/xSl
-	 sb3JchfU6+kZw==
+	s=k20201202; t=1772792187;
+	bh=wXe+RSv0ZEZP5PzCGaEji2iLfOC9MuiizNczqfoD3ig=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=kU39nsPRVeuy80Xot7u6yG6vMyTyS6h997P73CrnD4Uyqpy624AKPN+ubADcvkfjP
+	 a9iQwyewJuuytTvKDcC/8rOKLTG+an15rRuwx+T+iSmhFomRVzbckAYuOcC2XpFSfW
+	 VJQPEroBKqE353sSdphB/CJ63WiHqv/e3xNlbCxcDuNrYeksB/HvFo1KsposSbh8Sl
+	 PI28L4pG8bvlXORzyDFf9BS12DIJAg4ARA2xLpvXN7ZI6dl/T25TwCjGcuIUXAqM0S
+	 xf0xFt+3UQAMKk0VL72N2I+xwG9I0cY3dWhbq9dS0zjPmHnC7FnkAFx/4kfoe9mtCY
+	 hIfrH0bn+WFaA==
 From: "David Hildenbrand (Arm)" <david@kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-mm@kvack.org,
 	linuxppc-dev@lists.ozlabs.org,
 	kvm@vger.kernel.org,
 	"David Hildenbrand (Arm)" <david@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>,
-	Oscar Salvador <osalvador@suse.de>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Vlastimil Babka <vbabka@kernel.org>,
-	Mike Rapoport <rppt@kernel.org>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Jann Horn <jannh@google.com>,
-	Pedro Falcato <pfalcato@suse.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
 	Dan Williams <dan.j.williams@intel.com>
-Subject: [PATCH v1 0/4] mm: move vma_(kernel|mmu)_pagesize() out of hugetlb.c
-Date: Fri,  6 Mar 2026 11:15:56 +0100
-Message-ID: <20260306101600.57355-1-david@kernel.org>
+Subject: [PATCH v1 1/4] mm: move vma_kernel_pagesize() from hugetlb to mm.h
+Date: Fri,  6 Mar 2026 11:15:57 +0100
+Message-ID: <20260306101600.57355-2-david@kernel.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260306101600.57355-1-david@kernel.org>
+References: <20260306101600.57355-1-david@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,27 +64,26 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 5B99C21E8C4
+X-Rspamd-Queue-Id: BE05C21E8F8
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kvack.org,lists.ozlabs.org,vger.kernel.org,kernel.org,linux-foundation.org,linux.ibm.com,gmail.com,ellerman.id.au,linux.dev,suse.de,oracle.com,google.com,suse.com,redhat.com,intel.com];
+	TAGGED_FROM(0.00)[bounces-73010-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73009-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
@@ -108,56 +94,123 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_HAS_DN(0.00)[]
 X-Rspamd-Action: no action
 
-Looking into vma_(kernel|mmu)_pagesize(), I realized that there is one
-scenario where DAX would not do the right thing when the kernel is
-not compiled with hugetlb support.
+In the past, only hugetlb had special "vma_kernel_pagesize()"
+requirements, so it provided its own implementation.
 
-Without hugetlb support, vma_(kernel|mmu)_pagesize() will always return
-PAGE_SIZE instead of using the ->pagesize() result provided by dax-device
-code.
+In commit 05ea88608d4e ("mm, hugetlbfs: introduce ->pagesize() to
+vm_operations_struct") we generalized that approach by providing a
+vm_ops->pagesize() callback to be used by device-dax.
 
-Fix that by moving vma_kernel_pagesize() to core MM code, where it belongs.
-I don't think this is stable material, but am not 100% sure.
+Once device-dax started using that callback in commit c1d53b92b95c
+("device-dax: implement ->pagesize() for smaps to report MMUPageSize")
+it was missed that CONFIG_DEV_DAX does not depend on hugetlb support.
 
-Also, move vma_mmu_pagesize() while at it. Remove the unnecessary hugetlb.h
-inclusion from KVM code.
+So building a kernel with CONFIG_DEV_DAX but without CONFIG_HUGETLBFS
+would not pick up that value.
 
-Cross-compiled heavily.
+Fix it by moving vma_kernel_pagesize() to mm.h, providing only a single
+implementation. While at it, improve the kerneldoc a bit.
 
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Madhavan Srinivasan <maddy@linux.ibm.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-Cc: Muchun Song <muchun.song@linux.dev>
-Cc: Oscar Salvador <osalvador@suse.de>
-Cc: Lorenzo Stoakes <ljs@kernel.org>
-Cc: "Liam R. Howlett" <Liam.Howlett@oracle.com>
-Cc: Vlastimil Babka <vbabka@kernel.org>
-Cc: Mike Rapoport <rppt@kernel.org>
-Cc: Suren Baghdasaryan <surenb@google.com>
-Cc: Michal Hocko <mhocko@suse.com>
-Cc: Jann Horn <jannh@google.com>
-Cc: Pedro Falcato <pfalcato@suse.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Ideally, we'd move vma_mmu_pagesize() as well to the header. However,
+its __weak symbol might be overwritten by a PPC variant in hugetlb code.
+So let's leave it in there for now, as it really only matters for some
+hugetlb oddities.
+
+This was found by code inspection.
+
+Fixes: c1d53b92b95c ("device-dax: implement ->pagesize() for smaps to report MMUPageSize")
 Cc: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
+---
+ include/linux/hugetlb.h |  7 -------
+ include/linux/mm.h      | 20 ++++++++++++++++++++
+ mm/hugetlb.c            | 17 -----------------
+ 3 files changed, 20 insertions(+), 24 deletions(-)
 
-David Hildenbrand (Arm) (4):
-  mm: move vma_kernel_pagesize() from hugetlb to mm.h
-  mm: move vma_mmu_pagesize() from hugetlb to vma.c
-  KVM: remove hugetlb.h inclusion
-  KVM: PPC: remove hugetlb.h inclusion
-
- arch/powerpc/kvm/book3s_hv.c |  1 -
- include/linux/hugetlb.h      | 14 --------------
- include/linux/mm.h           | 22 ++++++++++++++++++++++
- mm/hugetlb.c                 | 28 ----------------------------
- mm/vma.c                     | 21 +++++++++++++++++++++
- virt/kvm/kvm_main.c          |  1 -
- 6 files changed, 43 insertions(+), 44 deletions(-)
-
-
-base-commit: f75825cdfc4c5477cffcfd2cafa4e5ce5aa67f13
+diff --git a/include/linux/hugetlb.h b/include/linux/hugetlb.h
+index 65910437be1c..44c1848a2c21 100644
+--- a/include/linux/hugetlb.h
++++ b/include/linux/hugetlb.h
+@@ -777,8 +777,6 @@ static inline unsigned long huge_page_size(const struct hstate *h)
+ 	return (unsigned long)PAGE_SIZE << h->order;
+ }
+ 
+-extern unsigned long vma_kernel_pagesize(struct vm_area_struct *vma);
+-
+ extern unsigned long vma_mmu_pagesize(struct vm_area_struct *vma);
+ 
+ static inline unsigned long huge_page_mask(struct hstate *h)
+@@ -1177,11 +1175,6 @@ static inline unsigned long huge_page_mask(struct hstate *h)
+ 	return PAGE_MASK;
+ }
+ 
+-static inline unsigned long vma_kernel_pagesize(struct vm_area_struct *vma)
+-{
+-	return PAGE_SIZE;
+-}
+-
+ static inline unsigned long vma_mmu_pagesize(struct vm_area_struct *vma)
+ {
+ 	return PAGE_SIZE;
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 44e04a42fe77..227809790f1a 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1307,6 +1307,26 @@ static inline bool vma_is_shared_maywrite(const struct vm_area_struct *vma)
+ 	return is_shared_maywrite(&vma->flags);
+ }
+ 
++/**
++ * vma_kernel_pagesize - Default page size granularity for this VMA.
++ * @vma: The user mapping.
++ *
++ * The kernel page size specifies in which granularity VMA modifications
++ * can be performed. Folios in this VMA will be aligned to, and at least
++ * the size of the number of bytes returned by this function.
++ *
++ * The default kernel page size is not affected by Transparent Huge Pages
++ * being in effect.
++ *
++ * Return: The default page size granularity for this VMA.
++ */
++static inline unsigned long vma_kernel_pagesize(struct vm_area_struct *vma)
++{
++	if (unlikely(vma->vm_ops && vma->vm_ops->pagesize))
++		return vma->vm_ops->pagesize(vma);
++	return PAGE_SIZE;
++}
++
+ static inline
+ struct vm_area_struct *vma_find(struct vma_iterator *vmi, unsigned long max)
+ {
+diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+index 1d41fa3dd43e..66eadfa9e958 100644
+--- a/mm/hugetlb.c
++++ b/mm/hugetlb.c
+@@ -1017,23 +1017,6 @@ static pgoff_t vma_hugecache_offset(struct hstate *h,
+ 			(vma->vm_pgoff >> huge_page_order(h));
+ }
+ 
+-/**
+- * vma_kernel_pagesize - Page size granularity for this VMA.
+- * @vma: The user mapping.
+- *
+- * Folios in this VMA will be aligned to, and at least the size of the
+- * number of bytes returned by this function.
+- *
+- * Return: The default size of the folios allocated when backing a VMA.
+- */
+-unsigned long vma_kernel_pagesize(struct vm_area_struct *vma)
+-{
+-	if (vma->vm_ops && vma->vm_ops->pagesize)
+-		return vma->vm_ops->pagesize(vma);
+-	return PAGE_SIZE;
+-}
+-EXPORT_SYMBOL_GPL(vma_kernel_pagesize);
+-
+ /*
+  * Return the page size being used by the MMU to back a VMA. In the majority
+  * of cases, the page size used by the kernel matches the MMU size. On
 -- 
 2.43.0
 
