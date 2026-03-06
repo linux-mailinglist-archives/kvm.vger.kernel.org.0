@@ -1,367 +1,211 @@
-Return-Path: <kvm+bounces-73016-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73017-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IJejCdGsqmlTVQEAu9opvQ
-	(envelope-from <kvm+bounces-73016-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 11:30:41 +0100
+	id AIUgMhCxqmluVQEAu9opvQ
+	(envelope-from <kvm+bounces-73017-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 11:48:48 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D0B921EBE9
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 11:30:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B5C821F1CF
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 11:48:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BE5BC309AA4F
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 10:27:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 08FEE30965B4
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 10:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93EA37C101;
-	Fri,  6 Mar 2026 10:27:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30AFC37F8B6;
+	Fri,  6 Mar 2026 10:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g+Y24qxd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M4qcSrcm";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="QBbJFSW7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4288E37BE77;
-	Fri,  6 Mar 2026 10:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772792820; cv=none; b=Ped25AAXBPdzpo4KEp4qRP+DSXM7T0fbJOPBFfj5KgcxsuxyuPl664YgdfKQO89I/Ezne7e2V5izZaHgWGYCWs4bgL+2eUKZLGzN4Wd0ScM0nPktKRyBCT9tCvXFb8d+s6x5yxeUcr/IRQt96/K9PT+ypMJhN4V7FnmKcFCBfuQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772792820; c=relaxed/simple;
-	bh=Oa5GSxVRAyX/+Nw+3DZDviZU2/d1tK6RTc8Kr9xrYmk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hsns3ALe2JROTzGm4HUxrs00pqiyXpLMSaCm2RlQTuzS/dlLqYxtPOMPvH63SfcUYh0j5afgrPkqLrjx6aEYdiKLgU6pnk6YV0rni21PzWTcUpE2TccCXaFmSk3kiKclDaORyBH1nDEnj0NhuM0yZDPl2YoybRT+CTaYDAcL94E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g+Y24qxd; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1772792818; x=1804328818;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Oa5GSxVRAyX/+Nw+3DZDviZU2/d1tK6RTc8Kr9xrYmk=;
-  b=g+Y24qxdQMrCPKzyL9lU1hazRqRBohJoajy9cdsBcILbZMkjAn34Qg4r
-   m2LihO2KmLGuBhsV1PadHxZzeP9/d2G3+u5jAcVct8K5KE3wvTaQ39NzM
-   n/S6YTZ4onWLq1rJDAEReMWgrGEw09nywHgXi8Mp1psBh+1h4peA6NUFc
-   UiK/FeghzOH70WYUYQyVqjUMyNFWoOHm7pKJ7QzzDxb9f79AgttZ7WR8I
-   wlWGFg6FakUvGymeCaSU5X/PGM+xIeUcAWiLLmmJYgnHuw3cjE6HuK0z8
-   5Uo8gIBIl3q7DCFaS/4LdrVNPYLvS8RZ42oKb1o5eiskLW3FJWZRP0bia
-   Q==;
-X-CSE-ConnectionGUID: nz/yXLNQQD+Wh4yDawo8bA==
-X-CSE-MsgGUID: 3nO+oNaETuqd7h2YaUZ8Xw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11720"; a="77500104"
-X-IronPort-AV: E=Sophos;i="6.23,104,1770624000"; 
-   d="scan'208";a="77500104"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2026 02:26:58 -0800
-X-CSE-ConnectionGUID: HE6/6FuVTgexjlkjffmvtA==
-X-CSE-MsgGUID: 0IRGHa0bRSqkMF2IuFKrQw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,104,1770624000"; 
-   d="scan'208";a="221789006"
-Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
-  by fmviesa004.fm.intel.com with ESMTP; 06 Mar 2026 02:26:56 -0800
-Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vySOT-000000002Eb-3FCn;
-	Fri, 06 Mar 2026 10:26:53 +0000
-Date: Fri, 6 Mar 2026 11:26:27 +0100
-From: kernel test robot <lkp@intel.com>
-To: Anshuman Khandual <anshuman.khandual@arm.com>,
-	linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: Change [g|h]va_t as u64
-Message-ID: <202603061115.VQTqyi2i-lkp@intel.com>
-References: <20260306041125.45643-1-anshuman.khandual@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FA137BE85
+	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 10:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772793938; cv=pass; b=jvBgOvYPav8+LWQykqrZu8O+9CduSTVkMhi37QRLkX6Icx8aQ7ZeBFOb2AXp/8U6Pq05lE8Fhq0EbHxa7onYeCSDuqV84+KAo3WvDazZf7mGfLyTEeMiyh/RpIGX/5LQ/ECrJFidEsqYfFOs5fzh1QTcFzaJGriGXGlN5U8NDbM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772793938; c=relaxed/simple;
+	bh=4+ZluKQE3SyqvN+mzK/Yz0W319zNcEqUt5PY18QlPWM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FAN2c5OTH5hZNUaQDDaazrZ5+GxKf4AsPZKufUMpNHx5ClvarY4e8SiT+m7XGp9+8rYOl+AfDKU22+VUG0PZKysG5MJK8ZAV4DD5dPmjPV6ZocWVmGXx3GcQhfPPooM8tsEh9LCkpu7GNhqovLRrG36sFZAgGVcWQGCAjv1IGNo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M4qcSrcm; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=QBbJFSW7; arc=pass smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772793936;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q0gIJNIcAGUOsJZzstkoZ+rj/OkGKwI2OmgQf4MTA+g=;
+	b=M4qcSrcmFENRC98d/wOUuy2HQMv7bSCLXxsFJ5JEE1reH2Eqnq7JY2ZtaPYKrRyyb8Z6gY
+	uNUqAf0bPTVZYHhf3OIYemdcSb+0oTxMS6RQXrLShdGgPgphQBGynb9ZclWJ6uCgaIQfJ6
+	gzf4p8PLzo8CrlhkwcQq279IIRLBDA8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-110-sMjNsYDyP0eTz6tci47KUA-1; Fri, 06 Mar 2026 05:45:34 -0500
+X-MC-Unique: sMjNsYDyP0eTz6tci47KUA-1
+X-Mimecast-MFC-AGG-ID: sMjNsYDyP0eTz6tci47KUA_1772793933
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-439ab866bc1so7205517f8f.2
+        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 02:45:34 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772793932; cv=none;
+        d=google.com; s=arc-20240605;
+        b=B0FpcFaMqNvPMbYKZBPtugB7i6gpp7icL9ukD5+PEgEglO+4y7GznkmhSn8nHoopg4
+         YDrOA9RXlhx3tWVoTEDlR70Yg6qtV+RXXVb00gykuIWH8+Bnc6OdoHWVShOfBrPA929C
+         1JyPHl9DLpk3VtRXM/4U2kz6f3n69a0I1tBP6bagfw2vFSPQhN5h1oY03GTkiek8O80F
+         jkQ8v1jJXdgITU477G65cAxDtX8V+MvbhoYGruxiVnzXvOJWFxnAuvYd+j0zlAh/oZPO
+         /HlvSdz+1+SpqCVoTxQ1sn9Ksshc5WW0vIMvgaeNxBcTvb10oh37nn8C1AGWt4/olirD
+         EQDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=q0gIJNIcAGUOsJZzstkoZ+rj/OkGKwI2OmgQf4MTA+g=;
+        fh=mNu58vj4360Zmgjqydrn0SvyVxS+1qrKHzqK/fvVLZs=;
+        b=k7zGoABtu83IBSMEYeSxntdAI+ghgLjU8OslLA9Ewv4SRURvHBO1MKIvzk3p45wI7s
+         B7h8ZrtvPujT2ciQg4a1M90T8REz5la0zSmwzaX+FONMasH/aLc78Rczwtgiob4olBIU
+         032gjMhHmFTXPl/2P3ZR7ZXZWrJwwuK0NSmi8FqAJ1OooaPFGitrlsJCCd7/rxgkRHjB
+         CSpCrz3IPmTPNxNpEPExzsP6WHNFhUhTMVmDBA6eOr0sEFFEuPobUy1AxS6BH8Un8YY2
+         I/M/lQ7p8gFQjjMpoLRCXopg7xs9tOOnppxTvRmJlWX9hNhJASN6xEhvw89URiFmnUsg
+         IUYw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1772793932; x=1773398732; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=q0gIJNIcAGUOsJZzstkoZ+rj/OkGKwI2OmgQf4MTA+g=;
+        b=QBbJFSW703Qp3/hFbXBMwIyLrhBVZR/8RV2/RWds/T0fh8+Xx7DtqRLN/ZR/vdZ0IU
+         IxD8WKoCHWljnHF9rn7VoBo+9TOPa+8nIRBL2Ly7bFHtnqrV7646/Cr6PMHlVqKKgzWD
+         65+dw5QsRy4l2pKfAMzOVY+Nihn91KXdfPBVDHHvdgBSYurknwu2Z+flnyHVNPJQfVLX
+         QY+R02PMLdVGk501VyH96EVw5EhAkf5Q/CK9ERvQ1TexKbQxz10EK2InQxnTd1/LZ53v
+         dLACMtnqXczoIPBtZ/bOVRyPwmNxCdBG2ltJXqV83pWfSnNJBcJQ9LAkeLNYzoQrpy3+
+         7ZGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772793932; x=1773398732;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q0gIJNIcAGUOsJZzstkoZ+rj/OkGKwI2OmgQf4MTA+g=;
+        b=xHl5V6AS7GRoerMav8lBfeLT3SkXUv87/S9S8+C423jQ4/WHbhgntyAV3SkA7wYgdH
+         u9up5DN1XVVU7qJtHet/CtegiHi1YQyh58FTpeK3OPoUN6v0ZRXnxhq0bQ3zdy/WdvSQ
+         duKHNuMVyKbsan3sYtFmONaZJPQ3OD5b4REmcYWWEl+C+hfn1Qicr6nrpaO0t84laRqq
+         MfzDLQx4Y5HLodEmyCa4h/n8HLx0coMTMEqPvb5RMbZH9leFeIbIwGTDGzW9UeO6fOBu
+         ziVyHcssCl9GkcMUXtyPCamEWUmZcmIyt5NBv74g0g2h2+TNDFFpjcMofU4wnRbd31WL
+         mPNg==
+X-Forwarded-Encrypted: i=1; AJvYcCWeI+/Ux95xDmUvM9jk8r6cvMkRaMsaZrfsGALN3qZerOejQlXzEGV8yFEPJJPQ6MkQDeY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwSyBNY79jW837KuD1oEqpf28ffBAHbCFQvm3v55/ewMfBlLfw
+	a2utVaG67TQXMM6MCryV0eGprLEs+NMg+K1+WwRMxyhw4hcdyIiknn844ymHM3JbDyBLki6CIPX
+	iQ3aJtcHvkGK7up7km3X6iMDgF4ydmmlNiVhysmM1J2rTj9BzO9zSpYMZwVqT89LhD+dgVnrOO1
+	i1DGeL374lY0oyIx7FVDg1dzfVD8FbbJyoTC5m
+X-Gm-Gg: ATEYQzzgLtesL2G+WG3I/AgWd1JD6HomKiNqHwh/lQaBSAWfSdWPtvfuL1/rhUFR+i0
+	WUzwEZZs/koa/IURHFOSno/laim5syv+9k5Cxd5d6o5gfD3/R30cpJL9FDy1blA2AvzxBTf+qt6
+	qWbIEoQBB/o4ESA+6DU6biUjtvC4DAF5gBIfoOfWPqF8PTkNrcNvb4mrkv/BM4aS9Ba727vKECI
+	tyGjRFjffYqbCwf8OOxs/IUFgkWks6tRy82JJzileBjh12g9PyEIUEf1DakRVUtE+0BJQg3d3F8
+	NI/if8E=
+X-Received: by 2002:a05:6000:2385:b0:439:b60a:b3ed with SMTP id ffacd0b85a97d-439da5552e5mr2545851f8f.9.1772793932165;
+        Fri, 06 Mar 2026 02:45:32 -0800 (PST)
+X-Received: by 2002:a05:6000:2385:b0:439:b60a:b3ed with SMTP id
+ ffacd0b85a97d-439da5552e5mr2545824f8f.9.1772793931689; Fri, 06 Mar 2026
+ 02:45:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260306041125.45643-1-anshuman.khandual@arm.com>
-X-Rspamd-Queue-Id: 7D0B921EBE9
+References: <20250804064405.4802-1-thijs@raymakers.nl> <ac94394405bf7e878c8ff0acf87db922dc4af48c.camel@infradead.org>
+In-Reply-To: <ac94394405bf7e878c8ff0acf87db922dc4af48c.camel@infradead.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 6 Mar 2026 11:45:19 +0100
+X-Gm-Features: AaiRm52JUs6mwy8ro2yT4HEZ3S2JC02gl4J9DTinX4u6JthR0qmLrhQ0Ms5gqSE
+Message-ID: <CABgObfbApSRD=MjdbNOS086eOSPpHtxB9JhX1+0Wbp0nrjxECw@mail.gmail.com>
+Subject: Re: [PATCH v3] KVM: x86: use array_index_nospec with indices that
+ come from guest
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Thijs Raymakers <thijs@raymakers.nl>, kvm <kvm@vger.kernel.org>, 
+	"Orazgaliyeva, Anel" <anelkz@amazon.de>, stable <stable@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 2B5C821F1CF
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73016-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,kvm@vger.kernel.org];
+	TO_DN_ALL(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73017-lists,kvm=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[kvm];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pbonzini@redhat.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6]
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,infradead.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hi Anshuman,
+Il gio 5 mar 2026, 21:31 David Woodhouse <dwmw2@infradead.org> ha scritto:
+>
+> On Mon, 2025-08-04 at 08:44 +0200, Thijs Raymakers wrote:
+> > min and dest_id are guest-controlled indices. Using array_index_nospec()
+> > after the bounds checks clamps these values to mitigate speculative execution
+> > side-channels.
+> >
+>
+> (commit c87bd4dd43a6)
+>
+> Is this sufficient in the __pv_send_ipi() case?
+>
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -852,6 +852,8 @@ static int __pv_send_ipi(unsigned long *ipi_bitmap, struct kvm_apic_map *map,
+> >       if (min > map->max_apic_id)
+> >               return 0;
+> >
+> > +     min = array_index_nospec(min, map->max_apic_id + 1);
+> > +
+> >       for_each_set_bit(i, ipi_bitmap,
+> >               min((u32)BITS_PER_LONG, (map->max_apic_id - min + 1))) {
+> >               if (map->phys_map[min + i]) {
+>                         vcpu = map->phys_map[min + i]->vcpu;
+>                         count += kvm_apic_set_irq(vcpu, irq, NULL);
+>                 }
+>         }
+>
+> Do we need to protect [min + i] in the loop, rather than just [min]?
+>
+> The end condition for the for_each_set_bit() loop does mean that it
+> won't actually execute past max_apic_id but is that sufficient to
+> protect against *speculative* execution?
 
-kernel test robot noticed the following build errors:
+You would be able to load extra values in the cache but it would not
+be a fully guest controlled load in the same way that Spectre wants to
+do it. Spectre works because the value used in the speculative load is
+way beyond the maximum and points to attacker-controlled memory.
 
-[auto build test ERROR on kvm/queue]
-[also build test ERROR on kvm/next linus/master v7.0-rc2 next-20260305]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+That said it doesn't hurt either, other than a few clock cycles for
+not hoisting array_index_nospec out of the loop.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Anshuman-Khandual/KVM-Change-g-h-va_t-as-u64/20260306-123029
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20260306041125.45643-1-anshuman.khandual%40arm.com
-patch subject: [PATCH] KVM: Change [g|h]va_t as u64
-config: x86_64-rhel-9.4-ltp (https://download.01.org/0day-ci/archive/20260306/202603061115.VQTqyi2i-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260306/202603061115.VQTqyi2i-lkp@intel.com/reproduce)
+Paolo
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603061115.VQTqyi2i-lkp@intel.com/
+>
+> I have a variant of this which uses array_index_nospec(min+i, ...)
+> *inside* the loop.
+>
 
-All error/warnings (new ones prefixed by >>):
-
-   In file included from include/trace/define_trace.h:132,
-                    from arch/x86/kvm/trace.h:1976,
-                    from arch/x86/kvm/x86.c:89:
-   include/trace/../../arch/x86/kvm/trace.h: In function 'trace_raw_output_vcpu_match_mmio':
->> include/trace/../../arch/x86/kvm/trace.h:973:19: warning: format '%lx' expects argument of type 'long unsigned int', but argument 3 has type 'gva_t' {aka 'long long unsigned int'} [-Wformat=]
-     973 |         TP_printk("gva %#lx gpa %#llx %s %s", __entry->gva, __entry->gpa,
-         |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/trace/trace_events.h:219:34: note: in definition of macro 'DECLARE_EVENT_CLASS'
-     219 |         trace_event_printf(iter, print);                                \
-         |                                  ^~~~~
-   include/trace/trace_events.h:45:30: note: in expansion of macro 'PARAMS'
-      45 |                              PARAMS(print));                   \
-         |                              ^~~~~~
-   include/trace/../../arch/x86/kvm/trace.h:954:1: note: in expansion of macro 'TRACE_EVENT'
-     954 | TRACE_EVENT(
-         | ^~~~~~~~~~~
-   include/trace/../../arch/x86/kvm/trace.h:973:9: note: in expansion of macro 'TP_printk'
-     973 |         TP_printk("gva %#lx gpa %#llx %s %s", __entry->gva, __entry->gpa,
-         |         ^~~~~~~~~
-   In file included from include/trace/trace_events.h:256:
-   include/trace/../../arch/x86/kvm/trace.h:973:27: note: format string is defined here
-     973 |         TP_printk("gva %#lx gpa %#llx %s %s", __entry->gva, __entry->gpa,
-         |                        ~~~^
-         |                           |
-         |                           long unsigned int
-         |                        %#llx
-   arch/x86/kvm/x86.c: At top level:
->> arch/x86/kvm/x86.c:8897:32: error: initialization of 'int (*)(struct x86_emulate_ctxt *, long unsigned int,  void *, unsigned int,  struct x86_exception *, bool)' {aka 'int (*)(struct x86_emulate_ctxt *, long unsigned int,  void *, unsigned int,  struct x86_exception *, _Bool)'} from incompatible pointer type 'int (*)(struct x86_emulate_ctxt *, gva_t,  void *, unsigned int,  struct x86_exception *, bool)' {aka 'int (*)(struct x86_emulate_ctxt *, long long unsigned int,  void *, unsigned int,  struct x86_exception *, _Bool)'} [-Wincompatible-pointer-types]
-    8897 |         .read_std            = emulator_read_std,
-         |                                ^~~~~~~~~~~~~~~~~
-   arch/x86/kvm/x86.c:8897:32: note: (near initialization for 'emulate_ops.read_std')
-   arch/x86/kvm/x86.c:8898:32: error: initialization of 'int (*)(struct x86_emulate_ctxt *, long unsigned int,  void *, unsigned int,  struct x86_exception *, bool)' {aka 'int (*)(struct x86_emulate_ctxt *, long unsigned int,  void *, unsigned int,  struct x86_exception *, _Bool)'} from incompatible pointer type 'int (*)(struct x86_emulate_ctxt *, gva_t,  void *, unsigned int,  struct x86_exception *, bool)' {aka 'int (*)(struct x86_emulate_ctxt *, long long unsigned int,  void *, unsigned int,  struct x86_exception *, _Bool)'} [-Wincompatible-pointer-types]
-    8898 |         .write_std           = emulator_write_std,
-         |                                ^~~~~~~~~~~~~~~~~~
-   arch/x86/kvm/x86.c:8898:32: note: (near initialization for 'emulate_ops.write_std')
->> arch/x86/kvm/x86.c:8899:32: error: initialization of 'int (*)(struct x86_emulate_ctxt *, long unsigned int,  void *, unsigned int,  struct x86_exception *)' from incompatible pointer type 'int (*)(struct x86_emulate_ctxt *, gva_t,  void *, unsigned int,  struct x86_exception *)' {aka 'int (*)(struct x86_emulate_ctxt *, long long unsigned int,  void *, unsigned int,  struct x86_exception *)'} [-Wincompatible-pointer-types]
-    8899 |         .fetch               = kvm_fetch_guest_virt,
-         |                                ^~~~~~~~~~~~~~~~~~~~
-   arch/x86/kvm/x86.c:8899:32: note: (near initialization for 'emulate_ops.fetch')
---
-   In file included from include/asm-generic/bug.h:31,
-                    from arch/x86/include/asm/bug.h:193,
-                    from arch/x86/include/asm/alternative.h:9,
-                    from arch/x86/include/asm/segment.h:6,
-                    from arch/x86/include/asm/ptrace.h:5,
-                    from arch/x86/include/asm/math_emu.h:5,
-                    from arch/x86/include/asm/processor.h:13,
-                    from arch/x86/include/asm/timex.h:5,
-                    from include/linux/timex.h:67,
-                    from include/linux/time32.h:13,
-                    from include/linux/time.h:60,
-                    from include/linux/stat.h:19,
-                    from include/linux/fs_dirent.h:5,
-                    from include/linux/fs/super_types.h:5,
-                    from include/linux/fs/super.h:5,
-                    from include/linux/fs.h:5,
-                    from include/linux/highmem.h:5,
-                    from arch/x86/kvm/vmx/vmx.c:17:
-   arch/x86/kvm/vmx/vmx.c: In function 'invvpid_error':
->> include/linux/kern_levels.h:5:25: warning: format '%lx' expects argument of type 'long unsigned int', but argument 4 has type 'gva_t' {aka 'long long unsigned int'} [-Wformat=]
-       5 | #define KERN_SOH        "\001"          /* ASCII Start Of Header */
-         |                         ^~~~~~
-   include/linux/printk.h:483:25: note: in definition of macro 'printk_index_wrap'
-     483 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
-         |                         ^~~~
-   include/linux/printk.h:705:17: note: in expansion of macro 'printk'
-     705 |                 printk(fmt, ##__VA_ARGS__);                             \
-         |                 ^~~~~~
-   include/linux/printk.h:721:9: note: in expansion of macro 'printk_ratelimited'
-     721 |         printk_ratelimited(KERN_WARNING pr_fmt(fmt), ##__VA_ARGS__)
-         |         ^~~~~~~~~~~~~~~~~~
-   include/linux/kern_levels.h:12:25: note: in expansion of macro 'KERN_SOH'
-      12 | #define KERN_WARNING    KERN_SOH "4"    /* warning conditions */
-         |                         ^~~~~~~~
-   include/linux/printk.h:721:28: note: in expansion of macro 'KERN_WARNING'
-     721 |         printk_ratelimited(KERN_WARNING pr_fmt(fmt), ##__VA_ARGS__)
-         |                            ^~~~~~~~~~~~
-   arch/x86/kvm/vmx/vmx.c:532:9: note: in expansion of macro 'pr_warn_ratelimited'
-     532 |         pr_warn_ratelimited(fmt);       \
-         |         ^~~~~~~~~~~~~~~~~~~
-   arch/x86/kvm/vmx/vmx.c:573:9: note: in expansion of macro 'vmx_insn_failed'
-     573 |         vmx_insn_failed("invvpid failed: ext=0x%lx vpid=%u gva=0x%lx\n",
-         |         ^~~~~~~~~~~~~~~
---
-   In file included from include/trace/define_trace.h:132,
-                    from kvm/trace.h:1976,
-                    from kvm/x86.c:89:
-   include/trace/../../arch/x86/kvm/trace.h: In function 'trace_raw_output_vcpu_match_mmio':
->> include/trace/../../arch/x86/kvm/trace.h:973:19: warning: format '%lx' expects argument of type 'long unsigned int', but argument 3 has type 'gva_t' {aka 'long long unsigned int'} [-Wformat=]
-     973 |         TP_printk("gva %#lx gpa %#llx %s %s", __entry->gva, __entry->gpa,
-         |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/trace/trace_events.h:219:34: note: in definition of macro 'DECLARE_EVENT_CLASS'
-     219 |         trace_event_printf(iter, print);                                \
-         |                                  ^~~~~
-   include/trace/trace_events.h:45:30: note: in expansion of macro 'PARAMS'
-      45 |                              PARAMS(print));                   \
-         |                              ^~~~~~
-   include/trace/../../arch/x86/kvm/trace.h:954:1: note: in expansion of macro 'TRACE_EVENT'
-     954 | TRACE_EVENT(
-         | ^~~~~~~~~~~
-   include/trace/../../arch/x86/kvm/trace.h:973:9: note: in expansion of macro 'TP_printk'
-     973 |         TP_printk("gva %#lx gpa %#llx %s %s", __entry->gva, __entry->gpa,
-         |         ^~~~~~~~~
-   In file included from include/trace/trace_events.h:256:
-   include/trace/../../arch/x86/kvm/trace.h:973:27: note: format string is defined here
-     973 |         TP_printk("gva %#lx gpa %#llx %s %s", __entry->gva, __entry->gpa,
-         |                        ~~~^
-         |                           |
-         |                           long unsigned int
-         |                        %#llx
-   kvm/x86.c: At top level:
-   kvm/x86.c:8897:32: error: initialization of 'int (*)(struct x86_emulate_ctxt *, long unsigned int,  void *, unsigned int,  struct x86_exception *, bool)' {aka 'int (*)(struct x86_emulate_ctxt *, long unsigned int,  void *, unsigned int,  struct x86_exception *, _Bool)'} from incompatible pointer type 'int (*)(struct x86_emulate_ctxt *, gva_t,  void *, unsigned int,  struct x86_exception *, bool)' {aka 'int (*)(struct x86_emulate_ctxt *, long long unsigned int,  void *, unsigned int,  struct x86_exception *, _Bool)'} [-Wincompatible-pointer-types]
-    8897 |         .read_std            = emulator_read_std,
-         |                                ^~~~~~~~~~~~~~~~~
-   kvm/x86.c:8897:32: note: (near initialization for 'emulate_ops.read_std')
-   kvm/x86.c:8898:32: error: initialization of 'int (*)(struct x86_emulate_ctxt *, long unsigned int,  void *, unsigned int,  struct x86_exception *, bool)' {aka 'int (*)(struct x86_emulate_ctxt *, long unsigned int,  void *, unsigned int,  struct x86_exception *, _Bool)'} from incompatible pointer type 'int (*)(struct x86_emulate_ctxt *, gva_t,  void *, unsigned int,  struct x86_exception *, bool)' {aka 'int (*)(struct x86_emulate_ctxt *, long long unsigned int,  void *, unsigned int,  struct x86_exception *, _Bool)'} [-Wincompatible-pointer-types]
-    8898 |         .write_std           = emulator_write_std,
-         |                                ^~~~~~~~~~~~~~~~~~
-   kvm/x86.c:8898:32: note: (near initialization for 'emulate_ops.write_std')
-   kvm/x86.c:8899:32: error: initialization of 'int (*)(struct x86_emulate_ctxt *, long unsigned int,  void *, unsigned int,  struct x86_exception *)' from incompatible pointer type 'int (*)(struct x86_emulate_ctxt *, gva_t,  void *, unsigned int,  struct x86_exception *)' {aka 'int (*)(struct x86_emulate_ctxt *, long long unsigned int,  void *, unsigned int,  struct x86_exception *)'} [-Wincompatible-pointer-types]
-    8899 |         .fetch               = kvm_fetch_guest_virt,
-         |                                ^~~~~~~~~~~~~~~~~~~~
-   kvm/x86.c:8899:32: note: (near initialization for 'emulate_ops.fetch')
---
-   In file included from include/asm-generic/bug.h:31,
-                    from arch/x86/include/asm/bug.h:193,
-                    from arch/x86/include/asm/alternative.h:9,
-                    from arch/x86/include/asm/segment.h:6,
-                    from arch/x86/include/asm/ptrace.h:5,
-                    from arch/x86/include/asm/math_emu.h:5,
-                    from arch/x86/include/asm/processor.h:13,
-                    from arch/x86/include/asm/timex.h:5,
-                    from include/linux/timex.h:67,
-                    from include/linux/time32.h:13,
-                    from include/linux/time.h:60,
-                    from include/linux/stat.h:19,
-                    from include/linux/fs_dirent.h:5,
-                    from include/linux/fs/super_types.h:5,
-                    from include/linux/fs/super.h:5,
-                    from include/linux/fs.h:5,
-                    from include/linux/highmem.h:5,
-                    from kvm/vmx/vmx.c:17:
-   kvm/vmx/vmx.c: In function 'invvpid_error':
->> include/linux/kern_levels.h:5:25: warning: format '%lx' expects argument of type 'long unsigned int', but argument 4 has type 'gva_t' {aka 'long long unsigned int'} [-Wformat=]
-       5 | #define KERN_SOH        "\001"          /* ASCII Start Of Header */
-         |                         ^~~~~~
-   include/linux/printk.h:483:25: note: in definition of macro 'printk_index_wrap'
-     483 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
-         |                         ^~~~
-   include/linux/printk.h:705:17: note: in expansion of macro 'printk'
-     705 |                 printk(fmt, ##__VA_ARGS__);                             \
-         |                 ^~~~~~
-   include/linux/printk.h:721:9: note: in expansion of macro 'printk_ratelimited'
-     721 |         printk_ratelimited(KERN_WARNING pr_fmt(fmt), ##__VA_ARGS__)
-         |         ^~~~~~~~~~~~~~~~~~
-   include/linux/kern_levels.h:12:25: note: in expansion of macro 'KERN_SOH'
-      12 | #define KERN_WARNING    KERN_SOH "4"    /* warning conditions */
-         |                         ^~~~~~~~
-   include/linux/printk.h:721:28: note: in expansion of macro 'KERN_WARNING'
-     721 |         printk_ratelimited(KERN_WARNING pr_fmt(fmt), ##__VA_ARGS__)
-         |                            ^~~~~~~~~~~~
-   kvm/vmx/vmx.c:532:9: note: in expansion of macro 'pr_warn_ratelimited'
-     532 |         pr_warn_ratelimited(fmt);       \
-         |         ^~~~~~~~~~~~~~~~~~~
-   kvm/vmx/vmx.c:573:9: note: in expansion of macro 'vmx_insn_failed'
-     573 |         vmx_insn_failed("invvpid failed: ext=0x%lx vpid=%u gva=0x%lx\n",
-         |         ^~~~~~~~~~~~~~~
-
-
-vim +8897 arch/x86/kvm/x86.c
-
-16ccadefa295af arch/x86/kvm/x86.c Maxim Levitsky      2024-09-06  8892  
-0225fb509d51fc arch/x86/kvm/x86.c Mathias Krause      2012-08-30  8893  static const struct x86_emulate_ops emulate_ops = {
-1cca2f8c501fa0 arch/x86/kvm/x86.c Sean Christopherson 2022-05-26  8894  	.vm_bugged           = emulator_vm_bugged,
-dd856efafe6097 arch/x86/kvm/x86.c Avi Kivity          2012-08-27  8895  	.read_gpr            = emulator_read_gpr,
-dd856efafe6097 arch/x86/kvm/x86.c Avi Kivity          2012-08-27  8896  	.write_gpr           = emulator_write_gpr,
-ce14e868a54ede arch/x86/kvm/x86.c Paolo Bonzini       2018-06-06 @8897  	.read_std            = emulator_read_std,
-ce14e868a54ede arch/x86/kvm/x86.c Paolo Bonzini       2018-06-06  8898  	.write_std           = emulator_write_std,
-1871c6020d7308 arch/x86/kvm/x86.c Gleb Natapov        2010-02-10 @8899  	.fetch               = kvm_fetch_guest_virt,
-bbd9b64e37aff5 drivers/kvm/x86.c  Carsten Otte        2007-10-30  8900  	.read_emulated       = emulator_read_emulated,
-bbd9b64e37aff5 drivers/kvm/x86.c  Carsten Otte        2007-10-30  8901  	.write_emulated      = emulator_write_emulated,
-bbd9b64e37aff5 drivers/kvm/x86.c  Carsten Otte        2007-10-30  8902  	.cmpxchg_emulated    = emulator_cmpxchg_emulated,
-3cb16fe78ce919 arch/x86/kvm/x86.c Avi Kivity          2011-04-20  8903  	.invlpg              = emulator_invlpg,
-cf8f70bfe38b32 arch/x86/kvm/x86.c Gleb Natapov        2010-03-18  8904  	.pio_in_emulated     = emulator_pio_in_emulated,
-cf8f70bfe38b32 arch/x86/kvm/x86.c Gleb Natapov        2010-03-18  8905  	.pio_out_emulated    = emulator_pio_out_emulated,
-1aa366163b8b69 arch/x86/kvm/x86.c Avi Kivity          2011-04-27  8906  	.get_segment         = emulator_get_segment,
-1aa366163b8b69 arch/x86/kvm/x86.c Avi Kivity          2011-04-27  8907  	.set_segment         = emulator_set_segment,
-5951c442372475 arch/x86/kvm/x86.c Gleb Natapov        2010-04-28  8908  	.get_cached_segment_base = emulator_get_cached_segment_base,
-2dafc6c234b606 arch/x86/kvm/x86.c Gleb Natapov        2010-03-18  8909  	.get_gdt             = emulator_get_gdt,
-160ce1f1a8fe64 arch/x86/kvm/x86.c Mohammed Gamal      2010-08-04  8910  	.get_idt	     = emulator_get_idt,
-1ac9d0cfb07e8a arch/x86/kvm/x86.c Avi Kivity          2011-04-20  8911  	.set_gdt             = emulator_set_gdt,
-1ac9d0cfb07e8a arch/x86/kvm/x86.c Avi Kivity          2011-04-20  8912  	.set_idt	     = emulator_set_idt,
-52a4661737ecc9 arch/x86/kvm/x86.c Gleb Natapov        2010-03-18  8913  	.get_cr              = emulator_get_cr,
-52a4661737ecc9 arch/x86/kvm/x86.c Gleb Natapov        2010-03-18  8914  	.set_cr              = emulator_set_cr,
-9c5372445c1ad4 arch/x86/kvm/x86.c Gleb Natapov        2010-03-18  8915  	.cpl                 = emulator_get_cpl,
-35aa5375d407ec arch/x86/kvm/x86.c Gleb Natapov        2010-04-28  8916  	.get_dr              = emulator_get_dr,
-35aa5375d407ec arch/x86/kvm/x86.c Gleb Natapov        2010-04-28  8917  	.set_dr              = emulator_set_dr,
-ac8d6cad3c7b39 arch/x86/kvm/x86.c Hou Wenlong         2022-03-07  8918  	.set_msr_with_filter = emulator_set_msr_with_filter,
-ac8d6cad3c7b39 arch/x86/kvm/x86.c Hou Wenlong         2022-03-07  8919  	.get_msr_with_filter = emulator_get_msr_with_filter,
-717746e382e58f arch/x86/kvm/x86.c Avi Kivity          2011-04-20  8920  	.get_msr             = emulator_get_msr,
-7bb7fce13601d2 arch/x86/kvm/x86.c Sean Christopherson 2024-01-09  8921  	.check_rdpmc_early   = emulator_check_rdpmc_early,
-222d21aa070a48 arch/x86/kvm/x86.c Avi Kivity          2011-11-10  8922  	.read_pmc            = emulator_read_pmc,
-6c3287f7c50500 arch/x86/kvm/x86.c Avi Kivity          2011-04-20  8923  	.halt                = emulator_halt,
-bcaf5cc543bdb8 arch/x86/kvm/x86.c Avi Kivity          2011-04-20  8924  	.wbinvd              = emulator_wbinvd,
-d6aa10003b0cde arch/x86/kvm/x86.c Avi Kivity          2011-04-20  8925  	.fix_hypercall       = emulator_fix_hypercall,
-c4f035c60dad45 arch/x86/kvm/x86.c Avi Kivity          2011-04-04  8926  	.intercept           = emulator_intercept,
-bdb42f5afebe20 arch/x86/kvm/x86.c Stephan Bärwolf     2012-01-12  8927  	.get_cpuid           = emulator_get_cpuid,
-5ae78e95ed0c77 arch/x86/kvm/x86.c Sean Christopherson 2019-12-17  8928  	.guest_has_movbe     = emulator_guest_has_movbe,
-5ae78e95ed0c77 arch/x86/kvm/x86.c Sean Christopherson 2019-12-17  8929  	.guest_has_fxsr      = emulator_guest_has_fxsr,
-a836839cbfe60d arch/x86/kvm/x86.c Hou Wenlong         2022-03-02  8930  	.guest_has_rdpid     = emulator_guest_has_rdpid,
-d99e4cb2ae2e02 arch/x86/kvm/x86.c Sean Christopherson 2024-04-05  8931  	.guest_cpuid_is_intel_compatible = emulator_guest_cpuid_is_intel_compatible,
-801806d956c2c1 arch/x86/kvm/x86.c Nadav Amit          2015-01-26  8932  	.set_nmi_mask        = emulator_set_nmi_mask,
-32e69f232db4ca arch/x86/kvm/x86.c Maxim Levitsky      2022-11-29  8933  	.is_smm              = emulator_is_smm,
-ecc513e5bb7ed5 arch/x86/kvm/x86.c Sean Christopherson 2021-06-09  8934  	.leave_smm           = emulator_leave_smm,
-25b17226cd9a77 arch/x86/kvm/x86.c Sean Christopherson 2021-06-09  8935  	.triple_fault        = emulator_triple_fault,
-f106797f81d633 arch/x86/kvm/x86.c Paolo Bonzini       2025-11-13  8936  	.get_xcr             = emulator_get_xcr,
-02d4160fbd7651 arch/x86/kvm/x86.c Vitaly Kuznetsov    2019-08-13  8937  	.set_xcr             = emulator_set_xcr,
-37a41847b770c7 arch/x86/kvm/x86.c Binbin Wu           2023-09-13  8938  	.get_untagged_addr   = emulator_get_untagged_addr,
-16ccadefa295af arch/x86/kvm/x86.c Maxim Levitsky      2024-09-06  8939  	.is_canonical_addr   = emulator_is_canonical_addr,
-bbd9b64e37aff5 drivers/kvm/x86.c  Carsten Otte        2007-10-30  8940  };
-bbd9b64e37aff5 drivers/kvm/x86.c  Carsten Otte        2007-10-30  8941  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
