@@ -1,141 +1,303 @@
-Return-Path: <kvm+bounces-73018-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73019-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +KV2Hf2wqmluVQEAu9opvQ
-	(envelope-from <kvm+bounces-73018-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 11:48:29 +0100
+	id QAmqB3C1qml9VgEAu9opvQ
+	(envelope-from <kvm+bounces-73019-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 12:07:28 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 432CC21F1C7
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 11:48:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A51BC21F6E4
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 12:07:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 40E023012E4F
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 10:48:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6B342301D317
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 11:07:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34BBF3803CC;
-	Fri,  6 Mar 2026 10:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0E3A386C30;
+	Fri,  6 Mar 2026 11:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uWkIXjPn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="niRYr2GU"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693F637F8B6;
-	Fri,  6 Mar 2026 10:48:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8E9382F15;
+	Fri,  6 Mar 2026 11:06:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772794103; cv=none; b=krOxU0KhkSbGnoeroRPj/EuhL6oqkC3/o3wzWGgURs4jgTJbs65UeXgfc0TFhoTNxYaw1lrqukkz7E4JtfsDYzFYhIqlhaLZjY+G1GIF9S64QtULZLg34hdBOK8n0Fct3v7E3xSkOVgtYFKg370EDCU/i6GAv9PnuQX0YiEu/HA=
+	t=1772795220; cv=none; b=YDiN+r+9Gw03wrMf0PLCOWHMoaskZonOY2BA4oUDFgsx7kXC5yu2FFlSsA7uJS/dYPa9nfqW/bGU1MlzUloujJlPNrEDpWM5oCaCT0uWyZsMegQP8X7h7aHEKsO/ckXPI8jLuI9YpTDx6WqtB9daHngc6mUV7oYsIZh8MbXsEso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772794103; c=relaxed/simple;
-	bh=MdElHuWuXCJux7zqmegpUP2Qfg6BCPRGxfz5Oung5eA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CRmZcdG2QeB+AcUbO4FO/pitB/GV0nEUw1SOv2oz+O3Fquev8wa9nCJVftG2HppmG5h124jp8cohTg+cL+Fb8CsqaxQbQ+YpaqOoUYJj5ByeT/pnuH2/JhvEDtpEmrqjZKbdYM5cFaZvgZ4mK423oq1513dhBA1hxObA00aOrYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uWkIXjPn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01699C4CEF7;
-	Fri,  6 Mar 2026 10:48:23 +0000 (UTC)
+	s=arc-20240116; t=1772795220; c=relaxed/simple;
+	bh=5JLFleFOGu2yk6q3/LVcwXRgVRIsHMw1XzIURCrmxSs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hdty7cG86xga+EJZI8glT4JGr+EUzrFjAUgnWqyTwla0rZarIj66AtgxXlhh6QnPqrjjQqShUYrEsdjtyZbfsIsm2FlBRlYd7lJWi0Wpse+3Jl6qqM54WadSAty0omABefsbXusRvQsqT5awtDusSHAHynUWgQd21GauBjIAVu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=niRYr2GU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E533C4CEF7;
+	Fri,  6 Mar 2026 11:06:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772794103;
-	bh=MdElHuWuXCJux7zqmegpUP2Qfg6BCPRGxfz5Oung5eA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uWkIXjPnPdH0SHTldhJPXKsQaMYFRSs2jegGWAt3uSTgeuKRbS8jDJ1Xl8nk7pinr
-	 2tz2JYIx2x8S5YFGD23PAsbtIwO0RNDqeAJm9COClpgJc3nofEb4A5AboftsVa0LK3
-	 /FkA9iFDmhccA30lxN+BKUJJAtWkmAvear8dtPeJyoMKN89DzX/0PA2kmaW3uZmoYU
-	 h+6cxqmpWVRd0OlDLyywMCcu2M7kPxLpZnx08yFYwlXzGO/N34CwPQo848PslGtHGh
-	 MQPddDCPoqMrjtkpprvuw097Rt2x3Ib8D/R40S20VrhDSS4bkq7kOl0DkuxA6P6axG
-	 isOFuqI1hLCKw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vySjE-0000000Gnnk-2qan;
-	Fri, 06 Mar 2026 10:48:20 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Fuad Tabba <tabba@google.com>
-Cc: joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	yangyicong@hisilicon.com,
-	wangzhou1@hisilicon.com,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH v1 0/2] KVM: arm64: Fix a couple of latent bugs in user_mem_abort()
-Date: Fri,  6 Mar 2026 10:48:17 +0000
-Message-ID: <177279406014.3200749.4050138870760336994.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260304162222.836152-1-tabba@google.com>
-References: <20260304162222.836152-1-tabba@google.com>
+	s=k20201202; t=1772795219;
+	bh=5JLFleFOGu2yk6q3/LVcwXRgVRIsHMw1XzIURCrmxSs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=niRYr2GUkeZ2evtY/MvpTINahTL9FeEOM2+S5jIOhI6rTICEN4ErbX/41cP3OcnQk
+	 zhd2aol7vsSHYfqBanZvFiKJcNJc6c4P89P7ym6dPfWZKLhYYMXYar4U8Pdft4PWnT
+	 fygpvXhCsB69JLcRjvP2uqCg8fjYbwpXeM/cE7qNEJfb1msgEIWCQl/tf49x0ZGqn0
+	 mrfXLzAm9K2gKESMGb16yku1dBu7nk1ppJCDfTKLNkWttrSTSXXuNLZaasQnr9ATSW
+	 EFnRv7/BKOZYAfL8DUdTEHwCuhf7KQyUra8DtlOk4TzKJd2blbg/WJLhMHSgfV9Lx7
+	 xvZe13Ywzo6dQ==
+Message-ID: <9798cb27-0f52-42fa-b0da-a7834039da1f@kernel.org>
+Date: Fri, 6 Mar 2026 12:06:51 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, yangyicong@hisilicon.com, wangzhou1@hisilicon.com, oupton@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Rspamd-Queue-Id: 432CC21F1C7
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
+ stalls, timeout
+Content-Language: en-GB, fr-BE
+To: Thomas Gleixner <tglx@kernel.org>, Jiri Slaby <jirislaby@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
+ rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
+ Linux Kernel <linux-kernel@vger.kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, "luto@kernel.org"
+ <luto@kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
+ Waiman Long <longman@redhat.com>
+References: <b24ffcb3-09d5-4e48-9070-0b69bc654281@kernel.org>
+ <7f3e74d7-67dc-48d7-99d2-0b87f671651b@kernel.org>
+ <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
+ <20260302114636.GL606826@noisy.programming.kicks-ass.net>
+ <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
+ <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
+ <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
+ <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
+ <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
+ YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
+ c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
+ WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
+ CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
+ nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
+ TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
+ nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
+ VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
+ 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
+ YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
+ AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
+ EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
+ /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
+ MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
+ cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
+ iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
+ jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
+ 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
+ VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
+ BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
+ ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
+ 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
+ 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
+ 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
+ mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
+ Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
+ Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
+ Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
+ x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
+ V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
+ Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
+ HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
+ 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
+ Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
+ voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
+ KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
+ UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
+ vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
+ mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
+ JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <87qzpx2sck.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: A51BC21F6E4
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-73018-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73019-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	HAS_ORG_HEADER(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maz@kernel.org,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[kvm];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[]
 X-Rspamd-Action: no action
 
-On Wed, 04 Mar 2026 16:22:20 +0000, Fuad Tabba wrote:
-> While digging into arch/arm64/kvm/mmu.c with the intention of finally
-> refactoring user_mem_abort(), I ran into a couple of latent bugs that
-> we should probably fix right now before attempting any major plumbing.
-> 
-> You might experience some deja-vu looking at the first patch. A while
-> back (in 5f9466b50c1b), I fixed a struct page reference leak on an
-> early error return in this exact same block. It turns out that another
-> early exit was introduced later on (for exclusive/atomic faults), and it
-> fell into the exact same trap of leaking the page.
-> 
-> [...]
+Hi Thomas,
 
-Applied to fixes, thanks!
+Thank you for looking into this!
 
-[1/2] KVM: arm64: Fix page leak in user_mem_abort() on atomic fault
-      commit: e07fc9e2da91f6d9eeafa2961be9dc09d65ed633
-[2/2] KVM: arm64: Fix vma_shift staleness on nested hwpoison path
-      commit: 244acf1976b889b80b234982a70e9550c6f0bab7
+On 06/03/2026 10:57, Thomas Gleixner wrote:
+> On Fri, Mar 06 2026 at 06:48, Jiri Slaby wrote:
+>> On 05. 03. 26, 20:25, Thomas Gleixner wrote:
+>>> Is there simple way to reproduce?
+>>
+>> Unfortunately not at all. To date, I even cannot reproduce locally, it 
+>> reproduces exclusively in opensuse build service (and github CI as per 
+>> Matthieu's report). I have a project in there with packages which fail 
+>> more often than others:
+>>    https://build.opensuse.org/project/monitor/home:jirislaby:softlockup
+>> But it's all green ATM.
+>>
+>> Builds of Go 1.24 and tests of rust 1.90 fail the most. The former even 
+>> takes only ~ 8 minutes, so it's not that intensive build at all. So the 
+>> reasons are unknown to me. At least, Go apparently uses threads for 
+>> building (unlike gcc/clang with forks/processes). Dunno about rust.
+> 
+> I tried with tons of test cases which stress test mmcid with threads and
+> failed.
+
+On my side, I didn't manage to reproduce it locally either.
+
+
+> Can you provide me your .config, source version, VM setup (Number of
+> CPUs, memory etc.)?
+
+My CI ran into this issue 2 days ago, with and without a debug kernel
+config. The kernel being tested was on top of 'net-next', which was on
+top of this commit from Linus' tree: fbdfa8da05b6 ("selftests:
+tc-testing: fix list_categories() crash on list type").
+
+- Config without debug:
+
+
+https://github.com/user-attachments/files/25791728/config-run-22657946888-normal-join.gz
+
+- Config with debug:
+
+
+https://github.com/user-attachments/files/25791960/config-run-22657946888-debug-nojoin.gz
+
+- Just in case, stacktraces available there:
+
+  https://github.com/multipath-tcp/mptcp_net-next/actions/runs/22657946888
+
+
+My tests are being executed in VMs I don't control using a kernel v6.14
+on Azure with 4 vCPUs, 16GB of RAM, and KVM nested support. From more
+details about what's in it:
+
+
+https://github.com/actions/runner-images/blob/ubuntu24/20260302.42/images/ubuntu/Ubuntu2404-Readme.md
+
+
+From there, a docker container is started, from which QEMU 10.1.0
+(Debian 1:10.1.0+ds-5ubuntu2.2) is launched with 4 vCPU and 5GB of RAM
+using this command:
+
+
+/usr/bin/qemu-system-x86_64 \
+  -name mptcpdev \
+  -m 5120M \
+  -smp 4 \
+  -chardev socket,id=charvirtfs5,path=/tmp/virtmevrwrzu5k \
+  -device vhost-user-fs-device,chardev=charvirtfs5,tag=ROOTFS \
+  -object memory-backend-memfd,id=mem,size=5120M,share=on \
+  -numa node,memdev=mem \
+  -machine accel=kvm:tcg \
+  -M microvm,accel=kvm,pcie=on,rtc=on \
+  -cpu host,topoext=on \
+  -parallel none \
+  -net none \
+  -echr 1 \
+  -chardev file,path=/proc/self/fd/2,id=dmesg \
+  -device virtio-serial-device \
+  -device virtconsole,chardev=dmesg \
+  -chardev stdio,id=console,signal=off,mux=on \
+  -serial chardev:console \
+  -mon chardev=console \
+  -vga none \
+  -display none \
+  -device vhost-vsock-device,guest-cid=3 \
+  -kernel
+/home/runner/work/mptcp_net-next/mptcp_net-next/.virtme/build/arch/x86/boot/bzImage
+\
+  -append 'virtme_hostname=mptcpdev nr_open=1048576
+virtme_link_mods=/home/runner/work/mptcp_net-next/mptcp_net-next/.virtme/build/.virtme_mods/lib/modules/0.0.0
+virtme_rw_overlay0=/tmp console=hvc0 earlyprintk=serial,ttyS0,115200
+virtme_console=ttyS0 psmouse.proto=exps
+virtme.vsockexec=`/tmp/virtme-console/3.sh`
+virtme_chdir=home/runner/work/mptcp_net-next/mptcp_net-next
+virtme_root_user=1 rootfstype=virtiofs root=ROOTFS raid=noautodetect rw
+debug nokaslr mitigations=off softlockup_panic=1 nmi_watchdog=1
+hung_task_panic=1 panic=-1 oops=panic
+init=/usr/local/lib/python3.13/dist-packages/virtme/guest/bin/virtme-ng-init'
+\
+  -gdb tcp::1234 \
+  -qmp tcp::3636,server,nowait \
+  -no-reboot
+
+
+It is possible to locally launch the same command using the same QEMU
+version (but not the same host kernel) with the help of Docker:
+
+  $ cd <kernel source code>
+  # docker run -v "${PWD}:${PWD}:rw" -w "${PWD}" --rm \
+    -it --privileged mptcp/mptcp-upstream-virtme-docker:latest \
+    manual normal
+
+This will build a new kernel in O=.virtme/build, launch it and give you
+access to a prompt.
+
+
+After that, you can do also use the "auto" mode with the last built
+image to boot the VM, only print "OK", stop and retry if there were no
+errors:
+
+  $ cd <kernel source code>
+  $ echo 'echo OK' > .virtme-exec-run
+  # i=1; \
+    while docker run -v "${PWD}:${PWD}:rw" -w "${PWD}" --rm \
+    -it --privileged mptcp/mptcp-upstream-virtme-docker:latest \
+    vm auto normal; do \
+      echo "== Attempt: $i: OK =="; \
+      i=$((i+1)); \
+    done; \
+    echo "== Failure after $i attempts =="
+
+
+> I tried to find it on that github page Matthiue mentioned but I'm
+> probably too stupid to navigate this clicky interface.
+
+I'm sorry about that, I understand, the interface is not very clear. Do
+not hesitate to tell me if you need anything else from me.
 
 Cheers,
-
-	M.
+Matt
 -- 
-Without deviation from the norm, progress is not possible.
-
+Sponsored by the NGI0 Core fund.
 
 
