@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-73055-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73056-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GNgFAI/Wqmn3XQEAu9opvQ
-	(envelope-from <kvm+bounces-73055-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 14:28:47 +0100
+	id 4MnPMI7ZqmkZXwEAu9opvQ
+	(envelope-from <kvm+bounces-73056-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 14:41:34 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C3E42219A7
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 14:28:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4015D221EE9
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 14:41:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E1FA4314B56F
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 13:26:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1B61E31D6BB2
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 13:28:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F7F39A061;
-	Fri,  6 Mar 2026 13:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A90A39E6C0;
+	Fri,  6 Mar 2026 13:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V+rWmYyq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="klmrVagm"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3023988FA;
-	Fri,  6 Mar 2026 13:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE6C39A7F3;
+	Fri,  6 Mar 2026 13:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772803558; cv=none; b=kcIlp/0jdAKpn1QpcxD7Uo07uu41W8YfZkj0JptaTV6f4jGa5z6TfshasZN+IR1iyc8KCXh42/gKkaJ01FoNjobDf+bCD532mRnmcICITVA7ODxha6kvGvDXuHMzne43aZ1omuq32ddaHWFwCBNW8RaKzNZ2dOzJJfsskmee+n8=
+	t=1772803681; cv=none; b=kYJsnJyHtEbnZEASlZ5x5I2CMF/OtCwZ+z4V4bZXIzBqegpL/0RnYm4ohAZ2nwmnaqfcVmROcs0faxuK+r6P3kPNCW9momWRQZt+VPlM00LA1GVki01ksbB7TbaoCzkAltwp4XllcozsqCNBHIosSDGk91VZDhTE6ZoGsCRXz+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772803558; c=relaxed/simple;
-	bh=VU30iKH+h/qW7CEQKlKOIowLeYhmlgQ/q/0Y/mYCK3U=;
+	s=arc-20240116; t=1772803681; c=relaxed/simple;
+	bh=b4U3xjNeltKbkeNzgWxFljW210JkNn6MPbdzC3gSIjo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MnA5AdlyEUC7YTJFq1xVFigeg5395y1aW55+ll11kozbm2GISf8GNiJEFUGEh6fL8fFfyrMu/VqSRLL5+JgK5qarmEmV+1FAg4giG9+mm8eoZE5CcVn7kHlV7FkJ+HU+5b48A1BAbhU83M82FDLA9+tJRLqBaxcRs9osWKCGFDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V+rWmYyq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2742DC2BC86;
-	Fri,  6 Mar 2026 13:25:55 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=D+/kEyu0kVsc1EEnFzGLZnzwKxvlE2qgaDy3vYK8XX8lVT8849cffDLlOe8dXKakepI80gkqNSGNwuf59KN4Des4+fNkEeNOGX2Pe/frLKWj7uFcQJ9+H7vdifJNYn2Paj+spkfPyRFW/eDc+I+sd8Vu6vXBJC3R7q2DdGZ4NDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=klmrVagm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECA26C2BC87;
+	Fri,  6 Mar 2026 13:27:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772803558;
-	bh=VU30iKH+h/qW7CEQKlKOIowLeYhmlgQ/q/0Y/mYCK3U=;
+	s=k20201202; t=1772803681;
+	bh=b4U3xjNeltKbkeNzgWxFljW210JkNn6MPbdzC3gSIjo=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=V+rWmYyqOSRcqABxv0QWdLshlJpYgu7fEwgb64B0fTA/c6pgG8MG/w+ZcKT0/BuWP
-	 PXHroR3YWS3vqI4BXdgO/PxHbkyiiDZx4CmTzeiMilwaV9zEePGKlT7F+TKuzNdFq6
-	 v2AJAZCJG5oFbUGQE7dJAZb6p4yLwKqLyUPcFhQnI/04TmuuPHAC8Dlx12mvsL1UE+
-	 2la+iQcxibbkBOTCIH3s+84DEkiaAmThXEppa4VEG3WIhzOKk8/fe/f2f7DQvpp676
-	 uLIpdNki57hG3MPr5ty1Pt4afb+h9Ntc6yYqShkM0PHnlXPALS6pVO+pdo3KeYSU62
-	 7t2ssBVeagtzQ==
-Message-ID: <729e14d4-6949-4d46-9380-12331b5ad363@kernel.org>
-Date: Fri, 6 Mar 2026 14:25:51 +0100
+	b=klmrVagmasGkU+kD2JWGkZJzLXk2A3iawm5yGVjyge88NXEO5dK6ETi83DLBMIQj8
+	 IU1UuibEG3O/0jt7pcj7Tpv9p1dB55yDQWvU1M48LvqcGNQ1+BapOUW12vjO8BJke7
+	 AfQmhLTWukPTM5c08VI/1rbVNNSeWhHW0EhnoiPDixqrHYb7H/bEez+PPiHAsQzVyX
+	 9d9ap2BiUXv4akVNqPdCzR/FlxEJrOzc2MA8tmp1l1w1bnpC8Fwf7Nl1ju9Y4t71IS
+	 p/8s5sAr7sTpi8tB7sCYlqH1aruOYy7cfTMN+/pOuwZu1DcjBJASyAM01aEm1RGFfd
+	 vEav6Fj4utRhQ==
+Message-ID: <7c74ea71-cf5a-4167-a2ff-26a424271007@kernel.org>
+Date: Fri, 6 Mar 2026 14:27:55 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -53,15 +53,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/4] mm: move vma_kernel_pagesize() from hugetlb to
- mm.h
+Subject: Re: [PATCH v1 3/4] KVM: remove hugetlb.h inclusion
 To: "Lorenzo Stoakes (Oracle)" <ljs@kernel.org>
 Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- Dan Williams <dan.j.williams@intel.com>
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
 References: <20260306101600.57355-1-david@kernel.org>
- <20260306101600.57355-2-david@kernel.org>
- <833950ef-e01d-4914-b5f9-bc1f6261b184@lucifer.local>
+ <20260306101600.57355-4-david@kernel.org>
+ <305a98f5-0a28-4eb9-a647-a30716e61cb4@lucifer.local>
 From: "David Hildenbrand (Arm)" <david@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=david@kernel.org; keydata=
@@ -108,29 +106,29 @@ Autocrypt: addr=david@kernel.org; keydata=
  3iyY2Nsd7JxfKu1PRhCGwXzRw5TlfEsoRI7V9A8isUCoqE2Dzh3FvYHVeX4Us+bRL/oqareJ
  CIFqgYMyvHj7Q06kTKmauOe4Nf0l0qEkIuIzfoLJ3qr5UyXc2hLtWyT9Ir+lYlX9efqh7mOY
  qIws/H2t
-In-Reply-To: <833950ef-e01d-4914-b5f9-bc1f6261b184@lucifer.local>
+In-Reply-To: <305a98f5-0a28-4eb9-a647-a30716e61cb4@lucifer.local>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 8C3E42219A7
+X-Rspamd-Queue-Id: 4015D221EE9
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73055-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-73056-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[david@kernel.org,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -138,72 +136,19 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[kvm];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 3/6/26 12:07, Lorenzo Stoakes (Oracle) wrote:
-> On Fri, Mar 06, 2026 at 11:15:57AM +0100, David Hildenbrand (Arm) wrote:
->> In the past, only hugetlb had special "vma_kernel_pagesize()"
->> requirements, so it provided its own implementation.
+On 3/6/26 12:11, Lorenzo Stoakes (Oracle) wrote:
+> On Fri, Mar 06, 2026 at 11:15:59AM +0100, David Hildenbrand (Arm) wrote:
+>> hugetlb.h is no longer required now that we moved vma_kernel_pagesize()
+>> to mm.h.
 >>
->> In commit 05ea88608d4e ("mm, hugetlbfs: introduce ->pagesize() to
->> vm_operations_struct") we generalized that approach by providing a
->> vm_ops->pagesize() callback to be used by device-dax.
->>
->> Once device-dax started using that callback in commit c1d53b92b95c
->> ("device-dax: implement ->pagesize() for smaps to report MMUPageSize")
->> it was missed that CONFIG_DEV_DAX does not depend on hugetlb support.
->>
->> So building a kernel with CONFIG_DEV_DAX but without CONFIG_HUGETLBFS
->> would not pick up that value.
->>
->> Fix it by moving vma_kernel_pagesize() to mm.h, providing only a single
->> implementation. While at it, improve the kerneldoc a bit.
->>
->> Ideally, we'd move vma_mmu_pagesize() as well to the header. However,
->> its __weak symbol might be overwritten by a PPC variant in hugetlb code.
->> So let's leave it in there for now, as it really only matters for some
->> hugetlb oddities.
->>
->> This was found by code inspection.
->>
->> Fixes: c1d53b92b95c ("device-dax: implement ->pagesize() for smaps to report MMUPageSize")
->> Cc: Dan Williams <dan.j.williams@intel.com>
 >> Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
 > 
-> LGTM, but you need to fix up VMA tests, I attach a patch below to do this. Will
-> this resolved:
+> Aww this is the tiniest cutest patch evah!
 
-Thanks!
-
-I assume that should go into patch #2 instead?
-
-> 
-> Reviewed-by: Lorenzo Stoakes (Oracle) <ljs@kernel.org>
-
-
-[...]
-
-> ---
->  tools/testing/vma/include/dup.h | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/tools/testing/vma/include/dup.h b/tools/testing/vma/include/dup.h
-> index 3078ff1487d3..65b1030a7fdf 100644
-> --- a/tools/testing/vma/include/dup.h
-> +++ b/tools/testing/vma/include/dup.h
-> @@ -1318,3 +1318,10 @@ static inline void vma_set_file(struct vm_area_struct *vma, struct file *file)
->  	swap(vma->vm_file, file);
->  	fput(file);
->  }
-> +
-> +static inline unsigned long vma_kernel_pagesize(struct vm_area_struct *vma)
-> +{
-> +	if (unlikely(vma->vm_ops && vma->vm_ops->pagesize))
-> +		return vma->vm_ops->pagesize(vma);
-> +	return PAGE_SIZE;
-
-Should we just KIS and use PAGE_SIZE for the test?
+It's a very smol patch! :)
 
 -- 
 Cheers,
