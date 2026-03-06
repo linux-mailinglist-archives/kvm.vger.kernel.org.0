@@ -1,186 +1,166 @@
-Return-Path: <kvm+bounces-73098-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73099-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ECuMLt4Cq2nDZQEAu9opvQ
-	(envelope-from <kvm+bounces-73098-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 17:37:50 +0100
+	id aNXMDn8Eq2nDZQEAu9opvQ
+	(envelope-from <kvm+bounces-73099-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 17:44:47 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AF8C225389
-	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 17:37:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B297E2254E4
+	for <lists+kvm@lfdr.de>; Fri, 06 Mar 2026 17:44:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 359983034099
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 16:37:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 88926304C7C2
+	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 16:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5422B2472AA;
-	Fri,  6 Mar 2026 16:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D4A37883C;
+	Fri,  6 Mar 2026 16:42:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S3FquQ64"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mVliGTI5"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731E03ACF0C
-	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 16:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077EA2BEC27
+	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 16:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772815059; cv=none; b=QcMghwm4XX92oXYk8y4aIsKQj1WDvjs3fC0l6IrpSAVJ7VWKI5Vxqdv1XDo3awm0/v/jIgpj9ymFLhpK3L0JHaleCZ1RbPnMKUpPqEnfDhObpGOiH6Om455xJ4i0etE/JZNP9egofjd8kQWyLODJ5VdkgDrL16igSr1eUAgg0jw=
+	t=1772815326; cv=none; b=qkA8owHf0gJtck/y5OlpicOmidxZqpGxG9gzuE/B/vdIG0IAmQrn1jdpQAWxfuP9oVV+kzfCB5YflSZefzWoNxhZXHxgmld2l9lBPoZzHIgo1h3NG8dEH3sgkGgI/7MSsTu5A1x927bw/y9a+4Ta7kSQZ3VnPvVe4pvuggeeqOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772815059; c=relaxed/simple;
-	bh=JUjEN0DYWM8Ioj0l3YYXoGiZDzEyXypebkZ9t9Bv0QQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WPsTsoPhvCPLLPdPjJEGCmr2uYh04QdCaouHyxDqaOG4jUCb7DFbX682STgQ6wR1JqbA7IbryyOBmR7et9x55Vw0ptI0/jeDWJQG+ZQfCHAUduhY5zb2R5iOmzN+sDBCsuB/q48oIKmTLV/2LJ9TkkwjKgNNiGAjiVcYmaZN8PA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S3FquQ64; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 542A4C2BC9E
-	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 16:37:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772815059;
-	bh=JUjEN0DYWM8Ioj0l3YYXoGiZDzEyXypebkZ9t9Bv0QQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=S3FquQ64E9O/Eo+2QBgah1c5/v8SLmlmrtJSbUUTm0+9PjPJAH0rnHegwvwRK1xvn
-	 xOjBy/CrjTVczgF+SmQWWxtIUmrgaRlVc69P8eCd25zfmULVl5x0V5IMKSl/2zi6Dd
-	 W9NWP6vP8cVxmkpdgAm6Ff7eQeHep9IA5eNh4rlSo/J5GHbt8Or41MLGsl+sRJT7gC
-	 kYeJW43SNqMxG0UQ63fTDgtnJbMxPiwS406CdUPkQsGN5d56lQF/YoEzXpc6PE+fJJ
-	 7YbVG5ZnaD2EgcSREu4McN7PswPFsYSBYrFCNQXPJaHhpEFK10CDT8FsFoxRsSKdks
-	 OkDYwXgPUip1w==
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b94358796a1so87561766b.2
-        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 08:37:39 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVRlCzCP408f1zA4f3O5nLe5aNS5EHQV344DSDdJ73INwEfRkp46ksWnCL44+Yr5oHTw8M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0Z0cA2WFQfxEDHpmyVEcijWmMS20ubeGApYeaK1o75cT2TAeA
-	XPfnZHM59Ea3dyyA+aMF00p/Onrs0xtwC8H3hoG4ub0Zpxy3992qX5qbJ3HRkutyChEFI6Vbluk
-	0ES2z8iIVH0N/VhWJEAUvo6pXdqu5vQY=
-X-Received: by 2002:a17:907:948c:b0:b94:c55:81b3 with SMTP id
- a640c23a62f3a-b942df8f0d8mr176205266b.24.1772815057971; Fri, 06 Mar 2026
- 08:37:37 -0800 (PST)
+	s=arc-20240116; t=1772815326; c=relaxed/simple;
+	bh=TADcOpWEvJLAOeAtgeTIyGynHje+264iN18XJs1JvqQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sPcqHP0Udx5aDZwLxUtoFMosHIHeaZqAt7PHRVAPb48BDCPwQK3he/vpUSMcTBI43rGlj2COLdIF2ZsTDwI0X3BtwOe0FpmjjeNxSIDkQFmYRqvuTyYvNtrWcEPMvHkOEV8HwBpD3ojqe87CbeFdlE6rbgjldF4PDS3Qhbuej+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mVliGTI5; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae4b96c259so64121245ad.1
+        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 08:42:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772815322; x=1773420122; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rk41VVSwMD1I02bvg41LBcCUW/2xACIjrkOSKPXzHO4=;
+        b=mVliGTI5JTgh3CAMVxKs/qq1k/DC8HxRd4OcT1gfk04ZLhQ/6UgjuwlBCJpjPrh2ox
+         wpiE5nL7sFR8phPOer+DPLHLJg7FS9UexGGijHESDjYcQlsfoPJ0i9OZ2xOA2olxli7s
+         Eos2aTFCE8SSkYo0yfCYB/geSIYZjGp+ae9YQnScYVWpj8bsJkIOfp7ezEZue+hX+Wg+
+         EGA6TjgS0OdAQ6Z8WedkqMOKrsi/86LuCM1hk55qEeMNhMHaEktu9P11I0Ircp9FLQ1H
+         0ybiYE8IEh5/o4LCz5J4b8Pk36Q9g2UDjys0Vsha4A85RIH3InCB0NIO92d/fqJMykHF
+         JCHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772815322; x=1773420122;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rk41VVSwMD1I02bvg41LBcCUW/2xACIjrkOSKPXzHO4=;
+        b=VLK5PjfBIJ0Dol7NKnA9kZcPxU60e+gHOdtjuhrS63wPUWCYmFkp6D+lN63H1PW2mU
+         rL8wyBKtLJohw9s7Nk9zPmlIp/k15ZQxHMLUbYfUGAUKCoai4Nk+Zx/xt2V/HE2rvyds
+         lik6ZGFEiAzDzTBkPwMf8Cd20aML5LsputijCFX/T3LqaHFFIk2fFHYgpw/cjQggn3hi
+         FLmnUSrgAV76ek5nhE6hytwakf1MuyFbxF/Pddddag7L1mcbzBRGuezDki7VphJDqjMh
+         Jv7oOUW+fYJiWDyMx4j55uABf+GkfwYiba2oXOfy9uIQzA2PUOvQZsc/Q/84echIaKPb
+         mY+g==
+X-Forwarded-Encrypted: i=1; AJvYcCUnd4qYP4ejkd+pU1ZQQGqMmBV5gb0tfjIjKYOQbQGA6fTqBkk9b2jqyNk6MyR07zXGyqg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzD4t965O4BBTxQTV/enlHze8xR2OZFi/HyisdkGifGMqbfkGNY
+	8+KsKkrhe7ApLxjGrIFoO3DeT88X0+FisRSlPIcR5X6y6FQm0vGEcFKchW7TYjtBS7NQORdoLkp
+	rdanOxQ==
+X-Received: from plch14.prod.google.com ([2002:a17:902:f2ce:b0:2ae:3b56:7c6a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:4b2d:b0:2ae:525a:f971
+ with SMTP id d9443c01a7336-2ae82a0a890mr26503905ad.23.1772815321672; Fri, 06
+ Mar 2026 08:42:01 -0800 (PST)
+Date: Fri, 6 Mar 2026 08:42:00 -0800
+In-Reply-To: <aactOOfirdVRYfNS@acer-nitro-anv15-41>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260306002327.1225504-1-yosry@kernel.org> <aar-gDulqlXtVDhR@google.com>
-In-Reply-To: <aar-gDulqlXtVDhR@google.com>
-From: Yosry Ahmed <yosry@kernel.org>
-Date: Fri, 6 Mar 2026 08:37:25 -0800
-X-Gmail-Original-Message-ID: <CAO9r8zNb8Kvq=6e=pbCe6-T1wT5RcHRerDUAPq4yMvrMjRN8dw@mail.gmail.com>
-X-Gm-Features: AaiRm50jpMs1YdRWG5Kvjkq2VOJRlD3EO-tONpUPVXNZxK5iSEa9J_HD5Ou2mKQ
-Message-ID: <CAO9r8zNb8Kvq=6e=pbCe6-T1wT5RcHRerDUAPq4yMvrMjRN8dw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: SVM: Propagate Translation Cache Extensions to the guest
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Venkatesh Srinivas <venkateshs@google.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Venkatesh Srinivas <venkateshs@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 5AF8C225389
+Mime-Version: 1.0
+References: <20260209161527.31978-1-shaikhkamal2012@gmail.com>
+ <20260211120944.-eZhmdo7@linutronix.de> <aYyhfvC_2s000P7H@google.com> <aactOOfirdVRYfNS@acer-nitro-anv15-41>
+Message-ID: <aasD2OHkQN3kdRba@google.com>
+Subject: Re: [PATCH] KVM: mmu_notifier: make mn_invalidate_lock non-sleeping
+ for non-blocking invalidations
+From: Sean Christopherson <seanjc@google.com>
+To: shaikh kamaluddin <shaikhkamal2012@gmail.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
+X-Rspamd-Queue-Id: B297E2254E4
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73098-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-73099-lists,kvm=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yosry@kernel.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.932];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.946];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo,mail.gmail.com:mid,chromium.org:email]
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Fri, Mar 6, 2026 at 8:19=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Fri, Mar 06, 2026, Yosry Ahmed wrote:
-> > From: Venkatesh Srinivas <venkateshs@chromium.org>
+On Wed, Mar 04, 2026, shaikh kamaluddin wrote:
+> On Wed, Feb 11, 2026 at 07:34:22AM -0800, Sean Christopherson wrote:
+> > On Wed, Feb 11, 2026, Sebastian Andrzej Siewior wrote:
+> > It's not at all clear to me that switching mmu_lock to a raw lock would be a net
+> > positive for PREEMPT_RT.  OOM-killing a KVM guest in a PREEMPT_RT seems like a
+> > comically rare scenario.  Whereas contending mmu_lock in normal operation is
+> > relatively common (assuming there are even use cases for running VMs with a
+> > PREEMPT_RT host kernel).
+> > 
+> > In fact, the only reason the splat happens is because mmu_notifiers somewhat
+> > artificially forces an atomic context via non_block_start() since commit
+> > 
+> >   ba170f76b69d ("mm, notifier: Catch sleeping/blocking for !blockable")
+> > 
+> > Given the massive amount of churn in KVM that would be required to fully eliminate
+> > the splat, and that it's not at all obvious that it would be a good change overall,
+> > at least for now:
+> > 
+> > NAK
+> > 
+> > I'm not fundamentally opposed to such a change, but there needs to be a _lot_
+> > more analysis and justification beyond "fix CONFIG_DEBUG_ATOMIC_SLEEP=y".
 > >
-> > TCE augments the behavior of TLB invalidating instructions (INVLPG,
-> > INVLPGB, and INVPCID) to only invalidate translations for relevant
-> > intermediate mappings to the address range, rather than ALL intermdiate
-> > translations.
-> >
-> > The Linux kernel has been setting EFER.TCE if supported by the CPU sinc=
-e
-> > commit 440a65b7d25f ("x86/mm: Enable AMD translation cache extensions")=
-,
-> > as it may improve performance.
-> >
-> > KVM does not need to do anything to virtualize the feature,
->
-> Please back this up with actual analysis.
+> Hi Sean,
+> Thanks for the detailed explanation and for spelling out the border
+> issue.
+> Understood on both points:
+> 	1. The changelog wording was too strong; PREEMPT_RT changes
+> 	spin_lock() semantics, and the splat is fundamentally due to
+> 	spinlocks becoming sleepable there.
+> 	2. Converting only mm_invalidate_lock to raw is insufficient
+> 	since KVM can still take the mmu_lock (and other sleeping locks
+> 	RT) in invalidate_range_start() when the invalidation hits a
+> 	memslot.
+> Given the above, it shounds like "convert locks to raw" is not the right
+> direction without sinificat rework and justification.
+> Would an acceptable direction be to handle the !blockable notifier case
+> by deferring the heavyweight invalidation work(anything that take
+> mmu_lock/may sleep on RT) to a context that may block(e.g. queued work),
+> while keeping start()/end() accounting consisting with memslot changes ?
 
-Something like this?
+No, because the _only_ case where the invalidation is non-blockable is when the
+kernel is OOM-killing.  Deferring the invalidations when we're OOM is likely to
+make the problem *worse*.
 
-If a TLB invalidating instruction is not intercepted, it will behave
-according to the guest's setting of EFER.TCE as the value will be
-loaded on VM-Enter. Otherwise, KVM's emulation may invalidate more TLB
-entries, which is perfectly fine as the CPU is allowed to invalidate
-more TLB entries that it strictly needs to.
-
->
-> > only advertise it and allow setting EFER.TCE.  Passthrough X86_FEATURE_=
-TCE to
->
-> Advertise X86_FEATURE_TCE to userspace, not "passthrough xxx to the guest=
-".
-> Because that's all KVM
->
-> > the guest, and allow the guest to set EFER.TCE if available.
-> >
-> > Co-developed-by: Yosry Ahmed <yosry@kernel.org>
-> > Signed-off-by: Yosry Ahmed <yosry@kernel.org>
-> > Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
->
-> Your SoB should come last to capture that the chain of hanlding, i.e. thi=
-s should
-> be:
-
-Ack.
-
->
->   Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
->   Co-developed-by: Yosry Ahmed <yosry@kernel.org>
->   Signed-off-by: Yosry Ahmed <yosry@kernel.org>
->
-[..]
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 3407deac90bd6..fee1c8cd45973 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -5580,6 +5580,9 @@ static __init int svm_hardware_setup(void)
-> >       if (boot_cpu_has(X86_FEATURE_AUTOIBRS))
-> >               kvm_enable_efer_bits(EFER_AUTOIBRS);
-> >
-> > +     if (boot_cpu_has(X86_FEATURE_TCE))
-> > +             kvm_enable_efer_bits(EFER_TCE);
->
-> Hrm, I think we should handle all of the kvm_enable_efer_bits() calls tha=
-t are
-> conditioned only on CPU support in common code.  While it's highly unlike=
-ly Intel
-> CPUs will ever support more EFER-based features, if they do, then KVM wil=
-l
-> over-report support since kvm_initialize_cpu_caps() will effectively enab=
-le the
-> feature, but VMX won't enable the corresponding EFER bit.
->
-> I can't think anything that will go sideways if we rely purely on KVM cap=
-s, so
-> get to something like this as prep work, and then land TCE in common x86?
-
-Will do.
+That's the crux of my NAK.  We'd be making KVM and kernel behavior worse to "fix"
+a largely hypothetical issue (OOM-killing a KVM guest in a RT kernel).
 
