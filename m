@@ -1,171 +1,198 @@
-Return-Path: <kvm+bounces-73185-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73186-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YB3hNzdnq2kfcwEAu9opvQ
-	(envelope-from <kvm+bounces-73185-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 00:45:59 +0100
+	id qIphB5hxq2m6dAEAu9opvQ
+	(envelope-from <kvm+bounces-73186-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 01:30:16 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79211228D45
-	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 00:45:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD6AE228FC8
+	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 01:30:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 31923303639B
-	for <lists+kvm@lfdr.de>; Fri,  6 Mar 2026 23:45:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C21543051C80
+	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2026 00:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF38A38F22C;
-	Fri,  6 Mar 2026 23:45:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776F4275864;
+	Sat,  7 Mar 2026 00:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QifiXDk7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iX3OE5qF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7495358377
-	for <kvm@vger.kernel.org>; Fri,  6 Mar 2026 23:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772840738; cv=pass; b=KuS79Yb2WfB2YYw+9WE0YCSh6XRF1G50gABclZhwQlF7LlOQaRknxc1vsJOJCIRTMZlmcF5vsMqpV1auLTxvrJauBZsK2LiCndJ+nMCWrw4ekIJ4qdNeheZmS4vi2ojnWPoz2Dr88MeouMdQtR1VM4f/JwdnshaDOB1CpvzRvzo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772840738; c=relaxed/simple;
-	bh=GJtBB9cbQADjutlg1/84ZCAeyk/fDQtRv94VxILrjkc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DvbSO9HU1qtgpW48XJeZ5Pcb/n8yHMgADkDYyC6sZioouYSwBJIhU/Fe/XvK7JvlnWUt1N67fBB3rx2VgI/P0UAAdb2Tg2SvzpRUTCdQ9wv/H8UexldLuArtOYO5coeTVZWQuTL2+UM1/9gWOJ4S5pGaVHWNwrbKqF2YmIaHc48=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QifiXDk7; arc=pass smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB29D26AA91
+	for <kvm@vger.kernel.org>; Sat,  7 Mar 2026 00:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772843332; cv=none; b=kJp5Qs5ZooWJssxscZHiwCYE/OCDqgC5AeHgFYF2csinUTl9pgrtoWA07Fg1EHStKAaF+McIlsahiYXL240uQdn0hrLTmEebL9FBmNpyX2ybGKiQgN2ccOPIo+b5TLA+ORQbkj7ne+F0dCem7Z8x5CNWOQ0o4EuakqNlkb8xJb8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772843332; c=relaxed/simple;
+	bh=QWMLlUntDiL0xIVsEqxbbJvqg3LbfJ3Wz79e3tM5FWA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=R6L/NG5B19vFB62vUhEo7Onvv8H91ufcgOeI0VBr4xOWN77KBZj5CxNZGfd3Bz7s97R5fA2prSghJFZOBGcgkQy5PDJ1rOaQ41CMIL2g865lkM24i4TEF5spvV/EHtdVvSyrVG7wlj53t2RygnZdXCmlWwaEtXOgk2KUaOKHJ+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iX3OE5qF; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-661169cd6d8so1902a12.1
-        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 15:45:36 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772840735; cv=none;
-        d=google.com; s=arc-20240605;
-        b=J3dAFDync7gB2R6lH/WqQtDX2OSRh0/FZfPfw1v+STIjGMjdQNqMl4kD6zKJU9n0rl
-         gJY2R3fvfx4BEn/aQdRt6TDn7WMS6TJVWh7gK4C8TGpH8k++WOJV2uctiHJIT9LeLXf4
-         MHbjiFiZ94yIHPszDASS2NrPnOVULbB415lwVqxBCvQfWYqoqcq0ksCm8XWwCviIx7U0
-         WE/UZcCoxj5k+cdKA2zB6mc1G00KCwnJBdyR4segkuRJbywOeBOL8nLkb5hnNp0/vu0r
-         Zk2eWTtkHkOBpOCG9SHVYf1dBhNZOtX8KTlLXheeAhnHVfQBKcQvTu+08SR89b9uGJTl
-         b6GA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=GJtBB9cbQADjutlg1/84ZCAeyk/fDQtRv94VxILrjkc=;
-        fh=czHwFJ9lfJkj4DKwNM9RIuRAp12F9Fg+2Gfqn2qZ7bg=;
-        b=IuYiw5MvmEHmEI5z2t16UqrV/yGoUVwkkltQ2XQrTt4rxAw7o1RvDRHar6Hsl9Yes7
-         4iDapfbwCPaOT7cpW/3i8yVOyMnkSb0qVG0PZMx6x8zOaf/eDkpJUUt5gEnCxqqCffz6
-         xh7JDcL5x6ndqZR0K1zdUWeRoMUSs28AqreWh44SCwgmXghSG/jPDl4ydHLE3SWldguS
-         6qbRUVzqI+bpRu3MCTHp9+MFYqlVgN+RvUSYMShwkqH3X8q7ItUqNNT7XpJKOF9ARyIo
-         fPwT2ccohabBrycUaLDMOubpuiEWpSWRD5zh7kcmxxNJpBxyGMWclXD6GDdRwo+bdx4N
-         WL4g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c6e24ee93a6so5954957a12.0
+        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 16:28:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772840735; x=1773445535; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GJtBB9cbQADjutlg1/84ZCAeyk/fDQtRv94VxILrjkc=;
-        b=QifiXDk78JP3ncau1n7FjamvTnyiPlVxjBX8DA8uaXB4uvRQxrig0ZEJT0bko0ciFz
-         AKv+C4NtV27O9fJPGVmiA5OOpoLJa2A1v5kW0qp9gyNLe8PeyqK4BruXLyOv0lidYV4N
-         WeXdlD5V1sGatKVPMHinjBY/M0EXYz3OM4b0VX2bUvzYUnXxDoPJPlJB0aPSFJC0zupW
-         TNkunCmoNBzLpCLlGLWPh3LMkgqgeBD/uOPVrkXATlttgjWtWRpKukAizfjSlhXFDWug
-         pSX5wpxjK1eZlSoRoYdEgbNuf2C4eCGBBwZe5jnt2jpMezTEXGELOvqkl2mFBO/4S0J1
-         p+7A==
+        d=google.com; s=20230601; t=1772843331; x=1773448131; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tHNM+q95fw1pTGGYqDi35exVyzczshxw543JBLx5Ogc=;
+        b=iX3OE5qFtiCoQVDsQlxF8Pmm5zbfPp/URqbfaUr46NBC8PtAo+ualv/M3Nv/0JIsGb
+         H4/znFX1+TSerqwJGfg/SP3WLYeY0Q4dZzjxwLcKr7Yk6hcXnFXkZ29N/VSL2LuGObax
+         DJ6DczlviSGNaZJpHGCepEtNWc1Fik5wF41n90Pgj3oK6DV/ir/l7E1r2GB9wWCL1iJB
+         xQmlpW0YTzSJ9+PlWJcR9tGsmAGdTLhoe88sOy5WXidCSAJOErGm7XfqzhjwDlDVRli4
+         YhU3rDPiBuKIOMhrKMYsJpXUM/hj8LuhgTHLagYeBrZSPPMX9F4CgOacodgwiUGx7aAs
+         ooTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772840735; x=1773445535;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=GJtBB9cbQADjutlg1/84ZCAeyk/fDQtRv94VxILrjkc=;
-        b=HCA+82sVoBg3tnQ8ZJ4jTc6cwUh/MFfjYmhH5ubU2GG2fj2C0ktbHiEBrjEciWWo0A
-         UwagJSnnicO/oYF9IYkONnDvmXXLqcTIZMVY5LJS/fV302xrYR5QRwota0JXo+gQ9Q3h
-         ppAPEccQhhsMLb2qrwvqDqi0QTzlOI07wLfnHBZLJS9eNY8r5oywmWgAjATuIlS5/Ing
-         CYK04uj8OL/vw/HNtpPwFQF/Kdd1fzgPFuf3f2rBlxsoIxmgdFHl7bS+eXS18uockjek
-         MIU6KNwcQVd5Uy5jaG8mgT/JIAhu7LGoIB9uPNoCUJwyHBeuN9LGcLl7WzTsf4hZDgtr
-         Yvww==
-X-Forwarded-Encrypted: i=1; AJvYcCWjXvM4qKTKHXb5nl1Is6WJAgtOxtYC9iEbJmOLzPxGXRZ1BUdXSuCywWSEwPucrml+uiU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8GV+t4IAfCdm1tU9jYfRArGspOqDYyquY9w4ZhOCylYe1UIO7
-	fsykuaTeBr9wcxvX0b0ZkOFH95X1euTuCVbeQ2H95VGyb/55wL8yfzoghTljqDXq42C6adcm/As
-	WxiPEab22G4qwZf2yayZrCsx2K9ejO1H2nQdCszfM
-X-Gm-Gg: ATEYQzxbxmx7UjHmdz2n3DMeL3r15mlh0P9qFy3BD9NpINQTlNgO6z0418a8YYSs3cX
-	VZFl5eQJE4I3aOgjJZQ3MjBBrgsfTRH40TXf8Rf31VEQqIERML3Igdw6H6l3Be73DTvaa2P5BOI
-	qWxeT5u6SIwzrq+miGG5H4CYEq+YRFyvxTMuTmrgxS5bCBQNuiLmn6kgx2Cdduw5a8jR1yoh9uQ
-	qPcqqgqY4KDjl21HOjzJzAQrxsyMolkWqL8t66a4DuWPz6ENE5P8nS3pt9My1EB/ojGnrpk/Ast
-	WmL9NYg=
-X-Received: by 2002:aa7:c245:0:b0:660:ce96:cd8d with SMTP id
- 4fb4d7f45d1cf-661e70e9f6emr9285a12.2.1772840734706; Fri, 06 Mar 2026 15:45:34
- -0800 (PST)
+        d=1e100.net; s=20230601; t=1772843331; x=1773448131;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tHNM+q95fw1pTGGYqDi35exVyzczshxw543JBLx5Ogc=;
+        b=UcU0OzgGn9chQmuEdNMan/sEhWmdcf867yNWxQC/JkHiVYZIaxz6rru5h68z48ITQ5
+         bkrzg/SidFc6Q4U27yhV70r7krJ/KzcPjJzh5vxGOWjFYhnCd7glabwYZQvw+STAhmqs
+         YVg4+qbHTbY4gzGWxUZmDtoNlbtCnPQBf4D0FOC25JukLp0qqI7wpxfYUOEuqcdj5dep
+         Tp7NLFTUcLckZMosUrLWiBjmUyBGiyCa+Zixiv4t9kfAn3WhX4tGViwmIwlL9fjulhEd
+         3B71p9KyfmM+vUUWqNOV/kQr329z8arWkBDXFv9zzE4gZFD3hkaNN+UkfEq+aK2CYlE+
+         JzMg==
+X-Forwarded-Encrypted: i=1; AJvYcCWXeul3yGD/ALaBT8DHvfSLpva4cQLVfdJyJX1PxVf5lj7yZq/OK09K+ASyHYM0abFsA/4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYWIaSzYWiX5/ThGk5EZuCj1C8wqaOIzdoW/w9VSQ4WDgv2vQT
+	NJ0EIG/IF9ipTv+A5nfyAZWj6D3hGaKHkaiaTeZsHby59/xFxjE2nDz8XH03a4btwxtQCWsUa2r
+	GBDuZww==
+X-Received: from pjza2.prod.google.com ([2002:a17:90a:e202:b0:359:86b9:176d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3dc8:b0:359:8c5a:a564
+ with SMTP id 98e67ed59e1d1-359be37fc88mr3246997a91.13.1772843330852; Fri, 06
+ Mar 2026 16:28:50 -0800 (PST)
+Date: Fri, 6 Mar 2026 16:28:49 -0800
+In-Reply-To: <CALMp9eScswzFak+PMOcaDXM-W+cXtkG7fQ=jadq__+5JeqYcTQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 References: <20260306210900.1933788-1-yosry@kernel.org> <20260306210900.1933788-2-yosry@kernel.org>
  <CALMp9eRWwPwUSyQmizy8i2tF1CVO4iLY6x0vX1OoPUiRdCm4NQ@mail.gmail.com>
- <CAO9r8zOhaDeYWq_6TNdPGyEE323o_8xsWTozGdro9Oni8310kA@mail.gmail.com>
- <CALMp9eScswzFak+PMOcaDXM-W+cXtkG7fQ=jadq__+5JeqYcTQ@mail.gmail.com> <CAO9r8zOK5+xmkf3FsWRz2wHcUCN30GJ9kfZx-K7DAa1HNGhRVA@mail.gmail.com>
-In-Reply-To: <CAO9r8zOK5+xmkf3FsWRz2wHcUCN30GJ9kfZx-K7DAa1HNGhRVA@mail.gmail.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Fri, 6 Mar 2026 15:45:22 -0800
-X-Gm-Features: AaiRm50abE4bbOMdoY75xPHADuVduiO8lygtoerodZLT3KKWu_82xp2UdXcy8Dk
-Message-ID: <CALMp9eRZy78fc=8_NtGTeYYX8EU-VEKkSMG=oibTijKC8ANJWQ@mail.gmail.com>
+ <CAO9r8zOhaDeYWq_6TNdPGyEE323o_8xsWTozGdro9Oni8310kA@mail.gmail.com> <CALMp9eScswzFak+PMOcaDXM-W+cXtkG7fQ=jadq__+5JeqYcTQ@mail.gmail.com>
+Message-ID: <aatxQXV-mQX6uE1C@google.com>
 Subject: Re: [PATCH v2 1/6] KVM: SVM: Use maxphyaddr in emulator RAX check for VMRUN/VMLOAD/VMSAVE
-To: Yosry Ahmed <yosry@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Yosry Ahmed <yosry@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 79211228D45
+X-Rspamd-Queue-Id: BD6AE228FC8
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-73186-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73185-lists,kvm=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.957];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-0.949];
 	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Fri, Mar 6, 2026 at 3:20=E2=80=AFPM Yosry Ahmed <yosry@kernel.org> wrote=
-:
->
-> > > Right, but I am trying to have the #GP check for VMLOAD/VMSAVE behave
-> > > consistently with vls=3D1, whether it's done by the hardware or the
-> > > emulator.
+On Fri, Mar 06, 2026, Jim Mattson wrote:
+> On Fri, Mar 6, 2026 at 2:37=E2=80=AFPM Yosry Ahmed <yosry@kernel.org> wro=
+te:
 > >
-> > Consistency should not be an issue, since VLS cannot be enabled when
-> > the MAXPHYADDRs differ. VLS doesn't work in that scenario.
->
-> Why? It's only broken if VMLOAD/VMSAVE is executed with a GPA that
-> exceeds the guest's MAXPHYADDR, but not the host's, right? So only
-> broken if the guest is misbehaving.
+> > On Fri, Mar 6, 2026 at 2:27=E2=80=AFPM Jim Mattson <jmattson@google.com=
+> wrote:
+> > >
+> > > On Fri, Mar 6, 2026 at 1:09=E2=80=AFPM Yosry Ahmed <yosry@kernel.org>=
+ wrote:
+> > > >
+> > > > Architecturally, VMRUN/VMLOAD/VMSAVE should generate a #GP if the
+> > > > physical address in RAX is not supported. check_svme_pa() hardcodes=
+ this
+> > > > to checking that bits 63-48 are not set. This is incorrect on HW
+> > > > supporting 52 bits of physical address space, so use maxphyaddr ins=
+tead.
+> > > >
+> > > > Note that the host's maxphyaddr is used, not the guest, because the
+> > > > emulator path for VMLOAD/VMSAVE is generally used when virtual
+> > > > VMLOAD/VMSAVE is enabled AND a #NPF is generated. If a #NPF is not
+> > > > generated, the CPU will inject a #GP based on the host's maxphyaddr=
+.  So
+> > > > this keeps the behavior consistent.
+> > > >
+> > > > If KVM wants to consistently inject a #GP based on the guest's
+> > > > maxphyaddr, it would need to disabled virtual VMLOAD/VMSAVE and
+> > > > intercept all VMLOAD/VMSAVE instructions to do the check.
+> > > >
+> > > > Also, emulating a smaller maxphyaddr for the guest than the host
+> > > > generally doesn't work well, so it's not worth handling this.
+> > >
+> > > If we're going to throw in the towel on allow_smaller_maxphyaddr, the
+> > > code should be removed.
+> > >
+> > > In any case, the check should logically be against the guest's
+> > > maxphyaddr, because the VMLOAD/VMSAVE instruction executes in guest
+> > > context.
+> >
+> > Right, but I am trying to have the #GP check for VMLOAD/VMSAVE behave
+> > consistently with vls=3D1, whether it's done by the hardware or the
+> > emulator.
+>=20
+> Consistency should not be an issue, since VLS cannot be enabled when
+> the MAXPHYADDRs differ. VLS doesn't work in that scenario.
+>=20
+> > >
+> > > Note that virtual VMLOAD/VMSAVE cannot be used if the guest's
+> > > maxphyaddr doesn't match the host's maxphyaddr.
+> >
+> > Not sure what you mean? Do you mean it wouldn't be correct to use it?
+> > AFAICT that doesn't prevent it from being enabled.
 
-"Misbehaving" is a tad pejorative. Faulting behavior is part of the
-architectural specification. A less biased assessment is that VLS is
-partially correct when the MAXPHYADDRs don't match.
+It does, actually.  KVM doesn't support allow_smaller_maxphyaddr when NPT i=
+s
+enabled, because AMD CPUs (and now some Intel CPUs, lolz) do A/D updates be=
+fore
+signalling the reserved #NPF.
 
-People thought it was a big deal when FDIV produced incorrect results
-one out of 10 billion times.
+	allow_smaller_maxphyaddr =3D !npt_enabled;
 
-> Taking a step back, I am not disagreeing that VLS should not be used
-> with different MAXPHYADDRs, I am just saying it might be.
 
-That would be wrong.
+And vls is disabled if NPT is disabled, for all the reasons Jim is pointing=
+ out.
+
+	if (vls) {
+		if (!npt_enabled ||
+		    !boot_cpu_has(X86_FEATURE_V_VMSAVE_VMLOAD) ||
+		    !IS_ENABLED(CONFIG_X86_64)) {
+			vls =3D false;
+		} else {
+			pr_info("Virtual VMLOAD VMSAVE supported\n");
+		}
+	}
+
+Thus running with allow_smaller_maxphyaddr+vls is impossible.
+
+> It is incorrect to use VLS when it doesn't work.
 
