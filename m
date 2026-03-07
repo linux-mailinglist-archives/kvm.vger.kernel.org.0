@@ -1,216 +1,204 @@
-Return-Path: <kvm+bounces-73218-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73219-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wNJeNiqPq2kaeQEAu9opvQ
-	(envelope-from <kvm+bounces-73218-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 03:36:26 +0100
+	id OKkiEEuQq2lHeQEAu9opvQ
+	(envelope-from <kvm+bounces-73219-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 03:41:15 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8822B229A28
-	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 03:36:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9256A229A78
+	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 03:41:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DFB863098896
-	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2026 02:35:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0BCFD309BE9D
+	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2026 02:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B251B2D6E7E;
-	Sat,  7 Mar 2026 02:35:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB0C2F1FE3;
+	Sat,  7 Mar 2026 02:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cibbdFCA"
 X-Original-To: kvm@vger.kernel.org
-Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC301F0E2E;
-	Sat,  7 Mar 2026 02:35:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C63D28B7EA;
+	Sat,  7 Mar 2026 02:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772850957; cv=none; b=RTHM9wuU18Ixp4JtGtfQey9JsBIXXvFjaGAIlHZZQAEaisIglwT6ORllX1H9jnIhjf/ZwJd0HUKOPXVuS32+8p2fh4Icg5ihGxf8Nz3+vTNGle60XtBcMoVlcaDtogHZ8A+oxIr9Jl2wmyWG/mAbQn1hETQCyp0LDQA8v01Krds=
+	t=1772851236; cv=none; b=jebgTyEhwm2FJalC8CepjupDdgi0gfNBrAWEKRnu6lBTlPsx3/QpdAvsJPWqSzDrMDEZbhvL2XAdVpa0CARi4IIanKnBLFN0VPUdZSX4Qt3J0diq2Rqn/y5rh2/V/6VoLf4sMBT63NCMmMGj0GvU/d5SLkfAyfyNjCJ4NNCASeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772850957; c=relaxed/simple;
-	bh=CseQ6nlOsyy8lb+9pULwavR2MOkQcoP/seLQW3yInRM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YCLREgq5yaLF1bOnpy2fENLH1KjLOAMi5mbOWUGFELJh39xy1BD4EDFrXr/KvBE+oha5ujwftkvC6shyUX46m8QyoCxDsMwvTOlFznrUjd3CXk7odifcJhjP2/fKck5Rz3KiPb1/FrZyfVthwB2YuvdZ8iJvOCscrEWLTagNLfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from fric.. (unknown [210.73.43.101])
-	by APP-05 (Coremail) with SMTP id zQCowABH1Qj5jqtptETJCQ--.6811S2;
-	Sat, 07 Mar 2026 10:35:37 +0800 (CST)
-From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
-To: andrew.jones@oss.qualcomm.com
-Cc: ajones@ventanamicro.com,
-	alex@ghiti.fr,
-	anup@brainfault.org,
-	aou@eecs.berkeley.edu,
-	atish.patra@linux.dev,
-	jiakaiPeanut@gmail.com,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	palmer@dabbelt.com,
-	pjw@kernel.org,
-	xujiakai2025@iscas.ac.cn
-Subject: Re: [PATCH 1/2] RISC-V: KVM: Fix array out-of-bounds in pmu_ctr_read()
-Date: Sat,  7 Mar 2026 02:35:37 +0000
-Message-Id: <20260307023537.3686946-1-xujiakai2025@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <7cv4cq43l33fvpbikecjecfulomzurfmlbjk45u6amvdmnmrhu@7padusm25g5l>
-References: <7cv4cq43l33fvpbikecjecfulomzurfmlbjk45u6amvdmnmrhu@7padusm25g5l>
+	s=arc-20240116; t=1772851236; c=relaxed/simple;
+	bh=c4HYzQN0vXYjWHgpJTlJgGV9/4D6aRi70EbJEvmAYGw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WTe78ToI+TPIZINoD1s0XiTKNK4MzquBTZ31pVpJwgXmoPhVssblK0b+HWNX4rbHcCy33ngZRtmjaHJ0DvPKLZPK4xHSaX1TNqiJzMUqBd+mHVWjeg1a7Ift/a66nCYD4QY+uvVBwMMkPPWcBsYUMagYNlKXdJnmYyFqxCOqt80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cibbdFCA; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1772851235; x=1804387235;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=c4HYzQN0vXYjWHgpJTlJgGV9/4D6aRi70EbJEvmAYGw=;
+  b=cibbdFCAKxh/ppMbXretMtzlhFF2W//x0k8W4+I7GZhg1SlT/f3d+6ev
+   NUF/FI+T24FzceB2RY5euP+fZoOu8BIa0P5vwXeh+BJlzSKspMJXjn6Kl
+   32mtUrVOuHhtmaiyxvFAQC4AOeLyQkqPj8Mgj2IKPNMaBH6EkUfUeUmoU
+   YkGVbRXNochHk8XJ2C3mk7EROJ8vNRgoQsrcQ+njmDrv/W7JVdWSDqwQ8
+   WQ7itDqHmTUQNI8Bswt0RB4GWpn9vFyKeCk0PwW/AnImUDeiU+6fLqvO2
+   iHzqSkBpHNBHNjgHYS3JpaGTLkaiNsYAKObXdy73UhKdyssdhaJan/eAN
+   Q==;
+X-CSE-ConnectionGUID: vdMduCHHTaKNvGBcvGgBQQ==
+X-CSE-MsgGUID: IKsedVizSeybSaQKE8IsiA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11721"; a="84597598"
+X-IronPort-AV: E=Sophos;i="6.23,106,1770624000"; 
+   d="scan'208";a="84597598"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2026 18:40:35 -0800
+X-CSE-ConnectionGUID: P49Gc/fIRhOduYL+i83w+A==
+X-CSE-MsgGUID: 9R+cPpZeTGuRq94Bj/HJaA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,106,1770624000"; 
+   d="scan'208";a="215810667"
+Received: from lkp-server01.sh.intel.com (HELO 058beb05654c) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 06 Mar 2026 18:40:31 -0800
+Received: from kbuild by 058beb05654c with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vyhae-000000001cD-0Wkz;
+	Sat, 07 Mar 2026 02:40:28 +0000
+Date: Sat, 7 Mar 2026 10:39:46 +0800
+From: kernel test robot <lkp@intel.com>
+To: Sairaj Kodilkar <sarunkod@amd.com>, "H. Peter Anvin" <hpa@zytor.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Ingo Molnar <mingo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Thomas Gleixner <tglx@kernel.org>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, x86@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, suravee.suthikulpanit@amd.com,
+	vasant.hegde@amd.com, nikunj.dadhania@amd.com,
+	Manali.Shukla@amd.com, Sairaj Kodilkar <sarunkod@amd.com>
+Subject: Re: [PATCH] KVM: x86: Add support for cmpxchg16b emulation
+Message-ID: <202603071055.Wi43mREW-lkp@intel.com>
+References: <20260306102047.29760-1-sarunkod@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowABH1Qj5jqtptETJCQ--.6811S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxCFyfCw13ArWfKr1DAF43KFg_yoWrGryUpa
-	y8JayYyr1fKFnrtFy3ArnFgr1UJan3Zay8Jry7Gryjyr45JryfXrsFgF9FyayDCFZ5Ww13
-	uw1Iga1ruF4UAaDanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
-	0_GcWlnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67
-	AK6r4UMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
-	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc4
-	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
-	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
-	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXo7tUU
-	UUU==
-X-CM-SenderInfo: 50xmxthndljiysv6x2xfdvhtffof0/1tbiCRATCWmrbvc4AQAAsh
-X-Rspamd-Queue-Id: 8822B229A28
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260306102047.29760-1-sarunkod@amd.com>
+X-Rspamd-Queue-Id: 9256A229A78
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [0.04 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73218-lists,kvm=lfdr.de];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[ventanamicro.com,ghiti.fr,brainfault.org,eecs.berkeley.edu,linux.dev,gmail.com,lists.infradead.org,vger.kernel.org,dabbelt.com,kernel.org,iscas.ac.cn];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-73219-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[xujiakai2025@iscas.ac.cn,kvm@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.675];
-	TO_DN_NONE(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,iscas.ac.cn:mid]
+	NEURAL_HAM(-0.00)[-0.963];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:email,intel.com:mid,01.org:url]
 X-Rspamd-Action: no action
 
-Hi Andrew,
+Hi Sairaj,
 
-Thanks for the review and the suggestions.
+kernel test robot noticed the following build warnings:
 
-I agree with your feedback. In v2, I will merge the fixes for both
-pmu_ctr_read() and pmu_fw_ctr_read_hi() into a single commit and remove
-the pr_warn, simply returning -EINVAL instead.
+[auto build test WARNING on kvm/queue]
+[also build test WARNING on kvm/next tip/master linus/master v7.0-rc2 next-20260306]
+[cannot apply to kvm/linux-next tip/auto-latest]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-I have two questions regarding the next version:
+url:    https://github.com/intel-lab-lkp/linux/commits/Sairaj-Kodilkar/KVM-x86-Add-support-for-cmpxchg16b-emulation/20260306-182915
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20260306102047.29760-1-sarunkod%40amd.com
+patch subject: [PATCH] KVM: x86: Add support for cmpxchg16b emulation
+config: i386-randconfig-005-20260307 (https://download.01.org/0day-ci/archive/20260307/202603071055.Wi43mREW-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.4.0-5) 12.4.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260307/202603071055.Wi43mREW-lkp@intel.com/reproduce)
 
-1. Regarding other pr_warns in PMU emulation code:
-You mentioned that other pr_warns in the code might need auditing. Should
-I address those in this patchset (e.g., converting them to pr_warn_once
-or removing them), or is it better to keep this series focused strictly
-on the out-of-bounds fix and handle the logging cleanup in a separate
-patchset later?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603071055.Wi43mREW-lkp@intel.com/
 
-2. Selftests update:
-I noticed that applying this fix causes a regression in
-selftests/kvm/sbi_pmu_test. The test_pmu_basic_sanity function currently
-attempts to read a firmware counter without configuring it via
-SBI_EXT_PMU_COUNTER_CFG_MATCH first.
+All warnings (new ones prefixed by >>):
 
-Previously, this triggered the out-of-bounds access (likely reading
-garbage), but with this fix, the kernel correctly returns
-SBI_ERR_INVALID_PARAM, causing the test to fail.
+   In file included from arch/x86/kvm/emulate.c:24:
+   arch/x86/kvm/kvm_emulate.h:271:17: error: unknown type name '__uint128_t'
+     271 |                 __uint128_t val128;
+         |                 ^~~~~~~~~~~
+   arch/x86/kvm/emulate.c: In function '__handle_cmpxchg16b':
+   arch/x86/kvm/emulate.c:2215:9: error: unknown type name '__uint128_t'; did you mean '__int128__'?
+    2215 |         __uint128_t old128 = ctxt->dst.val128;
+         |         ^~~~~~~~~~~
+         |         __int128__
+>> arch/x86/kvm/emulate.c:2222:28: warning: right shift count >= width of type [-Wshift-count-overflow]
+    2222 |             ((u64) (old128 >> 64) != (u64) reg_read(ctxt, VCPU_REGS_RDX))) {
+         |                            ^~
+   arch/x86/kvm/emulate.c:2224:65: warning: right shift count >= width of type [-Wshift-count-overflow]
+    2224 |                 *reg_write(ctxt, VCPU_REGS_RDX) = (u64) (old128 >> 64);
+         |                                                                 ^~
+   arch/x86/kvm/emulate.c:2228:27: error: '__uint128_t' undeclared (first use in this function); did you mean '__int128__'?
+    2228 |                         ((__uint128_t) reg_read(ctxt, VCPU_REGS_RCX) << 64) |
+         |                           ^~~~~~~~~~~
+         |                           __int128__
+   arch/x86/kvm/emulate.c:2228:27: note: each undeclared identifier is reported only once for each function it appears in
+   arch/x86/kvm/emulate.c:2228:39: error: expected ')' before 'reg_read'
+    2228 |                         ((__uint128_t) reg_read(ctxt, VCPU_REGS_RCX) << 64) |
+         |                         ~             ^~~~~~~~~
+         |                                       )
 
-To fix this, I plan to include a second patch in v2 that updates the
-selftest to properly configure the counter before reading. Here is my
-draft for the fix. Does this approach look reasonable to you?
 
-Thanks,
-Jiakai
+vim +2222 arch/x86/kvm/emulate.c
 
----
- .../testing/selftests/kvm/include/riscv/sbi.h | 28 +++++++++++++++++++
- .../selftests/kvm/riscv/sbi_pmu_test.c        |  9 +++++-
- 2 files changed, 36 insertions(+), 1 deletion(-)
+  2212	
+  2213	static int __handle_cmpxchg16b(struct x86_emulate_ctxt *ctxt)
+  2214	{
+  2215		__uint128_t old128 = ctxt->dst.val128;
+  2216	
+  2217		/* Use of the REX.W prefix promotes operation to 128 bits */
+  2218		if (!(ctxt->rex_bits & REX_W))
+  2219			return X86EMUL_UNHANDLEABLE;
+  2220	
+  2221		if (((u64) (old128 >> 0) != (u64) reg_read(ctxt, VCPU_REGS_RAX)) ||
+> 2222		    ((u64) (old128 >> 64) != (u64) reg_read(ctxt, VCPU_REGS_RDX))) {
+  2223			*reg_write(ctxt, VCPU_REGS_RAX) = (u64) (old128 >> 0);
+  2224			*reg_write(ctxt, VCPU_REGS_RDX) = (u64) (old128 >> 64);
+  2225			ctxt->eflags &= ~X86_EFLAGS_ZF;
+  2226		} else {
+  2227			ctxt->dst.val128 =
+  2228				((__uint128_t) reg_read(ctxt, VCPU_REGS_RCX) << 64) |
+  2229				(u64) reg_read(ctxt, VCPU_REGS_RBX);
+  2230	
+  2231			ctxt->eflags |= X86_EFLAGS_ZF;
+  2232		}
+  2233		return X86EMUL_CONTINUE;
+  2234	}
+  2235	
 
-diff --git a/tools/testing/selftests/kvm/include/riscv/sbi.h b/tools/testing/selftests/kvm/include/riscv/sbi.h
-index 046b432ae896..8c172422f386 100644
---- a/tools/testing/selftests/kvm/include/riscv/sbi.h
-+++ b/tools/testing/selftests/kvm/include/riscv/sbi.h
-@@ -97,6 +97,34 @@ enum sbi_pmu_hw_generic_events_t {
- 	SBI_PMU_HW_GENERAL_MAX,
- };
- 
-+enum sbi_pmu_fw_generic_events_t {
-+	SBI_PMU_FW_MISALIGNED_LOAD	= 0,
-+	SBI_PMU_FW_MISALIGNED_STORE	= 1,
-+	SBI_PMU_FW_ACCESS_LOAD		= 2,
-+	SBI_PMU_FW_ACCESS_STORE		= 3,
-+	SBI_PMU_FW_ILLEGAL_INSN		= 4,
-+	SBI_PMU_FW_SET_TIMER		= 5,
-+	SBI_PMU_FW_IPI_SENT		= 6,
-+	SBI_PMU_FW_IPI_RCVD		= 7,
-+	SBI_PMU_FW_FENCE_I_SENT		= 8,
-+	SBI_PMU_FW_FENCE_I_RCVD		= 9,
-+	SBI_PMU_FW_SFENCE_VMA_SENT	= 10,
-+	SBI_PMU_FW_SFENCE_VMA_RCVD	= 11,
-+	SBI_PMU_FW_SFENCE_VMA_ASID_SENT	= 12,
-+	SBI_PMU_FW_SFENCE_VMA_ASID_RCVD	= 13,
-+
-+	SBI_PMU_FW_HFENCE_GVMA_SENT	= 14,
-+	SBI_PMU_FW_HFENCE_GVMA_RCVD	= 15,
-+	SBI_PMU_FW_HFENCE_GVMA_VMID_SENT = 16,
-+	SBI_PMU_FW_HFENCE_GVMA_VMID_RCVD = 17,
-+
-+	SBI_PMU_FW_HFENCE_VVMA_SENT	= 18,
-+	SBI_PMU_FW_HFENCE_VVMA_RCVD	= 19,
-+	SBI_PMU_FW_HFENCE_VVMA_ASID_SENT = 20,
-+	SBI_PMU_FW_HFENCE_VVMA_ASID_RCVD = 21,
-+	SBI_PMU_FW_MAX,
-+};
-+
- /* SBI PMU counter types */
- enum sbi_pmu_ctr_type {
- 	SBI_PMU_CTR_TYPE_HW = 0x0,
-diff --git a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-index 924a335d2262..0d6ba3563561 100644
---- a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-+++ b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-@@ -461,7 +461,14 @@ static void test_pmu_basic_sanity(void)
- 			pmu_csr_read_num(ctrinfo.csr);
- 			GUEST_ASSERT(illegal_handler_invoked);
- 		} else if (ctrinfo.type == SBI_PMU_CTR_TYPE_FW) {
--			read_fw_counter(i, ctrinfo);
-+			/*
-+			 * Try to configure with a common firmware event.
-+			 * If configuration succeeds, verify we can read it.
-+			 */
-+			ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_CFG_MATCH,
-+			        i, 1, 0, SBI_PMU_FW_ACCESS_LOAD, 0, 0);
-+			if (ret.error == 0 && ret.value < RISCV_MAX_PMU_COUNTERS && BIT(ret.value) & counter_mask_available)
-+				read_fw_counter(i, ctrinfo);
- 		}
- 	}
- 
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
