@@ -1,135 +1,230 @@
-Return-Path: <kvm+bounces-73222-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73223-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aLzkI+WZq2nYegEAu9opvQ
-	(envelope-from <kvm+bounces-73222-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 04:22:13 +0100
+	id aJP/MRyyq2mSfgEAu9opvQ
+	(envelope-from <kvm+bounces-73223-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 06:05:32 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19242229D43
-	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 04:22:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FEE422A2E9
+	for <lists+kvm@lfdr.de>; Sat, 07 Mar 2026 06:05:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 29C6F3028367
-	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2026 03:21:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E22D1304527D
+	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2026 05:05:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776CF309DC4;
-	Sat,  7 Mar 2026 03:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A78735A925;
+	Sat,  7 Mar 2026 05:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="WwmfJOVX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cgCLjTY7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5C11E7C23;
-	Sat,  7 Mar 2026 03:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772853715; cv=none; b=MT4Qd7Lf2BmBdwx52pPimkZhGkUOpZMB5svvCPHp7L3E7LAAQ74DtKK7gZNxlDIi2l/LNnhuWKZ9x0JX4g+HaPUiwg9kNfMSV7IgJmgN5MIOFnX1Wg31ftPw3Sy3QLQ/4xGPaCMe+M7s3OrWce/fmUIv/mzJ69IDZX+yj4kZO8M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772853715; c=relaxed/simple;
-	bh=UuKtYQLEpbZzXF4D203RAUfvz14kMMGl6TPKP4QK4eA=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=lFfTZbbFkSjNKX0m1aOA0m5VDK/GP61/ZYzKsmP1n0oZ5mH4K5vzSRNDmq2tBWpDcRuznBoIVKXFNl7Kv/Q+G9qCmG1TNq/QBlv+CwC0CY3DiCZGCJYjJUVnMwj/24aixBT4gfDlVrdKtKANqZvYwbjWrxabBpjM9U6UJKXIaQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=WwmfJOVX; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from smtpclient.apple (c-24-130-165-117.hsd1.ca.comcast.net [24.130.165.117])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 62735SVf2594941
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 6 Mar 2026 19:05:28 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 62735SVf2594941
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2026022301; t=1772852729;
-	bh=Lg/cqXkxdh6j/9Vx7MayeK1i/ddSevoVsnuXd/tRki0=;
-	h=Subject:From:In-Reply-To:Date:Cc:References:To:From;
-	b=WwmfJOVXBs7PcVo13W3mUkrnrMY3knNv49gmfvuKuu3h+4GTZrIqjTjySTUWjhqBk
-	 3Ux2WInQ2riniuOpqEOnI5L/79IqMJd9rqhjSryUDIrn6HuWRLQhqm4+z/dgdpxZiV
-	 5FxvzK8Mezwc2y7vg2I19qDEBgluB0RDMj9NPdQqh9oYSPSZnsUXrC6S2FnGCR27Q3
-	 71bIdKHir94r9zRq1qPEPFJgp4epnt1OpS/qT/Ah33wRQSRarsA7uXwqJ9fonIiDI1
-	 VJp8gQxYHpW5wqX5vmrzeD8+Q2MDCCC18ylRgTPXhj+NC6vYUVC9LIodm89X+FFjuJ
-	 86OWLdG6OQRmg==
-Content-Type: text/plain;
-	charset=utf-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C955369980
+	for <kvm@vger.kernel.org>; Sat,  7 Mar 2026 05:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772859923; cv=pass; b=ljgc2VblMH/8ziRRJ+FJoxCw6Aka9UW9zMdKR7ivio+wk2cN7lLDIaeUY0933E28NLvIqGhA+GaA8hsnmZO9KvLuJxj4B0WBJ+zAnDHDD/HpbWyUPpYdpxGlb0xSlKrpzP+CkatXQM64EDk8wGKiMFEJlV6GASxPjlSMXFJMqMk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772859923; c=relaxed/simple;
+	bh=m+5jDdjhfe9gygaw5cmNN+U9gLqfe9mm1ny9+3sGnkk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JFeKesKP9zNNBtC8NxvSzV2e2LBpDbkN/vgQNIpyYZCAaL+eVEOxp5i72nlu3ERllK/bm/L1BtFg41NNtXYVyQFjiahgqwsLCQLJmLkmHVr6u1wD73dKn2BfFTHTsVsT0jfIhz6c9XMWIQnR0FcPhAZNEEVoxgdkh/flEs1aMEs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cgCLjTY7; arc=pass smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6614615fde6so2544a12.1
+        for <kvm@vger.kernel.org>; Fri, 06 Mar 2026 21:05:16 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772859915; cv=none;
+        d=google.com; s=arc-20240605;
+        b=eoDQ5YAV6VC1V0EIy56LpdQrZXbMhUBRnzFX2ewpqeaLfVF5wd6OnpubsmD0qrUxof
+         +lKnp/mj62gRBH9nuY9FbU2oVKzwnBzCVqNJQn3PjdQrsik9VqfM12Ld3A0bdoZv26os
+         qkMVp3z1ylJFlg5v6FXS9Y9nM4Q96tjCDI5BnROBmxFp37HaLmLk+zzbibdypdLUDF3p
+         HXkCezQpP0eO9XzfH8y3qNAgWHpcsCaYN1NFoJE6CaqeRVG/k+s0dNVtczNTWExUPIvI
+         GlOoFDP9GQNf7GvG5eWJ2CHD3gRr7/yRuonQQPZxGdX0q7vSSU/p20W0n1u0/E548c0t
+         HHzw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=FzZnqBz8H2Ikf67ooR80zhf5Zwa0E0u4JK0MciwOL38=;
+        fh=+bfcKFq+/OQVtzrCBpcAyMlL2mqd/Z/pm2kLkprpBiA=;
+        b=LcvvCYGnoTdKupeAdJXgKbS6ZbDy2WJLVSMrTljRkRrd/vz+DuNFecBF6AGLG5+xjT
+         PjxOYmUM7d5e/HOEAlMHgfxUaAy+2u+8bkMsXkM8WnK2E7vy+yEnHwcZDHOSkiB/emwd
+         8ctXWqZYKPul4q3G5jafPNC5472OxPxWNqB2U4ehakRKbs05T1Hbg0ew1NtMtqJQO9PD
+         VGIKhCPbPmRl6NmYa3XygTtTHB6LgagRmiQF/ovNORz6aSMijM7/OOKHStLbF0r/H0el
+         +EHgCaZ/i6q8vnRipmY3UrRkvQop7A92vWpW8XPdpJWDSyw879Eab5D/1/QfBAwcYvnb
+         CYsw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772859915; x=1773464715; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FzZnqBz8H2Ikf67ooR80zhf5Zwa0E0u4JK0MciwOL38=;
+        b=cgCLjTY7S7CFy3wtO4JOfrx/i5ewtsik1AhkKEjlbo3yrf1jw2gTeKJP3KqEM2XmX6
+         X5ZUl+sehe7bO/t1wfSQK+FKmsPSKkzSnLZi9sWVqRH7BzDFEY1ob3KLqzRnPfP7iLs4
+         vSYbd4nd5dWnztX7yRT7NQ2f+lNNhpmF51yLtwrYYwTdbLnAX9Ap3PGA4668lj2ESnRL
+         gX/G8C0unQLHHIH6y3OOiGn0pmbwKeVGdy7rOSpVTeseCmZ4RxRlB/baoRnJakN80vv4
+         TKP/kwd8wwYLk7DlJSWKUc2XNuxWS5a7/BaoLTjVSIrZYYbWofju1H/O+Hz2ytPCmEBh
+         psEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772859915; x=1773464715;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=FzZnqBz8H2Ikf67ooR80zhf5Zwa0E0u4JK0MciwOL38=;
+        b=MfXvSiLnHH8quzvzvrChIC4VFoQTD+lbAIhElNMGKN12SiKL5KVeFsTvaenzfsOgV1
+         wj+O1br4ADeNochITZGVxdz5tkRII7xoiR2fjn48difGaXOUYxROvkk95VrAlZotFnmq
+         wJqGRRdr45CVKkSK7i8jWUSGOUnjMcmwCmhq3hCPlwEckWIhQI2urubzdg3dY8HyYxTD
+         nun0wPYL8A5CDrveMjV/qXCQCF1H1T64ZG6Gxue8xW9gdT+l2kXkvw01/2ZBwjbgdMYB
+         ONw6JumC3Ef1aJh7x/G1JQx8dUztk0VFOEFJH175635TgssVrpw0Nf7fofmILmAZGXQc
+         5fEA==
+X-Forwarded-Encrypted: i=1; AJvYcCWuJvd/XLoUOdxpLQPNPQT5ysLei0ia2MXFaz6vjdw2vy73Syxv5yk6OlU9s6ksTY2pFOc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3mpANZCqfsC61WYmyVWImLdcWKSHFtW5rjGjkgmT/MWQMemVm
+	rm8rcZxCAD98o+dBVUIXSVPKUYp4HlTVVoVtcPMOpDsLoxsfeexvJ/rgleIy2cx/Sq4P26bU+a3
+	khQhmpQ8GqjufcyCR94cfjjNcEulAa1DnzJSM+Hha
+X-Gm-Gg: ATEYQzzjEeOui7tXjsb5ZYQ+Z86O/4RROlB737JPUHclL43CNcRia4qejPSKrqJGt5T
+	4tMDJV/LaMAs73hIUl4yjiTH51h2SBQhmTABRqjDm37sAeGjEFbo3urwKKEhBWRkSHjlymYSaDr
+	VYalvmL5jSLoX3KCVKSgUbyuPqTyc9DRvTbWJOZDJaKHbewPjSMyhgjVOK9F8aMNCzXyrx4+/9P
+	L7Dxk1CFvI4fOmg3nQPave5a5RrPoj9Xf1a6XkYTfOLHLliUXofmATwzzskELqvY25knuZ4cDU0
+	E3FAbBw=
+X-Received: by 2002:aa7:d997:0:b0:64b:2faa:d4e8 with SMTP id
+ 4fb4d7f45d1cf-661f54be61cmr10231a12.1.1772859914257; Fri, 06 Mar 2026
+ 21:05:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.400.21\))
-Subject: Re: [PATCH v9 13/22] KVM: VMX: Virtualize FRED nested exception
- tracking
-From: Xin Li <xin@zytor.com>
-In-Reply-To: <aauIT-6fK5Jl2Ig6@google.com>
-Date: Fri, 6 Mar 2026 19:05:18 -0800
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        luto@kernel.org, peterz@infradead.org, andrew.cooper3@citrix.com,
-        chao.gao@intel.com, hch@infradead.org, sohil.mehta@intel.com
+MIME-Version: 1.0
+References: <20251119-vmscape-bhb-v4-0-1adad4e69ddc@linux.intel.com>
+ <20251119-vmscape-bhb-v4-4-1adad4e69ddc@linux.intel.com> <CALMp9eQNBZsJNdfCVwbJ4v1DgCNqRV3DVcEeCPFt=dd29+qy-A@mail.gmail.com>
+ <20260306223225.l2beapz3nvmqefou@desk> <CALMp9eQoE13d1cqD3PNJtvdKUGZeVm1g-9TWh+M+MJj_sm9CzA@mail.gmail.com>
+ <20260306232920.dja5n7cngrsyj6tk@desk> <CALMp9eSoNaifKyppbjJjNx1YEw9KFv0LGAJ6xD-ko0zJnNXEbw@mail.gmail.com>
+ <20260307010051.u4ugg3nyvsu6hwbg@desk> <CALMp9eQGZcekQ3QtL=J7TqHJ9YfZ+SbrgY5P8fp14p4KNThYmw@mail.gmail.com>
+ <20260307024132.wleqtpovzd6wtvm7@desk>
+In-Reply-To: <20260307024132.wleqtpovzd6wtvm7@desk>
+From: Jim Mattson <jmattson@google.com>
+Date: Fri, 6 Mar 2026 21:05:01 -0800
+X-Gm-Features: AaiRm53KBRRe1-ojBI7-Ba8xmHnOvDB52LWWCjTuNBfS3IU6Sl_b4qSl6f-zxIY
+Message-ID: <CALMp9eTO0irFX9sZaVU84r1aW5E7Q2B3bE8uWfgViSug6Hx+og@mail.gmail.com>
+Subject: Re: [PATCH v4 04/11] x86/bhi: Make clear_bhb_loop() effective on
+ newer CPUs
+To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc: x86@kernel.org, David Kaplan <david.kaplan@amd.com>, 
+	Nikolay Borisov <nik.borisov@suse.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Josh Poimboeuf <jpoimboe@kernel.org>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>, 
+	Tao Zhang <tao1.zhang@intel.com>, David Dunn <daviddunn@google.com>, chao.gao@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <C6F155DA-70F1-4DC3-8317-ED40ABCA05E5@zytor.com>
-References: <20251026201911.505204-1-xin@zytor.com>
- <20251026201911.505204-14-xin@zytor.com> <aauIT-6fK5Jl2Ig6@google.com>
-To: Sean Christopherson <seanjc@google.com>
-X-Mailer: Apple Mail (2.3864.400.21)
-X-Rspamd-Queue-Id: 19242229D43
+X-Rspamd-Queue-Id: 3FEE422A2E9
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[zytor.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[zytor.com:s=2026022301];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73222-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[zytor.com:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	TAGGED_FROM(0.00)[bounces-73223-lists,kvm=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xin@zytor.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.915];
+	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,kvm@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-0.949];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[kvm];
-	APPLE_MAILER_COMMON(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[zytor.com:dkim,zytor.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,intel.com:email,mail.gmail.com:mid]
 X-Rspamd-Action: no action
 
+On Fri, Mar 6, 2026 at 6:41=E2=80=AFPM Pawan Gupta
+<pawan.kumar.gupta@linux.intel.com> wrote:
+>
+> On Fri, Mar 06, 2026 at 05:10:23PM -0800, Jim Mattson wrote:
+> > On Fri, Mar 6, 2026 at 5:01=E2=80=AFPM Pawan Gupta
+> > <pawan.kumar.gupta@linux.intel.com> wrote:
+> > >
+> > > +Chao
+> > >
+> > > On Fri, Mar 06, 2026 at 04:35:49PM -0800, Jim Mattson wrote:
+> > > > > > > > I think we need an explicit CPUID bit that a hypervisor can=
+ set to
+> > > > > > > > indicate that the underlying hardware might be SPR or later=
+.
+> > > > > > >
+> > > > > > > Something similar was attempted via virtual-MSRs in the below=
+ series:
+> > > > > > >
+> > > > > > > [RFC PATCH v3 09/10] KVM: VMX: Advertise MITI_CTRL_BHB_CLEAR_=
+SEQ_S_SUPPORT
+> > > > > > > https://lore.kernel.org/lkml/20240410143446.797262-10-chao.ga=
+o@intel.com/
+> > > > > > >
+> > > > > > > Do you think a rework of this approach would help?
+> > > > > >
+> > > > > > No, I think that whole idea is ill-conceived.  As I said above,=
+ the
+> > > > > > hypervisor should just set IA32_SPEC_CTRL.BHI_DIS_S on the gues=
+t's
+> > > > > > behalf when BHI_CTRL is not advertised to the guest. I don't se=
+e any
+> > > > > > value in predicating this mitigation on guest usage of the shor=
+t BHB
+> > > > > > clearing sequence. Just do it.
+> > > > >
+> > > > > There are cases where this would be detrimental:
+> > > > >
+> > > > > 1. A guest disabling the mitigation in favor of performance.
+> > > > > 2. A guest deploying the long SW sequence would suffer from two m=
+itigations
+> > > > >    for the same vulnerability.
+> > > >
+> > > > The guest is already getting a performance boost from the newer
+> > > > microarchitecture, so I think this argument is moot.
+> > >
+> > > For a Linux guest this is mostly true. IIRC, there is atleast one maj=
+or
+> > > non-Linux OS that suffers heavily from BHI_DIS_S.
+> >
+> > Presumably, this guest OS wants to deploy the long sequence (if it may
+> > run on SPR and later) and doesn't want BHI_DIS_S foisted on it. I
+> > don't recall that negotiation being possible with
+> > MSR_VIRTUAL_MITIGATION_CTRL.
+>
+> Patch 4/10 of that series is about BHI_DIS_S negotiation. A guest had to
+> set MITI_CTRL_BHB_CLEAR_SEQ_S_USED to indicate that it isn't aware of the
+> BHI_DIS_S control and is using the short sequence (ya, there is nothing
+> about the long sequence). When KVM sees this bit set, it deploys BHI_DIS_=
+S
+> for that guest.
+>
+> x86/bugs: Use Virtual MSRs to request BHI_DIS_S
+> https://lore.kernel.org/lkml/20240410143446.797262-5-chao.gao@intel.com/
 
+Ah. I see now. I missed this part of the specification: "Guest OSes
+that are using long or TSX sequences can optionally clear
+BHB_CLEAR_SEQ_S_USED bit in order to communicate this to the VMM."
 
-> On Mar 6, 2026, at 6:07=E2=80=AFPM, Sean Christopherson =
-<seanjc@google.com> wrote:
->=20
->> @@ -2231,7 +2232,8 @@ void kvm_queue_exception(struct kvm_vcpu *vcpu, =
-unsigned nr);
->> void kvm_queue_exception_e(struct kvm_vcpu *vcpu, unsigned nr, u32 =
-error_code);
->> void kvm_queue_exception_p(struct kvm_vcpu *vcpu, unsigned nr, =
-unsigned long payload);
->> void kvm_requeue_exception(struct kvm_vcpu *vcpu, unsigned int nr,
->> -    bool has_error_code, u32 error_code, u64 event_data);
->> +    bool has_error_code, u32 error_code, bool nested,
->=20
-> I think we should pick a different name, as both VMX and SVM declare =
-"nested" as
-> a global boolean.  I.e. this creates some nasty variable shadowing.
->=20
-> Maybe is_nested?
+Maybe this would be less confusing if BHB_CLEAR_SEQ_S_USED were named
+more clearly. Perhaps something like "SET_BHI_DIS_S_FOR_ME"?
 
-is_nested looks good to me.
-
-I thought about is_nested_exp, however the function names already =
-contain
-=E2=80=9Cexception=E2=80=9D, no point to duplicate it.=
+Is it reasonable to assume that without the presence of BHI_CTRL, the
+non-Linux OS we've been discussing will (ironically) only use the long
+sequence if the hypervisor advertises BHB_CLEAR_SEQ_S_SUPPORT? That
+is, without BHB_CLEAR_SEQ_S_SUPPORT, does it assume the short sequence
+is adequate?
 
