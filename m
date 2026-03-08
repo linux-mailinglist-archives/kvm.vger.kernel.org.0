@@ -1,231 +1,173 @@
-Return-Path: <kvm+bounces-73238-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73239-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2OaoKXpfrWkf2AEAu9opvQ
-	(envelope-from <kvm+bounces-73238-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sun, 08 Mar 2026 12:37:30 +0100
+	id 6E6oFvtgrWk92AEAu9opvQ
+	(envelope-from <kvm+bounces-73239-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sun, 08 Mar 2026 12:43:55 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18ECB22F6FE
-	for <lists+kvm@lfdr.de>; Sun, 08 Mar 2026 12:37:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C719122F8F4
+	for <lists+kvm@lfdr.de>; Sun, 08 Mar 2026 12:43:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3CDE3300F18E
-	for <lists+kvm@lfdr.de>; Sun,  8 Mar 2026 11:37:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A026E30755FF
+	for <lists+kvm@lfdr.de>; Sun,  8 Mar 2026 11:39:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C307C314D08;
-	Sun,  8 Mar 2026 11:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A61CE36CE1D;
+	Sun,  8 Mar 2026 11:39:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RTCRgCDa";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kek4VTyK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SGCN5MTH"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827FB2BAF7
-	for <kvm@vger.kernel.org>; Sun,  8 Mar 2026 11:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772969843; cv=pass; b=nokzgtRqZhkiza2M/0gHkPtpzDcUtXX3DKOJ9LK73in+LtmumsskrICzJyMNNaNJ1mn1x/7MLGI60xHbP8TVd8yxuLUWS68Ez8CNq9Xk5l2mBCfEPiVxugUVmUfWqYbc2UYl3Ue3FN7xCnj0zRhdRZsW8nP2f66dkfL98cKS0Lw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772969843; c=relaxed/simple;
-	bh=Hg/m/L7X/2wFGDLmS+K66JhSEuDhU5LK5I5zXEx3pr4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J+Zp6+ieHrW8WTN9r8ykRgu9pxHfNViPgsHguZ/pRWj7R0Im8cI4b2Wf0ph+Ncb5Pe40nxathGag5KAr6Ldq8o9Ei41+EDUWuXMBcO8fkqxjtGXqP3Dbb1oyCmoJwLKEwUNb6s8NRpTC4LLdgn/kz3uBWiKl0B+I/jRw0ZBGA54=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RTCRgCDa; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kek4VTyK; arc=pass smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CBE631B828
+	for <kvm@vger.kernel.org>; Sun,  8 Mar 2026 11:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772969942; cv=none; b=MSWZfU7bE15sYtDBMrI05Q1sfG2EAjn5ZqzIEbTrGos71W8bkbU3cgl1rpEF0cyQYMK1fArY+YYlO7pAiBiJV/56OfNZ+JvmPtS34B2uy9Tc48N3g30umHJKfo7LXniESw9LzVLmBdGBuIqqiZrEAjwpfCBgnt1IbNZbBWAwO8c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772969942; c=relaxed/simple;
+	bh=MzJytNiX7BKXpABC+JY8qrKP0Einh9dkCwkMSJWOtTo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iDfk9i/6aLgL7CuWBlT2L3MpGVCXWWzeCHkh75XpwZRDu2YmOavd2lF4yzOIiDfkxF4abBR+4ZIr9nmBQdyxu9Fn1XFKvCRTquq4IXgupcugSTdQC49+jhYeeGq52PJ0xLaUhd8flrqekIeHOZV+DILWDUKQADKPpS+osjyBmS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SGCN5MTH; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1772969840;
+	s=mimecast20190719; t=1772969940;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RQxvjiWaZpfq136BgtJUGLwuAiTet43kLgxTqa3sdJ8=;
-	b=RTCRgCDa1msknR7CN/Kp9z075TLwHvb9JZut688BZ1NEKYsneAxzpmVZuLJW2QkWODFXHE
-	BYXSRPGvenSaI9cseDYbXO17hkzhi4IYqq6yKZaAIrv38+xN41tMlMjSmaxAv4gggDovfV
-	AgytMhziD4sO07ZJEDori1JY1nHfmCw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-687-oFmharfLMB6KX-x8I6TVXw-1; Sun, 08 Mar 2026 07:37:18 -0400
-X-MC-Unique: oFmharfLMB6KX-x8I6TVXw-1
-X-Mimecast-MFC-AGG-ID: oFmharfLMB6KX-x8I6TVXw_1772969838
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-439cbfcfc21so4549921f8f.2
-        for <kvm@vger.kernel.org>; Sun, 08 Mar 2026 04:37:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1772969837; cv=none;
-        d=google.com; s=arc-20240605;
-        b=TyUb2ANbDViJ28jnascYuvDGdsgu9/g19w/f+ZUK7M0IfgzkodgbWLXVzQ8RPeMxTz
-         97ZDw0OzOI+NW0PJfDGu2tT2OJTQfmeXjEl8zbyJTe9R8TwW+f5QgKTr62FJCz+LR0xH
-         Yyp+XHxunqkEuL9CpL7lSO4It34jawrMjHE4pCdm5ZE+53XYOWaa0lZYwqNuCIrfnh4W
-         6HcszEco+mRZz0NWDyPFU2HP8j0qRuurkuHSezpy2hR9VynC40Yk2yKr84ugfUN5sPzi
-         4tFIsMmWwqTuxmNwZ43VxHtQHXAz/6FvIXPG+va3LTW9o8pDi3EA4XTasjIk/Nf5AEQR
-         scvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=RQxvjiWaZpfq136BgtJUGLwuAiTet43kLgxTqa3sdJ8=;
-        fh=6wlYl167uWjbfLK6ON1HXXx9+3Xm9uJhwzs/sv/nlGg=;
-        b=RS8vmT08rXTYbme0vyvV14R7SbrL4H4EfID1x+Shyr7/rS18oin1WPzIXRSWNH01KF
-         Q62gF47JTpjGurKLc02J3Isz8a2Z6PD3S12nnqwpLxibjtmMzD6pbgA7lehj7vwSebiu
-         SFiVRJBf5iowSk/T0QOuY+nsaLkLAfjwLsiSqcrG6iefvo+bAePvcvlxvF7rCLcmL6nX
-         2BfP+LirBRFDfMtRQrNGKTsYXth02s0SFjOTjg96n/zEpAAWDVqRAZQKDYPTsBcsB6o0
-         vGgxdGFsFbzVY50dGNRLNz3N7i/Iw/RsiqzxoeFS7oZYYKaHY8+LpaSrYT4rgyF3Hoe6
-         D/9Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1772969837; x=1773574637; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RQxvjiWaZpfq136BgtJUGLwuAiTet43kLgxTqa3sdJ8=;
-        b=Kek4VTyKUcDLfTd3m6hKmvJItfzmmwxM1H/5/lvm7OCzDUX7E8DmVfv9GVxKq2ZYZ7
-         uiyLehZHIT7TJzXokAakBxKHvAB7YkBNaD0/efrOSEGbAu2793woz7xJbr8EBhrvu70/
-         7VBKj2a/eIsNXUNizKiy2wU1Hsuy4bDYJSMpSl8Ua601cJChO10aTnSMBHrvwecO+ESs
-         2IRM0vJjElaSWdOs9g4G1NiuhG44iP4+1ZM5IoyKLYsVWchpgM71sDVEpRPlIXVVzWKJ
-         Ivx4geUX3UDd/OqmNWJ1thOopB4FCyHvCeAGkkRY2+snvPtWWTgzFpoz3u8KOJg6jRXz
-         E8XQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772969837; x=1773574637;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RQxvjiWaZpfq136BgtJUGLwuAiTet43kLgxTqa3sdJ8=;
-        b=tz7K9TIY0MU6ykkmT/yTYggnq0SH3/GI5qAm/eMnvQd2V61NT5BCE5jhfOxYwEogeh
-         mo7Yzov7zNuS6NwnVrMohHeusiTiaDPZPgZwJD1N3p8AdFFANCW4NO0xzsirWiWKZKGE
-         Y5HXRmeHEcCcCnXznx0XUqNlBeujVxBJsxo8xTqjD6wasvTk1N3oQKYwvjF9FuSOuw40
-         pyzjpwz43mHOdzU1zHw4KC2gKGa+hSyZvfy5DPR57E3K4zkm1dSj2QR32d6A9AFvqif6
-         pFTmjGUPD5xR8jBZjGt8+ct178RNouUoUMcPzOWp5JkbWMs520EsaSD9quLpvmg0dYkQ
-         XHsg==
-X-Forwarded-Encrypted: i=1; AJvYcCUNKRt3qE/JQE07IqHXUQ9g6VHJ/riYM28rbveLvJ725MpEn+V1M4qDrpnPHK/JKnYSIR8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9yHDOJXQCQKtV4g2VH1RCvyjZCMh3se2vSwTK3N90Dpo4bQx4
-	J5P9LigbzTYHzfmZb1af+sxa03pFpI8S6vKc1N+pN9weY4Mat2ONxTBiKDcuLjg2ZP5HLufncxf
-	nK9MggDo6/prcAcuV4j0IZOBYYQGi7k659x86bDtR5Yh6TIEPWJI0W9NyozWciZpLbNFiFkBnvc
-	jRvW66jnR1wZjGXYF2lTK32E6q7Ieu/tS2vkjl
-X-Gm-Gg: ATEYQzxcrSRkBa4yOpbe9BPc4AMQySPGPYpxGJx9hwPWcNIjUF1INQNbCXgzGY+QCUF
-	5DZoUX8lvDTHf52mndjnZHludXqz/GmlzFe/6m7RPGbYrVfa6y0pNlczaYaLaAf2kmHcBQvOMDD
-	V6+c0q/rb+VGmOV9lm36BICRAAdfiARH/bwkU0p6XekEoqODXh4gOQNJGv4OtMP2cYcqga3S7Qj
-	pUymmXd7g5fAUVIZ0dFAfzS9sDthMA/kkf5Amdd3i0+GUGkKWQGi+rQcPXbWwrvlZ/1EC8FdgAZ
-	YfPmhn0=
-X-Received: by 2002:a05:6000:2010:b0:439:d6ea:7cff with SMTP id ffacd0b85a97d-439da354a83mr15465649f8f.4.1772969837036;
-        Sun, 08 Mar 2026 04:37:17 -0700 (PDT)
-X-Received: by 2002:a05:6000:2010:b0:439:d6ea:7cff with SMTP id
- ffacd0b85a97d-439da354a83mr15465628f8f.4.1772969836567; Sun, 08 Mar 2026
- 04:37:16 -0700 (PDT)
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=KJ8bzg8V+uvZAsLa7IYzmmSXgUWNDaSyMpThEwzLfNY=;
+	b=SGCN5MTHAIaVF6a+upaxcUX7p9/Hr1vtPuGUJL7AqUeTHmb6eD6iT7kc37IRsMiQJn8O4W
+	68VYhQ8JZI6AoYEul2zJPR13UfsKPf9Ay2Qlf1ZBPXFcs8iwOqWZ1sWkLfiemlqahToTMT
+	Eit6d847ThEFSv3SlXROkiXWgImCN1U=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-696-gbvbB5zdMmqjnisJl9BFmw-1; Sun,
+ 08 Mar 2026 07:38:57 -0400
+X-MC-Unique: gbvbB5zdMmqjnisJl9BFmw-1
+X-Mimecast-MFC-AGG-ID: gbvbB5zdMmqjnisJl9BFmw_1772969936
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D36841956050;
+	Sun,  8 Mar 2026 11:38:55 +0000 (UTC)
+Received: from [10.44.32.5] (unknown [10.44.32.5])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 72D0A1958DC5;
+	Sun,  8 Mar 2026 11:38:51 +0000 (UTC)
+Message-ID: <ec3ccf72-d44e-4078-bbe7-12c70bf4e4e4@redhat.com>
+Date: Sun, 8 Mar 2026 12:38:50 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHj+bcNm8nZdod6VxW_dQkXm1iqyNnQNyh4VONAT6npBGvv+Pw@mail.gmail.com>
-In-Reply-To: <CAHj+bcNm8nZdod6VxW_dQkXm1iqyNnQNyh4VONAT6npBGvv+Pw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 8 Mar 2026 12:37:04 +0100
-X-Gm-Features: AaiRm53YqKCNcoTNpdkjWzrwJudS39DT-imbLgb65H3q8b6CyFBjXr4yq3Ah-nA
-Message-ID: <CABgObfZYaysmpwwAmJP7yOZ6T8OSFdw9VwpUczr9bTAw0tu7fA@mail.gmail.com>
-Subject: Re: [SECURITY] KVM: nSVM: TOCTOU on uncached VMCB12 save-area fields
- in nested_vmcb02_prepare_save()
-To: Natarajan KV <natarajankv91@gmail.com>
-Cc: Security Officers <security@kernel.org>, kvm <kvm@vger.kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Yosry Ahmed <yosry.ahmed@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 18ECB22F6FE
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/4] target/i386/kvm: Remove X86CPU::hyperv_synic_kvm_only
+ field
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Zhao Liu <zhao1.liu@intel.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
+References: <20260307150042.78030-1-philmd@linaro.org>
+ <20260307150042.78030-4-philmd@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20260307150042.78030-4-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Rspamd-Queue-Id: C719122F8F4
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_ALL(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73238-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pbonzini@redhat.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.952];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.954];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thuth@redhat.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73239-lists,kvm=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+]
 X-Rspamd-Action: no action
 
-Il dom 8 mar 2026, 07:06 Natarajan KV <natarajankv91@gmail.com> ha scritto:
->
-> Hi,
->
-> Please find the details on the subject issue below.
+On 07/03/2026 16.00, Philippe Mathieu-Daudé wrote:
+> The X86CPU::hyperv_synic_kvm_only boolean (see commit 9b4cf107b09
+> "hyperv: only add SynIC in compatible configurations") was only set
+> in the pc_compat_3_0[] array, via the 'x-hv-synic-kvm-only=on'
+> property. We removed all machines using that array, lets remove that
+> property and all the code around it.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 > ---
->
-> ## Summary
->
-> The VMCB12 save-area caching introduced to mitigate CVE-2021-29657 is
-> incomplete. `vmcb_save_area_cached` (svm.h:117-122) caches only 6 fields
-> (efer, cr0, cr3, cr4, dr6, dr7), yet `nested_vmcb02_prepare_save()`
-> (nested.c:539-631) reads at least 14 additional security-critical fields
-> directly from the guest-mapped VMCB12 page. Since `kvm_vcpu_map()` pins the
-> guest physical page but does not revoke write access, a concurrent L1 vCPU
-> can modify these fields between validation and use, constituting a
-> time-of-check to time-of-use (TOCTOU) vulnerability.
->
-> This is a residual from the incomplete fix for CVE-2021-29657, which
-> addressed only the control-area double-fetch. The save-area TOCTOU has no
-> assigned CVE.
+>   target/i386/cpu.h     |  1 -
+>   target/i386/cpu.c     |  2 --
+>   target/i386/kvm/kvm.c | 15 ++++-----------
+>   3 files changed, 4 insertions(+), 14 deletions(-)
 
-Leaving aside that the email was obviously created by AI, there is no
-check on the save area fields so there's no TOC in the TOCTOU. The
-code can be cleaned up (and Yosry's pending patches do that) but
-that's it.
-
-So this report is bogus, but I will leave a few notes below
-nevertheless for everyone else that's reading.
-
-> ### Double-Read on RIP/RSP/RAX (Lines 580-587)
->
-> RAX, RSP, and RIP are each read twice from guest memory:
->
-> ```c
-> kvm_rax_write(vcpu, vmcb12->save.rax);    // L580: read #1
-> kvm_rsp_write(vcpu, vmcb12->save.rsp);    // L581: read #1
-> kvm_rip_write(vcpu, vmcb12->save.rip);    // L582: read #1
-> vmcb02->save.rax = vmcb12->save.rax;      // L585: read #2
-> vmcb02->save.rsp = vmcb12->save.rsp;      // L586: read #2
-> vmcb02->save.rip = vmcb12->save.rip;      // L587: read #2
-> ```
->
-> If the racing vCPU modifies these between reads, `vcpu->arch.regs[]` and
-> `vmcb02->save` will hold different values for the same register. When KVM's
-> instruction emulator uses `kvm_rip_read()` (from `vcpu->arch.regs`), it
-> will operate on a different instruction stream than what the hardware
-> actually executes from `vmcb02->save.rip`.
-
-This is the only part that can barely resemble a bug, but even then
-it's just unclean code. The value in vcpu->arch.regs is refreshed from
-the VMCB well within the GIF=0 area that holds the core guest switch
-code, and the value is never read in the meantime.
-
-> ### CPL Confusion
->
-> The most impactful scenario. The attacker:
-> 1. Prepares VMCB12 with valid CPL=3 and consistent ring-3 segments
-> 2. vCPU-0 executes VMRUN; KVM caches the 6 save fields and validates
-> 3. vCPU-1 writes `vmcb12->save.cpl = 0` during the race window
-> 4. At nested.c:561, KVM copies the modified CPL=0 into vmcb02
->
-> With forged CPL=0, `svm_get_cpl()` (svm.c:1804) returns 0 for L2.
-
-This (and everything else) makes no sense. It's the same as if the
-write happened before the VMRUN.
-
-Paolo
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
