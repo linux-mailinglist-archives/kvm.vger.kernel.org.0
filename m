@@ -1,134 +1,188 @@
-Return-Path: <kvm+bounces-73247-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73248-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ID3cApqwrWnh6AEAu9opvQ
-	(envelope-from <kvm+bounces-73247-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sun, 08 Mar 2026 18:23:38 +0100
+	id E0VtJvDurWka9wEAu9opvQ
+	(envelope-from <kvm+bounces-73248-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sun, 08 Mar 2026 22:49:36 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBC9023163F
-	for <lists+kvm@lfdr.de>; Sun, 08 Mar 2026 18:23:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03886232592
+	for <lists+kvm@lfdr.de>; Sun, 08 Mar 2026 22:49:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 21054300693E
-	for <lists+kvm@lfdr.de>; Sun,  8 Mar 2026 17:23:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3F54E3011747
+	for <lists+kvm@lfdr.de>; Sun,  8 Mar 2026 21:49:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCEC3939C7;
-	Sun,  8 Mar 2026 17:23:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF550355F49;
+	Sun,  8 Mar 2026 21:49:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AxLf6j4G"
+	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="eXrOd83D"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB63286412;
-	Sun,  8 Mar 2026 17:23:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150BB279DB3
+	for <kvm@vger.kernel.org>; Sun,  8 Mar 2026 21:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772990597; cv=none; b=UcqAVlZKBurGLSAxMpHkkehx08H8IanslVA7E2PMNf01cE8Msqyo9TYmtHDhABqxltKb737Qvj/Xhj4RtTAmV11vY77o+N3dIypFqCyfehiCh9PDgT1WTAvWtp241+pGBq+MbB8T4S8yNfsfpPZjl8U4cDFXNdV4dBEgDCieZuU=
+	t=1773006566; cv=none; b=Am7bBkhPgQWkJKIct1T+B9L7Ngpao6WbdxZBTAN0QhWIMwD9z0g6mCEfj7PVGn9iGz8vjU/4c4fN17nB1DiLBpDWRiUK0q/dRRDZ8XTRHNXh7iuaMoTRZPmgisxwFmv4XrcX1I6rG+j4q3n2Hm1TxrUF5KQ+9CiB2FKvqQjjmIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772990597; c=relaxed/simple;
-	bh=aKTiLeBUT/yyVrfF+UX9Dm/tjm0IVzbkGDksBmzpY0Y=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=PioeYBUGINGx9gCVU2T51vtI971lTBzSDOiS+B2wZpQOjhVgbgbqoxcEstd3hsvcDntq2wAtGFZoQRGjqhkq4dJTpEG6G0bF1kUJHoZi2CRWgBwH7PZ1AkMndoX0N4Hi3NxUI7OGoSBYiUJK4yOUpHLuPkicdqAPkZ4NKRKd1Gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AxLf6j4G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC301C116C6;
-	Sun,  8 Mar 2026 17:23:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772990596;
-	bh=aKTiLeBUT/yyVrfF+UX9Dm/tjm0IVzbkGDksBmzpY0Y=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=AxLf6j4GvGHT+C8ZRyPQ8SdmNN8dUN+vRNWyNZgN/eeKcMM83VgsKiv2Thvnni7mF
-	 CfgmTPF5cBDong5YKy9PoAEZZLFYWmSGaY/yFgJtjGTUB++iQ0ZTbwUwg41cVL2Hb4
-	 aVDzcTTxsw+4N3cFJLEvBKbS0+/gIDH6gRh1dsIbaYxkTvJmMEHmDQkpGBhoMAbTtQ
-	 yiPpUo051i5ohiLr/B8HHuV9Jw6JIpHsXv65F8axnnjl4GvPp5YG5dLQbEOC3wVSye
-	 wmL+EvQq9IJY1MIDsWdo/YtrWIjcfslHSeKCRPBvaG1GdZz4KFU1L8KJDa5bRAczNO
-	 ioxyQ4Cvo8vUQ==
-Date: Sun, 8 Mar 2026 18:23:08 +0100
-From: Matthieu Baerts <matttbe@kernel.org>
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Jiri Slaby <jirislaby@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
-	rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
-	Linux Kernel <linux-kernel@vger.kernel.org>,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>, luto@kernel.org,
-	=?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
-	Waiman Long <longman@redhat.com>, Marco Elver <elver@google.com>
-Message-ID: <57c1e171-9520-4288-9e2d-10a72a499968@kernel.org>
-In-Reply-To: <87v7f61cnl.ffs@tglx>
-References: <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org> <20260302114636.GL606826@noisy.programming.kicks-ass.net> <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org> <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org> <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx> <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx> <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx> <20260306152458.GT606826@noisy.programming.kicks-ass.net> <87ldg42eu7.ffs@tglx> <87h5qr2rzi.ffs@tglx> <87eclu3coa.ffs@tglx> <87v7f61cnl.ffs@tglx>
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups,
- RCU stalls, timeout
+	s=arc-20240116; t=1773006566; c=relaxed/simple;
+	bh=8eUodJoImyp3FpY1awWiZQWm9hUZMkl7VClTa58uKYc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aTvj5PCGkVEw/eswQ9m9KOxl4jFPBm46/skfHjZowRi7LSuw+ufsecTx8bB2Qw7gp1FX7Sqt6ZMqmM/8W5suNPAjNsZiGVIXeO4leRzD0hia9VszEarq52HXqpUMZyVqKZruN8/xTAahqeNxBT8+LUGH9M+qu3KuujgGOtjoTqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=eXrOd83D; arc=none smtp.client-ip=195.121.94.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
+X-KPN-MessageId: ab70d234-1b38-11f1-8a98-005056ab378f
+Received: from smtp.kpnmail.nl (unknown [10.31.155.37])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id ab70d234-1b38-11f1-8a98-005056ab378f;
+	Sun, 08 Mar 2026 22:49:23 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=xs4all.nl; s=xs4all01;
+	h=mime-version:message-id:date:subject:to:from;
+	bh=/hD77eT0WFhDi8fkYCqVxQSPbeWfWws7rsHE8QnhqoQ=;
+	b=eXrOd83DHK5jIx0vfFAe0m1IDqeftPLmovIVXjfIJkVVxJfthR7ZXh8dOu2/JkFLzXQzJIohN50Fy
+	 IGqqfcM+Q8TQCSylsFka0RsMku6yXdLJsV/RbMaKe7P0d4ep8LQaJL6iEhk4NOn8XCn6W/j0iLv5Ar
+	 ATCS7SMweGCbCPwYhiieHRkF7wWHkPvpbk7XTX210dIajAHQ96XKBhqG4FhVDp8Um820ZzbMFk1fyl
+	 a6gvWy9cuGIKvJdKl4hK7kXpUmmih/fuiqiP8nx7MTZ8BudiJ09+8tzfTf/3hpVQzeCg+YZIv4eT4c
+	 214brfwQdlKWZdTCESwLw0HKny40xWg==
+X-KPN-MID: 33|z3L3e0rFyDUM1v+oDap6aAmV867SHMDOaNaV7jf/6+XAUdcLwO1s7Yk0cq7hrAZ
+ qAcSlN+b8Cu5grEIIkrQbnsv8ZV0Je9mcnLpobwAHBLQ=
+X-KPN-VerifiedSender: Yes
+X-CMASSUN: 33|T6FDhkZletdXcGyERNjjjxtrbRKu9ulq1yqZMMEbVLbDY2/INX1Z6Z4fId36opD
+ fRnUh+SzdCyGhiL57XITJow==
+Received: from daedalus.home (unknown [178.229.142.230])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id a8d6e635-1b38-11f1-bdab-005056ab1411;
+	Sun, 08 Mar 2026 22:49:23 +0100 (CET)
+From: Jori Koolstra <jkoolstra@xs4all.nl>
+To: gregkh@linuxfoundation.org,
+	Kirti Wankhede <kwankhede@nvidia.com>
+Cc: Jori Koolstra <jkoolstra@xs4all.nl>,
+	kvm@vger.kernel.org (open list:VFIO MEDIATED DEVICE DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH v2] vfio: mdev: replace mtty_dev->vd_class with a const struct class
+Date: Sun,  8 Mar 2026 22:49:39 +0100
+Message-ID: <20260308214939.1215682-1-jkoolstra@xs4all.nl>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Correlation-ID: <57c1e171-9520-4288-9e2d-10a72a499968@kernel.org>
-X-Rspamd-Queue-Id: EBC9023163F
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 03886232592
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[xs4all.nl,reject];
+	R_DKIM_ALLOW(-0.20)[xs4all.nl:s=xs4all01];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_FROM(0.00)[xs4all.nl];
+	FREEMAIL_CC(0.00)[xs4all.nl,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-73248-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73247-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.923];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jkoolstra@xs4all.nl,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[xs4all.nl:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[kvm];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-0.983];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-08 Mar 2026 17:58:26 Thomas Gleixner <tglx@kernel.org>:
+The class_create() call has been deprecated in favor of class_register()
+as the driver core now allows for a struct class to be in read-only
+memory. Replace mtty_dev->vd_class with a const struct class and drop the
+class_create() call.
 
-> On Sun, Mar 08 2026 at 10:15, Thomas Gleixner wrote:
->
->> On Sat, Mar 07 2026 at 23:29, Thomas Gleixner wrote:
->>> I'll look at it more tomorrow in the hope that this rested brain
->>> approach works out again.
->>
->> There is another one of the same category. Combo patch below.
->
-> This rested brain thing is clearly a myth. The patch actually solves
-> nothing because the code ensures that the TRANSIT bit is never set
-> together with the ONCPU bit.
+Compile tested and found no errors/warns in dmesg after enabling
+CONFIG_VFIO and CONFIG_SAMPLE_VFIO_MDEV_MTTY.
 
-Thank you for having shared these patches. I confirm the myth: I can
-still reproduce the issue on my side.
+Link: https://lore.kernel.org/all/2023040244-duffel-pushpin-f738@gregkh/
 
-> One of those moments where you just hope that the earth opens up and
-> swallows you.
->
-> So I'm back to square one. I go and do what I should have done in the
-> first place. Write a debug patch with trace_printks and let the people
-> who can actually trigger the problem run with it.
+Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Jori Koolstra <jkoolstra@xs4all.nl>
+---
+v2: undo whitespace reformating of struct mtty_dev
 
-Happy to test such debug patches!
+ samples/vfio-mdev/mtty.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-Cheers,
-Matt
+diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+index bd92c38379b8..01a9db84c4ab 100644
+--- a/samples/vfio-mdev/mtty.c
++++ b/samples/vfio-mdev/mtty.c
+@@ -68,9 +68,12 @@
+  * Global Structures
+  */
+ 
++static const struct class mtty_class = {
++	.name	= MTTY_CLASS_NAME
++};
++
+ static struct mtty_dev {
+ 	dev_t		vd_devt;
+-	struct class	*vd_class;
+ 	struct cdev	vd_cdev;
+ 	struct idr	vd_idr;
+ 	struct device	dev;
+@@ -1980,15 +1983,14 @@ static int __init mtty_dev_init(void)
+ 	if (ret)
+ 		goto err_cdev;
+ 
+-	mtty_dev.vd_class = class_create(MTTY_CLASS_NAME);
++	ret = class_register(&mtty_class);
+ 
+-	if (IS_ERR(mtty_dev.vd_class)) {
++	if (ret) {
+ 		pr_err("Error: failed to register mtty_dev class\n");
+-		ret = PTR_ERR(mtty_dev.vd_class);
+ 		goto err_driver;
+ 	}
+ 
+-	mtty_dev.dev.class = mtty_dev.vd_class;
++	mtty_dev.dev.class = &mtty_class;
+ 	mtty_dev.dev.release = mtty_device_release;
+ 	dev_set_name(&mtty_dev.dev, "%s", MTTY_NAME);
+ 
+@@ -2007,7 +2009,7 @@ static int __init mtty_dev_init(void)
+ 	device_del(&mtty_dev.dev);
+ err_put:
+ 	put_device(&mtty_dev.dev);
+-	class_destroy(mtty_dev.vd_class);
++	class_unregister(&mtty_class);
+ err_driver:
+ 	mdev_unregister_driver(&mtty_driver);
+ err_cdev:
+@@ -2026,8 +2028,7 @@ static void __exit mtty_dev_exit(void)
+ 	mdev_unregister_driver(&mtty_driver);
+ 	cdev_del(&mtty_dev.vd_cdev);
+ 	unregister_chrdev_region(mtty_dev.vd_devt, MINORMASK + 1);
+-	class_destroy(mtty_dev.vd_class);
+-	mtty_dev.vd_class = NULL;
++	class_unregister(&mtty_class);
+ 	pr_info("mtty_dev: Unloaded!\n");
+ }
+ 
+
+base-commit: d466c332e106fe666d1e2f5a24d08e308bebbfa1
+-- 
+2.53.0
+
 
