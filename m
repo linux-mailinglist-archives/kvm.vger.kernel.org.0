@@ -1,96 +1,61 @@
-Return-Path: <kvm+bounces-73231-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73232-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IP2SCaO4rGkftgEAu9opvQ
-	(envelope-from <kvm+bounces-73231-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Sun, 08 Mar 2026 00:45:39 +0100
+	id OG7iA8jOrGkHuwEAu9opvQ
+	(envelope-from <kvm+bounces-73232-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Sun, 08 Mar 2026 02:20:08 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D05622E044
-	for <lists+kvm@lfdr.de>; Sun, 08 Mar 2026 00:45:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ABFC22E34E
+	for <lists+kvm@lfdr.de>; Sun, 08 Mar 2026 02:20:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7248A302C5FD
-	for <lists+kvm@lfdr.de>; Sat,  7 Mar 2026 23:45:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9324D301E97A
+	for <lists+kvm@lfdr.de>; Sun,  8 Mar 2026 01:19:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDCB3382F7;
-	Sat,  7 Mar 2026 23:45:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kW577S4F"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE58229B38;
+	Sun,  8 Mar 2026 01:19:51 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7491A9F93
-	for <kvm@vger.kernel.org>; Sat,  7 Mar 2026 23:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F302110E;
+	Sun,  8 Mar 2026 01:19:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772927116; cv=none; b=REyVYFBppYe1deEUYuRR3Wgi2mlfp5JkYIZXN4SUMKBGgJNvVw9Fz+fmKOqM3Q1JpEx0VC8mwHJupj3DXuGVl2u/T8GOauymzhJVNNhMkoak7N5nGHvKpdyrHQPChYBifsDRO2sv/fmHHFqXSaXFayYoP3e0mBqm/+0TAY86gME=
+	t=1772932791; cv=none; b=JWs5sENwkXCEomCmxg4yM5pCRc5mjM2K+VfTurhtHKDpSWyOkeS4bCjlUqdJ4no3vBg8V3/mxcV850DF+gsMYrZ0UYLWTzh5da7WoxRsb5zB2Gj4R6q+a2YlWR+18Ny/weLpSh6/8fxiLeV5EPh6gIjjoaXd6kYolX7olPhRYJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772927116; c=relaxed/simple;
-	bh=B0FMhBfrocAC+fIijCeunI5+OVR44/k33na+05sqr5o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jSB+ISSzT56Y6kKbrTGgNxWqywhGNFKw4XiT9snmMsSJQiWdnHpmCGSXdsYKwIQIZREjDOTGrZJHD1LGBKhQfszBv7YJgEnKWdWpFdSsU69prEtyxMFBAK1g9jitvK5S45H0mMFBdiaIqf+L9NpC2DoKYu8ypgXPrndqxKno8N8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kW577S4F; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4836f4cbe0bso91049305e9.3
-        for <kvm@vger.kernel.org>; Sat, 07 Mar 2026 15:45:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1772927112; x=1773531912; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qjRKrJQ2J/VDkoqe2xizeTmn4PJSWMUuw8x/Xk5UYBU=;
-        b=kW577S4FRR5AndfU8/5opz2HwzArmfkjl3uR/DGr0TflSrY3xgIYQeig6L1f+o2Gdr
-         wVGsmqqletCiknaQfHHo8snlbgMVFImBzHk73Gzx9ha48uaxTF1LjliDQ9g1rjxqsib5
-         v/ma4AfRg6ieR1eKvZfaCdmH00lcGkFodnpeeMrago9EyM1yDyMHY0HEbLN5QoGuWGVZ
-         d7BuEhUYXeuvf/M1Fm6vcUkwkiByC5JC8a+T/Bh1k0LEcYYfa7BttPuwNmkgrnGdrB5d
-         Jnfj7E32KUn6mMHvck24Y3/HKTkxYExffp8Cu63uTLiGm202UggHF4w+Gt+HqgZvTJSe
-         Q8yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772927112; x=1773531912;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qjRKrJQ2J/VDkoqe2xizeTmn4PJSWMUuw8x/Xk5UYBU=;
-        b=P1zV1ZUSigjt1pRweXCQRwkecWA15tl71gse3pAMumXDFBKaKRgZine4oIh6QOo8xf
-         /unPx6QqY/w8Fn6WinHSHGQ2HYSGxSvwJYRIgOyVqZcRtuIV4JtA1jpfkz4Lc3kHV0vE
-         L8ZPJ72RWIW4OR7GUKm+4q4ZxnNcjWPUaj6ONs60okoNqMrgPVqqjWHbvzJ8Bh0j3+uQ
-         0iDch3BWzfrUGbccD4qAjmHIMb0viV/IdJ1uPR8SwVpHHLsHNEJUcWXknfqCZ/PXnpWC
-         jzsPm6f7e69P4bY/ZSRM01SPG40+uyhoLn9HpgSUu/z7loAhzEKHejKX+eb4fCnwmJEc
-         XURQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVK5P6SzhEKc7h0mldgSandoX+EvtjlIs5jdKW2v3ZyInviEn+snbll1OCwzZZ+oc/txG0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPvRsonm+wEuXZdH4VDYMS9IO2cfrtA/rXpmN+xjiHIqrrx07F
-	Iim82+Aqf+vy8dxYNLYtMd8HEwOjzqLHFmJ0lsDRAjQYZwr6GmiF1iNz
-X-Gm-Gg: ATEYQzwSp9yEAyZ05eXvLlCtyEbOGuy/O4/NIY3m/LC57luAx7N164svnzUW0Ylah9n
-	UL2YEExMnAtPcgJKMEG2k5Zgb1OrfOqdSk8UrTB23IKDkAz2blXE7b7gLVvOJEGFW+osxWEUIyH
-	avDkQcKjOyDRAtiEDrShQ86ne6pZ7sUPkRxGa+EEKf4o257GolWdlK7RxrMyEWsREi0zOe2os48
-	4YUV9HVTyDWyq23TYdTiTklLlEptyMAqR8cAaV7qZQwyPjduUcIm5MV5Hz7dhwDEV125f52ghYX
-	ZHTSkcgGh2uZllpJgEcVO5TJvpsrmmhyiBocGSbcjnuSR6nJtooArsO1jTtBWhaxbkTS9DfipNb
-	FkjPCHvpgTiDymhLFkAD3YkznbKege/E6biUcXqTmePrusxzoqHytAP7HXvH+Y2LTG1XtKV5TV7
-	g/jVRU6bUOIkjXh6HG6W/XwlNpt/ajkmCjUGt24uBbFN+xGNkOE+Q46cqL7e3v
-X-Received: by 2002:a05:600c:1e88:b0:47d:8479:78d5 with SMTP id 5b1f17b1804b1-4852690f599mr132855755e9.7.1772927112391;
-        Sat, 07 Mar 2026 15:45:12 -0800 (PST)
-Received: from osama.. ([156.223.176.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-485247029a4sm49900895e9.26.2026.03.07.15.45.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Mar 2026 15:45:11 -0800 (PST)
-From: Osama Abdelkader <osama.abdelkader@gmail.com>
-To: Anup Patel <anup@brainfault.org>,
-	Atish Patra <atish.patra@linux.dev>,
-	Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	kvm@vger.kernel.org,
+	s=arc-20240116; t=1772932791; c=relaxed/simple;
+	bh=Z/Ixav0e+wqHYrfHHBoHB0c5Hxy4y9wzi3e3jM/DKkw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Rt2Xu6RuPMziwuPg8vKkKd5l6U7K8gGb3x1E8QtLQZ4bv3Jc7IheoiKOIjKIaRwYIajkg3UBKmPM1JlTbI4o9RhxUvlrGzCuuDoB+S9KpzaDQRNrmozGLive4LAB+B51x9GTmm2hXfDBUY+1myzZfwv0kBozaNqXkT9zGfXg3sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from fric.. (unknown [210.73.43.101])
+	by APP-05 (Coremail) with SMTP id zQCowAA3yQyYzqxpAXvWCQ--.23484S2;
+	Sun, 08 Mar 2026 09:19:20 +0800 (CST)
+From: Jiakai Xu <xujiakai2025@iscas.ac.cn>
+To: andrew.jones@oss.qualcomm.com
+Cc: ajones@ventanamicro.com,
+	alex@ghiti.fr,
+	anup@brainfault.org,
+	aou@eecs.berkeley.edu,
+	atish.patra@linux.dev,
+	jiakaiPeanut@gmail.com,
 	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Osama Abdelkader <osama.abdelkader@gmail.com>
-Subject: [PATCH] RISC-V: KVM: fix PMU snapshot_set_shmem on 32-bit hosts
-Date: Sun,  8 Mar 2026 00:43:54 +0100
-Message-ID: <20260307234355.69831-1-osama.abdelkader@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	palmer@dabbelt.com,
+	pjw@kernel.org,
+	xujiakai2025@iscas.ac.cn
+Subject: Re: [PATCH 1/2] RISC-V: KVM: Fix array out-of-bounds in pmu_ctr_read()
+Date: Sun,  8 Mar 2026 01:19:19 +0000
+Message-Id: <20260308011919.3891975-1-xujiakai2025@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <bcshd6j3vdeorxxmsmjmj5vi52mmivfe247aw77mr75zsk4llk@h3rxaqe23sb5>
+References: <bcshd6j3vdeorxxmsmjmj5vi52mmivfe247aw77mr75zsk4llk@h3rxaqe23sb5>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -98,68 +63,106 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 7D05622E044
+X-CM-TRANSID:zQCowAA3yQyYzqxpAXvWCQ--.23484S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7WryDZFyDAFyUAr15KrWruFg_yoW8Aw1fpF
+	Z3tFn0ya1xtFsrXFyxZr4DXr48Wwn3uFn8WrWrKryjgFs8JF97Wr4IkrWjkwsrCrn5WryS
+	9a10gwn8C3WYvFJanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWlnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67
+	AK6w4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
+	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
+	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
+	6r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
+	CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUrZ2-UUUU
+	U
+X-CM-SenderInfo: 50xmxthndljiysv6x2xfdvhtffof0/1tbiBg0ACWmsPiSXUwAAsZ
+X-Rspamd-Queue-Id: 4ABFC22E34E
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73231-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[osamaabdelkader@gmail.com,kvm@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-73232-lists,kvm=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[ventanamicro.com,ghiti.fr,brainfault.org,eecs.berkeley.edu,linux.dev,gmail.com,lists.infradead.org,vger.kernel.org,dabbelt.com,kernel.org,iscas.ac.cn];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[xujiakai2025@iscas.ac.cn,kvm@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.686];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-When saddr_high != 0 on RV32, the goto out was unconditional, causing
-valid 64-bit addresses to be rejected. Only goto out when the address
-is invalid (64-bit host with saddr_high != 0).
+Hi drew,
 
-Fixes: c2f41ddbcdd7 ("RISC-V: KVM: Implement SBI PMU Snapshot feature")
-Signed-off-by: Osama Abdelkader <osama.abdelkader@gmail.com>
----
- arch/riscv/kvm/vcpu_pmu.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Thanks for the clarification.
 
-diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
-index 4d8d5e9aa53d..045099ca904b 100644
---- a/arch/riscv/kvm/vcpu_pmu.c
-+++ b/arch/riscv/kvm/vcpu_pmu.c
-@@ -425,9 +425,10 @@ int kvm_riscv_vcpu_pmu_snapshot_set_shmem(struct kvm_vcpu *vcpu, unsigned long s
- 	if (saddr_high != 0) {
- 		if (IS_ENABLED(CONFIG_32BIT))
- 			saddr |= ((gpa_t)saddr_high << 32);
--		else
-+		else {
- 			sbiret = SBI_ERR_INVALID_ADDRESS;
--		goto out;
-+			goto out;
-+		}
- 	}
- 
- 	kvpmu->sdata = kzalloc(snapshot_area_size, GFP_ATOMIC);
--- 
-2.43.0
+> Any changes that come out of the pr_warn audit will result in a separate
+> patch or patches. That work can be done completely separately and submit
+> as a separate series. Or, if you do it right now, you could append those
+> patches to this series. Either way works for me.
+
+I will submit the pr_warn cleanup as a separate patch series later.
+
+> That's good and we should do that, but we should also do negative testing.
+> So there should be a test case where we try to read a counter without
+> configuring it and ensure everything fails gracefully.
+
+Agreed. In v2, I will update the selftests to include both positive tests 
+and negative tests.
+
+> > diff --git a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
+> > index 924a335d2262..0d6ba3563561 100644
+> > --- a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
+> > +++ b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
+> > @@ -461,7 +461,14 @@ static void test_pmu_basic_sanity(void)
+> >  			pmu_csr_read_num(ctrinfo.csr);
+> >  			GUEST_ASSERT(illegal_handler_invoked);
+> >  		} else if (ctrinfo.type == SBI_PMU_CTR_TYPE_FW) {
+> > -			read_fw_counter(i, ctrinfo);
+> > +			/*
+> > +			 * Try to configure with a common firmware event.
+> > +			 * If configuration succeeds, verify we can read it.
+> > +			 */
+> > +			ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_CFG_MATCH,
+> > +			        i, 1, 0, SBI_PMU_FW_ACCESS_LOAD, 0, 0);
+> > +			if (ret.error == 0 && ret.value < RISCV_MAX_PMU_COUNTERS && BIT(ret.value) & counter_mask_available)
+> 
+> Put () around the & operator. checkpatch should have pointed that out.
+> 
+
+Noted, I will fix it in the next version.
+
+> > +				read_fw_counter(i, ctrinfo);
+> >  		}
+> >  	}
+> >  
+> > -- 
+> > 2.34.1
+> >
+
+I'll send out v2 shortly.
+
+Thanks,
+Jiakai
 
 
