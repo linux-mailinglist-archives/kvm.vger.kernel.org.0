@@ -1,210 +1,174 @@
-Return-Path: <kvm+bounces-73327-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73328-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wD2wKfjrrmkWKQIAu9opvQ
-	(envelope-from <kvm+bounces-73327-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:49:12 +0100
+	id CG2TBpbwrmkWKQIAu9opvQ
+	(envelope-from <kvm+bounces-73328-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 17:08:54 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B1C223C076
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:49:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7786D23C77B
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 17:08:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 003F03025115
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 15:45:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8922C30B9805
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 16:02:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E17463DBD71;
-	Mon,  9 Mar 2026 15:45:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD0593B8BB2;
+	Mon,  9 Mar 2026 16:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xI5mH1Ok"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gBTlwZch"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF15623AB88
-	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 15:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773071114; cv=pass; b=WqGZZD+PtWBqSUlVSYBgCq5QD6/81JRHRYhnn6DbIN8ijjxz3+o0BY2eEZlfcnPe2uLp1ZS+ZTWhgtokY9sEX1kbbnfhWj6DJxsg7v9GoJ4N4Qu/cZkQiPyd7ZSavv06NNB2lvXfjuRhI2TfICvdhyFiaUYOE3YsxJ8BYIBCe5k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773071114; c=relaxed/simple;
-	bh=FQ+rfw6YSM+Ur2t0O+8S8EZHYkkVvAytEeux3uABvPk=;
-	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CLyPk1sfIT6EmOcFT/gP/lEhHaVzt0Zo+csFr41twxtjfJl84rC0CDTYVABKAJJRTqxCBQpwAEtOk4G15Ue43mrmhVyabrkhxQ6vmpfreqPEE4O6kC8eEA22CIcwv8SkdvOs+RVP7gAm93sRal7pqEEVn5YCjLla9OMXJXmVrm8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xI5mH1Ok; arc=pass smtp.client-ip=209.85.217.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-5ffca37e8cdso2502223137.2
-        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 08:45:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773071112; cv=none;
-        d=google.com; s=arc-20240605;
-        b=crpPFus59383R5hz8S0iMr2g76RYeY+Dk33DlGfM2zy7LmY5CGAT3wPF0SidLh7GIf
-         8SVesiBMDJE5Z/vVMGZIzOFkrP8a4zz+hqLQQX1Xw4kIgEmNSLbqq8Mwb2/x184/sjnE
-         vnxheUZzqKBBpyOJptkGDW5drWepJzgmwCyL9A3lZJfXx0d+CU2FGSwYwec+xDkMIW5H
-         UPX9u0u/GJ97yDm3zzqwpkxz2wm6NW3kV+B9fb7pgCbAdoMTpeuhQZgh0CENQQUvEH7I
-         f4pgJ+ejBvRfKUTVoHCxqZYuynVlEwSGJQzjY9rt1L9Sod/m2V6CPrC6WXZ1o7+2rOge
-         aOKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:dkim-signature;
-        bh=bKp7UfWwsR+Qtr2/5qSzMlZ35ZQUtFxqOaPiGk/f9/o=;
-        fh=P6WteVIMEz5nZCiuubsrMVYQ82HtTp/00uXrYehBy8E=;
-        b=FRirAm4spScEcCsoRV8bmRhksDaC9Nh8mMvKVPXPnOueXzvqcupBjDFhi+5S7kKSdh
-         jtfA05vt2y9eRVZXiRrw70kw3WYE84FeSuciioU/pd1zviMzIHUFm+PCS01MgbUOnDB7
-         d2h7PXTj6oQMMoQsl5dhSurxVsuFEuR9sH/HpsEzc6f6MhA4/GAoHNGOeV4bqFr026Ai
-         1fIR/X8jT1WTo3CbwKHZrwPqdz5gwdDLM7qoI867KyHEFQZB0ic8r4eOid5Ho2pB1OOq
-         I6dmcn+WqrAlVi5cU+GeXb0OcA4xJAgMvWoGtk3eg+f2jHZu6zIVyWOxmKnayx7PixXm
-         pf+w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40AB392C2C
+	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 16:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773072137; cv=none; b=J7nHmUmZsNodFp0fqrX3yTSDhhVN+eORUya9rMQEAKHdMHzMwyR7MDnulL+wNsaRR9KQz5fPeHwltVBOApdAVbOrFpAV+FUbPu+hPPZeqdvkJc440UYCXJCpwvAPWNF6+T4J1OS+PlSrotiRIATj1tav4sPZbthSeo9lAGPwAf8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773072137; c=relaxed/simple;
+	bh=g4xnvV/ZslA3nhJ7BC+rZ0cWzXT4jo4xIZglkvyS4C4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sP68kySDBzSN5vu8Y1Jb0CrhyrQ8xqQyrbG9UM8d2MFZO/ojJzC853tPT1awfA+NvJh9UmUcYoYXdwpR6jfgF9JrXPdLhbXzQK58xq36+8WzwU2WVOHBRa6wjBDJC+6Ebsl8mvof77M92gRnY+8vtGwJCzGDRqG1bPkeufsNVio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gBTlwZch; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3597fea200dso6371154a91.3
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 09:02:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773071112; x=1773675912; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bKp7UfWwsR+Qtr2/5qSzMlZ35ZQUtFxqOaPiGk/f9/o=;
-        b=xI5mH1OkbEx5rEciwSIW1r8sSiLBgdGlSOlZdRK6ui/M4nAvFHW8cqdINYfAXsV8uG
-         nI8bSnfXg0WmJyzGTT4KYmmik5uOhjiWXFNNN14RCQ6kfG8md8JpD12d9PnsFp8CBb1s
-         M8dPVYwMPiKqykvvLzCaRCNuF6x88XCJz0UtP/nxZjLTELP5LxX3WZ9mmh4rvorqeHDC
-         FyXPy7Jpc0aPA/cTi1HrTrP/p+3xCtoe/TNwAtZwTewTH8loPRekj2HfeUsE0o5Y8BdT
-         E9EMgjx38u6ekuFmEvOkfZ9NWw8lFW9GeB+xS0zv/EBLsB1y0gkdSa1SZtV4LgVKrjRb
-         EGow==
+        d=gmail.com; s=20230601; t=1773072132; x=1773676932; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0JcBmMc7RHH64iN3rytmVT6qlyOdSxQ+djReiuE8ktE=;
+        b=gBTlwZchheD3rMBCEweOGahUiJwWtnNEMuDINTOwsijU7cSKBF/QrQzUcg+P6MHsjt
+         h2f+S5lqLIHPAha58vBDaxN9v5Q+yLUeQUnmaPn2VPN9qTXagINqQHLefQ8lOW9fCiwz
+         cVwsBhOSh1ADPhIpEBrm4rHRQ3Tw6jJn9hbZHuInMhqOdEvHJqjCYQ/ETjFVNvMCOkrU
+         9xycPBVCQrYpTR1yP+JWfqdZJrVF0v1zWVOPsBfWZO1N1hUzgezjZqN5edktylB/ocuX
+         hNWyq94S/F7EjKOvcZF+nSYri4cz2EybHzo6EtpdVls0xUMDTEUePuqaZbdK8EskUtgi
+         10Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773071112; x=1773675912;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1773072132; x=1773676932;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bKp7UfWwsR+Qtr2/5qSzMlZ35ZQUtFxqOaPiGk/f9/o=;
-        b=NYiymgyZXV3KbPV4HEnOjhQfha7V1TJ6ocqXuuVawR8700jekc4CBJR3PO+FSTraDE
-         t1+SspABrtblI995dzhuB5WwqiyuxOLgWTCErOB+mgZV8YavAlpbHTO+5Wt73h+XM43w
-         O550V2sC8m5xqvio+tMEpUPsU+TZUyRcXoCv7Wbwq+fZA4IrX+rrCkZOMmeHmRDc+cRL
-         xYwinQuVJwpEdm4/ZJqbHGSbVdPx0kcYTzY1tRYR3BO43Gi3pON2hiN+Q5J7jkTreyek
-         28NUxS9aHh8XU3l5YtUdq4y74KtYDvUp/S+TptN4va2lubYIICn8e/6Byy8TyYZgfLfE
-         nfiQ==
-X-Gm-Message-State: AOJu0YyQGyu+PecyrZLeX3KfmyYYkOl2OWSLA3o4gIqWoUy8a8v783cW
-	XtDmebjrZ9jUby31z+tJ+M3hemyEVhOW5B0HTfDWHp2JjbrLpRPAV+9Wc8T4VHHMXrULlbXjenT
-	YSpn+f+XEPcAgw9khE/bksLuuJ1/XG6rWiMoWSvdc
-X-Gm-Gg: ATEYQzzkX6R7rc1NOmU+VcFIuqiNx8ZsPeNc8xIQxT0Wi3IR1mcdJIFu1FvEQ9RGo8C
-	PQPKTLQkaGO19/+C5MFGxfzupLFK65cefxVB9C1upiZaqou0MwjE4B+G96atWJ5t3JiyPooIz+x
-	xpsgIXVDFBZ49Vr2NNcd2wtlD9XAyrpYR+D+BQgLYjgFN80hrTjw+OC4wAVSxGxVeGC8rPUjyqF
-	6u2boozNqjzdHbBWGimxwKWQfQ1OIFDkQcN3yPzZ1GUnDb7xk9d3sOzqzOwTx8DDP9v9VRhXHF6
-	fwEcyjNsQd9sy4uBt2FqogrwOQRjj8k1zoLeU88Esg==
-X-Received: by 2002:a05:6102:ccf:b0:600:131f:b68a with SMTP id
- ada2fe7eead31-600131fe1bemr2252059137.23.1773071109964; Mon, 09 Mar 2026
- 08:45:09 -0700 (PDT)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 9 Mar 2026 08:45:09 -0700
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 9 Mar 2026 08:45:09 -0700
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <577c4725-7eda-4693-a55a-413572541161@kernel.org>
-References: <20260309-gmem-st-blocks-v3-0-815f03d9653e@google.com>
- <20260309-gmem-st-blocks-v3-1-815f03d9653e@google.com> <577c4725-7eda-4693-a55a-413572541161@kernel.org>
+        bh=0JcBmMc7RHH64iN3rytmVT6qlyOdSxQ+djReiuE8ktE=;
+        b=Yw/OICGni9lYjRo3S7aNG+0lVTcObsEzjOGHbPPxzQVpcY4SXwaP87eNIXC/VHnCq9
+         51OV2NPwmXGZSoNi3KeNKK/gA4ZhFZYegPHK3ZwtDlP/eOt53XlYySxmBHP1px8LpjET
+         bVpWt41Hoj90chZvrRToyIiN/Rhz7CJoFhfkoFP/z3eKKJeq5f5FGJtBbYdCGRHcJLWi
+         c8ZXmhvBXCUTLJHKO659gRzMpgYXHqCfIrTLFt8SKoz9BeGQZLOye2cEynvxJ2LKm9bV
+         Z55hn6qavr7jamO80y44kJy0VQKyjps1eKMkYXgR2n1fqovs8vRD/UGZMAshhyFxLS5j
+         qNwA==
+X-Forwarded-Encrypted: i=1; AJvYcCUxCs0dQ4PhkDlGk/RG/lDLj1Uqp7HsPWfYrb0Nn0Di5x7d5bNcP/mendlYP67Ag4UPgCI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxuQria2iEarn/9uzdCFn2n9yVwTp5+enHDHH8HVgWUDXbakqD
+	HF7YlN5Ngg84SBwctHXCZnET/z44CMCqlQ2L5abWOzIClnsn7VnqxQ1X4geX+D+qqDg=
+X-Gm-Gg: ATEYQzyZDTHK7xFsDTtKMjq4v5J5qlY93z6UURVm5/NeLxgMctOthz8XEqbncEaz7B3
+	AqYRDAYIgGE6RpKtEQb4kcdor1N4y5Ijyj00CC8lhxboYNmon61gCaxPm9J77AiuPqVywRXpoYB
+	xAYMAJ4G/+eqc3oY08Hw5RKz8LplzqzQ2/+I4Htt6VfK+B4xEi7WfUH5GCpWVxaeJyw8f9kRLXv
+	1T83bxYB971jGKLX6glRy/Krgh9DwTOQaXQLoRYP+T+IBS3O3PP+tShfcBdvE16IPdddF9sto20
+	HzxNB7MT2tN26rDJC29mdxkN3FliLo3ib3xiMVmx8G+aDABDUAT3y7DOksxPk6fKV+DvlZbSeXR
+	zX5ig+idcRxq7lDd6dQPM7irP4yQR5ujRjydQ8DoDuKUF+vCNXMxl7YTm+osNrWugWDcIJBZCC9
+	l2Q9WXtVDIOsZtGkC59vCkhRDjQA62/Hy/750VKALIz+UFOtg2Wm6cqCwhSALuuJba7y/JI7Pnq
+	d+i7MeMlifSS97a
+X-Received: by 2002:a17:90b:350b:b0:34c:a29d:992f with SMTP id 98e67ed59e1d1-359be32b9ccmr10866952a91.31.1773072131119;
+        Mon, 09 Mar 2026 09:02:11 -0700 (PDT)
+Received: from ?IPV6:2406:3003:2007:2131:15e3:dec5:94ba:4da7? ([2406:3003:2007:2131:15e3:dec5:94ba:4da7])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359f05ee4a7sm50316a91.4.2026.03.09.09.02.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Mar 2026 09:02:10 -0700 (PDT)
+Message-ID: <d550c85e-a149-4cc2-8519-d157226097e2@gmail.com>
+Date: Tue, 10 Mar 2026 00:02:07 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 9 Mar 2026 08:45:09 -0700
-X-Gm-Features: AaiRm50NI2W_b1s4wqVK3z2E19_F4wrYli0WrzITukeFFAKkCo-7bYk8Lb2_YMI
-Message-ID: <CAEvNRgHhFoyh__shK_YefhUOTP4RaG-sivUH=4Gj-2iy1HX+tw@mail.gmail.com>
-Subject: Re: [PATCH RFC v3 1/4] KVM: guest_memfd: Track amount of memory
- allocated on inode
-To: "David Hildenbrand (Arm)" <david@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	seanjc@google.com, rientjes@google.com, rick.p.edgecombe@intel.com, 
-	yan.y.zhao@intel.com, fvdl@google.com, jthoughton@google.com, 
-	vannapurve@google.com, shivankg@amd.com, michael.roth@amd.com, 
-	pratyush@kernel.org, pasha.tatashin@soleen.com, kalyazin@amazon.com, 
-	tabba@google.com, Vlastimil Babka <vbabka@kernel.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 8B1C223C076
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: pfncache: Fix uhva validity check in
+ kvm_gpc_is_valid_len()
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ syzbot+cde12433b6c56f55d9ed@syzkaller.appspotmail.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260309075629.24569-2-phind.uet@gmail.com>
+ <aa7bjEJ_ICGjuiy5@google.com>
+Content-Language: en-US
+From: Phi Nguyen <phind.uet@gmail.com>
+In-Reply-To: <aa7bjEJ_ICGjuiy5@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 7786D23C77B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73327-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73328-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[34];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.951];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[phinduet@gmail.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.950];
+	TAGGED_RCPT(0.00)[kvm,cde12433b6c56f55d9ed];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-"David Hildenbrand (Arm)" <david@kernel.org> writes:
-
-> On 3/9/26 10:53, Ackerley Tng wrote:
->> The guest memfd currently does not update the inode's i_blocks and i_bytes
->> count when memory is allocated or freed. Hence, st_blocks returned from
->> fstat() is always 0.
+On 3/9/2026 10:39 PM, Sean Christopherson wrote:
+> On Mon, Mar 09, 2026, phind.uet@gmail.com wrote:
+>> From: Nguyen Dinh Phi <phind.uet@gmail.com>
 >>
->> Introduce byte accounting for guest memfd inodes.  When a new folio is
->> added to the filemap, add the folio's size.  Use the .invalidate_folio()
->> callback to subtract the folio's size from inode fields when folios are
->> truncated and removed from the filemap.
->>
->> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
->> ---
->>  virt/kvm/guest_memfd.c | 14 ++++++++++++++
->>  1 file changed, 14 insertions(+)
->>
->> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
->> index 462c5c5cb602a..77219551056a7 100644
->> --- a/virt/kvm/guest_memfd.c
->> +++ b/virt/kvm/guest_memfd.c
->> @@ -136,6 +136,9 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
->>  					 mapping_gfp_mask(inode->i_mapping), policy);
->>  	mpol_cond_put(policy);
->>
->> +	if (!IS_ERR(folio))
->> +		inode_add_bytes(inode, folio_size(folio));
->> +
->
-> Can't we have two concurrent calls to __filemap_get_folio_mpol(), and we
-> don't really know whether our call allocated the folio or simply found
-> one (the other caller allocated) in the pagecache?
->
+>> In kvm_gpc_is_valid_len(), if the GPA is an error GPA, the function uses
+>> uhva to calculate the page offset. However, if uhva is invalid, its value
+>> can still be page-aligned (for example, PAGE_OFFSET) and this function will
+>> still return true.
+> 
+> The HVA really shouldn't be invalid in the first place.  Ideally, Xen code wouldn't
+> call kvm_gpc_refresh() on an inactive cache, but I suspect we'd end up with TOCTOU
+> flaws even if we tried to add checks.
+> 
+> The next best thing would be to explicitly check if the gpc is active.  That should
+> preserve the WARN if KVM tries to pass in a garbage address to __kvm_gpc_activate().
+> 
+> diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+> index 728d2c1b488a..8372d1712471 100644
+> --- a/virt/kvm/pfncache.c
+> +++ b/virt/kvm/pfncache.c
+> @@ -369,6 +369,9 @@ int kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, unsigned long len)
+>   
+>          guard(mutex)(&gpc->refresh_lock);
+>   
+> +       if (!gpc->active)
+> +               return -EINVAL;
+> +
+>          if (!kvm_gpc_is_valid_len(gpc->gpa, gpc->uhva, len))
+>                  return -EINVAL;
+In this reproducer, userspace invokes KVM_XEN_HVM_EVTCHN_SEND without 
+first configuring the cache. As a result, kvm_xen_set_evtchn_fast() 
+returns -EWOULDBLOCK when kvm_gpc_check() fails. The -EWOULDBLOCK error 
+then causes kvm_xen_set_evtchn() to fall back to calling kvm_gpc_refresh().
 
-Ah that is true. Two threads can get past filemap_lock_folio(), then get
-to __filemap_get_folio_mpol(), and then thread 1 will return from
-__filemap_get_folio_mpol() with an allocated folio while thread 2
-returns with the folio allocated by thread 1. Both threads would end up
-incrementing the number of bytes in the inode.
-
-Sean, Vlastimil, is this a good argument for open coding, like in RFC v2
-[1]? So that guest_memfd can do inode_add_bytes() specifically when the
-folio is added to the filemap.
-
-An alternative I can think of is to add a callback that is called from
-within __filemap_add_folio(). Would that be preferred?
-
-[1] https://lore.kernel.org/all/20260225-gmem-st-blocks-v2-2-87d7098119a9@google.com/
-
-> --
-> Cheers,
->
-> David
+IMO, if the cache is not active, kvm_xen_set_evtchn_fast() should return 
+-EINVAL instead. It may be better to check the active state of the GPC 
+in kvm_xen_set_evtchn_fast() rather than kvm_gpc_refresh()?
+Br,
+Phi
 
