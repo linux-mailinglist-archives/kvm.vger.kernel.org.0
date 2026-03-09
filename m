@@ -1,176 +1,181 @@
-Return-Path: <kvm+bounces-73310-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73311-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EIpvCmjirmlPJwIAu9opvQ
-	(envelope-from <kvm+bounces-73310-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:08:24 +0100
+	id 4PPiAszirmmoJgIAu9opvQ
+	(envelope-from <kvm+bounces-73311-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:10:04 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8315723B4AB
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:08:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 622E223B51C
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:10:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0BAE730CCD7A
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 15:05:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C547A3126C55
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 15:06:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB903D7D64;
-	Mon,  9 Mar 2026 15:05:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021C83D75DE;
+	Mon,  9 Mar 2026 15:06:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1OKV2Oo2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZVwyCNzP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167BF3D75D8
-	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 15:05:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773068709; cv=pass; b=AQ3jkUHxgSuUultuUpf1/NTt5V7epKNzTCK9KojvIN5xSgSMMrPE7DUxaEJ0pjkUejTeidu6aCLdGJDJrUgAu8lcqEE6wPIPTyeNSTyV0/bxThf4H5ijjJdEoYmdFryMke4coXISNVGs1QqQPXjT0G5LjBzyV8AkTbORygtYXKA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773068709; c=relaxed/simple;
-	bh=h506DdISAW0jZvmzWHOqq1yATIV5e0BG5Ps1k2LXKBM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fR9BgKjltz9t8k4UOET5glneZv9Tl0Vlh3xUvVOdKMRYJIZEle9+OBbRdSBCKlqYsJI3th2UpV0EccFd7DY4oxB9rwpgdqJq4RrI3bbX0wfpiR4AE/rq7x0pIPp0N/jqDw9AJSpMSVKJ4f8cDR27WBT3FNtCWxJhpdXk/CLKYhM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1OKV2Oo2; arc=pass smtp.client-ip=74.125.82.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803573D6681
+	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 15:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773068771; cv=none; b=bmXVWfNw5HB6T2Y2c86YxkW5Hf23L256a6SwFpvbo02PH3KipVQ4752pNuC6aMu0s3Qn+yTPermw1BxG/s9OPtf5sdg0rDtp6yGWGJEYSsuxbkm4lfbCIv9+y92S4DODEBa9uCK3nNJS0w4MK194LbSTuJDXIn/WsCBBQLStqy8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773068771; c=relaxed/simple;
+	bh=/MOHaVgNHRp4JBw8+Wq3HwMoLhDR1d5oqHOoghhG4VY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kDoqMnNlRyOaTJC5Ix5w8diS9eed4b5yik00/8JkyUmRUtmI0fQ3dP5SQSD7z5+XA+IRb3SlhXyfPLIbq4HK7LmI1dU/kaWJZOSyYhKi+03nf2yLyIH8fnlCVpWqxiq2WjJ91INBisD3Grj82KfVpVFFVw8+3SUeh5r4FzO75gQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZVwyCNzP; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-126ea4e9697so14321c88.1
-        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 08:05:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773068707; cv=none;
-        d=google.com; s=arc-20240605;
-        b=W5703Hc1b8DzEpBRY+TvehKhWyOZwbIE71uwhA9Xo8ZkkuTgoEScW1vg7GD6hyqlAx
-         gHL0kUDGKZlOX2hNtBeL4/ihvHRAKpeSLwX3ZkQMYTnju6UCKQfpUpdPSnaW4ttFyd9+
-         XNN5h2RFAHIvCggCMajSSMxlD6H48iwiMWfzlZyoNLwh3//aWlJFw6bmIaypecT2IGF3
-         oR84AqfHBuVXZtgaOUAhrlW3jR50aoIGErv3mCJ3XRSXMjh7u4XABLc8LdGpMP9N+RwT
-         HTgyqYg20+ZOcfYwN03EMRx4SyTEJ3SkK2zjdi2UQwI+xDuJyxx/KXXKrqmZYXsbROhQ
-         cR1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=9VyI22y/VeTZdWcSGQANDYhZXVCP9xDCNVvpAO/VOQQ=;
-        fh=XWkDB2ltUqqhcFy9muzev86NoOCQKBCUYLYCpoMBoZQ=;
-        b=IRA/xMNeYSIH14WgwbwFBKZrmWcQ4KaWITRl2mK1tyqqjonTq3C9a0Ebj1WorBafuc
-         OQb1sxMVdBg3X/qatqK33VCUcAS76aBUvG+gnVtG5xSZifCjC3BfzyNmsGZaFZuxLf0d
-         z/UxoNpEt1fjRfJiRF+aoddKK/lXm02+L9qtKVE9lCOANaQjTSw6K4q46kkCahgsLj5M
-         DSJ+Y8eGr/QsVgtOtf3Xx5DOZBWD5rf5p9XGtR2lexkKM/UuBsNCsWsPfLbHr4KgtlIy
-         FhMGvdq43X4wtH1TDtyY+iQF82p6l905WFJJoR6bo4bh/TEqytFqUqXqK+QGINtLbc9i
-         tMfw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c73b1376f98so5098976a12.0
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 08:06:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773068707; x=1773673507; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9VyI22y/VeTZdWcSGQANDYhZXVCP9xDCNVvpAO/VOQQ=;
-        b=1OKV2Oo2ZpvrDiIem7vHcExeAzTgPqeXPaLCENvu5K8kJPozVtYggxkGESq9typnHt
-         L4kc+2KJo35EDCSUGcGCEDRFNCRea1Lfk7TwD5cJYwmvGtaSTQ2D/LL92PlhvhgS/ROK
-         LvQ5WdPifdcUCV8931cxIotU41yboxSzu8SDGY24oYFf5QyD/S4qQyh0ZKyY3S9RENwJ
-         JLV8S9c+Y6p1xPuqUvUBfFaNVjP/0+vo35QJ2GqG1o4QmvwJDpFm2NUfe+mYX3T/16ih
-         foMIGYa8iIjQgcr/iQpfxcKWb9ysclIyHYO9UQMDgmcqglkw+ecm0Mm018u/gdjZHwZ8
-         FryA==
+        d=google.com; s=20230601; t=1773068769; x=1773673569; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X6+jvs0ikVmPfIUblxLDk+jmVbMmxtDwNslNjGhaR8Y=;
+        b=ZVwyCNzPfhXT70Z/jo3Ho7/UT/FGRYDvKSmKX+1IniEfWDSl8+MBd6Z01veQAXsEiQ
+         b+/W3bzWZcpxjBGmlk9IKbOwjRNyKK07YPGidR0VofvibooMjGQKM4bQlA/Tk2op0Cyq
+         lJoQNurDHwqnk+FOwT4KjubFiIUVmX3jbH6xlZD2uEW9wA4Jf0O4ybxMcfAwS8DXAb4c
+         5hHNxS7cXmRwWmCb6Nr/pLYT9yFa0l/nKjvEEM0c8C6LlBkR3zYxx9Sc4iO8IB1y9x6z
+         7UGV0vWTuPDkIONcnfneKwKhAeGObTEjRRCdp5RSg1YNFKEWiQ0iaDSLeBSSUg17KjMr
+         bjqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773068707; x=1773673507;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9VyI22y/VeTZdWcSGQANDYhZXVCP9xDCNVvpAO/VOQQ=;
-        b=SWwERRWeGCCuw66tJdIP7ozUzZW6+Pl9/mVm6AhM2Pm0+2poSP1owoG7I81YS369k6
-         gNCZOfPsOuEWiqn0r+scz+d5nszFdX6VHPb9+BIrQBLr3DtIjMLbVPrIf1ahWGMBoUsP
-         yhC8d4UDzua42I1VUgnGStLrC/AWL7jxBXPyjAW0BkFkf0+LvTrSxlCnf3a6nOKNYtkd
-         NqtQiSxijzGi7RY4rFVZYvD7d3lpWW+yo+gpqlqPAYQRiBJaAfzKDdU+fUmtJfA1j1Wq
-         5SENbLHVURHqVT9iEghna+wGrMYgPIjvsOvv8I4RuAP32ggPHYzTzfZhqfTxXncQQLfC
-         5TIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVIyzaF9SRtIsVedqUS4ZVkbaHHhNM+9xpxMCL6qm4CzIl/6pAToIuzG3u64Sh1MVTluKI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4hJWz7VkDrzgXlUyGSzSA4BEK1lDhSDnPQCV3R27isNUssDLl
-	n2CBiPP4nx9/sSCxNRgGtxRMGXUdyeT6cjZOT4+3b2LVwsoSpXCMdcvm1ougozwlsmVAsI7DBbt
-	MaY885JWIaT1xJMXUNo/mk7yt5GSP678CGEB2IFi/
-X-Gm-Gg: ATEYQzyxOROQeju4nlFmu+K/OoMV3xZVPDTzPRYxu1NqkKe3f4lJZ9hLtj4Yr0t/PsE
-	svbbVWOZxDmjsc0J72aF/2bV92wRfqnskcCtZ6GEQrNu2p1YCphOS+xj5a1BBhMLgWLR7s65Wrp
-	ANiBgtumTAQAEiTqFchDKEJqNZlYiz+aVmxNZRaTHi1ttupnPSqCKqKmaiCu0ZiSuLEP6ix3H+J
-	RmKN57pwbXF4arpbyIP58/IdBjvnnY8Gy1Tc8VvoDWCuwOqYzB6CEQ5bz8E1IJf45p15qdXs6jZ
-	kvzdQ1+Wcm5uD7bJ/P9gpUmS+22cVopoF+kFhpg=
-X-Received: by 2002:a05:7022:984:b0:127:9745:c69f with SMTP id
- a92af1059eb24-128cd6c78e4mr326409c88.9.1773068706409; Mon, 09 Mar 2026
- 08:05:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1773068769; x=1773673569;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=X6+jvs0ikVmPfIUblxLDk+jmVbMmxtDwNslNjGhaR8Y=;
+        b=Myf07CVeadPLMdQK1/3mMGhk3uK3/99JRuyvGDCyijrjrP6+6I9GqLHkxbml/kW+rn
+         5PaGsDZCp/x064OLQLhYAp88vnipd1yl5ujbMowdGulMvl3Pmgj1pV9EQUk2AO4GDrTt
+         hNwY4yzQ83izE7w7k7Dp0ui+Vv8eKe9bGBau0QX80bJWwvBHZTQSz3epyfWDuBSedxcw
+         2hWHesoGdCSmRdNA8LjU1AnhAeTao2H7VcjhDvEweaE+BmDYXjpB2+y4UvFJvVa3LdjI
+         KSEgszy1VO3ot/cyoBTYZ1I60dOnfOMvNee8s9Q85E85vW18NpQSHnYiK3+Kwu37lATl
+         v3tA==
+X-Forwarded-Encrypted: i=1; AJvYcCV1gUiKyoiOfwTuJ60I6NAQeNjcT+5h5s/rrE4T0CRRtotT4siKuC6+1OWw6MTPnJM6w3E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/ttMG5ZPAx2aSPRQGPzzeYMhGyTudG9XMEPpAAiPYjPcu+3xC
+	OG83ButNK7WSGGXI7kttHpoK0/EaMf6dMMAXLUM36I1BUuMkXrMQAzt4t7cLN38BllaHZ6c54+M
+	Roy+ljw==
+X-Received: from pfw6.prod.google.com ([2002:a05:6a00:a266:b0:824:a303:863c])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:6b0d:b0:394:56ae:8a7f
+ with SMTP id adf61e73a8af0-3985908ba31mr11560818637.42.1773068768737; Mon, 09
+ Mar 2026 08:06:08 -0700 (PDT)
+Date: Mon, 9 Mar 2026 08:06:07 -0700
+In-Reply-To: <CAO9r8zOM0OWaFvAQd6FGkCC6WxkVBbQZa10pFm9b-wF1G1A6ew@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1749672978.git.afranji@google.com> <aa7WjPHTUDCgsO-U@google.com>
-In-Reply-To: <aa7WjPHTUDCgsO-U@google.com>
-From: Vishal Annapurve <vannapurve@google.com>
-Date: Mon, 9 Mar 2026 08:04:53 -0700
-X-Gm-Features: AaiRm51CMdt3YQzldlYrLNi93jNDQSQgth1QTuEwDfkO5X2hip81D88zpTx2ItQ
-Message-ID: <CAGtprH8Ls0vTYo_Fq_Tb8DwU8R2J14oaniAYNBOPb15dyaWOXg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 00/10] Add TDX intra-host migration support
-To: Sean Christopherson <seanjc@google.com>
-Cc: Ryan Afranji <afranji@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, sagis@google.com, bp@alien8.de, chao.p.peng@linux.intel.com, 
-	dave.hansen@linux.intel.com, dmatlack@google.com, erdemaktas@google.com, 
-	isaku.yamahata@intel.com, kai.huang@intel.com, mingo@redhat.com, 
-	pbonzini@redhat.com, tglx@linutronix.de, zhi.wang.linux@gmail.com, 
-	ackerleytng@google.com, andrew.jones@linux.dev, david@redhat.com, 
-	hpa@zytor.com, kirill.shutemov@linux.intel.com, 
-	linux-kselftest@vger.kernel.org, tabba@google.com, yan.y.zhao@intel.com, 
-	rick.p.edgecombe@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20260307011619.2324234-4-yosry@kernel.org> <34cbc227-f01f-4d4b-b6ab-19bcb02d7e3c@citrix.com>
+ <CAO9r8zOM0OWaFvAQd6FGkCC6WxkVBbQZa10pFm9b-wF1G1A6ew@mail.gmail.com>
+Message-ID: <aa7h39_Vp6P5TVA7@google.com>
+Subject: Re: [PATCH v2 3/3] KVM: SVM: Advertise Translation Cache Extensions
+ to userspace
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosry@kernel.org>
+Cc: Andrew Cooper <andrew.cooper3@citrix.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, pbonzini@redhat.com, venkateshs@chromium.org, 
+	venkateshs@google.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: 8315723B4AB
+X-Rspamd-Queue-Id: 622E223B51C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-73311-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73310-lists,kvm=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	FREEMAIL_CC(0.00)[google.com,vger.kernel.org,kernel.org,alien8.de,linux.intel.com,intel.com,redhat.com,linutronix.de,gmail.com,linux.dev,zytor.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vannapurve@google.com,kvm@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.990];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[kvm];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-0.942];
+	TAGGED_RCPT(0.00)[kvm];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[chromium.org:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,citrix.com:email]
 X-Rspamd-Action: no action
 
-On Mon, Mar 9, 2026 at 7:17=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Wed, Jun 11, 2025, Ryan Afranji wrote:
-> > Hello,
+On Mon, Mar 09, 2026, Yosry Ahmed wrote:
+> On Fri, Mar 6, 2026 at 5:54=E2=80=AFPM Andrew Cooper <andrew.cooper3@citr=
+ix.com> wrote:
 > >
-> > This is RFC v2 for the TDX intra-host migration patch series. It
-> > addresses comments in RFC v1 [1] and is rebased onto the latest kvm/nex=
-t
-> > (v6.16-rc1).
+> > > From: Venkatesh Srinivas <venkateshs@chromium.org>
+> > >
+> > > TCE augments the behavior of TLB invalidating instructions (INVLPG,
+> > > INVLPGB, and INVPCID) to only invalidate translations for relevant
+> > > intermediate mappings to the address range, rather than ALL intermdia=
+te
+> > > translations.
+> > >
+> > > The Linux kernel has been setting EFER.TCE if supported by the CPU si=
+nce
+> > > commit 440a65b7d25f ("x86/mm: Enable AMD translation cache extensions=
+"),
+> > > as it may improve performance.
+> > >
+> > > KVM does not need to do anything to virtualize the feature, only
+> > > advertise it and allow setting EFER.TCE. If a TLB invalidating
+> > > instruction is not intercepted, it will behave according to the guest=
+'s
+> > > setting of EFER.TCE as the value will be loaded on VM-Enter. Otherwis=
+e,
+> > > KVM's emulation may invalidate more TLB entries, which is perfectly f=
+ine
+> > > as the CPU is allowed to invalidate more TLB entries that it strictly
+> > > needs to.
+> > >
+> > > Advertise X86_FEATURE_TCE to userspace, and allow the guest to set
+> > > EFER.TCE if available.
+> > >
+> > > Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
+> > > Co-developed-by: Yosry Ahmed <yosry@kernel.org>
+> > > Signed-off-by: Yosry Ahmed <yosry@kernel.org>
 > >
-> > This patchset was built on top of the latest TDX selftests [2] and gmem
-> > linking [3] RFC patch series.
->
-> In case someone is feeling necromantic, don't bother reviewing this serie=
-s.  I've
-> provided a pile of feedback off-list (I forgot this on-list RFC existed),=
- and the
-> next version should be have significant changes.
+> > I'll repeat what I said on that referenced patch.
+> >
+> > What's the point?  AMD have said that TCE doesn't exist any more; it's =
+a
+> > bit that's no longer wired into anything.
+> >
+> > You've got to get to pre-Zen hardware before this has any behavioural
+> > effect, at which point the breath of testing is almost 0.
+>=20
+> Oh, I did not know that, thanks for pointing it out.
+>=20
+> I'll leave it up to Sean whether to pick this up (because Linux guests
+> still set the bit), just pick up patches 1-2 as cleanups, or drop this
+> entirely.
 
-Thanks Sean for the note. We will soon refresh intrahost migration
-support for software-protected VMs and this series. Need to inject
-these features at the right place in the queue of guest_memfd and TDX
-features already under review.
+I'll grab 1-2 and leave 3 alone, at least for now.  It _should_ do no harm,=
+ but
+it would really suck to discover that pre-Zen hardware has a TLB bug that a=
+ffects
+TCE, or worse, affects TCE but only for ASID!=3D0 translations or something=
+.
+
+If new CPUs ever use TCE, it'll be trivial to enable at that time.
 
