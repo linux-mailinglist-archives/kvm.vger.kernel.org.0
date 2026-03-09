@@ -1,88 +1,92 @@
-Return-Path: <kvm+bounces-73356-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73357-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mESpKfggr2neOAIAu9opvQ
-	(envelope-from <kvm+bounces-73356-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 20:35:20 +0100
+	id aJExBwkhr2myOQIAu9opvQ
+	(envelope-from <kvm+bounces-73357-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 20:35:37 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 555DF2401C6
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 20:35:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B82312401DB
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 20:35:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 425AC30396BC
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 19:31:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 18DB5306F0D1
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 19:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5236440FDA2;
-	Mon,  9 Mar 2026 19:31:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CF46410D1E;
+	Mon,  9 Mar 2026 19:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="usO9sazn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XUgzOMyp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA5D345745
-	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 19:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A5140FD84
+	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 19:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773084674; cv=none; b=uNbMEO9A0RqDzvyNm1iom2e8dtyPwGfzaXeqgSNBIF/Tw8GMSrze8GMm0Oe9nhG/C+kA+GOOkwayhx6ErOS1Ed6vdlJmfgH7xihLTVcgK8nS9DVZO/rGkYlT7V+Nzf+1+Z0bRhhxaMWnqMFxBoGh4jnUKX/+FJlEMtAX90iLAk4=
+	t=1773084675; cv=none; b=OqSm+fHxz9hFdZlaqfzDBPhE0zP9ZLntuQ+sNNZFJXtlXYRfeKsAy2Aw1LhcA9TOGQyysDwy6YXJApQeDfGpnzpBkbu6ZagZ+KLvbOjktzF4/rp6T7Uvo8WyETqI2lAwiuUW8oCTsSyh8kTW1EpRyaTkw/T6D9P9PtMd0U/4v4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773084674; c=relaxed/simple;
-	bh=iW/ovbydh6oe8AnccpxkXTU0eghC5tS6m7BQI/qh4ik=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VL344KxyXNX8vYFBur4FIG4cxhOwWquHbQIbkDvIclgLI+/LyJakRJJylvJLCQPP6YKDt5O/xaiH8iLWv5nDdvq6TOiDS/wbD4hSFp8LsuO0+iMvZmtTIZF4Lcq4wIW1xHS//Jb4CN+i+aA9CqKR79HrPLQeQYJnjef7kYqbCEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=usO9sazn; arc=none smtp.client-ip=209.85.210.202
+	s=arc-20240116; t=1773084675; c=relaxed/simple;
+	bh=zqSouceZtFC5TpkGpy+KiFus4h62hOvNb+G9ZODiRYE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=KZUTEWyC2ji4avkh6e5m1nwuK43M1mz8AEsqfOCVrEoSugUeGVgsmLU405MiT8lEXzFaPesguBTwdRKjfcNsr64jRL7x+gEBL1Ndy8AgQ2ohVgTwFYF2g6NgRkOa7T1PQ45A8CMW6QcR429CjkeAr7UEjqSmTHPm8jYQ6ts0HrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XUgzOMyp; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-829b7ed8964so1322278b3a.2
-        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 12:31:12 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae61939fa5so193181575ad.0
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 12:31:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773084672; x=1773689472; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s7IWN2tD4stFfXobSZdPZ2dyLMJvR8FtsJ70ojQYFj0=;
-        b=usO9saznJYUdXgvFh0wddzDKO4/XLuQKVqibQfEnkhy79eL2IvRO7tBdRYpf+N44Ej
-         JyEk4Qxx+Dk8UBtjnS50nHBh5VmxfpdoVogaQYsS2g/K6sLlX4Iokr65vM2ZZVv05FDD
-         we2EYtuKmeJAVr6Q3kblV1VXYnYRI8phZwrpJmQOA4v05eOZ8bkRfVsgi3Q8SqoYb65G
-         t2JQ1vCOs/Y+49OfNR3OrBd+GD2HOyrtPcKNqh+O1Zx5OyjiZUbRMR8LnhoFXjgqD7Yr
-         0qX/83pcLWSTmo3kV7/lHCXWuFlYEMF/IFyJQWLpcKBe4gOak9Ip+Z2W+YzNShzn3ir8
-         lKiw==
+        d=google.com; s=20230601; t=1773084674; x=1773689474; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=wblNA6bj3f7w06PD/nTLmV/SuffW2mSGdWVBXF9Y8dI=;
+        b=XUgzOMyp9Y1oN6fXRl22p6JHmy+Xk/0x9JJMz5aNgNrg+0pZAzkdJhdZsLswx6n5JD
+         ciR4DVH6f4KR6mMlag6337uQsGjHDcGmcEtv/GvO9B9yvCj5MrUS6JDPZ37lI0Fkmmir
+         wX8bMRkP4t+3Il56No5JdzJMxuKv5MWXfqu4R8t53MJ5f/pESOzRwkfvTabK7WdYBu1d
+         WcKbWcr4u+FHYuLs/zV6DMOOAuWOlYx5l6lw/5+vLwLnpYT/JUJ/IETPlA/NQStMviGE
+         JbEHh7ZDbsx/TSGttOlv/lUtV8hPCgo6sblYdZDRBWMMAIc+EBLPle/VpeqylZr7jlmq
+         RVmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773084672; x=1773689472;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s7IWN2tD4stFfXobSZdPZ2dyLMJvR8FtsJ70ojQYFj0=;
-        b=MEBXPf+kN7Fir6NMCWktO4jb5JWyFwt2Bpki2ZqSoSRW79v3bgh+4MkrcJyCkwjF3u
-         qxPqg/5UPD01pJoP3xtCE3jVacd7rN5TifjjBQv06EbOgCwAZSuYG6es1gEVffdoFrxR
-         K/bXp93GivAUGVSVg4NbtebGD9RCL+mC4W94xB1HUu9TR9yipPr2p+nc+UFPpplec2Eu
-         2zSCNy7bKibrc5/1n+a+w03v7z7fIRKMiCgbqrUM/UoNDTSnguzh7ESUwfghNJbQ7Q3O
-         H1CytVLfK+eZSkfN8HXCwA94Cpak3VFFtb8A1CEAW0RwWeGM8qlDf/HW2aj2xx2RJQkk
-         X2FQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV8KM8S2ifQaIWDC0TxA3mTDLq6JUn2e1BKHV4tJLSJd8LxkVYnsFkdQP8AuoRCXrwFJCQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjZaVGVSfoA5aSmybLVV6WxoZE54vAYut3YJzb/MADq5WzWTBG
-	ZqcHusmn6ZGm1v8JlYOtfdy1iK5NiQ0sFJuMbh7eqQAW2szfBr5iraHuvZEGROkpow/OCx5yNT9
-	5/fwHIA==
-X-Received: from pfbjc7.prod.google.com ([2002:a05:6a00:6c87:b0:829:7d34:ff91])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2e23:b0:81f:48d4:a979
- with SMTP id d2e1a72fcca58-829a30a6273mr10762158b3a.49.1773084672132; Mon, 09
- Mar 2026 12:31:12 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1773084674; x=1773689474;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wblNA6bj3f7w06PD/nTLmV/SuffW2mSGdWVBXF9Y8dI=;
+        b=T+Dg4bug0iwMZuP57b6pf1dkjg5Mrj9kWcHfcGWEPn5/Xna7ZSfT3a7QZ6Jj9pQRVe
+         VN9tP3JW2cAPp8/TJFTixfyOX9AdNnrwTd38g+GamsjQTczRuZnYTQQxJFN1bwadmX5L
+         tFK8owl6r886bftZyfZTGqzFjSXq41AwR9844pZpii2tMASGEkEiHeIYX1t+KQzK6FKB
+         1jXqPKEmpqYKtVaH3IAlLlFUaKb0uQGKlfs/iSE8MCfiFUxFa0jxWf1fbNr4jrhkZ5Qi
+         rFacq+8+VL26GR5K8ig7eKilcZjvL6R315iKFQ8bUeTq3oc08H4hZTocXFSUiRngfJr0
+         xfsw==
+X-Forwarded-Encrypted: i=1; AJvYcCW4gNcXKkJsiC2g4c2Vqn2lmpcOl6DWq4KTiyZWpiwboa3x6cNsMPJo6JC6o5TLiKAXeko=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0QwXpeAlF5UDs7KhKZwf+OG2aQxqBwb1B4xaWVVqgWfXX2bwJ
+	K8Q/1YcJH2E89sjzAW2duv5wk7EXekKLJ5i17Lncs8/TyzA3voP2UXTDWAwJAb3TjCMoawx9K2t
+	opyHU/g==
+X-Received: from plcy10.prod.google.com ([2002:a17:903:10a:b0:2ae:45a4:ca9f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2b06:b0:2ae:50ec:fa2e
+ with SMTP id d9443c01a7336-2ae823a1f61mr121594565ad.21.1773084674028; Mon, 09
+ Mar 2026 12:31:14 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon,  9 Mar 2026 12:30:56 -0700
+Date: Mon,  9 Mar 2026 12:30:57 -0700
+In-Reply-To: <20260309193059.2244645-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260309193059.2244645-1-seanjc@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260309193059.2244645-1-seanjc@google.com>
-Subject: [RFC PATCH 0/3] srcu: KVM: Add, export and use call_srcu_expedited()
+Message-ID: <20260309193059.2244645-2-seanjc@google.com>
+Subject: [RFC PATCH 1/3] srcu: Declare exported symbols before including srcu{tiny,tree}.h
 From: Sean Christopherson <seanjc@google.com>
 To: Lai Jiangshan <jiangshanlai@gmail.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
 	Josh Triplett <josh@joshtriplett.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: rcu@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Sean Christopherson <seanjc@google.com>, Nikita Kalyazin <kalyazin@amazon.com>, Keir Fraser <keirf@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 555DF2401C6
+X-Rspamd-Queue-Id: B82312401DB
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -90,19 +94,19 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73356-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-73357-lists,kvm=lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com,kernel.org,joshtriplett.org,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -115,39 +119,64 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	REPLYTO_EQ_FROM(0.00)[]
 X-Rspamd-Action: no action
 
-We've got a conundrum in KVM where we have multiple use cases that generally
-want the same thing (eliminate waiting on guest configuration changes whenever
-possible), but use KVM uAPIs in slightly different ways and effectively create
-competing requirements.
+Move the declarations of call_srcu(), cleanup_srcu_struct(), and
+synchronize_srcu() above the inclusion of the implementation specific SRCU
+header so that tiny SRCU can provide inline wrappers, e.g. for expedited
+versions, without needing to re-declare synchronize_srcu() and call_srcu().
 
-The crux of the problem is that one use case wants KVM to free an object via
-call_srcu() so that the task doesn't risk getting stalled waiting for a grace
-period.  But for the other use case, using call_srcu() can trigger a
-non-expedited grace period and cause a synchronize_srcu_expedited() in a
-different ioctl (that must do a full sync, i.e. can't use call_srcu()) to stall
-waiting for the non-expedited grace period.
+Opportunsitically use rcu_callback_t in the call_srcu() declaration instead
+of an open coded equivalent (all implementations already use
+rcu_callback_t).
 
-Tagged RFC because while having the call_srcu() request do an expedited grace
-period eliminates the unwanted synchronize_srcu_expedited() stalls, this feels
-like a very crude fix.   That said, I'm definitely not opposed to this being a
-final solution if it's the best option available.
+No functional change intended.
 
-Sean Christopherson (3):
-  srcu: Declare exported symbols before including srcu{tiny,tree}.h
-  srcu: Add and export call_srcu_expedited() to avoid transferring grace
-    periods
-  KVM: Expedite SRCU callbacks when freeing objects during I/O bus
-    registration
-
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
  include/linux/srcu.h     | 10 +++++-----
- include/linux/srcutiny.h |  8 ++++++--
- include/linux/srcutree.h |  2 ++
- kernel/rcu/srcutree.c    |  7 +++++++
- virt/kvm/kvm_main.c      |  2 +-
- 5 files changed, 21 insertions(+), 8 deletions(-)
+ include/linux/srcutiny.h |  2 --
+ 2 files changed, 5 insertions(+), 7 deletions(-)
 
-
-base-commit: 5128b972fb2801ad9aca54d990a75611ab5283a9
+diff --git a/include/linux/srcu.h b/include/linux/srcu.h
+index bb44a0bd7696..1cbc37e3b59c 100644
+--- a/include/linux/srcu.h
++++ b/include/linux/srcu.h
+@@ -79,6 +79,11 @@ int init_srcu_struct_fast_updown(struct srcu_struct *ssp);
+ 						// instead of smp_mb().
+ void __srcu_read_unlock(struct srcu_struct *ssp, int idx) __releases_shared(ssp);
+ 
++void call_srcu(struct srcu_struct *ssp, struct rcu_head *head,
++	       rcu_callback_t func);
++void cleanup_srcu_struct(struct srcu_struct *ssp);
++void synchronize_srcu(struct srcu_struct *ssp);
++
+ #ifdef CONFIG_TINY_SRCU
+ #include <linux/srcutiny.h>
+ #elif defined(CONFIG_TREE_SRCU)
+@@ -87,11 +92,6 @@ void __srcu_read_unlock(struct srcu_struct *ssp, int idx) __releases_shared(ssp)
+ #error "Unknown SRCU implementation specified to kernel configuration"
+ #endif
+ 
+-void call_srcu(struct srcu_struct *ssp, struct rcu_head *head,
+-		void (*func)(struct rcu_head *head));
+-void cleanup_srcu_struct(struct srcu_struct *ssp);
+-void synchronize_srcu(struct srcu_struct *ssp);
+-
+ #define SRCU_GET_STATE_COMPLETED 0x1
+ 
+ /**
+diff --git a/include/linux/srcutiny.h b/include/linux/srcutiny.h
+index dec7cbe015aa..4976536e8b28 100644
+--- a/include/linux/srcutiny.h
++++ b/include/linux/srcutiny.h
+@@ -64,8 +64,6 @@ struct srcu_usage { };
+ #define init_srcu_struct_fast_updown init_srcu_struct
+ #endif // #ifndef CONFIG_DEBUG_LOCK_ALLOC
+ 
+-void synchronize_srcu(struct srcu_struct *ssp);
+-
+ /*
+  * Counts the new reader in the appropriate per-CPU element of the
+  * srcu_struct.  Can be invoked from irq/bh handlers, but the matching
 -- 
 2.53.0.473.g4a7958ca14-goog
 
