@@ -1,434 +1,210 @@
-Return-Path: <kvm+bounces-73271-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73272-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UGLFDySJrmnKFgIAu9opvQ
-	(envelope-from <kvm+bounces-73271-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 09:47:32 +0100
+	id yNYqLJGMrmnlFwIAu9opvQ
+	(envelope-from <kvm+bounces-73272-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 10:02:09 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98FB2235A96
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 09:47:31 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 659C9235CD5
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 10:02:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5FBA03035AA0
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 08:43:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6241530233DA
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 09:02:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D99338910;
-	Mon,  9 Mar 2026 08:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6447C37475A;
+	Mon,  9 Mar 2026 09:01:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LvJhrhdh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HZ+OBMvu"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9F23093C3;
-	Mon,  9 Mar 2026 08:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773045832; cv=none; b=AAmuIBCuhISA+E+TDEaikBoadfVqzmIg4/IPNVMHTwswa43TWd6B23wY5mOrDIpqAPY+YsQFeGlXmnHAixEyS1xdk1G4SUeC53LlsZ9Ks7xmddaw9Cjs99liwKYJEw9CL/+f+l9pNg/UcT0RDzCpMxSbj4E5q7XCuXa3zcUDhe0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773045832; c=relaxed/simple;
-	bh=R0Tj8WHPpvIY04QiJfIurzlhzjfV000u26yyDgGvweo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ns9l44uiBiNooKuBXvbOtWpf2QAsUGZLfWOsXnSW9RZcFATx7B8tSsDjWMBv+3IohYv9HaJ6vgtKX7AnUEp276Y1GzTRyw3XFd/xkV8MipYHMlUG4aygOZtVJsXT+amKiPVJpfJ83vCnfhNjQI6ZrZigvWOf4ed1JT58+BbDudY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LvJhrhdh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B812EC4CEF7;
-	Mon,  9 Mar 2026 08:43:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773045832;
-	bh=R0Tj8WHPpvIY04QiJfIurzlhzjfV000u26yyDgGvweo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=LvJhrhdhbQozIAuWAlqXW3bj0cWo8FxnOWgkdMke7eRZtRR20Tv8o5cECmuZmGYK+
-	 dBqhRaiCqlkEO0AdOUsxXmyF4MqENquSuSHBmz2RU47VGIJdubddTYCV9qRakBnbje
-	 O5unNYzBed62xZ5MFgbrtjoTo28MBcjxmyBaGbRFpwxHRYoVzlpO3sSOS8ggVcqOFq
-	 HbmwYbvG57oSLBYDozAq6nXOliqgesdIs76MP+Pa/lkgzIW3gkLP7SsXzNAn8IT0FP
-	 Rwr0N9MBjMJld+itIy9r6hlCbW/vmJHmxt5o5a088yXOn46IJZ0xMCwU1Mzza1obzD
-	 X5xgE1A2esdCQ==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Jiri Slaby
- <jirislaby@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano
- Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
- rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>, Linux Kernel
- <linux-kernel@vger.kernel.org>, Shinichiro Kawasaki
- <shinichiro.kawasaki@wdc.com>, "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, luto@kernel.org, Michal
- =?utf-8?Q?Koutn=C3=BD?=
- <MKoutny@suse.com>, Waiman Long <longman@redhat.com>, Marco Elver
- <elver@google.com>
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups,
- RCU stalls, timeout
-In-Reply-To: <57c1e171-9520-4288-9e2d-10a72a499968@kernel.org>
-References: <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
- <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
- <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
- <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
- <20260306152458.GT606826@noisy.programming.kicks-ass.net>
- <87ldg42eu7.ffs@tglx> <87h5qr2rzi.ffs@tglx> <87eclu3coa.ffs@tglx>
- <87v7f61cnl.ffs@tglx> <57c1e171-9520-4288-9e2d-10a72a499968@kernel.org>
-Date: Mon, 09 Mar 2026 09:43:48 +0100
-Message-ID: <87pl5ds88r.ffs@tglx>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D646372B27
+	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 09:01:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773046916; cv=pass; b=G75hh1N8F6AmjHBsNUkQZwwEhTlT8Gqg22WxSkuWrDosPjDvGb2JCt1iI95VvODw9WFbccFL2pSAovE417stj5p5LjjFerb5BcMs0G+DYoYcY/fyKpO7vIimiZGOwvt31LjJPmwtCtj8Q9R362Aotghrk15Cng34kfgqBnMkVuQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773046916; c=relaxed/simple;
+	bh=PNkPX25Cp7e7Iwb2dKtnjzov9RP8heUl93T4iWLshSg=;
+	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YfLtLR/gQ3dBuZNFlKEjo1HCfyNEav3ELgUirzd5ztJSWCLqEZk5L2Sj6QnAbF6nOeJFG83yryHsYhff65shoJfYw6+SXEFUiRQg9Jc0JMg+8piRKSNobEq5BO2s8bS9vd2f3kaMEXvExxS6G4YwCWHm1dikkCoNfitZT7Amd9U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HZ+OBMvu; arc=pass smtp.client-ip=209.85.217.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-5ff05af29b4so3855642137.1
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 02:01:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773046914; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NFss7kUyG0VGr0+4L+naT52j38YUK3QMs9vV53eWi1Axm6fDJsIl3P22IklKvPZzhB
+         dAgws92nDt2dbKSe0fsmXX5AHx3GY4Dokmd66cY81yP5mWYTmQMwMq0ZVMelYKUFCXRL
+         i926bvN/ZtUEXqus8EBCUtNr2FXWlxrR6omM6SvBQRcAaE2c9Fz3y8h0686fvjAN8ncA
+         KE+lRqpvqfz5gHI/NBBG+4X1mKe/PcdWEwhLB0/W/CgJIHf4vb+0nDPFfRo2NZSUS0Dv
+         oKWtB4FBMO5/+R+K7fKO1dz8Ttg3l5BKBT2iax2KauVCk/zdr995Geyc/j97hz1z52WN
+         gj0Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:dkim-signature;
+        bh=RFQA1zNrgYGwPSpxXXkSccQrNeC8DGePNpNQ4Qq3K74=;
+        fh=0YZpqzuIHlIF/LubTgwDB4Z7kIZDvesGVMRIPXOVVDQ=;
+        b=FQj6n8rv3rlf0scUgaySngY+IgDkJwwbjrZTtF5/Y21wp07fuXKoZUHF/V5PbumuuB
+         yUBjYRRxHA/OCMY+xVSge+bJ1clRyR2AJbuLtdFQgC9wYB9RtyN3xFx2pQ1uEX3C4Bjf
+         9itlxYowoNdCaOWmvrcwwAYQz8aModNaQNWdOUqMfnBbLB4ihWSKylGni8OtPvhHxuol
+         YKfpHFHNnMoOfseNtnjQCmTy6wACSEaM1Ca+ndinbSj152WgJE3ekcIil7dvrjCZC0rL
+         cH5LON3+0XmXceKYApEMdisyQusw/8OpHxH5f5wA9fmlnl0Ncdqji8VxJ/EbzLLsqj6F
+         x17Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773046914; x=1773651714; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RFQA1zNrgYGwPSpxXXkSccQrNeC8DGePNpNQ4Qq3K74=;
+        b=HZ+OBMvu14mLMWV7Hizzd6RlJU+TG+l5CUyuTPiK3a8leO1gHkq9AhhkKPdYyvVTgl
+         O7BRrxwbVPMIMuA0zGsbKSSw3GeoElrAvB3jEhKS9fyofkrGPKBcYRGf7CTrjvAPHrB6
+         awiWYKqFZ/l8b39F0Qjoxd4KBA7QDMCZPVRgni3XLyZa30ARiMoLr6u9pA14p7Ki/8I6
+         D+moV25McBJrtzIfddwO0l1/HtDYCxK4oTbmbDrWkJ8kokCBVwObC0wJ8k1YQ4XXAA80
+         +ReTAkQREhJLLpKKquQvXk8ddfJitPFLRwVpnK+wqXLwC5RLgMlnZc0eYIMI+YkMrxk3
+         EZSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773046914; x=1773651714;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RFQA1zNrgYGwPSpxXXkSccQrNeC8DGePNpNQ4Qq3K74=;
+        b=vHXtU2tkfKZwcLw/+h3EU6wH9JZftKbOHQpHl47eme76klkQtnjWyiQIixzkUgO7NG
+         nyEhaFXLFPp4+kmfaUwld93TCkzNrlG9kMZz/8bHgVXmyEK7XbM7W5kg/cDW2rNzbCPQ
+         rW3yz98MGru9xSKhSSN4ruDl/GI82y7kESdrs3+rxuJHT1m+8MW1I6WQt9/HTDcorl/Y
+         DxSCWminUXAPyKNyQjXub2wP0MautnLMSm1aVIj4PeZhtrzN2dDGn4cwJgDAk4EG01DV
+         G9QYK20yVdCamXKPhEa1OwqtcUk8C7s/BOGCVQocOiY1p1F9c0y0zT1CWl/P9QY1cArL
+         h8Xw==
+X-Forwarded-Encrypted: i=1; AJvYcCXxtjfHIysZ+am9CedE/hZ2KZNeK3H8UFRhQl3DuDYdNBJHANGAyX+qYlPUB6jLDZPkBHM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCF3raJx2f+r3612s6hVSfiSmdcjrmSdKg4xLwvITu/r3ELEFl
+	JavSYW/c0pfYJffwtlFV6bWv0yu6tHAKwy4URnfH0S96vhu5QIz7+7XbEmpmHq2FrmojziwJyrv
+	tejb4UjIOWlGGHjKsCJ5BriDR9FSxiPj0yMroagQr
+X-Gm-Gg: ATEYQzyNO5AbfjLbLJ2hJD5GevnXBbFfy6tpDZ/SfPCNGz66i5Dj6yUIqkF2UiAhfkV
+	oApp+6Kndp16/uW3ufggapL0woq0h608ybC7vRNk0i/bWskiO5pp2bGPkiJ41/2BUKVq8embQQK
+	KtCBKujBw+gZi7YISFAkaYIPSe5HFeOcIyhTsnub+MWKf+eyd77ZJNRbalx81GtMXXjXGKesTw4
+	uAxCQioDq7yzaEpJIYggheFU65olYN47BX8P5kn1nxOaDqixRuH77nXlkEkY44a/Sxc7q5SCrS0
+	i9ixaPcctEUBa+xF9degWkwryqzWG/8jAOw4sPoNbxXDmtZglALk2kXjPzR7GaQtDZwyGg==
+X-Received: by 2002:a05:6102:3f0b:b0:5ef:a644:ca4 with SMTP id
+ ada2fe7eead31-5ffe6134835mr3557573137.23.1773046913874; Mon, 09 Mar 2026
+ 02:01:53 -0700 (PDT)
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 9 Mar 2026 02:01:53 -0700
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 9 Mar 2026 02:01:53 -0700
+From: Ackerley Tng <ackerleytng@google.com>
+In-Reply-To: <ce99dc548000b5a1f4486cdd3efe510b3874684b.1772486459.git.ashish.kalra@amd.com>
+References: <cover.1772486459.git.ashish.kalra@amd.com> <ce99dc548000b5a1f4486cdd3efe510b3874684b.1772486459.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Rspamd-Queue-Id: 98FB2235A96
+Date: Mon, 9 Mar 2026 02:01:53 -0700
+X-Gm-Features: AaiRm523pnGIGt0JrK2mF_UJQjN59ASDAQJnNicAgeYGdxK3jDgLfp_34dMqkIY
+Message-ID: <CAEvNRgFCTNr=LUR_RM7+A4z+qHCWBZOYKe_Cbokwx0UsCtzaVw@mail.gmail.com>
+Subject: Re: [PATCH v2 5/7] KVM: guest_memfd: Add cleanup interface for guest teardown
+To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, seanjc@google.com, 
+	peterz@infradead.org, thomas.lendacky@amd.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, ardb@kernel.org
+Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com, 
+	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com, 
+	jackyli@google.com, pgonda@google.com, rientjes@google.com, 
+	jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com, 
+	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com, 
+	darwi@linutronix.de, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 659C9235CD5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [2.84 / 15.00];
-	MID_END_EQ_FROM_USER_PART(4.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-73272-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73271-lists,kvm=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tglx@kernel.org,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.209];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-0.946];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,amd.com:email]
 X-Rspamd-Action: no action
 
-On Sun, Mar 08 2026 at 18:23, Matthieu Baerts wrote:
-> 08 Mar 2026 17:58:26 Thomas Gleixner <tglx@kernel.org>:
->> So I'm back to square one. I go and do what I should have done in the
->> first place. Write a debug patch with trace_printks and let the people
->> who can actually trigger the problem run with it.
+Ashish Kalra <Ashish.Kalra@amd.com> writes:
+
+> From: Ashish Kalra <ashish.kalra@amd.com>
 >
-> Happy to test such debug patches!
+> Introduce kvm_arch_gmem_cleanup() to perform architecture-specific
+> cleanups when the last file descriptor for the guest_memfd inode is
+> closed. This typically occurs during guest shutdown and termination
+> and allows for final resource release.
+>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>
+> [...snip...]
+>
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 017d84a7adf3..2724dd1099f2 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -955,6 +955,14 @@ static void kvm_gmem_destroy_inode(struct inode *inode)
+>
+>  static void kvm_gmem_free_inode(struct inode *inode)
+>  {
+> +#ifdef CONFIG_HAVE_KVM_ARCH_GMEM_CLEANUP
+> +	/*
+> +	 * Finalize cleanup for the inode once the last guest_memfd
+> +	 * reference is released. This usually occurs after guest
+> +	 * termination.
+> +	 */
+> +	kvm_arch_gmem_cleanup();
+> +#endif
 
-See below.
+Folks have already talked about the performance implications of doing
+the scan and rmpopt, I just want to call out that one VM could have more
+than one associated guest_memfd too.
 
-Enable the tracepoints either on the kernel command line:
+I think the cleanup function should be thought of as cleanup for the
+inode (even if it doesn't take an inode pointer since it's not (yet)
+required).
 
-    trace_event=sched_switch,mmcid:*
+So, the gmem cleanup function should not handle deduplicating cleanup
+requests, but the arch function should, if the cleanup needs
+deduplicating.
 
-or before starting the test case:
+Also, .free_inode() is called through RCU, so it could be called after
+some delay. Could it be possible that .free_inode() ends up being called
+way after the associated VM gets torn down, or after KVM the module gets
+unloaded?  Does rmpopt still work fine if KVM the module got unloaded?
 
-    echo 1 >/sys/kernel/tracing/events/sched/sched_switch/enable
-    echo 1 >/sys/kernel/tracing/events/mmcid/enable
+IIUC the current kmem_cache_free(kvm_gmem_inode_cachep, GMEM_I(inode));
+is fine because in kvm_gmem_exit(), there is a rcu_barrier() before
+kmem_cache_destroy(kvm_gmem_inode_cachep);.
 
-I added a 50ms timeout into mm_cid_get() which freezes the trace and
-emits a warning. If you enable panic_on_warn and ftrace_dump_on_oops,
-then it dumps the trace buffer once it hits the warning.
-
-Either kernel command line:
-
-   panic_on_warn ftrace_dump_on_oops
-
-or
-
-  echo 1 >/proc/sys/kernel/panic_on_warn
-  echo 1 >/proc/sys/kernel/ftrace_dump_on_oops
-
-That should provide enough information to decode this mystery.
-
-Thanks,
-
-        tglx
----
- include/trace/events/mmcid.h |  138 +++++++++++++++++++++++++++++++++++++++++++
- kernel/sched/core.c          |   10 +++
- kernel/sched/sched.h         |   20 +++++-
- 3 files changed, 165 insertions(+), 3 deletions(-)
-
---- /dev/null
-+++ b/include/trace/events/mmcid.h
-@@ -0,0 +1,138 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM mmcid
-+
-+#if !defined(_TRACE_MMCID_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_MMCID_H
-+
-+#include <linux/sched.h>
-+#include <linux/tracepoint.h>
-+
-+DECLARE_EVENT_CLASS(mmcid_class,
-+
-+	TP_PROTO(struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(mm, cid),
-+
-+	TP_STRUCT__entry(
-+		__field( void *,	mm	)
-+		__field( unsigned int,	cid	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->mm	= mm;
-+		__entry->cid	= cid;
-+	),
-+
-+	TP_printk("mm=%p cid=%08x", __entry->mm, __entry->cid)
-+);
-+
-+DEFINE_EVENT(mmcid_class, mmcid_getcid,
-+
-+	TP_PROTO(struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(mm, cid)
-+);
-+
-+DEFINE_EVENT(mmcid_class, mmcid_putcid,
-+
-+	TP_PROTO(struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(mm, cid)
-+);
-+
-+DECLARE_EVENT_CLASS(mmcid_task_class,
-+
-+	TP_PROTO(struct task_struct *t, struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(t, mm, cid),
-+
-+	TP_STRUCT__entry(
-+		__field( void *,	t	)
-+		__field( void *,	mm	)
-+		__field( unsigned int,	cid	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->t	= t;
-+		__entry->mm	= mm;
-+		__entry->cid	= cid;
-+	),
-+
-+	TP_printk("t=%p mm=%p cid=%08x", __entry->t, __entry->mm, __entry->cid)
-+);
-+
-+DEFINE_EVENT(mmcid_task_class, mmcid_task_update,
-+
-+	TP_PROTO(struct task_struct *t, struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(t, mm, cid)
-+);
-+
-+DECLARE_EVENT_CLASS(mmcid_cpu_class,
-+
-+	TP_PROTO(unsigned int cpu, struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(cpu, mm, cid),
-+
-+	TP_STRUCT__entry(
-+		__field( unsigned int,	cpu	)
-+		__field( void *,	mm	)
-+		__field( unsigned int,	cid	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->cpu	= cpu;
-+		__entry->mm	= mm;
-+		__entry->cid	= cid;
-+	),
-+
-+	TP_printk("cpu=%u mm=%p cid=%08x", __entry->cpu, __entry->mm, __entry->cid)
-+);
-+
-+DEFINE_EVENT(mmcid_cpu_class, mmcid_cpu_update,
-+
-+	TP_PROTO(unsigned int cpu, struct mm_struct *mm, unsigned int cid),
-+
-+	TP_ARGS(cpu, mm, cid)
-+);
-+
-+DECLARE_EVENT_CLASS(mmcid_user_class,
-+
-+	TP_PROTO(struct task_struct *t, struct mm_struct *mm),
-+
-+	TP_ARGS(t, mm),
-+
-+	TP_STRUCT__entry(
-+		__field( void *,	t	)
-+		__field( void *,	mm	)
-+		__field( unsigned int,	users	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->t	= t;
-+		__entry->mm	= mm;
-+		__entry->users	= mm->mm_cid.users;
-+	),
-+
-+	TP_printk("t=%p mm=%p users=%u", __entry->t, __entry->mm, __entry->users)
-+);
-+
-+DEFINE_EVENT(mmcid_user_class, mmcid_user_add,
-+
-+	TP_PROTO(struct task_struct *t, struct mm_struct *mm),
-+
-+	TP_ARGS(t, mm)
-+);
-+
-+DEFINE_EVENT(mmcid_user_class, mmcid_user_del,
-+
-+	TP_PROTO(struct task_struct *t, struct mm_struct *mm),
-+
-+	     TP_ARGS(t, mm)
-+);
-+
-+#endif
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -86,6 +86,7 @@
- #include <linux/sched/rseq_api.h>
- #include <trace/events/sched.h>
- #include <trace/events/ipi.h>
-+#include <trace/events/mmcid.h>
- #undef CREATE_TRACE_POINTS
- 
- #include "sched.h"
-@@ -10569,7 +10570,9 @@ static inline void mm_cid_transit_to_tas
- 		unsigned int cid = cpu_cid_to_cid(t->mm_cid.cid);
- 
- 		t->mm_cid.cid = cid_to_transit_cid(cid);
-+		trace_mmcid_task_update(t, t->mm, t->mm_cid.cid);
- 		pcp->cid = t->mm_cid.cid;
-+		trace_mmcid_cpu_update(task_cpu(t), t->mm, pcp->cid);
- 	}
- }
- 
-@@ -10602,7 +10605,9 @@ static void mm_cid_fixup_cpus_to_tasks(s
- 			if (!cid_in_transit(cid)) {
- 				cid = cid_to_transit_cid(cid);
- 				rq->curr->mm_cid.cid = cid;
-+				trace_mmcid_task_update(rq->curr, rq->curr->mm, cid);
- 				pcp->cid = cid;
-+				trace_mmcid_cpu_update(cpu, mm, cid);
- 			}
- 		}
- 	}
-@@ -10613,7 +10618,9 @@ static inline void mm_cid_transit_to_cpu
- {
- 	if (cid_on_task(t->mm_cid.cid)) {
- 		t->mm_cid.cid = cid_to_transit_cid(t->mm_cid.cid);
-+		trace_mmcid_task_update(t, t->mm, t->mm_cid.cid);
- 		pcp->cid = t->mm_cid.cid;
-+		trace_mmcid_cpu_update(task_cpu(t), t->mm, pcp->cid);
- 	}
- }
- 
-@@ -10685,6 +10692,7 @@ static bool sched_mm_cid_add_user(struct
- {
- 	t->mm_cid.active = 1;
- 	mm->mm_cid.users++;
-+	trace_mmcid_user_add(t, mm);
- 	return mm_update_max_cids(mm);
- }
- 
-@@ -10727,6 +10735,7 @@ void sched_mm_cid_fork(struct task_struc
- 	} else {
- 		mm_cid_fixup_cpus_to_tasks(mm);
- 		t->mm_cid.cid = mm_get_cid(mm);
-+		trace_mmcid_task_update(t, t->mm, t->mm_cid.cid);
- 	}
- }
- 
-@@ -10739,6 +10748,7 @@ static bool sched_mm_cid_remove_user(str
- 		mm_unset_cid_on_task(t);
- 	}
- 	t->mm->mm_cid.users--;
-+	trace_mmcid_user_del(t, t->mm);
- 	return mm_update_max_cids(t->mm);
- }
- 
---- a/kernel/sched/sched.h
-+++ b/kernel/sched/sched.h
-@@ -75,6 +75,7 @@
- #include <linux/delayacct.h>
- #include <linux/mmu_context.h>
- 
-+#include <trace/events/mmcid.h>
- #include <trace/events/power.h>
- #include <trace/events/sched.h>
- 
-@@ -3809,6 +3810,7 @@ static __always_inline bool cid_on_task(
- 
- static __always_inline void mm_drop_cid(struct mm_struct *mm, unsigned int cid)
- {
-+	trace_mmcid_putcid(mm, cid);
- 	clear_bit(cid, mm_cidmask(mm));
- }
- 
-@@ -3817,6 +3819,7 @@ static __always_inline void mm_unset_cid
- 	unsigned int cid = t->mm_cid.cid;
- 
- 	t->mm_cid.cid = MM_CID_UNSET;
-+	trace_mmcid_task_update(t, t->mm, t->mm_cid.cid);
- 	if (cid_on_task(cid))
- 		mm_drop_cid(t->mm, cid);
- }
-@@ -3838,6 +3841,7 @@ static inline unsigned int __mm_get_cid(
- 		return MM_CID_UNSET;
- 	if (test_and_set_bit(cid, mm_cidmask(mm)))
- 		return MM_CID_UNSET;
-+	trace_mmcid_getcid(mm, cid);
- 	return cid;
- }
- 
-@@ -3845,9 +3849,17 @@ static inline unsigned int mm_get_cid(st
- {
- 	unsigned int cid = __mm_get_cid(mm, READ_ONCE(mm->mm_cid.max_cids));
- 
--	while (cid == MM_CID_UNSET) {
--		cpu_relax();
--		cid = __mm_get_cid(mm, num_possible_cpus());
-+	if (cid == MM_CID_UNSET) {
-+		ktime_t t0 = ktime_get();
-+
-+		while (cid == MM_CID_UNSET) {
-+			cpu_relax();
-+			cid = __mm_get_cid(mm, num_possible_cpus());
-+			if (ktime_get() - t0 > 50 * NSEC_PER_MSEC) {
-+				tracing_off();
-+				WARN_ON_ONCE(1);
-+			}
-+		}
- 	}
- 	return cid;
- }
-@@ -3874,6 +3886,7 @@ static inline unsigned int mm_cid_conver
- static __always_inline void mm_cid_update_task_cid(struct task_struct *t, unsigned int cid)
- {
- 	if (t->mm_cid.cid != cid) {
-+		trace_mmcid_task_update(t, t->mm, cid);
- 		t->mm_cid.cid = cid;
- 		rseq_sched_set_ids_changed(t);
- 	}
-@@ -3881,6 +3894,7 @@ static __always_inline void mm_cid_updat
- 
- static __always_inline void mm_cid_update_pcpu_cid(struct mm_struct *mm, unsigned int cid)
- {
-+	trace_mmcid_cpu_update(smp_processor_id(), mm, cid);
- 	__this_cpu_write(mm->mm_cid.pcpu->cid, cid);
- }
- 
+>  	kmem_cache_free(kvm_gmem_inode_cachep, GMEM_I(inode));
+>  }
+>
+> --
+> 2.43.0
 
