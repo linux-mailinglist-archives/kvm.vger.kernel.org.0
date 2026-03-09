@@ -1,215 +1,127 @@
-Return-Path: <kvm+bounces-73279-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73280-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cGrWHKmZrmmqGgIAu9opvQ
-	(envelope-from <kvm+bounces-73279-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 10:58:01 +0100
+	id WLTtMnStrmntHQIAu9opvQ
+	(envelope-from <kvm+bounces-73280-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 12:22:28 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA61F236A6A
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 10:58:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36541237DB3
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 12:22:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AE932307E85A
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 09:54:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 56F233080F95
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 11:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6BA8388E62;
-	Mon,  9 Mar 2026 09:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B944739A7FA;
+	Mon,  9 Mar 2026 11:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jBoeGbob"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FYkoQYw2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C144638946C
-	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 09:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C69939B94C;
+	Mon,  9 Mar 2026 11:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773050063; cv=none; b=ESWy3+OAil7GjQDtBGeA3n7DxXrXKqNFvFjFV9GJMxLK0DRE2G1B9zwG/mNa4Hl4isYiDCCZRA4O8y8hu5WgOYAlzxTAcyBIE3yEG1YckpJdXlsazHVnAk3hZBv0CbowsYhLNqEkJOR1qy/fs/zD1BkYPXOtz+/Bu/A9y43Yd+4=
+	t=1773055048; cv=none; b=cw+wWhERnvAXmhT2YfbfzVKoNnwvsdxNT777YVOludNIldzYaZ1k3ULsqJYPCDsAHsbjEcF+4tlQWjdZ/jxUAykgJTj/efgNI52rrbPRdv7Uokf9juPrSRaOV/dJQD2S9YpOUY9Lu/QyhS+Rqs4ZjToup2kRPixjeX4pRUvvEog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773050063; c=relaxed/simple;
-	bh=j//w3WNdHhv+K+KJtK+49w6iacgmz4dTxY4RPng9cDM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nalKBKh4iBBKq4PKRPCiJigwM+HyGd7d+97eZtYqvT8HOnyVYMZeNukKQFjUEaZpL58pWLyg5rke6plVEHtvCN+0uvqqNJ9LEcKcpeI8AHVYR/p8tvGknwNP+GxyJOI3SjkaMfIwPJDCMPE9x9A3QIzed67K276/E8DFz8F94zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jBoeGbob; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3597f559e70so5835083a91.3
-        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 02:54:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773050059; x=1773654859; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/MEyZb/LBxvw6GMpGFDX0oKNKuzzaTQJv09alTwZUHg=;
-        b=jBoeGbobj/yi+M2LQwgl1qx7sArCfTFGvxF5XbkL3jWyqS21RVKROuu050PtaWf7O6
-         shDPTH3/eDYmksy5EQL/BRMSW66450RgItibmOJHKs2DCVG4xqHii4LUXqdmqMiwjjIi
-         e4W7n3h1f5ZDOBqtkEyMFJgpi893oGhCfImQrwqX1whU92yLIfVK5bLyIqMxrHKI8hQP
-         /sNZ4PSKd9vpzQ1LoQR2C9yzHeAOQSk62x6QcGd6uP1F19LE6c0V1wVJ//FZRipHqJMF
-         P/tj4CJ0OqvB4Ozeb8cQEDp8bGVrgJKsbhWt68X+yTEw/5loh5W90exHu7vue4nRaqy6
-         Y2RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773050059; x=1773654859;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/MEyZb/LBxvw6GMpGFDX0oKNKuzzaTQJv09alTwZUHg=;
-        b=Umjo+2OCdGA0YwVdEs8roHecqnsKDPyUbdE9LRJvh5u0tcgKXb6+3t0CSE212czMeW
-         DB3AokvS3RGIpZQv5sErlTb8fSKCikGrQl3YoRqCuEaLTRxR+hCyidwk/x7qOWaYQFaE
-         hYP9MvXHdIeQ6B+MoRh5GJO80LbbeYtWCXVC1SiPeiFyQnJIwa1bzXlB64uh/xVKUH+2
-         3JVms0SdXwW28IVjKyZkp0LtNb5DfuZLuPzpGE0m4+Z9dHS2I2inbfa3WgBGRtw4hU7T
-         xHZYTDhqLAVA8yTvfzPwrk1efXdO/Ftdmg8huyoMvIPgIljfJaIi1CoyP0uXN7XJEigI
-         H0qQ==
-X-Gm-Message-State: AOJu0YwDrujACskyJIuUfFydsCvXB35CGjQ+es1Z57fGEXZSH3fX1fXD
-	lLlWt4nCkM+aimKqTFu89//06CkkLbAGTOanItm43q5Dtthbs0V0XYzn7+8AZEXDizLyuWuCKhZ
-	rRki1MdqaSdkVSC6J55jEkhGznA==
-X-Received: from pjbcq1.prod.google.com ([2002:a17:90a:f981:b0:359:8ddd:8042])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:2b4e:b0:359:8e5e:43ee with SMTP id 98e67ed59e1d1-359be2ee7f0mr9058209a91.19.1773050058833;
- Mon, 09 Mar 2026 02:54:18 -0700 (PDT)
-Date: Mon, 09 Mar 2026 09:53:55 +0000
-In-Reply-To: <20260309-gmem-st-blocks-v3-0-815f03d9653e@google.com>
+	s=arc-20240116; t=1773055048; c=relaxed/simple;
+	bh=SnmyFF1XhivWaff3cyVDTm+Im2RbOKLj8Y3ciYszN7k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bbijGatOVSmhpI+oUqZ51fwaYT2PrA1jbBHHK7l9gv4005Q0ppPZ5+bqJAXitC9gIfJmO9xg+sx0P2LWBSK7ycc+x8mqNuoRdMGEvjDCsTYck9fH3T6RBUwnRD5swEYBZyapIvflte6hvQ292k+bvTovlTjGqKHonzj5ETG/6V8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FYkoQYw2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06D09C4CEF7;
+	Mon,  9 Mar 2026 11:17:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773055047;
+	bh=SnmyFF1XhivWaff3cyVDTm+Im2RbOKLj8Y3ciYszN7k=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FYkoQYw2zMbmsB5a4Zg6oMiB50D8VDqvzw9kxL2z1M/Dwv7enDYy+XRKOHOv8d7SQ
+	 bQHHRrDxMt69JPyGtYisY29w43KqeS/lbMq21EbJ9BvGc08qu+Az5vsp/O+8eLxQS7
+	 opT63/r5Gg7AgFbg3JZGNCUDbtgJRiBRzB6SdbgOQNXlEEMfpN+BuzSBcx61ZHj0Hn
+	 qZ3fyDi6yexUItC3vJg8qVafYeQPp2rUk89JqpQ4zW9BRQRwmrfEMXO+8GDG6QtMkV
+	 NFZ7Fwegjhy3om6p0e68TJR0ppMj7SJ8aYX9dKS9/zd3yfOsf0BZXXcVWdPjBt724i
+	 3i4QrqNmeKGoQ==
+From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+To: iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Subject: [PATCH v2 0/3] Add iommufd ioctls to support TSM operations
+Date: Mon,  9 Mar 2026 16:47:01 +0530
+Message-ID: <20260309111704.2330479-1-aneesh.kumar@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260309-gmem-st-blocks-v3-0-815f03d9653e@google.com>
-X-Developer-Key: i=ackerleytng@google.com; a=ed25519; pk=sAZDYXdm6Iz8FHitpHeFlCMXwabodTm7p8/3/8xUxuU=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1773050050; l=3384;
- i=ackerleytng@google.com; s=20260225; h=from:subject:message-id;
- bh=j//w3WNdHhv+K+KJtK+49w6iacgmz4dTxY4RPng9cDM=; b=47SP9RDMCEYTpZusRbsJtAhE6uNyDbx53VwlcxfkhVofBND7pZ84qMDahkOmQWfyUOEuUMi+w
- 8KtzTKEfucPCalS3OewldUeVaBmw6TDArODKk48Vg/ruFqX9znVvd2L
-X-Mailer: b4 0.14.3
-Message-ID: <20260309-gmem-st-blocks-v3-4-815f03d9653e@google.com>
-Subject: [PATCH RFC v3 4/4] KVM: selftests: Test that st_blocks is updated on allocation
-From: Ackerley Tng <ackerleytng@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	David Hildenbrand <david@kernel.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Mike Rapoport <rppt@kernel.org>, 
-	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	seanjc@google.com, rientjes@google.com, rick.p.edgecombe@intel.com, 
-	yan.y.zhao@intel.com, fvdl@google.com, jthoughton@google.com, 
-	vannapurve@google.com, shivankg@amd.com, michael.roth@amd.com, 
-	pratyush@kernel.org, pasha.tatashin@soleen.com, kalyazin@amazon.com, 
-	tabba@google.com, Vlastimil Babka <vbabka@kernel.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-doc@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Rspamd-Queue-Id: DA61F236A6A
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 36541237DB3
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73279-lists,kvm=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[35];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73280-lists,kvm=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_THREE(0.00)[4];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aneesh.kumar@kernel.org,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.989];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.913];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-The st_blocks field reported by fstat should reflect the number of
-allocated 512-byte blocks for the guest memfd file.
+This patch series adds iommufd ioctl support for TSM-related operations.
+These ioctls allow VMMs to perform TSM management tasks such as bind/unbind
+operations and handling guest requests.
 
-Extend the fallocate test to verify that st_blocks is correctly updated
-when memory is allocated or deallocated via
-fallocate(FALLOC_FL_PUNCH_HOLE).
+This series is posted separately in v2. The v1 posting is available at:
+https://lore.kernel.org/all/20250728135216.48084-8-aneesh.kumar@kernel.org
 
-Add checks after each fallocate call to ensure that st_blocks increases on
-allocation, decreases when a hole is punched, and is restored when the hole
-is re-allocated. Also verify that st_blocks remains unchanged for failing
-fallocate calls.
+Changes from v1:
+* Rebased onto the latest kernel
+* Addressed review feedback
+* Dropped the TSM map ioctl; the KVM prefault patch will be used instead to
+  ensure private memory is preallocated
 
-Signed-off-by: Ackerley Tng <ackerleytng@google.com>
----
- tools/testing/selftests/kvm/guest_memfd_test.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+Aneesh Kumar K.V (Arm) (3):
+  iommufd/viommu: Allow associating a KVM VM fd with a vIOMMU
+  iommufd/tsm: add vdevice TSM bind/unbind ioctl
+  iommufd/vdevice: add TSM guest request ioctl
 
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index 638906298ed73..3381a556f397d 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -276,41 +276,58 @@ static void test_file_size(int fd, size_t total_size)
- 	TEST_ASSERT_EQ(sb.st_blksize, page_size);
- }
- 
-+static void assert_st_blocks_matches_size(int fd, size_t expected_size)
-+{
-+	struct stat sb;
-+
-+	kvm_fstat(fd, &sb);
-+	TEST_ASSERT_EQ(sb.st_blocks, expected_size / 512);
-+}
-+
- static void test_fallocate(int fd, size_t total_size)
- {
- 	int ret;
- 
- 	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE, 0, total_size);
- 	TEST_ASSERT(!ret, "fallocate with aligned offset and size should succeed");
-+	assert_st_blocks_matches_size(fd, total_size);
- 
- 	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 			page_size - 1, page_size);
- 	TEST_ASSERT(ret, "fallocate with unaligned offset should fail");
-+	assert_st_blocks_matches_size(fd, total_size);
- 
- 	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE, total_size, page_size);
- 	TEST_ASSERT(ret, "fallocate beginning at total_size should fail");
-+	assert_st_blocks_matches_size(fd, total_size);
- 
- 	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE, total_size + page_size, page_size);
- 	TEST_ASSERT(ret, "fallocate beginning after total_size should fail");
-+	assert_st_blocks_matches_size(fd, total_size);
- 
- 	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 			total_size, page_size);
- 	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) at total_size should succeed");
-+	assert_st_blocks_matches_size(fd, total_size);
- 
- 	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 			total_size + page_size, page_size);
- 	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) after total_size should succeed");
-+	assert_st_blocks_matches_size(fd, total_size);
- 
- 	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 			page_size, page_size - 1);
- 	TEST_ASSERT(ret, "fallocate with unaligned size should fail");
-+	assert_st_blocks_matches_size(fd, total_size);
- 
- 	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE,
- 			page_size, page_size);
- 	TEST_ASSERT(!ret, "fallocate(PUNCH_HOLE) with aligned offset and size should succeed");
-+	assert_st_blocks_matches_size(fd, total_size - page_size);
- 
- 	ret = fallocate(fd, FALLOC_FL_KEEP_SIZE, page_size, page_size);
- 	TEST_ASSERT(!ret, "fallocate to restore punched hole should succeed");
-+	assert_st_blocks_matches_size(fd, total_size);
- }
- 
- static void test_invalid_punch_hole(int fd, size_t total_size)
+ drivers/iommu/iommufd/Makefile          |   2 +
+ drivers/iommu/iommufd/iommufd_private.h |  15 ++++
+ drivers/iommu/iommufd/main.c            |   6 ++
+ drivers/iommu/iommufd/tsm.c             | 115 ++++++++++++++++++++++++
+ drivers/iommu/iommufd/viommu.c          |  57 +++++++++++-
+ drivers/virt/coco/tsm-core.c            |  33 +++++++
+ include/linux/iommufd.h                 |   3 +
+ include/linux/tsm.h                     |  44 +++++++++
+ include/uapi/linux/iommufd.h            |  54 ++++++++++-
+ virt/kvm/kvm_main.c                     |   2 +-
+ 10 files changed, 328 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/iommu/iommufd/tsm.c
 
 -- 
-2.53.0.473.g4a7958ca14-goog
+2.43.0
 
 
