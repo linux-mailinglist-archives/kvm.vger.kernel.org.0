@@ -1,223 +1,311 @@
-Return-Path: <kvm+bounces-73264-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73265-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mO6wMeJ+rmlfFQIAu9opvQ
-	(envelope-from <kvm+bounces-73264-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 09:03:46 +0100
+	id iPzWA8CBrmlfFQIAu9opvQ
+	(envelope-from <kvm+bounces-73265-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 09:16:00 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 291DB2353AD
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 09:03:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68BE7235659
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 09:15:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9AD273030748
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 08:02:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 55B6B302E403
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 08:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8663F36BCD5;
-	Mon,  9 Mar 2026 08:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DE4F36CE01;
+	Mon,  9 Mar 2026 08:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CrUxksLl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YDfQlxRV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8940C36B04E
-	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 08:02:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0E5368977;
+	Mon,  9 Mar 2026 08:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773043325; cv=pass; b=fzqtgn3wYmPREgp6jYoTQiU9IVs6rk0/9Q2BbHZn6VNKXZh1xN8AwNHfjBcEYe68I3omejMCDwnH2n124pBQufcnENakYY+WOhj2Wtb8vA1vqOPmfsbsUglwfxLQq7QGlkesYi0TTjD+pQ1VmUr+gYzTrMq1U/jkH3R0Spl8I+A=
+	t=1773044138; cv=fail; b=Tz+ryWshUvUfH6A7mL/Owv+GJPvfNqGD/RxM7gudJRC+PkjJlso4XKuQTnJV2RVbrDxb60pfKkF/rQEWDBFgAH+i9zcLE2hjUMt6/OrXPDyh3VnQCeC9LmMY0g4oHEXsTx7ps43rMAlPcVL3mYCxGhzPOZkU+prilDqVCECZN9A=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773043325; c=relaxed/simple;
-	bh=YZGVdYoM57Ljoy9ZvHaawIawTucwlY62ulstM6rXlh4=;
-	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XLhLCIF4kYkTiWRla6RcaMj7y4EmCdKVLIA/bhchrNSccLnaLZf1IgrFv7PuaOpFewWTbeADLFqnqSgNinfiSfEaNwZ0dckukygcJ5ID84Ps6XNEvNYvD/z1+jj9N0y4BzbpHOiNLW6UJUDzZKkFDufcGloWvdwQZd0rxdBNo0o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CrUxksLl; arc=pass smtp.client-ip=209.85.222.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-94ddba39060so3086036241.1
-        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 01:02:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773043323; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DQo1Sq3xO0QLcwGnC13OXyamFwfRCqZg3GUSrwb2A5MJSlV27n0n1j+jwjk0RvKPag
-         ea/qZu/XWHmOEklmKbBarH4sjGJQD5bh8kj6s6xn3UNmCWn79vee5jM+Wsw8Sch66hyV
-         SC4yGM4KTX+9YzryaTRKusHUn5UCLUsh77nU0S3JQW5p93meLhbB1MX2L4k20k9dvPkv
-         9q6f6ApHLxkm53dzzf2Qng8TdBQJnW1fQXu/kK8Kw+Bk1YTkibtM6ojiRlDeax3x/RW2
-         m/45Dt/EsBJgwoHf4TSC1XdHN7n5DbMIorLgAtxQUeAa8eB0/IFdkGU/bu8WISt6aevd
-         5PUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:dkim-signature;
-        bh=5iKTwpN//vgpsNCCXbcsIw/eIDxxyup8fH8lZJsZvpA=;
-        fh=2B8S++9xrebr/uBfkMVImzPT5NdiSjyAw67eYNK/r9A=;
-        b=J2mpSYrjDOaJoQw+VdxhwmY1YYthfMtrUpCSphdiuL9EfSElmOGBz1BZauI9nVZd9v
-         /VGqh9duHRgCb9RfURptx6EAsrQ4QotXGRKLvCom1wdme1owcYoLTSMkbdEnYxgJWIDa
-         Iu0JH9qdNQ1wpXv3MYEgSgFgx1g8zAyqUZJLIkxO9D8H/XnT/dPZSytbVbWVwfzPbl0e
-         dvIZV2b8Guz2qaYchdtqBt4gT7Z3FKSLEqw77oH57GDKbujwKPRqkNl43nGKTQ/L58er
-         H2nZ7D73mWs4BgfNeJiaNQjUxY9nMy8/Mb6OpIp/QxGJq3rNcFRBuki+/h0XwphjGEYI
-         OaQA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773043323; x=1773648123; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5iKTwpN//vgpsNCCXbcsIw/eIDxxyup8fH8lZJsZvpA=;
-        b=CrUxksLl5ZhEZYNX4dpMjta5jQtWUxaGY397oFvuTSjQP75JG2G1HWvyS6ZqkmPcLz
-         XvcQiDeqw5wCuH6rdcu9qevxZJ4edrBqvyLN+jZCBZI7i0QjntVHe94mUXQR9RAv7Nwk
-         ksMwRgzT/mrbQvpijMpv6nDY5M9sdyPrX/gKAvNW0TAwXzlaVPNg+nN74qwzVSEyJa8S
-         xiQwjlrZcVqPUquT9tTUQ1SgvoYKq7IDxllJoWCewzOM+GDBxkc8iNh3rnjhhhPq6Cn5
-         wirgUBRicT7dgfzd8N6KQnfVuHKtoRamt4sJI6b9occkPgO7COKShMIAgo3vpP0oPYpP
-         YNDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773043323; x=1773648123;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5iKTwpN//vgpsNCCXbcsIw/eIDxxyup8fH8lZJsZvpA=;
-        b=KNq0jK6C1N7YUFJgJtZEWitAZpreTczXDztbxrDyz3mj46YTxACPjP+L5uXkPDcFWV
-         rUxWHTG6eZim8U68f3DO2imY66RBRnKSn3kZOeHptRA5BOGWVWzq9y/OzDQkdQZNa9Sa
-         UEWcPxSk/s8y8Nw/jIrITyLMm/7gQwrhuJpwDZRRNXFMxwnR5y3yi1zQL8dLkI+7S8OM
-         CKmlzLeaUuYFd0cUCekSOkgGICU2cjF4vDEsrz2a+DTmfWhA+wycsFLUTQk2cFm/Tdyx
-         ZXBJReKXYx5oprMrysZIxa343KFf6YGQFxVRnA77S8aAY9j9CtVAUewOQkAMcorTnBn7
-         vDhw==
-X-Forwarded-Encrypted: i=1; AJvYcCUkb9PUQkqWORllvhJmrZprTOoa5sAZRFuIdEvn3kN4Santrff2upRY0D9n+vqueAuwGkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxqv3x7tKbJYHnj4GtWPbPGUKPsHcsXhkh5TiVCMmpvDEElOhQt
-	hYOHChP8wlJn9aI5qQ3ajaC45a5uy/xYwtA08DB/fDe+IXOHDFy1zKCB7PBkP6KL/u6r7uJVlU5
-	vgwknIFvEdp1+etQrtzWBaO4EYHiqr8KRyRqrH5e+
-X-Gm-Gg: ATEYQzwcVOFsjSlkqlYwTUleZ2yEGVEOKqph3luarbe7w6GwS4vZehI4g3gyw/jEldP
-	LENgPTBSs9ZWyjLnj6D1wUMNvTVNyFPkj7GDjwW3btFx1LvH5amj/Y39TScRT610GyexSv12aSD
-	NzhPUq49hIvPUqp7HcRjnf4ANiSdDR4EKQGygRLVi8PLYRGjYnHN+CAcc0QKUCA6ZF+u5WpAs7H
-	NxbD//Sh7D6irPPo0ynpXspI3uOKXrTFn4uFlFRLHV9namkuVj2rcB6HY3FLUfGrXiWVbVKGq/D
-	shuesr+q4VtMVMQ2oL4f2ktCo1PkZMoVZFx80hicR+zn2V56KsVaN0H89tySWmWQJSZT+w==
-X-Received: by 2002:a05:6102:4194:b0:5ff:cee8:660c with SMTP id
- ada2fe7eead31-5ffe61bf0d2mr3868411137.31.1773043322886; Mon, 09 Mar 2026
- 01:02:02 -0700 (PDT)
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 9 Mar 2026 01:02:02 -0700
-Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 9 Mar 2026 01:02:02 -0700
-From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <aahNprLw0_Cdhzxp@google.com>
-References: <20260225-gmem-st-blocks-v2-0-87d7098119a9@google.com>
- <20260225-gmem-st-blocks-v2-2-87d7098119a9@google.com> <5097ff66-b727-4eac-b845-3bd08d1a0ead@suse.com>
- <aahNprLw0_Cdhzxp@google.com>
+	s=arc-20240116; t=1773044138; c=relaxed/simple;
+	bh=ZybvSYGpjML+oqYSNhSfSzq25pm0y6XurdNQSQceOvo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=S4MhIiH/sDRgB3eNmsZUetSpuSlmejZnRuiO+ofhojB/epgltNSdwFmER4kDzry/aLbyWeCluSjB6eWXOkTqn7DZZbTZWrt2BYLWA03AJLeWX+WgXLbFTVfQi8OTG4hzKrxKM9pQClk4Igr2Qh+L7uRvhIfaiZvMiHc/PGoEKNs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YDfQlxRV; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1773044136; x=1804580136;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=ZybvSYGpjML+oqYSNhSfSzq25pm0y6XurdNQSQceOvo=;
+  b=YDfQlxRVch0IBmiTEFuPjbR0ayDNq2mvnTpnkHppclWkBtM7EnAfyEPE
+   OEe790lyeTnilQVt0mNl5XmRZbNb+XV1sSULIozLwuAAGAfX6X44DENte
+   pL/OApeiSvBcuW612HchePpvRyDuQCjf6xxnUvFc05/TH4BN53ShYP1/n
+   BR3fneHDHbCoR8WvpRzgiVlALYXR4SYhW37hNDlXrOufV1zw8uglY9PHF
+   BtFN0uM+YtRC9nx8W1bfcjke71B9Hv39NZ3jH+NSYeRi+WaiTtp6Dnd6X
+   9KZ0OY7EeOpH5eAQyJHzbCmBpqKG1v1nadaMZBnK/q16/R0YLSzrDz0Wc
+   A==;
+X-CSE-ConnectionGUID: sLBr4NMMQo+KZm5CAO7SAQ==
+X-CSE-MsgGUID: Ssah5Pa1RqClHRNkjhEvsw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11723"; a="74106456"
+X-IronPort-AV: E=Sophos;i="6.23,109,1770624000"; 
+   d="scan'208";a="74106456"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2026 01:15:35 -0700
+X-CSE-ConnectionGUID: 3HCj0hbIQe2Ok27pTcYFjw==
+X-CSE-MsgGUID: IuDMZH1tQICuFc7Lxurfnw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,109,1770624000"; 
+   d="scan'208";a="224140256"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2026 01:15:36 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 9 Mar 2026 01:15:34 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 9 Mar 2026 01:15:34 -0700
+Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.21) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 9 Mar 2026 01:15:34 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ODixrt3jdxCzHODhBfKQYPXzmTW//LApI0lBI6c5Z4lX3WjVPL/xMaENhhnApMc8sypVlc31ftwDNWGs4wLkGJ5ZIvMxlfkJofo/O06Xnwhhy1din5DHi2lJBKk21pU0lwCHbNGGYMihM3PzZK3YEDf0erp8DGbjwRYvdigiATgDLdCNtCH6LnHYQ7VoB7m+NIrbHLvFlrPXoLx6xmuS7zl4Ev+7ta9rGsFcYXc65mZZh4X8L1yp2r5UwN/0uMomDWDx6shmFTPwnUPc+qMcOO2G24BWstgo8GxMUOxAhR7HngthfsYhMXN9+xKuFjmrhD68KV7Nd2Dm3ON21HT3kQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XsvGM7H1vht27HpFf1k8DJnKjGbfNQsaN/CrlpNV/I0=;
+ b=PcL/5v4CWXONCI3View5aK3qm/7UMpN8bcJyI3hK5LXdokH4hHSQkX/1SQ66fCmRbqTPeSe3Th7CP/fyx9bYXC5s4YpWtPSqFouM25A1xgFLbqtpZ+a97bhBzn9o1GLl9Jr7XhICmxiF0Uvj4PIgA9ucGuWQ9JncjQKReF1WxnC8AgKKyzjODfC5Ga5c60gLrGqsiTRsvDf27Unt/Gwj2HW9OXprxJ0IIcqeg52vlidCBn+DV6e5Gy5vrOWRpH1g8MSrT22xWQ/CEgU3n066nZj89ePp6PpnaUpXAfjhbXNpNJOtX1k2+wMfEVKJp034WDKGkMMpzbis3esh72qwxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by DM6PR11MB4548.namprd11.prod.outlook.com (2603:10b6:5:2ad::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.11; Mon, 9 Mar
+ 2026 08:15:32 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::fdc2:40ba:101d:40bf]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::fdc2:40ba:101d:40bf%6]) with mapi id 15.20.9700.010; Mon, 9 Mar 2026
+ 08:15:32 +0000
+Date: Mon, 9 Mar 2026 16:15:20 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>
+CC: <bp@alien8.de>, <dave.hansen@intel.com>, <hpa@zytor.com>,
+	<kas@kernel.org>, <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <mingo@redhat.com>, <pbonzini@redhat.com>,
+	<seanjc@google.com>, <tglx@kernel.org>, <x86@kernel.org>,
+	<kai.huang@intel.com>, <ackerleytng@google.com>, <vishal.l.verma@intel.com>
+Subject: Re: [PATCH 4/4] KVM: x86: Disable the TDX module during kexec and
+ kdump
+Message-ID: <aa6BmJzypU1o53rB@intel.com>
+References: <20260307010358.819645-1-rick.p.edgecombe@intel.com>
+ <20260307010358.819645-5-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260307010358.819645-5-rick.p.edgecombe@intel.com>
+X-ClientProxiedBy: SG2P153CA0017.APCP153.PROD.OUTLOOK.COM (2603:1096::27) To
+ CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 9 Mar 2026 01:02:02 -0700
-X-Gm-Features: AaiRm52tdsuammFV80Tf5JuKg-WPQwxrDNCct9c5X_bV6T_IkMHGIVZ0r4R166A
-Message-ID: <CAEvNRgFwyqY0q-PTvMGjK82rxvbCfPxK8-RUPML3w_8mzAk8xA@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 2/6] KVM: guest_memfd: Directly allocate folios
- with filemap_alloc_folio()
-To: Sean Christopherson <seanjc@google.com>, Vlastimil Babka <vbabka@suse.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	David Hildenbrand <david@kernel.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Vlastimil Babka <vbabka@suse.cz>, 
-	Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	rientjes@google.com, rick.p.edgecombe@intel.com, yan.y.zhao@intel.com, 
-	fvdl@google.com, jthoughton@google.com, vannapurve@google.com, 
-	shivankg@amd.com, michael.roth@amd.com, pratyush@kernel.org, 
-	pasha.tatashin@soleen.com, kalyazin@amazon.com, tabba@google.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: 291DB2353AD
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|DM6PR11MB4548:EE_
+X-MS-Office365-Filtering-Correlation-Id: 40a30759-cae2-49ce-f601-08de7db4088f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info: cP+rHxwQIm1V9dB7PpSkJMdAILcmBijcyAVvNX328o6kcGARc7pNUAaODwf0uUS2GvxnFDPrP9JjnaLZ8lwtXhP3g7vQh3id1vP3ZYCFHImYyoIwhp7OCMGKkrjZNaKQ/TcnaeoyR8rukEmH4I/5oQ69gvQ48UkVuf8nhFA4voLNcACtFTdjxi5YqHoNZUXy236VAcDbvM5p7f3HGSRwONfBGC806aqKn/j+5+AIoPEYFpExfj4fyATA9wZTbHtKza7SxdgL6R7TcmuSzo4jHQKWqtd8DfdKD/HrEl4+nOm43dVmfJPYUwWJ3Lg2AQDhBDUkhkIi1TXs1ZUeFj03u3HBbHGXXARlGoHX97fLHSqE+LP3g11lKWg97hTEF/v62gFNk2vAbRRKMC1+2IxUbgA44gWWLRlnbzjpDnHbtgruQX2gK0VWyMFbzFrhSthXyKzSy22IQ8jS7vy+GVWZ8En5X1/QFI3QIKB4gW4FEniXA1cWIa2Cp/q7NUgLiyyMB2aSpUkFkddjSzCzFUJc0CkDxpLLQ4qJyNEcvQPAqmPSXBjuN0sboI+bW6MplUTk17kpk+ewU2wEb73wU81BluQKBCRYB6Eq/0JqmGmjmld0fwxKKJEwZqITDEbteNHDcwJTA0J3O0ZFo/+0evbobMSxmoNSwHuwb/ZUCKaukCwWuCcdkMPcgF4fMp4e6OHwn1lZZlCyzh8lGoRnIOl4+iCkK2PFPvbmPuqappdm5HM=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?3I5rU/7bUXj5VcWotq016xb4w292AwELKxfwafa1IDJuy67t9+1hir09ixKD?=
+ =?us-ascii?Q?SiG6vLe4dC3LSxyabGZI4dSs8UuKXJ+0s100zn754posivz0mav9hLayUP9j?=
+ =?us-ascii?Q?qzKJBNS/rrq0TrHcSGEIxA6KYvwTvHWu/Xu3tOUp0W75Dz1CLp1Ph5929Xdg?=
+ =?us-ascii?Q?+aB6m/f1aNc5cQq9b4fEX/1/zTa3OsFSlsvN1ZXZfWTLg142LUlKmOj5cAf4?=
+ =?us-ascii?Q?ES2nSC7RM0mUo4xJL15Pau7lbLSjFmoL//koRVev14QRU5HHM4HyYm3stYn3?=
+ =?us-ascii?Q?wm7o/ZFJ6uDWZdS1+LHvtXmr2ZPMVnzo3BBQ2fMZFTUkCvhLeV07yQrBwlZq?=
+ =?us-ascii?Q?1qy/xnLWmVCD1d3sj9d2FeryaZ7r6SU2Nny0pjyeh3hLNI7FhAwWAs+5DmR4?=
+ =?us-ascii?Q?8tovXhf5XQUkk1VyKqCrHVfsOOoJ98VDG+DbqVsHHJwVSlEkHFYLsEvWm1U4?=
+ =?us-ascii?Q?FnOjR3vaDgtxi3wzRCqWLd8Zvbh3daBBUdum4lgtCVm0V6kntED3fRZiaB8+?=
+ =?us-ascii?Q?b0eZGsAhWYzTl4p3s0t7ph+R2UKAh66axalGKN60BT/ZAxv27Grplpv15TE5?=
+ =?us-ascii?Q?ChV8cNBfo4AGmrs9tz+u48V6VlRPROUoP5jbAWQfK84ucIjRlkdk90asuXKI?=
+ =?us-ascii?Q?9TkRi08qP6/SqEM0sMahOAQqmS+YnGvO+bnUBgzhma6uyCQN39tQrp5HZSo9?=
+ =?us-ascii?Q?DaMMUf69TxUQ5BxaCsbbNvJKICz2+PYD7iHfH5CeRP9z/cAjFMUJWobWNAe/?=
+ =?us-ascii?Q?FUgpPTV947FxHA5ikcBe2j9fdDDrEcIE6Y3lrbgM+R7WjrIGc4Vr9dP7lUQO?=
+ =?us-ascii?Q?VrVsyfObiuaFt5PsAADqmDtrZvdQUA+vGPgQLz4KTdMT56YWRaNtU0qb+HYM?=
+ =?us-ascii?Q?l0Y5mm+prH/dVV5R5IIiFzl9cJG/kpoO9zuQ4/F2EaKdkRYaZrvDO6fgHQ7q?=
+ =?us-ascii?Q?HTQtxMdyUwxh/Jg1/8IgyhrVwWneDJgSlMQTbVi7RY3NP5pIOF+uAt1o8LvN?=
+ =?us-ascii?Q?thuF18O2JAjxC2vUqmwxOhKYuXgDNrdDvkJuy929d0ZoGPEy7Ugj03IUV+Sh?=
+ =?us-ascii?Q?UEXp8qEBYA2Vj5uD9gA4gREkzm+k9ndB2Rpq8Rew8/n0qcreJGfh2ugH8pJw?=
+ =?us-ascii?Q?tMpW6gAI5weig1lB+TkJxLP9hKm+y4Y2M1NLmWakchAfSMi9rjExjxFSICTE?=
+ =?us-ascii?Q?HVJ9OQz4hGz5gRUMY50nE16zjHKlIf/xygF3pfhO3KGu34bOaHg/5DvYbnci?=
+ =?us-ascii?Q?vH2LVNqg3e0KIgOKxgf9zdq5t4x6qZs9zNJyCjzntdTaRZNIrCU7FApaRXFN?=
+ =?us-ascii?Q?Ykc3Fcu4w6jjtVEnyd931dg5O8YOE39GN189ivvhS2nuSPoMyhmveGsi9DYQ?=
+ =?us-ascii?Q?01WDaRwetEAsA2lEmReMFTjHwqTEMI8Xx+aZlac9mdUKeL1FlS9HXDU7BajN?=
+ =?us-ascii?Q?NWGp9SMrSn6uB8txG+YoIt0J2sB6FDxNsCq9BzWUq/xRYcOs64vKiNXfyDhr?=
+ =?us-ascii?Q?f3bWtbfgMhyMaeNiQFLneO6oQquluuuLjqqCnLOUHiB57eNwyHj846uNTswg?=
+ =?us-ascii?Q?Ph96ohZ9KZ3FRSZu3GxoKVJivFYoOIDt1moBXygn5Jx7WsgKlUvnwepk7eNH?=
+ =?us-ascii?Q?Aboe12fcwtLmfdwYuEQfyuwC9UX5rzgUBVFOVq42jbt1qX/jXP40FgHJPcuC?=
+ =?us-ascii?Q?rw59Vbhu0p20ovy5Z6gyhJpxuwbZhf+6bZJOm+p2OiJCIthgnev68jK93Z7s?=
+ =?us-ascii?Q?tPolVrnS5A=3D=3D?=
+X-Exchange-RoutingPolicyChecked: ngspWbfPN3oGMXz5D6KTUJ7sV0Cip2CvdGQcJH7fwY4FKncyJps36gnQF6ZaQha7qar2+7T0Z3wMZCduiWsUbJT4ug0SJ3EzvwbtPntBevA5zBYe98HuF3KTG0KK8NPbyCpJg7k4NtahRm54C1af6SPxafavgFN06zSsTupW5FKTXU1bghBXRwwr8BrQiiiIOJt8JRh4utNkCgnljXkExzHYFvFaFbnFSl8x0Rj9rzMMw2JvBMLBkVdiFptwdMJyPT8lQ4UhhKOcJbxL9MdKg3vRqFahKd+Gqd1dcbNNnVIoDR5kgd5FTLrIMWHlus2x+o0NYDSBLcRKVmIPic3ugw==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 40a30759-cae2-49ce-f601-08de7db4088f
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2026 08:15:32.6294
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5n/u52Tnkoi4IvCf3tDMdPfps+JUs4oloKyORJddGYigWt7Idi2x4O+3cNBDqMF0JnCT4yis/7XOBD+Ub5Ja+Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4548
+X-OriginatorOrg: intel.com
+X-Rspamd-Queue-Id: 68BE7235659
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73264-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-73265-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[35];
-	DKIM_TRACE(0.00)[google.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[kvm];
-	NEURAL_HAM(-0.00)[-0.951];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,mail.gmail.com:mid]
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[chao.gao@intel.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.957];
+	TAGGED_RCPT(0.00)[kvm];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
 X-Rspamd-Action: no action
 
-Sean Christopherson <seanjc@google.com> writes:
 
-> On Mon, Mar 02, 2026, Vlastimil Babka wrote:
->> On 2/25/26 08:20, Ackerley Tng wrote:
->> > __filemap_get_folio_mpol() is parametrized by a bunch of GFP flags, which
->>
->>                                                            FGP?
->>
->> > adds complexity for the reader. Since guest_memfd doesn't meaningfully use
->> > any of the other FGP flags, undo that complexity by directly calling
->> > filemap_alloc_folio().
->> >
->> > Directly calling filemap_alloc_folio() also allows the order of 0 to be
->> > explicitly specified, which is the only order guest_memfd supports. This is
->> > easier to understand,
->
-> That's debatable.  IMO, one isn't clearly better than the other, especially since
-> filemap_lock_folio() is itself a wrapper for __filemap_get_folio_mpol().  And there
-> is a cost to open-coding, as it means we risk missing something if there's a change
-> in __filemap_get_folio_mpol() that's beneficial to guest_memfd.
->
-> As Vlastimil said, if this greatly simplifies accounting, then I'm ok with it.
-> But the changelog needs to focus on that aspect, because I don't see this as a
-> clear win versus using __filemap_get_folio_mpol().
->
+A few nits below:
 
-FGF_GET_ORDER() indeed caps the order at 0. I was overly focused on the
-earlier line where it did mapping_min_folio_order(), where I thought
-other code could possibly influence the eventual order.
+The scope "KVM: x86" is wrong as this doesn't touch any KVM code.
 
-I'll revert to __filemap_get_folio_mpol() in the next version and see
-how that goes. Thanks!
+On Fri, Mar 06, 2026 at 05:03:58PM -0800, Rick Edgecombe wrote:
+>From: Vishal Verma <vishal.l.verma@intel.com>
+>
+>Use the TDH.SYS.DISABLE SEAMCALL, which disables the TDX module,
+>reclaims all memory resources assigned to TDX, and clears any
+>partial-write induced poison, to allow kexec and kdump on platforms with
+>the partial write errata.
+>
+>On TDX-capable platforms with the partial write erratum, kexec has been
+>disabled because the new kernel could hit a machine check reading a
+>previously poisoned memory location.
+>
+>Later TDX modules support TDH.SYS.DISABLE, which disables the module and
+>reclaims all TDX memory resources, allowing the new kernel to re-initialize
+>TDX from scratch. This operation also clears the old memory, cleaning up
+>any poison.
+>
+>Add tdx_sys_disable() to tdx_shutdown(), which is called in the
+>syscore_shutdown path for kexec. This is done just before tdx_shutdown()
+>disables VMX on all CPUs.
+>
+>For kdump, call tdx_sys_disable() in the crash path before
+>x86_virt_emergency_disable_virtualization_cpu() does VMXOFF.
+>
+>Since this clears any poison on TDX-managed memory, the
+>X86_BUG_TDX_PW_MCE check in machine_kexec() that blocked kexec on
+>partial write errata platforms can be removed.
 
-> And if we go through with this, we should probably revert 16a542e22339 ("mm/filemap:
-> Extend __filemap_get_folio() to support NUMA memory policies"), because guest_memfd
-> is/was the only user.
+Use imperative mood here: "Since ..., remove the X86_BUG_TDX_PW_MCE check..."
+
 >
->> > +static struct folio *__kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
->> > +{
->> > +	/* TODO: Support huge pages. */
->> > +	struct mempolicy *policy;
->> > +	struct folio *folio;
->> > +	gfp_t gfp;
->> > +	int ret;
->> > +
->> > +	/*
->> > +	 * Fast-path: See if folio is already present in mapping to avoid
->> > +	 * policy_lookup.
->> > +	 */
->> > +	folio = filemap_lock_folio(inode->i_mapping, index);
->> > +	if (!IS_ERR(folio))
->> > +		return folio;
->> > +
->> > +	gfp = mapping_gfp_mask(inode->i_mapping);
->> > +
->> > +	policy = mpol_shared_policy_lookup(&GMEM_I(inode)->policy, index);
+>Signed-off-by: Vishal Verma <vishal.l.verma@intel.com>
+>Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+>---
+> arch/x86/kernel/crash.c            |  2 ++
+> arch/x86/kernel/machine_kexec_64.c | 16 ----------------
+> arch/x86/virt/vmx/tdx/tdx.c        |  1 +
+> 3 files changed, 3 insertions(+), 16 deletions(-)
 >
-> This is a potential performance regression.  Previously, KVM would do a policy
-> lookup once per retry loop.  Now KVM will do the lookup
+>diff --git a/arch/x86/kernel/crash.c b/arch/x86/kernel/crash.c
+>index cd796818d94d..623d4474631a 100644
+>--- a/arch/x86/kernel/crash.c
+>+++ b/arch/x86/kernel/crash.c
+>@@ -38,6 +38,7 @@
+> #include <linux/kdebug.h>
+> #include <asm/cpu.h>
+> #include <asm/reboot.h>
+>+#include <asm/tdx.h>
+> #include <asm/intel_pt.h>
+> #include <asm/crash.h>
+> #include <asm/cmdline.h>
+>@@ -112,6 +113,7 @@ void native_machine_crash_shutdown(struct pt_regs *regs)
+> 
+> 	crash_smp_send_stop();
+> 
+>+	tdx_sys_disable();
+> 	x86_virt_emergency_disable_virtualization_cpu();
+> 
+> 	/*
+>diff --git a/arch/x86/kernel/machine_kexec_64.c b/arch/x86/kernel/machine_kexec_64.c
+>index 0590d399d4f1..c3f4a389992d 100644
+>--- a/arch/x86/kernel/machine_kexec_64.c
+>+++ b/arch/x86/kernel/machine_kexec_64.c
+>@@ -347,22 +347,6 @@ int machine_kexec_prepare(struct kimage *image)
+> 	unsigned long reloc_end = (unsigned long)__relocate_kernel_end;
+> 	int result;
+> 
+>-	/*
+>-	 * Some early TDX-capable platforms have an erratum.  A kernel
+>-	 * partial write (a write transaction of less than cacheline
+>-	 * lands at memory controller) to TDX private memory poisons that
+>-	 * memory, and a subsequent read triggers a machine check.
+>-	 *
+>-	 * On those platforms the old kernel must reset TDX private
+>-	 * memory before jumping to the new kernel otherwise the new
+>-	 * kernel may see unexpected machine check.  For simplicity
+>-	 * just fail kexec/kdump on those platforms.
+>-	 */
+>-	if (boot_cpu_has_bug(X86_BUG_TDX_PW_MCE)) {
+>-		pr_info_once("Not allowed on platform with tdx_pw_mce bug\n");
+>-		return -EOPNOTSUPP;
+>-	}
+
+With this series, we need to update the "Kexec" section in tdx.rst.
+
+>-
+> 	/* Setup the identity mapped 64bit page table */
+> 	result = init_pgtable(image, __pa(control_page));
+> 	if (result)
+>diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+>index 68bd2618dde4..b388fbce5d76 100644
+>--- a/arch/x86/virt/vmx/tdx/tdx.c
+>+++ b/arch/x86/virt/vmx/tdx/tdx.c
+>@@ -252,6 +252,7 @@ static void tdx_shutdown_cpu(void *ign)
+> 
+> static void tdx_shutdown(void *ign)
+> {
+>+	tdx_sys_disable();
+> 	on_each_cpu(tdx_shutdown_cpu, NULL, 1);
+> }
+> 
+>-- 
+>2.53.0
 >
-> I doubt it will matter in practice, because on EEXIST filemap_lock_folio() should
-> be all but guaranteed to find the existing folio.  But it's also something that
-> should be easy enough to avoid, and it's also another argument for using
-> __filemap_get_folio_mpol() instead of open coding our own version.
 
