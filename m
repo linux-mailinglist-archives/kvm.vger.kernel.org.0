@@ -1,216 +1,209 @@
-Return-Path: <kvm+bounces-73288-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73289-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNDNLfy+rmlEIgIAu9opvQ
-	(envelope-from <kvm+bounces-73288-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 13:37:16 +0100
+	id MDi+JGO/rmlEIgIAu9opvQ
+	(envelope-from <kvm+bounces-73289-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 13:38:59 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFE45238F39
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 13:37:15 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01F09238F79
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 13:38:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5606F30A5949
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 12:24:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C1E3D301E7D2
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 12:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFAF13ACA46;
-	Mon,  9 Mar 2026 12:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 869FD3AEF52;
+	Mon,  9 Mar 2026 12:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PvW4+5jG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NaOyQSgo"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CD33A7834;
-	Mon,  9 Mar 2026 12:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D42A3ACF1E
+	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 12:38:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773059034; cv=none; b=QMn8snAqNI07Dc9XNo8ZkSa6+7I2bQ/F/T7m1h+0dTqICjGDzoXkogVt725+pp2roW5LNCzapvmcynufTj7ZnbaDzpX44f8YKHU1JVjVX4JeKrbp/xyb9iFfq09GwBmuzArvexptrCVCBNxaooVv/mk56y81yzZ9qsqnnU2Cuh0=
+	t=1773059930; cv=none; b=IhYxzUGJpqHnHfRpOnC2dPWNAT5i1HHZr7Eve57l3mW6vgm9hoT0w/UhN7EHTzynCwCfsQh3+e2I/WW9PlqnWlXz9WLqRUCR0Iu8Sb9QhS9u97zrOYKdgtTDKLq+H0u2HC6C53pUm9+CrBqyPqMCUYzw4JVWniQrgxTqF3HIpaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773059034; c=relaxed/simple;
-	bh=Py+g6qnSgfEWX6Iy57JwP3p1Ze1RcHqTVF7eH+A0Jhk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qxnc78KH1VCZkM4/Qr2YTqTyik039zIQwnnXXxnjo9guFlrsw3Jq6lgZOQyoz2j8t/feVFdnNn1N3XreOau6QHugJaWdjbVR9kwACJ7h/pPU463AJmAoCvwGVyXoP3sfsGjTRaqjSOYTvr1/gwJnwKPTBmv/vsP5+EmkOk/yD4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PvW4+5jG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11CD8C2BC9E;
-	Mon,  9 Mar 2026 12:23:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773059033;
-	bh=Py+g6qnSgfEWX6Iy57JwP3p1Ze1RcHqTVF7eH+A0Jhk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PvW4+5jGrvqEwqTJgwKyHWnHCD4CDRJ/u0vWGwgMRhHQYFXpnPbSqrG+0BB/qCigK
-	 0rjDo7Wbe/D/FtdJEth+OLeRQNISEeO9zfkJDjL0iFSQ+MjzesPDa+YhQCM7uRjj8M
-	 bYI3GGrKrQhaLcBsA1wbHipEKP6czfMaWYy1dFu9rs7SgNLeHk6pmbyiiQatCeYSK+
-	 nVBxHPOid2BywQf1QS/xk8+7vM5bjB36WH+hi+GGkOaR1/M1TneLJI/yLTeiaEe9kR
-	 505lQlqcTSIio85UBYbLQL7OSLtFP1syJxfq+LY8AKNvuB5it3nCV0QLaqS+6X+15c
-	 KXgvvhib5oFeg==
-Message-ID: <0ae4d678-5676-4523-bae3-5ad73b526e27@kernel.org>
-Date: Mon, 9 Mar 2026 13:23:45 +0100
+	s=arc-20240116; t=1773059930; c=relaxed/simple;
+	bh=V3EMYBRqyzEJ6Vju6UtCEtdyL7830YWzE0P9moZtzbY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=R5DMomsYdDb1iKGK9AWm5NP9/UhacnTsam5erG5AlvgoZ8F2je3Gb+Xi8TMEi3wEIFcqR8fW9LkuRrhFFLxAS8yQxlCYDQ1b08SbbVHtT5PrBcoi5GuQ8pyz1GXYnrzvr/ndeJj3xFISdWMFgTOsEdx4QrIYHG/TdHBSjS2UuXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NaOyQSgo; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2ae4e538abdso78198345ad.3
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 05:38:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773059929; x=1773664729; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vew/51ISuWV8SVa/aQVcC7dheArZhsg+HjWKeDYSuPQ=;
+        b=NaOyQSgoc17brGUkP0ONppVOid7BA66qMGKMay7yvtmWEZ+LIOrSBq1qRuE6IrZDo4
+         RDN5OVrpYafXEIfgRQdHhLx3671bay7Xtzus3hOZ9cy2XG7ji23DssWbrW7JLWbT1m2G
+         6nkFwC90m5mi3/ZafeNb0vnXdioeVLWLkKp1Z2o3hy9ZqbwATXI8mQgALU6JvJBpYErP
+         sw+PzENfL8yX9apzXv+02E2HfV/yeS4SwyfXSocsfU556SqT76YN1oB0cYS7sZSdFN1D
+         g71pr/+Ahdzy/6XlTe77Z1g6oljeWQ6bZBsOmFuPq0PDItRazlwq9ckzAe4ulusQz6E/
+         +tIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773059929; x=1773664729;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vew/51ISuWV8SVa/aQVcC7dheArZhsg+HjWKeDYSuPQ=;
+        b=oaWifLdknkm7X2HCNzQC5L/B6pYH+kgA6aywEQtLcFNmE5kfZxuveiFNnhaVQeqtHn
+         XxQ5VG/rt8+yXbAEwPnAul94MW9IN7rmoZI1ZDhHP0TYNr9Er0zsWEoX0U8kWfm3LVdf
+         oJKqP1CIzhUO3pOFj2IYkhcM6CvME37gNHl57h4amY9KJhoqbg+dr4NS+9cDDjcVa8N+
+         t+VBGvvzLm4c0KbVrt4aCJGEnXPO6wVItCEMI8V7SQZp/KfmURox7tfcm4Q3McnV4l3B
+         reKpTNImT2eculUD53qlbCk1nVZoXwNa5yUYDCvA1lDan5D0LjJBCqTmgfd9HdLFuVXi
+         Znhg==
+X-Forwarded-Encrypted: i=1; AJvYcCUhPHpO1BuUQ8/kOaHnXDSlpTsLcwlAPr2Pk1Nbn+ZLltP2xCxk3PNfgL3jXM8jIpuo9to=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzkqt56MMzKrLf6iJQvuraPeLqib7rYYAbwCPm6TMZiHjf3usTQ
+	Vm/hkhqc+3Ylo50SqeKNyZ8KjfWQFsr1Vv6uG5lHkDQF5uHgtHoHMHFv
+X-Gm-Gg: ATEYQzwrdhc9J2fKgt4A8SlClt8JlDrAwl+Gtx7pvpRsL0Bt0rq2pYd8ZnrG1DyBHb9
+	krYDhycW9cAydibbcJ+zZrX9xhMUB2A9soZoANhPK0YQGxwBJDHkD3JuwXvNm7PCQV5nksv/Z/D
+	3OXaxGnn0TvvYqKfmcXjxarzoEiu5TwSHAWwmthlgIt//be7D9OxU2VUCNRf/O/75F4Yuydxbmd
+	I5WzN+fzL5K2u8dvBhRebBuwCZLVhBfI4245Au6CMBhAycagfRv5eH1x6qvAF5zdt2nD63BqzS5
+	V0g20WY/FJj29hi643Bn/0yI0yA0Jzsr5R3xMGFmyjIblG/2BBF5uK2gmG5rNt5qTxrwRJtLngU
+	E98B6Xp1PD6o5qslYQ0GrK1ftMCnjYMHcgw43771lHJ6RDo1T7m8uyEmqpHE+j3Poq3Up33VazA
+	aA7o6juT48FKVldMLMByO36sthhZlLCPCllVk70CQ=
+X-Received: by 2002:a17:903:388f:b0:2ae:50a3:3aa5 with SMTP id d9443c01a7336-2ae824879a7mr107552435ad.52.1773059928817;
+        Mon, 09 Mar 2026 05:38:48 -0700 (PDT)
+Received: from pve-server.rlab ([49.205.216.49])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ae83eafc64sm154867375ad.40.2026.03.09.05.38.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Mar 2026 05:38:48 -0700 (PDT)
+From: "Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
+To: linuxppc-dev@lists.ozlabs.org
+Cc: Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Christophe Leroy <chleroy@kernel.org>,
+	linux-mm@kvack.org,
+	kvm@vger.kernel.org,
+	Alex Williamson <alex@shazbot.org>,
+	Peter Xu <peterx@redhat.com>,
+	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>
+Subject: [PATCH v2 1/2] drivers/vfio_pci_core: Change PXD_ORDER check from switch case to if/else block
+Date: Mon,  9 Mar 2026 18:08:37 +0530
+Message-Id: <b155e19993ee1f5584c72050192eb468b31c5029.1773058761.git.ritesh.list@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: Stalls when starting a VSOCK listening socket: soft lockups, RCU
- stalls, timeout
-Content-Language: en-GB, fr-BE
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Jiri Slaby <jirislaby@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, Netdev <netdev@vger.kernel.org>,
- rcu@vger.kernel.org, MPTCP Linux <mptcp@lists.linux.dev>,
- Linux Kernel <linux-kernel@vger.kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>, luto@kernel.org,
- =?UTF-8?Q?Michal_Koutn=C3=BD?= <MKoutny@suse.com>,
- Waiman Long <longman@redhat.com>, Marco Elver <elver@google.com>
-References: <863a5291-a636-47d0-891c-bb0524d2e134@kernel.org>
- <20260302114636.GL606826@noisy.programming.kicks-ass.net>
- <717310d8-6274-4b7f-8a19-561c45f5f565@kernel.org>
- <a2b573b4-af61-4b84-a7d1-012ed6bb23c9@kernel.org>
- <ba067933-bf3b-476d-a0bb-53eda56996ca@kernel.org> <87zf4m2qvo.ffs@tglx>
- <47cba228-bba7-4e58-a69d-ea41f8de6602@kernel.org> <87tsuu2i59.ffs@tglx>
- <7efde2b5-3b72-4858-9db0-22493d446301@kernel.org> <87qzpx2sck.ffs@tglx>
- <20260306152458.GT606826@noisy.programming.kicks-ass.net>
- <87ldg42eu7.ffs@tglx> <87h5qr2rzi.ffs@tglx> <87eclu3coa.ffs@tglx>
- <87v7f61cnl.ffs@tglx> <57c1e171-9520-4288-9e2d-10a72a499968@kernel.org>
- <87pl5ds88r.ffs@tglx>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <87pl5ds88r.ffs@tglx>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: EFE45238F39
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 01F09238F79
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73288-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[linux.ibm.com,kernel.org,kvack.org,vger.kernel.org,shazbot.org,redhat.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,kvm@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73289-lists,kvm=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.990];
-	TAGGED_RCPT(0.00)[kvm];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[riteshlist@gmail.com,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.977];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:rdns,sin.lore.kernel.org:helo]
+	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-Hi Thomas,
+Architectures like PowerPC uses runtime defined values for
+PMD_ORDER/PUD_ORDER. This is because it can use either RADIX or HASH MMU
+at runtime using kernel cmdline. So the pXd_index_size is not known at
+compile time. Without this fix, when we add huge pfn support on powerpc
+in the next patch, vfio_pci_core driver compilation can fail with the
+following errors.
 
-On 09/03/2026 09:43, Thomas Gleixner wrote:
-> On Sun, Mar 08 2026 at 18:23, Matthieu Baerts wrote:
->> 08 Mar 2026 17:58:26 Thomas Gleixner <tglx@kernel.org>:
->>> So I'm back to square one. I go and do what I should have done in the
->>> first place. Write a debug patch with trace_printks and let the people
->>> who can actually trigger the problem run with it.
->>
->> Happy to test such debug patches!
-> 
-> See below.
-> 
-> Enable the tracepoints either on the kernel command line:
-> 
->     trace_event=sched_switch,mmcid:*
-> 
-> or before starting the test case:
-> 
->     echo 1 >/sys/kernel/tracing/events/sched/sched_switch/enable
->     echo 1 >/sys/kernel/tracing/events/mmcid/enable
-> 
-> I added a 50ms timeout into mm_cid_get() which freezes the trace and
-> emits a warning. If you enable panic_on_warn and ftrace_dump_on_oops,
-> then it dumps the trace buffer once it hits the warning.
-> 
-> Either kernel command line:
-> 
->    panic_on_warn ftrace_dump_on_oops
-> 
-> or
-> 
->   echo 1 >/proc/sys/kernel/panic_on_warn
->   echo 1 >/proc/sys/kernel/ftrace_dump_on_oops
-> 
-> That should provide enough information to decode this mystery.
+  CC [M]  drivers/vfio/vfio_main.o
+  CC [M]  drivers/vfio/group.o
+  CC [M]  drivers/vfio/container.o
+  CC [M]  drivers/vfio/virqfd.o
+  CC [M]  drivers/vfio/vfio_iommu_spapr_tce.o
+  CC [M]  drivers/vfio/pci/vfio_pci_core.o
+  CC [M]  drivers/vfio/pci/vfio_pci_intrs.o
+  CC [M]  drivers/vfio/pci/vfio_pci_rdwr.o
+  CC [M]  drivers/vfio/pci/vfio_pci_config.o
+  CC [M]  drivers/vfio/pci/vfio_pci.o
+  AR      kernel/built-in.a
+../drivers/vfio/pci/vfio_pci_core.c: In function ‘vfio_pci_vmf_insert_pfn’:
+../drivers/vfio/pci/vfio_pci_core.c:1678:9: error: case label does not reduce to an integer constant
+ 1678 |         case PMD_ORDER:
+      |         ^~~~
+../drivers/vfio/pci/vfio_pci_core.c:1682:9: error: case label does not reduce to an integer constant
+ 1682 |         case PUD_ORDER:
+      |         ^~~~
+make[6]: *** [../scripts/Makefile.build:289: drivers/vfio/pci/vfio_pci_core.o] Error 1
+make[6]: *** Waiting for unfinished jobs....
+make[5]: *** [../scripts/Makefile.build:546: drivers/vfio/pci] Error 2
+make[5]: *** Waiting for unfinished jobs....
+make[4]: *** [../scripts/Makefile.build:546: drivers/vfio] Error 2
+make[3]: *** [../scripts/Makefile.build:546: drivers] Error 2
 
-Thank you for the debug patch and the clear instructions. I managed to
-reproduce the issue with the extra debug. The ouput is available here:
+Fixes: f9e54c3a2f5b7 ("vfio/pci: implement huge_fault support")
+Signed-off-by: Ritesh Harjani (IBM) <ritesh.list@gmail.com>
+---
+v1 -> v2:
+1. addressed review comments from Christophe [1]
+[1]: https://lore.kernel.org/linuxppc-dev/0b8fce7a61561640634317a5e287cdb4794715fd.1772170860.git.ritesh.list@gmail.com/
 
-  https://github.com/user-attachments/files/25841808/issue-617-debug.txt.gz
+ drivers/vfio/pci/vfio_pci_core.c | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
 
-Just in case, the kernel config file that was used:
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index d43745fe4c84..0967307235b8 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -1670,21 +1670,16 @@ vm_fault_t vfio_pci_vmf_insert_pfn(struct vfio_pci_core_device *vdev,
+ 	if (vdev->pm_runtime_engaged || !__vfio_pci_memory_enabled(vdev))
+ 		return VM_FAULT_SIGBUS;
 
+-	switch (order) {
+-	case 0:
++	if (!order)
+ 		return vmf_insert_pfn(vmf->vma, vmf->address, pfn);
+-#ifdef CONFIG_ARCH_SUPPORTS_PMD_PFNMAP
+-	case PMD_ORDER:
++
++	if (IS_ENABLED(CONFIG_ARCH_SUPPORTS_PMD_PFNMAP) && order == PMD_ORDER)
+ 		return vmf_insert_pfn_pmd(vmf, pfn, false);
+-#endif
+-#ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
+-	case PUD_ORDER:
++
++	if (IS_ENABLED(CONFIG_ARCH_SUPPORTS_PUD_PFNMAP) && order == PUD_ORDER)
+ 		return vmf_insert_pfn_pud(vmf, pfn, false);
+-		break;
+-#endif
+-	default:
+-		return VM_FAULT_FALLBACK;
+-	}
++
++	return VM_FAULT_FALLBACK;
+ }
+ EXPORT_SYMBOL_GPL(vfio_pci_vmf_insert_pfn);
 
-https://github.com/user-attachments/files/25841873/issue-617-debug.config.gz
-
-Please tell me if it is an issue to download these files from GitHub.
-The output file has 10k+ lines.
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+--
+2.39.5
 
 
