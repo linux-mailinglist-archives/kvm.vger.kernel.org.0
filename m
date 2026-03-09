@@ -1,111 +1,158 @@
-Return-Path: <kvm+bounces-73286-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73287-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uHPsNxe2rmkSHwIAu9opvQ
-	(envelope-from <kvm+bounces-73286-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 12:59:19 +0100
+	id +JQKLBm8rmn6IQIAu9opvQ
+	(envelope-from <kvm+bounces-73287-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 13:24:57 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E46A238501
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 12:59:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35089238C2D
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 13:24:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9DF413019FFD
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 11:59:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C899930F8350
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 12:17:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFB839B490;
-	Mon,  9 Mar 2026 11:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 468AC3A7828;
+	Mon,  9 Mar 2026 12:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="k+U1zGBW"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Z5gqq93U"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7259C27603A;
-	Mon,  9 Mar 2026 11:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D427394462;
+	Mon,  9 Mar 2026 12:17:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773057553; cv=none; b=M4FauZcrA7e1mr82TtX/7Gc3bVkRpGTg5ol5vidgnn2xw34tGL5rriB5YwlpH+wy5g2DtU1ER3NiduWmodonK84ne0X7KQnE29lhXs/S7JEpxaRE4de01xiv490d9o8KLp+wq7yZUl1qGwNuOIb7tqdDxdEqgBHPZ1aJdSOnnHQ=
+	t=1773058658; cv=none; b=CCvWwguHXAjJEvcDM6C0d/F4ZX1HE/S6gRJgJ1Bx8tZjGXS0jQ0Cvo6NYhgXdy1WSgGjqjT4s12vNYmH0Z8cccu0nVPX5Cvkp3YjGbk33qml+oZNfdon/NtDt4BPoNDp76oyffi3E2kBohZj7Hpi3AFmzJoxpdLrPZT9zZZeykI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773057553; c=relaxed/simple;
-	bh=UWcEZh6dGXYV5Oga/9d2Cw6hQhOQBzfP6cV8V/cI3M0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UI2wsDYSnLh9UMBdHEvG3H+0uqv+PdCXiCjwdKnUWl1e7WoxjqhusPC1tFoRqNf+0ZgEGhIXDYCfpmFIH04CtO+ai3uNLn5/z9fo3GN+ELXAMx12wQZ0u6W+uejifqsCQdJn0UMGXxVTCFynsYY6ztZfPdJ/3CZLAZkJ5wPD53U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=k+U1zGBW; arc=none smtp.client-ip=148.163.156.1
+	s=arc-20240116; t=1773058658; c=relaxed/simple;
+	bh=bInCVmORJfdcpqjOhrkBZOuqIN9G+veWrNOoetnfsA0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PfsyolgfAfmrRgqmDBk4O7lYhqLYH5zfgqy+xLshrl8xg+mccKYLq3VZpLsO7lO1EbtLp8UYTVVVqRnU9K2a+02ZqD/mvqxD3bJ+u21TJAn3zrrlmfLb3sTDA63Ws7xPAADdpX57GDsv5J5vstjeWBG6ANq5c6OemhDXWlDNb2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Z5gqq93U; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 628NVe6h1619828;
-	Mon, 9 Mar 2026 11:59:09 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 628MrnLC1549095;
+	Mon, 9 Mar 2026 12:17:36 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=P8wmXXEGtjAtWjPktMGFDENKnLwtFJW8fNtMWJ3To
-	ww=; b=k+U1zGBWb1UsO+X7fdH08dPaf5g7YoyMkrNmTF5ckwtiFiCUYWPr57dor
-	TSHq8FAk7elFpqsgbjWlp6gIle9BQkmxUTKT1iF16wJVK4kNd4DfiadyCMm54Zf2
-	Pj1MLywT9DsmBlTMLpFLsyvb3KxI5BUd+SqzJuPvvYXthMpgeKP5OQe9hEqlI60s
-	8tFwsWz5I15EVmkBm7pI8QuHcDKJgngf3CYRFk4EwdE49HtfIe1dKe0mnsG5rlZH
-	CNW/gn0XpLLhkOVoPy1/ySAShyGu/y0Qhc3uA/HzfOPO5h9TvoF3aOHFKFDGWTLg
-	36xUbHEGBJUUvrk3LKJS92np4zo8w==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4crcyw6bn2-1
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=59Z3BC
+	hmjkQseEf5edthCrB1nPb8IFGJXXcUpsCuIe8=; b=Z5gqq93UXqJ32KeZuRuYl2
+	eIgu6kneOmPVW5UBljd7wNs60Yi9LuEx7n94b/nlMoycffMLogoGW2tMfyMJ9TiZ
+	NV8dz5LV9vSLSaA4OSHeHCdbO2owj2Gk84khFoF4k6H6lVxPbVWpmDAzThexBkfo
+	Oaf+IMor4Lmime6fffSOj5qYhSv9fWBHDVwwaiowR0szyOeFP20bDV4D4a0M0w+U
+	QCJ5+2TqaWyjRtXlSFrDXne5l3y/MaveK8bWDaj9iQ9lngNn8ZpItTt/V0MAdxZS
+	SZEpPpINnomHzp7kGpejlViG1d4nH51Rg4b0nLyv/6e+0Y39SCbqco2st4WpOd2A
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4crcyw6dy2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Mar 2026 11:59:09 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 6298tvQR021389;
-	Mon, 9 Mar 2026 11:59:08 GMT
+	Mon, 09 Mar 2026 12:17:36 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 6299D5oj009057;
+	Mon, 9 Mar 2026 12:17:35 GMT
 Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4crxbsmxfm-1
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4crxqy4xue-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Mar 2026 11:59:08 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 629Bx5jP56164652
+	Mon, 09 Mar 2026 12:17:35 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 629CHVBB35783024
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 9 Mar 2026 11:59:05 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0E6A620043;
-	Mon,  9 Mar 2026 11:59:05 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DBF6F20040;
-	Mon,  9 Mar 2026 11:59:04 +0000 (GMT)
-Received: from m83lp52.lnxne.boe (unknown [9.87.84.240])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  9 Mar 2026 11:59:04 +0000 (GMT)
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-To: KVM <kvm@vger.kernel.org>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: [PATCH] KVM: s390: log machine checks more aggressively
-Date: Mon,  9 Mar 2026 12:59:04 +0100
-Message-ID: <20260309115904.7280-1-borntraeger@linux.ibm.com>
-X-Mailer: git-send-email 2.53.0
+	Mon, 9 Mar 2026 12:17:31 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8C8BD20043;
+	Mon,  9 Mar 2026 12:17:31 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 28C2C20040;
+	Mon,  9 Mar 2026 12:17:31 +0000 (GMT)
+Received: from [9.111.68.1] (unknown [9.111.68.1])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  9 Mar 2026 12:17:31 +0000 (GMT)
+Message-ID: <67b67097-c4d5-470f-9653-8cb30cddd3f7@linux.ibm.com>
+Date: Mon, 9 Mar 2026 13:17:30 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] KVM: s390: Limit adapter indicator access to
+ mapped page
+To: Matthew Rosato <mjrosato@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, freimuth@linux.ibm.com, imbrenda@linux.ibm.com,
+        borntraeger@linux.ibm.com
+References: <20260303135250.3665-1-frankja@linux.ibm.com>
+ <20260303135250.3665-2-frankja@linux.ibm.com>
+ <be334141-01d4-4398-b89f-09f84519f29d@linux.ibm.com>
+ <9eef692a-7d8f-4082-89e0-22210c407395@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <9eef692a-7d8f-4082-89e0-22210c407395@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDEwNiBTYWx0ZWRfX0G3oQmpUQywV
- sx2aqBHPkfPGOzGPdSbuaqsMpvU/zG+irnBrP8GEHUecrsgpYAnMMr4F8vPVDbGOg2YbAplIEJa
- 7VZJZtGM4YK+Pg+FBAKW7PocdgCG7a0Q7RQ3Uu0elHGFiIBS/Hg1Uhhu+rWOjdsGdSaV19Q+B8d
- AjsmZZCrSP4iVWteuHEwX0YvGvpUnx/duqofPmDEeLPNizaAI/18mkfEcSHOB/imwp5HcUCBuYv
- 2sopqN+6b7ZjX2drJZP18SujgZBPn0y5uzNmVBsIQjrkJDCpqY5LNEiPf5bIuI/IqMoHWpxUkVg
- pr88DJQTzQT/9Sta1rw4t6zYgnsLFrhmQGAFpdRzYCf4wf+0NnXbD2YGhwnJ7Otdx4RPCgGBE+r
- NJEwZAUgeItqSwiJtqoYbn/+VjTsK7gh4lr59nZp7vJybnfL/j8uIbFL/Zgb096q72AFzRpSxkl
- fl2AyyIt/7sL9jnrxAg==
-X-Authority-Analysis: v=2.4 cv=QaVrf8bv c=1 sm=1 tr=0 ts=69aeb60d cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=AY7VfyBuPtHfJwy2xJcA:9
-X-Proofpoint-GUID: CSKr9KQKKQ577QbdeJBrpPy6F6dS_oaA
-X-Proofpoint-ORIG-GUID: CSKr9KQKKQ577QbdeJBrpPy6F6dS_oaA
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDExMCBTYWx0ZWRfXyfiJKiOU2+VG
+ P3BGiJZluwVUcHwL2wzGgT3thAa+j/U2DOUnbUWRivcM+/6PVkEoPQ23vvIp3mRFIHr23cgaVc2
+ ddEfcr6PmGEANTHPFGEveevNKXBtjy7snhTJvKKE39GDpV1rb7vK5fsJiOue1ECsybsGcx0Roze
+ 556j7V/WYALqCpRsgqSvS0yQ7790pEiPjiRP2y0iLobRI0EiSQ/3lKfjQ8rEz3B6EX4tD13elZm
+ Av2OBsC2bPkRZLRN3JMWL4IyJCifupK3uazNCL3lRXBiPmde7HOYBvGFRVStlC2do5NSr4cbDEi
+ X9141kDXMSJyHqN8zuRWS97YMZrCUmGI1KISpCYyWd53h3TKTdmyp5H3VX6HEyZe9Y8HzJoHXGK
+ IbjEkXIrQTbmSi+gvh2WbA7BUQ5BA19UbJ7oG0VYzT1MD9zUHSJP8tMX0JEApkuk0haM43tzTDI
+ R0mQz6NyXTco0DwQSyw==
+X-Authority-Analysis: v=2.4 cv=QaVrf8bv c=1 sm=1 tr=0 ts=69aeba60 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8
+ a=SqCTtwHuElgG5PwzLcgA:9 a=QEXdDO2ut3YA:10 a=ZXulRonScM0A:10
+ a=zZCYzV9kfG8A:10
+X-Proofpoint-GUID: B22LQeY7RXJ274Ffbfih1cD5q0PtmIW9
+X-Proofpoint-ORIG-GUID: B22LQeY7RXJ274Ffbfih1cD5q0PtmIW9
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-03-09_03,2026-03-06_02,2025-10-01_01
@@ -113,96 +160,56 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  malwarescore=0 spamscore=0 impostorscore=0 clxscore=1015 adultscore=0
  bulkscore=0 lowpriorityscore=0 priorityscore=1501 suspectscore=0 phishscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603090106
-X-Rspamd-Queue-Id: 5E46A238501
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603090110
+X-Rspamd-Queue-Id: 35089238C2D
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_ALL(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73286-lists,kvm=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[borntraeger@linux.ibm.com,kvm@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-0.990];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	TAGGED_RCPT(0.00)[kvm];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73287-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[frankja@linux.ibm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.964];
+	TAGGED_RCPT(0.00)[kvm];
 	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Action: no action
 
-KVM will reinject machine checks that happen during guest activity.
-From a host perspective this machine check is no longer visible
-and even for the guest, the guest might decide to only kill a
-userspace program or even ignore the machine check.
-As this can be a disruptive event nevertheless, we should log this
-not only in the VM debug event (that gets lost after guest shutdown)
-but also on the global KVM event as well as syslog.
-Consolidate the logging and log with loglevel 2 and higher.
+On 3/5/26 15:04, Matthew Rosato wrote:
+> On 3/4/26 3:16 PM, Matthew Rosato wrote:
+>> On 3/3/26 8:46 AM, Janosch Frank wrote:
+>>> While we check the address for errors, we don't seem to check the bit
+>>> offsets and since they are 32 and 64 bits a lot of memory can be
+>>> reached indirectly via those offsets.
+>>>
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> Fixes: 84223598778b ("KVM: s390: irq routing for adapter interrupts.")
+>>> Suggested-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>>
+>> Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>>
+> 
+> Like with v1, I used a modified QEMU to attempt various invocations to convince myself this works.  So feel free to also add:
+> 
+> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> 
+> 
+> 
 
-Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
----
-
- arch/s390/kvm/interrupt.c | 6 ++++++
- arch/s390/kvm/kvm-s390.c  | 1 -
- arch/s390/kvm/vsie.c      | 1 -
- 3 files changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index 18932a65ca68..9885d4bcb6ae 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -2824,6 +2824,12 @@ void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
- 	int rc;
- 
- 	mci.val = mcck_info->mcic;
-+
-+	/* log machine checks being reinjected on all debugs */
-+	VCPU_EVENT(vcpu, 2, "guest machine check %lx", mci.val);
-+	KVM_EVENT(2, "guest_machine check %lx", mci.val);
-+	pr_info("guest_machine check pid %d: %lx", current->pid, mci.val);
-+
- 	if (mci.sr)
- 		cr14 |= CR14_RECOVERY_SUBMASK;
- 	if (mci.dg)
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index bc7d6fa66eaf..1668580008c6 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4634,7 +4634,6 @@ static int vcpu_post_run(struct kvm_vcpu *vcpu, int exit_reason)
- 	vcpu->run->s.regs.gprs[15] = vcpu->arch.sie_block->gg15;
- 
- 	if (exit_reason == -EINTR) {
--		VCPU_EVENT(vcpu, 3, "%s", "machine check");
- 		sie_page = container_of(vcpu->arch.sie_block,
- 					struct sie_page, sie_block);
- 		mcck_info = &sie_page->mcck_info;
-diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-index d249b10044eb..c0d36afd4023 100644
---- a/arch/s390/kvm/vsie.c
-+++ b/arch/s390/kvm/vsie.c
-@@ -1179,7 +1179,6 @@ static int do_vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page, struc
- 	kvm_vcpu_srcu_read_lock(vcpu);
- 
- 	if (rc == -EINTR) {
--		VCPU_EVENT(vcpu, 3, "%s", "machine check");
- 		kvm_s390_reinject_machine_check(vcpu, &vsie_page->mcck_info);
- 		return 0;
- 	}
--- 
-2.53.0
-
+Thank you for testing this!
 
