@@ -1,173 +1,191 @@
-Return-Path: <kvm+bounces-73262-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73263-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YK7ANdt9rmlfFQIAu9opvQ
-	(envelope-from <kvm+bounces-73262-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 08:59:23 +0100
+	id cOxPIfZ9rmlfFQIAu9opvQ
+	(envelope-from <kvm+bounces-73263-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 08:59:50 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D4AE23524B
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 08:59:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30E3D235272
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 08:59:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 720F4304C622
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 07:57:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CDE3C3055100
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 07:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74F1A36AB7C;
-	Mon,  9 Mar 2026 07:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3885B36BCC0;
+	Mon,  9 Mar 2026 07:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zt5QHL9P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wQQ8sP7O"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CB735CBC4
-	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 07:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773043060; cv=none; b=jzvoh2n3+BjN4j7TNPu8hReDbhcXESTwLYzDw542PNx5Tv9OxjU82dqA6YzO5MWnLxk9vQl2wMFTOq4XtZj0KpJWtf4vt0H7GoKKNZN+tFKM8IYGeN9trg2HzeDFWDXiZDgM0BjygotGguuCMidE31ca2DGff47yKwufN/C8CIo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773043060; c=relaxed/simple;
-	bh=frZ/Gjh5qCWQ8LcCQqDuW5jr4lafMvpstNc8bo2TYgo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P8RFBGXb0fxmsU+wWWUViKPRHR7g2Z+RbrU2SMhgOmay4X8xFFnoOWpJ+9JnOxKlNBBhbe+vH5jHWEUh9/uAKwqKVGCEjtlV1/CEYCsdefSmTCXsf8B0dstL3YNy0QxksfOCAPUXbGd+gZCcaj8i27Id1MB2IV06VzosfMyKtag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zt5QHL9P; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-354a18c48b5so10186787a91.1
-        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 00:57:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE5936A022
+	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 07:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773043061; cv=pass; b=i+eNjyTpXRBShtN535fRtOsy+0wvNZ9hQQOaDcquAH2P5wkKQOpW7quxIaSilbicxCiWnlMVXQMueiO0xlf5L3f0OdIFnZBfZPixpqnkgFErHVeI5rflThXoVsIoXIGlgEzgPTLh+meW/61uy8f9fHUeoMKlCAkwVXepVg80KFg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773043061; c=relaxed/simple;
+	bh=Bc5YCzZwaugc6qlY/fyP8r1uGR0PYI0Vhk0jy+TRtSM=;
+	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=txayP9gFIU7oqMcFH9fTwyYP1/KNJh8pPao0qWvYcLmO9mjfn8m+FZ2jorUi8VYiJ/v6QdL/44WEr9QoDp802rW1A8gg7Fl/zC8qwPv85aXIsb9dk3lj3JI0VF/tpwPS74Zj5u/mYEjPMxliBLkLshEHxAXkCF1KtKDzZvTQFrA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wQQ8sP7O; arc=pass smtp.client-ip=209.85.221.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-5673804da95so4597335e0c.0
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 00:57:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773043059; cv=none;
+        d=google.com; s=arc-20240605;
+        b=COdTueSOqWZcu9vhD+fNewVomLpLPW4kGsIsajMBKlA5MHzipX8dlePaSyAH2VdSx0
+         tujnlrSd5cpVe3acm6KzzzlhvYKl00H1rPSSGTOISEP8RgS8nX5C7q6QJHnbKdNICUjJ
+         /EK0XFsg91bYJYw99oRa89sBnELnvzTWYBD8VVZZPg2NTqW3ZdbvPEy/eKYQuJoik2wr
+         W/HenICh2KdSml9QrpoYCTPCU1v0Lhwhe9vLay2pobwliVSJxGLrsXBDg5bWZjAUr+t4
+         M2YsPmVn1z+GLAKw+QJO8YrVUuPL+/oSVVBjPRpDJHu72DTM809jNNkX/3hAy3ZJ8BJH
+         gHww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:dkim-signature;
+        bh=G9secbmrLeczpRPZ42gZHzPMJ4soIG7S5n6DXzNQl4Q=;
+        fh=ih5qgrR8LPmmsvVaJtSrKhTMSG7aZs8tiXrqUh+pinw=;
+        b=eP8Nyexx4HdICHyjSxfhXlIEOS0BaZdWYJ22exde7kpKn0jBnCAt5+J8EJSWcje+fQ
+         WJtzOqAVgHYYWbmEauXBtQqd93PtO0kSFhfx9YV/cToX8G4DZJUmFYcmFRPzmUOQdWy7
+         T+LwDCEEQRVV2Y7CxGWPXomcIxaiuCCqmf3ap6hjFMTGsjcTRlcYaoTGKpGo7tLj9kUQ
+         NwMfg/ve4YUKyVrC/M5qUhg/0XxmxVD9efa/lK9uygcFotSfusMFpIWBi78Ov0tN4VMG
+         ngOJc4oHaZpovn1+o+bTfWYxewcp0s5y7p0g+b4sLIuoWdnEXkjMnU4l3did71MCWfG5
+         wGIA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1773043059; x=1773647859; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vYxvvKDM1kpJclPuX2KpjyyYIPBTNr1A0MC60wYdYOM=;
-        b=Zt5QHL9PMEZ0jiSwu8EbhxR1BPjVkRMjtfi8An2+LNjpAt1RN6U4kyB8bZABAX73ZB
-         NT4hxkL38y0ob8rVcVU0P6ap5HqVD+XVzIfxFAyUojcxsqrA4A10+domFINdmaFvfkBA
-         Es63hub0usnuMknYcH1teFNqyFmyBMDXdKEH6gJj6z7vFowyOp4T6cEKEHpmCc7b18CL
-         Pd3Cg6G4tmFVEXx2jQpe7I/LNpmIwCw4QTsQ/5KU7X5/s7SHlnwG+RGD1T5ZKCOsqggk
-         1hLBa4CU0JGpeC4qq++Le/n8N7FqAkPnW8Sp9WzYD+KiKxbiDeekn+GPfvPv3KSCKM5+
-         kdDA==
+        d=google.com; s=20230601; t=1773043059; x=1773647859; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=G9secbmrLeczpRPZ42gZHzPMJ4soIG7S5n6DXzNQl4Q=;
+        b=wQQ8sP7OObRVcKgeGGv/EzwD3xLC5blExAfs9xMlsv9wXPz4gTY8BOntw4SjgTmNDN
+         cRZQEL20ABBq7ZxLfp9oZTpp23v1pxAp5y732TxQdk8skhbNcTSzbNOB4VxkQOe+vEYT
+         3QbGCZyRVGPxET4P2rhcv0Macc6trG4PottoMRTws7a2Us9OQGVoromoHQk5zZoeu5Fd
+         1fiUjb4SDwZ+3wETlO2DfqSVB7fHEoT81J8viPUXHb4+2I6ZAcCuXh9+VtRsnrEhEaLR
+         C2JzEkxC/jWSujXPW+/1iwtYKxKzbwiHRi8nf1xTmCbUR1n21O2CRV0XJqxff7GQpKT9
+         HNeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1773043059; x=1773647859;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vYxvvKDM1kpJclPuX2KpjyyYIPBTNr1A0MC60wYdYOM=;
-        b=J36CGs7yhi2zpm6sklnz8iH5lN7UTFnt0UP2cXaUZPWnl26PuST9r/uEl2NBuiK3nz
-         rBwI2tBis1Fqa8SADKVNvv9nfFOujKB+zL5Jy+KKKSXOpiZ6W6vBUbTwFZqDK+vNJt/Q
-         qxWCOW9hiF17fak7Mdu77GRY7A2QsB1W/HzUqU2syVy3F2DQyBhRxFLR4FtL1SBKtFb9
-         UTBPCTqwDuRg5awF2Ox9MBTn/C38bDEh0Tx+bKWRPd5gr9kyJnB8iZ58KbiaqdxaZPHA
-         HfRGziWl6Fx1wFSfPPj/0gmJexRJm+dwkCeGBLF1bOh45UmqZa8RJwBSmJua32H6J4Xh
-         /9Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCXNacmx2nRlg5glZw2ABJWvQt81RVE5DGzDCT8eoxcoRMh0ZFlxukYBNy9ftsb7YrNUeLc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3d+Q0NoRBAVADBf8xnmpSxQGDfliR+TLMCnOPZQNR+rqeITcD
-	JVDTatQkrUAaBzdcU17GtDHhC+rxpJ+L2w0Gx8CZZREvNSL4aldKK1+b
-X-Gm-Gg: ATEYQzw2KSoVs7vh1EuN/WKxS8QYA8YraBoo7CUXRiXNWJE5z4dvzvV04+ZKvTxlKN+
-	XvNAErRho4PCboArsISoEChAuVx6FeUWNHPgWJ8mSGU2sEkMjkszCXEqhhwGLmvatlp4gRTQllQ
-	pOmOzspaIfbgAXf1MNFRb/7r4qBNhpB1Sfgt0SaEgUtVOqldUmFOfPghuCuWAChwF4160lsv6Se
-	rHsdxwJy8kRVQJy6er4fnALduA9w0mGkfs4jqKjCSse56jTFTDcX22NIlpTR71ijDGS9DznbWiz
-	KG45WnG3kDfvG+sPMrRHxAvjpensvZppBek2gYH+KT3SiNl0W9lQVFPY632F1krUxtDB94LrSh5
-	ajlFvEOmlvAOfzzobYR4yCiQf80ENnPOL2D6FdCiWeWTzBTpWzZqqheOajHHPhnZ6Xtnf85uK8U
-	GtN5Nqnqx0t4bsoDlVfPYXXJLZnZ0v1nO3Jxh22n1ykkcOUA==
-X-Received: by 2002:a17:90b:4cc6:b0:340:ff7d:c26 with SMTP id 98e67ed59e1d1-359be3082b7mr9445937a91.16.1773043058893;
-        Mon, 09 Mar 2026 00:57:38 -0700 (PDT)
-Received: from localhost.localdomain ([147.136.157.3])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-359c0154a09sm10039968a91.12.2026.03.09.00.57.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Mar 2026 00:57:38 -0700 (PDT)
-From: phind.uet@gmail.com
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Nguyen Dinh Phi <phind.uet@gmail.com>,
-	syzbot+cde12433b6c56f55d9ed@syzkaller.appspotmail.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: pfncache: Fix uhva validity check in kvm_gpc_is_valid_len()
-Date: Mon,  9 Mar 2026 15:56:29 +0800
-Message-ID: <20260309075629.24569-2-phind.uet@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G9secbmrLeczpRPZ42gZHzPMJ4soIG7S5n6DXzNQl4Q=;
+        b=CbO0c1UOps9YIpUcIObz4GJgtSJ6pDOdGDdy8L4EI8BsnFF81DkBceeapYcNbJUywq
+         SAYUG0i0cft06I5kNa/Smvcuuxh7sQ/w8zIkGzUQ14/NL/zSnFO/RimK1OBTgZ5LRmCx
+         hJDreRoVBtcwC2GRUvIeESVaOUFHiky3eN5H9lqKQ1yVPMgCYRfFTrKCakP0X1rgrNVO
+         fZKOS8HNUuiqJ6v+yQvbx4KVIWsQUfvRXgWiYfGzd+TapcxeZzyIY/Bf/dCybuHtX6jk
+         ZbIJCRz29y0RCx41j1mzpb1SXAm8LxVnRPxRKHxbaajkwZGY6djs1Cv+4UB8KuHRAQBG
+         gdaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUThoIcKex24DkrPBD040lIpShPg4xlRhm5KTGUt350NCJc1eIcYWdoDmM69CHdh8a0uL0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxj42vvZEtspg/epa+FdfAK42Pw82vRZOqY1DQ+Hdm1CX6s0vB3
+	cqkZ63LGm0Ugn9ZdERPsPrqizQWp1DstGI6fj4EKnFSzppYbYtu8PiXeBcQQ/PdtykJYBDai+mc
+	yDEwpS0xTFTN5tdyz6/JbFzop0hikxJKWpfV5mMY9
+X-Gm-Gg: ATEYQzyPZcTKCOuHS9uXR9qROADY23aeB0Q3tk0AJ1L8quWQsCiqXUjVWv9vPg4n6AK
+	VxamKAehpEsun5G3y2CoBJ6Zk0dN1tJDAazKrBNLr5ULtxR6nqrlfRJru6+W31x6D9wZciu2sf4
+	R3aPaxDlUyiPeBxhp74cpG/OSSrF7g17Jpb929mDYL9cD+ZWD1y5DO7i0jvWFczDoNsd0f66SEY
+	3VUnJkRnzx1hq6wP3/Oy7PywzM2LbbY06ESKylDgArbqFVGAjVfp4nnIaMSPuwybIMpEqdyA6JI
+	JAcpWgKCUaYqCcrGz+VqAC6T6KAFIXLol+keWGv5/CFV3Lg2Mo73PY4SXP18TWc+oUTwHA==
+X-Received: by 2002:a05:6102:d8c:b0:5ff:d192:ff2c with SMTP id
+ ada2fe7eead31-5ffe6213645mr3556252137.34.1773043058690; Mon, 09 Mar 2026
+ 00:57:38 -0700 (PDT)
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 9 Mar 2026 00:57:38 -0700
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 9 Mar 2026 00:57:38 -0700
+From: Ackerley Tng <ackerleytng@google.com>
+In-Reply-To: <2s33j7wg6ehizvdoz5fggc6kfa5byrs4yg2hk4fvwvfjp7nigo@se7fhyaknqqm>
+References: <20260225-gmem-st-blocks-v2-0-87d7098119a9@google.com>
+ <20260225-gmem-st-blocks-v2-3-87d7098119a9@google.com> <2s33j7wg6ehizvdoz5fggc6kfa5byrs4yg2hk4fvwvfjp7nigo@se7fhyaknqqm>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 3D4AE23524B
+Date: Mon, 9 Mar 2026 00:57:38 -0700
+X-Gm-Features: AaiRm539ncfsVFw5AP9VoOkialmaGifm5bQJ7k_NAlY4DMAWUCQTSVmir1fUcmo
+Message-ID: <CAEvNRgEH5X79zwFr8t4EayDccED8i5__-oFyBZ4nb_RkX8826A@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 3/6] fs: Add .unaccount_folio callback
+To: Jan Kara <jack@suse.cz>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	David Hildenbrand <david@kernel.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Vlastimil Babka <vbabka@suse.cz>, 
+	Mike Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, seanjc@google.com, 
+	rientjes@google.com, rick.p.edgecombe@intel.com, yan.y.zhao@intel.com, 
+	fvdl@google.com, jthoughton@google.com, vannapurve@google.com, 
+	shivankg@amd.com, michael.roth@amd.com, pratyush@kernel.org, 
+	pasha.tatashin@soleen.com, kalyazin@amazon.com, tabba@google.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 30E3D235272
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20230601];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73262-lists,kvm=lfdr.de];
-	FREEMAIL_CC(0.00)[gmail.com,syzkaller.appspotmail.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-73263-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	DKIM_TRACE(0.00)[google.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FROM_NO_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[phinduet@gmail.com,kvm@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.987];
-	TAGGED_RCPT(0.00)[kvm,cde12433b6c56f55d9ed];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,appspotmail.com:email]
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-0.947];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,mail.gmail.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,suse.com:email]
 X-Rspamd-Action: no action
 
-From: Nguyen Dinh Phi <phind.uet@gmail.com>
+Jan Kara <jack@suse.cz> writes:
 
-In kvm_gpc_is_valid_len(), if the GPA is an error GPA, the function uses
-uhva to calculate the page offset. However, if uhva is invalid, its value
-can still be page-aligned (for example, PAGE_OFFSET) and this function will
-still return true.
+> On Wed 25-02-26 07:20:38, Ackerley Tng wrote:
+>> Add .unaccount_folio callback to allow filesystems to do accounting-related
+>> updates to the inode or struct address_space mapping, when the folio is
+>> about to be removed from the filemap/page_cache.
+>>
+>> .free_folio cannot be used since .free_folio cannot assume that struct
+>> address_space mapping still exists.
+>
+> I agree .free_folio isn't the right place.
+>
+>> From the name, .invalidate_folio and .release_folio seem suitable, but
+>> those are meant only to handle freeing of a folio's private
+>> data. .release_folio is also not called in the truncation path.
+>
+> But this I don't quite understand. .invalidate_folio is called when
+> the file is truncated (or when the whole inode is being evicted from
+> memory). Filesystem can do whatever it wishes there, not just free folio
+> private data. Are you pointing at folio_needs_release() check? But you can
+> mark your mappings with mapping_release_always() - it's there exactly for
+> such usecases... Am I missing something?
+>
 
-An invalid uhva could lead to incorrect offset calculations and potentially
-trigger a WARN_ON_ONCE in __kvm_gpc_refresh().
+Looking at it again, mapping_release_always() gates both
+.release_folio() in filemap_release_folio() and .invalidate_folio() in
+truncate_cleanup_folio() and truncate_inode_partial_folio().
 
-Fixing it by adding an additional check for uhva.
+Let me try that out in the next revision. Thanks for pointing this out!
 
-Signed-off-by: Nguyen Dinh Phi <phind.uet@gmail.com>
-Reported-by: syzbot+cde12433b6c56f55d9ed@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=cde12433b6c56f55d9ed
-
----
- virt/kvm/pfncache.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index 728d2c1b488a..707ead0a096c 100644
---- a/virt/kvm/pfncache.c
-+++ b/virt/kvm/pfncache.c
-@@ -60,8 +60,16 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
- static bool kvm_gpc_is_valid_len(gpa_t gpa, unsigned long uhva,
- 				 unsigned long len)
- {
--	unsigned long offset = kvm_is_error_gpa(gpa) ? offset_in_page(uhva) :
--						       offset_in_page(gpa);
-+	unsigned long offset;
-+
-+	if (kvm_is_error_gpa(gpa)) {
-+		if (kvm_is_error_hva(uhva))
-+			return false;
-+
-+		offset = offset_in_page(uhva);
-+	} else {
-+		offset = offset_in_page(gpa);
-+	}
- 
- 	/*
- 	 * The cached access must fit within a single page. The 'len' argument
--- 
-2.43.0
-
+> 								Honza
+> --
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
 
