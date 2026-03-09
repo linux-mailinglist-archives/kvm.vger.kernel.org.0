@@ -1,240 +1,192 @@
-Return-Path: <kvm+bounces-73334-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73335-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0FPzBvP6rmm8LAIAu9opvQ
-	(envelope-from <kvm+bounces-73334-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 17:53:07 +0100
+	id ENkGAef7rmnZKgIAu9opvQ
+	(envelope-from <kvm+bounces-73335-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 17:57:11 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C049523D200
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 17:53:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5466A23D2E5
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 17:57:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B71B130821D3
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 16:46:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E0DC03138625
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 16:49:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26FEF3E8C4F;
-	Mon,  9 Mar 2026 16:46:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ABC23E9598;
+	Mon,  9 Mar 2026 16:48:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LzK0cQVs"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VOLCym7c"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433B113C9C4;
-	Mon,  9 Mar 2026 16:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A0463E7176;
+	Mon,  9 Mar 2026 16:48:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773074774; cv=none; b=EDhLhnuxAxquXOKGCBSiKBcLj8EN927fWHvxhWFdOa/c+wX0n55knk+O6jG5+iL7xXfXUerX7CQJBJ6M0FUPq1Y5zZaWyIqd2BsUbNkhBI4wNiOrMDz76rBsLQKSHac+pp8RgYsp16kytvds9Aco3ITDMkGmH1JymjPKoG49VMM=
+	t=1773074936; cv=none; b=vCJ/yU6hkOEjy+A+FabwXxDmQ1EgCUTkdHYqhyHXzJnyJ2e7I0572n4vJngSiO564fqIlvj0hG0yL6Afsm9XjQFW2W6yBYamcYstdbBJSxku4wDnv9KW3zVJRkksb5DgX5PUblOWAkDLZ/URs0YdDUQYdMXIoIXXs8g+Ho8AW/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773074774; c=relaxed/simple;
-	bh=Tqx7dK7zOG7rDfy0y5qpLKhV/OEzGrhs5r7m6DAJi38=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=nMitJQCdIfNRGGAS7Xj3H3bD7uOcGBv6pNVP8B2Eweq+zcJhdXgJP+5uF980Wx+7/HpaZ53qSZOpOhmoioPyuwVp6YFAUH3cahCECIczHQuE+lpJg0yYYRLnVcc3nS3m1gHuwIWQICKdwkcODHmrY439kL3c4p7FNzdTc8ltlwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LzK0cQVs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49200C2BC86;
-	Mon,  9 Mar 2026 16:46:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773074773;
-	bh=Tqx7dK7zOG7rDfy0y5qpLKhV/OEzGrhs5r7m6DAJi38=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=LzK0cQVs8ML2i3sxYVbeGEnQp3w8SiK+QCVVNiljg5JvL/h1NF64fnF/LeKgIGdiK
-	 FOGHzG/pM6V0WQ0+b8SQ0t/UMvJOUMcusbuLVmT/L9OqD1faOj86rMgMiOHjdxvqGI
-	 yIQ/9OIKCWBpkH4MHWrgENng96n48RfZlIt9izmWjO4cti60m/ZwnFqRYcL5mCDTwP
-	 DfuORlXZKGVaEPeUO4naijPeyrfCDna/PZ7pWLYmdFjFehFa05pbi7AVJIw8tnnEyc
-	 ZTPJPpl/MNPND8YXYuNEC+NesxXKrtqgA8aH5SvyaoIRcGYq2BHQTMuqf6hml1zBOr
-	 7JQtnjx5KlFCw==
-From: Puranjay Mohan <puranjay@kernel.org>
-To: "David Hildenbrand (Arm)" <david@kernel.org>, linux-kernel@vger.kernel.org
-Cc: "linux-mm @ kvack . org" <linux-mm@kvack.org>, "David Hildenbrand (Arm)"
- <david@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Lorenzo
- Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett"
- <Liam.Howlett@oracle.com>, Vlastimil Babka <vbabka@kernel.org>, Mike
- Rapoport <rppt@kernel.org>, Suren Baghdasaryan <surenb@google.com>, Michal
- Hocko <mhocko@suse.com>, Jann Horn <jannh@google.com>, Pedro Falcato
- <pfalcato@suse.de>, David Rientjes <rientjes@google.com>, Shakeel Butt
- <shakeel.butt@linux.dev>, "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Alice Ryhl <aliceryhl@google.com>, Madhavan Srinivasan
- <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, Christian
- Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank
- <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>, Gerald Schaefer
- <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Jarkko Sakkinen <jarkko@kernel.org>,
- Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Arve =?utf-8?B?SGrDuG5uZXbDpWc=?=
- <arve@android.com>, Todd Kjos
- <tkjos@android.com>, Christian Brauner <brauner@kernel.org>, Carlos Llamas
- <cmllamas@google.com>, Ian Abbott <abbotti@mev.co.uk>, H Hartley Sweeten
- <hsweeten@visionengravers.com>, Jani Nikula <jani.nikula@linux.intel.com>,
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi
- <rodrigo.vivi@intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>, David
- Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jason
- Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Dimitri
- Sivanich <dimitri.sivanich@hpe.com>, Arnd Bergmann <arnd@arndb.de>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Peter Zijlstra
- <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Andy Lutomirski <luto@kernel.org>,
- Vincenzo Frascino <vincenzo.frascino@arm.com>, Eric Dumazet
- <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, "David S.
- Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Miguel Ojeda
- <ojeda@kernel.org>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
- intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v1 14/16] mm: rename zap_page_range_single() to
- zap_vma_range()
-In-Reply-To: <20260227200848.114019-15-david@kernel.org>
-References: <20260227200848.114019-1-david@kernel.org>
- <20260227200848.114019-15-david@kernel.org>
-Date: Mon, 09 Mar 2026 16:46:09 +0000
-Message-ID: <m2y0k1vtm6.fsf@kernel.org>
+	s=arc-20240116; t=1773074936; c=relaxed/simple;
+	bh=R2t8aT9AfEryA2jCPKdVCwNrXnUCL7+CnrkUTC8dBXY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YtcNQnd3Msquur9e2ewZRv46KeaCm45KmCXH3YoZZm9B2KNboqmJbvFnw4GCqX7f0246KNlWti52F+bpD4YFtPLR7KUaDmO28USthr+ulcpVIlvDLUHeCm3NatacxhSRux/0QWqkTnrf/yoHfx1kIaTaicftrZbCUNaCGCn5ttc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VOLCym7c; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 629FEvNG1377495;
+	Mon, 9 Mar 2026 16:48:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=i3dle+
+	I6+lhzmsmx2XC26uNVY9RQtVYKjJf8QxUxP/8=; b=VOLCym7cSHKTsdPIZcn3Bz
+	AgKP+vTmbDPDV4NLmEvf/4e5NsxZA66ktwlECAFwD4Uv9V8eGCWnhiXzSJlIUo9a
+	ztyr9Ll51DyPl4xey/fJduJDIEW76Z0D/mMG1QR1B1SPdCN+9nMVQ3B+wCFiXrHQ
+	KfpZTsoj4C7IEEJUUVTbvcqvlIev8uM+2xLWQkCs1SHtmpkGze5ks37/hUE4FYwl
+	RWOAgM4L0pQXAwS/hgJEPriHDEPxLQ3ZNbDYUhBe80iDM5Rf3Mt9Qgz6nzYR+1DK
+	MwaeLyqKXDlM9jhGxazmvILiDZUebSw7/4Op4/2KgynCKJVDjX6M5OQPM2eLgPXw
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4crcvr7arr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Mar 2026 16:48:49 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 629G3Ufs015758;
+	Mon, 9 Mar 2026 16:48:48 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cs121wfxb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Mar 2026 16:48:48 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 629GmkHk525198
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 9 Mar 2026 16:48:46 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CA5995805C;
+	Mon,  9 Mar 2026 16:48:46 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D6CF958058;
+	Mon,  9 Mar 2026 16:48:44 +0000 (GMT)
+Received: from [9.61.251.111] (unknown [9.61.251.111])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  9 Mar 2026 16:48:44 +0000 (GMT)
+Message-ID: <7bc3e127-c2de-4e72-9bbb-9554da2c1e22@linux.ibm.com>
+Date: Mon, 9 Mar 2026 09:48:44 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Rspamd-Queue-Id: C049523D200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/3] vfio/ism: Implement vfio_pci driver for ISM
+ devices
+To: Julian Ruess <julianr@linux.ibm.com>, schnelle@linux.ibm.com,
+        wintera@linux.ibm.com, ts@linux.ibm.com, oberpar@linux.ibm.com,
+        gbayer@linux.ibm.com, Alex Williamson <alex@shazbot.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>,
+        Shameer Kolothum <skolothumtho@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>
+Cc: mjrosato@linux.ibm.com, raspl@linux.ibm.com, hca@linux.ibm.com,
+        agordeev@linux.ibm.com, gor@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-pci@vger.kernel.org
+References: <20260305-vfio_pci_ism-v3-0-1217076c81d9@linux.ibm.com>
+ <20260305-vfio_pci_ism-v3-2-1217076c81d9@linux.ibm.com>
+Content-Language: en-US
+From: Farhan Ali <alifm@linux.ibm.com>
+In-Reply-To: <20260305-vfio_pci_ism-v3-2-1217076c81d9@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDE0OSBTYWx0ZWRfX5Mou3i/qOXyH
+ d51DrAWmG0eTJ3+qZIuwxwilVK+eZp8qJ02dJiadI3m+SwvyKvvo1BFcq/REYlNA8VpcHU40cy6
+ CnLZzzUucMN2CphRQ0WR1SaES0J6amRx5h3yyJ2IjoGMGhOboKFeu6/mOEOnLNTJcuyyEwrmekM
+ DQEj4Y+O/F1LRgErr0XpPrwf/rbBak2MRRu0iExmgyevNkfOntEWg41WIDZFkYVMy1Rr8AdC5qH
+ Az4020xVFuO6hIOIIVoeidGsXoZ4sMF/oXl37Fl7vEtZorSsYFLSGnP5CvrEQoVcUhU3f8BtMye
+ kh9wHxsQAXfhUh+AerBOgLMJr1OEQ6LDWk6psoPUSAkvpJVDnecoDe6JbtFwKAvtZggbpM+s+Yc
+ qbauMRcZrE/v2c6fm1jSapPWwt+VaKZbse/O1LHHJ0kJh/n0bgdCw3fkxdKbYafDfio/9cCS3n4
+ AP/lhpE5kiaYpzZiMAQ==
+X-Proofpoint-GUID: V7IiDIBV_wBRJNM3FNP_d3VmVnEJtneF
+X-Proofpoint-ORIG-GUID: V7IiDIBV_wBRJNM3FNP_d3VmVnEJtneF
+X-Authority-Analysis: v=2.4 cv=QoFTHFyd c=1 sm=1 tr=0 ts=69aef9f1 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8
+ a=akap8JHnbm7pTVdsz3UA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-09_04,2026-03-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 spamscore=0 priorityscore=1501 phishscore=0
+ lowpriorityscore=0 adultscore=0 clxscore=1015 malwarescore=0 suspectscore=0
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2602130000
+ definitions=main-2603090149
+X-Rspamd-Queue-Id: 5466A23D2E5
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73334-lists,kvm=lfdr.de];
-	FREEMAIL_CC(0.00)[kvack.org,kernel.org,linux-foundation.org,oracle.com,google.com,suse.com,suse.de,linux.dev,infradead.org,linux.ibm.com,ellerman.id.au,redhat.com,alien8.de,linuxfoundation.org,android.com,mev.co.uk,visionengravers.com,linux.intel.com,intel.com,ursulin.net,gmail.com,ffwll.ch,ziepe.ca,hpe.com,arndb.de,iogearbox.net,arm.com,davemloft.net,lists.ozlabs.org,vger.kernel.org,lists.freedesktop.org];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[puranjay@kernel.org,kvm@vger.kernel.org];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
-	RCPT_COUNT_GT_50(0.00)[75];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-73335-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[kvm];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.ibm.com:mid];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo]
+	FROM_NEQ_ENVFROM(0.00)[alifm@linux.ibm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.955];
+	TAGGED_RCPT(0.00)[kvm];
+	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Action: no action
 
-"David Hildenbrand (Arm)" <david@kernel.org> writes:
 
-> Let's rename it to make it better match our new naming scheme.
+On 3/5/2026 4:20 AM, Julian Ruess wrote:
+> Add a vfio_pci variant driver for the s390-specific Internal Shared
+> Memory (ISM) devices used for inter-VM communication.
 >
-> While at it, polish the kerneldoc.
+> This enables the development of vfio-pci-based user space drivers for
+> ISM devices.
 >
-> Signed-off-by: David Hildenbrand (Arm) <david@kernel.org>
+> On s390, kernel primitives such as ioread() and iowrite() are switched
+> over from function handle based PCI load/stores instructions to PCI
+> memory-I/O (MIO) loads/stores when these are available and not
+> explicitly disabled. Since these instructions cannot be used with ISM
+> devices, ensure that classic function handle-based PCI instructions are
+> used instead.
+>
+> The driver is still required even when MIO instructions are disabled, as
+> the ISM device relies on the PCI store block (PCISTB) instruction to
+> perform write operations.
+>
+> Stores are not fragmented, therefore one ioctl corresponds to exactly
+> one PCISTB instruction. User space must ensure to not write more than
+> 4096 bytes at once to an ISM BAR which is the maximum payload of the
+> PCISTB instruction.
+>
+> Reviewed-by: Niklas Schnelle<schnelle@linux.ibm.com>
+> Signed-off-by: Julian Ruess<julianr@linux.ibm.com>
 > ---
->  arch/s390/mm/gmap_helpers.c          |  2 +-
->  drivers/android/binder/page_range.rs |  4 ++--
->  drivers/android/binder_alloc.c       |  2 +-
->  include/linux/mm.h                   |  4 ++--
->  kernel/bpf/arena.c                   |  2 +-
->  kernel/events/core.c                 |  2 +-
->  mm/madvise.c                         |  4 ++--
->  mm/memory.c                          | 14 +++++++-------
->  net/ipv4/tcp.c                       |  6 +++---
->  rust/kernel/mm/virt.rs               |  4 ++--
->  10 files changed, 22 insertions(+), 22 deletions(-)
->
-> diff --git a/arch/s390/mm/gmap_helpers.c b/arch/s390/mm/gmap_helpers.c
-> index ae2d59a19313..f8789ffcc05c 100644
-> --- a/arch/s390/mm/gmap_helpers.c
-> +++ b/arch/s390/mm/gmap_helpers.c
-> @@ -89,7 +89,7 @@ void gmap_helper_discard(struct mm_struct *mm, unsigned long vmaddr, unsigned lo
->  		if (!vma)
->  			return;
->  		if (!is_vm_hugetlb_page(vma))
-> -			zap_page_range_single(vma, vmaddr, min(end, vma->vm_end) - vmaddr);
-> +			zap_vma_range(vma, vmaddr, min(end, vma->vm_end) - vmaddr);
->  		vmaddr = vma->vm_end;
->  	}
->  }
-> diff --git a/drivers/android/binder/page_range.rs b/drivers/android/binder/page_range.rs
-> index fdd97112ef5c..2fddd4ed8d4c 100644
-> --- a/drivers/android/binder/page_range.rs
-> +++ b/drivers/android/binder/page_range.rs
-> @@ -130,7 +130,7 @@ pub(crate) struct ShrinkablePageRange {
->      pid: Pid,
->      /// The mm for the relevant process.
->      mm: ARef<Mm>,
-> -    /// Used to synchronize calls to `vm_insert_page` and `zap_page_range_single`.
-> +    /// Used to synchronize calls to `vm_insert_page` and `zap_vma_range`.
->      #[pin]
->      mm_lock: Mutex<()>,
->      /// Spinlock protecting changes to pages.
-> @@ -719,7 +719,7 @@ fn drop(self: Pin<&mut Self>) {
->  
->      if let Some(vma) = mmap_read.vma_lookup(vma_addr) {
->          let user_page_addr = vma_addr + (page_index << PAGE_SHIFT);
-> -        vma.zap_page_range_single(user_page_addr, PAGE_SIZE);
-> +        vma.zap_vma_range(user_page_addr, PAGE_SIZE);
->      }
->  
->      drop(mmap_read);
-> diff --git a/drivers/android/binder_alloc.c b/drivers/android/binder_alloc.c
-> index dd2046bd5cde..e4488ad86a65 100644
-> --- a/drivers/android/binder_alloc.c
-> +++ b/drivers/android/binder_alloc.c
-> @@ -1185,7 +1185,7 @@ enum lru_status binder_alloc_free_page(struct list_head *item,
->  	if (vma) {
->  		trace_binder_unmap_user_start(alloc, index);
->  
-> -		zap_page_range_single(vma, page_addr, PAGE_SIZE);
-> +		zap_vma_range(vma, page_addr, PAGE_SIZE);
->  
->  		trace_binder_unmap_user_end(alloc, index);
->  	}
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 4bd1500b9630..833bedd3f739 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -2835,7 +2835,7 @@ struct page *vm_normal_page_pud(struct vm_area_struct *vma, unsigned long addr,
->  
->  void zap_vma_ptes(struct vm_area_struct *vma, unsigned long address,
->  		  unsigned long size);
-> -void zap_page_range_single(struct vm_area_struct *vma, unsigned long address,
-> +void zap_vma_range(struct vm_area_struct *vma, unsigned long address,
->  			   unsigned long size);
->  /**
->   * zap_vma - zap all page table entries in a vma
-> @@ -2843,7 +2843,7 @@ void zap_page_range_single(struct vm_area_struct *vma, unsigned long address,
->   */
->  static inline void zap_vma(struct vm_area_struct *vma)
->  {
-> -	zap_page_range_single(vma, vma->vm_start, vma->vm_end - vma->vm_start);
-> +	zap_vma_range(vma, vma->vm_start, vma->vm_end - vma->vm_start);
->  }
->  struct mmu_notifier_range;
->  
-> diff --git a/kernel/bpf/arena.c b/kernel/bpf/arena.c
-> index c34510d83b1f..37843c6a4764 100644
-> --- a/kernel/bpf/arena.c
-> +++ b/kernel/bpf/arena.c
-> @@ -656,7 +656,7 @@ static void zap_pages(struct bpf_arena *arena, long uaddr, long page_cnt)
->  	guard(mutex)(&arena->lock);
->  	/* iterate link list under lock */
->  	list_for_each_entry(vml, &arena->vma_list, head)
-> -		zap_page_range_single(vml->vma, uaddr, PAGE_SIZE * page_cnt);
-> +		zap_vma_range(vml->vma, uaddr, PAGE_SIZE * page_cnt);
->  }
+>   drivers/vfio/pci/Kconfig      |   2 +
+>   drivers/vfio/pci/Makefile     |   2 +
+>   drivers/vfio/pci/ism/Kconfig  |  10 ++
+>   drivers/vfio/pci/ism/Makefile |   3 +
+>   drivers/vfio/pci/ism/main.c   | 343 ++++++++++++++++++++++++++++++++++++++++++
+>   5 files changed, 360 insertions(+)
 
-Acked-by: Puranjay Mohan <puranjay@kernel.org>
+Reviewed-by: Farhan Ali<alifm@linux.ibm.com>
+
 
