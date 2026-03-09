@@ -1,113 +1,152 @@
-Return-Path: <kvm+bounces-73324-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73325-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AMK1FMzprmlRKAIAu9opvQ
-	(envelope-from <kvm+bounces-73324-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:39:56 +0100
+	id UCJGH3jqrmlRKAIAu9opvQ
+	(envelope-from <kvm+bounces-73325-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:42:48 +0100
 X-Original-To: lists+kvm@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E206B23BDEC
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:39:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D52EA23BEDC
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:42:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3DF5B30579EF
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 15:33:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D78B930C5744
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 15:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C0F3D9054;
-	Mon,  9 Mar 2026 15:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E46C3DA5D5;
+	Mon,  9 Mar 2026 15:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sa8EL99P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oCZco0nZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74F82222A9;
-	Mon,  9 Mar 2026 15:33:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB2C3C1995
+	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 15:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773070409; cv=none; b=ppFXPo+KguOZMJAg3PwebV+vsJp/61fNnzdJmzwLigt0XW82beKrsVjTv4/S5g5ZuwaVKg/mtIzAh3wBNbOUabs1F+XT1n+xMuoB2YDMU7aJlp52IEFKXyNRFx2e/Tx2DvFaGfyeeSDMO516u7YqMfMf0llRNLxroFdhbISRFhU=
+	t=1773070591; cv=none; b=KRHsxZPdrQ6/VJrwADjHOoyPd8J+dRW+V4PT1zx7IUZG3d9d35nqD2Ss8e3PB9gGUvR5K2C5yVzKu432MQvwo9jF5orKtMPgnnT3fZgWv9V2U3LOFEWRqt3ki34duN092gZSjMdUHGrrUHH7FC7Aowy6ZykqfK0Qs0DVyGAKW6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773070409; c=relaxed/simple;
-	bh=aD4Kvtq7MFHFOf563GxDjJW7WigBUuLJJsMJDmUv1Y8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KvOIOZFExAtYIW/tvhODQAVTXc6LowyC/fQXxG038ZwQH7pfLUt4vqjSCEhge99YBPV5wFc0TOWhrrzIUPxsq6bmVQ5Iqtuh/jCFYWTKxJfOyYJhQQN+4u6yMI6af8pC+VXEYo2ZNrLamHOkIIo5rcWcM7bvLWFE1woHM4vzUTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sa8EL99P; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=pp4urnCi3IeTM6CGI1j9gUGdpbRv58OD4sLS7m/YmFk=; b=sa8EL99PTk5jodZyOPf/tiBXzc
-	j6HMZcBoPsL/mZs/0GCN1f3JSPORGalqrWjqGAG5Q62IuvW3sRV3SJl7fPz7syjDK20eSRfeGGwo+
-	02pgXbN+UktlrmioYNMVAyBFRbIcikAEa8WIvD2mnQS+oHASgnk0ODcg6Ypdly2lgV86hJGjvwrIJ
-	9fa4+vVqODzlpkKT8p4YyeYdLHmEWksgYoXx7fv59k4wZhVBYA+yQKNOTQ/rtEE0tg4oo7upfuxp/
-	9DFbtEfgEcPMN/3cU4MxYO7oBliTj3yGdTQTVR8Q00CgaguiBM0Yra3bWLD4t+dhivj3CMWI9dyQq
-	cS2n56og==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vzcbj-00000007cEr-06XI;
-	Mon, 09 Mar 2026 15:33:23 +0000
-Date: Mon, 9 Mar 2026 08:33:23 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: "JP Kobryn (Meta)" <jp.kobryn@linux.dev>
-Cc: kwankhede@nvidia.com, alex@shazbot.org, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, malmond@meta.com,
-	kernel-team@meta.com
-Subject: Re: [PATCH] vfio/mdev: make VFIO_MDEV user-visible in Kconfig
-Message-ID: <aa7oQ8ony-5sGEFY@infradead.org>
-References: <20260305233526.32607-1-jp.kobryn@linux.dev>
+	s=arc-20240116; t=1773070591; c=relaxed/simple;
+	bh=8STJekAaFwPzLSmMbD5LEd1DImwS08qunVsBresWQtI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=tYqIbpohWBhtcbZQ0MmqvqyrbQbt+YOT1/P5ZptyWkCnj2R3F8WVRlyRyJq2Iv5hLop3aylSf0F/ApJ8+854j9KWayba8GlfHCEnhFmZGaweKCzhqew9OaXz3bSPuqvAu/mka13rMyeO22dXa78gKf/vJx9Af/dyNrtIox7UjEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oCZco0nZ; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c738563e61eso3212393a12.2
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 08:36:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773070589; x=1773675389; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=z/VyzIuCqmA7zPKt1jhrtzJRnA3TqN016b76izXw4pE=;
+        b=oCZco0nZ43jrwY+ZxAtyaVEEgTaXQMbp6lPi/CY/6WfJk+W77uh9L1EgxctynQwOgw
+         FH5d1N0L8+22oieqZQmww/jnsmHq+LMhL4bPOwEodFcuqPFnE8CdoByj61a85ot6+bCR
+         3QnhpGQBCWkhUkJiXdMZyP8h7eXJYO7Nkyt54phWsckzgrHBNKlzRlMgbwee7xK5Btlm
+         VKhNw7SQb18eHMnfYjcbtxuDPb4qGHKiqgfkKDP0ZzRPL1A/56WQWWSbvzNTrcvjgSKU
+         uFrmx/9MArkuim/illB3+TRn51xaFBii7eAHC6wun3EoNmebNQ8tdJqKbBvOOmLqu/wI
+         xDnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773070589; x=1773675389;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z/VyzIuCqmA7zPKt1jhrtzJRnA3TqN016b76izXw4pE=;
+        b=MoKHnPH88u7KuWB2p2ZyZ0NKmD8NBTIVEVFMDHAg3jHF1QtuSZP1POzBONbMzNCh99
+         x3lTb6GMWXlhKhu3E6JKX1dBTAHlWkki74vsN96dlVcS3KITbTPzmd0JTW6xRTeYciJi
+         JuDDWJP3J82EJhVAngrm/tYL/EBRn9jcTQ8cgphHTOGvsU/wNLBfZOj2NMonfF8ekvxm
+         9tb7+BB9wnoBTYTMToKYnMaVXmD2+2twDWl+l/fUGWBREAAzC1oSA/h6ujl+GXOc6RGZ
+         mYI4+X78nE2sJ+UwnsZZBJPuVzDHXSz9RY8BlkU0ADaThZnqHwfZcoqeNanqmeQFYzVj
+         ADpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWfeX4A7pnpxS8H1HPXE0JQ1WYD2DGHaqPyxsS1+BONzjjY9exa3Tpsws++x1xviF9c3kg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpVhJSQkCf6w1kcqR8c39TyWRCOniwMqkFI+yxvtymWnBle2mL
+	q/PL1uId0+vfQn216q72TY3C82U9t+GGsWICQjzBviOGUBbpRv/WqBg/2TlBqq4Y+arA6iDgfRN
+	NvBPk2A==
+X-Received: from pgbfe16.prod.google.com ([2002:a05:6a02:2890:b0:c73:9d90:977a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:3289:b0:398:9820:f6de
+ with SMTP id adf61e73a8af0-398982100e0mr2684067637.49.1773070588807; Mon, 09
+ Mar 2026 08:36:28 -0700 (PDT)
+Date: Mon, 9 Mar 2026 08:36:27 -0700
+In-Reply-To: <20260309092132.2484-1-lirongqing@baidu.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260305233526.32607-1-jp.kobryn@linux.dev>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Rspamd-Queue-Id: E206B23BDEC
+Mime-Version: 1.0
+References: <20260309092132.2484-1-lirongqing@baidu.com>
+Message-ID: <aa7o-4eHAfTikGec@google.com>
+Subject: Re: [PATCH] KVM: eventfd: Remove redundant synchronize_srcu_expedited
+ from irqfd assignment
+From: Sean Christopherson <seanjc@google.com>
+To: lirongqing <lirongqing@baidu.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+X-Rspamd-Queue-Id: D52EA23BEDC
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73324-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73325-lists,kvm=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[google.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hch@infradead.org,kvm@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.949];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,infradead.org:dkim,infradead.org:mid]
+	NEURAL_HAM(-0.00)[-0.939];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On Thu, Mar 05, 2026 at 03:35:26PM -0800, JP Kobryn (Meta) wrote:
-> From: JP Kobryn <jp.kobryn@linux.dev>
+On Mon, Mar 09, 2026, lirongqing wrote:
+> From: Li RongQing <lirongqing@baidu.com>
 > 
-> VFIO_MDEV is currently hidden and only enabled via select by in-tree
-> consumers. Out-of-tree drivers such as the NVIDIA vGPU rely on the mdev
-> framework but have no way to trigger its selection.
+> The synchronize_srcu_expedited() call in kvm_irqfd_assign() is unnecessary
+> when adding a new irqfd to the resampler list. The list insertion is
+> already RCU-safe, and existing readers will either see the old or the
+> updated list without inconsistency.
+
+It's not required for kernel safety, but I do think it's required for KVM's ABI,
+e.g. to ensure the resampler is visible to readers before KVM_IRQFD returns to
+userspace.
+
+> Removing this call reduces latency during resampling irqfd setup.
+
+May I ask why you're micro-optimizing VMs with an in-kernel I/O APIC?
+
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> ---
+>  virt/kvm/eventfd.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> Add a description and help text to make VFIO_MDEV visible and directly
-> selectable.
-
-Just as last time:  no.  out of tree drivers don't matter to the kernel,
-and add totally pointless user visible options for them is of course
-a no-go.
-
+> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+> index 3201f60..facfeab 100644
+> --- a/virt/kvm/eventfd.c
+> +++ b/virt/kvm/eventfd.c
+> @@ -450,7 +450,6 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
+>  		}
+>  
+>  		list_add_rcu(&irqfd->resampler_link, &irqfd->resampler->list);
+> -		synchronize_srcu_expedited(&kvm->irq_srcu);
+>  
+>  		mutex_unlock(&kvm->irqfds.resampler_lock);
+>  	}
+> -- 
+> 2.9.4
+> 
 
