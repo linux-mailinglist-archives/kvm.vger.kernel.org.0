@@ -1,209 +1,193 @@
-Return-Path: <kvm+bounces-73292-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73293-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uKkUGwfLrmnEIwIAu9opvQ
-	(envelope-from <kvm+bounces-73292-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 14:28:39 +0100
+	id IB1eCi3MrmkDJAIAu9opvQ
+	(envelope-from <kvm+bounces-73293-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 14:33:33 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA012239BD5
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 14:28:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4CA6239CD7
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 14:33:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2D72230EEDCA
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 13:25:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B6E5C3050212
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 13:31:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A9E3A962D;
-	Mon,  9 Mar 2026 13:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943F635C19B;
+	Mon,  9 Mar 2026 13:31:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kBbjpzSq"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bxCZkHhV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2972F38F249;
-	Mon,  9 Mar 2026 13:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24E520B22;
+	Mon,  9 Mar 2026 13:31:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773062713; cv=none; b=AjiDQERbFn8OOuy3k3bd8sPCpa+iue9SIBTLihUZSDDkSccF8l+3XOwOii8Trlywv6umtXkhoDmwJ9I4RmdHa/Qw12uJ8b4ElZswEZsdXqZQueMbgNH8yVso8vLQWFcoxHFw1ElUtVsQZU+P6oqA28p/cE9udbm2xT3Dgk2lsbg=
+	t=1773063104; cv=none; b=LWfFNpQbVvHYO4dDGpnczlgqH7oe9LpKdoQgJY5ZfS/ZWeCwcAwAHYRomaULQbB8TF2k1Ak9F5sNsUbeNPwBCkUG1uxtBB+6Hy55j7+6uu8AYJOohPI7oieLclLt2mKtL0l8xv0cPvpSrws8SIxA2IDnfAhAX9tbQ9ZsXf2m3DU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773062713; c=relaxed/simple;
-	bh=lOftqXIibPcruqzyAyrTT8hLesD4obaQUp2KOHRUIL8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bI/QS7EnZRg3yH0MRG3JSX4E4L4MTFbkn5CqEhHxW2CfwIJ6BeHjdLkyJlcQEsu7PXq/xYuSQ/GbfwpJXwSYy7mAyGjocvQ2yjEuNMw4M2I/CF5kSAVc7PZWoCfUwBoEHZzbsM4KgVBg0lpOqu43JOZrzw1aky8ei1DtoEtI2k4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kBbjpzSq; arc=none smtp.client-ip=148.163.158.5
+	s=arc-20240116; t=1773063104; c=relaxed/simple;
+	bh=6BNPmUyzSbSNypouwU29Ish4OEWhUbIEgWdZ+sIYifE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tIBS0lkthMG1vBa5of5SHCnhrcoHrFwCP55pTyNB3+2sLok6xGLXP9pvW6gGTwIDAxwmqinhHs2n5ZJqG3TXamQYwayZB2sEVXTgDhSK2LXMBClhgXPw5opze1qOK12s/FIPPaIAfTXx2GwZ0elF93py0Ug3ZhEAvMoDmnqu3OU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bxCZkHhV; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 628MunYm1619459;
-	Mon, 9 Mar 2026 13:25:08 GMT
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 628Jehhn1200596;
+	Mon, 9 Mar 2026 13:31:43 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=y0suVF
-	gsu6/YpqFmukqG2LjRB+wqx0K7za/SJmNzA5o=; b=kBbjpzSq91tJcLAqTTe5vR
-	bIU+2y1an1fpfg7qNFJeXvri+oj/AtXTHIdOZy5B4KpmZmvOYUt3z7zL9tF2/wuF
-	KTvJ0183jwzk6Ysf5lI2XtjFmD0Kfm9n55a6XQeTJMXeuTa3jVANUIlN56vqQaky
-	i9AxQwlYNv3fUQyw9toffmWM/X/ZewjsVtg//6Qx/qSCNL3ku/K3+O/yM3EFOWNm
-	uSXnlJHh0DjtCGFkL95ctiMljka518xIw7zsXGCh5E/boLHU/nMl9fqUtCB2aBG6
-	uRVM7wcXRKnpeRWNcrhBXRdvifxTbDJvswtS9eIzJJrVdPT86Du54Yv2vEu6iLjw
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4crcvr6fw0-1
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=hHqTiuRqBrT9mk7+wPR2kot50c6/t8
+	Vgdo77Q8CvCq8=; b=bxCZkHhVWfaE1KN+igvdqZCHGPQbsB5CtmwD3yF3J+wn1o
+	ptDzjiHnC4PGtbCUjSRjmGD2CLoVPb2s0aGr55+SB3Ra6nCbltGdQq913LvGmIpH
+	UExuwZ/rm0/hLBCnwQVx7HBOwSMd5InMHtUIUSIotUPtx+DS8FxZxg+iBHq2HC2G
+	OED5L5ot2fzOMUz3AgZekN5G2Ai0Mmsu0+wgSkWSF9b/CGYN+w9LOBZFMeL2La9d
+	+83ODYyRAky7pRk7oJ7PfZ8sJg1A/lyfdvhZ5gAxeDy0eTGyDCdpzmZJALIMHzyT
+	P+CKs//1+z+RD21OFpBNX9ccmqKSW4DGGoY6nWoA==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4crcyw6pw5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Mar 2026 13:25:08 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 629AhIOt024649;
-	Mon, 9 Mar 2026 13:25:07 GMT
+	Mon, 09 Mar 2026 13:31:42 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 629B7lij015706;
+	Mon, 9 Mar 2026 13:31:42 GMT
 Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cs0jjvwg5-1
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4cs121vtn5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Mar 2026 13:25:07 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 629DP3s431785530
+	Mon, 09 Mar 2026 13:31:41 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 629DVbtX15466772
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 9 Mar 2026 13:25:04 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D071620043;
-	Mon,  9 Mar 2026 13:25:03 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 75B6820040;
-	Mon,  9 Mar 2026 13:25:03 +0000 (GMT)
-Received: from [9.111.1.107] (unknown [9.111.1.107])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  9 Mar 2026 13:25:03 +0000 (GMT)
-Message-ID: <3feb59dc-b4b3-4fd1-b2fd-3e07d5579de9@linux.ibm.com>
-Date: Mon, 9 Mar 2026 14:25:03 +0100
+	Mon, 9 Mar 2026 13:31:37 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 250ED2004B;
+	Mon,  9 Mar 2026 13:31:37 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BA8DC20040;
+	Mon,  9 Mar 2026 13:31:36 +0000 (GMT)
+Received: from osiris (unknown [9.111.32.176])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon,  9 Mar 2026 13:31:36 +0000 (GMT)
+Date: Mon, 9 Mar 2026 14:31:35 +0100
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        borntraeger@linux.ibm.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] s390/mm: add missing secure storage access fixups for
+ donated memory
+Message-ID: <20260309133135.30265H8b-hca@linux.ibm.com>
+References: <20260309125311.31937-5-frankja@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: s390: log machine checks more aggressively
-To: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        KVM <kvm@vger.kernel.org>
-Cc: David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-References: <20260309115904.7280-1-borntraeger@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20260309115904.7280-1-borntraeger@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260309125311.31937-5-frankja@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDExOSBTYWx0ZWRfX4BjwKkLre6Gy
- ti1tq2+Tc1zS5t2xMpkdWyAEDeEI5GgcySEicnmTZXe2zjp2lPfttRNtyxov8q3QYPlg8J1+B4E
- ZbHqpqHE5KMeQaExYxd7MsYUJTziELFqJDvTN2UcvbvOPWqhO0/Nl6v4VKXnWg1zTLor/P6tJ6e
- ntgEcHFcGS3v6GSvTrMwXZmfG7XwaQg1OyY6ma6tOtnjPhUrhDDu8UIRCremIOOYGe983W0hm7v
- cAxtGPXwRfjGGmU8dzs41IregFWXGNcx1vxxcd4rpHQzio+6N107U9JYR68sCaNjgm6yi6LTREt
- az9r9ghl82j3ec9EBKk304NtE4NFwsyH+17zbauLI1efIBsjj6DYyxDw9HPNE1sir8IyQYXt/+g
- snLP/SrZ7RI45nsECFsYL6DlsOD6otimEgAz8Kmh8U/m2GdzTFr9AIBQZxA62qzwJ8wcjcr5vpX
- O8DJP8rxfFdL8vHflhg==
-X-Proofpoint-GUID: 5UrjhR4GP1izBqWYnFoezWtwHrszXVjY
-X-Proofpoint-ORIG-GUID: 5UrjhR4GP1izBqWYnFoezWtwHrszXVjY
-X-Authority-Analysis: v=2.4 cv=QoFTHFyd c=1 sm=1 tr=0 ts=69aeca34 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8
- a=ymbBQ6HPjoWgL7Fn5rcA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDEyMyBTYWx0ZWRfX+VXydZnQyvU6
+ jXuCQom8XMiLEXsL1Ty7UZRNGQogDO4E2EDudzm8VvLkpQYzOyTZKRLs1sdy84T329U2AC5/8Py
+ orgAvveaOTtAOgjptKHxXXDp8g3idL/kdFflHCD//5uFqtlEhCaWl4hKCstz/Nmu9nG3LF8gdaZ
+ qJJlcuVF53AWEjlTDW7WuLoHujccSyrYtwFvewH4va9jyPVXGe8rHTV6Y7Tu/V9Gg2zf1aCl5Sc
+ /i6mv1rnJxq0kkwPaki2EpUaSKBS1onhJj8h6xFpuDKdijFZam62MPA74vW1F3qeGE5N1d1w2sE
+ AtibHUpEhqSZKyPT5TivMo9XffGXV4hkYXIfjy/XFHwxlszrJfX9Y4QO1PnlL8X3bh5Hu+Z3Xe+
+ G5Kp0NHpdy9u+Bc0VUU/JSLKHANEZNfljpNBRvvqElhS1cfP58v2Wyo/j3eT/tZXc5KPq7e2fCV
+ WOokqXGl2E9q8vcLGyQ==
+X-Authority-Analysis: v=2.4 cv=QaVrf8bv c=1 sm=1 tr=0 ts=69aecbbe cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=kj9zAlcOel0A:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8
+ a=TrE2I5bt53qSS1KpehMA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-GUID: lJCR9h8VoHXjYYwetiKv_zc0gPVA2bJ5
+X-Proofpoint-ORIG-GUID: lJCR9h8VoHXjYYwetiKv_zc0gPVA2bJ5
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-03-09_03,2026-03-09_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 spamscore=0 priorityscore=1501 phishscore=0
- lowpriorityscore=0 adultscore=0 clxscore=1015 malwarescore=0 suspectscore=0
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2602130000
- definitions=main-2603090119
-X-Rspamd-Queue-Id: CA012239BD5
+ malwarescore=0 spamscore=0 impostorscore=0 clxscore=1015 adultscore=0
+ bulkscore=0 lowpriorityscore=0 priorityscore=1501 suspectscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2602130000 definitions=main-2603090123
+X-Rspamd-Queue-Id: C4CA6239CD7
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
 	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73293-lists,kvm=lfdr.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.ibm.com:mid,sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73292-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,linux.ibm.com:mid];
-	TAGGED_RCPT(0.00)[kvm];
-	FROM_NEQ_ENVFROM(0.00)[frankja@linux.ibm.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[hca@linux.ibm.com,kvm@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.959];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[kvm];
+	NEURAL_HAM(-0.00)[-0.953];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[11]
 X-Rspamd-Action: no action
 
-On 3/9/26 12:59, Christian Borntraeger wrote:
-> KVM will reinject machine checks that happen during guest activity.
->  From a host perspective this machine check is no longer visible
-> and even for the guest, the guest might decide to only kill a
-> userspace program or even ignore the machine check.
-> As this can be a disruptive event nevertheless, we should log this
-> not only in the VM debug event (that gets lost after guest shutdown)
-> but also on the global KVM event as well as syslog.
-> Consolidate the logging and log with loglevel 2 and higher.
+On Mon, Mar 09, 2026 at 12:53:15PM +0000, Janosch Frank wrote:
+> There are special cases where secure storage access exceptions happen
+> in a kernel context for pages that don't have the PG_arch_1 bit
+> set. That bit is set for non-exported guest secure storage (memory)
+> but is absent on storage donated to the Ultravisor since the kernel
+> isn't allowed to export donated pages.
 > 
-> Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+> Prior to this patch we would try to export the page by calling
+> arch_make_folio_accessible() which would instantly return since the
+> arch bit is absent signifying that the page was already exported and
+> no further action is necessary. This leads to secure storage access
+> exception loops which can never be resolved.
+> 
+> With this patch we unconditionally try to export and if that fails we
+> fixup.
+> 
+> Fixes: 084ea4d611a3 ("s390/mm: add (non)secure page access exceptions handlers")
+> Reported-by: Heiko Carstens <hca@linux.ibm.com>
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  arch/s390/mm/fault.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
+> index a52aa7a99b6b..71bad4257aab 100644
+> --- a/arch/s390/mm/fault.c
+> +++ b/arch/s390/mm/fault.c
+> @@ -441,10 +441,15 @@ void do_secure_storage_access(struct pt_regs *regs)
+>  		folio = phys_to_folio(addr);
+>  		if (unlikely(!folio_try_get(folio)))
+>  			return;
+> -		rc = arch_make_folio_accessible(folio);
+> +		rc = uv_convert_from_secure(folio_to_phys(folio));
+>  		folio_put(folio);
+> +		/*
+> +		 * There are some valid fixup types for kernel
+> +		 * accesses to donated secure memory. zeropad is one
+> +		 * of them.
+> +		 */
+>  		if (rc)
+> -			BUG();
+> +			return handle_fault_error(regs, 0);
 
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+This context doesn't hold mmlock, so it should be:
+
+			return handle_fault_error_nolock(regs, 0);
+
+And, yes, you can blame me, since I proposed the wrong call off-list.
 
