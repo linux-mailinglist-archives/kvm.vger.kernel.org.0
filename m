@@ -1,180 +1,210 @@
-Return-Path: <kvm+bounces-73326-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73327-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cG5qIJHqrmlRKAIAu9opvQ
-	(envelope-from <kvm+bounces-73326-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:43:13 +0100
+	id wD2wKfjrrmkWKQIAu9opvQ
+	(envelope-from <kvm+bounces-73327-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:49:12 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B72023BEF9
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:43:13 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B1C223C076
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 16:49:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 61E7F3026A8F
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 15:38:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 003F03025115
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 15:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1DD3DA5A8;
-	Mon,  9 Mar 2026 15:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E17463DBD71;
+	Mon,  9 Mar 2026 15:45:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DD2UpCCY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xI5mH1Ok"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043CB3CD8AE;
-	Mon,  9 Mar 2026 15:38:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773070682; cv=none; b=tUa368aXXVjOlNnWhK7K+PNAnzcZ9iFXVOIWHtyAmUDWFhhAy6fNKFeG77c54qQmbZrAEBBvsZikT3kyYVQ7aWOYDjsrBoHjuWELY/3nG75HC3lrxLH0N7wrsqkupq790HaGqmHsC++WVbGelowu0R4EEncdAv5yUzGrKuD98kA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773070682; c=relaxed/simple;
-	bh=SS+oEKw0YcLlyAkLYfu1GW4aaaan3sBzOG+6J9k607g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ca2+H3tSDSSLjLev6yAZh+DZ9fQakElDFc+MHVZLDZ6WM9kbDN2Lpj4j5uDdNk6FT16UyQFf2ji+ZUnlpb1Ziai3QXAErbRnpAfr80irSCFd/H07dta9kjuej2YafaZoO5oW0kH4absOfbrlg9KlpIrO2V6G+RLzQfr3i3ZzJK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DD2UpCCY; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773070681; x=1804606681;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=SS+oEKw0YcLlyAkLYfu1GW4aaaan3sBzOG+6J9k607g=;
-  b=DD2UpCCYoyQWBq1tgtPE/GwOfPomwzPpy+Rtz8xtLui+xeR1w8ls5aPV
-   gbWnGiTyrq82fGtW17gW7yjEsLOZ0qwvR1CCsIcI9enrGbHruhF5l1hLw
-   WgZ22Elq11mWxNrwiAeYXHD64mfjHnl/CfZafY8iJNVQ71CH9T1J4Zky2
-   6letvTMyKHgjChCMJ7N4EvsWfO5VVf65bXfpChO4iC2/0D2drmjeY8XmF
-   LMhWSWdsRwFym8GOL9UtKOCiIxsRoAUcbkWI+nWigurjGf1K84Gnxi5Zt
-   atksPH8JYsSVRtnZgsAL52NSWDciAEFsWvesE6xhlLNcK+tNNBG8FcRFS
-   A==;
-X-CSE-ConnectionGUID: spKrg4ZjQZeSq5SKKBY4zg==
-X-CSE-MsgGUID: Yejt8AI+RLKa2rCT6JluQA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11723"; a="74175083"
-X-IronPort-AV: E=Sophos;i="6.23,109,1770624000"; 
-   d="scan'208";a="74175083"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2026 08:38:00 -0700
-X-CSE-ConnectionGUID: Rp9F/e6rSc+gQQtKU/O6RQ==
-X-CSE-MsgGUID: 0ZfSA1WsRxWZAhEmMzE9dw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,109,1770624000"; 
-   d="scan'208";a="215320959"
-Received: from aduenasd-mobl5.amr.corp.intel.com (HELO [10.125.109.195]) ([10.125.109.195])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2026 08:37:59 -0700
-Message-ID: <cde957ba-3579-4063-9d17-3630e79ea388@intel.com>
-Date: Mon, 9 Mar 2026 08:38:10 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF15623AB88
+	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 15:45:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773071114; cv=pass; b=WqGZZD+PtWBqSUlVSYBgCq5QD6/81JRHRYhnn6DbIN8ijjxz3+o0BY2eEZlfcnPe2uLp1ZS+ZTWhgtokY9sEX1kbbnfhWj6DJxsg7v9GoJ4N4Qu/cZkQiPyd7ZSavv06NNB2lvXfjuRhI2TfICvdhyFiaUYOE3YsxJ8BYIBCe5k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773071114; c=relaxed/simple;
+	bh=FQ+rfw6YSM+Ur2t0O+8S8EZHYkkVvAytEeux3uABvPk=;
+	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CLyPk1sfIT6EmOcFT/gP/lEhHaVzt0Zo+csFr41twxtjfJl84rC0CDTYVABKAJJRTqxCBQpwAEtOk4G15Ue43mrmhVyabrkhxQ6vmpfreqPEE4O6kC8eEA22CIcwv8SkdvOs+RVP7gAm93sRal7pqEEVn5YCjLla9OMXJXmVrm8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xI5mH1Ok; arc=pass smtp.client-ip=209.85.217.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-5ffca37e8cdso2502223137.2
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 08:45:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773071112; cv=none;
+        d=google.com; s=arc-20240605;
+        b=crpPFus59383R5hz8S0iMr2g76RYeY+Dk33DlGfM2zy7LmY5CGAT3wPF0SidLh7GIf
+         8SVesiBMDJE5Z/vVMGZIzOFkrP8a4zz+hqLQQX1Xw4kIgEmNSLbqq8Mwb2/x184/sjnE
+         vnxheUZzqKBBpyOJptkGDW5drWepJzgmwCyL9A3lZJfXx0d+CU2FGSwYwec+xDkMIW5H
+         UPX9u0u/GJ97yDm3zzqwpkxz2wm6NW3kV+B9fb7pgCbAdoMTpeuhQZgh0CENQQUvEH7I
+         f4pgJ+ejBvRfKUTVoHCxqZYuynVlEwSGJQzjY9rt1L9Sod/m2V6CPrC6WXZ1o7+2rOge
+         aOKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:dkim-signature;
+        bh=bKp7UfWwsR+Qtr2/5qSzMlZ35ZQUtFxqOaPiGk/f9/o=;
+        fh=P6WteVIMEz5nZCiuubsrMVYQ82HtTp/00uXrYehBy8E=;
+        b=FRirAm4spScEcCsoRV8bmRhksDaC9Nh8mMvKVPXPnOueXzvqcupBjDFhi+5S7kKSdh
+         jtfA05vt2y9eRVZXiRrw70kw3WYE84FeSuciioU/pd1zviMzIHUFm+PCS01MgbUOnDB7
+         d2h7PXTj6oQMMoQsl5dhSurxVsuFEuR9sH/HpsEzc6f6MhA4/GAoHNGOeV4bqFr026Ai
+         1fIR/X8jT1WTo3CbwKHZrwPqdz5gwdDLM7qoI867KyHEFQZB0ic8r4eOid5Ho2pB1OOq
+         I6dmcn+WqrAlVi5cU+GeXb0OcA4xJAgMvWoGtk3eg+f2jHZu6zIVyWOxmKnayx7PixXm
+         pf+w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773071112; x=1773675912; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bKp7UfWwsR+Qtr2/5qSzMlZ35ZQUtFxqOaPiGk/f9/o=;
+        b=xI5mH1OkbEx5rEciwSIW1r8sSiLBgdGlSOlZdRK6ui/M4nAvFHW8cqdINYfAXsV8uG
+         nI8bSnfXg0WmJyzGTT4KYmmik5uOhjiWXFNNN14RCQ6kfG8md8JpD12d9PnsFp8CBb1s
+         M8dPVYwMPiKqykvvLzCaRCNuF6x88XCJz0UtP/nxZjLTELP5LxX3WZ9mmh4rvorqeHDC
+         FyXPy7Jpc0aPA/cTi1HrTrP/p+3xCtoe/TNwAtZwTewTH8loPRekj2HfeUsE0o5Y8BdT
+         E9EMgjx38u6ekuFmEvOkfZ9NWw8lFW9GeB+xS0zv/EBLsB1y0gkdSa1SZtV4LgVKrjRb
+         EGow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773071112; x=1773675912;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bKp7UfWwsR+Qtr2/5qSzMlZ35ZQUtFxqOaPiGk/f9/o=;
+        b=NYiymgyZXV3KbPV4HEnOjhQfha7V1TJ6ocqXuuVawR8700jekc4CBJR3PO+FSTraDE
+         t1+SspABrtblI995dzhuB5WwqiyuxOLgWTCErOB+mgZV8YavAlpbHTO+5Wt73h+XM43w
+         O550V2sC8m5xqvio+tMEpUPsU+TZUyRcXoCv7Wbwq+fZA4IrX+rrCkZOMmeHmRDc+cRL
+         xYwinQuVJwpEdm4/ZJqbHGSbVdPx0kcYTzY1tRYR3BO43Gi3pON2hiN+Q5J7jkTreyek
+         28NUxS9aHh8XU3l5YtUdq4y74KtYDvUp/S+TptN4va2lubYIICn8e/6Byy8TyYZgfLfE
+         nfiQ==
+X-Gm-Message-State: AOJu0YyQGyu+PecyrZLeX3KfmyYYkOl2OWSLA3o4gIqWoUy8a8v783cW
+	XtDmebjrZ9jUby31z+tJ+M3hemyEVhOW5B0HTfDWHp2JjbrLpRPAV+9Wc8T4VHHMXrULlbXjenT
+	YSpn+f+XEPcAgw9khE/bksLuuJ1/XG6rWiMoWSvdc
+X-Gm-Gg: ATEYQzzkX6R7rc1NOmU+VcFIuqiNx8ZsPeNc8xIQxT0Wi3IR1mcdJIFu1FvEQ9RGo8C
+	PQPKTLQkaGO19/+C5MFGxfzupLFK65cefxVB9C1upiZaqou0MwjE4B+G96atWJ5t3JiyPooIz+x
+	xpsgIXVDFBZ49Vr2NNcd2wtlD9XAyrpYR+D+BQgLYjgFN80hrTjw+OC4wAVSxGxVeGC8rPUjyqF
+	6u2boozNqjzdHbBWGimxwKWQfQ1OIFDkQcN3yPzZ1GUnDb7xk9d3sOzqzOwTx8DDP9v9VRhXHF6
+	fwEcyjNsQd9sy4uBt2FqogrwOQRjj8k1zoLeU88Esg==
+X-Received: by 2002:a05:6102:ccf:b0:600:131f:b68a with SMTP id
+ ada2fe7eead31-600131fe1bemr2252059137.23.1773071109964; Mon, 09 Mar 2026
+ 08:45:09 -0700 (PDT)
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 9 Mar 2026 08:45:09 -0700
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 9 Mar 2026 08:45:09 -0700
+From: Ackerley Tng <ackerleytng@google.com>
+In-Reply-To: <577c4725-7eda-4693-a55a-413572541161@kernel.org>
+References: <20260309-gmem-st-blocks-v3-0-815f03d9653e@google.com>
+ <20260309-gmem-st-blocks-v3-1-815f03d9653e@google.com> <577c4725-7eda-4693-a55a-413572541161@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] x86/cpu: Disable CR pinning during CPU bringup
-To: Borislav Petkov <bp@alien8.de>, Nikunj A Dadhania <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- thomas.lendacky@amd.com, tglx@kernel.org, mingo@redhat.com,
- dave.hansen@linux.intel.com, hpa@zytor.com, xin@zytor.com,
- seanjc@google.com, pbonzini@redhat.com, x86@kernel.org,
- sohil.mehta@intel.com, jon.grimm@amd.com
-References: <20260226092349.803491-1-nikunj@amd.com>
- <20260226092349.803491-2-nikunj@amd.com>
- <20260309134640.GOaa7PQJli_C9QATGB@fat_crate.local>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20260309134640.GOaa7PQJli_C9QATGB@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 6B72023BEF9
+Date: Mon, 9 Mar 2026 08:45:09 -0700
+X-Gm-Features: AaiRm50NI2W_b1s4wqVK3z2E19_F4wrYli0WrzITukeFFAKkCo-7bYk8Lb2_YMI
+Message-ID: <CAEvNRgHhFoyh__shK_YefhUOTP4RaG-sivUH=4Gj-2iy1HX+tw@mail.gmail.com>
+Subject: Re: [PATCH RFC v3 1/4] KVM: guest_memfd: Track amount of memory
+ allocated on inode
+To: "David Hildenbrand (Arm)" <david@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Mike Rapoport <rppt@kernel.org>, 
+	Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Shuah Khan <shuah@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	seanjc@google.com, rientjes@google.com, rick.p.edgecombe@intel.com, 
+	yan.y.zhao@intel.com, fvdl@google.com, jthoughton@google.com, 
+	vannapurve@google.com, shivankg@amd.com, michael.roth@amd.com, 
+	pratyush@kernel.org, pasha.tatashin@soleen.com, kalyazin@amazon.com, 
+	tabba@google.com, Vlastimil Babka <vbabka@kernel.org>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Rspamd-Queue-Id: 8B1C223C076
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-73326-lists,kvm=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73327-lists,kvm=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[34];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.956];
+	FROM_NEQ_ENVFROM(0.00)[ackerleytng@google.com,kvm@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[kvm];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
+	NEURAL_HAM(-0.00)[-0.951];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-On 3/9/26 06:46, Borislav Petkov wrote:
-> My SNP guest stops booting with this right:
+"David Hildenbrand (Arm)" <david@kernel.org> writes:
 
-Could you dump out CR4 at wakeup_cpu_via_vmgexit() before and after this
-patch? Right here:
+> On 3/9/26 10:53, Ackerley Tng wrote:
+>> The guest memfd currently does not update the inode's i_blocks and i_bytes
+>> count when memory is allocated or freed. Hence, st_blocks returned from
+>> fstat() is always 0.
+>>
+>> Introduce byte accounting for guest memfd inodes.  When a new folio is
+>> added to the filemap, add the folio's size.  Use the .invalidate_folio()
+>> callback to subtract the folio's size from inode fields when folios are
+>> truncated and removed from the filemap.
+>>
+>> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+>> ---
+>>  virt/kvm/guest_memfd.c | 14 ++++++++++++++
+>>  1 file changed, 14 insertions(+)
+>>
+>> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+>> index 462c5c5cb602a..77219551056a7 100644
+>> --- a/virt/kvm/guest_memfd.c
+>> +++ b/virt/kvm/guest_memfd.c
+>> @@ -136,6 +136,9 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
+>>  					 mapping_gfp_mask(inode->i_mapping), policy);
+>>  	mpol_cond_put(policy);
+>>
+>> +	if (!IS_ERR(folio))
+>> +		inode_add_bytes(inode, folio_size(folio));
+>> +
+>
+> Can't we have two concurrent calls to __filemap_get_folio_mpol(), and we
+> don't really know whether our call allocated the folio or simply found
+> one (the other caller allocated) in the pagecache?
+>
 
-        /* CR4 should maintain the MCE value */
-        cr4 = native_read_cr4() & X86_CR4_MCE;
+Ah that is true. Two threads can get past filemap_lock_folio(), then get
+to __filemap_get_folio_mpol(), and then thread 1 will return from
+__filemap_get_folio_mpol() with an allocated folio while thread 2
+returns with the folio allocated by thread 1. Both threads would end up
+incrementing the number of bytes in the inode.
 
-It's got to be some delta there.
+Sean, Vlastimil, is this a good argument for open coding, like in RFC v2
+[1]? So that guest_memfd can do inode_add_bytes() specifically when the
+folio is added to the filemap.
 
-The other possibility is that some CR4 bit becomes no longer pinned when
-the CPU comes up, and the *pinning* was what caused the secondary CPU's
-CR4 bit to get set, not its actual initialization.
+An alternative I can think of is to add a callback that is called from
+within __filemap_add_folio(). Would that be preferred?
 
-Basically, the secondary boot code didn't explicitly set a bit and
-counted on the pinning code to do it instead.
+[1] https://lore.kernel.org/all/20260225-gmem-st-blocks-v2-2-87d7098119a9@google.com/
 
-It's probably exacerbated by the "novel" way that SEV-SNP CPUs get
-brought up and all the assembly that *only* runs there.
+> --
+> Cheers,
+>
+> David
 
