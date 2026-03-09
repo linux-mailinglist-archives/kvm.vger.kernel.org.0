@@ -1,69 +1,85 @@
-Return-Path: <kvm+bounces-73346-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73347-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CKzRLvgMr2nHMwIAu9opvQ
-	(envelope-from <kvm+bounces-73346-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 19:10:00 +0100
+	id +EEbKIgOr2njNAIAu9opvQ
+	(envelope-from <kvm+bounces-73347-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 19:16:40 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B7CD23E4CE
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 19:09:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49C2523E76B
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 19:16:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DDCB73034567
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 18:06:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 335D63048930
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 18:13:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B633EF0C1;
-	Mon,  9 Mar 2026 18:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85C3C30BBA9;
+	Mon,  9 Mar 2026 18:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gI2aK8y+"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iIHlBjcZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57623EF0A0;
-	Mon,  9 Mar 2026 18:03:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799902FFDDE
+	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 18:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773079413; cv=none; b=RNyCQdjO1BaUS82RV9KVB9Ck8FqhoFGHsRF4zv50SRwFcrEN3evfRsTnGxc0XXxadA6SQwGrLpI3ut8QO5pFJ2y1JQG1EA56ALohY8BMw7/Ds16D8PyvXfIse8o06vxu//zrn2KyBWYJqSu160ouHD3VGTQMOKyryeoHAYWj0v4=
+	t=1773079972; cv=none; b=h4bfe/k1+klqhJS8OdiW4UiooCMIPD0w5DEKL5LD1RAhZiTaoRQ587ZdanVc0nhKoXpAMoA3A19JgxUWnEO6agivVmC3Jaw3aDctkb5IJRF7LrHDeRwcJB0hCWZ235eBrxCy03Xn0aJGGjVwz3pLi+4itSBzUIjdxT7/vjRGzIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773079413; c=relaxed/simple;
-	bh=mfFYyaFbN/O1YfBRmMLt0ySeW7NEuIVVxDMZ1FTnxtg=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=t7brl0vgzSjYYDdG6Oo+eaFlgAxxmmzlIazPiIIg5HoVf68YsEYV+x7uRt/7DmK7Px/2rZk8zNkRJ2q7PO/27yc/dfH/J8zu88UhOOPxsK4LH0Bb4PVwsHIT2VTNp1F3I94M/4CvjZz2HQkotJ0uMfJ3LsyF0mMolRekaUUqlCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gI2aK8y+; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773079412; x=1804615412;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to;
-  bh=mfFYyaFbN/O1YfBRmMLt0ySeW7NEuIVVxDMZ1FTnxtg=;
-  b=gI2aK8y+OwNoGsaRK+mlqO+fBeWgy0LO4gIc9Cmq5R+hM0SP73+Bze+p
-   oBe5OWaIIgg2hT6SEer+dlCFiSTzHyqYLKIyCE5zdsiPLQIuo2aaNHOd5
-   db8APd6EwhcVhriXC9oKl9bPYBUVj5CY1a2ZaTez/qDdmdVNn/ppRmWVH
-   R7n9JUaWJtoIdaipyhYoYaOqFyPWFiJaRwVibu6ihG5S3g5loYTECG7uT
-   g+/frH6pa90QP45jwD1fcqeRB8j+YAZca+ufBJvcqqjUxu6YaPGt3fpC6
-   CRwZbAqDaRJNk7C2RaSGM5aA64TYkA/+feIo4LghbFD6m/yj1ddJ3ljWY
-   g==;
-X-CSE-ConnectionGUID: 7LjDDEPYRACV6LMzYKyEmA==
-X-CSE-MsgGUID: FOV7fQa2SsKojwZItznYFw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11724"; a="85463747"
-X-IronPort-AV: E=Sophos;i="6.23,109,1770624000"; 
-   d="scan'208";a="85463747"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2026 11:03:31 -0700
-X-CSE-ConnectionGUID: 50M/u+KySvKZ6Q0PG8swvw==
-X-CSE-MsgGUID: Im/YRD6BRBCLesqCQ68lqw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,109,1770624000"; 
-   d="scan'208";a="219772463"
-Received: from aduenasd-mobl5.amr.corp.intel.com (HELO [10.125.109.195]) ([10.125.109.195])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2026 11:03:31 -0700
-Content-Type: multipart/mixed; boundary="------------MkPVvWUIej1M6m3WoIiNMTwR"
-Message-ID: <70644e1d-dd0e-4f0f-81c0-fd095e46e50b@intel.com>
-Date: Mon, 9 Mar 2026 11:03:42 -0700
+	s=arc-20240116; t=1773079972; c=relaxed/simple;
+	bh=kqVuC9royASKdXGEsbezJWeT793uIzmXoD+McdcWmqs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Mh4y2x4K24R6NIkFOdSJm2TE+2D/AosNaE+xSebhHdiG9qMORLA4P6tTwu5u6MXu6YGF0EBe8pqsj0fXihkc52QNDWAcSGaDuoU4QCfHTrNkcSg40IjP2ltbB/UJetDx/L3DkMld52ToKovKvkxwFzuV05bSz51aE1pNx9QGtOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iIHlBjcZ; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8cd79e43da3so205578185a.1
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 11:12:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1773079970; x=1773684770; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NEjfrceVoPpsyMxRtYpKXw6OfR+Lo42WgLugVLi/t74=;
+        b=iIHlBjcZFA3eKGuINev70eyVZobAXEHEaLBvqZPlPRZt7P8k7i38hKC5MMuzRi7GHP
+         jKn0mLAcs4vOcfXLJTeXmpXpB4WQjndiENQMZ9Iq9zu66uo+YCB4b5SsG0xTotF2IkTK
+         wF1CC5ShVu8IQsqIsXwIfm/UOj+djj1MkyGJOqGJia4MOv0Rg5FdTV225uf5+aTZYeN2
+         aXnaukbk+9xSgQotXmYh48E76KmWLbCSt0s1fr3tKQXE0OGAh0qiy6dgO1P5nNGWknCI
+         6OIIlIoFUJmoqDMO3IZTgHBF2PQodOthpLf/nX1DiSlI5+7E9n4vhiNYa67ArryJOIad
+         HUmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773079970; x=1773684770;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NEjfrceVoPpsyMxRtYpKXw6OfR+Lo42WgLugVLi/t74=;
+        b=HqFiZpPAjUcHFCy/MorXGHU394wRWlARRP1QxVq7MjzlfcYBL/ELMQIzVIspF1ujNT
+         05Okw/VceQJ3CGWC7N8HRXZYxs1GqQmgqHBxSYQ0poVQtRn78ZO1dLUFIeXOp/mtJ0ib
+         gmrO4Mlv22wJzKYjSJfs8aQ4AKUaD87drEFKbLHigd/ycEL5qgjyXLoyQ8S8ostgq6KL
+         ziXSdnrUo2YhxSV1KKJ5MSeeotTLEj+flckI/wpYRIQTFIbBfgdZufzIYYuawO8OTPtm
+         Em3dI6VqhOTN/TBj/Td539iFEH8PMUv3kC3wJVwAJarej49lMcUZiSH5LInwVPsidwf2
+         uYUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXaiJQCgdDUSZq8sFBdpfLNXemP8/3hUckcjxv5sKtxZrFuQxaxq0e+yA4DocqPGBcZHsE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnCGM3IDr6s/mgSd1zH+uVAADDlkN//g3t2/2m4U4bt5O8qatG
+	DMG8zEGe6r/6OxUKvDMyVU8V00ZGOfqhkDf4xVp49ygw1J5VEiAimM7HqBMoP0+jvRbqolUKkN4
+	0ZsLG
+X-Gm-Gg: ATEYQzxYxu2VYTuD1AbEh2+xj8HplycsOSAOA4y0yW70LEX4Bphffrv8mHiVSSCB9sQ
+	msEKSmGun1EAw/L2rsPSXHM4iGr/meMqwXs8X2BpzG1hPAO5M/cJ81a1XoFbXRSFLtG7bipZ0ah
+	P4ZWSSQe84cPZbO7wz2tGhgMUWl181FFMcQJ5DGjngoDf77zSAthT7G8VhP7NP+/osbYuNfqmT/
+	xNhGTMMKLE44CXQxSKTOKp5D4gAbM8zWtuGXasY1xBG1wEyRpeXcni2bh2lWwpV45jMeCVFdzUe
+	PKKrGRYGbzTWRXJt2TwBmEA7sEGzQnV7ZFzzAkMdXIg3Cbd4vGFryuorHUnMvz7SO3F5joSAdjm
+	62jKvutiBufiZdmz0Dx28EhhoxGc0WcceIwi9V81NsUhgtD+R0IGqLVzjXh24Ge9DtHhlipBxqq
+	pg56hgZeGhB6T+l5FDx6ozn4L+PPSMxFQbXKssFahC66A00T0cM8zju56lZ7OVfHDyDZdR
+X-Received: by 2002:a05:620a:1a8b:b0:8cd:8938:effd with SMTP id af79cd13be357-8cd8938f3b6mr551924085a.1.1773079970375;
+        Mon, 09 Mar 2026 11:12:50 -0700 (PDT)
+Received: from [192.168.1.87] (216-71-219-44.dyn.novuscom.net. [216.71.219.44])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8cd6f49649esm719044285a.12.2026.03.09.11.12.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Mar 2026 11:12:49 -0700 (PDT)
+Message-ID: <c632b868-3c0c-4a9a-b592-1af0429c6033@linaro.org>
+Date: Mon, 9 Mar 2026 11:12:48 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,168 +87,110 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] x86/cpu: Disable CR pinning during CPU bringup
-To: Borislav Petkov <bp@alien8.de>
-Cc: Nikunj A Dadhania <nikunj@amd.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, thomas.lendacky@amd.com, tglx@kernel.org,
- mingo@redhat.com, dave.hansen@linux.intel.com, hpa@zytor.com, xin@zytor.com,
- seanjc@google.com, pbonzini@redhat.com, x86@kernel.org,
- sohil.mehta@intel.com, jon.grimm@amd.com
-References: <20260226092349.803491-1-nikunj@amd.com>
- <20260226092349.803491-2-nikunj@amd.com>
- <20260309134640.GOaa7PQJli_C9QATGB@fat_crate.local>
- <cde957ba-3579-4063-9d17-3630e79ea388@intel.com>
- <20260309161516.GAaa7yFMulhdzNQ-pt@fat_crate.local>
-From: Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [PATCH v2 1/2] system/kvm: Make kvm_irqchip*notifier()
+ declaration non target-specific
 Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20260309161516.GAaa7yFMulhdzNQ-pt@fat_crate.local>
-X-Rspamd-Queue-Id: 2B7CD23E4CE
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <20260309174941.67624-1-philmd@linaro.org>
+ <20260309174941.67624-2-philmd@linaro.org>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Autocrypt: addr=pierrick.bouvier@linaro.org; keydata=
+ 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
+ ZtfdHNZotF092MIH0IQC3poExQpV/WBYFAI=
+In-Reply-To: <20260309174941.67624-2-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 49C2523E76B
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-1.06 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-patch];
-	MIME_BASE64_TEXT(0.10)[];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-73346-lists,kvm=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	HAS_ATTACHMENT(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73347-lists,kvm=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[linaro.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dave.hansen@intel.com,kvm@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[pierrick.bouvier@linaro.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[kvm];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,intel.com:dkim,intel.com:mid]
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linaro.org:dkim,linaro.org:email,linaro.org:mid,sto.lore.kernel.org:rdns,sto.lore.kernel.org:helo]
 X-Rspamd-Action: no action
 
-This is a multi-part message in MIME format.
---------------MkPVvWUIej1M6m3WoIiNMTwR
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
-On 3/9/26 09:15, Borislav Petkov wrote:
-> On Mon, Mar 09, 2026 at 08:38:10AM -0700, Dave Hansen wrote:
->> On 3/9/26 06:46, Borislav Petkov wrote:
->>> My SNP guest stops booting with this right:
->> Could you dump out CR4 at wakeup_cpu_via_vmgexit() before and after this
->> patch? Right here:
->>
->>         /* CR4 should maintain the MCE value */
->>         cr4 = native_read_cr4() & X86_CR4_MCE;
->>
->> It's got to be some delta there.
-> Looks the same to me:
+On 3/9/26 10:49 AM, Philippe Mathieu-Daudé wrote:
+> Commit 3607715a308 ("kvm: Introduce KVM irqchip change notifier")
+> restricted the kvm_irqchip*notifier() declarations to target-specific
+> files, guarding them under the NEED_CPU_H (later renamed as
+> COMPILING_PER_TARGET) #ifdef check.
 > 
-> before:      31  SEV: wakeup_cpu_via_vmgexit: CR4: 0x3506f0
+> This however prohibit building the kvm-stub.c file once:
 > 
-> That's 31 CPUs - no BSP with the CR4 value above.
+>    ../accel/stubs/kvm-stub.c:70:6: error: no previous prototype for function 'kvm_irqchip_add_change_notifier' [-Werror,-Wmissing-prototypes]
+>       70 | void kvm_irqchip_add_change_notifier(Notifier *n)
+>          |      ^
+>    ../accel/stubs/kvm-stub.c:74:6: error: no previous prototype for function 'kvm_irqchip_remove_change_notifier' [-Werror,-Wmissing-prototypes]
+>       74 | void kvm_irqchip_remove_change_notifier(Notifier *n)
+>          |      ^
+>    ../accel/stubs/kvm-stub.c:78:6: error: no previous prototype for function 'kvm_irqchip_change_notify' [-Werror,-Wmissing-prototypes]
+>       78 | void kvm_irqchip_change_notify(void)
+>          |      ^
 > 
-> after: [    3.354326] SEV: wakeup_cpu_via_vmgexit: CR4: 0x3506f0
+> Since nothing in these prototype declarations is target specific,
+> move them around to be generically available, allowing to build
+> kvm-stub.c once for all targets in the next commit.
 > 
-> That stops after CPU1, i.e., the first AP. But the CR4 value is the same.
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>   include/system/kvm.h | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> 
 
-The only pinned bits in there are: SMAP, SMEP and FSGSBASE.
-
-SMAP and SMEP are unlikely to be biting us here.
-
-FSGSBASE is _possible_ but I don't see any of the {RD,WR}{F,G}SBASE
-instructions in early boot where it would bite us.
-
-Can you boot this thing without FSGSBASE support?
-
-The other option would be to boot a working system, normally and see
-what is getting flipped by pinning at cr4_init(). The attached patch
-does that. It also uses trace_printk() so it hopefully won't trip over
-#VC's during early boot with the console.
-
-For me, it's flipping on 0x310800, which is:
-
-	#define X86_CR4_OSXMMEXCPT      (1ul << 10)
-	#define X86_CR4_FSGSBASE        (1ul << 16)
-	#define X86_CR4_SMEP            (1ul << 20)
-	#define X86_CR4_SMAP            (1ul << 21)
-
-*Maybe* the paranoid entry code is getting called from the #VC handler
-in early boot? It has ALTERNATIVEs on X86_FEATURE_FSGSBASE and might be
-using the FSGSBASE instructions in there.
-
---------------MkPVvWUIej1M6m3WoIiNMTwR
-Content-Type: text/x-patch; charset=UTF-8; name="cr4.patch"
-Content-Disposition: attachment; filename="cr4.patch"
-Content-Transfer-Encoding: base64
-
-ZGlmZiAtLWdpdCBhL2FyY2gveDg2L2tlcm5lbC9jcHUvY29tbW9uLmMgYi9hcmNoL3g4Ni9r
-ZXJuZWwvY3B1L2NvbW1vbi5jCmluZGV4IDAyNDcyZmM3NjNkOWIuLmNjNDA4ZWM4MTg4NzAg
-MTAwNjQ0Ci0tLSBhL2FyY2gveDg2L2tlcm5lbC9jcHUvY29tbW9uLmMKKysrIGIvYXJjaC94
-ODYva2VybmVsL2NwdS9jb21tb24uYwpAQCAtNTAxLDEyICs1MDEsMjAgQEAgRVhQT1JUX1NZ
-TUJPTF9GT1JfS1ZNKGNyNF9yZWFkX3NoYWRvdyk7CiB2b2lkIGNyNF9pbml0KHZvaWQpCiB7
-CiAJdW5zaWduZWQgbG9uZyBjcjQgPSBfX3JlYWRfY3I0KCk7CisJdW5zaWduZWQgbG9uZyBw
-cmVwaW5fY3I0OwogCiAJaWYgKGJvb3RfY3B1X2hhcyhYODZfRkVBVFVSRV9QQ0lEKSkKIAkJ
-Y3I0IHw9IFg4Nl9DUjRfUENJREU7CisJcHJlcGluX2NyNCA9IGNyNDsKIAlpZiAoc3RhdGlj
-X2JyYW5jaF9saWtlbHkoJmNyX3Bpbm5pbmcpKQogCQljcjQgPSAoY3I0ICYgfmNyNF9waW5u
-ZWRfbWFzaykgfCBjcjRfcGlubmVkX2JpdHM7CiAKKwlpZiAocHJlcGluX2NyNCAhPSBjcjQp
-IHsKKwkJdHJhY2VfcHJpbnRrKCIgICAgIHByZXBpbl9jcjQ6IDB4JTAxNmx4XG4iLCBwcmVw
-aW5fY3I0KTsKKwkJdHJhY2VfcHJpbnRrKCIgICAgICAgICAgICBjcjQ6IDB4JTAxNmx4XG4i
-LCBjcjQpOworCQl0cmFjZV9wcmludGsoImNyNF9waW5uZWRfbWFzazogMHglMDE2bHhcbiIs
-IGNyNF9waW5uZWRfbWFzayk7CisJCXRyYWNlX3ByaW50aygiY3I0X3Bpbm5lZF9iaXRzOiAw
-eCUwMTZseFxuIiwgY3I0X3Bpbm5lZF9iaXRzKTsKKwl9CiAJX193cml0ZV9jcjQoY3I0KTsK
-IAogCS8qIEluaXRpYWxpemUgY3I0IHNoYWRvdyBmb3IgdGhpcyBDUFUuICovCg==
-
---------------MkPVvWUIej1M6m3WoIiNMTwR--
+Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 
