@@ -1,206 +1,139 @@
-Return-Path: <kvm+bounces-73344-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73345-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +NgLI+gJr2nYMQIAu9opvQ
-	(envelope-from <kvm+bounces-73344-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 18:56:56 +0100
+	id EAsyMFcJr2lzMQIAu9opvQ
+	(envelope-from <kvm+bounces-73345-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 18:54:31 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06FBA23E0DC
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 18:56:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 419EA23E01C
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 18:54:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC7053126355
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 17:52:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2E90C300E605
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 17:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB13303C86;
-	Mon,  9 Mar 2026 17:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78F113B531B;
+	Mon,  9 Mar 2026 17:54:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="MfdWxYUf"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vRp0Plbk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00190b01.pphosted.com (mx0b-00190b01.pphosted.com [67.231.157.127])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEFC3033E1;
-	Mon,  9 Mar 2026 17:51:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.157.127
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779033CA4BE
+	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 17:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773078718; cv=none; b=ESKwwcAteW7bPvdq+8Kfr8o2S/F1GTHYpXrKIWmL6AWtCdHQ9nBWEF5OA7uSj5qw14j4yo81Aptw9pcUXS8xspPrmChMU3r6Dr/JVi5zdXbH11E4GSuwsUQ17V0fOCgJqaRCMb2szUzfWXeeMbXB7YEL2gzXIBmpPgcgMnI/GEM=
+	t=1773078862; cv=none; b=rnYfRjktOqKuCf7NBHy34dkMSFxg64TAlW7dJenGlPjHj4RHK7pDIXB012yz2rjTaPBTWqZNp4vavlwHea2eXmsJiiMkD7+Evbn9/ySG4G2LgHZRG4wwcQsb8ns4t56+lIMeQ/aC1ABQq7mWAoC0rXWLaHzcYAcBT2YD5V2FZCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773078718; c=relaxed/simple;
-	bh=gQXEyf9WH0XxJmE7YloWbQ7DbKT2KKIhzze2eU3OK18=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AAx2CciwvAHAxOAELFY3L8Rumf1z/qM3GmnGP4VG78RGKg2vlnfGfrA6GQZ0UMiVbSeszcazun/l3fgRG8DdhMoOLdhz1FrEis2JFpWXVLSYcaEtLGreebh685voI9GprNO/2+4+niDp91pfdxvkt9IifpUyGIZktOFa5bIy67A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=MfdWxYUf; arc=none smtp.client-ip=67.231.157.127
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
-Received: from pps.filterd (m0409410.ppops.net [127.0.0.1])
-	by m0409410.ppops.net-00190b01. (8.18.1.11/8.18.1.11) with ESMTP id 629HTUvu2133576;
-	Mon, 9 Mar 2026 17:51:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=jan2016.eng; bh=HKJJE1a9/
-	G6LVwmqfStU9M/AiiM+ISgsUS0KJWYykqA=; b=MfdWxYUfo8XNAm5avcphPnFg7
-	utE/UxcYAlRMM9H2Yi3FtqZgVW3+gD8xUQa/mmaG+QMPgXUuCZbBxwzG7mF1AJd2
-	jyDGC5222/ETxXUxfVh6NkZBXLMCl7EWqnr81C2XQzSKUkq5AXnX4F4RaLMLfFRc
-	prxVLNxg3euh+DxhcoQeKIvY19iEH2r/aEXCuzkdvTPiQLFQgTKNdG20oaKxzqzU
-	6sMrSiG8i5zEOZyqqqw1lRmLm2Y2lsrFYWaMEmRpdAYHSW9+qmMaHJfxoWkk/czO
-	Duv8tPfYvPeA5wv4eaLTUi3rJzfA0Io7PSzuFXUzrjzVXojTU0u+TwL5DUhng==
-Received: from prod-mail-ppoint1 (prod-mail-ppoint1.akamai.com [184.51.33.18])
-	by m0409410.ppops.net-00190b01. (PPS) with ESMTPS id 4cryt9g9sn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Mar 2026 17:51:32 +0000 (GMT)
-Received: from pps.filterd (prod-mail-ppoint1.akamai.com [127.0.0.1])
-	by prod-mail-ppoint1.akamai.com (8.18.1.7/8.18.1.7) with ESMTP id 629HmuAB013814;
-	Mon, 9 Mar 2026 13:51:31 -0400
-Received: from prod-mail-relay01.akamai.com ([172.27.118.31])
-	by prod-mail-ppoint1.akamai.com (PPS) with ESMTP id 4crg7yh57e-1;
-	Mon, 09 Mar 2026 13:51:31 -0400 (EDT)
-Received: from muc-lhv4ep.munich.corp.akamai.com (muc-lhv4ep.munich.corp.akamai.com [172.29.0.215])
-	by prod-mail-relay01.akamai.com (Postfix) with ESMTP id 50CA889;
-	Mon,  9 Mar 2026 17:51:29 +0000 (UTC)
-From: Max Boone <mboone@akamai.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-        David Hildenbrand <david@kernel.org>
-Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-        "Liam R . Howlett" <Liam.Howlett@oracle.com>,
-        Vlastimil Babka <vbabka@suse.cz>, Mike Rapoport <rppt@kernel.org>,
-        Suren Baghdasaryan <surenb@google.com>, Michal Hocko <mhocko@suse.com>,
-        Alex Williamson <alex@shazbot.org>, linux-mm@kvack.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Max Tottenham <mtottenh@akamai.com>, Josh Hunt <johunt@akamai.com>,
-        Matt Pelland <mpelland@akamai.com>, Max Boone <mboone@akamai.com>
-Subject: [RFC 1/1] mm/pagewalk: don't split device-backed huge pfnmaps
-Date: Mon,  9 Mar 2026 18:49:49 +0100
-Message-ID: <20260309174949.2514565-2-mboone@akamai.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260309174949.2514565-1-mboone@akamai.com>
-References: <20260309174949.2514565-1-mboone@akamai.com>
+	s=arc-20240116; t=1773078862; c=relaxed/simple;
+	bh=BuwqdQR/+JoA/BZVUlisB+/mVbteEFRlh//+sjJRQCw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KkJV13voF4ujuq3WmRFFP/i0pRZ6CXccR6QSBXSASckPBR83i47e+VG4/uayrn22dE6iu/3O5oZMwNCF9GuC7qQEeFLZ76RLSZZ2u3TpUSTEm7medxRWm7Y+1bnopMk9UDPtCxJzT4ZeSsyj2sizAoEyqXFQJkwyZxRMgPLapJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vRp0Plbk; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4806ce0f97bso108276965e9.0
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 10:54:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1773078856; x=1773683656; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DQpCcbWib06GwrSrjKEgPauEB4pMQNN0BW8pnBJ7+wc=;
+        b=vRp0Plbka85TW7vX8+qolBfZoE5kGf/fDTfRkrCJH9Te3GPDEJmluH73MWpT6xF8q7
+         rQZAKgbBosWF9r5uawUGVDWLPCUc6gu342mXZ5+ztmkK7q5uXDTYCwwKA6sGNBV7sCR8
+         Ul10+elIcNqCTgFI19ge26dJsgNMvS+pxe/6cTWURpFTT7EtQtFKHwiX3MEF17wJE+NX
+         2yJfV1fmNG6qxitz0eMskdxL7eLULobP6ReK8ZHfKW8RXCYASYGZOv7QN7+TVM5rLs+V
+         T5dbhBdKyBGWTCNWPoCZDLG5yzaHh7YguyEY+keZpwNcVW9/7II5WtA7Y8F03Y95NJHD
+         yMtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773078856; x=1773683656;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DQpCcbWib06GwrSrjKEgPauEB4pMQNN0BW8pnBJ7+wc=;
+        b=V+8K+UXwdYrGAh9ydfbouiUvDHcoDLZyyf+WIEIN8rf4gcJvEbSPNq4chEByUZXQTo
+         MNi95o95tgDr8hUonvj54MiQZzSGGICfVX30NXob9LfeQubMCL2HZSM81SrA7o6ifJ37
+         qzb4NzMmA+Yngvn+QatssmBwLPb220QREAraJJhHAFzuQaF1+23D6J7vN3XmoGy5Q1IR
+         yDHJ+L+zbxSQnc7IAn/e8NIwrZgv/GU3MVjJP/5PuY2WVGEIOJ0lihif0zBuRtbk4/U+
+         RFqDTsdAANzUnr7sUuB4nB5OFxGKglsbrFWbC/I7PryGgh8K4960nhxhRa7pPPO7qbWx
+         PEpA==
+X-Gm-Message-State: AOJu0YxbV835IKIpsQJ/aUV4ktEHp9Aq6dze210KkzJJwAIjVpOVpSZI
+	V3q3FM0tU1Y9HOHPx30mC9aXPvUV0U6ps+w4RuxVFoN22BtiXyMO9+0ZGNi3KGpzduo9+vlsILT
+	KxsngBNo=
+X-Gm-Gg: ATEYQzxmKPbi1DlYJmTnI8wmPKihTp9VsbA3wlN9Fck8ZRx9h6yicGEwRCFGy6nLuAr
+	0aKp0gXCRyQK0HlPgl0ag0hYfB7cojkJD1Gsbwm3FG+I2sch/O+wjh9x3BuFPCrnUoOputVJ5UW
+	B3qzGthQuFFmxjMfOC7vRc0Ic7UeFghDm7viyQtKwYOyNcPHRrsWQ/RYebjx6jRQYiXZiC1xIdN
+	SyYvRrs0n1HExGGnqtUTj573+c8k2o/EEHf2wlxCL6OByDPMsm9O+BfRdv9zwn6g6r/bdmoUUpo
+	uaoJze93CfvzZxqgm/u8JLT5AuM3RdSUaGV6s/7c9r/PahJH3IRQBd6YVUqCQsulsFJHEdHdoS1
+	Xcdbe2l9VW4AN1zszMtij76RJbUZg2wkcp3Tb46WyzcrpXBM/GC9Smwh0FREODGTVihvJzDfaxQ
+	X9XkwHdI3slJ7QWHj7aSlyo8YKTWlsDy3b9hFoRBZxo+4KdCjibe5fAwqRAL966M0Kmw==
+X-Received: by 2002:a05:600c:4445:b0:483:6a8d:b2f9 with SMTP id 5b1f17b1804b1-4852690febamr219281285e9.5.1773078856525;
+        Mon, 09 Mar 2026 10:54:16 -0700 (PDT)
+Received: from [192.168.69.201] (88-187-86-199.subs.proxad.net. [88.187.86.199])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48541a8f610sm12732545e9.7.2026.03.09.10.54.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Mar 2026 10:54:15 -0700 (PDT)
+Message-ID: <80f7ebc0-2ca9-489e-a017-29965a3fa50b@linaro.org>
+Date: Mon, 9 Mar 2026 18:54:14 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/5] accel: Try to build without target-specific knowledge
+Content-Language: en-US
+To: qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org
+References: <20260225051303.91614-1-philmd@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20260225051303.91614-1-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-09_04,2026-03-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- bulkscore=0 malwarescore=0 adultscore=0 mlxlogscore=999 lowpriorityscore=0
- suspectscore=0 spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2602130000 definitions=main-2603090160
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzA5MDE2MSBTYWx0ZWRfX+lTaKK7/VWFw
- RX0cFG8smkSdrmeSg5bQ4tgQUcfySS33Ev9vGzp26TewWJoSEpLSan4TUFnG2lgGRm7G4xQKZyV
- eL8vcIVF/QDZ49X76BQ570AX2jNO1AucbJoxm8jYH5lR+uB4ssqmZdaJvd0FFa6aFjV9NxlfKI4
- DdFjPeF36unKLdgkFUsVi740c014VX+4nBpK3l1TDfahS3mPei7DZTEAWTFmGwWksR/kWMtDNeV
- 4pa91v1w0UV4QDVggJzOjRMKtQy5RgXDIHoNbHffxMvkM6eKjkEIgQ4cQxfrv2P4uADhF+bs0oi
- mjVDCiHg+asfGLYI8jXChGbUpfSz5QkgbWUUTPNGc4CkVVCU4J+7H3vq2w5J2zHai+218oMvt6f
- /JjHyfOJIRR3+xaamLU5Ta1txRMNIAOQnGAA+BSk/yFZzlQqW04qIpOw4XGyaM/KacVJ3ToQisQ
- azw6/LjW0jpbMtpTZ0Q==
-X-Authority-Analysis: v=2.4 cv=bahmkePB c=1 sm=1 tr=0 ts=69af08a4 cx=c_pps
- a=StLZT/nZ0R8Xs+spdojYmg==:117 a=StLZT/nZ0R8Xs+spdojYmg==:17
- a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Ifg-1AOnLHOf1gn6spyb:22
- a=KDzEjHMMTas96-nIEKpj:22 a=X7Ea-ya5AAAA:8 a=TWRbNayY-KqUAGRnHQoA:9
-X-Proofpoint-GUID: PQGRm8GX1GzudYyVcHmOtKlfYD8YwBf-
-X-Proofpoint-ORIG-GUID: PQGRm8GX1GzudYyVcHmOtKlfYD8YwBf-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-09_04,2026-03-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 phishscore=0 lowpriorityscore=0 clxscore=1011 adultscore=0
- suspectscore=0 malwarescore=0 spamscore=0 impostorscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603090161
-X-Rspamd-Queue-Id: 06FBA23E0DC
+X-Rspamd-Queue-Id: 419EA23E01C
 X-Rspamd-Server: lfdr
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[akamai.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[akamai.com:s=jan2016.eng];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-73345-lists,kvm=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73344-lists,kvm=lfdr.de];
-	DKIM_TRACE(0.00)[akamai.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mboone@akamai.com,kvm@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linaro.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:rdns,sea.lore.kernel.org:helo,akamai.com:dkim,akamai.com:email,akamai.com:mid];
+	FROM_NEQ_ENVFROM(0.00)[philmd@linaro.org,kvm@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[kvm];
-	RCVD_COUNT_SEVEN(0.00)[8]
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo,linaro.org:dkim,linaro.org:mid]
 X-Rspamd-Action: no action
 
-Don't split and descend on special PMD/PUDs, which are generally
-device-backed huge pfnmaps as used by vfio for BAR mapping. These
-can be faulted back in after splitting and before descending, which
-can race to an illegal read.
+On 25/2/26 06:12, Philippe Mathieu-Daudé wrote:
 
-Signed-off-by: Max Boone <mboone@akamai.com>
-Signed-off-by: Max Tottenham <mtottenh@akamai.com>
+> Philippe Mathieu-Daudé (5):
+>    accel/kvm: Include missing 'exec/cpu-common.h' header
+>    accel/mshv: Forward-declare mshv_root_hvcall structure
+>    accel/mshv: Build without target-specific knowledge
+>    accel/hvf: Build without target-specific knowledge
+>    accel/xen: Build without target-specific knowledge
 
----
- mm/pagewalk.c | 24 ++++++++++++++++++++----
- 1 file changed, 20 insertions(+), 4 deletions(-)
-
-diff --git a/mm/pagewalk.c b/mm/pagewalk.c
-index a94c401ab..d1460dd84 100644
---- a/mm/pagewalk.c
-+++ b/mm/pagewalk.c
-@@ -147,10 +147,18 @@ static int walk_pmd_range(pud_t *pud, unsigned long addr, unsigned long end,
- 				continue;
- 		}
- 
--		if (walk->vma)
-+		if (walk->vma) {
-+			/*
-+			 * Don't descend into device-backed pfnmaps,
-+			 * they might refault the PMD entry.
-+			 */
-+			if (unlikely(pmd_special(*pmd)))
-+				continue;
-+
- 			split_huge_pmd(walk->vma, pmd, addr);
--		else if (pmd_leaf(*pmd) || !pmd_present(*pmd))
-+		} else if (pmd_leaf(*pmd) || !pmd_present(*pmd)) {
- 			continue; /* Nothing to do. */
-+		}
- 
- 		err = walk_pte_range(pmd, addr, next, walk);
- 		if (err)
-@@ -213,10 +221,18 @@ static int walk_pud_range(p4d_t *p4d, unsigned long addr, unsigned long end,
- 				continue;
- 		}
- 
--		if (walk->vma)
-+		if (walk->vma) {
-+			/*
-+			 * Don't descend into device-backed pfnmaps,
-+			 * they might refault the PUD entry.
-+			 */
-+			if (unlikely(pud_special(*pud)))
-+				continue;
-+
- 			split_huge_pud(walk->vma, pud, addr);
--		else if (pud_leaf(*pud) || !pud_present(*pud))
-+		} else if (pud_leaf(*pud) || !pud_present(*pud)) {
- 			continue; /* Nothing to do. */
-+		}
- 
- 		if (pud_none(*pud))
- 			goto again;
--- 
-2.34.1
-
+Series queued, thanks.
 
