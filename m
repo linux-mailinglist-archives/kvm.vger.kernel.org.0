@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-73357-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-73358-lists+kvm=lfdr.de@vger.kernel.org>
 Delivered-To: lists+kvm@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aJExBwkhr2myOQIAu9opvQ
-	(envelope-from <kvm+bounces-73357-lists+kvm=lfdr.de@vger.kernel.org>)
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 20:35:37 +0100
+	id IE9sKRwhr2neOAIAu9opvQ
+	(envelope-from <kvm+bounces-73358-lists+kvm=lfdr.de@vger.kernel.org>)
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 20:35:56 +0100
 X-Original-To: lists+kvm@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B82312401DB
-	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 20:35:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 412B52401F3
+	for <lists+kvm@lfdr.de>; Mon, 09 Mar 2026 20:35:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 18DB5306F0D1
-	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 19:31:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DD64F307648C
+	for <lists+kvm@lfdr.de>; Mon,  9 Mar 2026 19:31:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CF46410D1E;
-	Mon,  9 Mar 2026 19:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED4641160B;
+	Mon,  9 Mar 2026 19:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XUgzOMyp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zYVzPMLx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A5140FD84
-	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 19:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8982E410D18
+	for <kvm@vger.kernel.org>; Mon,  9 Mar 2026 19:31:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773084675; cv=none; b=OqSm+fHxz9hFdZlaqfzDBPhE0zP9ZLntuQ+sNNZFJXtlXYRfeKsAy2Aw1LhcA9TOGQyysDwy6YXJApQeDfGpnzpBkbu6ZagZ+KLvbOjktzF4/rp6T7Uvo8WyETqI2lAwiuUW8oCTsSyh8kTW1EpRyaTkw/T6D9P9PtMd0U/4v4s=
+	t=1773084677; cv=none; b=MWeMaeg8lgkTKQgJ1GZngDusnNUogIWduiqGcrt6gnGgu7fr9W6DeusHphYW8pnpuhBVFG1c0k9ew8W4JhpMdSY4kw3r0z990/Vqa787RmWHfnV/NXxE4xSChIkRNvMfY9qzsImgKKvPRMvKMEDVe2GqjsaxrhLcHlSrhDQAhMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773084675; c=relaxed/simple;
-	bh=zqSouceZtFC5TpkGpy+KiFus4h62hOvNb+G9ZODiRYE=;
+	s=arc-20240116; t=1773084677; c=relaxed/simple;
+	bh=mUKw0kl0f4KxNAzKhr8UyqO0R7jCXXC379eGBhra2Q8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KZUTEWyC2ji4avkh6e5m1nwuK43M1mz8AEsqfOCVrEoSugUeGVgsmLU405MiT8lEXzFaPesguBTwdRKjfcNsr64jRL7x+gEBL1Ndy8AgQ2ohVgTwFYF2g6NgRkOa7T1PQ45A8CMW6QcR429CjkeAr7UEjqSmTHPm8jYQ6ts0HrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XUgzOMyp; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=psQY8NaO5/VKAWL2RQ0Gt+AaLaP3knZML5hu+VSXbLSlFzack+jynMMgVMti/2HPuH3D54XlAQAkySfB4uvW5HwY9+s2BD/bgWwVOTS2GxgtMhp6CkiZ7iS+mS/9GEEgNKnLEPcdqL3TAyISg38QfyV3PxHbQE/Qcvp5vFYR4sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zYVzPMLx; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2ae61939fa5so193181575ad.0
-        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 12:31:14 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-8299499d582so11490138b3a.2
+        for <kvm@vger.kernel.org>; Mon, 09 Mar 2026 12:31:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773084674; x=1773689474; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1773084676; x=1773689476; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=wblNA6bj3f7w06PD/nTLmV/SuffW2mSGdWVBXF9Y8dI=;
-        b=XUgzOMyp9Y1oN6fXRl22p6JHmy+Xk/0x9JJMz5aNgNrg+0pZAzkdJhdZsLswx6n5JD
-         ciR4DVH6f4KR6mMlag6337uQsGjHDcGmcEtv/GvO9B9yvCj5MrUS6JDPZ37lI0Fkmmir
-         wX8bMRkP4t+3Il56No5JdzJMxuKv5MWXfqu4R8t53MJ5f/pESOzRwkfvTabK7WdYBu1d
-         WcKbWcr4u+FHYuLs/zV6DMOOAuWOlYx5l6lw/5+vLwLnpYT/JUJ/IETPlA/NQStMviGE
-         JbEHh7ZDbsx/TSGttOlv/lUtV8hPCgo6sblYdZDRBWMMAIc+EBLPle/VpeqylZr7jlmq
-         RVmg==
+        bh=1G09RtyABu4hfI9DMnNr2bllkac+dmhEIEcvARTdDJk=;
+        b=zYVzPMLxyfgWNWIGVx+FhZzYjdW6KlRPal5FWU5nVKX9Ekz020jycy/N8L4pWnNwDv
+         tIr8HIwIpIO4PDWBU9CESIhnABTGwOpuVAKEGjcBiO1rlqIOHn0tauHjBU8TShrppBV0
+         6Vj/daXm88s5hP4OJkotY7xxO6TH75dDN4Xl+7R/pFnCx1STvW+t1kKUI5DAtNpFfVDZ
+         pNZ5xKZgudojvAYZWIuK9bNn4utQO6v/5Uz0saTNC5dwlTzdhaMS+RzudcSybAlMEgPN
+         wzMy0JC3b3V4l7eQqF4rxbCJSQAGiQxRjtmUPxt1h1+U1RIu0+TxKTL/9q0FUB8tHUz7
+         awRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773084674; x=1773689474;
+        d=1e100.net; s=20230601; t=1773084676; x=1773689476;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wblNA6bj3f7w06PD/nTLmV/SuffW2mSGdWVBXF9Y8dI=;
-        b=T+Dg4bug0iwMZuP57b6pf1dkjg5Mrj9kWcHfcGWEPn5/Xna7ZSfT3a7QZ6Jj9pQRVe
-         VN9tP3JW2cAPp8/TJFTixfyOX9AdNnrwTd38g+GamsjQTczRuZnYTQQxJFN1bwadmX5L
-         tFK8owl6r886bftZyfZTGqzFjSXq41AwR9844pZpii2tMASGEkEiHeIYX1t+KQzK6FKB
-         1jXqPKEmpqYKtVaH3IAlLlFUaKb0uQGKlfs/iSE8MCfiFUxFa0jxWf1fbNr4jrhkZ5Qi
-         rFacq+8+VL26GR5K8ig7eKilcZjvL6R315iKFQ8bUeTq3oc08H4hZTocXFSUiRngfJr0
-         xfsw==
-X-Forwarded-Encrypted: i=1; AJvYcCW4gNcXKkJsiC2g4c2Vqn2lmpcOl6DWq4KTiyZWpiwboa3x6cNsMPJo6JC6o5TLiKAXeko=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0QwXpeAlF5UDs7KhKZwf+OG2aQxqBwb1B4xaWVVqgWfXX2bwJ
-	K8Q/1YcJH2E89sjzAW2duv5wk7EXekKLJ5i17Lncs8/TyzA3voP2UXTDWAwJAb3TjCMoawx9K2t
-	opyHU/g==
-X-Received: from plcy10.prod.google.com ([2002:a17:903:10a:b0:2ae:45a4:ca9f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2b06:b0:2ae:50ec:fa2e
- with SMTP id d9443c01a7336-2ae823a1f61mr121594565ad.21.1773084674028; Mon, 09
- Mar 2026 12:31:14 -0700 (PDT)
+        bh=1G09RtyABu4hfI9DMnNr2bllkac+dmhEIEcvARTdDJk=;
+        b=mMK/R/YE2HLP7C/82+1p/PtxtkIiTq3eNKdJw84F1kRjU6SLua8Neasx9OZpjmmPjw
+         QU1nZt4M6vB9Z6sZjhSlxNHy1A1JMHERymrXao7NcBAVjYH0JgKKm75XjRxcPRAmUdnc
+         Fp99ljrPJ7++t11/N+wh9yzn6vyiigw7NdWH2AMCkrOvui0X4m/JnDRfQKkl0vlGk6hk
+         ln8OjVLwqe7G1wutGEQWYiTxBKPwoaL/8dRqZdh+jROpJSKa/7E71LE+g4hHfAGIMxyi
+         QMnnJZQ9SQsoz9alM1F9U1nzlJ9nYmmL+nDUdw1fR3p6q2Uq9Ti9hb2Wd1yC/dzIxl7Q
+         BUrw==
+X-Forwarded-Encrypted: i=1; AJvYcCUoWXmYwhIFMYcSxi07pTzZ7Ic7EUKFtxWolw61dHgrDjaG4LKmsPvedOit1EQ6+70PbZo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYjOtZLpuuLr7NhvedlLuHKSVwDl5zz8ZHZPVDttb4jt73RJuA
+	wt/ObZCeSj5g4TjD1LKCT9lptI/xPNRu1Ut62K60EQRoJiVNFgfTAxYU70ufaBIFXWTouVL9Uve
+	/RsQ1UA==
+X-Received: from pfog16.prod.google.com ([2002:aa7:8750:0:b0:829:707f:6f3e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1827:b0:827:444a:58e0
+ with SMTP id d2e1a72fcca58-829a2ea9fd8mr11118741b3a.32.1773084675798; Mon, 09
+ Mar 2026 12:31:15 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon,  9 Mar 2026 12:30:57 -0700
+Date: Mon,  9 Mar 2026 12:30:58 -0700
 In-Reply-To: <20260309193059.2244645-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -78,15 +78,16 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260309193059.2244645-1-seanjc@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260309193059.2244645-2-seanjc@google.com>
-Subject: [RFC PATCH 1/3] srcu: Declare exported symbols before including srcu{tiny,tree}.h
+Message-ID: <20260309193059.2244645-3-seanjc@google.com>
+Subject: [RFC PATCH 2/3] srcu: Add and export call_srcu_expedited() to avoid
+ transferring grace periods
 From: Sean Christopherson <seanjc@google.com>
 To: Lai Jiangshan <jiangshanlai@gmail.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
 	Josh Triplett <josh@joshtriplett.org>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: rcu@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Sean Christopherson <seanjc@google.com>, Nikita Kalyazin <kalyazin@amazon.com>, Keir Fraser <keirf@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Rspamd-Queue-Id: B82312401DB
+X-Rspamd-Queue-Id: 412B52401F3
 X-Rspamd-Server: lfdr
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -94,19 +95,19 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-73357-lists,kvm=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-73358-lists,kvm=lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com,kernel.org,joshtriplett.org,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:rdns,tor.lore.kernel.org:helo];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[seanjc@google.com,kvm@vger.kernel.org];
@@ -119,64 +120,82 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	REPLYTO_EQ_FROM(0.00)[]
 X-Rspamd-Action: no action
 
-Move the declarations of call_srcu(), cleanup_srcu_struct(), and
-synchronize_srcu() above the inclusion of the implementation specific SRCU
-header so that tiny SRCU can provide inline wrappers, e.g. for expedited
-versions, without needing to re-declare synchronize_srcu() and call_srcu().
+Add and export an expedited version of call_srcu() so that users of
+synchronize_srcu_expedited() can avoid "transferring" non-expedited grace
+periods.  In response to userspace changes to guest devices and memory,
+KVM uses call_srcu() when freeing an object to avoid having to wait for
+readers to go away, but then often emits a synchronize_srcu_expedited() in
+a largely unrelated path shortly thereafter (on the same SRCU object).
 
-Opportunsitically use rcu_callback_t in the call_srcu() declaration instead
-of an open coded equivalent (all implementations already use
-rcu_callback_t).
+Due to differences in how VMMs manage guest devices, and in the
+architecture being emulated by userspace, some updates trigger call_srcu()
+with concurrent readers (i.e. while the VM is active), while others occur
+without readers, e.g. when configuring devices during a pre-boot setup.
+For the later case (no concurrent readers), using the vanilla call_srcu()
+is problematic, as it can kick off a normal grace period (totally fine for
+freeing the object) and effectively transfer the non-expedited grace period
+to the upcoming synchronize_srcu_expedited().
 
-No functional change intended.
+For micro-VM use cases with CONFIG_HZ=100 kernels, the resulting ~20ms
+delay on the would-be-expedited sync can increase the boot time of the VM
+by 15% or more.
 
+Link: https://lore.kernel.org/all/a84ddba8-12da-489a-9dd1-ccdf7451a1ba@amazon.com
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- include/linux/srcu.h     | 10 +++++-----
- include/linux/srcutiny.h |  2 --
- 2 files changed, 5 insertions(+), 7 deletions(-)
+ include/linux/srcutiny.h | 6 ++++++
+ include/linux/srcutree.h | 2 ++
+ kernel/rcu/srcutree.c    | 7 +++++++
+ 3 files changed, 15 insertions(+)
 
-diff --git a/include/linux/srcu.h b/include/linux/srcu.h
-index bb44a0bd7696..1cbc37e3b59c 100644
---- a/include/linux/srcu.h
-+++ b/include/linux/srcu.h
-@@ -79,6 +79,11 @@ int init_srcu_struct_fast_updown(struct srcu_struct *ssp);
- 						// instead of smp_mb().
- void __srcu_read_unlock(struct srcu_struct *ssp, int idx) __releases_shared(ssp);
- 
-+void call_srcu(struct srcu_struct *ssp, struct rcu_head *head,
-+	       rcu_callback_t func);
-+void cleanup_srcu_struct(struct srcu_struct *ssp);
-+void synchronize_srcu(struct srcu_struct *ssp);
-+
- #ifdef CONFIG_TINY_SRCU
- #include <linux/srcutiny.h>
- #elif defined(CONFIG_TREE_SRCU)
-@@ -87,11 +92,6 @@ void __srcu_read_unlock(struct srcu_struct *ssp, int idx) __releases_shared(ssp)
- #error "Unknown SRCU implementation specified to kernel configuration"
- #endif
- 
--void call_srcu(struct srcu_struct *ssp, struct rcu_head *head,
--		void (*func)(struct rcu_head *head));
--void cleanup_srcu_struct(struct srcu_struct *ssp);
--void synchronize_srcu(struct srcu_struct *ssp);
--
- #define SRCU_GET_STATE_COMPLETED 0x1
- 
- /**
 diff --git a/include/linux/srcutiny.h b/include/linux/srcutiny.h
-index dec7cbe015aa..4976536e8b28 100644
+index 4976536e8b28..e2fc8c138e6a 100644
 --- a/include/linux/srcutiny.h
 +++ b/include/linux/srcutiny.h
-@@ -64,8 +64,6 @@ struct srcu_usage { };
- #define init_srcu_struct_fast_updown init_srcu_struct
- #endif // #ifndef CONFIG_DEBUG_LOCK_ALLOC
+@@ -130,6 +130,12 @@ static inline void srcu_barrier(struct srcu_struct *ssp)
+ 	synchronize_srcu(ssp);
+ }
  
--void synchronize_srcu(struct srcu_struct *ssp);
--
++static inline void call_srcu_expedited(struct srcu_struct *ssp, struct rcu_head *rhp,
++				       rcu_callback_t func)
++{
++	call_srcu(ssp, rhp, func);
++}
++
+ static inline void srcu_expedite_current(struct srcu_struct *ssp) { }
+ #define srcu_check_read_flavor(ssp, read_flavor) do { } while (0)
+ 
+diff --git a/include/linux/srcutree.h b/include/linux/srcutree.h
+index 958cb7ef41cb..ed3cbbe7f5ce 100644
+--- a/include/linux/srcutree.h
++++ b/include/linux/srcutree.h
+@@ -234,6 +234,8 @@ struct srcu_struct {
+ 					__DEFINE_SRCU(name, SRCU_READ_FLAVOR_FAST_UPDOWN, static)
+ 
+ int __srcu_read_lock(struct srcu_struct *ssp) __acquires_shared(ssp);
++void call_srcu_expedited(struct srcu_struct *ssp, struct rcu_head *head,
++			 rcu_callback_t func);
+ void synchronize_srcu_expedited(struct srcu_struct *ssp);
+ void srcu_barrier(struct srcu_struct *ssp);
+ void srcu_expedite_current(struct srcu_struct *ssp);
+diff --git a/kernel/rcu/srcutree.c b/kernel/rcu/srcutree.c
+index aef8e91ad33e..77076d2a1c57 100644
+--- a/kernel/rcu/srcutree.c
++++ b/kernel/rcu/srcutree.c
+@@ -1495,6 +1495,13 @@ void call_srcu(struct srcu_struct *ssp, struct rcu_head *rhp,
+ }
+ EXPORT_SYMBOL_GPL(call_srcu);
+ 
++void call_srcu_expedited(struct srcu_struct *ssp, struct rcu_head *rhp,
++			 rcu_callback_t func)
++{
++	__call_srcu(ssp, rhp, func, rcu_gp_is_normal());
++}
++EXPORT_SYMBOL_GPL(call_srcu_expedited);
++
  /*
-  * Counts the new reader in the appropriate per-CPU element of the
-  * srcu_struct.  Can be invoked from irq/bh handlers, but the matching
+  * Helper function for synchronize_srcu() and synchronize_srcu_expedited().
+  */
 -- 
 2.53.0.473.g4a7958ca14-goog
 
